@@ -1,0 +1,89 @@
+export interface FeaturedProjectLink {
+  type: string;
+  label: string | null;
+  url: string;
+}
+
+export interface FeaturedProject {
+  id: string;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  technologies: string[];
+  domains: string[];
+  focusAreas: string[];
+  posterUrl: string | null;
+  videoUrl: string | null;
+  links: FeaturedProjectLink[];
+  screenshots: string[];
+}
+
+export function normalizeFeaturedProject(project: {
+  id: string;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  technologies: string[];
+  project_domains?: { name: string }[];
+  project_focus_areas?: { name: string }[];
+  project_media_assets?: { type: string; storage_path: string }[];
+  project_links?: { type: string; label: string | null; url: string }[];
+}): FeaturedProject {
+  const assets = project.project_media_assets ?? [];
+  return {
+    id: project.id,
+    title: project.title,
+    tagline: project.tagline,
+    description: project.description,
+    technologies: project.technologies ?? [],
+    domains: (project.project_domains ?? []).map((d) => d.name),
+    focusAreas: (project.project_focus_areas ?? []).map((f) => f.name),
+    posterUrl: assets.find((a) => a.type === 'poster')?.storage_path ?? null,
+    videoUrl: assets.find((a) => a.type === 'hero_video')?.storage_path ?? null,
+    links: (project.project_links ?? []).map((l) => ({
+      type: l.type,
+      label: l.label,
+      url: l.url,
+    })),
+    screenshots: assets.filter((a) => a.type === 'screenshot').map((a) => a.storage_path),
+  };
+}
+
+export function collectFilterOptions(projects: FeaturedProject[]) {
+  const domains = new Set<string>();
+  const focusAreas = new Set<string>();
+  for (const p of projects) {
+    p.domains.forEach((d) => domains.add(d));
+    p.focusAreas.forEach((f) => focusAreas.add(f));
+  }
+  return {
+    domains: [...domains].sort(),
+    focusAreas: [...focusAreas].sort(),
+  };
+}
+
+export function filterProjects(
+  projects: FeaturedProject[],
+  domain: string | null,
+  focusArea: string | null,
+): FeaturedProject[] {
+  return projects.filter((p) => {
+    if (domain && !p.domains.includes(domain)) return false;
+    if (focusArea && !p.focusAreas.includes(focusArea)) return false;
+    return true;
+  });
+}
+
+/** Linear interpolate */
+export function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * Math.max(0, Math.min(1, t));
+}
+
+/** Proximity to viewport vertical center (0 = far, 1 = centered) */
+export function centerProximity(rect: DOMRect, viewportHeight: number): number {
+  const cardCenter = rect.top + rect.height / 2;
+  const viewportCenter = viewportHeight / 2;
+  const distance = Math.abs(cardCenter - viewportCenter);
+  const falloff = viewportHeight * 0.55;
+  return Math.max(0, 1 - distance / falloff);
+}
