@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GlobalBackdrop } from '@/components/landing/global-backdrop';
 import { ProjectOpenProvider } from '@/components/featured-work/project-open-overlay';
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GlobalBackdrop />
           <ProjectOpenProvider>{children}</ProjectOpenProvider>
         </ThemeRoot>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>

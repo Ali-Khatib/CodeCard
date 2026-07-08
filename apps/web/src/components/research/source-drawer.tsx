@@ -26,6 +26,7 @@ export function SourceInfoIcon({
     <button
       type="button"
       onClick={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         openSource(sourceId);
       }}
@@ -39,18 +40,23 @@ export function SourceInfoIcon({
 
 export function SourceDrawer({ source, onClose }: SourceDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const scrollYRef = useRef(0);
 
   useEffect(() => {
     if (!source) return;
+
+    scrollYRef.current = window.scrollY;
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    document.body.style.overflow = 'hidden';
+
     window.addEventListener('keydown', onKey);
-    closeRef.current?.focus();
+    closeRef.current?.focus({ preventScroll: true });
+
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', onKey);
+      window.scrollTo({ top: scrollYRef.current, behavior: 'auto' });
     };
   }, [source, onClose]);
 

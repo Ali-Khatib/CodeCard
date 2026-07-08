@@ -14,8 +14,8 @@
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "db:migrate": "supabase db push",
-    "db:reset": "supabase db reset",
+    "db:migrate": "npx supabase db push",
+    "db:reset": "npx supabase db reset",
     "db:seed": "tsx supabase/seed.ts",
     "security:scan": "node scripts/check-secrets.js"
   },

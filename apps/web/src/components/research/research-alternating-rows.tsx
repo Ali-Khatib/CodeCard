@@ -4,74 +4,52 @@ import { ALTERNATING_RESEARCH } from '@/lib/research/alternating-insights';
 import { ScrollReveal } from '@/components/landing/scroll-reveal';
 import { SourceInfoIcon } from './source-drawer';
 
-function ResearchQuoteBox({
-  quote,
-  citation,
-  sourceId,
-}: {
-  quote: string;
-  citation: string;
-  sourceId: string;
-}) {
-  return (
-    <div className="cc-research-alt-quote">
-      <blockquote className="font-display text-[20px] font-normal leading-[1.45] tracking-[-0.02em] text-ink md:text-[24px] md:leading-[1.4]">
-        &ldquo;{quote}&rdquo;
-      </blockquote>
-      <footer className="mt-6 flex items-center justify-between gap-4 border-t border-border/60 pt-5">
-        <cite className="font-eyebrow text-[11px] not-italic uppercase tracking-[0.08em] text-smoke">
-          {citation}
-        </cite>
-        <SourceInfoIcon sourceId={sourceId} />
-      </footer>
-    </div>
-  );
-}
+const ACCENT_CLASS: Record<(typeof ALTERNATING_RESEARCH)[number]['accent'], string> = {
+  lavender: 'cc-research-card--lavender',
+  peach: 'cc-research-card--peach',
+  mint: 'cc-research-card--mint',
+};
 
-function HumanProblem({
-  headline,
-  body,
+function ResearchCard({
+  item,
+  index,
 }: {
-  headline: string;
-  body: string;
+  item: (typeof ALTERNATING_RESEARCH)[number];
+  index: number;
 }) {
   return (
-    <div className="cc-research-alt-human">
-      <h3 className="font-display text-[28px] font-normal leading-[1.2] tracking-[-0.03em] text-ink md:text-[36px] md:leading-[1.15]">
-        {headline}
-      </h3>
-      <p className="mt-5 text-[17px] leading-[1.6] text-ink md:text-[19px] md:leading-[1.55]">
-        {body}
-      </p>
-    </div>
+    <ScrollReveal y={40} delay={index * 0.08} scale={0.98}>
+      <article className={`cc-research-card ${ACCENT_CLASS[item.accent]}`}>
+        <div className="cc-research-card__widget" aria-hidden>
+          <div className="cc-research-card__widget-inner">
+            <span className="cc-research-card__widget-label">Study finding</span>
+            <blockquote className="cc-research-card__widget-quote">
+              &ldquo;{item.paperQuote}&rdquo;
+            </blockquote>
+            <footer className="cc-research-card__widget-cite">{item.citation}</footer>
+          </div>
+        </div>
+
+        <div className="cc-research-card__content">
+          <div className="flex items-center justify-between gap-3">
+            <span className="cc-research-card__pill">{item.category}</span>
+            <SourceInfoIcon sourceId={item.sourceId} className="h-7 w-7 text-[15px]" />
+          </div>
+
+          <h3 className="cc-research-card__title">{item.humanHeadline}</h3>
+          <p className="cc-research-card__body">{item.humanBody}</p>
+        </div>
+      </article>
+    </ScrollReveal>
   );
 }
 
 export function ResearchAlternatingRows() {
   return (
-    <div className="cc-research-alt-stack">
-      {ALTERNATING_RESEARCH.map((item, index) => {
-        const boxOnRight = index % 2 === 0;
-
-        return (
-          <ScrollReveal key={item.id} y={48} delay={index * 0.06}>
-            <article
-              className={`cc-research-alt-row ${boxOnRight ? 'cc-research-alt-row--box-right' : 'cc-research-alt-row--box-left'}`}
-            >
-              <div className="cc-research-alt-row__human">
-                <HumanProblem headline={item.humanHeadline} body={item.humanBody} />
-              </div>
-              <div className="cc-research-alt-row__quote">
-                <ResearchQuoteBox
-                  quote={item.paperQuote}
-                  citation={item.citation}
-                  sourceId={item.sourceId}
-                />
-              </div>
-            </article>
-          </ScrollReveal>
-        );
-      })}
+    <div className="cc-research-masonry">
+      {ALTERNATING_RESEARCH.map((item, index) => (
+        <ResearchCard key={item.id} item={item} index={index} />
+      ))}
     </div>
   );
 }

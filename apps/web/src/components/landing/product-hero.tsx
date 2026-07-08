@@ -7,6 +7,7 @@ import { useHeroParallax } from '@/hooks/use-hero-parallax';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
+import { HeroDashboardPeek } from './hero-dashboard-peek';
 
 export function ProductHero() {
   const heroRef = useHeroParallax<HTMLElement>();
@@ -21,6 +22,7 @@ export function ProductHero() {
     const statement = section.querySelector('[data-hero-statement]');
     const pitch = section.querySelector('[data-hero-pitch]');
     const cta = section.querySelector('[data-hero-cta]');
+    const peek = section.querySelector('[data-hero-peek]');
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -33,6 +35,9 @@ export function ProductHero() {
       if (cta) {
         tl.fromTo(cta, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65 }, 0.28);
       }
+      if (peek) {
+        tl.fromTo(peek, { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 0.9 }, 0.42);
+      }
     }, section);
 
     return () => ctx.revert();
@@ -41,15 +46,15 @@ export function ProductHero() {
   return (
     <section
       ref={heroRef}
-      className="cc-hume-hero relative flex min-h-[min(88svh,820px)] scroll-mt-28 flex-col items-center justify-center overflow-hidden px-6 pb-16 pt-[104px] text-center text-ink md:pb-20 md:pt-[112px]"
+      className="cc-hume-hero relative flex min-h-[min(92svh,900px)] scroll-mt-28 flex-col items-center justify-start overflow-visible px-6 pb-[clamp(140px,18vw,220px)] pt-[104px] text-center text-ink md:pt-[112px]"
       data-testid="hero-section"
     >
       <div className="cc-hume-hero__blobs pointer-events-none" aria-hidden />
 
-      <div className="relative z-[1] flex w-full max-w-[920px] flex-col items-center">
+      <div className="relative z-[1] flex w-full max-w-[980px] flex-col items-center">
         <h1
           data-hero-statement
-          className="cc-hume-hero__headline max-w-[900px] text-balance"
+          className="cc-hume-hero__headline max-w-[920px] text-balance"
         >
           Your best work. Ready to{' '}
           <span className="cc-hume-gradient-text">share in seconds.</span>
@@ -57,7 +62,7 @@ export function ProductHero() {
 
         <p
           data-hero-pitch
-          className="mt-5 max-w-[560px] text-balance text-[18px] leading-[1.45] text-smoke md:text-[20px] md:leading-[1.5]"
+          className="cc-hume-hero__tagline mt-6 max-w-[620px] text-balance"
         >
           {CODECARD_TAGLINE}
         </p>
@@ -71,6 +76,8 @@ export function ProductHero() {
           </LiveDemoLink>
         </div>
       </div>
+
+      <HeroDashboardPeek />
     </section>
   );
 }

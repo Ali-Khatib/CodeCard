@@ -134,14 +134,75 @@ export function HowItWorksSection() {
         <section className="cc-container">
           <div
             ref={runwayRef}
-            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[minmax(280px,360px)_1fr] md:gap-16 lg:gap-20"
+            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[1fr_minmax(340px,460px)] md:gap-16 lg:gap-20"
             style={{ minHeight: `${STEPS.length * STEP_SCROLL_VH}vh` }}
           >
+            <div className="relative hidden md:block">
+              <div className="cc-how-it-works-rail absolute bottom-0 left-0 top-0 w-px" aria-hidden />
+              <div
+                className="cc-how-it-works-rail__progress absolute left-0 top-0 w-px"
+                style={{ height: `${progressPct}%` }}
+                aria-hidden
+              />
+
+              <div className="sticky top-28 pl-10 lg:pl-12">
+                <nav className="cc-how-it-works-rail-nav flex flex-col" aria-label="How it works steps">
+                  {STEPS.map((s, i) => {
+                    const isActive = i === activeStep;
+                    return (
+                      <div
+                        key={s.title}
+                        className={`cc-how-it-works-rail-step-wrap ${isActive ? 'cc-how-it-works-rail-step-wrap--active' : ''}`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => scrollToStep(i)}
+                          className="cc-how-it-works-rail-step text-left"
+                        >
+                          <span className="font-eyebrow text-[11px] uppercase tracking-[0.08em]">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <span className="block font-display leading-snug">{s.title}</span>
+                        </button>
+
+                        <AnimatePresence initial={false}>
+                          {isActive && (
+                            <motion.div
+                              key={`detail-${i}`}
+                              className="cc-how-it-works-rail-detail"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                              <p>{s.detail}</p>
+                              {i === 3 && (
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                  {['GitHub ↗', 'LinkedIn ↗', 'Live demo ↗'].map((link) => (
+                                    <span
+                                      key={link}
+                                      className="rounded-full border border-reactor/25 bg-reactor/10 px-3 py-1.5 text-[12px] text-lichen"
+                                    >
+                                      {link}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </nav>
+              </div>
+            </div>
+
             <div className="md:sticky md:top-28 md:self-start">
               <motion.div
                 animate={{ rotateZ: activeStep % 2 === 0 ? -1 : 1 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="cc-how-it-works-phone-wrap"
+                className="cc-how-it-works-phone-wrap cc-how-it-works-phone-wrap--right"
               >
                 <PhoneMock step={activeStep} />
               </motion.div>
@@ -153,42 +214,9 @@ export function HowItWorksSection() {
                 className="mt-8 md:hidden"
               />
 
-              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">
+              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite md:text-left">
                 Step {activeStep + 1} of {STEPS.length}
               </p>
-            </div>
-
-            <div className="relative hidden md:block">
-              <div className="cc-how-it-works-rail absolute bottom-0 left-0 top-0 w-px" aria-hidden />
-              <div
-                className="cc-how-it-works-rail__progress absolute left-0 top-0 w-px"
-                style={{ height: `${progressPct}%` }}
-                aria-hidden
-              />
-
-              <div className="sticky top-28 pl-10 lg:pl-12">
-                <nav className="cc-how-it-works-rail-nav mb-8 flex flex-col" aria-label="How it works steps">
-                  {STEPS.map((s, i) => (
-                    <button
-                      key={s.title}
-                      type="button"
-                      onClick={() => scrollToStep(i)}
-                      className={`cc-how-it-works-rail-step text-left transition-all duration-300 ${
-                        i === activeStep ? 'cc-how-it-works-rail-step--active' : ''
-                      }`}
-                    >
-                      <span className="font-eyebrow text-[11px] uppercase tracking-[0.08em]">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span className="block font-display text-[14px] leading-snug lg:text-[15px]">
-                        {s.title}
-                      </span>
-                    </button>
-                  ))}
-                </nav>
-
-                <StepPanel step={step} stepIndex={activeStep} total={STEPS.length} />
-              </div>
             </div>
           </div>
         </section>
@@ -313,7 +341,7 @@ function PhoneMock({ step }: { step: number }) {
   const showSavedToast = step === 5;
 
   return (
-    <div className="cc-how-it-works-preview relative mx-auto w-full max-w-[320px]">
+    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[440px]">
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
         <div className="cc-how-it-works-preview__browser" aria-hidden>
@@ -389,7 +417,7 @@ function PhoneMock({ step }: { step: number }) {
                   <div key={p.id} className={isLead && expanded ? 'space-y-2' : ''}>
                     <div
                       className={`cc-how-it-works-preview__media relative overflow-hidden rounded-[10px] border border-[rgba(34,34,34,0.1)] transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                        isLead && expanded ? 'h-[128px]' : 'h-[56px]'
+                        isLead && expanded ? 'h-[180px]' : 'h-[72px]'
                       }`}
                     >
                       {showVideo && p.videoUrl ? (
