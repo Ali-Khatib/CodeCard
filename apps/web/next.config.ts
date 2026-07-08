@@ -1,5 +1,18 @@
 import type { NextConfig } from 'next';
 
+const previewEmbedCsp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://api.qrserver.com",
+  "media-src 'self' blob: https://cdn.coverr.co",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://api.qrserver.com",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
@@ -49,7 +62,15 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }];
+    const previewEmbedHeaders = [
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Content-Security-Policy', value: previewEmbedCsp },
+    ];
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      { source: '/dashboard/preview', headers: previewEmbedHeaders },
+      { source: '/dashboard/preview/:path*', headers: previewEmbedHeaders },
+    ];
   },
 };
 

@@ -1,12 +1,33 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
+import {
+  Code2,
+  Cpu,
+  Database,
+  GitBranch,
+  Globe,
+  Layers,
+  Terminal,
+  Zap,
+} from 'lucide-react';
 import { useHeroParallax } from '@/hooks/use-hero-parallax';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
+
+const FLOAT_ICONS = [
+  { Icon: Code2, x: '8%', y: '18%', size: 28, delay: 0, duration: 9 },
+  { Icon: GitBranch, x: '88%', y: '14%', size: 32, delay: 0.6, duration: 10 },
+  { Icon: Terminal, x: '14%', y: '72%', size: 26, delay: 1.2, duration: 8.5 },
+  { Icon: Database, x: '82%', y: '68%', size: 30, delay: 0.3, duration: 11 },
+  { Icon: Cpu, x: '72%', y: '28%', size: 24, delay: 1.8, duration: 9.5 },
+  { Icon: Layers, x: '22%', y: '42%', size: 22, delay: 0.9, duration: 10.5 },
+  { Icon: Globe, x: '58%', y: '78%', size: 26, delay: 1.5, duration: 8 },
+  { Icon: Zap, x: '46%', y: '12%', size: 20, delay: 2.1, duration: 7.5 },
+] as const;
 
 export function ProductHero() {
   const heroRef = useHeroParallax<HTMLElement>();
@@ -45,6 +66,28 @@ export function ProductHero() {
       data-testid="hero-section"
     >
       <div className="cc-hume-hero__blobs pointer-events-none" aria-hidden />
+
+      {!reducedMotion && (
+        <div className="cc-hume-hero__float-icons pointer-events-none" aria-hidden>
+          {FLOAT_ICONS.map(({ Icon, x, y, size, delay, duration }, i) => (
+            <span
+              key={i}
+              className="cc-hume-hero__float-icon"
+              style={
+                {
+                  left: x,
+                  top: y,
+                  '--float-size': `${size}px`,
+                  '--float-delay': `${delay}s`,
+                  '--float-duration': `${duration}s`,
+                } as CSSProperties
+              }
+            >
+              <Icon size={size} strokeWidth={1.5} />
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="relative z-[1] flex w-full max-w-[980px] flex-col items-center">
         <h1

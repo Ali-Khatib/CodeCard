@@ -1,29 +1,33 @@
-'use client';
-
-import { ScrollSequence } from './scroll-sequence';
-
-const STATS = [
-  { value: '<5 min', label: 'to publish your CodeCard' },
-  { value: '1 link', label: 'share by QR or screen' },
-  { value: '3×', label: 'more opens with hero video' },
+const POINTS = [
+  {
+    headline: 'Live in minutes',
+    detail: 'Add your projects, hit publish. No coding.',
+  },
+  {
+    headline: 'One link',
+    detail: 'Share by text, email, QR, or show your screen.',
+  },
+  {
+    headline: 'Video helps',
+    detail: 'A quick demo gets about 3× more people to look.',
+  },
 ] as const;
 
 export function HumeStatStrip() {
   return (
-    <section className="cc-hume-stat-sequence border-y border-[var(--border)] bg-paper" aria-label="Key metrics">
-      <div className="cc-container">
-        <ScrollSequence
-          items={STATS}
-          stepVh={48}
-          className="cc-hume-stat-sequence__runway"
-          stageClassName="cc-hume-stat-sequence__stage"
-          renderItem={(stat, _i, isActive) => (
-            <div className="cc-hume-stat-sequence__card" data-active={isActive}>
-              <p className="cc-hume-stat-sequence__value">{stat.value}</p>
-              <p className="cc-hume-stat-sequence__label">{stat.label}</p>
-            </div>
-          )}
-        />
+    <section className="cc-container py-10 md:py-12" aria-label="How CodeCard works in three steps">
+      <div className="cc-hume-stat-card">
+        <ul className="cc-hume-stat-card__grid">
+          {POINTS.map((point, i) => (
+            <li key={point.headline} className="cc-hume-stat-card__item">
+              <span className="cc-hume-stat-card__num" aria-hidden>
+                {i + 1}
+              </span>
+              <p className="cc-hume-stat-card__headline">{point.headline}</p>
+              <p className="cc-hume-stat-card__detail">{point.detail}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

@@ -49,7 +49,6 @@ export function HowItWorksSection() {
   const runwayRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef(activeStep);
   const step = STEPS[activeStep];
-  const progressPct = (activeStep / Math.max(STEPS.length - 1, 1)) * 100;
 
   const goToStep = useCallback((index: number) => {
     const next = Math.min(STEPS.length - 1, Math.max(0, index));
@@ -134,46 +133,42 @@ export function HowItWorksSection() {
         <section className="cc-container">
           <div
             ref={runwayRef}
-            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[1fr_minmax(340px,460px)] md:gap-16 lg:gap-20"
+            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[minmax(280px,380px)_1fr] md:gap-14 lg:gap-20"
             style={{ minHeight: `${STEPS.length * STEP_SCROLL_VH}vh` }}
           >
             <div className="relative hidden md:block">
-              <div className="cc-how-it-works-rail absolute bottom-0 left-0 top-0 w-px" aria-hidden />
-              <div
-                className="cc-how-it-works-rail__progress absolute left-0 top-0 w-px"
-                style={{ height: `${progressPct}%` }}
-                aria-hidden
-              />
-
-              <div className="sticky top-28 pl-10 lg:pl-12">
+              <div className="sticky top-28">
                 <nav className="cc-how-it-works-rail-nav flex flex-col" aria-label="How it works steps">
                   {STEPS.map((s, i) => {
                     const isActive = i === activeStep;
                     return (
-                      <div
+                      <motion.div
                         key={s.title}
-                        className={`cc-how-it-works-rail-step-wrap ${isActive ? 'cc-how-it-works-rail-step-wrap--active' : ''}`}
+                        layout
+                        className={`cc-how-it-works-pill-wrap ${isActive ? 'cc-how-it-works-pill-wrap--active' : ''}`}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <button
                           type="button"
                           onClick={() => scrollToStep(i)}
-                          className="cc-how-it-works-rail-step text-left"
+                          className="cc-how-it-works-pill text-left"
+                          aria-current={isActive ? 'step' : undefined}
                         >
-                          <span className="font-eyebrow text-[11px] uppercase tracking-[0.08em]">
+                          <span className="cc-how-it-works-pill__num font-eyebrow">
                             {String(i + 1).padStart(2, '0')}
                           </span>
-                          <span className="block font-display leading-snug">{s.title}</span>
+                          <span className="cc-how-it-works-pill__title font-display">{s.title}</span>
                         </button>
 
-                        <AnimatePresence initial={false} mode="wait">
+                        <AnimatePresence initial={false}>
                           {isActive && (
                             <motion.div
                               key={`detail-${i}`}
-                              className="cc-how-it-works-rail-detail"
-                              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-                              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-                              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                              className="cc-how-it-works-pill__detail"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                             >
                               <p>{s.detail}</p>
                               {i === 3 && (
@@ -191,16 +186,16 @@ export function HowItWorksSection() {
                             </motion.div>
                           )}
                         </AnimatePresence>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </nav>
               </div>
             </div>
 
-            <div className="md:sticky md:top-28 md:self-start">
+            <div className="md:sticky md:top-24 md:self-start">
               <motion.div
-                animate={{ rotateZ: activeStep % 2 === 0 ? -1 : 1 }}
+                animate={{ rotateZ: activeStep % 2 === 0 ? -0.8 : 0.8 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="cc-how-it-works-phone-wrap cc-how-it-works-phone-wrap--right"
               >
@@ -341,7 +336,7 @@ function PhoneMock({ step }: { step: number }) {
   const showSavedToast = step === 5;
 
   return (
-    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[440px]">
+    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[580px]">
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
         <div className="cc-how-it-works-preview__browser" aria-hidden>
@@ -417,7 +412,7 @@ function PhoneMock({ step }: { step: number }) {
                   <div key={p.id} className={isLead && expanded ? 'space-y-2' : ''}>
                     <div
                       className={`cc-how-it-works-preview__media relative overflow-hidden rounded-[10px] border border-[rgba(34,34,34,0.1)] transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                        isLead && expanded ? 'h-[180px]' : 'h-[72px]'
+                        isLead && expanded ? 'h-[220px]' : 'h-[88px]'
                       }`}
                     >
                       {showVideo && p.videoUrl ? (
