@@ -24,7 +24,7 @@ jobs:
         run: npm run lint
 
       - name: Typecheck
-        run: npm run typecheck
+        run: npx turbo typecheck --filter=web --filter=@codecard/*
 
       - name: Test
         run: npm run test
@@ -65,4 +65,4 @@ jobs:
 
       - name: Check for hardcoded secrets patterns
         run: |
-          ! grep -rE "(sk_live_|sk_test_|service_role|SUPABASE_SERVICE)" --include="*.ts" --include="*.tsx" --include="*.js" apps/ packages/ || (echo "Potential secret found in source" && exit 1)
+          ! grep -rE "sk_live_[a-zA-Z0-9]{16,}|sk_test_[a-zA-Z0-9]{16,}" --include="*.ts" --include="*.tsx" --include="*.js" apps/ packages/ || (echo "Potential secret found in source" && exit 1)

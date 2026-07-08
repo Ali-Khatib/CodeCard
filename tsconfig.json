@@ -12,5 +12,5 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "exclude": ["node_modules", "apps", "packages"]
+  "exclude": ["node_modules"]
 }
