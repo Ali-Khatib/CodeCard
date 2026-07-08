@@ -28,10 +28,10 @@ function ResearchDeckCard({
   onDragEnd: (offsetY: number) => void;
 }) {
   const absDist = Math.abs(distance);
-  const y = distance * 76;
-  const scale = isActive ? 1 : Math.max(0.78, 0.9 - absDist * 0.05);
+  const y = distance * 92;
+  const scale = isActive ? 1 : Math.max(0.76, 0.88 - absDist * 0.06);
   const rotateX = distance * -8;
-  const opacity = isActive ? 1 : Math.max(0.12, 0.38 - absDist * 0.1);
+  const opacity = isActive ? 1 : absDist === 1 ? 0.16 : 0.04;
   const zIndex = 30 - absDist;
 
   return (

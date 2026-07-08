@@ -924,7 +924,7 @@ body {
     position: relative;
     grid-column: 1 / -1;
     grid-row: 1;
-    width: min(720px, 100%);
+    width: min(700px, calc(100% - 160px));
     height: min(560px, 66vh);
     perspective: 1200px;
     transform-style: preserve-3d;
@@ -945,7 +945,7 @@ body {
   .cc-research-paper-deck__card:not(.cc-research-paper-deck__card--active) {
     pointer-events: none;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.5)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0.24)),
       var(--paper);
   }
 
@@ -964,11 +964,12 @@ body {
       linear-gradient(90deg, rgba(35, 35, 36, 0.08), transparent 56%) 0 44px / 58% 9px no-repeat,
       linear-gradient(90deg, rgba(192, 148, 228, 0.12), transparent 70%) 0 76px / 76% 11px no-repeat,
       linear-gradient(90deg, rgba(35, 35, 36, 0.06), transparent 64%) 0 108px / 68% 8px no-repeat;
-    opacity: 0.45;
+    opacity: 0.12;
   }
 
   .cc-research-paper-deck__card--active {
     cursor: grab;
+    background: var(--paper);
     box-shadow:
       0 34px 90px rgba(35, 35, 36, 0.16),
       0 16px 36px rgba(192, 148, 228, 0.12),
@@ -981,7 +982,7 @@ body {
 
   .cc-research-paper-deck__counter {
     position: absolute;
-    left: max(20px, calc(50% - 360px));
+    left: max(20px, calc(50% - 470px));
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -1009,7 +1010,7 @@ body {
 
   .cc-research-paper-deck__dots {
     position: absolute;
-    right: max(20px, calc(50% - 360px));
+    right: max(20px, calc(50% - 470px));
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -2002,31 +2003,6 @@ body {
   }
 
   /* ── Workspace showcase (live demo iframe embed) ── */
-  .cc-workspace-showcase-tabs__btn {
-    border-radius: 999px;
-    border: 1px solid rgba(34, 34, 34, 0.1);
-    background: var(--paper);
-    padding: 0.45rem 0.95rem;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--smoke);
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease,
-      color 0.15s ease;
-  }
-
-  .cc-workspace-showcase-tabs__btn:hover {
-    border-color: rgba(34, 34, 34, 0.16);
-    color: var(--ink);
-  }
-
-  .cc-workspace-showcase-tabs__btn--active {
-    border-color: rgba(192, 148, 228, 0.45);
-    background: rgba(192, 148, 228, 0.14);
-    color: var(--ink);
-  }
-
   .cc-workspace-showcase-embed {
     position: relative;
     isolation: isolate;
