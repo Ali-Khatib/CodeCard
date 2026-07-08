@@ -930,11 +930,36 @@ body {
     transform-style: preserve-3d;
   }
 
+  .cc-research-paper-deck__stack::before,
+  .cc-research-paper-deck__stack::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(35, 35, 36, 0.04);
+    box-shadow: 0 20px 60px rgba(35, 35, 36, 0.06);
+    pointer-events: none;
+  }
+
+  .cc-research-paper-deck__stack::before {
+    z-index: 0;
+    transform: translateY(-26px) scale(0.96);
+    opacity: 0.22;
+  }
+
+  .cc-research-paper-deck__stack::after {
+    z-index: 1;
+    transform: translateY(26px) scale(0.96);
+    opacity: 0.18;
+  }
+
   .cc-research-paper-deck__card {
     position: absolute;
     inset: 0;
-    cursor: grab;
-    touch-action: pan-y;
+    z-index: 2;
+    cursor: default;
+    touch-action: auto;
     will-change: transform, opacity;
     overflow: hidden;
     box-shadow:
@@ -968,7 +993,7 @@ body {
   }
 
   .cc-research-paper-deck__card--active {
-    cursor: grab;
+    cursor: default;
     background: var(--paper);
     box-shadow:
       0 34px 90px rgba(35, 35, 36, 0.16),
@@ -977,7 +1002,7 @@ body {
   }
 
   .cc-research-paper-deck__card--active:active {
-    cursor: grabbing;
+    cursor: default;
   }
 
   .cc-research-paper-deck__counter {
@@ -3395,6 +3420,7 @@ body {
     border-radius: 20px;
     border: 1px solid transparent;
     background: transparent;
+    overflow: hidden;
     transition:
       border-color 0.4s ease,
       background 0.4s ease,
@@ -3459,7 +3485,22 @@ body {
 
   .cc-how-it-works-pill__detail {
     overflow: hidden;
-    padding: 0 18px 16px 68px;
+    max-height: 0;
+    opacity: 0;
+    padding: 0 18px 0 68px;
+    transform: translateY(-4px);
+    transition:
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.24s ease,
+      padding 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cc-how-it-works-pill-wrap--active .cc-how-it-works-pill__detail {
+    max-height: 180px;
+    opacity: 1;
+    padding-bottom: 16px;
+    transform: translateY(0);
   }
 
   .cc-how-it-works-pill__detail p {

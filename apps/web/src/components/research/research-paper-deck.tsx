@@ -12,50 +12,17 @@ const ACCENT_CLASS: Record<(typeof ALTERNATING_RESEARCH)[number]['accent'], stri
   mint: 'cc-research-card--mint',
 };
 
-const WHEEL_COOLDOWN_MS = 520;
-const DRAG_THRESHOLD = 56;
 const ITEMS = ALTERNATING_RESEARCH;
+const SCROLL_RUNWAY_VH = 72;
 
-function ResearchDeckCard({
-  item,
-  distance,
-  isActive,
-  onDragEnd,
-}: {
-  item: (typeof ALTERNATING_RESEARCH)[number];
-  distance: number;
-  isActive: boolean;
-  onDragEnd: (offsetY: number) => void;
-}) {
-  const absDist = Math.abs(distance);
-  const y = distance * 92;
-  const scale = isActive ? 1 : Math.max(0.76, 0.88 - absDist * 0.06);
-  const rotateX = distance * -8;
-  const opacity = isActive ? 1 : absDist === 1 ? 0.16 : 0.04;
-  const zIndex = 30 - absDist;
-
+function ResearchDeckCard({ item }: { item: (typeof ALTERNATING_RESEARCH)[number] }) {
   return (
     <motion.article
-      className={`cc-research-paper-deck__card cc-research-card ${ACCENT_CLASS[item.accent]} ${
-        isActive ? 'cc-research-paper-deck__card--active' : ''
-      }`}
-      data-distance={absDist}
-      style={{
-        zIndex,
-        transformOrigin: 'center top',
-      }}
-      animate={{
-        y,
-        scale,
-        rotateX,
-        opacity,
-      }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      drag={isActive ? 'y' : false}
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={0.12}
-      onDragEnd={(_, info) => onDragEnd(info.offset.y)}
-      aria-hidden={!isActive}
+      key={item.id}
+      className={`cc-research-paper-deck__card cc-research-card cc-research-paper-deck__card--active ${ACCENT_CLASS[item.accent]}`}
+      initial={false}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="cc-research-card__widget" aria-hidden>
         <div className="cc-research-card__widget-inner">
@@ -84,10 +51,7 @@ export function ResearchPaperDeck() {
   const motionReduced = useMotionReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const activeRef = useRef(0);
-  const wheelLockRef = useRef(false);
-  const engagedRef = useRef(false);
   const [active, setActive] = useState(0);
-  const [engaged, setEngaged] = useState(false);
 
   const goTo = useCallback((index: number) => {
     const next = Math.min(ITEMS.length - 1, Math.max(0, index));
@@ -96,83 +60,68 @@ export function ResearchPaperDeck() {
     setActive(next);
   }, []);
 
-  const advance = useCallback(
-    (delta: number) => {
-      goTo(activeRef.current + delta);
-    },
-    [goTo],
-  );
-
-  const handleDragEnd = useCallback(
-    (offsetY: number) => {
-      if (offsetY < -DRAG_THRESHOLD) advance(1);
-      else if (offsetY > DRAG_THRESHOLD) advance(-1);
-    },
-    [advance],
-  );
-
-  useEffect(() => {
-    if (reducedMotion) return;
-
+  const scrollToCard = useCallback((index: number) => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isEngaged = entry.isIntersecting && entry.intersectionRatio >= 0.55;
-        engagedRef.current = isEngaged;
-        setEngaged(isEngaged);
-      },
-      { threshold: [0.35, 0.55, 0.75] },
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
+    const next = Math.min(ITEMS.length - 1, Math.max(0, index));
+    const maxScroll = Math.max(section.offsetHeight - window.innerHeight, 1);
+    const top = section.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: top + maxScroll * (next / Math.max(ITEMS.length - 1, 1)),
+      behavior: 'smooth',
+    });
+  }, []);
 
   useEffect(() => {
     if (reducedMotion) return;
 
-    const onWheel = (e: WheelEvent) => {
-      if (!engagedRef.current) return;
+    let raf = 0;
+    const measure = () => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-      const atStart = activeRef.current === 0;
-      const atEnd = activeRef.current === ITEMS.length - 1;
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
-
-      if ((atStart && scrollingUp) || (atEnd && scrollingDown)) return;
-
-      e.preventDefault();
-
-      if (wheelLockRef.current) return;
-      wheelLockRef.current = true;
-      advance(scrollingDown ? 1 : -1);
-      window.setTimeout(() => {
-        wheelLockRef.current = false;
-      }, WHEEL_COOLDOWN_MS);
+      const rect = section.getBoundingClientRect();
+      const maxScroll = Math.max(section.offsetHeight - window.innerHeight, 1);
+      const scrolled = Math.min(Math.max(-rect.top, 0), maxScroll);
+      const progress = scrolled / maxScroll;
+      goTo(Math.round(progress * (ITEMS.length - 1)));
     };
 
     const onKey = (e: KeyboardEvent) => {
-      if (!engagedRef.current) return;
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
+      if (!inView) return;
 
       if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') {
         e.preventDefault();
-        advance(1);
+        scrollToCard(activeRef.current + 1);
       } else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') {
         e.preventDefault();
-        advance(-1);
+        scrollToCard(activeRef.current - 1);
       }
     };
 
-    window.addEventListener('wheel', onWheel, { passive: false });
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
     window.addEventListener('keydown', onKey);
+    measure();
 
     return () => {
-      window.removeEventListener('wheel', onWheel);
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
       window.removeEventListener('keydown', onKey);
     };
-  }, [advance, reducedMotion]);
+  }, [goTo, reducedMotion, scrollToCard]);
 
   if (reducedMotion || motionReduced) {
     return (
@@ -210,7 +159,8 @@ export function ResearchPaperDeck() {
   return (
     <section
       ref={sectionRef}
-      className={`cc-research-paper-deck ${engaged ? 'cc-research-paper-deck--engaged' : ''}`}
+      className="cc-research-paper-deck"
+      style={{ minHeight: `${100 + (ITEMS.length - 1) * SCROLL_RUNWAY_VH}vh` }}
       aria-label="Research findings deck"
     >
       <div className="cc-research-paper-deck__stage">
@@ -230,7 +180,7 @@ export function ResearchPaperDeck() {
               key={item.id}
               type="button"
               className={`cc-research-paper-deck__dot ${i === active ? 'cc-research-paper-deck__dot--active' : ''}`}
-              onClick={() => goTo(i)}
+              onClick={() => scrollToCard(i)}
               aria-label={`Go to ${item.category} finding`}
               aria-current={i === active ? 'true' : undefined}
             />
@@ -238,19 +188,11 @@ export function ResearchPaperDeck() {
         </nav>
 
         <div className="cc-research-paper-deck__stack">
-          {ITEMS.map((item, i) => (
-            <ResearchDeckCard
-              key={item.id}
-              item={item}
-              distance={i - active}
-              isActive={i === active}
-              onDragEnd={handleDragEnd}
-            />
-          ))}
+          <ResearchDeckCard item={ITEMS[active]} />
         </div>
 
         <p className="cc-research-paper-deck__hint font-eyebrow" aria-hidden>
-          Scroll · drag · ↑↓
+          Scroll to change findings
         </p>
       </div>
     </section>

@@ -144,9 +144,7 @@ export function HowItWorksSection() {
                     return (
                       <motion.div
                         key={s.title}
-                        layout
                         className={`cc-how-it-works-pill-wrap ${isActive ? 'cc-how-it-works-pill-wrap--active' : ''}`}
-                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <button
                           type="button"
@@ -160,32 +158,21 @@ export function HowItWorksSection() {
                           <span className="cc-how-it-works-pill__title font-display">{s.title}</span>
                         </button>
 
-                        <AnimatePresence initial={false}>
-                          {isActive && (
-                            <motion.div
-                              key={`detail-${i}`}
-                              className="cc-how-it-works-pill__detail"
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                            >
-                              <p>{s.detail}</p>
-                              {i === 3 && (
-                                <div className="mt-4 flex flex-wrap gap-2">
-                                  {['GitHub ↗', 'LinkedIn ↗', 'Live demo ↗'].map((link) => (
-                                    <span
-                                      key={link}
-                                      className="rounded-full border border-reactor/25 bg-reactor/10 px-3 py-1.5 text-[12px] text-lichen"
-                                    >
-                                      {link}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </motion.div>
+                        <div className="cc-how-it-works-pill__detail" aria-hidden={!isActive}>
+                          <p>{s.detail}</p>
+                          {i === 3 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {['GitHub ↗', 'LinkedIn ↗', 'Live demo ↗'].map((link) => (
+                                <span
+                                  key={link}
+                                  className="rounded-full border border-reactor/25 bg-reactor/10 px-3 py-1.5 text-[12px] text-lichen"
+                                >
+                                  {link}
+                                </span>
+                              ))}
+                            </div>
                           )}
-                        </AnimatePresence>
+                        </div>
                       </motion.div>
                     );
                   })}
