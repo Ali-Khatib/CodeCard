@@ -36,6 +36,9 @@ Thumbs.db
 
 # Testing
 coverage/
+apps/web/.screenshots/
+apps/web/test-results/
+apps/web/playwright-report/
 
 # Supabase
 supabase/.branches
