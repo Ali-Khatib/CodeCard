@@ -35,7 +35,7 @@ function ResearchCard({
 }) {
   return (
     <BorderGlow {...CARD_BORDER_GLOW} className="cc-research-scroll-card h-full w-full">
-      <p className="font-display text-[22px] font-medium leading-snug text-vellum md:text-[26px]">{title}</p>
+      <p className="font-display text-[22px] font-normal leading-snug tracking-[-0.02em] text-ink md:text-[26px]">{title}</p>
       <div className="mt-6 flex flex-wrap items-end gap-2.5">
         <span className="font-display text-[40px] font-medium leading-none text-reactor md:text-[48px]">{stat}</span>
         <SourceInfoIcon sourceId={sourceId} />

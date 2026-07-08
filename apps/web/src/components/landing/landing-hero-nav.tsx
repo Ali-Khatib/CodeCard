@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LAYOUT } from '@/lib/design/tokens';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
 export type NavItem = {
   label: string;
@@ -35,8 +36,8 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           pathname.startsWith('/research/')
         );
       }
-      if (label === 'Profiles') {
-        return pathname === '/profiles' || pathname === '/demo' || pathname.startsWith('/demo/');
+      if (href === '/profiles') {
+        return pathname === '/profiles';
       }
       return pathname === href || pathname.startsWith(`${href}/`);
     },
@@ -87,7 +88,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       <div className="cc-nav-veil__inner">
         <Link
           href="/"
-          className="font-display text-[17px] font-medium text-vellum cc-instant-press"
+          className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press"
           aria-label="CodeCard home"
           onMouseEnter={() => router.prefetch('/')}
           onFocus={() => router.prefetch('/')}
@@ -97,7 +98,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
 
         <div ref={menuTrackRef} className="relative hidden flex-1 md:flex">
           <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
-          <ul className="flex items-center gap-1">
+          <ul className="cc-hume-fade-group flex items-center gap-1">
             {items.map((item, i) => {
               const active = isActive(item.href, item.label);
               return (
@@ -115,7 +116,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                     }}
                     onFocus={() => prefetchHref(item.href, router)}
                     onMouseLeave={() => setHovered(null)}
-                    className={`cc-nav-ghost-link cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
+                    className={`cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
                   >
                     {item.label}
                   </Link>
@@ -126,6 +127,9 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         </div>
 
         <div className="ml-auto hidden items-center gap-3 md:flex">
+          <LiveDemoLink className="cc-btn-pill-demo cc-instant-press">
+            Live demo
+          </LiveDemoLink>
           <Link
             href="/sign-in"
             className="cc-nav-ghost-link cc-instant-press"
@@ -146,9 +150,9 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
 
         <button
           type="button"
-          className="ml-auto flex h-9 w-9 items-center justify-center rounded-full border border-charcoal text-vellum md:hidden"
+          className="ml-auto flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
           aria-expanded={mobileOpen}
-          aria-label="Toggle menu"
+          aria-label="Open menu"
           onClick={() => setMobileOpen((o) => !o)}
         >
           <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
@@ -177,7 +181,15 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                 </li>
               );
             })}
-            <li className="mt-2 flex gap-2 border-t border-charcoal pt-3">
+            <li className="mt-2 border-t border-charcoal pt-3">
+              <LiveDemoLink
+                className="cc-btn-pill-demo mb-3 block w-full py-2.5 text-center"
+                onClick={() => setMobileOpen(false)}
+              >
+                Live demo
+              </LiveDemoLink>
+            </li>
+            <li className="flex gap-2">
               <Link
                 href="/sign-in"
                 className="cc-btn-pill-ghost flex-1 py-2 text-center"

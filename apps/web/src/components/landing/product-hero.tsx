@@ -1,31 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useHeroParallax } from '@/hooks/use-hero-parallax';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { TYPE } from '@/lib/design/tokens';
-
-const HERO_POINTS = [
-  {
-    tag: '01',
-    line: 'Who are you?',
-    detail: 'Name and role, up front.',
-    icon: '◆',
-  },
-  {
-    tag: '02',
-    line: 'What have you built?',
-    detail: 'Projects, demos, and outcomes first.',
-    icon: '▣',
-  },
-  {
-    tag: '03',
-    line: 'One link.',
-    detail: 'Share it anywhere they find you.',
-    icon: '◎',
-  },
-] as const;
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
 export function ProductHero() {
   const heroRef = useHeroParallax<HTMLElement>();
@@ -37,30 +18,20 @@ export function ProductHero() {
     const section = heroRef.current;
     if (!section) return;
 
-    const brand = section.querySelector('[data-hero-brand]');
-    const headline = section.querySelector('[data-hero-headline]');
-    const sub = section.querySelector('[data-hero-subcopy]');
-    const items = section.querySelectorAll('[data-hero-point]');
+    const statement = section.querySelector('[data-hero-statement]');
+    const pitch = section.querySelector('[data-hero-pitch]');
+    const cta = section.querySelector('[data-hero-cta]');
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-      if (brand) {
-        tl.fromTo(brand, { opacity: 0, y: 28, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.85 }, 0);
+      if (statement) {
+        tl.fromTo(statement, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.85 }, 0);
       }
-      if (headline) {
-        tl.fromTo(headline, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.75 }, 0.1);
+      if (pitch) {
+        tl.fromTo(pitch, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, 0.14);
       }
-      if (sub) {
-        tl.fromTo(sub, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, 0.2);
-      }
-      if (items.length) {
-        tl.fromTo(
-          items,
-          { opacity: 0, y: 28, scale: 0.97 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.12 },
-          0.34,
-        );
+      if (cta) {
+        tl.fromTo(cta, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65 }, 0.28);
       }
     }, section);
 
@@ -70,50 +41,35 @@ export function ProductHero() {
   return (
     <section
       ref={heroRef}
-      className="relative flex min-h-[92svh] scroll-mt-28 flex-col items-center justify-center overflow-hidden px-6 pb-24 pt-[96px] text-center md:pb-28 md:pt-[104px]"
+      className="cc-hume-hero relative flex min-h-[min(88svh,820px)] scroll-mt-28 flex-col items-center justify-center overflow-hidden px-6 pb-16 pt-[104px] text-center text-ink md:pb-20 md:pt-[112px]"
       data-testid="hero-section"
     >
-      <div className="cc-hero-spotlight cc-hero-spotlight--center pointer-events-none" aria-hidden />
-      <div className="cc-hero-spotlight cc-hero-spotlight--wide pointer-events-none" aria-hidden />
+      <div className="cc-hume-hero__blobs pointer-events-none" aria-hidden />
 
-      <div className="relative z-[1] flex w-full max-w-[1040px] flex-col items-center">
-        <p className="cc-hero-brand font-display" data-hero-brand aria-label="CodeCard">
-          CodeCard
-        </p>
-
+      <div className="relative z-[1] flex w-full max-w-[920px] flex-col items-center">
         <h1
-          data-hero-headline
-          className={`mt-6 ${TYPE.heroHeading} text-balance text-vellum`}
+          data-hero-statement
+          className="cc-hume-hero__headline max-w-[900px] text-balance"
         >
-          Share what you{' '}
-          <span className="bg-gradient-to-r from-reactor-bright via-reactor to-lavender-mist bg-clip-text text-transparent">
-            build.
-          </span>
+          Your best work. Ready to{' '}
+          <span className="cc-hume-gradient-text">share in seconds.</span>
         </h1>
 
         <p
-          data-hero-subcopy
-          className="cc-hero-subcopy mt-10 max-w-[700px] font-sans text-[18px] font-normal leading-[1.5] text-ash md:mt-12 md:text-[21px] md:leading-[1.45]"
+          data-hero-pitch
+          className="mt-5 max-w-[560px] text-balance text-[18px] leading-[1.45] text-smoke md:text-[20px] md:leading-[1.5]"
         >
-          If you build things, CodeCard is the one link you need. Your work goes first. Résumé,
-          school, and companies still matter. They just do not open the story.{' '}
-          <span className="text-vellum">Your work becomes the conversation starter.</span>
+          {CODECARD_TAGLINE}
         </p>
 
-        <ul className="cc-hero-points mt-14 w-full max-w-[960px]">
-          {HERO_POINTS.map((point) => (
-            <li key={point.tag} className="cc-hero-points__item" data-hero-point>
-              <div className="cc-hero-points__top">
-                <span className="cc-hero-points__icon" aria-hidden>
-                  {point.icon}
-                </span>
-                <span className="cc-hero-points__index font-eyebrow">{point.tag}</span>
-              </div>
-              <p className="cc-hero-points__line font-display">{point.line}</p>
-              <p className="cc-hero-points__detail font-sans">{point.detail}</p>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3" data-hero-cta>
+          <Link href="/sign-up" className="cc-btn-pill-primary cc-instant-press h-11 px-8 text-[15px]">
+            Start free →
+          </Link>
+          <LiveDemoLink className="cc-btn-pill-ghost cc-instant-press h-11 px-8 text-[15px]">
+            Live demo
+          </LiveDemoLink>
+        </div>
       </div>
     </section>
   );

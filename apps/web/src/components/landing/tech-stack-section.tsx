@@ -58,7 +58,7 @@ export function TechStackSection() {
               speed={80}
               direction="left"
               logoHeight={44}
-              gap={48}
+              gap={80}
               pauseOnHover={false}
               scaleOnHover
               fadeOut

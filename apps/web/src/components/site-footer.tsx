@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { LiveDemoLink, isLiveDemoHref } from '@/components/marketing/live-demo-link';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 
 const links = {
   product: [
     { href: '/pricing', label: 'Pricing' },
-    { href: '/demo', label: 'Demo profile' },
+    { href: LIVE_DEMO_HREF, label: 'Live demo' },
     { href: '/sign-up', label: 'Get started' },
   ],
   legal: [
@@ -34,9 +36,15 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2">
             {links.product.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="text-sm text-zinc-400 hover:text-zinc-200">
-                  {link.label}
-                </Link>
+                {isLiveDemoHref(link.href) ? (
+                  <LiveDemoLink className="text-sm text-zinc-400 hover:text-zinc-200">
+                    {link.label}
+                  </LiveDemoLink>
+                ) : (
+                  <Link href={link.href} className="text-sm text-zinc-400 hover:text-zinc-200">
+                    {link.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

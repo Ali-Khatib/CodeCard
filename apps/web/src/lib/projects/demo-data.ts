@@ -21,15 +21,18 @@ const unsplash = (id: string, w = 1600) =>
 
 export const DEMO_PROFILE = {
   display_name: 'Alex Chen',
-  headline: 'AI Engineer · building developer tools',
+  headline: 'Senior AI Engineer · Stripe',
   bio: 'I ship tools that help teams move faster. Previously early engineer at infra startups.',
   avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200',
   accentColor: '#9382ff',
+  location: 'San Francisco',
+  availability: 'Available for work',
+  followers: 1240,
   links: [
     { type: 'github', label: null, url: 'https://github.com' },
     { type: 'linkedin', label: null, url: 'https://linkedin.com' },
     { type: 'website', label: null, url: 'https://example.com' },
-    { type: 'resume', label: null, url: 'https://example.com/resume.pdf' },
+    { type: 'twitter', label: null, url: 'https://x.com' },
   ],
 };
 

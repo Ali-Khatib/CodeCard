@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { isLiveDemoHref } from '@/components/marketing/live-demo-link';
 
 type ArrowCtaProps = {
   href: string;
@@ -23,7 +24,7 @@ export function ArrowCta({ href, label, external }: ArrowCtaProps) {
     </span>
   );
 
-  if (external || href.startsWith('http') || href.startsWith('#')) {
+  if (external || href.startsWith('http') || href.startsWith('#') || isLiveDemoHref(href)) {
     return (
       <a href={href} className={className}>
         <span>{label}</span>

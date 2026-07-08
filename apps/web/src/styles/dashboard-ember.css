@@ -1,0 +1,582 @@
+/* ══════════════════════════════════════════════════════════════
+   CodeCard Dashboard — Aker editorial system (ZERO purple)
+   Loaded LAST in globals.css — wins over all legacy theme CSS
+   ══════════════════════════════════════════════════════════════ */
+
+.cc-dash-root,
+.cc-dash-aker {
+  /* Aker tokens — isolated from data-theme / violet picker */
+  --ink: #000000;
+  --paper: #ffffff;
+  --char: #1c1c1c;
+  --midnight: #070707;
+  --iron: #262626;
+  --slate: #38464a;
+  --mist: #e5e4e4;
+  --smoke: #8d8d8d;
+  --pewter: #666666;
+  --ember: #b75928;
+  --pine: #193f32;
+  --tide: #002934;
+  --driftwood: #537179;
+  --cedar: #776157;
+  --coral: #df6a6b;
+
+  --app-bg: #070707;
+  --sidebar-bg: #070707;
+  --panel: #1c1c1c;
+  --panel-2: #161616;
+  --panel-3: #262626;
+  --border: rgba(229, 228, 228, 0.16);
+  --border-strong: rgba(229, 228, 228, 0.36);
+  --text: #ffffff;
+  --text-soft: #b8b8b8;
+  --text-muted: #8d8d8d;
+  --text-faint: #666666;
+  --accent: #b75928;
+  --accent-soft: rgba(183, 89, 40, 0.14);
+  --success: #193f32;
+  --success-text: #7bc9a4;
+  --radius-card: 8px;
+  --radius-button: 80px;
+
+  /* Kill purple legacy aliases inside dashboard */
+  --reactor: #b75928;
+  --reactor-bright: #d4713a;
+  --iris: #b75928;
+  --violet: #b75928;
+  --lavender: #b75928;
+  --twilight: #38464a;
+  --specter: #8d8d8d;
+  --accent-rgb: 183, 89, 40;
+  --accent-bright-rgb: 212, 113, 58;
+  --accent-muted-rgb: 141, 141, 141;
+  --accent-secondary-rgb: 0, 41, 52;
+  --cosmic-glow: transparent;
+  --cosmic-glow-secondary: transparent;
+  --fern: #1c1c1c;
+  --obsidian: #070707;
+  --void-canvas: #070707;
+  --graphite-surface: #1c1c1c;
+  --vellum: #ffffff;
+  --phosphor: #ffffff;
+  --lichen: #b8b8b8;
+  --graphite: #8d8d8d;
+  --ash: #b8b8b8;
+  --midnight-legacy: #070707;
+
+  background: var(--app-bg) !important;
+  color: var(--text) !important;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.15px;
+}
+
+/* Hide purple ambient layers */
+.cc-dash-ambient,
+.cc-dash-noise,
+.cc-analytics-noise,
+.cc-analytics-insights__glow {
+  display: none !important;
+}
+
+/* ── Nuclear: no purple/violet/indigo/fuchsia classes survive ── */
+.cc-dash-root [class*='purple'],
+.cc-dash-root [class*='violet'],
+.cc-dash-root [class*='indigo'],
+.cc-dash-root [class*='fuchsia'],
+.cc-dash-root [class*='lavender'] {
+  background-color: var(--char) !important;
+  border-color: var(--border) !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-root [class*='from-purple'],
+.cc-dash-root [class*='to-purple'],
+.cc-dash-root [class*='via-purple'],
+.cc-dash-root [class*='from-violet'],
+.cc-dash-root [class*='to-violet'],
+.cc-dash-root [class*='via-violet'],
+.cc-dash-root [class*='from-indigo'],
+.cc-dash-root [class*='to-indigo'],
+.cc-dash-root [class*='via-indigo'],
+.cc-dash-root [class*='from-reactor'],
+.cc-dash-root [class*='to-reactor'],
+.cc-dash-root [class*='via-reactor'] {
+  --tw-gradient-from: var(--midnight) !important;
+  --tw-gradient-to: var(--char) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  background-image: none !important;
+}
+
+/* ── Sidebar ── */
+.cc-dash-sidebar {
+  position: relative;
+  background: var(--sidebar-bg) !important;
+  border-right: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.cc-dash-sidebar::before {
+  display: none !important;
+}
+
+.cc-dash-sidebar-user {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  border-radius: var(--radius-card);
+}
+
+/* ── Cards ── */
+.cc-card,
+.cc-dash-panel,
+.cc-analytics-card,
+.cc-analytics-kpi,
+.cc-analytics-hero,
+.cc-analytics-insights,
+.cc-analytics-referrer,
+.cc-metric-card,
+.cc-workspace-showcase__card {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.cc-dash-panel:hover,
+.cc-analytics-card:hover,
+.cc-analytics-referrer:hover {
+  border-color: var(--border-strong) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.cc-analytics-card--elevated {
+  background: var(--panel) !important;
+}
+
+.cc-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+/* ── Buttons ── */
+.cc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  border-radius: var(--radius-button);
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: 160ms ease;
+  white-space: nowrap;
+}
+
+.cc-btn-primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.cc-btn-primary:hover {
+  background: #e5e4e4 !important;
+}
+
+.cc-btn-secondary {
+  background: var(--char) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--border) !important;
+}
+
+.cc-btn-secondary:hover {
+  border-color: var(--border-strong) !important;
+}
+
+.cc-btn-outline {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 1px solid var(--border-strong) !important;
+}
+
+.cc-btn-outline:hover {
+  background: var(--panel-3) !important;
+}
+
+.cc-btn-ember {
+  background: var(--ember) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--ember) !important;
+}
+
+.cc-dash-sidebar-action,
+.cc-dash-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  border-radius: var(--radius-button);
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border-strong) !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-sidebar-action:hover,
+.cc-dash-topbar-btn:hover {
+  background: var(--panel-3) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text) !important;
+}
+
+.cc-dash-root .cc-btn-pill-primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-root .cc-btn-pill-primary:hover {
+  background: #e5e4e4 !important;
+}
+
+.cc-dash-root .cc-btn-pill-ghost,
+.cc-dash-root .cc-btn-pill-demo {
+  background: var(--char) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: none !important;
+}
+
+/* ── Nav ── */
+.cc-dash-nav-link__bar,
+.cc-dash-nav-link__glow {
+  display: none !important;
+}
+
+.cc-dash-nav-link--active,
+.cc-dash-nav-link.cc-dash-nav-link--active,
+.cc-dash-root a.cc-dash-nav-link.bg-white {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: var(--radius-button);
+}
+
+.cc-dash-nav-link:not(.cc-dash-nav-link--active):hover {
+  background: var(--char) !important;
+  color: #ffffff !important;
+}
+
+/* ── Filters & range pills ── */
+.cc-dash-filter-label {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-3) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-filter-pill {
+  border: 1px solid var(--border) !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-filter-pill:hover {
+  color: #ffffff !important;
+  border-color: var(--border-strong) !important;
+}
+
+.cc-dash-filter-pill--active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.cc-analytics-filter {
+  border: 1px solid var(--border-strong) !important;
+  background: var(--panel) !important;
+  border-radius: var(--radius-button);
+  padding: 4px;
+  backdrop-filter: none !important;
+}
+
+.cc-analytics-filter__pill {
+  background: #ffffff !important;
+}
+
+/* ── Inputs ── */
+.cc-dash-input {
+  border: 1px solid var(--border) !important;
+  background: var(--panel-3) !important;
+  border-radius: var(--radius-card);
+  color: var(--text) !important;
+}
+
+.cc-dash-input:focus {
+  border-color: var(--border-strong) !important;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.cc-dash-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+/* ── Badges ── */
+.badge-success,
+.cc-badge-success {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-button);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--pine) !important;
+  color: var(--mist) !important;
+  border: 1px solid rgba(229, 228, 228, 0.12);
+}
+
+/* ── Misc panels ── */
+.cc-dash-suggested-bar,
+.cc-dash-quick-action,
+.cc-dash-tech-chip {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  box-shadow: none !important;
+  border-radius: var(--radius-card);
+  color: var(--text-soft);
+}
+
+.cc-dash-quick-action:hover {
+  border-color: var(--border-strong) !important;
+  background: var(--panel-3) !important;
+  color: var(--text) !important;
+}
+
+.cc-dash-completion-ring {
+  background: conic-gradient(var(--ember) calc(var(--pct, 0) * 1%), var(--panel-3) 0) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-notifications-btn,
+.cc-dash-user-menu,
+.cc-dash-notifications-panel {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: none !important;
+}
+
+.cc-dash-notifications-btn:hover {
+  background: var(--panel-3) !important;
+}
+
+.cc-dash-connection--active {
+  border-color: var(--border-strong) !important;
+  background: var(--panel-3) !important;
+  box-shadow: none !important;
+}
+
+.cc-dash-avatar-ring {
+  border-color: var(--border-strong) !important;
+  background: var(--panel-3) !important;
+}
+
+.cc-dash-divider::before,
+.cc-dash-divider::after,
+.cc-analytics-hero__rule {
+  background: var(--border) !important;
+}
+
+.cc-settings-row:hover {
+  background: var(--panel-3) !important;
+}
+
+/* ── Analytics map / charts ── */
+.cc-analytics-root {
+  color: var(--text);
+}
+
+.cc-analytics-map {
+  border: 1px solid var(--border) !important;
+  background: var(--panel) !important;
+}
+
+.cc-analytics-map__dot {
+  background: var(--ember) !important;
+  box-shadow: none !important;
+}
+
+.cc-analytics-map__pulse {
+  border-color: var(--ember) !important;
+}
+
+.cc-dash-root .cc-sparkline-line {
+  stroke: var(--ember) !important;
+}
+
+/* ── Override ALL legacy Tailwind reactor/purple utility classes ── */
+.cc-dash-root .text-reactor,
+.cc-dash-root .text-reactor-bright,
+.cc-dash-root .text-reactor\/90,
+.cc-dash-root .text-reactor\/80,
+.cc-dash-root .text-violet,
+.cc-dash-root .text-purple,
+.cc-dash-root .text-indigo,
+.cc-dash-root .text-fuchsia,
+.cc-dash-root .font-eyebrow.text-reactor {
+  color: var(--text-muted) !important;
+}
+
+.cc-dash-root .hover\:text-reactor:hover,
+.cc-dash-root .hover\:text-reactorBright:hover {
+  color: var(--ember) !important;
+}
+
+.cc-dash-root .border-reactor,
+.cc-dash-root .border-reactor\/10,
+.cc-dash-root .border-reactor\/12,
+.cc-dash-root .border-reactor\/14,
+.cc-dash-root .border-reactor\/15,
+.cc-dash-root .border-reactor\/18,
+.cc-dash-root .border-reactor\/20,
+.cc-dash-root .border-reactor\/25,
+.cc-dash-root .border-reactor\/30,
+.cc-dash-root .border-reactor\/35,
+.cc-dash-root .border-reactor\/40,
+.cc-dash-root .divide-reactor\/10 > * + * {
+  border-color: var(--border) !important;
+}
+
+.cc-dash-root .bg-reactor,
+.cc-dash-root .bg-reactor\/5,
+.cc-dash-root .bg-reactor\/8,
+.cc-dash-root .bg-reactor\/10,
+.cc-dash-root .bg-reactor\/12,
+.cc-dash-root .bg-reactor\/15,
+.cc-dash-root .bg-reactor\/20,
+.cc-dash-root .bg-reactor\/22,
+.cc-dash-root .bg-reactor\/25,
+.cc-dash-root .bg-reactor\/90 {
+  background: var(--char) !important;
+}
+
+.cc-dash-root .hover\:bg-reactor\/5:hover,
+.cc-dash-root .hover\:bg-reactor\/8:hover,
+.cc-dash-root .hover\:bg-reactor\/10:hover {
+  background: var(--panel-3) !important;
+}
+
+.cc-dash-root .from-reactor\/15,
+.cc-dash-root .from-reactor\/20,
+.cc-dash-root .from-reactor\/22,
+.cc-dash-root .from-reactor\/30,
+.cc-dash-root .to-reactor\/15,
+.cc-dash-root .via-reactor {
+  --tw-gradient-from: var(--panel) !important;
+  --tw-gradient-to: var(--panel) !important;
+  background-image: none !important;
+}
+
+.cc-dash-root [class*='shadow-purple'],
+.cc-dash-root [class*='ring-purple'],
+.cc-dash-root [class*='ring-reactor'] {
+  box-shadow: none !important;
+}
+
+.cc-dash-root .text-vellum,
+.cc-dash-root .text-phosphor,
+.cc-dash-root .text-pearl {
+  color: #ffffff !important;
+}
+
+.cc-dash-root .text-lichen,
+.cc-dash-root .text-ash {
+  color: var(--text-soft) !important;
+}
+
+.cc-dash-root .text-graphite {
+  color: var(--text-muted) !important;
+}
+
+.cc-dash-root .bg-midnight,
+.cc-dash-root .bg-midnight\/50,
+.cc-dash-root .bg-midnight\/60,
+.cc-dash-root .bg-midnight\/70,
+.cc-dash-root .bg-midnight\/80,
+.cc-dash-root .bg-midnight\/95,
+.cc-dash-root .bg-void-canvas,
+.cc-dash-root .bg-void-canvas\/80,
+.cc-dash-root .bg-void-canvas\/90 {
+  background: var(--panel) !important;
+}
+
+.cc-dash-root .bg-gradient-to-br,
+.cc-dash-root .bg-gradient-to-r,
+.cc-dash-root .bg-gradient-to-t {
+  background-image: none !important;
+  background-color: var(--panel) !important;
+}
+
+.cc-dash-root .text-emerald-300,
+.cc-dash-root .text-emerald-400 {
+  color: var(--success-text) !important;
+}
+
+.cc-dash-root .border-emerald-500\/25,
+.cc-dash-root .bg-emerald-500\/10 {
+  border-color: var(--border) !important;
+  background: var(--pine) !important;
+}
+
+/* Grayscale project imagery */
+.cc-dash-root .cc-dash-project-img,
+.cc-dash-root .cc-circle-update-img {
+  filter: grayscale(100%) contrast(1.05);
+}
+
+/* Metric cards */
+.cc-metric-card {
+  padding: 1.25rem;
+}
+
+.cc-metric-card__value {
+  margin-top: 0.5rem;
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.cc-metric-card__trend {
+  margin-top: 0.35rem;
+  font-size: 12px;
+  color: var(--success-text);
+}
+
+@keyframes cc-analytics-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

@@ -8,7 +8,8 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
-      colors: {
+        colors: {
+        ink: 'var(--ink)',
         canvas: 'var(--canvas)',
         surface: 'var(--surface)',
         carbon: 'var(--carbon)',
@@ -53,6 +54,13 @@ export default {
         foreground: 'var(--foreground)',
         card: 'var(--surface)',
         muted: 'var(--text-secondary)',
+        cream: 'var(--hume-cream)',
+        'lavender-mist-brand': 'var(--hume-lavender-mist)',
+        periwinkle: 'var(--hume-periwinkle)',
+        'chart-hume': 'var(--chart-hume)',
+        'chart-compare': 'var(--chart-compare)',
+        'surface-dark': 'var(--surface-dark)',
+        'line-soft': 'var(--line-soft)',
       },
       maxWidth: {
         container: '1280px',

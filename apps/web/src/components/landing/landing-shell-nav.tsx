@@ -5,7 +5,6 @@ import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
   { label: 'Overview', href: '/', ariaLabel: 'Overview, research and how it works' },
-  { label: 'Profiles', href: '/profiles', ariaLabel: 'Live profiles' },
   { label: 'Pricing', href: '/pricing' },
 ];
 

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@codecard/ui';
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
 export function SiteHeader() {
   return (
@@ -12,9 +13,9 @@ export function SiteHeader() {
           <Link href="/pricing" className="transition-colors hover:text-zinc-100">
             Pricing
           </Link>
-          <Link href="/demo" className="transition-colors hover:text-zinc-100">
-            Demo
-          </Link>
+          <LiveDemoLink className="transition-colors hover:text-zinc-100">
+            Live demo
+          </LiveDemoLink>
         </nav>
         <div className="flex items-center gap-3">
           <Link href="/sign-in">

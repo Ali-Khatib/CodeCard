@@ -19,10 +19,10 @@ const AUDIENCE_CARDS = [
   {
     eyebrow: 'For builders',
     title: 'Lead with proof.',
-    body: 'Projects, outcomes, and stack up front, not buried on page two.',
-    detail: 'Ship a profile where your repos, demos, and case studies are the first thing someone sees.',
+    body: 'Share a link with your repos, demos, and case studies — the first thing they see, not the footnote.',
+    detail: 'A showcase where your proof is the headline, not buried below schools and titles.',
     highlights: ['Featured work stack', 'Stack tags & outcomes', 'One link for every channel'],
-    cta: { href: '/profiles', label: 'See profiles' },
+    cta: { href: '/demo/card', label: 'See a showcase' },
   },
   {
     eyebrow: 'For recruiters',
@@ -30,12 +30,12 @@ const AUDIENCE_CARDS = [
     body: 'Identity, role, and demonstrated work in one glance.',
     detail: 'Skip the PDF chase. Open one living page with role, proof, and project depth.',
     highlights: ['Name + role up top', 'Scrollable project stories', 'Shareable in one tap'],
-    cta: { href: '/profiles', label: 'See a live profile' },
+    cta: { href: '/demo/card', label: 'See a live profile' },
   },
   {
     eyebrow: 'For events',
     title: 'Show it on their phone.',
-    body: 'QR on your badge or screen. They scroll your projects right there.',
+    body: 'QR or your screen at a meetup — they scan or scroll with you live.',
     detail:
       'One scan opens your live profile. They flip through featured work on mobile while you talk, not a PDF that gets buried in their inbox.',
     highlights: ['QR-ready profile link', 'Projects on mobile', 'Still works weeks later'],
@@ -47,7 +47,7 @@ const AUDIENCE_CARDS = [
     body: 'Ship projects before the degree line. Show skill, not just school.',
     detail: 'Lead with what you built in class, clubs, and side projects, not just your major.',
     highlights: ['Project-first layout', 'Internship-ready proof', 'Easy to share with mentors'],
-    cta: { href: '/profiles', label: 'See student profiles' },
+    cta: { href: '/demo/card', label: 'See a student profile' },
   },
   {
     eyebrow: 'For freelancers',
@@ -60,11 +60,20 @@ const AUDIENCE_CARDS = [
 ] as const;
 
 const AUDIENCE_TRANSFORMS = [
-  'rotate(3deg) translate(-140px)',
-  'rotate(1.5deg) translate(-70px)',
+  'rotate(2deg) translate(-300px)',
+  'rotate(1deg) translate(-150px)',
   'rotate(0deg)',
-  'rotate(-1.5deg) translate(70px)',
-  'rotate(-3deg) translate(140px)',
+  'rotate(-1deg) translate(150px)',
+  'rotate(-2deg) translate(300px)',
+] as const;
+
+/** Distinct Hume pastels — one per audience card (ink text on light fills) */
+const AUDIENCE_CARD_TONES = [
+  'cc-audience-bounce-card--sky',
+  'cc-audience-bounce-card--mint',
+  'cc-audience-bounce-card--blush',
+  'cc-audience-bounce-card--lavender',
+  'cc-audience-bounce-card--peach',
 ] as const;
 
 function AudienceCardContent({
@@ -85,13 +94,13 @@ function AudienceCardContent({
       <div className="cc-feature-column__icon" aria-hidden>
         ✦
       </div>
-      <p className="font-eyebrow text-[13px] uppercase tracking-[0.06em] text-iris">{eyebrow}</p>
-      <h3 className="mt-3 font-display text-[20px] font-medium leading-[1.25] text-vellum md:text-[22px]">
+      <p className="font-eyebrow text-[13px] uppercase tracking-[0.06em] text-smoke">{eyebrow}</p>
+      <h3 className="mt-3 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-ink md:text-[24px]">
         {title}
       </h3>
-      <p className="mt-3 text-[15px] leading-[1.5] text-ash md:text-[16px]">{body}</p>
+      <p className="mt-3 line-clamp-3 text-[15px] leading-[1.5] text-smoke">{body}</p>
       {!compact && (
-        <p className="mt-5 text-[14px] font-medium text-reactor">{ctaLabel} →</p>
+        <p className="mt-5 text-[14px] font-medium text-ink">{ctaLabel} →</p>
       )}
     </>
   );
@@ -150,8 +159,11 @@ export function AudienceBounceCards() {
   if (reducedMotion) {
     return (
       <div className="cc-container mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {AUDIENCE_CARDS.map((card) => (
-          <BorderGlowCard key={card.title} className="h-full">
+        {AUDIENCE_CARDS.map((card, index) => (
+          <BorderGlowCard
+            key={card.title}
+            className={`h-full ${AUDIENCE_CARD_TONES[index] ?? ''}`}
+          >
             <AudienceCardContent
               eyebrow={card.eyebrow}
               title={card.title}
@@ -164,9 +176,12 @@ export function AudienceBounceCards() {
     );
   }
 
-  const items = AUDIENCE_CARDS.map((card) => ({
+  const items = AUDIENCE_CARDS.map((card, index) => ({
     content: (
-      <BorderGlow {...CARD_BORDER_GLOW} className="cc-audience-bounce-card h-full w-full">
+      <BorderGlow
+        {...CARD_BORDER_GLOW}
+        className={`cc-audience-bounce-card ${AUDIENCE_CARD_TONES[index] ?? ''} h-full w-full`}
+      >
         <AudienceCardContent
           eyebrow={card.eyebrow}
           title={card.title}
@@ -186,16 +201,16 @@ export function AudienceBounceCards() {
           className="cc-audience-bounce__stack mx-auto"
           items={items}
           orientation="horizontal"
-          containerWidth={1080}
-          containerHeight={320}
-          cardWidth={268}
+          containerWidth={1520}
+          containerHeight={300}
+          cardWidth={272}
           animationDelay={0}
           animationStagger={0}
           easeType="power2.out"
           transformStyles={[...AUDIENCE_TRANSFORMS]}
           enableEntranceAnimation={false}
           enableHover={selectedIndex === null}
-          hoverPushAmount={70}
+          hoverPushAmount={100}
           pickOnClick
           pickBehavior="in-place"
           selectedIndex={selectedIndex}

@@ -1,26 +1,20 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { DEMO_PROFILE, DEMO_FEATURED_PROJECTS } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { prefetchHref } from '@/hooks/use-view-transition-navigate';
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
 const DEMO_PROJECT = DEMO_FEATURED_PROJECTS[0];
 
 export function HeroProfilePreview() {
   const reducedMotion = useReducedMotion();
-  const router = useRouter();
   const showVideo = !reducedMotion && Boolean(DEMO_PROJECT.videoUrl);
 
   return (
-    <Link
-      href="/profiles"
+    <LiveDemoLink
       className="cc-hero-preview cc-instant-press group mx-auto mt-12 block w-full max-w-[680px] text-left active:scale-[0.99]"
       data-hero-preview
-      aria-label={`See ${DEMO_PROFILE.display_name}'s live demo profile`}
-      onMouseEnter={() => prefetchHref('/profiles', router)}
-      onFocus={() => prefetchHref('/profiles', router)}
+      aria-label="Open the live demo workspace"
     >
       <div className="cc-hero-preview__glow" aria-hidden />
       <div className="cc-hero-preview__frame">
@@ -41,10 +35,10 @@ export function HeroProfilePreview() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-[17px] font-medium text-vellum md:text-[18px]">
+            <p className="truncate font-display text-[17px] font-medium text-ink md:text-[18px]">
               {DEMO_PROFILE.display_name}
             </p>
-            <p className="truncate text-[13px] text-ash md:text-[14px]">{DEMO_PROFILE.headline}</p>
+            <p className="truncate text-[13px] text-smoke md:text-[14px]">{DEMO_PROFILE.headline}</p>
           </div>
           <span className="cc-hero-preview__live font-eyebrow">Live demo</span>
         </div>
@@ -70,19 +64,19 @@ export function HeroProfilePreview() {
               />
             ) : null}
             <div className="cc-hero-preview__media-overlay">
-              <p className="font-eyebrow text-[11px] uppercase tracking-[0.08em] text-reactor-bright">
+              <p className="font-eyebrow text-[11px] uppercase tracking-[0.08em] text-white/90">
                 Featured project
               </p>
-              <p className="mt-1 font-display text-[20px] font-medium leading-tight text-vellum md:text-[22px]">
+              <p className="mt-1 font-display text-[20px] font-medium leading-tight text-white md:text-[22px]">
                 {DEMO_PROJECT.title}
               </p>
-              <p className="mt-1 text-[14px] text-ash">{DEMO_PROJECT.tagline}</p>
+              <p className="mt-1 text-[14px] text-white/80">{DEMO_PROJECT.tagline}</p>
             </div>
           </div>
         </div>
 
-        <p className="cc-hero-preview__cta font-sans">See live demo profile →</p>
+        <p className="cc-hero-preview__cta font-sans">Open live demo workspace →</p>
       </div>
-    </Link>
+    </LiveDemoLink>
   );
 }

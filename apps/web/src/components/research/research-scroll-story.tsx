@@ -24,10 +24,10 @@ export function ResearchScrollStory() {
       <ResearchScrollStack />
       <div className="cc-research-takeaway cc-container mt-12 md:mt-16">
         <ScrollReveal>
-          <p className="text-center font-eyebrow text-[12px] uppercase tracking-[0.1em] text-reactor">
+          <p className="text-center font-eyebrow text-[12px] uppercase tracking-[0.1em] text-iris">
             In other words
           </p>
-          <p className="mx-auto mt-5 max-w-[700px] text-balance text-center font-display text-[28px] font-normal leading-[1.3] tracking-[-0.01em] text-vellum md:text-[36px] md:leading-[1.25]">
+          <p className="mx-auto mt-5 max-w-[700px] text-balance text-center font-display text-[28px] font-normal leading-[1.3] tracking-[-0.02em] text-ink md:text-[36px] md:leading-[1.25]">
             They check schools and titles first. Work buried at the bottom may never get seen.
           </p>
         </ScrollReveal>

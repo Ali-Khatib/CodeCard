@@ -1,7 +1,4 @@
 # CodeCard Master Build Prompt
-
-Copy everything below this line into Cursor / Claude Code as the single implementation contract.
-
 ---
 
 You are a principal engineer building **CodeCard** — a production MVP for web and mobile.

@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { TYPE } from '@/lib/design/tokens';
@@ -10,13 +12,32 @@ import { ScrollReveal } from './scroll-reveal';
 import { AuroraDivider } from './aurora-divider';
 
 const STEPS = [
-  { title: 'Tap or scan', detail: 'NFC badge or shareable link. No app install required.' },
-  { title: 'Profile opens', detail: 'Identity, role, and availability load in under a second.' },
-  { title: 'Featured work surfaces', detail: 'Projects appear as large cards with media, stack, and outcomes.' },
-  { title: 'Filter by domain', detail: 'Visitors narrow featured work by domain or focus area.' },
-  { title: 'Project expands', detail: 'Tap a card for screenshots, video, and proof in one view.' },
-  { title: 'Save the connection', detail: 'Visitors bookmark profiles after conferences or intros.' },
-  { title: 'Add private context', detail: 'Where you met and private notes stay visible only to you.' },
+  {
+    title: 'Scan or share',
+    detail: 'QR code or link. They open your showcase on their phone. No app install.',
+  },
+  {
+    title: 'Profile & best work',
+    detail:
+      'Name, role, and links up top. Your strongest projects show first with screenshots, demos, and outcomes.',
+  },
+  {
+    title: 'Filter by domain',
+    detail: 'Visitors narrow your work by focus area when you have a lot to show.',
+  },
+  {
+    title: 'Project expands',
+    detail: 'One tap for screenshots, video, repo links, and live demos.',
+  },
+  {
+    title: 'Save the connection',
+    detail:
+      'After they browse your profile or a project for a bit, a gentle prompt asks if they want to save you to their circle.',
+  },
+  {
+    title: 'Add private context',
+    detail: 'Where you met, follow-ups, and notes. Visible only to you.',
+  },
 ] as const;
 
 /** Viewport heights of scroll runway per step */
@@ -26,106 +47,152 @@ export function HowItWorksSection() {
   const reducedMotion = useReducedMotion();
   const [activeStep, setActiveStep] = useState(0);
   const runwayRef = useRef<HTMLDivElement>(null);
-  const project = DEMO_FEATURED_PROJECTS[0];
+  const stepRef = useRef(activeStep);
+  const step = STEPS[activeStep];
+  const progressPct = (activeStep / Math.max(STEPS.length - 1, 1)) * 100;
+
+  const goToStep = useCallback((index: number) => {
+    const next = Math.min(STEPS.length - 1, Math.max(0, index));
+    if (stepRef.current === next) return;
+    stepRef.current = next;
+    setActiveStep(next);
+  }, []);
 
   useEffect(() => {
     if (reducedMotion) return;
 
-    const onScroll = () => {
+    let raf = 0;
+    const measure = () => {
       const runway = runwayRef.current;
       if (!runway) return;
 
       const rect = runway.getBoundingClientRect();
       const stepPx = window.innerHeight * (STEP_SCROLL_VH / 100);
       const scrolled = Math.max(0, -rect.top);
-      const index = Math.min(STEPS.length - 1, Math.max(0, Math.floor(scrolled / stepPx)));
-      setActiveStep(index);
+      goToStep(Math.floor(scrolled / stepPx));
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [reducedMotion]);
+    window.addEventListener('resize', onScroll, { passive: true });
+    measure();
 
-  const step = STEPS[activeStep];
-  const progressPct = (activeStep / Math.max(STEPS.length - 1, 1)) * 100;
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [goToStep, reducedMotion]);
+
+  const scrollToStep = (index: number) => {
+    const runway = runwayRef.current;
+    if (!runway) return;
+    const stepPx = window.innerHeight * (STEP_SCROLL_VH / 100);
+    const top = runway.getBoundingClientRect().top + window.scrollY + index * stepPx;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
 
   return (
-    <div id="how-it-works" className="scroll-mt-28 py-[100px] md:py-[120px]">
-      <section className="cc-container pb-12">
+    <div id="how-it-works" className="scroll-mt-28 py-20 md:py-[100px]">
+      <section className="cc-container pb-10 md:pb-14">
         <ScrollReveal>
           <SectionCounter index="04" label="How it works" />
           <h2 className={`mt-6 ${TYPE.sectionHeading} text-phosphor`}>
-            Tap → profile → <span className="cc-text-reactor">project.</span>
+            Share once. <span className="cc-text-reactor">They see your work.</span>
           </h2>
-          <p className="mt-6 max-w-[640px] text-[18px] text-lichen">
-            Seven steps from first tap to saved connection, designed for conferences, intros, and async sharing.
+          <p className="mt-6 max-w-[680px] text-[18px] leading-[1.55] text-lichen">
+            Six steps from first scan to a saved connection, built for intros, events, and async
+            sharing. Scroll to walk through it.
           </p>
         </ScrollReveal>
       </section>
 
-      <AuroraDivider className="cc-container mb-12" />
+      <AuroraDivider className="cc-container mb-10 md:mb-14" />
 
-      <section className="cc-container">
-        <div
-          ref={runwayRef}
-          className="grid gap-12 md:grid-cols-[minmax(280px,340px)_1fr] md:gap-16"
-          style={{ minHeight: `${STEPS.length * STEP_SCROLL_VH}vh` }}
-        >
-          <ScrollReveal className="md:sticky md:top-28 md:self-start" scale={0.96}>
-            <motion.div
-              className="cc-surface-card overflow-hidden p-3"
-              animate={{
-                rotateZ: reducedMotion ? 0 : activeStep % 2 === 0 ? -1.5 : 1.5,
-                scale: reducedMotion ? 1 : 1 + activeStep * 0.008,
-              }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <PhoneMock step={activeStep} projectTitle={project.title} />
-            </motion.div>
-            <p className="mt-4 text-center text-[14px] text-fog">
-              Step {activeStep + 1} of {STEPS.length}
-            </p>
-          </ScrollReveal>
-
-          <div className="relative">
-            <div className="absolute bottom-0 left-[11px] top-0 w-px bg-border/60" aria-hidden />
-            <div
-              className="absolute left-[11px] top-0 w-px bg-reactor transition-[height] duration-500 ease-out"
-              style={{
-                height: `${progressPct}%`,
-                boxShadow: '0 0 12px rgba(147, 130, 255, 0.5)',
-              }}
-              aria-hidden
-            />
-
-            <div className="sticky top-28 pl-10">
-              <span
-                className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border border-reactor bg-reactor/20 text-[12px] font-medium text-phosphor"
-                aria-hidden
-              >
-                {activeStep + 1}
-              </span>
-
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={activeStep}
-                  initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <p className="text-[13px] font-medium text-fog">Step {activeStep + 1}</p>
-                  <p className="mt-1 font-display text-[22px] font-medium text-lilac-white md:text-[26px]">
-                    {step.title}
+      {reducedMotion ? (
+        <section className="cc-container">
+          <div className="grid gap-10 md:grid-cols-[minmax(260px,320px)_1fr] md:gap-14">
+            <PhoneMock step={0} />
+            <div className="space-y-8">
+              {STEPS.map((s, i) => (
+                <div key={s.title}>
+                  <p className="font-eyebrow text-[12px] uppercase tracking-[0.1em] text-reactor">
+                    Step {i + 1}
                   </p>
-                  <p className="mt-2 max-w-[480px] text-[16px] text-ash">{step.detail}</p>
-                </motion.div>
-              </AnimatePresence>
+                  <h3 className="mt-2 font-display text-[24px] text-vellum">{s.title}</h3>
+                  <p className="mt-2 text-[17px] leading-relaxed text-lichen">{s.detail}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        <section className="cc-container">
+          <div
+            ref={runwayRef}
+            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[minmax(280px,360px)_1fr] md:gap-16 lg:gap-20"
+            style={{ minHeight: `${STEPS.length * STEP_SCROLL_VH}vh` }}
+          >
+            <div className="md:sticky md:top-28 md:self-start">
+              <motion.div
+                animate={{ rotateZ: activeStep % 2 === 0 ? -1 : 1 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="cc-how-it-works-phone-wrap"
+              >
+                <PhoneMock step={activeStep} />
+              </motion.div>
+
+              <StepPanel
+                step={step}
+                stepIndex={activeStep}
+                total={STEPS.length}
+                className="mt-8 md:hidden"
+              />
+
+              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">
+                Step {activeStep + 1} of {STEPS.length}
+              </p>
+            </div>
+
+            <div className="relative hidden md:block">
+              <div className="cc-how-it-works-rail absolute bottom-0 left-0 top-0 w-px" aria-hidden />
+              <div
+                className="cc-how-it-works-rail__progress absolute left-0 top-0 w-px"
+                style={{ height: `${progressPct}%` }}
+                aria-hidden
+              />
+
+              <div className="sticky top-28 pl-10 lg:pl-12">
+                <nav className="cc-how-it-works-rail-nav mb-8 flex flex-col" aria-label="How it works steps">
+                  {STEPS.map((s, i) => (
+                    <button
+                      key={s.title}
+                      type="button"
+                      onClick={() => scrollToStep(i)}
+                      className={`cc-how-it-works-rail-step text-left transition-all duration-300 ${
+                        i === activeStep ? 'cc-how-it-works-rail-step--active' : ''
+                      }`}
+                    >
+                      <span className="font-eyebrow text-[11px] uppercase tracking-[0.08em]">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span className="block font-display text-[14px] leading-snug lg:text-[15px]">
+                        {s.title}
+                      </span>
+                    </button>
+                  ))}
+                </nav>
+
+                <StepPanel step={step} stepIndex={activeStep} total={STEPS.length} />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -138,37 +205,297 @@ export function HowItWorksPage() {
   );
 }
 
-function PhoneMock({ step, projectTitle }: { step: number; projectTitle: string }) {
-  const labels = ['Tap NFC', 'Profile', 'Featured', 'Filters', 'Expanded', 'Saved', 'Notes'];
+function StepPanel({
+  step,
+  stepIndex,
+  total,
+  className = '',
+}: {
+  step: (typeof STEPS)[number];
+  stepIndex: number;
+  total: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      key={stepIndex}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      className={`cc-how-it-works-step-panel ${className}`}
+    >
+      <p className="font-eyebrow text-[12px] uppercase tracking-[0.1em] text-reactor">
+        Step {stepIndex + 1} of {total}
+      </p>
+      <h3 className="mt-2 font-display text-[28px] leading-[1.1] text-vellum md:text-[34px] lg:text-[40px]">
+        {step.title}
+      </h3>
+      <p className="mt-3 max-w-[520px] text-[16px] leading-[1.5] text-lichen md:text-[17px]">
+        {step.detail}
+      </p>
+
+      {stepIndex === 3 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {['GitHub ↗', 'LinkedIn ↗', 'Live demo ↗'].map((link) => (
+            <span
+              key={link}
+              className="rounded-full border border-reactor/25 bg-reactor/10 px-3 py-1.5 text-[12px] text-lichen"
+            >
+              {link}
+            </span>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+const FILTER_OPTIONS = ['All', 'DevOps', 'AI'] as const;
+type PreviewFilter = (typeof FILTER_OPTIONS)[number];
+
+function matchesPreviewFilter(
+  project: (typeof DEMO_FEATURED_PROJECTS)[number],
+  filter: PreviewFilter,
+): boolean {
+  if (filter === 'All') return true;
+  if (filter === 'DevOps') {
+    return project.focusAreas.some((f) => f === 'DevOps' || f === 'CI/CD');
+  }
+  if (filter === 'AI') {
+    return (
+      project.domains.includes('Artificial Intelligence') ||
+      project.focusAreas.some((f) => f === 'LLMs' || f === 'AI')
+    );
+  }
+  return true;
+}
+
+function PreviewFilterBar({ active }: { active: PreviewFilter }) {
+  return (
+    <div className="cc-how-it-works-preview__filter cc-app-filter-bar">
+      <span className="cc-how-it-works-preview__filter-label inline-flex items-center gap-1">
+        <HiOutlineFunnel className="h-3 w-3" aria-hidden />
+        Filter
+      </span>
+      {FILTER_OPTIONS.map((option) => (
+        <span
+          key={option}
+          className={`cc-app-filter-pill cc-how-it-works-preview__filter-pill ${
+            active === option ? 'cc-app-filter-pill--active' : ''
+          }`}
+        >
+          {option}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PhoneMock({ step }: { step: number }) {
+  const reducedMotion = useReducedMotion();
+  const allProjects = DEMO_FEATURED_PROJECTS.slice(0, 3);
+  const showProjects = step >= 1;
+  const isFilterStep = step === 2;
+  const isExpandStep = step === 3;
+  const showFilter = isFilterStep;
+  const activeFilter: PreviewFilter = isFilterStep ? 'DevOps' : 'All';
+
+  let displayProjects = allProjects;
+  if (isFilterStep) {
+    displayProjects = allProjects.filter((p) => matchesPreviewFilter(p, 'DevOps'));
+  } else if (isExpandStep) {
+    displayProjects = [allProjects[0]];
+  }
+
+  const expanded = isExpandStep;
+  const labels = ['Scan QR', 'Profile', 'Filters', 'Expanded', 'Save?', 'Notes'];
+  const showSavePrompt = step === 4;
+  const showSavedToast = step === 5;
 
   return (
-    <div className="overflow-hidden rounded-[12px] border border-border/40 bg-void-canvas">
-      <div className="border-b border-border/40 px-3 py-2 text-[13px] text-fog">codecard.app</div>
-      <div className="aspect-[9/16] p-3">
-        <div className="flex h-full flex-col rounded-[10px] border border-border/30 bg-midnight p-3 shadow-rim">
-          <p className="text-[12px] font-medium uppercase tracking-[0.1em] text-reactor">{labels[step] ?? 'Live'}</p>
-          <p className="mt-2 font-display text-[17px] font-medium text-lilac-white">{DEMO_PROFILE.display_name}</p>
-          <p className="mt-1 text-[13px] text-ash">{DEMO_PROFILE.headline}</p>
-          {step >= 2 && (
-            <div className="mt-3 flex-1 rounded-link border border-reactor/25 bg-fern/60 p-3">
-              <p className="text-[11px] uppercase tracking-wide text-fog">Featured</p>
-              <p className="mt-2 text-[14px] font-medium text-lilac-white">{projectTitle}</p>
-              {step >= 4 && (
-                <div className="mt-3 space-y-2">
-                  <div className="h-2 w-full rounded bg-reactor/20" />
-                  <div className="h-2 w-4/5 rounded bg-reactor/15" />
-                  <div className="h-2 w-3/5 rounded bg-reactor/10" />
-                </div>
-              )}
+    <div className="cc-how-it-works-preview relative mx-auto w-full max-w-[320px]">
+      <div className="cc-how-it-works-preview__glow" aria-hidden />
+      <div className="cc-how-it-works-preview__frame">
+        <div className="cc-how-it-works-preview__browser" aria-hidden>
+          <span className="cc-how-it-works-preview__dot" />
+          <span className="cc-how-it-works-preview__dot" />
+          <span className="cc-how-it-works-preview__dot" />
+          <span className="cc-how-it-works-preview__url font-eyebrow">codecard.app/demo</span>
+        </div>
+
+        <div className="cc-how-it-works-preview__header">
+          <p className="cc-how-it-works-preview__step font-eyebrow">{labels[step]}</p>
+          <div className="mt-2 flex items-center gap-3">
+            <div className="cc-how-it-works-preview__avatar relative h-10 w-10 overflow-hidden">
+              <Image
+                src={DEMO_PROFILE.avatar_url!}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <p className="truncate font-display text-[15px] text-ink">
+                  {DEMO_PROFILE.display_name}
+                </p>
+                {step >= 1 && (
+                  <span
+                    className={`cc-how-it-works-preview__header-save shrink-0 ${
+                      showSavePrompt ? 'cc-how-it-works-preview__header-save--hint' : ''
+                    } ${step >= 5 ? 'cc-how-it-works-preview__header-save--saved' : ''}`}
+                    aria-hidden
+                  >
+                    {step >= 5 ? (
+                      <HiCheck className="h-2.5 w-2.5" strokeWidth={2.5} />
+                    ) : (
+                      <HiPlus className="h-2.5 w-2.5" strokeWidth={2.5} />
+                    )}
+                  </span>
+                )}
+              </div>
+              <p className="truncate text-[11px] text-smoke">{DEMO_PROFILE.headline}</p>
+            </div>
+            <span className="cc-how-it-works-preview__live font-eyebrow">Live</span>
+          </div>
+        </div>
+
+        <div className="cc-how-it-works-preview__body relative">
+          {step === 0 && (
+            <div className="cc-how-it-works-preview__qr flex flex-col items-center gap-2 py-5">
+              <div className="cc-how-it-works-preview__qr-frame grid grid-cols-5 grid-rows-5 gap-0.5 p-2">
+                {Array.from({ length: 25 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={i % 3 === 0 || i % 7 === 0 ? 'bg-ink/80' : 'bg-ink/10'}
+                  />
+                ))}
+              </div>
+              <p className="text-[11px] font-medium text-ink">Scan to open</p>
             </div>
           )}
-          {step >= 6 && (
-            <p className="mt-2 rounded-[8px] border border-dashed border-border/50 p-2 text-[12px] text-fog">
-              Met at DevConf · private note
-            </p>
+
+          {showProjects && (
+            <div className="cc-how-it-works-preview__projects space-y-2 p-3 pt-2">
+              {showFilter && <PreviewFilterBar active={activeFilter} />}
+
+              {displayProjects.map((p, i) => {
+                const isLead = i === 0;
+                const showVideo =
+                  expanded && isLead && !reducedMotion && Boolean(p.videoUrl);
+
+                return (
+                  <div key={p.id} className={isLead && expanded ? 'space-y-2' : ''}>
+                    <div
+                      className={`cc-how-it-works-preview__media relative overflow-hidden rounded-[10px] border border-[rgba(34,34,34,0.1)] transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        isLead && expanded ? 'h-[128px]' : 'h-[56px]'
+                      }`}
+                    >
+                      {showVideo && p.videoUrl ? (
+                        <video
+                          src={p.videoUrl}
+                          poster={p.posterUrl ?? undefined}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="h-full w-full object-cover object-top"
+                        />
+                      ) : p.posterUrl ? (
+                        <Image
+                          src={p.posterUrl}
+                          alt=""
+                          fill
+                          className="object-cover object-top opacity-90"
+                          sizes="300px"
+                        />
+                      ) : null}
+                      <div className="cc-how-it-works-preview__media-overlay cc-how-it-works-preview__media-overlay--compact">
+                        <p className="font-display text-[13px] leading-tight text-white">{p.title}</p>
+                        <p className="truncate text-[10px] text-white/75">{p.tagline}</p>
+                      </div>
+                    </div>
+                    {isLead && expanded && p.screenshots?.[0] && p.screenshots?.[1] && (
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[p.screenshots[0], p.screenshots[1]].map((src, j) => (
+                          <div
+                            key={j}
+                            className="relative h-14 overflow-hidden rounded-[8px] border border-[rgba(34,34,34,0.1)]"
+                          >
+                            <Image src={src} alt="" fill className="object-cover" sizes="140px" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <AnimatePresence>
+            {showSavePrompt && (
+              <SaveConnectionPrompt key="save-prompt" reducedMotion={reducedMotion} />
+            )}
+          </AnimatePresence>
+
+          {showSavedToast && (
+            <div className="cc-how-it-works-preview__saved-toast mx-3 mt-2 flex items-center justify-center gap-1.5 rounded-full border border-[rgba(34,34,34,0.08)] bg-[#daf7ee] px-3 py-1.5">
+              <HiCheck className="h-3 w-3 text-ink" aria-hidden />
+              <p className="font-eyebrow text-[9px] uppercase tracking-[0.08em] text-ink">
+                Saved to connections
+              </p>
+            </div>
+          )}
+
+          {step >= 5 && (
+            <div className="cc-how-it-works-preview__note mx-3 mb-3 rounded-[12px] p-2.5">
+              <p className="font-eyebrow text-[10px] uppercase tracking-[0.08em] text-smoke">
+                Private note
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-ink">
+                Met at DevConf, follow up Jul 2
+              </p>
+            </div>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+function SaveConnectionPrompt({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <motion.div
+      className="cc-how-it-works-preview__save-overlay absolute inset-0 z-10 flex items-center justify-center p-4"
+      initial={reducedMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={reducedMotion ? undefined : { opacity: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="cc-how-it-works-preview__save-backdrop absolute inset-0" aria-hidden />
+
+      <motion.div
+        className="cc-how-it-works-preview__save-prompt relative flex flex-col items-center"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.88, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={reducedMotion ? undefined : { opacity: 0, scale: 0.94 }}
+        transition={{ duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <p className="font-eyebrow text-[8px] uppercase tracking-[0.14em] text-smoke">
+          Been browsing a while
+        </p>
+
+        <div className="cc-how-it-works-preview__save-plus my-3 flex h-14 w-14 items-center justify-center rounded-full border">
+          <HiPlus className="h-7 w-7 text-ink" strokeWidth={2} aria-hidden />
+        </div>
+
+        <p className="font-display text-[14px] leading-tight text-ink">Save connection?</p>
+        <p className="mt-1.5 max-w-[150px] text-center text-[10px] leading-relaxed text-smoke">
+          Tap + to keep {DEMO_PROFILE.display_name?.split(' ')[0] ?? 'them'} in your circle
+        </p>
+      </motion.div>
+    </motion.div>
   );
 }

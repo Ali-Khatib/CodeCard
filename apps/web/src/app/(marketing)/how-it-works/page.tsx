@@ -2,7 +2,7 @@ import { MarketingHashRedirect } from '@/components/landing/marketing-hash-redir
 
 export const metadata = {
   title: 'How it works | CodeCard',
-  description: 'Seven steps from NFC tap to saved connection with project proof.',
+  description: 'Seven steps from QR scan or shared link to a saved connection with project proof.',
 };
 
 export default function HowItWorksRoute() {

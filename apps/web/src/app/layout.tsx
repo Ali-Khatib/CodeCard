@@ -1,35 +1,48 @@
 import type { Metadata, Viewport } from 'next';
-import { Instrument_Serif, Inter, Space_Mono } from 'next/font/google';
+import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GlobalBackdrop } from '@/components/landing/global-backdrop';
 import { ProjectOpenProvider } from '@/components/featured-work/project-open-overlay';
+import { ThemeRoot } from '@/components/theme/theme-root';
 import './globals.css';
 
 const inter = Inter({
-  variable: '--font-sans',
+  variable: '--font-inter',
   subsets: ['latin'],
   weight: ['400', '500', '600'],
 });
 
 const instrumentSerif = Instrument_Serif({
-  variable: '--font-display',
+  variable: '--font-instrument',
   subsets: ['latin'],
   weight: '400',
 });
 
 const spaceMono = Space_Mono({
-  variable: '--font-eyebrow',
+  variable: '--font-space-mono',
+  subsets: ['latin'],
+  weight: ['400'],
+});
+
+const orbitron = Orbitron({
+  variable: '--font-cyber-display',
+  subsets: ['latin'],
+  weight: ['500', '700'],
+});
+
+const shareTechMono = Share_Tech_Mono({
+  variable: '--font-cyber-sans',
   subsets: ['latin'],
   weight: ['400'],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: 'CodeCard | Share what you build',
+    default: 'CodeCard | Quick showcase for your work',
     template: '%s | CodeCard',
   },
   description:
-    'The modern identity for people who build things. In 30 seconds: who you are, and what you\'ve built. Everything else comes later.',
+    "The fastest way to show someone what you're capable of. Your best work, ready to share by link, QR, or from your phone.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   openGraph: {
     type: 'website',
@@ -38,19 +51,32 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a13',
+  themeColor: '#fcf1e7',
   width: 'device-width',
   initialScale: 1,
 };
 
+const THEME_BOOT_SCRIPT = `(function(){try{var r=document.documentElement;r.setAttribute('data-theme','original');localStorage.setItem('codecard-theme','original');if(localStorage.getItem('cc-app-appearance')==='dark')r.classList.add('dark');var v={'--bone':'#fcf1e7','--paper':'#ffffff','--ink':'#232324','--canvas':'#fcf1e7','--void-canvas':'#fcf1e7','--background':'#fcf1e7','--obsidian':'#fcf1e7','--cosmic-base-start':'#fcf1e7','--cosmic-base-mid':'#fafafa','--cosmic-base-end':'#fcf1e7','--text-primary':'#232324','--vellum':'#232324','--phosphor':'#232324','--text-secondary':'#767073','--smoke':'#767073','--iris':'#c094e4','--accent':'#c094e4','--accent-rgb':'192, 148, 228','--cosmic-glow':'rgba(195, 192, 242, 0.14)','--cosmic-glow-secondary':'rgba(241, 201, 221, 0.12)'};for(var k in v)r.style.setProperty(k,v[k]);}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" data-theme="original" suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#fcf1e7" />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body
-        className={`${inter.variable} ${instrumentSerif.variable} ${spaceMono.variable} min-h-screen bg-obsidian antialiased`}
+        className={`${inter.variable} ${instrumentSerif.variable} ${spaceMono.variable} ${orbitron.variable} ${shareTechMono.variable} min-h-screen bg-bone font-sans text-ink antialiased`}
+        style={{
+          '--font-sans': 'var(--font-inter), system-ui, sans-serif',
+          '--font-display': 'var(--font-instrument), Georgia, ui-serif, serif',
+          '--font-eyebrow': 'var(--font-space-mono), ui-monospace, monospace',
+        } as Record<string, string>}
       >
-        <GlobalBackdrop />
-        <ProjectOpenProvider>{children}</ProjectOpenProvider>
+        <ThemeRoot>
+          <GlobalBackdrop />
+          <ProjectOpenProvider>{children}</ProjectOpenProvider>
+        </ThemeRoot>
         <SpeedInsights />
       </body>
     </html>

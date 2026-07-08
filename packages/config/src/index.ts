@@ -53,34 +53,51 @@ export const STORAGE_BUCKETS = {
   privateDocs: 'private-docs',
 } as const;
 
+export const PAYMENT_PROVIDERS = {
+  stripe: {
+    id: 'stripe',
+    name: 'Stripe',
+    regions: 'US, CA, UK, EU, AU, and more',
+  },
+  paddle: {
+    id: 'paddle',
+    name: 'Paddle',
+    regions: '190+ countries — local tax & checkout where Stripe is limited',
+  },
+} as const;
+
 export const PLANS = {
   free: {
     id: 'free',
     name: 'Free',
+    tagline: 'Good enough to launch and share.',
     priceMonthly: 0,
     features: [
-      'Public profile',
       'Up to 5 projects',
-      'Guided project creation',
-      'Profile & project view analytics',
-      'QR & link sharing',
+      'Basic project media',
+      'GitHub import',
+      'QR + link sharing',
+      'Basic analytics',
     ],
   },
   pro: {
     id: 'pro',
     name: 'Pro',
+    tagline: 'For people who actually want to use CodeCard seriously.',
     priceMonthly: 8,
     priceYearly: 76,
     stripePriceEnvKey: 'STRIPE_PRO_PRICE_ID',
+    /** Global checkout where Stripe is unavailable — Paddle acts as merchant of record */
+    paddlePriceEnvKey: 'PADDLE_PRO_PRICE_ID',
     features: [
       'Unlimited projects',
-      'GitHub repo import',
-      'AI hero generation',
-      'Premium analytics & visitor insights',
-      'Custom domain',
       'Remove CodeCard branding',
-      'Resume hosting',
-      'NFC card management',
+      'Custom domain',
+      'Premium analytics',
+      'Visitor insights',
+      'AI insights',
+      'AI project polishing',
+      'Guided project creation',
       'Early access',
     ],
   },

@@ -1,25 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { CODECARD_INTRO_HOOK, CODECARD_INTRO_USE_CASES } from '@/lib/marketing/positioning';
 import { ScrollReveal } from '@/components/landing/scroll-reveal';
 import { TYPE } from '@/lib/design/tokens';
 
 const BLOCKS = [
   {
-    title: 'The problem',
-    body: 'Most profiles lead with schools and job titles. Your projects sit at the bottom. People skim for a few seconds. Your proof may never get seen.',
+    title: 'Hand off your work',
+    body: 'The fastest way to show what you are capable of. Link, QR, or your screen in the room. Like a business card, but your projects and demos are right there.',
   },
   {
-    title: 'What CodeCard is',
-    body: 'One link to a profile that opens with what you built: projects, demos, and results. Your name, role, and background still matter. They just do not take the first look.',
+    title: 'Remember who you met',
+    body: 'Private notes on connections, where you met, and what to follow up on. LinkedIn keeps your network. CodeCard keeps your context.',
   },
   {
-    title: 'What is inside',
-    body: 'Project cards with screenshots, video, and tech stack. Repo and live demo links. Share by URL, QR code, or NFC at events. Analytics on profile and project views. Private notes on people you meet.',
+    title: 'Great tools, wrong moment',
+    body: 'LinkedIn is built for careers and timelines. GitHub is built for repositories. Neither is built for one scroll of your best work when someone is right in front of you.',
   },
   {
-    title: 'Why it matters',
-    body: 'Strong work does not help if nobody sees it. CodeCard puts your proof where people look first, so the conversation starts with what you built.',
+    title: 'The piece that was missing',
+    body: 'Import from what you already have, publish one page, and turn repositories into stories people actually understand. Your profiles link out. Setup takes minutes.',
   },
 ] as const;
 
@@ -27,25 +29,24 @@ export function ResearchWhyCodecard() {
   return (
     <section className="cc-container py-2 md:py-4" aria-labelledby="research-why-codecard-heading">
       <ScrollReveal>
-        <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-reactor">Why CodeCard</p>
+        <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-iris">Why CodeCard</p>
         <h2
           id="research-why-codecard-heading"
-          className={`mt-5 max-w-[900px] text-balance ${TYPE.sectionHeading} text-vellum`}
+          className={`mt-5 max-w-[920px] text-balance ${TYPE.sectionHeading} text-ink`}
         >
-          Show your work first. Share one link.
+          {CODECARD_INTRO_HOOK}
         </h2>
-        <p className="mt-6 max-w-[760px] text-[19px] font-medium leading-[1.5] text-lichen md:text-[21px]">
-          CodeCard is a work-first profile for builders. Put your best projects up front, keep your
-          credentials still matter, and share one link everywhere you show up.
+        <p className="mt-6 max-w-[720px] text-[19px] font-normal leading-[1.5] text-smoke md:text-[21px]">
+          {CODECARD_INTRO_USE_CASES}
         </p>
 
-        <div className="mt-14 grid gap-12 md:grid-cols-2 md:gap-x-16 md:gap-y-14 lg:max-w-[1120px]">
+        <div className="mt-14 grid gap-10 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-12 lg:max-w-[1120px]">
           {BLOCKS.map((block) => (
-            <div key={block.title}>
-              <h3 className="font-display text-[28px] font-semibold leading-[1.15] tracking-[-0.3px] text-vellum md:text-[32px]">
+            <div key={block.title} className="cc-why-codecard-point">
+              <h3 className="font-display text-[22px] font-normal leading-snug tracking-[-0.02em] text-ink md:text-[24px]">
                 {block.title}
               </h3>
-              <p className="mt-4 text-[18px] font-medium leading-[1.55] text-lichen md:text-[20px] md:leading-[1.5]">
+              <p className="mt-3 text-[17px] leading-[1.55] text-smoke md:text-[18px]">
                 {block.body}
               </p>
             </div>
@@ -53,15 +54,12 @@ export function ResearchWhyCodecard() {
         </div>
 
         <div className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-4">
-          <Link
-            href="/profiles"
-            className="text-[17px] font-semibold text-reactor transition-colors hover:text-vellum"
-          >
-            See live demo →
-          </Link>
+          <LiveDemoLink className="cc-btn-pill-demo cc-instant-press inline-flex h-11 px-7 text-[15px]">
+            Open live demo workspace →
+          </LiveDemoLink>
           <Link
             href="/sign-up"
-            className="text-[17px] font-semibold text-ash transition-colors hover:text-vellum"
+            className="text-[17px] font-medium text-ink transition-opacity hover:opacity-70"
           >
             Start free →
           </Link>

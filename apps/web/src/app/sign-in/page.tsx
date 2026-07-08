@@ -1,22 +1,73 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { signInSchema } from '@codecard/validation';
-import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle } from '@codecard/ui';
+import { AuthShell } from '@/components/auth/auth-shell';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 
-export default function SignInPage() {
+const SETUP_MSG =
+  'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY).';
+
+function OAuthButton({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="cc-app-btn cc-app-btn--ghost cc-app-btn--block disabled:opacity-50"
+    >
+      {label}
+    </button>
+  );
+}
+
+function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') ?? '/dashboard';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const authConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+
+  async function oauth(provider: 'google' | 'github') {
+    if (!authConfigured) {
+      setError(SETUP_MSG);
+      return;
+    }
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+      },
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!authConfigured) {
+      setError(SETUP_MSG);
+      return;
+    }
+
     setLoading(true);
 
     const parsed = signInSchema.safeParse({ email, password });
@@ -35,53 +86,85 @@ export default function SignInPage() {
       return;
     }
 
-    router.push('/dashboard');
+    router.push(redirectTo);
     router.refresh();
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign in to CodeCard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in'}
-            </Button>
-          </form>
-          <p className="mt-6 text-center text-sm text-zinc-400">
-            No account?{' '}
-            <Link href="/sign-up" className="text-violet-400 hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <AuthShell
+      title="Sign in to CodeCard"
+      subtitle="Manage your projects, profile, analytics, and connections."
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-[14px] font-medium text-[#222222]">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className="cc-app-input"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="password" className="text-[14px] font-medium text-[#222222]">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            className="cc-app-input"
+          />
+        </div>
+        {error && <p className="text-[14px] text-[#df6a6b]">{error}</p>}
+        <button
+          type="submit"
+          className="cc-app-btn cc-app-btn--primary cc-app-btn--block"
+          disabled={loading}
+        >
+          {loading ? 'Signing in…' : 'Sign in'}
+        </button>
+      </form>
+
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+        <span className="cc-app-mono">or</span>
+        <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+      </div>
+
+      <div className="space-y-3">
+        <OAuthButton label="Continue with GitHub" onClick={() => oauth('github')} disabled={loading} />
+        <OAuthButton label="Continue with Google" onClick={() => oauth('google')} disabled={loading} />
+      </div>
+
+      <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
+        <Link href={LIVE_DEMO_HREF} className="cc-app-btn cc-app-btn--soft cc-app-btn--block">
+          Explore demo workspace
+        </Link>
+      </div>
+
+      <p className="mt-6 text-center text-[14px] text-[#7a7876]">
+        No account?{' '}
+        <Link href="/sign-up" className="font-medium text-[#222222] underline-offset-2 hover:underline">
+          Create one
+        </Link>
+      </p>
+    </AuthShell>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
   );
 }

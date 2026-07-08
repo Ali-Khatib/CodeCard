@@ -9,14 +9,23 @@ import { MorphSignupCta } from './morph-signup-cta';
 import { ScrollReveal } from './scroll-reveal';
 import { AuroraDivider } from './aurora-divider';
 
+const PRO_MONTHLY = PLANS.pro.priceMonthly;
+const PRO_YEARLY = PLANS.pro.priceYearly;
+const YEARLY_SAVINGS_PCT = Math.round((1 - PRO_YEARLY / (PRO_MONTHLY * 12)) * 100);
+const PRO_YEARLY_PER_MONTH = (PRO_YEARLY / 12).toFixed(2);
+
 const FAQ = [
   {
     q: 'Can I start for free?',
-    a: 'Yes. The Free plan includes a public profile, up to five projects, analytics, and link sharing.',
+    a: 'Yes. Free is built to help you create and share a CodeCard fast: up to five projects, basic media, GitHub import, QR and link sharing, and basic analytics.',
+  },
+  {
+    q: 'What do I get with Pro?',
+    a: 'Pro is for when you want to use CodeCard seriously: look more professional, track more deeply, and customize more. You get unlimited projects, no CodeCard branding, a custom domain, premium analytics, visitor insights, AI insights, AI project polishing, guided project creation, and early access to new features.',
   },
   {
     q: 'How does billing work?',
-    a: 'Pro is billed monthly or yearly on the web. Manage your subscription anytime from the dashboard.',
+    a: `Pro is $${PRO_MONTHLY}/month or $${PRO_YEARLY}/year. Pay with Stripe where available, or Paddle in 190+ countries where Stripe is limited. Manage your subscription anytime from the dashboard.`,
   },
   {
     q: 'Do visitors need an account?',
@@ -36,11 +45,12 @@ export function PricingLandingPage() {
       <section className="cc-container scroll-mt-28 pb-16 pt-[120px] text-center md:pt-[140px]">
         <ScrollReveal>
           <SectionCounter index="01" label="Pricing" />
-          <h1 className={`mt-6 ${TYPE.sectionHeading} mx-auto max-w-[16ch] text-balance text-phosphor`}>
-            Start free. <span className="cc-text-reactor">Grow</span> when you need more.
+          <h1 className={`mt-6 ${TYPE.sectionHeading} mx-auto max-w-[20ch] text-balance text-phosphor`}>
+            Create fast. <span className="cc-text-reactor">Upgrade</span> when it matters.
           </h1>
-          <p className="mx-auto mt-8 max-w-[580px] text-[18px] leading-[1.56] text-lichen">
-            Publish your CodeCard, share projects, and upgrade for analytics and custom domains.
+          <p className="mx-auto mt-8 max-w-[600px] text-[18px] leading-[1.56] text-lichen">
+            Free helps you launch and share a CodeCard in minutes. Pro helps you look more professional,
+            track more deeply, and customize more.
           </p>
 
           <div className="mt-10 inline-flex rounded-full border border-border/50 bg-midnight p-1 shadow-rim">
@@ -61,7 +71,7 @@ export function PricingLandingPage() {
               }`}
             >
               Yearly
-              <span className="ml-1.5 text-[12px] opacity-80">−20%</span>
+              <span className="ml-1.5 text-[12px] opacity-80">−{YEARLY_SAVINGS_PCT}%</span>
             </button>
           </div>
         </ScrollReveal>
@@ -74,14 +84,10 @@ export function PricingLandingPage() {
           <div className="grid gap-5 md:grid-cols-2 md:gap-6">
             {Object.values(PLANS).map((plan, i) => {
               const monthly = plan.priceMonthly;
-              const price =
-                plan.id === 'free'
-                  ? 0
-                  : yearly && plan.id === 'pro'
-                    ? PLANS.pro.priceYearly
-                    : monthly;
-              const suffix = plan.id === 'free' ? '' : yearly ? '/yr' : '/mo';
               const isPro = plan.id === 'pro';
+              const price =
+                plan.id === 'free' ? 0 : yearly && isPro ? PRO_YEARLY : monthly;
+              const suffix = plan.id === 'free' ? '' : yearly && isPro ? '/yr' : '/mo';
 
               return (
                 <ScrollReveal key={plan.id} delay={i * 0.1}>
@@ -93,10 +99,16 @@ export function PricingLandingPage() {
                     <p className="cc-tag-dot text-[12px] font-medium uppercase tracking-[0.1em] text-graphite">
                       {plan.name}
                     </p>
+                    <p className="mt-3 text-[15px] leading-snug text-lichen">{plan.tagline}</p>
                     <p className="mt-6 font-display text-[48px] font-medium leading-none tracking-[-0.3px] text-phosphor md:text-[56px]">
                       ${price}
                       {suffix && <span className="text-[16px] font-normal text-graphite">{suffix}</span>}
                     </p>
+                    {isPro && yearly && (
+                      <p className="mt-2 text-[15px] text-graphite">
+                        ≈ ${PRO_YEARLY_PER_MONTH}/mo billed annually
+                      </p>
+                    )}
                     <ul className="mt-8 flex-1 space-y-3 text-[16px] text-lichen">
                       {plan.features.map((f) => (
                         <li key={f} className="flex gap-2">
@@ -153,13 +165,12 @@ export function PricingLandingPage() {
             <h2 className={`${TYPE.sectionHeading} text-phosphor`}>
               Ready when you <span className="cc-text-reactor">are.</span>
             </h2>
-            <p className="mt-6 text-[18px] text-lichen">Free to start. Upgrade only when you need Pro.</p>
+            <p className="mt-6 text-[18px] text-lichen">
+              Free to launch. Pro when you want to take it seriously.
+            </p>
             <div className="mt-10 flex justify-center">
               <MorphSignupCta layoutId="pricing-final-cta" />
             </div>
-            <Link href="/profiles" className="mt-6 inline-block text-[15px] text-graphite transition-colors hover:text-reactor">
-              Explore live demo →
-            </Link>
           </div>
         </ScrollReveal>
       </section>

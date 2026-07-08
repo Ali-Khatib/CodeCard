@@ -2,125 +2,276 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { DASH_NAV_ICONS } from './dashboard-nav-icons';
+import { DashboardPageTransition } from './dashboard-page-transition';
+import { DashboardNotifications } from './dashboard-notifications';
+import { AppButton } from './ui/dashboard-ui';
+import { AsyncActionButton } from '@/components/ui/async-action-button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 
-const NAV_LINKS = [
-  { href: '/dashboard/projects', label: 'Projects' },
-  { href: '/dashboard/analytics', label: 'Analytics' },
-  { href: '/dashboard/profile', label: 'Profile' },
-  { href: '/dashboard/connections', label: 'Connections' },
-  { href: '/dashboard/settings', label: 'Settings' },
+const NAV_ITEMS = [
+  { segment: '', label: 'Home', icon: 'home' as const },
+  { segment: 'projects', label: 'Projects', icon: 'projects' as const },
+  { segment: 'circle', label: 'Circle', icon: 'circle' as const },
+  { segment: 'analytics', label: 'Analytics', icon: 'analytics' as const },
+  { segment: 'connections', label: 'Connections', icon: 'connections' as const },
+  { segment: 'settings', label: 'Settings', icon: 'settings' as const },
 ] as const;
+
+const PAGE_TITLES: Record<string, string> = {
+  '': 'Home',
+  projects: 'Projects',
+  circle: 'Circle',
+  analytics: 'Analytics',
+  connections: 'Connections',
+  settings: 'Settings',
+  billing: 'Billing',
+};
 
 type DashboardShellProps = {
   children: React.ReactNode;
   profileSlug?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+  completion?: number;
+  basePath?: string;
+  preview?: boolean;
 };
 
-export function DashboardShell({ children, profileSlug }: DashboardShellProps) {
-  const pathname = usePathname();
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+function CopyProfileLinkButton({ slug }: { slug: string }) {
+  return (
+    <AsyncActionButton
+      variant="primary"
+      block
+      ariaLabel="Copy profile link"
+      successLabel="Copied"
+      onAction={async () => {
+        await navigator.clipboard.writeText(`${window.location.origin}/${slug}`);
+      }}
+    >
+      Copy profile link
+    </AsyncActionButton>
+  );
+}
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+export function DashboardShell({
+  children,
+  profileSlug,
+  displayName,
+  email,
+  avatarUrl,
+  completion,
+  basePath = '/dashboard',
+  preview = false,
+}: DashboardShellProps) {
+  const pathname = usePathname();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('cc-sidebar-open');
+    if (stored === '0') setSidebarOpen(false);
+  }, []);
+
+  useEffect(() => {
+    applyDarkMode(readDarkPreference());
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((open) => {
+      const next = !open;
+      localStorage.setItem('cc-sidebar-open', next ? '1' : '0');
+      return next;
+    });
+  }, []);
+
+  const hrefFor = (segment: string) => (segment ? `${basePath}/${segment}` : basePath);
+
+  const isActive = (segment: string) => {
+    const href = hrefFor(segment);
+    if (!segment) return pathname === basePath;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const segment = pathname.replace(basePath, '').replace(/^\//, '').split('/')[0] ?? '';
+  const pageTitle =
+    segment === 'profile' ? 'Home' : (PAGE_TITLES[segment] ?? 'Dashboard');
+
+  const initials = (displayName ?? email ?? 'U')
+    .split(' ')
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const navLinks = (
-    <>
-      {NAV_LINKS.map((link) => {
-        const active = isActive(link.href);
+    <nav className="flex flex-col gap-1" aria-label="Main">
+      {NAV_ITEMS.map((item) => {
+        const href = hrefFor(item.segment);
+        const active = isActive(item.segment);
+        const Icon = DASH_NAV_ICONS[item.icon];
         return (
           <Link
-            key={link.href}
-            href={link.href}
-            onClick={() => setMobileNavOpen(false)}
-            className={`rounded-[8px] px-3 py-2 text-left text-[14px] font-medium transition-colors ${
-              active
-                ? 'bg-reactor/15 font-semibold text-phosphor'
-                : 'text-graphite hover:bg-fern/50 hover:text-lichen'
-            }`}
+            key={href}
+            href={href}
+            className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''}`}
           >
-            {link.label}
+            <Icon />
+            {item.label}
           </Link>
         );
       })}
-    </>
+    </nav>
   );
 
   return (
-    <div className="min-h-screen bg-void-canvas text-phosphor">
-      <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_55%_at_20%_0%,rgba(139,92,246,0.14),transparent_55%),radial-gradient(ellipse_60%_50%_at_100%_100%,rgba(83,110,255,0.08),transparent_50%)]"
-        aria-hidden
-      />
+    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'}`}>
+      <button
+        type="button"
+        className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
+        onClick={toggleSidebar}
+        aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+        aria-expanded={sidebarOpen}
+      >
+        <span className="cc-app-sidebar-toggle__chevron" aria-hidden />
+      </button>
 
-      <div className="relative flex min-h-screen flex-col md:flex-row">
-        <header className="flex items-center justify-between border-b border-border/40 bg-midnight/60 px-4 py-3 backdrop-blur-md md:hidden">
-          <Link href="/dashboard/projects" className="font-display text-[17px] font-medium text-vellum">
+      <aside className={`cc-app-sidebar ${sidebarOpen ? 'cc-app-sidebar--open' : ''}`}>
+        <div className="cc-app-sidebar__head">
+          <Link href={basePath} className="cc-app-sidebar__brand">
             CodeCard
           </Link>
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 text-vellum"
-            aria-expanded={mobileNavOpen}
-            aria-label="Toggle dashboard menu"
-            onClick={() => setMobileNavOpen((open) => !open)}
-          >
-            <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
-              <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" strokeWidth="1.5" />
-            </svg>
-          </button>
-        </header>
+        </div>
 
-        {mobileNavOpen && (
-          <nav
-            className="flex flex-col gap-1 border-b border-border/30 bg-midnight/80 px-3 py-3 md:hidden"
-            aria-label="Dashboard"
-          >
-            {navLinks}
-          </nav>
-        )}
-
-        <aside className="hidden w-52 shrink-0 flex-col border-r border-border/30 bg-midnight/50 p-4 md:flex">
-          <Link href="/dashboard/projects" className="mb-6 font-display text-[17px] font-medium text-vellum">
-            CodeCard
-          </Link>
-          <nav className="flex flex-col gap-1" aria-label="Dashboard">
-            {navLinks}
-          </nav>
-          {profileSlug && (
-            <Link
-              href={`/${profileSlug}`}
-              target="_blank"
-              className="mt-auto pt-8 text-[13px] text-graphite transition-colors hover:text-reactor"
-            >
-              /{profileSlug} ↗
-            </Link>
-          )}
-        </aside>
-
-        <div className="flex min-h-0 flex-1 flex-col">
-          <div className="hidden items-center justify-between border-b border-border/40 px-6 py-3 md:flex">
-            <p className="font-eyebrow text-[11px] uppercase tracking-[0.08em] text-graphite">
-              app.codecard.io{pathname}
-            </p>
-            <div className="flex items-center gap-4">
-              {profileSlug && (
-                <Link
-                  href={`/${profileSlug}`}
-                  target="_blank"
-                  className="text-[13px] text-graphite transition-colors hover:text-phosphor"
-                >
-                  View public profile ↗
-                </Link>
+        <div className="cc-app-user-card mt-8">
+          <div className="flex items-center gap-3">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-[11px] font-medium">
+                  {initials}
+                </span>
               )}
-              <Link href="/" className="text-[13px] text-graphite transition-colors hover:text-phosphor">
-                Site
-              </Link>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[14px] font-medium text-[var(--app-ink)]">
+                {displayName ?? 'Workspace'}
+              </p>
+              <p className="truncate text-[12px] text-[var(--app-smoke)]">
+                @{profileSlug ?? email?.split('@')[0] ?? 'you'}
+              </p>
+              {completion != null && (
+                <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
+                  {completion}% ready
+                </span>
+              )}
             </div>
           </div>
+        </div>
 
-          <main className="flex-1 p-5 md:p-8">{children}</main>
+        <div className="mt-6 flex-1 overflow-y-auto">{navLinks}</div>
+
+        <div className="mt-4 space-y-2 border-t border-[var(--app-border)] pt-4">
+          <div className="cc-app-sidebar-appearance">
+            <div className="min-w-0">
+              <p className="text-[13px] font-medium text-[var(--app-ink)]">Appearance</p>
+              <p className="text-[11px] text-[var(--app-smoke)]">Light or dark</p>
+            </div>
+            <ThemeToggle />
+          </div>
+          {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
+          <AppButton variant="ghost" block href="/">
+            ← Back to landing
+          </AppButton>
+        </div>
+      </aside>
+
+      <div className="cc-app-main">
+        <header className="cc-app-topbar">
+          <h1 className="text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
+          <div className="flex-1" />
+          <DashboardNotifications basePath={basePath} />
+          <AppButton variant="primary" href={`${basePath}/projects/new`}>
+            Create project
+          </AppButton>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((o) => !o)}
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]"
+              aria-expanded={userMenuOpen}
+              aria-label="User menu"
+            >
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-[10px] font-medium">{initials}</span>
+              )}
+            </button>
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-[12px] border border-[var(--app-border)] bg-[var(--app-paper)] py-1 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+                <p className="border-b border-[var(--app-border)] px-3 py-2 text-[12px] text-[var(--app-smoke)]">
+                  {email}
+                </p>
+                <Link
+                  href={`${basePath}/settings`}
+                  className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                  onClick={() => setUserMenuOpen(false)}
+                >
+                  Settings
+                </Link>
+                {preview ? (
+                  <Link
+                    href="/sign-up"
+                    className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Create account
+                  </Link>
+                ) : (
+                  <Link
+                    href={`${basePath}/settings`}
+                    className="block px-3 py-2 text-[14px] text-[var(--app-smoke)] hover:bg-[var(--app-bone)]"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Sign out
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div className="cc-app-content">
+          <DashboardPageTransition>{children}</DashboardPageTransition>
         </div>
       </div>
+
+      <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
+        {NAV_ITEMS.slice(0, 5).map((item) => {
+          const href = hrefFor(item.segment);
+          const active = isActive(item.segment);
+          const Icon = DASH_NAV_ICONS[item.icon];
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] ${
+                active ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
+              }`}
+            >
+              <Icon />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

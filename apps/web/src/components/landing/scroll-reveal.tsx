@@ -20,15 +20,15 @@ type ScrollRevealProps = {
   delay?: number;
   y?: number;
   scale?: number;
-  /** Frame.io-style scrub parallax while section crosses viewport */
   parallax?: boolean;
 };
 
+/** Scroll entrance — always visible; animates translate only so content never stays hidden. */
 export function ScrollReveal({
   children,
   className = '',
   delay = 0,
-  y = 48,
+  y = 32,
   scale = 1,
   parallax = false,
 }: ScrollRevealProps) {
@@ -36,24 +36,26 @@ export function ScrollReveal({
   const reduced = useReducedMotion();
 
   useEffect(() => {
+    if (reduced) return;
+
     ensureGsap();
     const el = ref.current;
-    if (!el || reduced) return;
+    if (!el) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
-        { opacity: 0, y, scale: scale === 1 ? 1 : scale * 0.96 },
+        { y, scale: scale === 1 ? 1 : scale * 0.98 },
         {
-          opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.9,
+          duration: 0.75,
           delay,
           ease: 'power3.out',
+          immediateRender: false,
           scrollTrigger: {
             trigger: el,
-            start: 'top 85%',
+            start: 'top 88%',
             once: true,
           },
         },
@@ -61,13 +63,13 @@ export function ScrollReveal({
 
       if (parallax) {
         gsap.to(el, {
-          y: -32,
+          y: -24,
           ease: 'none',
           scrollTrigger: {
             trigger: el,
             start: 'top bottom',
             end: 'bottom top',
-            scrub: 0.6,
+            scrub: 0.5,
           },
         });
       }
@@ -77,7 +79,7 @@ export function ScrollReveal({
   }, [reduced, delay, y, scale, parallax]);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={`cc-scroll-reveal ${className}`.trim()}>
       {children}
     </div>
   );

@@ -54,7 +54,7 @@ export function MorphFilterSurface({
 
   if (!mounted) {
     return (
-      <div className="rounded-2xl border border-zinc-800/90 bg-zinc-950/90 px-3 py-2 text-[11px] uppercase tracking-[0.2em] text-zinc-400">
+      <div className="cc-profile-filter-btn rounded-2xl px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.12em]">
         Filter
       </div>
     );
@@ -64,13 +64,15 @@ export function MorphFilterSurface({
     <div className="relative">
       <motion.div
         animate={{ borderRadius: open ? 16 : 16 }}
-        className="overflow-hidden rounded-2xl border border-zinc-800/90 bg-zinc-950/90 shadow-xl backdrop-blur-xl"
+        className={`cc-profile-filter-btn overflow-hidden rounded-2xl shadow-xl backdrop-blur-xl ${
+          open ? 'cc-profile-filter-btn--open' : ''
+        }`}
       >
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="flex w-full items-center gap-2 px-3 py-2 text-[11px] uppercase tracking-[0.2em] text-zinc-400 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--profile-accent)]"
+          className="flex w-full min-w-[132px] items-center justify-center gap-2 px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.12em] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-reactor/50"
         >
           <HiOutlineFunnel aria-hidden />
           Filter
@@ -94,7 +96,7 @@ export function MorphFilterSurface({
               transition={{ type: 'spring', stiffness: 480, damping: 38 }}
               className="overflow-hidden"
             >
-              <div className="space-y-3 border-t border-zinc-800/80 p-3">
+              <div className="space-y-3 border-t border-reactor/15 p-3">
                 {domains.length > 0 && (
                   <FilterRow
                     label="Domain"
@@ -125,8 +127,7 @@ export function MorphFilterSurface({
                   <button
                     type="button"
                     onClick={close}
-                    className="flex-1 rounded-lg px-3 py-2 text-xs font-medium text-white outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-                    style={{ backgroundColor: accentColor }}
+                    className="flex-1 rounded-lg bg-reactor px-3 py-2.5 text-xs font-semibold text-pearl outline-none focus-visible:ring-2 focus-visible:ring-reactor/50"
                   >
                     Apply
                   </button>
@@ -191,10 +192,11 @@ const FilterChip = forwardRef<
       ref={ref}
       type="button"
       onClick={onClick}
-      className={`rounded-full px-2.5 py-1 text-xs outline-none focus-visible:ring-2 focus-visible:ring-[var(--profile-accent)] ${
-        active ? 'text-white' : 'border border-zinc-800 text-zinc-500'
+      className={`rounded-full px-3 py-1.5 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-reactor/40 ${
+        active
+          ? 'border border-reactor/50 bg-reactor/25 text-vellum'
+          : 'border border-reactor/15 text-graphite hover:border-reactor/30 hover:text-lichen'
       }`}
-      style={active ? { backgroundColor: accentColor } : undefined}
     >
       {label}
     </button>

@@ -43,7 +43,7 @@ export function TechIcon({ tech, className = '', imgClassName = 'h-[1em] w-[1em]
   }, [tech, simpleUrl]);
 
   if (Icon) {
-    return <Icon className={`drop-shadow-sm ${className}`} aria-hidden />;
+    return <Icon className={`shrink-0 ${imgClassName} ${className}`} aria-hidden />;
   }
 
   if (simpleUrl && !cdnFailed) {
