@@ -165,15 +165,15 @@ export function HowItWorksSection() {
                           <span className="block font-display leading-snug">{s.title}</span>
                         </button>
 
-                        <AnimatePresence initial={false}>
+                        <AnimatePresence initial={false} mode="wait">
                           {isActive && (
                             <motion.div
                               key={`detail-${i}`}
                               className="cc-how-it-works-rail-detail"
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                              exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+                              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                             >
                               <p>{s.detail}</p>
                               {i === 3 && (
@@ -214,7 +214,7 @@ export function HowItWorksSection() {
                 className="mt-8 md:hidden"
               />
 
-              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite md:text-left">
+              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite md:hidden">
                 Step {activeStep + 1} of {STEPS.length}
               </p>
             </div>

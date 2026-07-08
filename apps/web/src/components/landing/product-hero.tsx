@@ -7,7 +7,6 @@ import { useHeroParallax } from '@/hooks/use-hero-parallax';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
-import { HeroDashboardPeek } from './hero-dashboard-peek';
 
 export function ProductHero() {
   const heroRef = useHeroParallax<HTMLElement>();
@@ -22,7 +21,6 @@ export function ProductHero() {
     const statement = section.querySelector('[data-hero-statement]');
     const pitch = section.querySelector('[data-hero-pitch]');
     const cta = section.querySelector('[data-hero-cta]');
-    const peek = section.querySelector('[data-hero-peek]');
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -35,9 +33,6 @@ export function ProductHero() {
       if (cta) {
         tl.fromTo(cta, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65 }, 0.28);
       }
-      if (peek) {
-        tl.fromTo(peek, { opacity: 0, y: 48 }, { opacity: 1, y: 0, duration: 0.9 }, 0.42);
-      }
     }, section);
 
     return () => ctx.revert();
@@ -46,7 +41,7 @@ export function ProductHero() {
   return (
     <section
       ref={heroRef}
-      className="cc-hume-hero relative flex min-h-[min(92svh,900px)] scroll-mt-28 flex-col items-center justify-start overflow-visible px-6 pb-[clamp(140px,18vw,220px)] pt-[104px] text-center text-ink md:pt-[112px]"
+      className="cc-hume-hero relative flex min-h-[min(78svh,720px)] scroll-mt-28 flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-[104px] text-center text-ink md:pb-24 md:pt-[112px]"
       data-testid="hero-section"
     >
       <div className="cc-hume-hero__blobs pointer-events-none" aria-hidden />
@@ -76,8 +71,6 @@ export function ProductHero() {
           </LiveDemoLink>
         </div>
       </div>
-
-      <HeroDashboardPeek />
     </section>
   );
 }

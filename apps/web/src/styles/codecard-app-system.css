@@ -1861,6 +1861,7 @@ html.dark .cc-reactive-border:hover {
   align-items: center;
   gap: 20px;
   overflow: hidden;
+  isolation: isolate;
   border-radius: 24px;
   border: 1px solid var(--app-border);
   background: var(--app-paper);
@@ -1876,11 +1877,11 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-share-action--link {
-  background: linear-gradient(135deg, var(--app-paper) 0%, #f8f0ff 100%);
+  background: linear-gradient(135deg, var(--app-paper) 0%, rgba(192, 148, 228, 0.1) 100%);
 }
 
 .cc-share-action--qr {
-  background: linear-gradient(135deg, var(--app-paper) 0%, #eefaf5 100%);
+  background: linear-gradient(135deg, var(--app-paper) 0%, rgba(88, 214, 141, 0.08) 100%);
 }
 
 .cc-share-action--qr-open {
@@ -1890,11 +1891,11 @@ html.dark .cc-reactive-border:hover {
 
 .cc-share-action__glow {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.5;
+  filter: blur(40px);
+  opacity: 0.35;
   pointer-events: none;
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
@@ -1905,15 +1906,15 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-share-action__glow--iris {
-  top: -60px;
-  right: -40px;
-  background: rgba(192, 148, 228, 0.55);
+  top: -30px;
+  right: -20px;
+  background: rgba(192, 148, 228, 0.45);
 }
 
 .cc-share-action__glow--mint {
-  bottom: -60px;
-  left: -40px;
-  background: rgba(88, 214, 141, 0.45);
+  bottom: -30px;
+  left: -20px;
+  background: rgba(88, 214, 141, 0.35);
 }
 
 .cc-share-action__shine {
@@ -2376,15 +2377,17 @@ html.dark .cc-reactive-border:hover {
 
 .cc-projects-bubble-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
   gap: 14px;
   width: 100%;
+  align-items: stretch;
 }
 
 .cc-projects-bubble {
   display: flex;
+  height: 100%;
+  min-height: 0;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
   padding: 14px 12px 16px;
   border-radius: 22px;
@@ -2453,6 +2456,39 @@ html.dark .cc-projects-view-toggle {
 
 html.dark .cc-projects-view-toggle__btn--active {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .cc-share-action--link {
+  background: linear-gradient(135deg, var(--app-paper) 0%, rgba(192, 148, 228, 0.14) 100%);
+}
+
+html.dark .cc-share-action--qr {
+  background: linear-gradient(135deg, var(--app-paper) 0%, rgba(88, 214, 141, 0.12) 100%);
+}
+
+html.dark .cc-share-action__icon-wrap {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--app-border-strong);
+}
+
+html.dark .cc-share-action__glow {
+  opacity: 0.2;
+}
+
+html.dark .cc-share-action__title {
+  color: var(--app-ink);
+}
+
+html.dark .cc-share-action__eyebrow {
+  color: var(--app-smoke);
+}
+
+html.dark .cc-share-action__url {
+  color: var(--app-smoke);
+}
+
+html.dark .cc-share-action:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
 }
 
 /* ── Project card — premium hover ── */

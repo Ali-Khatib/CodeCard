@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
-import { FadeInView } from './fade-in-view';
+import { motion } from 'motion/react';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 const FALLBACK =
   'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80';
@@ -15,12 +16,31 @@ export function ProjectsBubbleGrid({
   projects: PortfolioProject[];
   basePath?: string;
 }) {
+  const reduced = useReducedMotion();
+  const count = projects.length;
+  const colMin = count <= 2 ? 'minmax(200px, 1fr)' : count === 3 ? 'minmax(160px, 1fr)' : 'minmax(140px, 1fr)';
+
   return (
-    <div className="cc-projects-bubble-grid">
+    <motion.div
+      className="cc-projects-bubble-grid"
+      layout
+      style={{
+        gridTemplateColumns: `repeat(auto-fit, ${colMin})`,
+      }}
+      initial={reduced ? false : { opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       {projects.map((project, index) => {
         const isPublished = project.isPublished !== false;
         return (
-          <FadeInView key={project.id} delay={index * 0.04}>
+          <motion.div
+            key={project.id}
+            layout
+            initial={reduced ? false : { opacity: 0, y: 16, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
             <Link
               href={`${basePath}/projects/${project.id}`}
               className="cc-projects-bubble group"
@@ -32,7 +52,7 @@ export function ProjectsBubbleGrid({
                   alt=""
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 640px) 33vw, 160px"
+                  sizes="(max-width: 640px) 45vw, 220px"
                 />
               </div>
               <div className="cc-projects-bubble__meta">
@@ -44,9 +64,9 @@ export function ProjectsBubbleGrid({
                 </span>
               </div>
             </Link>
-          </FadeInView>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

@@ -10,6 +10,7 @@ import { ScrollReveal } from './scroll-reveal';
 import { AuroraDivider } from './aurora-divider';
 import { AudienceBounceCards } from '@/components/landing/audience-bounce-cards';
 import { BuildYoursSection } from '@/components/landing/build-yours-section';
+import { WorkspaceShowcase } from '@/components/landing/workspace-showcase';
 import { SectionCounter } from './section-counter';
 import { TYPE } from '@/lib/design/tokens';
 
@@ -19,6 +20,10 @@ export function ProductPage() {
       <div className="pb-16">
         <ProductHero />
         <HumeStatStrip />
+
+        <AuroraDivider className="cc-container" />
+
+        <WorkspaceShowcase />
 
         <AuroraDivider className="cc-container" />
 
