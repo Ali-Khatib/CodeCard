@@ -8,7 +8,7 @@ import { signUpSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
 
 const SETUP_MSG =
-  'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.';
+  'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
 
 function SignUpForm() {
   const router = useRouter();

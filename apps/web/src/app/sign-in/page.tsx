@@ -9,7 +9,7 @@ import { AuthShell } from '@/components/auth/auth-shell';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 
 const SETUP_MSG =
-  'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY).';
+  'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
 
 function OAuthButton({
   label,
