@@ -19,7 +19,8 @@ import * as THREE from 'three';
 import cardGLB from './card.glb';
 import lanyardImg from './lanyard.png';
 
-const LANYARD_TEX = typeof lanyardImg === 'string' ? lanyardImg : lanyardImg.src;
+const lanyardTexture = lanyardImg as string | { src: string };
+const LANYARD_TEX = typeof lanyardTexture === 'string' ? lanyardTexture : lanyardTexture.src;
 
 /** Geometry-only GLB — badge faces are composited at runtime (no embedded textures). */
 const extendLanyardLoader = (loader: GLTFLoader) => {

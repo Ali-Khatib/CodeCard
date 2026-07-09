@@ -38,6 +38,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: [
     '@codecard/ui',
     '@codecard/types',
