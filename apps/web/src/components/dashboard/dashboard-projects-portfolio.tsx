@@ -10,6 +10,17 @@ import { ProjectsBubbleGrid } from './projects-bubble-grid';
 import { FilterBar, AppButton } from './ui/dashboard-ui';
 
 const ALL_PROJECTS_FILTER = 'All';
+const PROJECT_DOMAINS = [
+  'Full Stack',
+  'AI / ML',
+  'GenAI',
+  'DevOps',
+  'Data',
+  'Backend',
+  'Frontend',
+  'Observability',
+] as const;
+type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
 
 const SORT_OPTIONS = ['Visitor order', 'Most views', 'Recently updated'] as const;
 type ProjectSort = (typeof SORT_OPTIONS)[number];
@@ -21,20 +32,44 @@ const VIEW_MODES = [
 
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
 
-function getProjectFilterOptions(projects: PortfolioProject[]): string[] {
-  const tech = new Set<string>();
-  projects.forEach((project) => {
-    project.technologies.forEach((item) => {
-      if (item.trim()) tech.add(item.trim());
-    });
-  });
+const DOMAIN_KEYWORDS: Record<ProjectDomain, string[]> = {
+  'Full Stack': ['next.js', 'react', 'node.js', 'typescript', 'fastapi'],
+  'AI / ML': ['python', 'ml', 'machine learning', 'ai'],
+  GenAI: ['llm', 'genai', 'prompt', 'openai', 'rag'],
+  DevOps: ['docker', 'terraform', 'github actions', 'ci/cd', 'cli'],
+  Data: ['clickhouse', 'postgresql', 'sqlite', 'redis', 'database'],
+  Backend: ['node.js', 'fastapi', 'grpc', 'api', 'rust'],
+  Frontend: ['react', 'next.js', 'typescript'],
+  Observability: ['opentelemetry', 'grafana', 'prometheus', 'observability'],
+};
 
-  return [ALL_PROJECTS_FILTER, ...Array.from(tech).sort((a, b) => a.localeCompare(b))];
+function projectMatchesDomain(project: PortfolioProject, domain: ProjectDomain): boolean {
+  const haystack = [
+    project.title,
+    project.tagline ?? '',
+    project.description ?? '',
+    ...project.technologies,
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  return DOMAIN_KEYWORDS[domain].some((keyword) => haystack.includes(keyword));
+}
+
+function getProjectFilterOptions(projects: PortfolioProject[]): string[] {
+  return [
+    ALL_PROJECTS_FILTER,
+    ...PROJECT_DOMAINS.filter((domain) =>
+      projects.some((project) => projectMatchesDomain(project, domain)),
+    ),
+  ];
 }
 
 function matchesFilter(project: PortfolioProject, filter: string): boolean {
   if (filter === ALL_PROJECTS_FILTER) return true;
-  return project.technologies.some((tech) => tech.toLowerCase() === filter.toLowerCase());
+  return PROJECT_DOMAINS.includes(filter as ProjectDomain)
+    ? projectMatchesDomain(project, filter as ProjectDomain)
+    : true;
 }
 
 function sortProjects(projects: PortfolioProject[], sort: ProjectSort): PortfolioProject[] {
