@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { motion } from 'motion/react';
 import { BorderGlowCard } from './border-glow-card';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { CARD_BORDER_GLOW } from '@/lib/design/border-glow-preset';
 
 const BounceCards = dynamic(() => import('@/components/react-bits/bounce-cards/bounce-cards'), {
@@ -146,6 +148,7 @@ function AudienceDetailPanel({ index }: { index: number }) {
 
 export function AudienceBounceCards() {
   const reducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -156,21 +159,28 @@ export function AudienceBounceCards() {
     el.scrollLeft = center;
   }, []);
 
-  if (reducedMotion) {
+  if (reducedMotion || isMobile) {
     return (
-      <div className="cc-container mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="cc-container mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {AUDIENCE_CARDS.map((card, index) => (
-          <BorderGlowCard
+          <motion.div
             key={card.title}
-            className={`h-full ${AUDIENCE_CARD_TONES[index] ?? ''}`}
+            initial={isMobile && !reducedMotion ? { opacity: 0, y: 18 } : false}
+            whileInView={isMobile && !reducedMotion ? { opacity: 1, y: 0 } : undefined}
+            viewport={{ once: true, amount: 0.22 }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           >
-            <AudienceCardContent
-              eyebrow={card.eyebrow}
-              title={card.title}
-              body={card.body}
-              ctaLabel={card.cta.label}
-            />
-          </BorderGlowCard>
+            <BorderGlowCard
+              className={`h-full ${AUDIENCE_CARD_TONES[index] ?? ''}`}
+            >
+              <AudienceCardContent
+                eyebrow={card.eyebrow}
+                title={card.title}
+                body={card.body}
+                ctaLabel={card.cta.label}
+              />
+            </BorderGlowCard>
+          </motion.div>
         ))}
       </div>
     );

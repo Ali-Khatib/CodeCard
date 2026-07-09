@@ -843,6 +843,15 @@ html.dark .cc-app-sidebar-toggle {
     min-width: 0;
   }
 
+  .cc-app-topbar-title {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .cc-app-root--preview .cc-app-topbar-title {
+    display: none;
+  }
+
   .cc-app-topbar-cta {
     padding-inline: 12px;
     font-size: 13px;
@@ -870,22 +879,19 @@ html.dark .cc-app-sidebar-toggle {
 
   .cc-app-filter-bar {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
+    flex-wrap: wrap;
+    gap: 8px;
+    overflow-x: visible;
+    white-space: normal;
     width: 100%;
     max-width: 100%;
-    padding: 10px;
-  }
-
-  .cc-app-filter-bar::-webkit-scrollbar {
-    display: none;
+    padding: 8px;
   }
 
   .cc-app-filter-pill {
     flex: 0 0 auto;
+    height: 34px;
+    padding-inline: 12px;
   }
 
   .cc-app-mobile-nav {

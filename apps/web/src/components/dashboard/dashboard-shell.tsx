@@ -128,7 +128,7 @@ export function DashboardShell({
   );
 
   return (
-    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'}`}>
+    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''}`}>
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
@@ -205,7 +205,7 @@ export function DashboardShell({
               ← Landing
             </Link>
           )}
-          <h1 className="min-w-0 truncate text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
+          <h1 className="cc-app-topbar-title min-w-0 truncate text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
           <div className="flex-1" />
           <DashboardNotifications basePath={basePath} />
           <AppButton variant="primary" className="cc-app-topbar-cta shrink-0" href={`${basePath}/projects/new`}>

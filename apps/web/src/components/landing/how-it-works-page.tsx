@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { TYPE } from '@/lib/design/tokens';
 import { SectionCounter } from './section-counter';
 import { ScrollReveal } from './scroll-reveal';
@@ -41,25 +42,16 @@ const STEPS = [
 ] as const;
 
 /** Viewport heights of scroll runway per step */
-const STEP_SCROLL_VH = 48;
-const COMPACT_QUERY = '(max-width: 1099px)';
+const STEP_SCROLL_VH = 34;
 
 export function HowItWorksSection() {
   const reducedMotion = useReducedMotion();
-  const [compactLayout, setCompactLayout] = useState(false);
-  const useStaticLayout = reducedMotion || compactLayout;
+  const isMobile = useIsMobile();
+  const useStaticLayout = reducedMotion || isMobile;
   const [activeStep, setActiveStep] = useState(0);
   const runwayRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef(activeStep);
   const step = STEPS[activeStep];
-
-  useEffect(() => {
-    const mq = window.matchMedia(COMPACT_QUERY);
-    setCompactLayout(mq.matches);
-    const handler = () => setCompactLayout(mq.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const goToStep = useCallback((index: number) => {
     const next = Math.min(STEPS.length - 1, Math.max(0, index));
@@ -124,7 +116,7 @@ export function HowItWorksSection() {
       <AuroraDivider className="cc-container mb-10 md:mb-14" />
 
       {useStaticLayout ? (
-        compactLayout && !reducedMotion ? (
+        isMobile && !reducedMotion ? (
           <section className="cc-container cc-how-it-works-mobile">
             <div className="cc-how-it-works-mobile__steps">
               {STEPS.map((s, i) => (

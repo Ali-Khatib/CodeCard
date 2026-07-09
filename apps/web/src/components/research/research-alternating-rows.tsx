@@ -9,23 +9,21 @@ const ITEMS = ALTERNATING_RESEARCH;
 function ResearchPair({
   item,
   index,
-  active,
 }: {
   item: (typeof ITEMS)[number];
   index: number;
-  active: boolean;
 }) {
   return (
     <motion.article
       className="cc-research-crossfade__item"
-      aria-hidden={!active}
-      initial={false}
-      animate={{
-        opacity: active ? 1 : 0,
-        y: active ? 0 : 18,
-        filter: active ? 'blur(0px)' : 'blur(8px)',
+      initial={{ opacity: 0, y: 36, filter: 'blur(8px)' }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
       }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ amount: 0.38, margin: '0px 0px -12% 0px' }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="cc-research-crossfade__source">
         <div className="cc-research-crossfade__rule" aria-hidden />
@@ -51,7 +49,7 @@ export function ResearchAlternatingRows() {
   return (
     <div className="cc-research-alt-stack">
       {ITEMS.map((item, index) => (
-        <ResearchPair key={item.id} item={item} index={index} active />
+        <ResearchPair key={item.id} item={item} index={index} />
       ))}
     </div>
   );
