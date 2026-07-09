@@ -896,7 +896,7 @@ html.dark .cc-app-sidebar-toggle {
   }
 
   .cc-connection-grid__item--open {
-    grid-column: span 2;
+    grid-column: span 3;
   }
 }
 
@@ -1318,6 +1318,10 @@ html.dark .cc-app-sidebar-toggle {
 .cc-connection-grid-card__expand-body {
   padding: 16px 18px 18px;
   border-top: 1px solid var(--app-border);
+}
+
+.cc-connection-grid-card__expand-body .cc-connection-meta {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
 }
 
 @media (min-width: 1040px) {
