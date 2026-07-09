@@ -12,6 +12,7 @@ import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
 const SOURCES = ['All', 'NFC', 'QR', 'Conference', 'LinkedIn', 'Manual'] as const;
+type ConnectionsViewMode = 'list' | 'grid';
 
 function connectionEmail(connection: WorkspaceConnection) {
   const local = connection.name.toLowerCase().replace(/\s+/g, '.');
@@ -216,6 +217,61 @@ function ConnectionCard({
   );
 }
 
+function ConnectionGridCard({
+  connection,
+  expanded,
+  onToggle,
+}: {
+  connection: WorkspaceConnection;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [panelHeight, setPanelHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    setPanelHeight(expanded ? el.scrollHeight : 0);
+  }, [expanded, connection.id]);
+
+  return (
+    <ReactiveBorder
+      as="article"
+      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
+      liftOnHover={!expanded}
+      pressOnTap={false}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        className="cc-connection-grid-card__trigger"
+      >
+        <div className="cc-connection-grid-card__avatar">
+          {connection.avatarUrl ? (
+            <Image src={connection.avatarUrl} alt="" fill className="object-cover" sizes="72px" />
+          ) : (
+            <span className="cc-connection-grid-card__avatar-fallback">{connection.name[0]}</span>
+          )}
+        </div>
+        <p className="cc-connection-grid-card__name">{connection.name}</p>
+        <p className="cc-connection-grid-card__role">{connection.role}</p>
+      </button>
+
+      <div
+        className="cc-connection-grid-card__expand-slot"
+        style={{ height: panelHeight }}
+        aria-hidden={!expanded}
+      >
+        <div ref={bodyRef} className="cc-connection-grid-card__expand-body">
+          <ConnectionExpandedBody connection={connection} />
+        </div>
+      </div>
+    </ReactiveBorder>
+  );
+}
+
 export function DashboardConnectionsView({
   connections,
   basePath = '/dashboard',
@@ -226,6 +282,7 @@ export function DashboardConnectionsView({
   const [query, setQuery] = useState('');
   const [source, setSource] = useState<(typeof SOURCES)[number]>('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
 
   const filtered = useMemo(() => {
     return connections.filter((c) => {
@@ -257,41 +314,73 @@ export function DashboardConnectionsView({
       <div className="space-y-4">
         <FadeInView delay={0}>
           <div className="space-y-4">
-            <div className="relative max-w-md">
-              <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--app-smoke)]"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden
-              >
-                <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
-                <path d="M10.5 10.5 14 14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-              </svg>
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search connections…"
-                className="cc-app-input pl-9"
-                aria-label="Search connections"
-              />
+            <div className="cc-connections-toolbar">
+              <div className="relative max-w-md flex-1">
+                <svg
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--app-smoke)]"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden
+                >
+                  <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M10.5 10.5 14 14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search connections…"
+                  className="cc-app-input pl-9"
+                  aria-label="Search connections"
+                />
+              </div>
+
+              <div className="cc-projects-view-toggle" aria-label="Connections view">
+                {(['list', 'grid'] as ConnectionsViewMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className={`cc-projects-view-toggle__btn ${
+                      viewMode === mode ? 'cc-projects-view-toggle__btn--active' : ''
+                    }`}
+                    onClick={() => setViewMode(mode)}
+                    aria-pressed={viewMode === mode}
+                  >
+                    {mode === 'list' ? 'List' : 'Grid'}
+                  </button>
+                ))}
+              </div>
             </div>
             <DashFilterBar options={SOURCES} value={source} onChange={setSource} />
           </div>
         </FadeInView>
 
         <FadeInView delay={0.06}>
-          <ul className="cc-connection-list">
-            {filtered.map((c) => (
-              <li key={c.id}>
-                <ConnectionCard
-                  connection={c}
-                  expanded={selectedId === c.id}
-                  onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
-                />
-              </li>
-            ))}
-          </ul>
+          {viewMode === 'list' ? (
+            <ul className="cc-connection-list">
+              {filtered.map((c) => (
+                <li key={c.id}>
+                  <ConnectionCard
+                    connection={c}
+                    expanded={selectedId === c.id}
+                    onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="cc-connection-grid">
+              {filtered.map((c) => (
+                <li key={c.id}>
+                  <ConnectionGridCard
+                    connection={c}
+                    expanded={selectedId === c.id}
+                    onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
 
           {filtered.length === 0 && (
             <p className="py-16 text-center text-[15px] text-[var(--app-smoke)]">

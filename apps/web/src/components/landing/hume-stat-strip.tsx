@@ -8,8 +8,8 @@ const POINTS = [
     detail: 'Share by text, email, QR, or show your screen.',
   },
   {
-    headline: 'Video helps',
-    detail: 'A quick demo gets about 3× more people to look.',
+    headline: 'Saved with context',
+    detail: 'Every scan can become a connection with notes and follow-ups.',
   },
 ] as const;
 
