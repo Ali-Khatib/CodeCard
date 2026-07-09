@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { RevealProjectImages } from '@/components/ui/reveal-images';
@@ -25,6 +26,7 @@ function ProjectRow({
 }) {
   const isPublished = project.isPublished !== false;
   const reduced = useReducedMotion();
+  const router = useRouter();
   const revealImages = [
     ...(project.screenshots ?? []),
     ...(project.posterUrl ? [project.posterUrl] : []),
@@ -35,7 +37,19 @@ function ProjectRow({
 
   return (
     <FadeInView delay={index * 0.06}>
-      <ProjectHoverCard className="group/project cc-project-row-card">
+      <ProjectHoverCard
+        className="group/project cc-project-row-card cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+        role="button"
+        tabIndex={0}
+        aria-label={`Open ${project.title}`}
+        onClick={() => router.push(project.href)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            router.push(project.href);
+          }
+        }}
+      >
         <div className="cc-project-row">
           <div className="cc-project-hover-card__media">
             <Image
@@ -87,7 +101,11 @@ function ProjectRow({
               />
             )}
 
-            <div className="cc-project-card-actions mt-5 flex flex-wrap gap-2">
+            <div
+              className="cc-project-card-actions mt-5 flex flex-wrap gap-2"
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => event.stopPropagation()}
+            >
               <PopIconButton
                 variant="primary"
                 href={`${basePath}/projects/${project.id}`}

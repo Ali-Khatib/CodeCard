@@ -16,6 +16,11 @@ type ReactiveBorderProps = {
   pressOnTap?: boolean;
   onMouseEnter?: React.MouseEventHandler<HTMLElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLElement>;
+  role?: string;
+  tabIndex?: number;
+  'aria-label'?: string;
 };
 
 const MOTION_TAGS = {
@@ -36,6 +41,11 @@ export function ReactiveBorder({
   pressOnTap = true,
   onMouseEnter,
   onMouseLeave,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
+  'aria-label': ariaLabel,
 }: ReactiveBorderProps) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
@@ -65,6 +75,11 @@ export function ReactiveBorder({
       onPointerLeave={onLeave}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      role={role}
+      tabIndex={tabIndex}
+      aria-label={ariaLabel}
       whileHover={reduced || !liftOnHover ? undefined : { y: -4, scale: 1.01 }}
       whileTap={reduced || !pressOnTap ? undefined : { scale: 0.985 }}
       transition={HOVER_SPRING}

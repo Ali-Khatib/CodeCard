@@ -5,16 +5,31 @@ export type AnalyticsEventType =
   | 'project_view'
   | 'link_click'
   | 'resume_click'
-  | 'save_connection';
+  | 'save_connection'
+  | 'research_view'
+  | 'paper_download'
+  | 'citation_copy'
+  | 'abstract_expand'
+  | 'figure_view'
+  | 'related_project_click'
+  | 'time_spent_on_research'
+  | 'project_time_spent'
+  | 'project_section_time_spent'
+  | 'project_section_view'
+  | 'project_section_hover_or_click';
 
 export interface AnalyticsEventPayload {
   event_type: AnalyticsEventType;
   profile_id?: string;
   project_id?: string;
+  research_paper_id?: string;
+  target_type?: 'profile' | 'project' | 'research';
+  target_id?: string;
+  section_name?: string | null;
   source?: ConnectionSource | null;
   referrer?: string | null;
   session_id?: string | null;
-  metadata?: Record<string, string | number | boolean>;
+  metadata?: Record<string, unknown>;
 }
 
 const UUID_RE =
@@ -37,6 +52,8 @@ export async function trackEvent(
 ): Promise<void> {
   if (payload.profile_id && !isAnalyticsResourceId(payload.profile_id)) return;
   if (payload.project_id && !isAnalyticsResourceId(payload.project_id)) return;
+  if (payload.research_paper_id && !isAnalyticsResourceId(payload.research_paper_id)) return;
+  if (payload.target_id && !isAnalyticsResourceId(payload.target_id)) return;
 
   try {
     await fetch(endpoint, {

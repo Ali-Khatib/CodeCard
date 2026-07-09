@@ -1,12 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import ScrollExpandMedia from '@/components/ui/scroll-expansion-hero';
 import { TYPE } from '@/lib/design/tokens';
 import { SectionCounter } from './section-counter';
 import { ScrollReveal } from './scroll-reveal';
@@ -20,7 +20,7 @@ const STEPS = [
   {
     title: 'Profile & best work',
     detail:
-      'Name, role, and links up top. Your strongest projects show first with screenshots, demos, and outcomes.',
+      'Name, role, and links up top. Your strongest projects, papers, demos, and outcomes show first.',
   },
   {
     title: 'Filter by domain',
@@ -28,7 +28,7 @@ const STEPS = [
   },
   {
     title: 'Project expands',
-    detail: 'One tap for screenshots, video, repo links, and live demos.',
+    detail: 'One tap for screenshots, videos, paper PDFs, repo links, and live demos.',
   },
   {
     title: 'Save the connection',
@@ -41,62 +41,10 @@ const STEPS = [
   },
 ] as const;
 
-/** Viewport heights of scroll runway per step */
-const STEP_SCROLL_VH = 72;
-
 export function HowItWorksSection() {
   const reducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
   const useStaticLayout = reducedMotion || isMobile;
-  const [activeStep, setActiveStep] = useState(0);
-  const runwayRef = useRef<HTMLDivElement>(null);
-  const stepRef = useRef(activeStep);
-  const step = STEPS[activeStep];
-
-  const goToStep = useCallback((index: number) => {
-    const next = Math.min(STEPS.length - 1, Math.max(0, index));
-    if (stepRef.current === next) return;
-    stepRef.current = next;
-    setActiveStep(next);
-  }, []);
-
-  useEffect(() => {
-    if (useStaticLayout) return;
-
-    let raf = 0;
-    const measure = () => {
-      const runway = runwayRef.current;
-      if (!runway) return;
-
-      const rect = runway.getBoundingClientRect();
-      const stepPx = window.innerHeight * (STEP_SCROLL_VH / 100);
-      const scrolled = Math.max(0, -rect.top);
-      goToStep(Math.floor(scrolled / stepPx));
-    };
-
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(measure);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    measure();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [goToStep, useStaticLayout]);
-
-  const scrollToStep = (index: number) => {
-    const runway = runwayRef.current;
-    if (!runway) return;
-    const stepPx = window.innerHeight * (STEP_SCROLL_VH / 100);
-    const top = runway.getBoundingClientRect().top + window.scrollY + index * stepPx;
-    window.scrollTo({ top, behavior: 'smooth' });
-  };
 
   return (
     <div id="how-it-works" className="scroll-mt-28 py-20 md:py-[100px]">
@@ -151,78 +99,17 @@ export function HowItWorksSection() {
           </section>
         )
       ) : (
-        <section className="cc-container">
-          <div
-            ref={runwayRef}
-            className="cc-how-it-works-runway grid gap-10 md:grid-cols-[minmax(280px,380px)_1fr] md:gap-14 lg:gap-20"
-            style={{ minHeight: `${STEPS.length * STEP_SCROLL_VH}vh` }}
-          >
-            <div className="relative hidden md:block">
-              <div className="sticky top-28">
-                <nav className="cc-how-it-works-rail-nav flex flex-col" aria-label="How it works steps">
-                  {STEPS.map((s, i) => {
-                    const isActive = i === activeStep;
-                    return (
-                      <motion.div
-                        key={s.title}
-                        className={`cc-how-it-works-pill-wrap ${isActive ? 'cc-how-it-works-pill-wrap--active' : ''}`}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => scrollToStep(i)}
-                          className="cc-how-it-works-pill text-left"
-                          aria-current={isActive ? 'step' : undefined}
-                        >
-                          <span className="cc-how-it-works-pill__num font-eyebrow">
-                            {String(i + 1).padStart(2, '0')}
-                          </span>
-                          <span className="cc-how-it-works-pill__title font-display">{s.title}</span>
-                        </button>
-
-                        <div className="cc-how-it-works-pill__detail" aria-hidden={!isActive}>
-                          <p>{s.detail}</p>
-                          {i === 3 && (
-                            <div className="mt-4 flex flex-wrap gap-2">
-                              {['GitHub ↗', 'LinkedIn ↗', 'Live demo ↗'].map((link) => (
-                                <span
-                                  key={link}
-                                  className="rounded-full border border-reactor/25 bg-reactor/10 px-3 py-1.5 text-[12px] text-lichen"
-                                >
-                                  {link}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </nav>
-              </div>
-            </div>
-
-            <div className="md:sticky md:top-24 md:self-start">
-              <motion.div
-                animate={{ rotateZ: activeStep % 2 === 0 ? -0.8 : 0.8 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="cc-how-it-works-phone-wrap cc-how-it-works-phone-wrap--right"
-              >
-                <PhoneMock step={activeStep} />
-              </motion.div>
-
-              <StepPanel
-                step={step}
-                stepIndex={activeStep}
-                total={STEPS.length}
-                className="mt-8 md:hidden"
-              />
-
-              <p className="mt-5 text-center font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite md:hidden">
-                Step {activeStep + 1} of {STEPS.length}
-              </p>
-            </div>
-          </div>
-        </section>
+        <ScrollExpandMedia
+          mediaType="qr"
+          mediaSrc="qr"
+          bgImageSrc="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1920&q=80"
+          title="Scan CodeCard"
+          date="01 / QR to proof"
+          scrollToExpand="Scroll to expand the full flow"
+          className="mt-[-10px]"
+        >
+          <HowItWorksExpandedPage />
+        </ScrollExpandMedia>
       )}
     </div>
   );
@@ -232,6 +119,56 @@ export function HowItWorksPage() {
   return (
     <div className="cc-marketing-page pb-16">
       <HowItWorksSection />
+    </div>
+  );
+}
+
+function HowItWorksExpandedPage() {
+  return (
+    <div className="mx-auto flex min-h-full w-full max-w-[980px] flex-col justify-center">
+      <div className="grid gap-8 lg:grid-cols-[0.95fr_1.25fr] lg:items-center">
+        <div>
+          <p className="font-eyebrow text-[11px] uppercase tracking-[0.16em] text-[#8b7f76]">
+            Expanded CodeCard
+          </p>
+          <h3 className="mt-4 font-display text-[clamp(2.4rem,6vw,5.5rem)] font-normal leading-[0.92] tracking-[-0.06em] text-[#232324]">
+            One scan becomes the whole story.
+          </h3>
+          <p className="mt-5 max-w-[520px] text-[17px] leading-[1.58] text-[#6f6660]">
+            The QR starts small, then opens into a guided proof page with your profile, best work,
+            filters, project details, and a saved connection moment.
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {STEPS.map((step, index) => (
+            <article
+              key={step.title}
+              className="rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/72 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/25 bg-[#f5e9ff] font-eyebrow text-[10px] text-[#7d5ca4]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <h4 className="font-display text-[20px] leading-tight text-[#232324]">{step.title}</h4>
+              </div>
+              <p className="mt-3 text-[14px] leading-relaxed text-[#6f6660]">{step.detail}</p>
+              {index === 3 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {['Screenshots', 'Repo link', 'Live demo'].map((label) => (
+                    <span
+                      key={label}
+                      className="rounded-full border border-[#c094e4]/20 bg-[#c094e4]/10 px-3 py-1 text-[11px] font-medium text-[#6b527d]"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

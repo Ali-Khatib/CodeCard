@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
+import { normalizeResearchPaper } from '@/lib/research/research';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -9,6 +10,11 @@ import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+type ResearchPaperRow = Parameters<typeof normalizeResearchPaper>[0] & {
+  is_published: boolean;
+  sort_order: number;
+};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -46,6 +52,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
         project_focus_areas(*),
         project_media_assets(*),
         project_links(*)
+      ),
+      research_papers(
+        *,
+        research_figures(*),
+        related_project:related_project_id(id, title)
       )
     `,
     )
@@ -60,6 +71,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
 
   const featuredProjects = publishedProjects.map(normalizeFeaturedProject);
+  const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
+  const publishedResearch = researchRows
+    .filter((p: ResearchPaperRow) => p.is_published)
+    .sort((a: ResearchPaperRow, b: ResearchPaperRow) => a.sort_order - b.sort_order)
+    .map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, slug));
 
   const links: ProfileLinkItem[] = (profile.profile_links ?? [])
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
@@ -80,6 +96,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
         bio={profile.bio}
         links={links}
         projects={featuredProjects}
+        researchPapers={publishedResearch}
+        profileId={profile.id}
       />
     </>
   );

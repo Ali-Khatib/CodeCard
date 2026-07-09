@@ -14,6 +14,7 @@ import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
+  { segment: 'research', label: 'Research', icon: 'research' as const },
   { segment: 'circle', label: 'Circle', icon: 'circle' as const },
   { segment: 'analytics', label: 'Analytics', icon: 'analytics' as const },
   { segment: 'connections', label: 'Connections', icon: 'connections' as const },
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
   projects: 'Projects',
+  research: 'Research',
   circle: 'Circle',
   analytics: 'Analytics',
   connections: 'Connections',

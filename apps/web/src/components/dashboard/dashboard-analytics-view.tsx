@@ -14,6 +14,7 @@ import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
 import { AnalyticsGuestStats } from './analytics/analytics-guest-stats';
 import { AnalyticsGeoPanel } from './analytics/analytics-geo-panel';
 import { AnalyticsProjectPanel } from './analytics/analytics-project-panel';
+import { AnalyticsResearchPanel } from './analytics/analytics-research-panel';
 import { AnalyticsAudiencePanel } from './analytics/analytics-audience-panel';
 import { AppCard, FilterBar, MetricCard, MetricLabel, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
@@ -23,17 +24,34 @@ type DashboardAnalyticsViewProps = {
   displayName: string;
   profileViews?: number;
   projectViews?: number;
+  researchViews?: number;
+  pdfDownloads?: number;
+  citationCopies?: number;
+  topResearchTitle?: string;
 };
 
 export function DashboardAnalyticsView({
   displayName,
   profileViews,
   projectViews,
+  researchViews,
+  pdfDownloads,
+  citationCopies,
+  topResearchTitle,
 }: DashboardAnalyticsViewProps) {
   const [range, setRange] = useState<TimeRange>('30d');
   const data = useMemo(
-    () => buildAnalyticsData(range, { displayName, profileViews, projectViews }),
-    [range, displayName, profileViews, projectViews],
+    () =>
+      buildAnalyticsData(range, {
+        displayName,
+        profileViews,
+        projectViews,
+        researchViews,
+        pdfDownloads,
+        citationCopies,
+        topResearchTitle,
+      }),
+    [range, displayName, profileViews, projectViews, researchViews, pdfDownloads, citationCopies, topResearchTitle],
   );
 
   const rangeLabels = RANGES.reduce(
@@ -129,10 +147,14 @@ export function DashboardAnalyticsView({
       </FadeInView>
 
       <FadeInView delay={0.28}>
-        <AnalyticsAudiencePanel roles={data.roles} />
+        <AnalyticsResearchPanel summary={data.researchSummary} />
       </FadeInView>
 
       <FadeInView delay={0.32}>
+        <AnalyticsAudiencePanel roles={data.roles} />
+      </FadeInView>
+
+      <FadeInView delay={0.36}>
         <AppCard>
           <SectionLabel>Recent activity</SectionLabel>
           <ul className="mt-4 divide-y divide-[var(--app-border)]">

@@ -167,6 +167,7 @@ export function FeaturedWorkStack({
                             profileSlug,
                             displayName,
                             accentColor,
+                            projects: filtered,
                           })
                   }
                 />

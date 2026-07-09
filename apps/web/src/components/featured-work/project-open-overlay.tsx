@@ -37,6 +37,7 @@ export interface ProjectOpenMeta {
   profileSlug: string;
   displayName: string;
   accentColor?: string;
+  projects?: FeaturedProject[];
 }
 
 interface OpeningState {
@@ -264,6 +265,7 @@ export function ProjectOpenProvider({ children }: { children: ReactNode }) {
             profileSlug={opening.meta.profileSlug}
             displayName={opening.meta.displayName}
             accentColor={opening.meta.accentColor}
+            projects={opening.meta.projects}
             transitionHandoff
           />
         </div>

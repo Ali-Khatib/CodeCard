@@ -130,6 +130,55 @@ export interface ProjectLink {
   updated_at: string;
 }
 
+export interface ResearchPaper {
+  id: UUID;
+  tenant_id: UUID;
+  profile_id: UUID;
+  owner_user_id: UUID;
+  related_project_id: UUID | null;
+  slug: string;
+  title: string;
+  abstract: string | null;
+  authors: string[];
+  venue: string | null;
+  publication_status: string | null;
+  year: number | null;
+  pdf_url: string | null;
+  doi_url: string | null;
+  citation_text: string | null;
+  tags: string[];
+  cover_image_url: string | null;
+  is_published: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResearchFigure {
+  id: UUID;
+  tenant_id: UUID;
+  research_paper_id: UUID;
+  image_url: string;
+  caption: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnalyticsEvent {
+  id: UUID;
+  tenant_id: UUID;
+  profile_id: UUID | null;
+  user_id: UUID | null;
+  target_type: 'profile' | 'project' | 'research';
+  target_id: UUID | null;
+  event_type: string;
+  section_name: string | null;
+  metadata: Record<string, unknown>;
+  session_id: string | null;
+  created_at: string;
+}
+
 export interface SavedConnection {
   id: UUID;
   tenant_id: UUID;

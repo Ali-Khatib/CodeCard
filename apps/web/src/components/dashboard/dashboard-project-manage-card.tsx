@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import { AppButton } from './ui/dashboard-ui';
@@ -21,6 +22,7 @@ export function DashboardProjectManageCard({
   project: PortfolioProject;
   editHref?: string;
 }) {
+  const router = useRouter();
   const [hovered, setHovered] = useState(false);
   const impact = firstSentence(project.description);
   const githubClicks = Math.round((project.views ?? 0) * 0.28);
@@ -28,9 +30,19 @@ export function DashboardProjectManageCard({
 
   return (
     <article
-      className="cc-app-project-card"
+      className="cc-app-project-card cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${project.title}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => router.push(project.href)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          router.push(project.href);
+        }
+      }}
     >
       <div className="cc-app-project-card__media">
         <span className="cc-app-project-card__drag" aria-hidden title="Drag to reorder">
@@ -104,7 +116,11 @@ export function DashboardProjectManageCard({
           </span>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div
+          className="mt-6 flex flex-wrap gap-2"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
           <Link href={editLink}>
             <AppButton variant="primary">Edit</AppButton>
           </Link>

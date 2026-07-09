@@ -27,6 +27,47 @@ export function ProductPage() {
 
         <AuroraDivider className="cc-container" />
 
+        <section id="research-support" className="scroll-mt-28 py-16 md:py-24">
+          <div className="cc-container">
+            <ScrollReveal>
+              <SectionCounter label="Research support" index="" />
+              <h2 className={`mt-4 ${TYPE.sectionHeading} text-ink`}>
+                Showcase your research, not just your projects.
+              </h2>
+              <p className={`mt-5 max-w-[720px] ${TYPE.subheading}`}>
+                Add papers, abstracts, citations, PDFs, publication status, and related technical
+                work directly to your CodeCard.
+              </p>
+            </ScrollReveal>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  title: 'Research papers',
+                  body: 'Present authors, venues, status, abstracts, keywords, and figures beside your software work.',
+                },
+                {
+                  title: 'PDFs & citations',
+                  body: 'Give visitors a clean PDF download and one-click citation copy without sending them elsewhere first.',
+                },
+                {
+                  title: 'Related projects',
+                  body: 'Connect a paper to the demo, repository, or system that proves the work in practice.',
+                },
+              ].map((card) => (
+                <ScrollReveal key={card.title}>
+                  <article className="cc-surface-card h-full p-6">
+                    <h3 className="font-display text-[24px] tracking-[-0.03em] text-ink">{card.title}</h3>
+                    <p className="mt-3 text-[15px] leading-relaxed text-lichen">{card.body}</p>
+                  </article>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <AuroraDivider className="cc-container" />
+
         <section id="why-codecard" className="scroll-mt-28 py-16 md:py-24">
           <ResearchWhyCodecard />
         </section>

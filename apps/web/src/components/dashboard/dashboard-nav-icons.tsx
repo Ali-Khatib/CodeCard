@@ -32,6 +32,20 @@ export function DashIconAnalytics() {
   );
 }
 
+export function DashIconResearch() {
+  return (
+    <svg className={iconClass} viewBox="0 0 20 20" fill="none" aria-hidden>
+      <path
+        d="M5 3.5h7.5A2.5 2.5 0 0 1 15 6v10.5H6.5A2.5 2.5 0 0 1 4 14V4.5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path d="M7 7h5M7 10h5M7 13h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function DashIconProfile() {
   return (
     <svg className={iconClass} viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -94,6 +108,7 @@ export function DashIconBack() {
 export const DASH_NAV_ICONS = {
   home: DashIconHome,
   projects: DashIconProjects,
+  research: DashIconResearch,
   analytics: DashIconAnalytics,
   profile: DashIconProfile,
   circle: DashIconCircle,

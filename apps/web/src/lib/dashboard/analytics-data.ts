@@ -96,6 +96,16 @@ export type ProjectAnalyticsDetail = {
   countries: string[];
 };
 
+export type ResearchAnalyticsSummary = {
+  views: number;
+  pdfDownloads: number;
+  citationCopies: number;
+  avgReadTimeSec: number;
+  mostViewedTitle: string;
+  mostEngagedProjectSection: string;
+  projectTimeSpentSec: number;
+};
+
 export type GuestStats = {
   totalVisitors: number;
   guests: number;
@@ -117,6 +127,7 @@ export type AnalyticsBundle = {
   topCities: { name: string; visitors: number }[];
   activity: ActivityEvent[];
   projectDetails: ProjectAnalyticsDetail[];
+  researchSummary: ResearchAnalyticsSummary;
   roles: AudienceSlice[];
   industries: AudienceSlice[];
   devices: AudienceSlice[];
@@ -134,7 +145,15 @@ const DEMO_POSTERS = {
 
 export function buildAnalyticsData(
   range: TimeRange,
-  opts: { displayName: string; profileViews?: number; projectViews?: number },
+  opts: {
+    displayName: string;
+    profileViews?: number;
+    projectViews?: number;
+    researchViews?: number;
+    pdfDownloads?: number;
+    citationCopies?: number;
+    topResearchTitle?: string;
+  },
 ): AnalyticsBundle {
   const baseReach = opts.profileViews && opts.profileViews > 0 ? opts.profileViews : 1284;
   const profileReach = scale(baseReach, range);
@@ -355,6 +374,15 @@ export function buildAnalyticsData(
         countries: ['US', 'UK', 'IN'],
       },
     ],
+    researchSummary: {
+      views: scale(opts.researchViews && opts.researchViews > 0 ? opts.researchViews : 128, range),
+      pdfDownloads: scale(opts.pdfDownloads && opts.pdfDownloads > 0 ? opts.pdfDownloads : 42, range),
+      citationCopies: scale(opts.citationCopies && opts.citationCopies > 0 ? opts.citationCopies : 19, range),
+      avgReadTimeSec: 164,
+      mostViewedTitle: opts.topResearchTitle ?? 'Retrieval Evaluation for Developer Tooling Agents',
+      mostEngagedProjectSection: 'Results',
+      projectTimeSpentSec: 94,
+    },
     roles: [
       { label: 'Recruiters', pct: 32 },
       { label: 'Engineers', pct: 28 },

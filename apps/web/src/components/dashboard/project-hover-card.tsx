@@ -1,15 +1,14 @@
 'use client';
 
-import { useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useRef, type ComponentPropsWithoutRef, type CSSProperties } from 'react';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { cn } from '@/lib/cn';
 
-type ProjectHoverCardProps = {
-  children: ReactNode;
+type ProjectHoverCardProps = ComponentPropsWithoutRef<'article'> & {
   className?: string;
 };
 
-export function ProjectHoverCard({ children, className }: ProjectHoverCardProps) {
+export function ProjectHoverCard({ children, className, onPointerMove, onPointerLeave, style, ...props }: ProjectHoverCardProps) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -36,11 +35,18 @@ export function ProjectHoverCard({ children, className }: ProjectHoverCardProps)
 
   return (
     <article
+      {...props}
       ref={ref}
       className={cn('cc-project-hover-card', className)}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-      style={{ '--mx': '50%', '--my': '50%' } as CSSProperties}
+      onPointerMove={(event) => {
+        onMove(event);
+        onPointerMove?.(event);
+      }}
+      onPointerLeave={(event) => {
+        onLeave();
+        onPointerLeave?.(event);
+      }}
+      style={{ '--mx': '50%', '--my': '50%', ...style } as CSSProperties}
     >
       <span className="cc-project-hover-card__spotlight" aria-hidden />
       <span className="cc-project-hover-card__sheen" aria-hidden />

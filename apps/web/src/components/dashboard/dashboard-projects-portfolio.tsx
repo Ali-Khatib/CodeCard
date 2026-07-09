@@ -1,12 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { HiSquares2X2, HiBars3BottomLeft } from 'react-icons/hi2';
+import { HiSquares2X2, HiBars3BottomLeft, HiSparkles } from 'react-icons/hi2';
 import type { PortfolioCreator, PortfolioProject } from '@/lib/dashboard/portfolio';
 import { ProjectsProfileStrip } from './projects-profile-strip';
 import { FadeInView } from './fade-in-view';
 import { ProjectsVerticalStack } from './projects-vertical-stack';
 import { ProjectsBubbleGrid } from './projects-bubble-grid';
+import { A24ProjectShowcase } from './a24-project-showcase';
 import { FilterBar, AppButton } from './ui/dashboard-ui';
 
 const ALL_PROJECTS_FILTER = 'All';
@@ -26,6 +27,7 @@ const SORT_OPTIONS = ['Visitor order', 'Most views', 'Recently updated'] as cons
 type ProjectSort = (typeof SORT_OPTIONS)[number];
 
 const VIEW_MODES = [
+  { id: 'showcase' as const, label: 'Showcase', icon: HiSparkles },
   { id: 'stack' as const, label: 'Stack', icon: HiBars3BottomLeft },
   { id: 'grid' as const, label: 'Grid', icon: HiSquares2X2 },
 ];
@@ -104,7 +106,7 @@ export function DashboardProjectsPortfolio({
 }) {
   const [filter, setFilter] = useState<string>(ALL_PROJECTS_FILTER);
   const [sort, setSort] = useState<ProjectSort>('Visitor order');
-  const [viewMode, setViewMode] = useState<ViewMode>('stack');
+  const [viewMode, setViewMode] = useState<ViewMode>('showcase');
   const projectFilters = useMemo(() => getProjectFilterOptions(projects), [projects]);
   const filteredProjects = useMemo(() => {
     const filtered = projects.filter((p) => matchesFilter(p, filter));
@@ -158,7 +160,9 @@ export function DashboardProjectsPortfolio({
         </div>      </FadeInView>
 
       {filteredProjects.length > 0 ? (
-        viewMode === 'grid' ? (
+        viewMode === 'showcase' ? (
+          <A24ProjectShowcase projects={filteredProjects} basePath={basePath} />
+        ) : viewMode === 'grid' ? (
           <ProjectsBubbleGrid projects={filteredProjects} basePath={basePath} />
         ) : (
           <ProjectsVerticalStack projects={filteredProjects} basePath={basePath} />

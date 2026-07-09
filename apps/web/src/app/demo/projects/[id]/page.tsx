@@ -17,6 +17,7 @@ export default async function DemoProjectPage({ params }: PageProps) {
       profileSlug="demo"
       displayName={DEMO_PROFILE.display_name}
       accentColor={DEMO_PROFILE.accentColor}
+      projects={DEMO_FEATURED_PROJECTS}
     />
   );
 }

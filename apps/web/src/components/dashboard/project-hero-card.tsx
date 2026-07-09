@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HiOutlineArrowTopRightOnSquare, HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
 import { RevealProjectImages } from '@/components/ui/reveal-images';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
@@ -21,6 +22,7 @@ export function ProjectHeroCard({
   basePath?: string;
   colorIndex?: number;
 }) {
+  const router = useRouter();
   const color = projectColorAt(colorIndex);
   const revealImages = [
     ...(project.screenshots ?? []),
@@ -34,8 +36,18 @@ export function ProjectHeroCard({
     <ReactiveBorder
       as="article"
       glowRgb={color.glow}
-      className="cc-app-project-hero overflow-hidden rounded-[24px]"
+      className="cc-app-project-hero cursor-pointer overflow-hidden rounded-[24px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
       style={{ background: color.bg, borderColor: color.border } as React.CSSProperties}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${project.title}`}
+      onClick={() => router.push(project.href)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          router.push(project.href);
+        }
+      }}
     >
       <div className="group/project grid gap-0 md:grid-cols-[1.15fr_1fr]">
         <div className="relative min-h-[280px] md:min-h-[360px]">
@@ -84,7 +96,11 @@ export function ProjectHeroCard({
             </p>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-2">
+          <div
+            className="mt-8 flex flex-wrap gap-2"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
             <Link href={`${basePath}/projects/${project.id}`}>
               <AppButton variant="primary">
                 <HiOutlinePencil className="h-4 w-4" aria-hidden />

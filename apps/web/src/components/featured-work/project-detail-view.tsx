@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ProjectMedia } from '@/components/profile/project-media';
-import { HiOutlineArrowLeft } from 'react-icons/hi2';
+import { HiOutlineArrowLeft, HiOutlineChevronLeft, HiOutlineChevronRight } from 'react-icons/hi2';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useScrollRestore } from '@/hooks/use-scroll-restore';
@@ -16,6 +16,7 @@ import { resolveProjectLinkIcon, getProjectLinkAria } from '@/lib/icons/project-
 import { COLORS, TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
 import { isProjectTransitionTarget, useProjectOpenOptional } from './project-open-overlay';
+import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
 
 interface ProjectDetailViewProps {
   project: FeaturedProject;
@@ -23,6 +24,7 @@ interface ProjectDetailViewProps {
   profileId?: string;
   displayName: string;
   accentColor?: string;
+  projects?: FeaturedProject[];
   /** Rendered by the transition provider during card → project handoff */
   transitionHandoff?: boolean;
 }
@@ -33,6 +35,7 @@ export function ProjectDetailView({
   profileId,
   displayName,
   accentColor = COLORS.accent,
+  projects,
   transitionHandoff = false,
 }: ProjectDetailViewProps) {
   const pathname = usePathname();
@@ -40,6 +43,7 @@ export function ProjectDetailView({
   const reducedMotion = useReducedMotion();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [videoFailed, setVideoFailed] = useState(false);
+  const viewedSections = useRef<Set<string>>(new Set());
   const [fromTransition] = useState(
     () =>
       typeof document !== 'undefined' &&
@@ -73,7 +77,62 @@ export function ProjectDetailView({
     clearOptimisticProject();
   }, [project.id, profileId, transitionHandoff]);
 
+  useEffect(() => {
+    if (transitionHandoff) return;
+    const startedAt = Date.now();
+    return () => {
+      const seconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+      trackProjectEngagementEvent({
+        eventType: 'project_time_spent',
+        profileId,
+        projectId: project.id,
+        metadata: { seconds },
+      });
+      trackProjectEngagementEvent({
+        eventType: 'project_section_time_spent',
+        profileId,
+        projectId: project.id,
+        sectionName: 'Project page',
+        metadata: { seconds },
+      });
+    };
+  }, [project.id, profileId, transitionHandoff]);
+
+  const trackProjectSection = useCallback(
+    (sectionName: string, eventType: 'project_section_view' | 'project_section_hover_or_click' = 'project_section_view') => {
+      if (eventType === 'project_section_view') {
+        if (viewedSections.current.has(sectionName)) return;
+        viewedSections.current.add(sectionName);
+      }
+      trackProjectEngagementEvent({
+        eventType,
+        profileId,
+        projectId: project.id,
+        sectionName,
+      });
+    },
+    [profileId, project.id],
+  );
+
+  useEffect(() => {
+    if (transitionHandoff) return;
+    if (project.technologies.length > 0) trackProjectSection('Tech Stack');
+    if (project.description) trackProjectSection('Overview');
+    if (screenshots.length > 0) trackProjectSection('Product flow');
+  }, [
+    project.description,
+    project.technologies.length,
+    screenshots.length,
+    trackProjectSection,
+    transitionHandoff,
+  ]);
+
   const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const projectBase = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const projectList = projects?.length ? projects : [project];
+  const currentIndex = Math.max(0, projectList.findIndex((p) => p.id === project.id));
+  const previousProject = projectList.length > 1 ? projectList[(currentIndex - 1 + projectList.length) % projectList.length] : null;
+  const nextProject = projectList.length > 1 ? projectList[(currentIndex + 1) % projectList.length] : null;
 
   const hiddenByTransition =
     !transitionHandoff &&
@@ -119,6 +178,35 @@ export function ProjectDetailView({
             </div>
           </div>
         </header>
+
+        {(previousProject || nextProject) && (
+          <nav className="pointer-events-none fixed inset-x-0 top-1/2 z-30 hidden -translate-y-1/2 justify-between px-4 md:flex lg:px-8" aria-label="Project navigation">
+            {previousProject ? (
+              <Link
+                href={`${projectBase}/projects/${previousProject.id}`}
+                className="pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-lavender/25 bg-midnight/78 text-lilac-white shadow-rim backdrop-blur-md transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                aria-label={`Previous project: ${previousProject.title}`}
+                title={previousProject.title}
+              >
+                <HiOutlineChevronLeft className="h-7 w-7 transition-transform group-hover:-translate-x-0.5" aria-hidden />
+              </Link>
+            ) : (
+              <span />
+            )}
+            {nextProject ? (
+              <Link
+                href={`${projectBase}/projects/${nextProject.id}`}
+                className="pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-lavender/25 bg-midnight/78 text-lilac-white shadow-rim backdrop-blur-md transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                aria-label={`Next project: ${nextProject.title}`}
+                title={nextProject.title}
+              >
+                <HiOutlineChevronRight className="h-7 w-7 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )}
 
         <div className="relative w-full overflow-hidden">
           <div className="relative aspect-[16/9] min-h-[min(52vh,520px)] max-h-[min(78vh,880px)] w-full bg-deep-indigo">
@@ -186,15 +274,50 @@ export function ProjectDetailView({
         </div>
 
         <article className="cc-container cc-content pb-24 pt-10 md:pt-14">
+          {(previousProject || nextProject) && (
+            <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
+              {previousProject ? (
+                <Link
+                  href={`${projectBase}/projects/${previousProject.id}`}
+                  className="cc-instant-press rounded-full border border-border/40 bg-midnight/70 px-4 py-3 text-center text-[14px] text-text-secondary backdrop-blur-md"
+                  aria-label={`Previous project: ${previousProject.title}`}
+                >
+                  Previous
+                </Link>
+              ) : (
+                <span />
+              )}
+              {nextProject ? (
+                <Link
+                  href={`${projectBase}/projects/${nextProject.id}`}
+                  className="cc-instant-press rounded-full border border-border/40 bg-midnight/70 px-4 py-3 text-center text-[14px] text-text-secondary backdrop-blur-md"
+                  aria-label={`Next project: ${nextProject.title}`}
+                >
+                  Next
+                </Link>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+
           {project.technologies.length > 0 && (
-            <section className="rounded-card border border-border/40 bg-midnight/50 p-8 shadow-rim md:p-10">
+            <section
+              className="rounded-card border border-border/40 bg-midnight/50 p-8 shadow-rim md:p-10"
+              onMouseEnter={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
+              onFocus={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
+            >
               <p className={TYPE.eyebrow}>Stack</p>
               <TechLogoRow technologies={project.technologies} isActive pop size="lg" className="mt-5" />
             </section>
           )}
 
           {project.description && (
-            <section className="mt-12 border-t border-border/40 pt-12 md:mt-14 md:pt-14">
+            <section
+              className="mt-12 border-t border-border/40 pt-12 md:mt-14 md:pt-14"
+              onMouseEnter={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
+              onFocus={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
+            >
               <p className={TYPE.eyebrow}>Overview</p>
               <div className="mt-5 w-full max-w-none space-y-4 font-sans text-[20px] font-normal leading-[1.65] text-ash md:mt-6 md:space-y-5 md:text-[22px] md:leading-[1.6]">
                 {project.description
@@ -211,7 +334,11 @@ export function ProjectDetailView({
           )}
 
           {screenshots.length > 0 && (
-            <section className="mt-16 border-t border-border/40 pt-14 md:mt-20 md:pt-16">
+            <section
+              className="mt-16 border-t border-border/40 pt-14 md:mt-20 md:pt-16"
+              onMouseEnter={() => trackProjectSection('Product flow', 'project_section_hover_or_click')}
+              onFocus={() => trackProjectSection('Product flow', 'project_section_hover_or_click')}
+            >
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <p className={TYPE.eyebrow}>Product flow</p>
@@ -228,7 +355,10 @@ export function ProjectDetailView({
                   <button
                     key={src + i}
                     type="button"
-                    onClick={() => setLightbox(src)}
+                    onClick={() => {
+                      trackProjectSection('Product flow', 'project_section_hover_or_click');
+                      setLightbox(src);
+                    }}
                     className="group relative aspect-[16/10] overflow-hidden rounded-[14px] border border-border/40 bg-midnight outline-none transition-colors hover:border-lavender/50 focus-visible:ring-2 focus-visible:ring-lavender md:min-h-[280px]"
                   >
                     <ProjectMedia

@@ -2,6 +2,7 @@
 
 import { PublicProfileFocused } from './public-profile-focused';
 import type { FeaturedProject } from '@/lib/projects/featured';
+import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 interface PublicProfileExperienceProps {
@@ -12,6 +13,8 @@ interface PublicProfileExperienceProps {
   bio: string | null;
   links: ProfileLinkItem[];
   projects: FeaturedProject[];
+  researchPapers?: ResearchPaper[];
+  profileId?: string;
   accentColor?: string;
   location?: string | null;
 }
@@ -24,6 +27,8 @@ export function PublicProfileExperience({
   bio,
   links,
   projects,
+  researchPapers = [],
+  profileId,
   location,
 }: PublicProfileExperienceProps) {
   return (
@@ -35,6 +40,8 @@ export function PublicProfileExperience({
       bio={bio}
       links={links}
       projects={projects}
+      researchPapers={researchPapers}
+      profileId={profileId}
       location={location}
     />
   );

@@ -7,8 +7,10 @@ import { motion, useReducedMotion } from 'motion/react';
 import { parseHeadline } from '@/lib/profile/lanyard-badge-images';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { FeaturedProject } from '@/lib/projects/featured';
+import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { PublicProjectStack } from './public-project-stack';
+import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 
@@ -29,6 +31,8 @@ export function PublicProfileFocused({
   bio,
   links,
   projects,
+  researchPapers = [],
+  profileId,
   location,
 }: {
   profileSlug: string;
@@ -38,6 +42,8 @@ export function PublicProfileFocused({
   bio: string | null;
   links: ProfileLinkItem[];
   projects: FeaturedProject[];
+  researchPapers?: ResearchPaper[];
+  profileId?: string;
   location?: string | null;
 }) {
   const { role, company } = parseHeadline(headline);
@@ -220,7 +226,7 @@ export function PublicProfileFocused({
               What {displayName.split(' ')[0]} built
             </h2>
             <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-              Projects, demos, and outcomes — shown before credentials.
+              Projects, demos, research, and outcomes — shown before credentials.
             </p>
           </AppReveal>
 
@@ -234,6 +240,32 @@ export function PublicProfileFocused({
             )}
           </div>
         </section>
+
+        {researchPapers.length > 0 && (
+          <section id="research" className="mt-16 scroll-mt-24">
+            <AppReveal>
+              <p className="cc-app-mono">Research</p>
+              <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+                Papers &amp; publications
+              </h2>
+              <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
+                Abstracts, citations, PDFs, and related technical work in the same CodeCard.
+              </p>
+            </AppReveal>
+
+            <div className="mt-8 flex flex-col gap-8">
+              {researchPapers.map((paper, index) => (
+                <ResearchPaperCard
+                  key={paper.id}
+                  paper={paper}
+                  href={`/${profileSlug}/research/${paper.slug}`}
+                  profileId={profileId}
+                  delay={index * HUME_MOTION.stagger}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         <AppReveal className="mt-16">
           <div className="cc-app-card cc-app-card--rose !p-8 text-center">

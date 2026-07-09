@@ -20,4 +20,45 @@ SELECT tenant_id, id, 'github', 'GitHub', 'https://github.com', 0 FROM profiles 
 INSERT INTO projects (tenant_id, profile_id, owner_user_id, title, tagline, technologies, is_published, sort_order)
 SELECT tenant_id, id, owner_user_id, 'DevFlow', 'CI/CD pipelines that actually make sense', ARRAY['TypeScript', 'Go', 'Docker'], true, 0
 FROM profiles WHERE slug = 'demo';
+
+INSERT INTO research_papers (
+  tenant_id,
+  profile_id,
+  owner_user_id,
+  related_project_id,
+  slug,
+  title,
+  abstract,
+  authors,
+  venue,
+  publication_status,
+  year,
+  pdf_url,
+  doi_url,
+  citation_text,
+  tags,
+  is_published,
+  sort_order
+)
+SELECT
+  p.tenant_id,
+  p.id,
+  p.owner_user_id,
+  pr.id,
+  'retrieval-evaluation-for-dev-tools',
+  'Retrieval Evaluation for Developer Tooling Agents',
+  'A benchmark for measuring answer faithfulness, context recall, and time-to-fix reduction in practical developer tooling workflows.',
+  ARRAY['Alex Chen', 'Maya Patel'],
+  'Preprint',
+  'Under review',
+  2026,
+  'https://example.com/retrieval-evaluation.pdf',
+  'https://doi.org/10.0000/codecard.demo',
+  'Chen, A. & Patel, M. (2026). Retrieval Evaluation for Developer Tooling Agents. Preprint.',
+  ARRAY['RAG', 'Evaluation', 'Developer Tools'],
+  true,
+  0
+FROM profiles p
+LEFT JOIN projects pr ON pr.profile_id = p.id AND pr.title = 'DevFlow'
+WHERE p.slug = 'demo';
 */

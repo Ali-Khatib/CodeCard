@@ -13,6 +13,7 @@ export type ProfileSection =
   | 'identity'
   | 'featured'
   | 'all-work'
+  | 'research'
   | 'about'
   | 'experience'
   | 'education';
@@ -28,6 +29,7 @@ const SECTION_LABELS: Record<ProfileSection, string> = {
   identity: 'Profile',
   featured: 'Featured Work',
   'all-work': 'All Projects',
+  research: 'Research',
   about: 'About',
   experience: 'Experience',
   education: 'Education',
@@ -47,7 +49,7 @@ export function ProfileCardNav({
   const workLinks = [
     { label: 'Featured', section: 'featured' as const },
     { label: 'All Projects', section: 'all-work' as const },
-    { label: 'Research', section: 'featured' as const },
+    { label: 'Research', section: 'research' as const },
   ];
 
   const profileLinks = [
