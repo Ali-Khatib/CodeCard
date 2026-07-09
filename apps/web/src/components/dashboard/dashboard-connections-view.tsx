@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
 import { DashFilterBar } from './dash-filter-bar';
@@ -12,6 +13,10 @@ import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
 const SOURCES = ['All', 'NFC', 'QR', 'Conference', 'LinkedIn', 'Manual'] as const;
+const CONNECTION_VIEW_MODES = [
+  { id: 'list' as const, label: 'List view', icon: HiBars3BottomLeft },
+  { id: 'grid' as const, label: 'Grid view', icon: HiSquares2X2 },
+];
 type ConnectionsViewMode = 'list' | 'grid';
 
 function connectionEmail(connection: WorkspaceConnection) {
@@ -335,18 +340,20 @@ export function DashboardConnectionsView({
                 />
               </div>
 
-              <div className="cc-projects-view-toggle" aria-label="Connections view">
-                {(['list', 'grid'] as ConnectionsViewMode[]).map((mode) => (
+              <div className="cc-projects-view-toggle" role="group" aria-label="Connections view">
+                {CONNECTION_VIEW_MODES.map(({ id, label, icon: Icon }) => (
                   <button
-                    key={mode}
+                    key={id}
                     type="button"
                     className={`cc-projects-view-toggle__btn ${
-                      viewMode === mode ? 'cc-projects-view-toggle__btn--active' : ''
+                      viewMode === id ? 'cc-projects-view-toggle__btn--active' : ''
                     }`}
-                    onClick={() => setViewMode(mode)}
-                    aria-pressed={viewMode === mode}
+                    onClick={() => setViewMode(id)}
+                    aria-pressed={viewMode === id}
+                    aria-label={label}
+                    title={label}
                   >
-                    {mode === 'list' ? 'List' : 'Grid'}
+                    <Icon className="h-4 w-4" aria-hidden />
                   </button>
                 ))}
               </div>
@@ -371,7 +378,10 @@ export function DashboardConnectionsView({
           ) : (
             <ul className="cc-connection-grid">
               {filtered.map((c) => (
-                <li key={c.id}>
+                <li
+                  key={c.id}
+                  className={selectedId === c.id ? 'cc-connection-grid__item--open' : undefined}
+                >
                   <ConnectionGridCard
                     connection={c}
                     expanded={selectedId === c.id}

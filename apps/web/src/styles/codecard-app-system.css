@@ -868,10 +868,20 @@ html.dark .cc-app-sidebar-toggle {
 .cc-connection-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  align-items: start;
   gap: 12px;
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.cc-connection-grid > li {
+  min-width: 0;
+}
+
+.cc-connection-grid__item--open {
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 720px) {
@@ -883,6 +893,10 @@ html.dark .cc-app-sidebar-toggle {
 @media (min-width: 1040px) {
   .cc-connection-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cc-connection-grid__item--open {
+    grid-column: span 2;
   }
 }
 
@@ -1195,7 +1209,9 @@ html.dark .cc-app-sidebar-toggle {
 }
 
 .cc-connection-grid-card--open {
-  grid-column: 1 / -1;
+  height: auto;
+  min-height: 100%;
+  box-shadow: 0 18px 56px rgba(34, 34, 34, 0.09);
 }
 
 .cc-connection-grid-card--open.cc-reactive-border::before {
@@ -1204,7 +1220,7 @@ html.dark .cc-app-sidebar-toggle {
 
 .cc-connection-grid-card__trigger {
   display: flex;
-  min-height: 168px;
+  min-height: 136px;
   width: 100%;
   flex-direction: column;
   align-items: center;
@@ -1222,6 +1238,15 @@ html.dark .cc-app-sidebar-toggle {
     background 0.18s ease;
 }
 
+.cc-connection-grid-card--open .cc-connection-grid-card__trigger {
+  min-height: 104px;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 18px;
+  text-align: left;
+}
+
 .cc-connection-grid-card__trigger:hover {
   background: rgba(192, 148, 228, 0.055);
 }
@@ -1232,10 +1257,11 @@ html.dark .cc-app-sidebar-toggle {
 
 .cc-connection-grid-card__avatar {
   position: relative;
-  height: 68px;
-  width: 68px;
+  height: 58px;
+  width: 58px;
+  flex-shrink: 0;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 20px;
   border: 1.5px solid var(--app-border-strong);
   background: var(--app-bone);
   box-shadow: 0 14px 30px rgba(34, 34, 34, 0.08);
@@ -1264,6 +1290,15 @@ html.dark .cc-app-sidebar-toggle {
   color: var(--app-ink);
 }
 
+.cc-connection-grid-card--open .cc-connection-grid-card__name,
+.cc-connection-grid-card--open .cc-connection-grid-card__role {
+  white-space: normal;
+}
+
+.cc-connection-grid-card--open .cc-connection-grid-card__name {
+  font-size: 17px;
+}
+
 .cc-connection-grid-card__role {
   max-width: 100%;
   overflow: hidden;
@@ -1281,8 +1316,18 @@ html.dark .cc-app-sidebar-toggle {
 }
 
 .cc-connection-grid-card__expand-body {
-  padding: 0 18px 18px;
+  padding: 16px 18px 18px;
   border-top: 1px solid var(--app-border);
+}
+
+@media (min-width: 1040px) {
+  .cc-connection-grid-card__expand-body .cc-connection-expand__grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'meta meta'
+      'notes actions';
+    gap: 0;
+  }
 }
 
 .cc-connection-expand__body {
