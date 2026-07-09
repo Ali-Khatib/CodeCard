@@ -72,7 +72,7 @@ export function ProductHero() {
             {
               left: lineX,
               top: '56%',
-              opacity: 0.26,
+              opacity: 0.52,
               scale: 0.94,
               duration: 0.58,
               ease: 'power2.inOut',

@@ -51,6 +51,7 @@ supabase/.temp
 *.tsbuildinfo
 
 # Mobile
+apps/mobile/.git.local-backup-before-monorepo/
 *.jks
 *.p8
 *.p12
