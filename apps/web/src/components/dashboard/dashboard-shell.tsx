@@ -197,14 +197,9 @@ export function DashboardShell({
 
       <div className="cc-app-main">
         <header className="cc-app-topbar">
-          {preview && (
-            <Link
-              href="/"
-              className="cc-app-back-landing shrink-0 md:hidden"
-            >
-              ← Landing
-            </Link>
-          )}
+          <div className="cc-app-mobile-theme-toggle md:hidden">
+            <ThemeToggle />
+          </div>
           <h1 className="cc-app-topbar-title min-w-0 truncate text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
           <div className="flex-1" />
           <DashboardNotifications basePath={basePath} />
