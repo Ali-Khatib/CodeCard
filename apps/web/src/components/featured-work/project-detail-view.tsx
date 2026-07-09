@@ -196,13 +196,13 @@ export function ProjectDetailView({
           {project.description && (
             <section className="mt-12 border-t border-border/40 pt-12 md:mt-14 md:pt-14">
               <p className={TYPE.eyebrow}>Overview</p>
-              <div className="mt-5 max-w-[640px] space-y-4 pl-10 font-sans text-[20px] font-normal leading-[1.65] text-ash md:mt-6 md:space-y-5 md:pl-20 md:text-[22px] md:leading-[1.6] lg:pl-28">
+              <div className="mt-5 w-full max-w-none space-y-4 font-sans text-[20px] font-normal leading-[1.65] text-ash md:mt-6 md:space-y-5 md:text-[22px] md:leading-[1.6]">
                 {project.description
                   .split(/\n\n+/)
                   .map((paragraph) => paragraph.trim())
                   .filter(Boolean)
                   .map((paragraph) => (
-                    <p key={paragraph} className="text-pretty text-justify hyphens-auto">
+                    <p key={paragraph} className="text-pretty">
                       {paragraph}
                     </p>
                   ))}

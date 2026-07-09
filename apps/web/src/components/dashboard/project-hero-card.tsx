@@ -7,7 +7,7 @@ import { RevealProjectImages } from '@/components/ui/reveal-images';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import { projectColorAt } from '@/lib/design/project-card-colors';
 import { ReactiveBorder } from './reactive-border';
-import { AppButton, AppMono } from './ui/dashboard-ui';
+import { AppButton } from './ui/dashboard-ui';
 
 const FALLBACK =
   'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80';
@@ -48,14 +48,16 @@ export function ProjectHeroCard({
             priority
           />
           <RevealProjectImages images={revealImages} />
-          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(35,35,36,0.45)] via-transparent to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <AppMono>Featured hero</AppMono>
-            <h2 className="mt-2 text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-[-0.03em] text-white">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,18,20,0.72)_0%,rgba(18,18,20,0.5)_38%,rgba(18,18,20,0.2)_72%),linear-gradient(0deg,rgba(18,18,20,0.72)_0%,rgba(18,18,20,0.22)_58%,rgba(18,18,20,0.08)_100%)]" />
+          <div className="absolute bottom-6 left-6 right-6 max-w-[520px] rounded-[22px] border border-white/15 bg-black/28 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-[2px]">
+            <div className="inline-flex rounded-full border border-white/18 bg-black/35 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90">
+              Featured hero
+            </div>
+            <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-[-0.03em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
               {project.title}
             </h2>
             {project.tagline && (
-              <p className="mt-2 max-w-lg text-[16px] leading-relaxed text-white/90">{project.tagline}</p>
+              <p className="mt-2 max-w-lg text-[16px] font-medium leading-relaxed text-white/95 drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">{project.tagline}</p>
             )}
           </div>
         </div>
