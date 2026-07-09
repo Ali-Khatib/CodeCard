@@ -186,48 +186,6 @@ html.dark {
   --vault: #1a191c;
 }
 
-html.dark .cc-hume-hero,
-html.dark .cc-hume-scroll-expand__stage {
-  background: var(--bone);
-}
-
-html.dark .cc-hume-hero__peek-frame {
-  background: rgba(26, 25, 28, 0.72);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-html.dark .cc-hume-hero__peek-sidebar {
-  background: rgba(18, 17, 20, 0.55);
-}
-
-html.dark .cc-hume-hero__peek-topbar,
-html.dark .cc-hume-hero__peek-kpi {
-  background: rgba(26, 25, 28, 0.5);
-}
-
-html.dark .cc-research-card {
-  background: var(--paper);
-  border-color: var(--border);
-}
-
-html.dark .cc-research-card__pill {
-  background: var(--bone);
-  color: var(--ink);
-}
-
-html.dark .cc-workspace-showcase .text-vellum,
-html.dark .cc-workspace-showcase .font-display.text-vellum,
-html.dark .cc-how-it-works-rail-step-wrap--active .cc-how-it-works-rail-step {
-  color: var(--vellum);
-}
-
-html.dark .cc-workspace-showcase .text-lichen,
-html.dark .cc-workspace-showcase .text-graphite,
-html.dark .cc-workspace-showcase .text-ash,
-html.dark .cc-how-it-works-rail-detail p {
-  color: var(--lichen);
-}
-
 html {
   color-scheme: light;
 }
@@ -240,6 +198,98 @@ body {
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.01em;
+}
+
+.cc-marketing-shell {
+  color-scheme: light;
+  --hume-page: #fafafa;
+  --hume-cream: #fcf1e7;
+  --hume-lavender-mist: #e8e3f1;
+  --hume-periwinkle: #c3c0f2;
+  --hume-peach: #fadac1;
+  --hume-pink: #f1c9dd;
+  --ink: #232324;
+  --smoke: #767073;
+  --line-soft: #c2bcbb;
+  --paper: #ffffff;
+  --char: #ffffff;
+  --midnight: #232324;
+  --iron: #f5f0ea;
+  --slate: #767073;
+  --mist: #fcf1e7;
+  --pewter: #767073;
+  --ember: #c094e4;
+  --pine: #daf7ee;
+  --tide: #574853;
+  --driftwood: #767073;
+  --cedar: #767073;
+  --coral: #f7bbe6;
+  --primary-action-fill: #232324;
+  --blush: #fce0ee;
+  --rose-mist: #fdebf7;
+  --meringue: #ffe9cf;
+  --mint: #daf7ee;
+  --seafoam: #cef1e1;
+  --slate-plum: #574853;
+  --hume-gradient-accent: linear-gradient(90deg, #c094e4 0%, #f7bbe6 52%, #c3c0f2 100%);
+  --obsidian: #fcf1e7;
+  --void: #fcf1e7;
+  --graphite-surface: #ffffff;
+  --charcoal: #fcf1e7;
+  --vellum: #232324;
+  --phosphor: #232324;
+  --pearl: #ffffff;
+  --ash: #767073;
+  --lichen: #767073;
+  --graphite: #767073;
+  --smoke-legacy: #767073;
+  --fern: #fcf1e7;
+  --bronze-field: #fcf1e7;
+  --void-canvas: #fcf1e7;
+  --carbon: #232324;
+  --moss: #ffffff;
+  --stone: rgba(35, 35, 36, 0.08);
+  --midnight-legacy: #232324;
+  --deep-indigo: #574853;
+  --lilac-white: #ffffff;
+  --fog: #767073;
+  --steel: #fcf1e7;
+  --twilight: #767073;
+  --gunmetal: #767073;
+  --slate-veil: #767073;
+  --bone: #fcf1e7;
+  --abyss: #fcf1e7;
+  --vault: #ffffff;
+  --lime: #c094e4;
+  --cream: #fcf1e7;
+  --iris: #c094e4;
+  --lavender: #c094e4;
+  --lavender-mist: #fdebf7;
+  --violet: #c094e4;
+  --specter: #f7bbe6;
+  --reactor: #c094e4;
+  --reactor-bright: #f7bbe6;
+  --accent: #c094e4;
+  --accent-rgb: 192, 148, 228;
+  --accent-bright-rgb: 247, 187, 230;
+  --accent-muted-rgb: 192, 148, 228;
+  --accent-secondary-rgb: 195, 192, 242;
+  --accent-glow: rgba(192, 148, 228, 0.18);
+  --cosmic-glow: rgba(192, 148, 228, 0.12);
+  --cosmic-glow-secondary: rgba(247, 187, 230, 0.1);
+  --cosmic-base-start: #fcf1e7;
+  --cosmic-base-mid: #fafafa;
+  --cosmic-base-end: #fcf1e7;
+  --text-on-mist: #232324;
+  --canvas: #fcf1e7;
+  --surface: #ffffff;
+  --text-primary: #232324;
+  --text-secondary: #767073;
+  --text-on-light: #232324;
+  --border: rgba(35, 35, 36, 0.08);
+  --border-subtle: rgba(35, 35, 36, 0.05);
+  --background: #fcf1e7;
+  --foreground: #232324;
 }
 
 @layer components {
