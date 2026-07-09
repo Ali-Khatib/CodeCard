@@ -11,14 +11,14 @@ import { FilterBar, AppButton } from './ui/dashboard-ui';
 
 const ALL_PROJECTS_FILTER = 'All';
 const PROJECT_DOMAINS = [
-  'Full Stack',
-  'AI / ML',
   'GenAI',
+  'AI / ML',
   'DevOps',
   'Data',
+  'Observability',
+  'Full Stack',
   'Backend',
   'Frontend',
-  'Observability',
 ] as const;
 type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
 
@@ -33,14 +33,14 @@ const VIEW_MODES = [
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
 
 const DOMAIN_KEYWORDS: Record<ProjectDomain, string[]> = {
-  'Full Stack': ['next.js', 'react', 'node.js', 'typescript', 'fastapi'],
-  'AI / ML': ['python', 'ml', 'machine learning', 'ai'],
   GenAI: ['llm', 'genai', 'prompt', 'openai', 'rag'],
+  'AI / ML': ['python', 'ml', 'machine learning', 'ai'],
   DevOps: ['docker', 'terraform', 'github actions', 'ci/cd', 'cli'],
   Data: ['clickhouse', 'postgresql', 'sqlite', 'redis', 'database'],
+  Observability: ['opentelemetry', 'grafana', 'prometheus', 'observability'],
+  'Full Stack': ['next.js', 'react', 'node.js', 'typescript', 'fastapi'],
   Backend: ['node.js', 'fastapi', 'grpc', 'api', 'rust'],
   Frontend: ['react', 'next.js', 'typescript'],
-  Observability: ['opentelemetry', 'grafana', 'prometheus', 'observability'],
 };
 
 function projectMatchesDomain(project: PortfolioProject, domain: ProjectDomain): boolean {
@@ -56,19 +56,27 @@ function projectMatchesDomain(project: PortfolioProject, domain: ProjectDomain):
   return DOMAIN_KEYWORDS[domain].some((keyword) => haystack.includes(keyword));
 }
 
+function getPrimaryProjectDomain(project: PortfolioProject): ProjectDomain | null {
+  return PROJECT_DOMAINS.find((domain) => projectMatchesDomain(project, domain)) ?? null;
+}
+
 function getProjectFilterOptions(projects: PortfolioProject[]): string[] {
+  const domains = new Set<ProjectDomain>();
+  projects.forEach((project) => {
+    const domain = getPrimaryProjectDomain(project);
+    if (domain) domains.add(domain);
+  });
+
   return [
     ALL_PROJECTS_FILTER,
-    ...PROJECT_DOMAINS.filter((domain) =>
-      projects.some((project) => projectMatchesDomain(project, domain)),
-    ),
+    ...Array.from(domains).slice(0, projects.length),
   ];
 }
 
 function matchesFilter(project: PortfolioProject, filter: string): boolean {
   if (filter === ALL_PROJECTS_FILTER) return true;
   return PROJECT_DOMAINS.includes(filter as ProjectDomain)
-    ? projectMatchesDomain(project, filter as ProjectDomain)
+    ? getPrimaryProjectDomain(project) === filter
     : true;
 }
 
