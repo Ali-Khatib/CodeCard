@@ -79,7 +79,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   }, [hovered, moveHoverLine]);
 
   return (
-    <nav className={`cc-nav-veil w-full ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
+    <nav className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
       <div className="cc-nav-veil__inner">
         <Link
           href="/"
@@ -91,7 +91,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           CodeCard
         </Link>
 
-        <div ref={menuTrackRef} className="relative hidden flex-1 md:flex">
+        <div ref={menuTrackRef} className="relative hidden md:flex">
           <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
           <ul className="cc-hume-fade-group flex items-center gap-1">
             {items.map((item, i) => {
