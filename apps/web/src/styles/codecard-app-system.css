@@ -838,6 +838,15 @@ html.dark .cc-app-sidebar-toggle {
     max-width: 100%;
   }
 
+  .cc-app-content {
+    padding-top: 24px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .cc-app-page {
+    gap: 24px;
+  }
+
   .cc-app-topbar {
     gap: 8px;
     min-width: 0;
@@ -879,19 +888,23 @@ html.dark .cc-app-sidebar-toggle {
 
   .cc-app-filter-bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: clamp(1px, 0.7vw, 4px);
     overflow-x: visible;
-    white-space: normal;
+    white-space: nowrap;
     width: 100%;
     max-width: 100%;
-    padding: 8px;
+    padding: clamp(4px, 1.1vw, 7px);
   }
 
   .cc-app-filter-pill {
-    flex: 0 0 auto;
-    height: 34px;
-    padding-inline: 12px;
+    flex: 0 1 auto;
+    min-width: 0;
+    height: clamp(26px, 7.2vw, 34px);
+    padding-inline: clamp(4px, 1.45vw, 12px);
+    font-size: clamp(8px, 2.55vw, 13px);
+    letter-spacing: -0.02em;
   }
 
   .cc-app-mobile-nav {
@@ -930,6 +943,56 @@ html.dark .cc-app-sidebar-toggle {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 767px) {
+  .cc-connections-results-section {
+    order: 1;
+  }
+
+  .cc-connections-followups-section {
+    order: 2;
+  }
+
+  .cc-connection-list {
+    gap: 12px;
+  }
+
+  .cc-connection-followups__head {
+    margin-bottom: 14px;
+  }
+
+  .cc-connection-followups__grid {
+    gap: 10px;
+  }
+
+  .cc-connection-followup-card {
+    gap: 12px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .cc-connection-followup-card__avatar {
+    height: 44px;
+    width: 44px;
+  }
+
+  .cc-connection-followup-card__top {
+    gap: 8px;
+  }
+
+  .cc-connection-followup-card__name {
+    font-size: 15px;
+  }
+
+  .cc-connection-followup-card__date {
+    font-size: 12px;
+  }
+
+  .cc-connection-followup-card__note {
+    -webkit-line-clamp: 2;
+    font-size: 13px;
+  }
 }
 
 .cc-connection-grid {

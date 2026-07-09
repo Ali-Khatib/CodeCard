@@ -79,7 +79,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   }, [hovered, moveHoverLine]);
 
   return (
-    <nav className="cc-nav-veil w-full" aria-label="Primary">
+    <nav className={`cc-nav-veil w-full ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
       <div className="cc-nav-veil__inner">
         <Link
           href="/"
@@ -157,7 +157,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-charcoal px-4 py-3 md:hidden">
+        <div className="cc-nav-mobile-menu md:hidden">
           <ul className="flex flex-col gap-1">
             {items.map((item, i) => {
               const active = isActive(item.href, item.label);

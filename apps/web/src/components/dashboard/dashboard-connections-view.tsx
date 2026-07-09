@@ -316,7 +316,7 @@ export function DashboardConnectionsView({
         }
       />
 
-      <div className="space-y-4">
+      <div className="cc-connections-sections flex flex-col gap-4">
         <FadeInView delay={0}>
           <div className="space-y-4">
             <div className="cc-connections-toolbar">
@@ -362,14 +362,14 @@ export function DashboardConnectionsView({
           </div>
         </FadeInView>
 
-        <FadeInView delay={0.08}>
+        <FadeInView delay={0.08} className="cc-connections-followups-section">
           <ConnectionsFollowUps
             followUps={upcomingFollowUps}
             onSelect={(id) => setSelectedId(id)}
           />
         </FadeInView>
 
-        <FadeInView delay={0.06}>
+        <FadeInView delay={0.06} className="cc-connections-results-section">
           {viewMode === 'list' ? (
             <ul className="cc-connection-list">
               {filtered.map((c) => (

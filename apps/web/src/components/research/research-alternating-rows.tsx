@@ -1,29 +1,44 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { ALTERNATING_RESEARCH } from '@/lib/research/alternating-insights';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { SourceInfoIcon } from './source-drawer';
 
+const STEP_VH = 64;
+const FINAL_HOLD_VH = 72;
 const ITEMS = ALTERNATING_RESEARCH;
 
 function ResearchPair({
   item,
   index,
+  active,
+  reveal = false,
 }: {
   item: (typeof ITEMS)[number];
   index: number;
+  active: boolean;
+  reveal?: boolean;
 }) {
   return (
     <motion.article
       className="cc-research-crossfade__item"
-      initial={{ opacity: 0, y: 36, filter: 'blur(8px)' }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-      }}
-      viewport={{ amount: 0.38, margin: '0px 0px -12% 0px' }}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      aria-hidden={!active}
+      initial={reveal ? { opacity: 0, y: 24, filter: 'blur(6px)' } : false}
+      animate={
+        reveal
+          ? undefined
+          : {
+              opacity: active ? 1 : 0,
+              y: active ? 0 : 18,
+              filter: active ? 'blur(0px)' : 'blur(8px)',
+            }
+      }
+      whileInView={reveal ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined}
+      viewport={reveal ? { once: true, amount: 0.28 } : undefined}
+      transition={{ duration: reveal ? 0.48 : 0.55, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="cc-research-crossfade__source">
         <div className="cc-research-crossfade__rule" aria-hidden />
@@ -46,11 +61,71 @@ function ResearchPair({
 }
 
 export function ResearchAlternatingRows() {
+  const reducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef(0);
+  const [active, setActive] = useState(0);
+  const useStaticLayout = reducedMotion || isMobile;
+
+  const goTo = useCallback((index: number) => {
+    const next = Math.min(ITEMS.length - 1, Math.max(0, index));
+    if (activeRef.current === next) return;
+    activeRef.current = next;
+    setActive(next);
+  }, []);
+
+  useEffect(() => {
+    if (useStaticLayout) return;
+
+    let raf = 0;
+    const measure = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const stepPx = window.innerHeight * (STEP_VH / 100);
+      const scrolled = Math.max(0, -rect.top);
+      goTo(Math.min(ITEMS.length - 1, Math.floor(scrolled / stepPx)));
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    measure();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [goTo, useStaticLayout]);
+
+  if (useStaticLayout) {
+    return (
+      <div className="cc-research-alt-stack">
+        {ITEMS.map((item, index) => (
+          <ResearchPair key={item.id} item={item} index={index} active reveal />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="cc-research-alt-stack">
-      {ITEMS.map((item, index) => (
-        <ResearchPair key={item.id} item={item} index={index} />
-      ))}
+    <div
+      ref={sectionRef}
+      className="cc-research-crossfade"
+      style={{ minHeight: `${ITEMS.length * STEP_VH + FINAL_HOLD_VH}vh` }}
+    >
+      <div className="cc-research-crossfade__stage">
+        {ITEMS.map((item, index) => (
+          <ResearchPair key={item.id} item={item} index={index} active={index === active} />
+        ))}
+      </div>
     </div>
   );
 }

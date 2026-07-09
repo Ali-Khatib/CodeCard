@@ -42,7 +42,7 @@ const STEPS = [
 ] as const;
 
 /** Viewport heights of scroll runway per step */
-const STEP_SCROLL_VH = 34;
+const STEP_SCROLL_VH = 72;
 
 export function HowItWorksSection() {
   const reducedMotion = useReducedMotion();

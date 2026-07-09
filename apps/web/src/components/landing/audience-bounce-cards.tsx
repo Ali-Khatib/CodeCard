@@ -82,14 +82,10 @@ function AudienceCardContent({
   eyebrow,
   title,
   body,
-  ctaLabel,
-  compact = false,
 }: {
   eyebrow: string;
   title: string;
   body: string;
-  ctaLabel: string;
-  compact?: boolean;
 }) {
   return (
     <>
@@ -101,9 +97,6 @@ function AudienceCardContent({
         {title}
       </h3>
       <p className="mt-3 line-clamp-3 text-[15px] leading-[1.5] text-smoke">{body}</p>
-      {!compact && (
-        <p className="mt-5 text-[14px] font-medium text-ink">{ctaLabel} →</p>
-      )}
     </>
   );
 }
@@ -177,7 +170,6 @@ export function AudienceBounceCards() {
                 eyebrow={card.eyebrow}
                 title={card.title}
                 body={card.body}
-                ctaLabel={card.cta.label}
               />
             </BorderGlowCard>
           </motion.div>
@@ -196,8 +188,6 @@ export function AudienceBounceCards() {
           eyebrow={card.eyebrow}
           title={card.title}
           body={card.body}
-          ctaLabel={card.cta.label}
-          compact
         />
       </BorderGlow>
     ),
