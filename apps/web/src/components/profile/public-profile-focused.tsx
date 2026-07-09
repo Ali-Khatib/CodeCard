@@ -30,7 +30,6 @@ export function PublicProfileFocused({
   links,
   projects,
   location,
-  availability,
 }: {
   profileSlug: string;
   displayName: string;
@@ -40,7 +39,6 @@ export function PublicProfileFocused({
   links: ProfileLinkItem[];
   projects: FeaturedProject[];
   location?: string | null;
-  availability?: string | null;
 }) {
   const { role, company } = parseHeadline(headline);
   const reduced = useReducedMotion();
@@ -109,11 +107,6 @@ export function PublicProfileFocused({
                 )}
                 {location && (
                   <p className="mt-1 text-[15px] text-[var(--app-smoke)]">{location}</p>
-                )}
-                {availability && (
-                  <span className="cc-app-badge cc-app-badge--mint mt-3 inline-flex">
-                    {availability}
-                  </span>
                 )}
                 <p className="mt-4 max-w-lg text-[16px] leading-relaxed text-[var(--app-ink)]">
                   {intro}

@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signInSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
@@ -25,7 +26,7 @@ function OAuthButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="cc-app-btn cc-app-btn--ghost cc-app-btn--block disabled:opacity-50"
+      className="cc-btn-pill-ghost w-full py-2.5 text-[15px] disabled:opacity-50"
     >
       {label}
     </button>
@@ -41,9 +42,7 @@ function SignInForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const authConfigured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  const authConfigured = isSupabasePublicKeyConfigured();
 
   async function oauth(provider: 'google' | 'github') {
     if (!authConfigured) {
@@ -107,7 +106,7 @@ function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="cc-app-input"
+            className="cc-input w-full"
           />
         </div>
         <div className="space-y-2">
@@ -121,13 +120,13 @@ function SignInForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className="cc-app-input"
+            className="cc-input w-full"
           />
         </div>
         {error && <p className="text-[14px] text-[#df6a6b]">{error}</p>}
         <button
           type="submit"
-          className="cc-app-btn cc-app-btn--primary cc-app-btn--block"
+          className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
           disabled={loading}
         >
           {loading ? 'Signing in…' : 'Sign in'}
@@ -146,7 +145,7 @@ function SignInForm() {
       </div>
 
       <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
-        <Link href={LIVE_DEMO_HREF} className="cc-app-btn cc-app-btn--soft cc-app-btn--block">
+        <Link href={LIVE_DEMO_HREF} className="cc-btn-pill-ghost flex w-full justify-center py-2.5 text-[15px]">
           Explore demo workspace
         </Link>
       </div>

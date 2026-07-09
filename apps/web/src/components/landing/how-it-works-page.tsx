@@ -263,6 +263,28 @@ function StepPanel({
 const FILTER_OPTIONS = ['All', 'DevOps', 'AI'] as const;
 type PreviewFilter = (typeof FILTER_OPTIONS)[number];
 
+const QR_SIZE = 13;
+
+function isQrFinder(row: number, col: number, startRow: number, startCol: number) {
+  const r = row - startRow;
+  const c = col - startCol;
+  if (r < 0 || r > 4 || c < 0 || c > 4) return false;
+  return r === 0 || r === 4 || c === 0 || c === 4 || (r >= 2 && r <= 3 && c >= 2 && c <= 3);
+}
+
+function isQrCellFilled(index: number) {
+  const row = Math.floor(index / QR_SIZE);
+  const col = index % QR_SIZE;
+  if (isQrFinder(row, col, 0, 0) || isQrFinder(row, col, 0, 8) || isQrFinder(row, col, 8, 0)) {
+    return true;
+  }
+  return (
+    (row * 7 + col * 5) % 11 < 4 ||
+    (row + col) % 7 === 0 ||
+    (row % 3 === 0 && col % 4 === 1)
+  );
+}
+
 function matchesPreviewFilter(
   project: (typeof DEMO_FEATURED_PROJECTS)[number],
   filter: PreviewFilter,
@@ -318,7 +340,6 @@ function PhoneMock({ step }: { step: number }) {
   }
 
   const expanded = isExpandStep;
-  const labels = ['Scan QR', 'Profile', 'Filters', 'Expanded', 'Save?', 'Notes'];
   const showSavePrompt = step === 4;
   const showSavedToast = step === 5;
 
@@ -326,13 +347,8 @@ function PhoneMock({ step }: { step: number }) {
     <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[580px]">
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
-        <div className="cc-how-it-works-preview__browser" aria-hidden>
-          <span className="cc-how-it-works-preview__url font-eyebrow">codecard.app/demo</span>
-        </div>
-
         <div className="cc-how-it-works-preview__header">
-          <p className="cc-how-it-works-preview__step font-eyebrow">{labels[step]}</p>
-          <div className="mt-2 flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <div className="cc-how-it-works-preview__avatar relative h-10 w-10 overflow-hidden">
               <Image
                 src={DEMO_PROFILE.avatar_url!}
@@ -372,11 +388,20 @@ function PhoneMock({ step }: { step: number }) {
           {step === 0 && (
             <div className="cc-how-it-works-preview__scan-state">
               <div className="cc-how-it-works-preview__qr flex flex-col items-center gap-2 py-5">
-                <div className="cc-how-it-works-preview__qr-frame grid grid-cols-5 grid-rows-5 gap-0.5 p-2">
-                  {Array.from({ length: 25 }).map((_, i) => (
+                <div
+                  className="cc-how-it-works-preview__qr-frame grid gap-px p-2"
+                  style={{
+                    gridTemplateColumns: `repeat(${QR_SIZE}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${QR_SIZE}, minmax(0, 1fr))`,
+                  }}
+                >
+                  {Array.from({ length: QR_SIZE * QR_SIZE }).map((_, i) => (
                     <div
                       key={i}
-                      className={i % 3 === 0 || i % 7 === 0 ? 'bg-ink/80' : 'bg-ink/10'}
+                      className="rounded-[1px]"
+                      style={{
+                        backgroundColor: isQrCellFilled(i) ? 'rgba(35, 35, 36, 0.86)' : 'transparent',
+                      }}
                     />
                   ))}
                 </div>

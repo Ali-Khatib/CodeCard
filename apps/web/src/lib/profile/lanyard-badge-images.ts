@@ -92,10 +92,11 @@ export async function createLanyardFrontImage(opts: {
     });
   }
 
-  const company = opts.company ?? 'Available for work';
-  ctx.fillStyle = opts.accentColor;
-  ctx.font = '18px system-ui,sans-serif';
-  ctx.fillText(company, W / 2, 400);
+  if (opts.company) {
+    ctx.fillStyle = opts.accentColor;
+    ctx.font = '18px system-ui,sans-serif';
+    ctx.fillText(opts.company, W / 2, 400);
+  }
 
   ctx.fillStyle = '#52525b';
   ctx.font = 'bold 14px system-ui,sans-serif';

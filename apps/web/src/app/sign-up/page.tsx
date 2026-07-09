@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signUpSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
 
@@ -22,9 +23,7 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const authConfigured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  const authConfigured = isSupabasePublicKeyConfigured();
 
   function update(field: keyof typeof form, value: string) {
     setForm((prev) => {

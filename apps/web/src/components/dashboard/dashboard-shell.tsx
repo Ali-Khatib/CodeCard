@@ -136,6 +136,10 @@ export function DashboardShell({
         aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
         aria-expanded={sidebarOpen}
       >
+        <span className="cc-app-sidebar-toggle__card" aria-hidden>
+          <span />
+          <span />
+        </span>
         <span className="cc-app-sidebar-toggle__chevron" aria-hidden />
       </button>
 

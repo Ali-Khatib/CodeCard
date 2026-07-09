@@ -14,7 +14,6 @@ interface PublicProfileExperienceProps {
   projects: FeaturedProject[];
   accentColor?: string;
   location?: string | null;
-  availability?: string | null;
 }
 
 export function PublicProfileExperience({
@@ -26,7 +25,6 @@ export function PublicProfileExperience({
   links,
   projects,
   location,
-  availability,
 }: PublicProfileExperienceProps) {
   return (
     <PublicProfileFocused
@@ -38,7 +36,6 @@ export function PublicProfileExperience({
       links={links}
       projects={projects}
       location={location}
-      availability={availability}
     />
   );
 }

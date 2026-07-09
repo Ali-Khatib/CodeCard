@@ -40,10 +40,6 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
       <div className="cc-projects-profile-strip__copy">
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
-        {creator.availability && (
-          <p className="cc-projects-profile-strip__availability">{creator.availability}</p>
-        )}
-
         {creator.links.length > 0 && (
           <div className="cc-projects-profile-strip__links">
             {creator.links.map((link) => {

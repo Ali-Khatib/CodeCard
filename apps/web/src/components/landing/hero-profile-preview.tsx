@@ -18,13 +18,6 @@ export function HeroProfilePreview() {
     >
       <div className="cc-hero-preview__glow" aria-hidden />
       <div className="cc-hero-preview__frame">
-        <div className="cc-hero-preview__browser" aria-hidden>
-          <span className="cc-hero-preview__dot" />
-          <span className="cc-hero-preview__dot" />
-          <span className="cc-hero-preview__dot" />
-          <span className="cc-hero-preview__url font-eyebrow">codecard.app/demo</span>
-        </div>
-
         <div className="cc-hero-preview__header">
           <div className="cc-hero-preview__avatar">
             {/* eslint-disable-next-line @next/next/no-img-element */}

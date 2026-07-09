@@ -40,7 +40,6 @@ export function DashboardProfileView({
 
   const [company, setCompany] = useState('Stripe');
   const [location, setLocation] = useState('San Francisco');
-  const [availability, setAvailability] = useState('Available for work');
 
   return (
     <div className="cc-app-page cc-app-page--1120">
@@ -87,16 +86,6 @@ export function DashboardProfileView({
               />
             </label>
           </div>
-
-          <label className="block">
-            <span className="cc-app-mono">Availability</span>
-            <input
-              className="cc-app-input mt-2"
-              value={availability}
-              onChange={(e) => setAvailability(e.target.value)}
-              disabled={preview}
-            />
-          </label>
 
           {!preview ? (
             <ProfileEditor profile={profile} />

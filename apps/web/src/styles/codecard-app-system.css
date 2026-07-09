@@ -144,16 +144,22 @@ html.dark .cc-app-sidebar-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 44px;
-  border-radius: 0 12px 12px 0;
-  border: 2px solid var(--app-border-strong);
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border-strong);
   border-left: none;
-  background: var(--app-bone);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(252, 241, 231, 0.72)),
+    var(--app-bone);
   cursor: pointer;
-  box-shadow: 4px 0 12px rgba(34, 34, 34, 0.06);
+  box-shadow:
+    0 10px 24px rgba(34, 34, 34, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
   transition:
     left 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.25s ease,
     background 0.25s ease,
     border-color 0.25s ease;
   flex-shrink: 0;
@@ -162,7 +168,7 @@ html.dark .cc-app-sidebar-toggle {
 .cc-app-sidebar-toggle--fixed {
   position: fixed;
   top: 20px;
-  left: calc(var(--app-sidebar-width) - 14px);
+  left: calc(var(--app-sidebar-width) - 18px);
   z-index: 55;
 }
 
@@ -173,14 +179,44 @@ html.dark .cc-app-sidebar-toggle {
 .cc-app-sidebar-toggle:hover {
   background: var(--app-paper);
   border-color: var(--app-iris);
+  transform: translateX(2px);
+}
+
+.cc-app-sidebar-toggle__card {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 18px;
+}
+
+.cc-app-sidebar-toggle__card span {
+  position: absolute;
+  width: 12px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid var(--app-ink);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.cc-app-sidebar-toggle__card span:first-child {
+  left: 0;
+  top: 2px;
+  opacity: 0.32;
+  transform: rotate(-7deg);
+}
+
+.cc-app-sidebar-toggle__card span:last-child {
+  right: 0;
+  top: 0;
+  box-shadow: inset 0 4px 0 rgba(192, 148, 228, 0.18);
 }
 
 .cc-app-sidebar-toggle__chevron {
   display: block;
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid var(--app-ink);
-  border-bottom: 2px solid var(--app-ink);
+  width: 6px;
+  height: 6px;
+  border-right: 1.75px solid var(--app-ink);
+  border-bottom: 1.75px solid var(--app-ink);
   transform: rotate(135deg) translateX(1px);
   transition: transform 0.35s ease;
 }
@@ -2234,9 +2270,9 @@ html.dark .cc-reactive-border:hover {
 /* ── Projects page — borderless profile + stack ── */
 .cc-projects-profile-strip {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
   width: 100%;
   max-width: 100%;
   padding-bottom: 32px;
@@ -2278,18 +2314,11 @@ html.dark .cc-reactive-border:hover {
   color: var(--app-smoke);
 }
 
-.cc-projects-profile-strip__availability {
-  margin-top: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--app-iris);
-}
-
 .cc-projects-profile-strip__links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .cc-projects-profile-strip__link {

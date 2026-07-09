@@ -10,7 +10,6 @@ export type PortfolioCreator = {
   role: string;
   company: string | null;
   location?: string | null;
-  availability?: string | null;
   followers?: number;
   links: ProfileLinkItem[];
   profileSlug?: string | null;
@@ -54,7 +53,7 @@ type DbProject = {
 export function profileToPortfolioCreator(
   profile: DbProfile,
   links: ProfileLinkItem[],
-  extras?: Partial<Pick<PortfolioCreator, 'location' | 'availability' | 'followers'>>,
+  extras?: Partial<Pick<PortfolioCreator, 'location' | 'followers'>>,
 ): PortfolioCreator {
   const { role, company } = parseHeadline(profile.headline);
   return {
@@ -66,7 +65,6 @@ export function profileToPortfolioCreator(
     links,
     profileSlug: profile.slug ?? null,
     location: extras?.location ?? null,
-    availability: extras?.availability ?? 'Available for work',
     followers: extras?.followers ?? 0,
   };
 }

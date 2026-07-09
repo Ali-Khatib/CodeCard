@@ -26,7 +26,6 @@ export const DEMO_PROFILE = {
   avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200',
   accentColor: '#9382ff',
   location: 'San Francisco',
-  availability: 'Available for work',
   followers: 1240,
   links: [
     { type: 'github', label: null, url: 'https://github.com' },

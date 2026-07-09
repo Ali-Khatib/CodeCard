@@ -3,7 +3,10 @@
 import { useEffect, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
+  Braces,
+  Cloud,
   Code2,
   Cpu,
   Database,
@@ -11,6 +14,7 @@ import {
   Globe,
   Layers,
   Terminal,
+  Workflow,
   Zap,
 } from 'lucide-react';
 import { useHeroParallax } from '@/hooks/use-hero-parallax';
@@ -19,14 +23,17 @@ import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
 const FLOAT_ICONS = [
-  { Icon: Code2, x: '8%', y: '18%', size: 28, delay: 0, duration: 9 },
-  { Icon: GitBranch, x: '88%', y: '14%', size: 32, delay: 0.6, duration: 10 },
-  { Icon: Terminal, x: '14%', y: '72%', size: 26, delay: 1.2, duration: 8.5 },
-  { Icon: Database, x: '82%', y: '68%', size: 30, delay: 0.3, duration: 11 },
-  { Icon: Cpu, x: '72%', y: '28%', size: 24, delay: 1.8, duration: 9.5 },
-  { Icon: Layers, x: '22%', y: '42%', size: 22, delay: 0.9, duration: 10.5 },
-  { Icon: Globe, x: '58%', y: '78%', size: 26, delay: 1.5, duration: 8 },
-  { Icon: Zap, x: '46%', y: '12%', size: 20, delay: 2.1, duration: 7.5 },
+  { Icon: Code2, x: '15%', y: '28%', lineX: '18%', size: 30, delay: 0, duration: 9 },
+  { Icon: GitBranch, x: '83%', y: '24%', lineX: '25%', size: 32, delay: 0.6, duration: 10 },
+  { Icon: Terminal, x: '22%', y: '50%', lineX: '32%', size: 28, delay: 1.2, duration: 8.5 },
+  { Icon: Database, x: '78%', y: '52%', lineX: '39%', size: 31, delay: 0.3, duration: 11 },
+  { Icon: Cpu, x: '68%', y: '34%', lineX: '46%', size: 25, delay: 1.8, duration: 9.5 },
+  { Icon: Layers, x: '31%', y: '35%', lineX: '53%', size: 24, delay: 0.9, duration: 10.5 },
+  { Icon: Globe, x: '59%', y: '56%', lineX: '60%', size: 27, delay: 1.5, duration: 8 },
+  { Icon: Zap, x: '49%', y: '20%', lineX: '67%', size: 22, delay: 2.1, duration: 7.5 },
+  { Icon: Braces, x: '40%', y: '58%', lineX: '74%', size: 27, delay: 0.45, duration: 9.8 },
+  { Icon: Cloud, x: '88%', y: '40%', lineX: '81%', size: 30, delay: 1.05, duration: 10.8 },
+  { Icon: Workflow, x: '10%', y: '43%', lineX: '88%', size: 28, delay: 1.65, duration: 9.2 },
 ] as const;
 
 export function ProductHero() {
@@ -39,9 +46,12 @@ export function ProductHero() {
     const section = heroRef.current;
     if (!section) return;
 
+    gsap.registerPlugin(ScrollTrigger);
+
     const statement = section.querySelector('[data-hero-statement]');
     const pitch = section.querySelector('[data-hero-pitch]');
     const cta = section.querySelector('[data-hero-cta]');
+    const techIcons = gsap.utils.toArray<HTMLElement>('[data-hero-tech-icon]', section);
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -54,6 +64,37 @@ export function ProductHero() {
       if (cta) {
         tl.fromTo(cta, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65 }, 0.28);
       }
+
+      techIcons.forEach((icon, index) => {
+        const lineX = icon.dataset.lineX ?? '50%';
+        gsap.to(icon, {
+          keyframes: [
+            {
+              left: lineX,
+              top: '56%',
+              opacity: 0.26,
+              scale: 0.94,
+              duration: 0.58,
+              ease: 'power2.inOut',
+            },
+            {
+              left: lineX,
+              top: '-24%',
+              opacity: 0,
+              scale: 0.62,
+              duration: 0.42,
+              ease: 'power3.in',
+            },
+          ],
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.9,
+          },
+          delay: index * 0.01,
+        });
+      });
     }, section);
 
     return () => ctx.revert();
@@ -69,10 +110,12 @@ export function ProductHero() {
 
       {!reducedMotion && (
         <div className="cc-hume-hero__float-icons pointer-events-none" aria-hidden>
-          {FLOAT_ICONS.map(({ Icon, x, y, size, delay, duration }, i) => (
+          {FLOAT_ICONS.map(({ Icon, x, y, lineX, size, delay, duration }, i) => (
             <span
               key={i}
               className="cc-hume-hero__float-icon"
+              data-hero-tech-icon
+              data-line-x={lineX}
               style={
                 {
                   left: x,
@@ -83,7 +126,9 @@ export function ProductHero() {
                 } as CSSProperties
               }
             >
-              <Icon size={size} strokeWidth={1.5} />
+              <span className="cc-hume-hero__float-icon-inner">
+                <Icon size={size} strokeWidth={1.55} />
+              </span>
             </span>
           ))}
         </div>

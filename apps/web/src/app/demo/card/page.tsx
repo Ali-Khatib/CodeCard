@@ -28,7 +28,6 @@ export default function DemoCardPage() {
       links={links.length ? links : DEMO_PROFILE_LINKS}
       projects={projects}
       location={DEMO_PROFILE.location}
-      availability={DEMO_PROFILE.availability}
     />
   );
 }

@@ -60,7 +60,6 @@ export function DashboardOverviewView({
   const [editing, setEditing] = useState(false);
   const [company, setCompany] = useState('Stripe');
   const [location, setLocation] = useState('San Francisco');
-  const [availability, setAvailability] = useState('Available for work');
   const reduced = useReducedMotion() ?? false;
   const views = profileViews || stats.profileViews;
 
@@ -152,9 +151,6 @@ export function DashboardOverviewView({
                   </div>
                 )}
               </div>
-              <span className="cc-app-badge cc-app-badge--mint shrink-0 self-start">
-                {availability}
-              </span>
             </div>
 
             <AnimatePresence initial={false}>
@@ -198,7 +194,7 @@ export function DashboardOverviewView({
                       </div>
                     )}
 
-                    <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block">
                         <span className="cc-app-mono">Company</span>
                         <input
@@ -214,15 +210,6 @@ export function DashboardOverviewView({
                           className="cc-app-input mt-2"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
-                          disabled={preview}
-                        />
-                      </label>
-                      <label className="block">
-                        <span className="cc-app-mono">Availability</span>
-                        <input
-                          className="cc-app-input mt-2"
-                          value={availability}
-                          onChange={(e) => setAvailability(e.target.value)}
                           disabled={preview}
                         />
                       </label>

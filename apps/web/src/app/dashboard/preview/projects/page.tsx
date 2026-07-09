@@ -20,7 +20,6 @@ const creator = profileToPortfolioCreator(
   DEMO_PROFILE_LINKS,
   {
     location: DEMO_PROFILE.location,
-    availability: DEMO_PROFILE.availability,
     followers: DEMO_PROFILE.followers,
   },
 );
