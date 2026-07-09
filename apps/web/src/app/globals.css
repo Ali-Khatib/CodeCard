@@ -2133,7 +2133,7 @@ select,
 
   /* â”€â”€ Nav veil (Frame.io) â”€â”€ */
   .cc-nav-veil {
-    width: min(100%, 1080px);
+    width: min(100%, 900px);
     max-width: calc(100% - 24px);
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.62);
@@ -2155,7 +2155,7 @@ select,
     height: 58px;
     gap: 24px;
     padding-inline: 22px;
-    max-width: 1080px;
+    max-width: 900px;
     margin-inline: auto;
   }
 
