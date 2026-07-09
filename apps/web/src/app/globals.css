@@ -2153,8 +2153,8 @@ select,
     display: flex;
     align-items: center;
     height: 58px;
-    gap: 18px;
-    padding-inline: 18px;
+    gap: 22px;
+    padding-inline: 22px;
     max-width: 100%;
     margin-inline: auto;
   }
