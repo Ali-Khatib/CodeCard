@@ -193,11 +193,19 @@ html {
 body {
   background: var(--bone);
   color: var(--ink);
+  caret-color: transparent;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.01em;
+}
+
+input,
+textarea,
+select,
+[contenteditable='true'] {
+  caret-color: auto;
 }
 
 .cc-marketing-shell {
