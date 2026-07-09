@@ -20,7 +20,7 @@
     "security:scan": "node scripts/check-secrets.js"
   },
   "devDependencies": {
-    "prettier": "^3.4.2",
+    "prettier": "^3.9.4",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2"
   },
