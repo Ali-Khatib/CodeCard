@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LAYOUT } from '@/lib/design/tokens';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
@@ -80,11 +79,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   }, [hovered, moveHoverLine]);
 
   return (
-    <nav
-      className="cc-nav-veil w-full"
-      style={{ maxWidth: `${LAYOUT.navWidth}px` }}
-      aria-label="Primary"
-    >
+    <nav className="cc-nav-veil w-full" aria-label="Primary">
       <div className="cc-nav-veil__inner">
         <Link
           href="/"

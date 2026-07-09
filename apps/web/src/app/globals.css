@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-padding-top: calc(70px + env(safe-area-inset-top, 0px));
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
 
 :root {
   --pointer-x: 0.5;
@@ -302,13 +319,25 @@ select,
 
 @layer components {
   .cc-container {
-    width: min(var(--container-max), calc(100vw - var(--container-pad) * 2));
+    width: min(var(--container-max), calc(100% - var(--container-pad) * 2));
     margin-inline: auto;
   }
 
   .cc-content {
-    width: min(var(--content-max), calc(100vw - var(--container-pad) * 2));
+    width: min(var(--content-max), calc(100% - var(--container-pad) * 2));
     margin-inline: auto;
+  }
+
+  .cc-marketing-main {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .cc-marketing-page {
+    padding-top: calc(58px + 12px + env(safe-area-inset-top, 0px));
+  }
+
+  .cc-marketing-nav-shell {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
   }
 
   /* â”€â”€ Frame.io cosmic canvas (scroll + pointer reactive) â”€â”€ */
@@ -1368,6 +1397,19 @@ select,
     display: none;
   }
 
+  @media (max-width: 767px) {
+    .cc-audience-bounce__stack {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      transform: none;
+    }
+
+    .cc-audience-bounce__scroll {
+      padding-inline: 16px;
+    }
+  }
+
   @media (max-width: 1279px) {
     .cc-audience-bounce__stack {
       transform: scale(0.92);
@@ -1375,17 +1417,9 @@ select,
     }
   }
 
-  @media (max-width: 767px) {
-    .cc-audience-bounce__stack {
-      transform: scale(0.86);
-      transform-origin: center top;
-    }
-  }
-
   @media (max-width: 480px) {
     .cc-audience-bounce__stack {
-      transform: scale(0.78);
-      transform-origin: center top;
+      transform: none;
     }
   }
 
@@ -1461,7 +1495,7 @@ select,
     font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.15;
-    color: var(--vellum);
+    color: #f5f0ea;
   }
 
   @media (min-width: 768px) {
@@ -1474,7 +1508,7 @@ select,
     margin-top: 12px;
     font-size: 17px;
     line-height: 1.55;
-    color: var(--ash);
+    color: rgba(245, 240, 234, 0.78);
     max-width: 56ch;
   }
 
@@ -1499,7 +1533,7 @@ select,
     gap: 10px;
     font-size: 14px;
     line-height: 1.45;
-    color: var(--vellum);
+    color: rgba(245, 240, 234, 0.92);
     padding: 12px 14px;
     border-radius: 10px;
     background: rgba(var(--accent-rgb), 0.08);
@@ -2100,6 +2134,7 @@ select,
   /* â”€â”€ Nav veil (Frame.io) â”€â”€ */
   .cc-nav-veil {
     width: min(100%, 1280px);
+    max-width: calc(100% - 24px);
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.62);
     border-radius: 999px;
@@ -3411,6 +3446,65 @@ select,
 
   .cc-how-it-works-preview--large .cc-how-it-works-preview__body {
     min-height: 380px;
+  }
+
+  @media (max-width: 767px) {
+    .cc-how-it-works-mobile__steps {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .cc-how-it-works-mobile__step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .cc-how-it-works-phone-wrap--right {
+      margin-inline: auto;
+      max-width: min(92vw, 390px);
+      width: 100%;
+    }
+
+    .cc-how-it-works-preview--large {
+      max-width: min(92vw, 390px);
+      width: 100%;
+    }
+
+    .cc-how-it-works-preview--large .cc-how-it-works-preview__body {
+      min-height: auto;
+    }
+
+    .cc-how-it-works-step-panel {
+      width: 100%;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .cc-how-it-works-step-panel p,
+    .cc-how-it-works-step-panel h3 {
+      margin-inline: auto;
+    }
+
+    .cc-how-it-works-preview__filter.cc-app-filter-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
+    .cc-how-it-works-preview__filter.cc-app-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cc-how-it-works-preview__filter-pill.cc-app-filter-pill {
+      flex: 0 0 auto;
+    }
   }
 
   .cc-how-it-works-pill-wrap {

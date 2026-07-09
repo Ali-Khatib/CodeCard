@@ -705,6 +705,7 @@ html.dark .cc-app-sidebar-toggle {
   border: 1px solid var(--app-border);
   background: var(--app-paper);
   padding: 4px;
+  max-width: 100%;
 }
 
 .cc-app-filter-pill {
@@ -715,6 +716,7 @@ html.dark .cc-app-sidebar-toggle {
   font-weight: 500;
   color: var(--app-smoke);
   transition: color 0.28s ease, background 0.28s ease;
+  flex: 0 0 auto;
 }
 
 .cc-app-filter-pill:hover {
@@ -825,12 +827,65 @@ html.dark .cc-app-sidebar-toggle {
 
   .cc-app-main {
     margin-left: 0;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .cc-app-topbar,
   .cc-app-content {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+    max-width: 100%;
+  }
+
+  .cc-app-topbar {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .cc-app-topbar-cta {
+    padding-inline: 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .cc-app-back-landing {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--app-border);
+    background: var(--app-paper);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--app-smoke);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .cc-app-back-landing:hover {
+    color: var(--app-ink);
+    background: var(--app-bone);
+  }
+
+  .cc-app-filter-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .cc-app-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cc-app-filter-pill {
+    flex: 0 0 auto;
   }
 
   .cc-app-mobile-nav {
@@ -1535,6 +1590,11 @@ html.dark .cc-app-sidebar-toggle {
   border: 1px solid var(--app-border);
   background: var(--app-paper);
   box-shadow: 0 8px 32px rgba(34, 34, 34, 0.08);
+  max-width: calc(100vw - 24px);
+}
+
+.cc-app-notifications-panel--mobile {
+  max-height: min(70vh, 420px);
 }
 
 /* ── Compact profile preview ── */

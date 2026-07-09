@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { DEMO_NOTIFICATIONS, type DashboardNotification } from '@/lib/dashboard/notifications-demo';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 
 const TYPE_ICON: Record<DashboardNotification['type'], string> = {
   project: '◆',
@@ -14,7 +15,47 @@ const TYPE_ICON: Record<DashboardNotification['type'], string> = {
 export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?: string }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(DEMO_NOTIFICATIONS);
+  const [panelStyle, setPanelStyle] = useState<CSSProperties>();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const isMobile = useIsMobile();
   const unread = useMemo(() => items.filter((n) => n.unread).length, [items]);
+
+  useLayoutEffect(() => {
+    if (!open || !isMobile || !triggerRef.current) {
+      setPanelStyle(undefined);
+      return;
+    }
+
+    const updatePosition = () => {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+
+      const rect = trigger.getBoundingClientRect();
+      const panelWidth = Math.min(window.innerWidth * 0.92, 360);
+      const margin = 12;
+      const right = Math.max(margin, window.innerWidth - rect.right);
+      const left = Math.min(
+        Math.max(margin, rect.right - panelWidth),
+        window.innerWidth - panelWidth - margin,
+      );
+
+      setPanelStyle({
+        top: rect.bottom + 8,
+        left,
+        right: 'auto',
+        width: panelWidth,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
+  }, [isMobile, open]);
 
   const markAllRead = () => {
     setItems((prev) => prev.map((n) => ({ ...n, unread: false })));
@@ -29,8 +70,9 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
   };
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="cc-app-icon-btn relative"
@@ -61,7 +103,16 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
             aria-label="Close notifications"
             onClick={() => setOpen(false)}
           />
-          <div className="cc-app-notifications-panel absolute right-0 top-full z-50 mt-2 w-[min(360px,calc(100vw-2rem))]">
+          <div
+            className={`cc-app-notifications-panel z-50 ${
+              isMobile ? 'cc-app-notifications-panel--mobile fixed' : 'absolute right-0 top-full mt-2'
+            }`}
+            style={
+              isMobile
+                ? panelStyle
+                : { width: 'min(360px, calc(100vw - 2rem))' }
+            }
+          >
             <div className="flex items-center justify-between border-b border-[var(--app-border)] px-4 py-3">
               <p className="text-[16px] font-medium text-[var(--app-ink)]">Notifications</p>
               {unread > 0 && (

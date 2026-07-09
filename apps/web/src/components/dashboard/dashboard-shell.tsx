@@ -197,10 +197,18 @@ export function DashboardShell({
 
       <div className="cc-app-main">
         <header className="cc-app-topbar">
-          <h1 className="text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
+          {preview && (
+            <Link
+              href="/"
+              className="cc-app-back-landing shrink-0 md:hidden"
+            >
+              ← Landing
+            </Link>
+          )}
+          <h1 className="min-w-0 truncate text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
           <div className="flex-1" />
           <DashboardNotifications basePath={basePath} />
-          <AppButton variant="primary" href={`${basePath}/projects/new`}>
+          <AppButton variant="primary" className="cc-app-topbar-cta shrink-0" href={`${basePath}/projects/new`}>
             Create project
           </AppButton>
           <div className="relative">
@@ -231,13 +239,22 @@ export function DashboardShell({
                   Settings
                 </Link>
                 {preview ? (
-                  <Link
-                    href="/sign-up"
-                    className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Create account
-                  </Link>
+                  <>
+                    <Link
+                      href="/"
+                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)] md:hidden"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      ← Back to landing
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Create account
+                    </Link>
+                  </>
                 ) : (
                   <Link
                     href={`${basePath}/settings`}

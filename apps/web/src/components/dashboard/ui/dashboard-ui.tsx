@@ -213,7 +213,7 @@ export function FilterBar<T extends string>({
   labels?: Record<T, string>;
 }) {
   return (
-    <div className="cc-app-filter-bar" role="tablist">
+    <div className="cc-app-filter-bar min-w-0 max-w-full" role="tablist">
       {options.map((opt) => (
         <button
           key={opt}

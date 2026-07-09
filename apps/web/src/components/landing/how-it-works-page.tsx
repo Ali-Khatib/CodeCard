@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { TYPE } from '@/lib/design/tokens';
 import { SectionCounter } from './section-counter';
 import { ScrollReveal } from './scroll-reveal';
@@ -45,6 +46,8 @@ const STEP_SCROLL_VH = 72;
 
 export function HowItWorksSection() {
   const reducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const useStaticLayout = reducedMotion || isMobile;
   const [activeStep, setActiveStep] = useState(0);
   const runwayRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef(activeStep);
@@ -58,7 +61,7 @@ export function HowItWorksSection() {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (useStaticLayout) return;
 
     let raf = 0;
     const measure = () => {
@@ -85,7 +88,7 @@ export function HowItWorksSection() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [goToStep, reducedMotion]);
+  }, [goToStep, useStaticLayout]);
 
   const scrollToStep = (index: number) => {
     const runway = runwayRef.current;
@@ -105,30 +108,48 @@ export function HowItWorksSection() {
           </h2>
           <p className="mt-6 max-w-[680px] text-[18px] leading-[1.55] text-lichen">
             Six steps from first scan to a saved connection, built for intros, events, and async
-            sharing. Scroll to walk through it.
+            sharing.{useStaticLayout ? '' : ' Scroll to walk through it.'}
           </p>
         </ScrollReveal>
       </section>
 
       <AuroraDivider className="cc-container mb-10 md:mb-14" />
 
-      {reducedMotion ? (
-        <section className="cc-container">
-          <div className="grid gap-10 md:grid-cols-[minmax(260px,320px)_1fr] md:gap-14">
-            <PhoneMock step={0} />
-            <div className="space-y-8">
+      {useStaticLayout ? (
+        isMobile && !reducedMotion ? (
+          <section className="cc-container cc-how-it-works-mobile">
+            <div className="cc-how-it-works-mobile__steps">
               {STEPS.map((s, i) => (
-                <div key={s.title}>
-                  <p className="font-eyebrow text-[12px] uppercase tracking-[0.1em] text-reactor">
-                    Step {i + 1}
-                  </p>
-                  <h3 className="mt-2 font-display text-[24px] text-vellum">{s.title}</h3>
-                  <p className="mt-2 text-[17px] leading-relaxed text-lichen">{s.detail}</p>
-                </div>
+                <article key={s.title} className="cc-how-it-works-mobile__step">
+                  <PhoneMock step={i} />
+                  <StepPanel
+                    step={s}
+                    stepIndex={i}
+                    total={STEPS.length}
+                    className="mt-6"
+                  />
+                </article>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
+        ) : (
+          <section className="cc-container">
+            <div className="grid gap-10 md:grid-cols-[minmax(260px,320px)_1fr] md:gap-14">
+              <PhoneMock step={0} />
+              <div className="space-y-8">
+                {STEPS.map((s, i) => (
+                  <div key={s.title}>
+                    <p className="font-eyebrow text-[12px] uppercase tracking-[0.1em] text-reactor">
+                      Step {i + 1}
+                    </p>
+                    <h3 className="mt-2 font-display text-[24px] text-vellum">{s.title}</h3>
+                    <p className="mt-2 text-[17px] leading-relaxed text-lichen">{s.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
       ) : (
         <section className="cc-container">
           <div
@@ -209,7 +230,7 @@ export function HowItWorksSection() {
 
 export function HowItWorksPage() {
   return (
-    <div className="pb-16 pt-[96px]">
+    <div className="cc-marketing-page pb-16">
       <HowItWorksSection />
     </div>
   );
@@ -344,7 +365,7 @@ function PhoneMock({ step }: { step: number }) {
   const showSavedToast = step === 5;
 
   return (
-    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[580px]">
+    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[min(92vw,390px)] md:max-w-[580px]">
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
         <div className="cc-how-it-works-preview__header">

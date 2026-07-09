@@ -17,7 +17,7 @@ export function DashFilterBar<T extends string>({
   showFilterLabel = true,
 }: DashFilterBarProps<T>) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       {showFilterLabel && (
         <span className="cc-app-mono inline-flex items-center gap-1.5">
           <HiOutlineFunnel className="h-3.5 w-3.5" aria-hidden />

@@ -8,7 +8,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="cc-marketing-shell relative min-h-[100dvh] bg-bone text-ink">
       <div className="relative z-[1]">
         <LandingShellNav />
-        <main>{children}</main>
+        <main className="cc-marketing-main">{children}</main>
         <HumeFooterCluster />
       </div>
     </div>
