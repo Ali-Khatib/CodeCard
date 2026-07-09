@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HiOutlineArrowTopRightOnSquare, HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
+import { RevealProjectImages } from '@/components/ui/reveal-images';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import { projectColorAt } from '@/lib/design/project-card-colors';
 import { ReactiveBorder } from './reactive-border';
@@ -21,6 +22,13 @@ export function ProjectHeroCard({
   colorIndex?: number;
 }) {
   const color = projectColorAt(colorIndex);
+  const revealImages = [
+    ...(project.screenshots ?? []),
+    ...(project.posterUrl ? [project.posterUrl] : []),
+  ].map((src, imageIndex) => ({
+    src,
+    alt: `${project.title} preview ${imageIndex + 1}`,
+  }));
 
   return (
     <ReactiveBorder
@@ -29,7 +37,7 @@ export function ProjectHeroCard({
       className="cc-app-project-hero overflow-hidden rounded-[24px]"
       style={{ background: color.bg, borderColor: color.border } as React.CSSProperties}
     >
-      <div className="grid gap-0 md:grid-cols-[1.15fr_1fr]">
+      <div className="group/project grid gap-0 md:grid-cols-[1.15fr_1fr]">
         <div className="relative min-h-[280px] md:min-h-[360px]">
           <Image
             src={project.posterUrl ?? FALLBACK}
@@ -39,6 +47,7 @@ export function ProjectHeroCard({
             sizes="(max-width: 768px) 100vw, 60vw"
             priority
           />
+          <RevealProjectImages images={revealImages} />
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(35,35,36,0.45)] via-transparent to-transparent" />
           <div className="absolute bottom-6 left-6 right-6">
             <AppMono>Featured hero</AppMono>

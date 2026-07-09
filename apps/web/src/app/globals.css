@@ -2133,7 +2133,7 @@ select,
 
   /* â”€â”€ Nav veil (Frame.io) â”€â”€ */
   .cc-nav-veil {
-    width: min(100%, 1280px);
+    width: min(100%, 1080px);
     max-width: calc(100% - 24px);
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.62);
@@ -2155,7 +2155,7 @@ select,
     height: 58px;
     gap: 24px;
     padding-inline: 22px;
-    max-width: var(--container-max);
+    max-width: 1080px;
     margin-inline: auto;
   }
 
@@ -3782,6 +3782,30 @@ select,
       rgba(35, 35, 36, 0.25) 55%,
       transparent 100%
     );
+  }
+
+  .cc-how-it-works-preview__media--compact {
+    background: #fffaf6;
+  }
+
+  .cc-how-it-works-preview__project-card {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .cc-how-it-works-preview__project-thumb {
+    position: relative;
+    width: 64px;
+    height: 44px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 9px;
+    border: 1px solid rgba(34, 34, 34, 0.08);
+    background: #fcf1e7;
   }
 
   .cc-how-it-works-preview__project-row {

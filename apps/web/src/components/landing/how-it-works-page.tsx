@@ -482,32 +482,56 @@ function PhoneMock({ step }: { step: number }) {
                   <div key={p.id} className={isLead && expanded ? 'space-y-2' : ''}>
                     <div
                       className={`cc-how-it-works-preview__media relative overflow-hidden rounded-[10px] border border-[rgba(34,34,34,0.1)] transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                        isLead && expanded ? 'h-[220px]' : 'h-[88px]'
+                        isLead && expanded
+                          ? 'h-[220px]'
+                          : 'cc-how-it-works-preview__media--compact h-[64px]'
                       }`}
                     >
-                      {showVideo && p.videoUrl ? (
-                        <video
-                          src={p.videoUrl}
-                          poster={p.posterUrl ?? undefined}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="h-full w-full object-cover object-top"
-                        />
-                      ) : p.posterUrl ? (
-                        <Image
-                          src={p.posterUrl}
-                          alt=""
-                          fill
-                          className="object-cover object-top opacity-90"
-                          sizes="300px"
-                        />
-                      ) : null}
-                      <div className="cc-how-it-works-preview__media-overlay cc-how-it-works-preview__media-overlay--compact">
-                        <p className="font-display text-[13px] leading-tight text-white">{p.title}</p>
-                        <p className="truncate text-[10px] text-white/75">{p.tagline}</p>
-                      </div>
+                      {isLead && expanded ? (
+                        <>
+                          {showVideo && p.videoUrl ? (
+                            <video
+                              src={p.videoUrl}
+                              poster={p.posterUrl ?? undefined}
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              className="h-full w-full object-cover object-top"
+                            />
+                          ) : p.posterUrl ? (
+                            <Image
+                              src={p.posterUrl}
+                              alt=""
+                              fill
+                              className="object-cover object-top opacity-90"
+                              sizes="300px"
+                            />
+                          ) : null}
+                          <div className="cc-how-it-works-preview__media-overlay cc-how-it-works-preview__media-overlay--compact">
+                            <p className="font-display text-[13px] leading-tight text-white">{p.title}</p>
+                            <p className="truncate text-[10px] text-white/75">{p.tagline}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="cc-how-it-works-preview__project-card">
+                          <div className="cc-how-it-works-preview__project-thumb">
+                            {p.posterUrl ? (
+                              <Image
+                                src={p.posterUrl}
+                                alt=""
+                                fill
+                                className="object-cover object-top"
+                                sizes="72px"
+                              />
+                            ) : null}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate font-display text-[12px] leading-tight text-ink">{p.title}</p>
+                            <p className="mt-0.5 truncate text-[9px] leading-tight text-smoke">{p.tagline}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {isLead && expanded && p.screenshots?.[0] && p.screenshots?.[1] && (
                       <div className="grid grid-cols-2 gap-1.5">

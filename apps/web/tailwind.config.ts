@@ -54,6 +54,7 @@ export default {
         foreground: 'var(--foreground)',
         card: 'var(--surface)',
         muted: 'var(--text-secondary)',
+        'muted-foreground': 'var(--muted-foreground)',
         cream: 'var(--hume-cream)',
         'lavender-mist-brand': 'var(--hume-lavender-mist)',
         periwinkle: 'var(--hume-periwinkle)',

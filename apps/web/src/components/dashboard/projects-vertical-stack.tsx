@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
+import { RevealProjectImages } from '@/components/ui/reveal-images';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import { FadeInView } from './fade-in-view';
@@ -24,10 +25,17 @@ function ProjectRow({
 }) {
   const isPublished = project.isPublished !== false;
   const reduced = useReducedMotion();
+  const revealImages = [
+    ...(project.screenshots ?? []),
+    ...(project.posterUrl ? [project.posterUrl] : []),
+  ].map((src, imageIndex) => ({
+    src,
+    alt: `${project.title} preview ${imageIndex + 1}`,
+  }));
 
   return (
     <FadeInView delay={index * 0.06}>
-      <ProjectHoverCard className="cc-project-row-card">
+      <ProjectHoverCard className="group/project cc-project-row-card">
         <div className="cc-project-row">
           <div className="cc-project-hover-card__media">
             <Image
@@ -38,6 +46,7 @@ function ProjectRow({
               sizes="(max-width: 768px) 100vw, 1040px"
               priority={index === 0}
             />
+            <RevealProjectImages images={revealImages} />
           </div>
 
           <div className="cc-project-row__body cc-project-hover-card__body">

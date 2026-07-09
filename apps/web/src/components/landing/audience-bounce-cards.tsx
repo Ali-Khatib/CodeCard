@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion } from 'motion/react';
 import { BorderGlowCard } from './border-glow-card';
@@ -105,17 +104,6 @@ function AudienceDetailPanel({ index }: { index: number }) {
   const card = AUDIENCE_CARDS[index];
   if (!card) return null;
 
-  const cta =
-    card.cta.href.startsWith('#') ? (
-      <a href={card.cta.href} className="cc-audience-detail__cta">
-        {card.cta.label} →
-      </a>
-    ) : (
-      <Link href={card.cta.href} className="cc-audience-detail__cta">
-        {card.cta.label} →
-      </Link>
-    );
-
   return (
     <div className="cc-audience-detail">
       <div className="cc-audience-detail__glow" aria-hidden />
@@ -133,7 +121,6 @@ function AudienceDetailPanel({ index }: { index: number }) {
             </li>
           ))}
         </ul>
-        <div className="cc-audience-detail__footer">{cta}</div>
       </div>
     </div>
   );

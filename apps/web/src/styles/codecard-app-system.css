@@ -65,7 +65,25 @@ html.dark .cc-app-topbar {
 }
 
 html.dark .cc-app-sidebar-toggle {
+  background:
+    linear-gradient(135deg, rgba(42, 40, 46, 0.92), rgba(18, 17, 20, 0.86)),
+    var(--app-bone);
+  border-color: var(--app-border-strong);
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.24);
+}
+
+html.dark .cc-app-sidebar-toggle:hover {
+  background: var(--app-paper);
+  border-color: rgba(192, 148, 228, 0.55);
+}
+
+html.dark .cc-app-sidebar-toggle__card span {
+  border-color: var(--app-ink);
+  background: rgba(239, 237, 235, 0.12);
+}
+
+html.dark .cc-app-sidebar-toggle__card span:last-child {
+  box-shadow: inset 0 4px 0 rgba(192, 148, 228, 0.28);
 }
 
 /* ── Layout ── */

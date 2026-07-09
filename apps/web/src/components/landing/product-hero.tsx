@@ -134,10 +134,10 @@ export function ProductHero() {
         </div>
       )}
 
-      <div className="relative z-[1] flex w-full max-w-[980px] flex-col items-center">
+      <div className="relative z-[1] flex w-full max-w-[880px] translate-y-3 flex-col items-center md:translate-y-6">
         <h1
           data-hero-statement
-          className="cc-hume-hero__headline max-w-[920px] text-balance"
+          className="cc-hume-hero__headline max-w-[840px] text-balance"
         >
           Your best work. Ready to{' '}
           <span className="cc-hume-gradient-text">share in seconds.</span>
@@ -145,7 +145,7 @@ export function ProductHero() {
 
         <p
           data-hero-pitch
-          className="cc-hume-hero__tagline mt-6 max-w-[620px] text-balance"
+          className="cc-hume-hero__tagline mt-6 max-w-[560px] text-balance"
         >
           {CODECARD_TAGLINE}
         </p>
