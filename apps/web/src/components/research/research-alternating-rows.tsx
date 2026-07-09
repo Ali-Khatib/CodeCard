@@ -7,6 +7,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { SourceInfoIcon } from './source-drawer';
 
 const STEP_VH = 64;
+const FINAL_HOLD_VH = 72;
 const ITEMS = ALTERNATING_RESEARCH;
 
 function ResearchPair({
@@ -74,7 +75,7 @@ export function ResearchAlternatingRows() {
       const rect = section.getBoundingClientRect();
       const stepPx = window.innerHeight * (STEP_VH / 100);
       const scrolled = Math.max(0, -rect.top);
-      goTo(Math.min(ITEMS.length - 1, Math.floor((scrolled + stepPx * 0.5) / stepPx)));
+      goTo(Math.min(ITEMS.length - 1, Math.floor(scrolled / stepPx)));
     };
 
     const onScroll = () => {
@@ -107,7 +108,7 @@ export function ResearchAlternatingRows() {
     <div
       ref={sectionRef}
       className="cc-research-crossfade"
-      style={{ minHeight: `${ITEMS.length * STEP_VH}vh` }}
+      style={{ minHeight: `${ITEMS.length * STEP_VH + FINAL_HOLD_VH}vh` }}
     >
       <div className="cc-research-crossfade__stage">
         {ITEMS.map((item, index) => (

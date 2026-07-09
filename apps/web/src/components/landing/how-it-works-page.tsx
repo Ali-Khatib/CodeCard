@@ -327,9 +327,6 @@ function PhoneMock({ step }: { step: number }) {
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
         <div className="cc-how-it-works-preview__browser" aria-hidden>
-          <span className="cc-how-it-works-preview__dot" />
-          <span className="cc-how-it-works-preview__dot" />
-          <span className="cc-how-it-works-preview__dot" />
           <span className="cc-how-it-works-preview__url font-eyebrow">codecard.app/demo</span>
         </div>
 
@@ -373,16 +370,56 @@ function PhoneMock({ step }: { step: number }) {
 
         <div className="cc-how-it-works-preview__body relative">
           {step === 0 && (
-            <div className="cc-how-it-works-preview__qr flex flex-col items-center gap-2 py-5">
-              <div className="cc-how-it-works-preview__qr-frame grid grid-cols-5 grid-rows-5 gap-0.5 p-2">
-                {Array.from({ length: 25 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={i % 3 === 0 || i % 7 === 0 ? 'bg-ink/80' : 'bg-ink/10'}
-                  />
-                ))}
+            <div className="cc-how-it-works-preview__scan-state">
+              <div className="cc-how-it-works-preview__qr flex flex-col items-center gap-2 py-5">
+                <div className="cc-how-it-works-preview__qr-frame grid grid-cols-5 grid-rows-5 gap-0.5 p-2">
+                  {Array.from({ length: 25 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={i % 3 === 0 || i % 7 === 0 ? 'bg-ink/80' : 'bg-ink/10'}
+                    />
+                  ))}
+                </div>
+                <p className="text-[11px] font-medium text-ink">Scan to open</p>
               </div>
-              <p className="text-[11px] font-medium text-ink">Scan to open</p>
+
+              <div className="cc-how-it-works-preview__scan-content">
+                <div className="cc-how-it-works-preview__scan-summary">
+                  <div>
+                    <p className="font-eyebrow text-[9px] uppercase tracking-[0.1em] text-smoke">
+                      Opens into
+                    </p>
+                    <p className="mt-1 font-display text-[17px] leading-tight text-ink">
+                      A full project showcase
+                    </p>
+                  </div>
+                  <span className="cc-how-it-works-preview__scan-pill font-eyebrow">3 projects</span>
+                </div>
+
+                <div className="space-y-2">
+                  {allProjects.slice(0, 2).map((project) => (
+                    <div key={project.id} className="cc-how-it-works-preview__mini-project">
+                      <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-[9px] border border-[rgba(34,34,34,0.08)]">
+                        {project.posterUrl && (
+                          <Image
+                            src={project.posterUrl}
+                            alt=""
+                            fill
+                            className="object-cover object-top"
+                            sizes="64px"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-display text-[13px] leading-tight text-ink">
+                          {project.title}
+                        </p>
+                        <p className="mt-0.5 truncate text-[10px] text-smoke">{project.tagline}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
