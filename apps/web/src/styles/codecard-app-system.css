@@ -298,8 +298,8 @@ html.dark .cc-app-sidebar-toggle {
 }
 
 .cc-reactive-border.cc-app-card--meringue {
-  background: var(--app-meringue);
-  border-color: rgba(233, 90, 11, 0.18);
+  background: rgba(192, 148, 228, 0.08);
+  border-color: rgba(192, 148, 228, 0.16);
 }
 
 .cc-reactive-border.cc-app-card--seafoam {
@@ -323,8 +323,8 @@ html.dark .cc-app-sidebar-toggle {
 }
 
 .cc-app-card--meringue {
-  background: var(--app-meringue);
-  border-color: transparent;
+  background: rgba(192, 148, 228, 0.08);
+  border-color: rgba(192, 148, 228, 0.12);
 }
 
 .cc-app-card--seafoam {
@@ -1581,7 +1581,7 @@ html.dark .cc-reactive-border:hover {
   padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid var(--app-border);
-  background: var(--app-bone);
+  background: var(--app-paper);
 }
 
 .cc-analytics-visitor-bar {
@@ -2339,7 +2339,7 @@ html.dark .cc-reactive-border:hover {
   padding: 4px;
   border-radius: var(--app-radius-pill);
   border: 1px solid var(--app-border);
-  background: var(--app-bone);
+  background: var(--app-paper);
 }
 
 .cc-projects-view-toggle__btn {
@@ -2360,9 +2360,9 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-projects-view-toggle__btn--active {
-  background: var(--app-paper);
+  background: rgba(192, 148, 228, 0.12);
   color: var(--app-ink);
-  box-shadow: 0 1px 4px rgba(34, 34, 34, 0.08);
+  box-shadow: 0 0 0 1px rgba(192, 148, 228, 0.18);
 }
 
 .cc-projects-bubble-grid {

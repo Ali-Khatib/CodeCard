@@ -21,7 +21,7 @@ const RANGE_SCALE: Record<TimeRange, number> = {
   lifetime: 1.35,
 };
 
-export const ENGAGEMENT_BAR_COLOR = '#C9A86C';
+export const ENGAGEMENT_BAR_COLOR = '#C094E4';
 
 export function buildEngagementRows(range: TimeRange = '30d'): EngagementRow[] {
   const scale = RANGE_SCALE[range] ?? 1;
