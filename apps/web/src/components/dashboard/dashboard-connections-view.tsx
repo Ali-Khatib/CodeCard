@@ -362,6 +362,13 @@ export function DashboardConnectionsView({
           </div>
         </FadeInView>
 
+        <FadeInView delay={0.08}>
+          <ConnectionsFollowUps
+            followUps={upcomingFollowUps}
+            onSelect={(id) => setSelectedId(id)}
+          />
+        </FadeInView>
+
         <FadeInView delay={0.06}>
           {viewMode === 'list' ? (
             <ul className="cc-connection-list">
@@ -399,13 +406,6 @@ export function DashboardConnectionsView({
           )}
         </FadeInView>
       </div>
-
-      <FadeInView delay={0.1}>
-        <ConnectionsFollowUps
-          followUps={upcomingFollowUps}
-          onSelect={(id) => setSelectedId(id)}
-        />
-      </FadeInView>
     </div>
   );
 }

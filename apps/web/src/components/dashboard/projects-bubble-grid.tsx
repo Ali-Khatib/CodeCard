@@ -63,6 +63,15 @@ export function ProjectsBubbleGrid({
                   {isPublished ? 'Live' : 'Draft'}
                 </span>
               </div>
+              {project.technologies.length > 0 && (
+                <div className="cc-projects-bubble__tech-stack" aria-label={`${project.title} tech stack`}>
+                  {project.technologies.slice(0, 4).map((tech) => (
+                    <span key={tech} className="cc-projects-bubble__tech-chip">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              )}
             </Link>
           </motion.div>
         );
