@@ -15,30 +15,30 @@ import { AuroraDivider } from './aurora-divider';
 
 const STEPS = [
   {
-    title: 'Scan or share',
-    detail: 'QR code or link. They open your showcase on their phone. No app install.',
+    title: 'Share your CodeCard',
+    detail: 'Hand over a QR or link and they land on your showcase right away, with no app to install.',
   },
   {
-    title: 'Profile & best work',
+    title: 'Lead with your best work',
     detail:
-      'Name, role, and links up top. Your strongest projects, papers, demos, and outcomes show first.',
+      'Your name, role, links, and strongest projects appear first so visitors understand your value fast.',
   },
   {
-    title: 'Filter by domain',
-    detail: 'Visitors narrow your work by focus area when you have a lot to show.',
+    title: 'Help visitors find what matters',
+    detail: 'Filters let people narrow a larger body of work by domain, focus area, or the proof they came to see.',
   },
   {
-    title: 'Project expands',
-    detail: 'One tap for screenshots, videos, paper PDFs, repo links, and live demos.',
+    title: 'Open the full project story',
+    detail: 'One tap reveals screenshots, videos, papers, repo links, live demos, and the outcome behind the work.',
   },
   {
-    title: 'Save the connection',
+    title: 'Turn interest into a saved connection',
     detail:
-      'After they browse your profile or a project for a bit, a gentle prompt asks if they want to save you to their circle.',
+      'After someone explores, a gentle prompt helps them keep you in their circle for later follow-up.',
   },
   {
-    title: 'Add private context',
-    detail: 'Where you met, follow-ups, and notes. Visible only to you.',
+    title: 'Remember the context later',
+    detail: 'Add where you met, next steps, and private notes so the relationship has context when you return.',
   },
 ] as const;
 
@@ -145,7 +145,7 @@ function HowItWorksExpandedPage({ scrollProgress }: { scrollProgress: MotionValu
           </p>
         </motion.div>
 
-        <motion.div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" style={{ opacity: stepsOpacity }}>
+        <motion.div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" style={{ opacity: stepsOpacity }}>
           {STEPS.map((step, index) => (
             <ExpandedStepCard
               key={step.title}
@@ -176,16 +176,18 @@ function ExpandedStepCard({
 
   return (
     <motion.article
-      className="min-h-[150px] rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/80 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
+      className="min-h-[198px] rounded-[26px] border border-[rgba(35,35,36,0.12)] bg-white/85 p-5 shadow-[0_18px_52px_rgba(35,35,36,0.11)] backdrop-blur-sm md:p-6"
       style={{ opacity, y, scale }}
     >
-      <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/25 bg-[#f5e9ff] font-eyebrow text-[10px] text-[#7d5ca4]">
+      <div className="flex items-start gap-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/35 bg-[#f5e9ff] font-eyebrow text-[11px] text-[#7d5ca4] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <h4 className="font-display text-[20px] leading-tight text-[#232324]">{step.title}</h4>
+        <h4 className="font-display text-[24px] font-medium leading-[1.08] tracking-[-0.02em] text-[#232324] md:text-[25px]">
+          {step.title}
+        </h4>
       </div>
-      <p className="mt-3 text-[14px] leading-relaxed text-[#6f6660]">{step.detail}</p>
+      <p className="mt-4 text-[15px] leading-[1.62] text-[#6f6660] md:text-[16px]">{step.detail}</p>
       {index === 3 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {['Screenshots', 'Repo link', 'Live demo'].map((label) => (
