@@ -1,8 +1,12 @@
+import { parseCaseStudySections, type CaseStudySections } from '@/lib/projects/case-study-sections';
+
 export interface FeaturedProjectLink {
   type: string;
   label: string | null;
   url: string;
 }
+
+export type { CaseStudySections };
 
 export interface FeaturedProject {
   id: string;
@@ -16,6 +20,7 @@ export interface FeaturedProject {
   videoUrl: string | null;
   links: FeaturedProjectLink[];
   screenshots: string[];
+  caseStudySections: CaseStudySections;
 }
 
 export function normalizeFeaturedProject(project: {
@@ -24,6 +29,7 @@ export function normalizeFeaturedProject(project: {
   tagline: string | null;
   description: string | null;
   technologies: string[];
+  case_study_sections?: unknown;
   project_domains?: { name: string }[];
   project_focus_areas?: { name: string }[];
   project_media_assets?: { type: string; storage_path: string }[];
@@ -46,6 +52,7 @@ export function normalizeFeaturedProject(project: {
       url: l.url,
     })),
     screenshots: assets.filter((a) => a.type === 'screenshot').map((a) => a.storage_path),
+    caseStudySections: parseCaseStudySections(project.case_study_sections),
   };
 }
 
