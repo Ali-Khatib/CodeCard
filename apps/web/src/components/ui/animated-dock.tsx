@@ -41,7 +41,7 @@ export const AnimatedDock = ({ className, items }: AnimatedDockProps) => {
       onMouseMove={(event) => mouseX.set(event.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "cc-animated-dock mx-auto flex h-16 items-end gap-4 rounded-2xl border px-4 pb-3",
+        "cc-animated-dock mx-auto flex h-16 items-end gap-2 rounded-2xl border px-3 pb-3",
         className,
       )}
     >
@@ -92,7 +92,7 @@ interface DockItemProps {
 
 export const DockItem = ({ mouseX, children, active, wide, staticWidth }: DockItemProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const baseWidth = staticWidth ?? (wide ? 68 : 40);
+  const baseWidth = staticWidth ?? (wide ? 68 : 36);
 
   const distance = useTransform(mouseX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
@@ -131,8 +131,8 @@ export const DockItem = ({ mouseX, children, active, wide, staticWidth }: DockIt
       data-active={active ? "true" : "false"}
       data-wide={wide ? "true" : "false"}
       className={cn(
-        "cc-animated-dock__item flex h-10 items-center justify-center rounded-full",
-        !wide && "aspect-square w-10",
+        "cc-animated-dock__item flex h-9 w-9 min-w-9 shrink-0 items-center justify-center rounded-full",
+        wide && "h-10",
       )}
     >
       <motion.div

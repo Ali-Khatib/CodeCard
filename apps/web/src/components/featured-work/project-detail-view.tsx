@@ -152,7 +152,7 @@ export function ProjectDetailView({
 
       <div className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
-          <div className="flex items-center justify-between rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
+          <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
               href={backHref}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
@@ -163,14 +163,15 @@ export function ProjectDetailView({
             </Link>
             {project.links.length > 0 && (
               <AnimatedDock
-                className="cc-project-link-dock"
+                className="cc-project-link-dock max-w-[min(100%,220px)] shrink-0"
                 items={project.links.map((link) => {
                   const Icon = resolveProjectLinkIcon(link.type);
                   return {
                     link: link.url,
                     target: '_blank',
                     label: getProjectLinkAria(link.type, link.label),
-                    Icon: <Icon aria-hidden />,
+                    staticWidth: 34,
+                    Icon: <Icon className="h-[14px] w-[14px]" aria-hidden />,
                   };
                 })}
               />
@@ -245,24 +246,28 @@ export function ProjectDetailView({
               />
             )}
 
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.86)_0%,rgba(5,3,15,0.58)_36%,rgba(5,3,15,0.22)_68%,rgba(5,3,15,0.08)_100%),linear-gradient(90deg,rgba(5,3,15,0.62)_0%,rgba(5,3,15,0.28)_42%,rgba(5,3,15,0.08)_100%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.9)_0%,rgba(5,3,15,0.62)_40%,rgba(5,3,15,0.28)_72%,rgba(5,3,15,0.1)_100%),linear-gradient(90deg,rgba(5,3,15,0.68)_0%,rgba(5,3,15,0.34)_42%,rgba(5,3,15,0.1)_100%)]" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-lavender/50 to-transparent" />
 
             <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
-              <div className="max-w-[680px] rounded-[26px] border border-white/14 bg-black/24 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.26)] backdrop-blur-[2px] md:p-6">
-                <p className={`${TYPE.eyebrow} text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]`}>Featured project</p>
-                <h1 className={`cc-fit-title mt-3 max-w-[14ch] ${TYPE.projectTitle} text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.62)]`}>
+              <div className="max-w-[680px] rounded-[26px] border border-white/22 bg-black/48 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.42)] backdrop-blur-md md:p-6">
+                <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
+                  Featured project
+                </p>
+                <h1 className="cc-fit-title mt-3 max-w-[14ch] font-display text-[clamp(2rem,8vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)]">
                   {project.title}
                 </h1>
                 {project.tagline && (
-                  <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-white/88 drop-shadow-[0_2px_12px_rgba(0,0,0,0.52)]`}>{project.tagline}</p>
+                  <p className="mt-4 max-w-[42ch] text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
+                    {project.tagline}
+                  </p>
                 )}
                 {(project.domains.length > 0 || project.focusAreas.length > 0) && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {[...project.domains, ...project.focusAreas].map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-badge border border-white/18 bg-black/30 px-3 py-1 text-[13px] font-medium text-white/88 shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-sm"
+                        className="rounded-full border border-white/40 bg-black/55 px-3 py-1.5 text-[13px] font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-sm"
                       >
                         {tag}
                       </span>
@@ -280,7 +285,7 @@ export function ProjectDetailView({
               {previousProject ? (
                 <Link
                   href={`${projectBase}/projects/${previousProject.id}`}
-                  className="cc-instant-press rounded-full border border-border/40 bg-midnight/70 px-4 py-3 text-center text-[14px] text-text-secondary backdrop-blur-md"
+                  className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Previous project: ${previousProject.title}`}
                 >
                   Previous
@@ -291,7 +296,7 @@ export function ProjectDetailView({
               {nextProject ? (
                 <Link
                   href={`${projectBase}/projects/${nextProject.id}`}
-                  className="cc-instant-press rounded-full border border-border/40 bg-midnight/70 px-4 py-3 text-center text-[14px] text-text-secondary backdrop-blur-md"
+                  className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Next project: ${nextProject.title}`}
                 >
                   Next

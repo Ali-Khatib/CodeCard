@@ -68,15 +68,19 @@ export function ProjectDetailLoading() {
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
             )}
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.86)_0%,rgba(5,3,15,0.58)_36%,rgba(5,3,15,0.22)_68%,rgba(5,3,15,0.08)_100%),linear-gradient(90deg,rgba(5,3,15,0.62)_0%,rgba(5,3,15,0.28)_42%,rgba(5,3,15,0.08)_100%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.9)_0%,rgba(5,3,15,0.62)_40%,rgba(5,3,15,0.28)_72%,rgba(5,3,15,0.1)_100%),linear-gradient(90deg,rgba(5,3,15,0.68)_0%,rgba(5,3,15,0.34)_42%,rgba(5,3,15,0.1)_100%)]" />
             <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
-              <div className="max-w-[680px] rounded-[26px] border border-white/14 bg-black/24 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.26)] backdrop-blur-[2px] md:p-6">
-                <p className={`${TYPE.eyebrow} text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]`}>Featured project</p>
-                <h1 className={`cc-fit-title mt-3 max-w-[14ch] ${TYPE.projectTitle} text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.62)]`}>
+              <div className="max-w-[680px] rounded-[26px] border border-white/22 bg-black/48 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.42)] backdrop-blur-md md:p-6">
+                <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
+                  Featured project
+                </p>
+                <h1 className="cc-fit-title mt-3 max-w-[14ch] font-display text-[clamp(2rem,8vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)]">
                   {snapshot.title}
                 </h1>
                 {snapshot.tagline && (
-                  <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-white/88 drop-shadow-[0_2px_12px_rgba(0,0,0,0.52)]`}>{snapshot.tagline}</p>
+                  <p className="mt-4 max-w-[42ch] text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
+                    {snapshot.tagline}
+                  </p>
                 )}
               </div>
             </div>

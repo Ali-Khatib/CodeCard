@@ -19,7 +19,6 @@ import {
 } from '@/lib/navigation/optimistic-project';
 import { ProjectMedia } from '@/components/profile/project-media';
 import { ProjectDetailView } from './project-detail-view';
-import { TYPE } from '@/lib/design/tokens';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const EXPAND_MS = 520;
@@ -149,11 +148,15 @@ function ProjectOpenOverlay({
             className="absolute inset-0 h-full w-full object-cover object-top"
           />
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.82)_0%,rgba(5,3,15,0.52)_54%,transparent_100%)] p-8 md:p-12">
-          <div className="max-w-[680px] rounded-[24px] border border-white/14 bg-black/24 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.24)] backdrop-blur-[2px]">
-            <h2 className={`cc-fit-title ${TYPE.projectTitle} text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.62)]`}>{project.title}</h2>
+        <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.88)_0%,rgba(5,3,15,0.58)_54%,transparent_100%)] p-8 md:p-12">
+          <div className="max-w-[680px] rounded-[24px] border border-white/22 bg-black/48 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.38)] backdrop-blur-md">
+            <h2 className="cc-fit-title font-display text-[clamp(1.75rem,6vw,2.75rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)]">
+              {project.title}
+            </h2>
             {project.tagline && (
-              <p className="mt-2 text-[18px] text-white/88 drop-shadow-[0_2px_12px_rgba(0,0,0,0.52)]">{project.tagline}</p>
+              <p className="mt-2 text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
+                {project.tagline}
+              </p>
             )}
           </div>
         </div>

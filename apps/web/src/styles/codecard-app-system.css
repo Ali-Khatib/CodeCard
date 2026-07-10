@@ -815,7 +815,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   padding: 0 16px;
   font-size: 14px;
   font-weight: 650;
-  color: var(--app-smoke);
+  color: color-mix(in srgb, var(--app-ink) 78%, transparent);
   transition: color 0.28s ease, background 0.28s ease;
   flex: 0 0 auto;
   white-space: nowrap;
@@ -835,7 +835,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-animated-dock {
   width: fit-content;
   max-width: 100%;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-color: var(--app-border);
   background: var(--app-paper);
   box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
@@ -900,11 +901,21 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   gap: 8px;
   padding: 6px;
   padding-bottom: 6px;
+  max-width: 100%;
 }
 
 .cc-profile-link-dock .cc-animated-dock__item,
 .cc-project-link-dock .cc-animated-dock__item {
   height: 38px;
+  width: 38px;
+  min-width: 38px;
+  flex-shrink: 0;
+}
+
+.cc-profile-link-dock .cc-animated-dock__item svg,
+.cc-project-link-dock .cc-animated-dock__item svg {
+  width: 15px;
+  height: 15px;
 }
 
 .cc-profile-link-dock .cc-animated-dock__item {
@@ -1216,10 +1227,34 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   .cc-app-filter-pill {
     flex: 0 1 auto;
     min-width: 0;
-    height: clamp(26px, 7.2vw, 34px);
-    padding-inline: clamp(3px, 1.15vw, 10px);
-    font-size: clamp(9px, 2.85vw, 12px);
-    letter-spacing: -0.035em;
+    height: clamp(28px, 7.2vw, 34px);
+    padding-inline: clamp(6px, 1.15vw, 10px);
+    font-size: clamp(11px, 2.85vw, 12px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: color-mix(in srgb, var(--app-ink) 82%, transparent);
+  }
+
+  .cc-profile-link-dock,
+  .cc-project-link-dock {
+    height: 46px;
+    gap: 6px;
+    padding: 5px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .cc-profile-link-dock .cc-animated-dock__item,
+  .cc-project-link-dock .cc-animated-dock__item {
+    height: 34px;
+    width: 34px;
+    min-width: 34px;
+  }
+
+  .cc-profile-link-dock .cc-animated-dock__item svg,
+  .cc-project-link-dock .cc-animated-dock__item svg {
+    width: 14px;
+    height: 14px;
   }
 
   .cc-filter-dock {
@@ -1319,6 +1354,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
   .cc-projects-profile-strip__role {
     font-size: 12px;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--app-ink) 76%, transparent);
   }
 
   .cc-projects-profile-strip__link {
@@ -3014,7 +3051,7 @@ html.dark .cc-reactive-border:hover {
   margin-bottom: 24px;
   margin-inline: 0;
   text-align: left;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 28px;
   border: 1px solid var(--app-border);
   background:
@@ -3062,6 +3099,8 @@ html.dark .cc-reactive-border:hover {
 .cc-projects-profile-strip .cc-profile-link-dock {
   margin-top: 14px;
   margin-inline: 0;
+  width: 100%;
+  max-width: 100%;
   background: var(--app-paper);
   border-color: var(--app-border);
   box-shadow: 0 10px 24px rgba(34, 34, 34, 0.07);
@@ -3093,8 +3132,8 @@ html.dark .cc-reactive-border:hover {
   max-width: 100%;
   overflow-wrap: anywhere;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--app-smoke);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--app-ink) 72%, transparent);
 }
 
 .cc-projects-profile-strip__links {

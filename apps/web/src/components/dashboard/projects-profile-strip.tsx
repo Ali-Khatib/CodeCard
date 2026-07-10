@@ -52,7 +52,8 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
                 link: link.url,
                 target: '_blank',
                 label: getProfileLinkAria(link.type, link.label),
-                Icon: <Icon className="text-[15px]" aria-hidden />,
+                staticWidth: 34,
+                Icon: <Icon className="h-[14px] w-[14px]" aria-hidden />,
               };
             })}
           />
