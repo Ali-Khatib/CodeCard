@@ -34,7 +34,7 @@ export default async function ProjectsPage() {
     .from('projects')
     .select(
       `
-      id, title, tagline, description, is_published, technologies, updated_at, sort_order,
+      id, title, tagline, description, is_published, technologies, updated_at, sort_order, case_study_sections,
       project_media_assets(*),
       project_links(*)
     `,

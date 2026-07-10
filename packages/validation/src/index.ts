@@ -52,6 +52,13 @@ export const profileLinkSchema = z.object({
   sort_order: z.number().int().min(0).max(100).default(0),
 });
 
+export const caseStudySectionBodySchema = z.string().max(2000).trim();
+
+export const caseStudySectionsSchema = z
+  .record(caseStudySectionBodySchema)
+  .optional()
+  .default({});
+
 export const createProjectSchema = z.object({
   title: z.string().min(1).max(120).trim(),
   tagline: z.string().max(160).trim().optional().nullable(),
@@ -61,6 +68,7 @@ export const createProjectSchema = z.object({
   sort_order: z.number().int().min(0).max(1000).default(0),
   domains: z.array(z.string().min(1).max(40).trim()).max(10).default([]),
   focus_areas: z.array(z.string().min(1).max(40).trim()).max(10).default([]),
+  case_study_sections: caseStudySectionsSchema,
 });
 
 export const updateProjectSchema = createProjectSchema.partial();

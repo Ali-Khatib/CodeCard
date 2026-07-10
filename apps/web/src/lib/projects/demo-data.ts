@@ -68,6 +68,15 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
       mock('DevFlow', 'Deploy history'),
       mock('DevFlow', 'Environment preview'),
     ],
+    caseStudySections: {
+      problem:
+        'Teams were shipping slower because pipeline YAML was opaque, preview environments were manual, and failed deploys were hard to trace.',
+      pipeline:
+        'GitHub webhook → visual editor → generated Actions YAML → per-PR preview deploy → status checks → merge gate.',
+      model:
+        'Deterministic parser and diff engine that flags config drift before anything reaches production.',
+      results: '3× faster ship cadence, 50% fewer failed deploys, preview environments in under 90 seconds.',
+    },
   },
   {
     id: 'demo-2',
@@ -90,6 +99,7 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
       mock('SchemaSync', 'Drift report'),
       mock('SchemaSync', 'Migration timeline'),
     ],
+    caseStudySections: {},
   },
   {
     id: 'demo-3',
@@ -122,5 +132,6 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
       mock('Pulse', 'Service map'),
       unsplash('1550751827-4bd374c3f58b'),
     ],
+    caseStudySections: {},
   },
 ];
