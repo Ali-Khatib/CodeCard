@@ -58,3 +58,11 @@ apps/mobile/.git.local-backup-before-monorepo/
 *.key
 *.mobileprovision
 *.orig.*
+
+BUILD_PROMPT.md
+DECISIONS.md
+DESIGN.md
+LAUNCH_CHECKLIST.md
+PRODUCT.md
+SECURITY_CHECKLIST.md
+start.cmd
