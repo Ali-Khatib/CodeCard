@@ -30,8 +30,8 @@ export function HeroDashboardPeek() {
                 />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[10px] font-medium text-ink">Alex Chen</p>
-                <p className="truncate text-[8px] text-smoke">@demo</p>
+                <p className="break-words text-[10px] font-medium leading-tight text-ink">Alex Chen</p>
+                <p className="break-all text-[8px] leading-tight text-smoke">@demo</p>
               </div>
             </div>
             <nav className="mt-3 space-y-0.5">
@@ -95,7 +95,7 @@ export function HeroDashboardPeek() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[9px] font-medium text-vellum">Profile completion</p>
-                  <p className="truncate text-[8px] text-lichen">{DEMO_OVERVIEW_ACTIVITY[0]?.text}</p>
+                  <p className="break-words text-[8px] leading-tight text-lichen">{DEMO_OVERVIEW_ACTIVITY[0]?.text}</p>
                 </div>
               </div>
             </div>

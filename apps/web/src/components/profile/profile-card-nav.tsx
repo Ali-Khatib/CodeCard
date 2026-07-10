@@ -174,7 +174,7 @@ export function ProfileCardNav({
               <span className="hidden sm:inline">CodeCard</span>
             </Link>
 
-            <p className="min-w-0 flex-1 truncate text-center text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            <p className="min-w-0 flex-1 break-words text-center text-[11px] uppercase leading-tight tracking-[0.14em] text-zinc-500">
               {SECTION_LABELS[currentSection]}
             </p>
 

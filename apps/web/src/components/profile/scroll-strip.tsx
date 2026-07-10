@@ -112,7 +112,7 @@ export function ScrollStrip({ projects, activeId, accentColor, onSelect }: Scrol
                     <div className="h-full w-full bg-zinc-900" />
                   )}
                 </div>
-                <span className="max-w-[72px] truncate text-[9px] text-zinc-500 group-aria-[current=true]:text-zinc-300">
+                <span className="max-w-[88px] break-words text-center text-[9px] leading-tight text-zinc-500 group-aria-[current=true]:text-zinc-300">
                   {p.title}
                 </span>
               </button>

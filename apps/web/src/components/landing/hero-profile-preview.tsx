@@ -28,10 +28,10 @@ export function HeroProfilePreview() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-[17px] font-medium text-ink md:text-[18px]">
+            <p className="break-words font-display text-[17px] font-medium leading-tight text-ink md:text-[18px]">
               {DEMO_PROFILE.display_name}
             </p>
-            <p className="truncate text-[13px] text-smoke md:text-[14px]">{DEMO_PROFILE.headline}</p>
+            <p className="mt-0.5 break-words text-[13px] leading-snug text-smoke md:text-[14px]">{DEMO_PROFILE.headline}</p>
           </div>
           <span className="cc-hero-preview__live font-eyebrow">Live demo</span>
         </div>

@@ -149,8 +149,7 @@ export function ProfileMagicBento({
                 )}
                 {bio && !simplified && (
                   <p className="mt-3 max-w-[520px] text-[17px] leading-relaxed text-text-secondary">
-                    {bio.slice(0, 120)}
-                    {bio.length > 120 ? '…' : ''}
+                    {bio}
                   </p>
                 )}
               </div>

@@ -125,9 +125,9 @@ export function DashboardOverviewView({
                 <h3 className="text-[26px] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
                   {displayName}
                 </h3>
-                <p className="mt-1 text-[15px] text-[var(--app-smoke)]">{headline}</p>
+                <p className="mt-1 break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">{headline}</p>
                 {bio && !editing && (
-                  <p className="mt-3 line-clamp-2 max-w-xl text-[14px] leading-relaxed text-[var(--app-smoke)]">
+                  <p className="mt-3 max-w-xl break-words text-[14px] leading-relaxed text-[var(--app-smoke)]">
                     {bio}
                   </p>
                 )}

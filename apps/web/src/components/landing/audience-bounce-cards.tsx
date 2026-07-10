@@ -95,7 +95,7 @@ function AudienceCardContent({
       <h3 className="mt-3 font-display text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-ink md:text-[24px]">
         {title}
       </h3>
-      <p className="mt-3 line-clamp-3 text-[15px] leading-[1.5] text-smoke">{body}</p>
+      <p className="mt-3 break-words text-[15px] leading-[1.5] text-smoke">{body}</p>
     </>
   );
 }

@@ -41,7 +41,6 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
       </div>
 
       <div className="cc-projects-profile-strip__copy">
-        <p className="cc-projects-profile-strip__eyebrow">Creator workspace</p>
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
         {creator.links.length > 0 && (

@@ -9,7 +9,6 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import { centerProximity, lerp } from '@/lib/projects/featured';
 import { prefetchProjectRoute } from '@/hooks/use-view-transition-navigate';
 import { saveScrollForProfile } from '@/hooks/use-scroll-restore';
-import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { TYPE } from '@/lib/design/tokens';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -193,23 +192,26 @@ export function ScrollProjectCard({
           </div>
 
           <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-void-canvas/90 via-void-canvas/35 to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-[linear-gradient(0deg,rgba(5,3,15,0.94)_0%,rgba(5,3,15,0.72)_38%,rgba(5,3,15,0.28)_72%,transparent_100%)]"
             style={{ borderRadius: `${borderRadius}px` }}
           />
 
           <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
             <h3 className={`cc-fit-title ${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
             {project.tagline && (
-              <p className="mt-2 max-w-[640px] text-[17px] text-ash md:text-[18px]">{project.tagline}</p>
+              <p className="mt-3 max-w-[680px] text-[17px] font-medium leading-relaxed text-white/92 drop-shadow-[0_2px_12px_rgba(0,0,0,0.58)] md:text-[18px]">{project.tagline}</p>
             )}
-            {project.technologies.length > 0 && (
-              <TechLogoRow
-                technologies={project.technologies.slice(0, 8)}
-                isActive={isCentered}
-                pop
-                size="md"
-                className="mt-5"
-              />
+            {(project.domains.length > 0 || project.technologies.length > 0) && (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[...project.domains, ...project.technologies].slice(0, 6).map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-white/35 bg-black/38 px-3 py-1.5 text-[12px] font-semibold text-white/90 shadow-[0_10px_26px_rgba(0,0,0,0.24)] backdrop-blur-md"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         </div>

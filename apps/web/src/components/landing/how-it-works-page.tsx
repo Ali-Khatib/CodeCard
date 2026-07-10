@@ -125,18 +125,18 @@ export function HowItWorksPage() {
 }
 
 function HowItWorksExpandedPage({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
-  const introOpacity = useTransform(scrollProgress, [0.28, 0.4], [0, 1]);
-  const introY = useTransform(scrollProgress, [0.28, 0.4], ['18px', '0px']);
-  const stepsOpacity = useTransform(scrollProgress, [0.4, 0.48], [0, 1]);
+  const introOpacity = useTransform(scrollProgress, [0.36, 0.46], [0, 1]);
+  const introY = useTransform(scrollProgress, [0.36, 0.46], ['22px', '0px']);
+  const stepsOpacity = useTransform(scrollProgress, [0.47, 0.54], [0, 1]);
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[1040px] flex-col justify-center">
-      <div className="grid gap-8 lg:grid-cols-[0.92fr_1.28fr] lg:items-center">
-        <motion.div style={{ opacity: introOpacity, y: introY }}>
+    <div className="mx-auto flex min-h-full w-full max-w-[1120px] flex-col justify-center">
+      <div className="flex flex-col gap-8 md:gap-10">
+        <motion.div className="max-w-[680px]" style={{ opacity: introOpacity, y: introY }}>
           <p className="font-eyebrow text-[11px] uppercase tracking-[0.16em] text-[#8b7f76]">
             Expanded CodeCard
           </p>
-          <h3 className="mt-4 font-display text-[clamp(2.4rem,6vw,5.5rem)] font-normal leading-[0.92] tracking-[-0.06em] text-[#232324]">
+          <h3 className="mt-4 font-display text-[clamp(3rem,8vw,6.8rem)] font-normal leading-[0.86] tracking-[-0.075em] text-[#232324]">
             One scan becomes the whole story.
           </h3>
           <p className="mt-5 max-w-[520px] text-[17px] leading-[1.58] text-[#6f6660]">
@@ -145,7 +145,7 @@ function HowItWorksExpandedPage({ scrollProgress }: { scrollProgress: MotionValu
           </p>
         </motion.div>
 
-        <motion.div className="grid gap-3 sm:grid-cols-2" style={{ opacity: stepsOpacity }}>
+        <motion.div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" style={{ opacity: stepsOpacity }}>
           {STEPS.map((step, index) => (
             <ExpandedStepCard
               key={step.title}
@@ -169,14 +169,14 @@ function ExpandedStepCard({
   index: number;
   scrollProgress: MotionValue<number>;
 }) {
-  const start = 0.46 + index * 0.075;
+  const start = 0.52 + index * 0.065;
   const opacity = useTransform(scrollProgress, [start, start + 0.045], [0, 1]);
-  const y = useTransform(scrollProgress, [start, start + 0.045], ['20px', '0px']);
-  const scale = useTransform(scrollProgress, [start, start + 0.045], [0.97, 1]);
+  const y = useTransform(scrollProgress, [start, start + 0.045], ['24px', '0px']);
+  const scale = useTransform(scrollProgress, [start, start + 0.045], [0.96, 1]);
 
   return (
     <motion.article
-      className="rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/76 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
+      className="min-h-[150px] rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/80 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
       style={{ opacity, y, scale }}
     >
       <div className="flex items-center gap-3">
@@ -347,7 +347,7 @@ function PhoneMock({ step }: { step: number }) {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-1.5">
-                <p className="truncate font-display text-[15px] text-ink">
+                <p className="break-words font-display text-[15px] leading-tight text-ink">
                   {DEMO_PROFILE.display_name}
                 </p>
                 {step >= 1 && (
@@ -365,7 +365,7 @@ function PhoneMock({ step }: { step: number }) {
                   </span>
                 )}
               </div>
-              <p className="truncate text-[11px] text-smoke">{DEMO_PROFILE.headline}</p>
+              <p className="mt-0.5 break-words text-[11px] leading-tight text-smoke">{DEMO_PROFILE.headline}</p>
             </div>
             <span className="cc-how-it-works-preview__live font-eyebrow">Live</span>
           </div>
@@ -423,10 +423,10 @@ function PhoneMock({ step }: { step: number }) {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-display text-[13px] leading-tight text-ink">
+                        <p className="break-words font-display text-[13px] leading-tight text-ink">
                           {project.title}
                         </p>
-                        <p className="mt-0.5 truncate text-[10px] text-smoke">{project.tagline}</p>
+                        <p className="mt-0.5 break-words text-[10px] leading-tight text-smoke">{project.tagline}</p>
                       </div>
                     </div>
                   ))}
@@ -474,9 +474,9 @@ function PhoneMock({ step }: { step: number }) {
                               sizes="300px"
                             />
                           ) : null}
-                          <div className="cc-how-it-works-preview__media-overlay cc-how-it-works-preview__media-overlay--compact">
-                            <p className="font-display text-[13px] leading-tight text-white">{p.title}</p>
-                            <p className="truncate text-[10px] text-white/75">{p.tagline}</p>
+                          <div className="cc-how-it-works-preview__media-overlay cc-how-it-works-preview__media-overlay--compact bg-[linear-gradient(0deg,rgba(5,3,15,0.82),rgba(5,3,15,0.28),transparent)]">
+                            <p className="font-display text-[14px] leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]">{p.title}</p>
+                            <p className="break-words text-[10px] font-semibold leading-tight text-white/92 drop-shadow-[0_2px_8px_rgba(0,0,0,0.62)]">{p.tagline}</p>
                           </div>
                         </>
                       ) : (
@@ -493,8 +493,8 @@ function PhoneMock({ step }: { step: number }) {
                             ) : null}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate font-display text-[12px] leading-tight text-ink">{p.title}</p>
-                            <p className="mt-0.5 truncate text-[9px] leading-tight text-smoke">{p.tagline}</p>
+                            <p className="break-words font-display text-[12px] leading-tight text-ink">{p.title}</p>
+                            <p className="mt-0.5 break-words text-[9px] leading-tight text-smoke">{p.tagline}</p>
                           </div>
                         </div>
                       )}

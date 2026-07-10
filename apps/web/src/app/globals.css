@@ -1296,10 +1296,9 @@ select,
 
   .cc-research-card--compact .cc-research-card__body {
     font-size: 14px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: block;
+    overflow: visible;
+    overflow-wrap: anywhere;
   }
 
   .cc-how-it-works-rail-step-wrap:not(.cc-how-it-works-rail-step-wrap--active) .cc-how-it-works-rail-step {

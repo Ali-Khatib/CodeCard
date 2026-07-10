@@ -61,8 +61,8 @@ export function ThemePreviewMock({ theme, active, onClick }: ThemePreviewMockPro
               <div className="cc-theme-preview-mock__avatar h-8 w-8 rounded-lg border" />
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-[11px] text-vellum">Alex Chen</p>
-              <p className="truncate text-[8px] text-ash">Senior Engineer</p>
+              <p className="break-words font-display text-[11px] leading-tight text-vellum">Alex Chen</p>
+              <p className="break-words text-[8px] leading-tight text-ash">Senior Engineer</p>
             </div>
             <span className="cc-theme-preview-mock__pill font-eyebrow text-[7px] uppercase">Live</span>
           </div>

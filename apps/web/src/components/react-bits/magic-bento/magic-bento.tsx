@@ -629,21 +629,15 @@ const MagicBento: React.FC<BentoProps> = ({
           }
           
           .text-clamp-1 {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: block;
+            overflow: visible;
+            overflow-wrap: anywhere;
           }
           
           .text-clamp-2 {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: block;
+            overflow: visible;
+            overflow-wrap: anywhere;
           }
           
           @media (max-width: 599px) {

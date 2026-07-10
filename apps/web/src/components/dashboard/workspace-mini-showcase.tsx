@@ -99,8 +99,8 @@ function MiniPreview({ id, compact }: { id: WorkspaceShowcaseTab; compact?: bool
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-void-canvas via-void-canvas/40 to-transparent" />
         <div className="absolute bottom-2 left-2.5 right-2.5">
-          <p className="truncate font-display text-[13px] text-vellum">{project.title}</p>
-          <p className="truncate text-[9px] text-lichen">{project.tagline}</p>
+          <p className="break-words font-display text-[13px] leading-tight text-vellum">{project.title}</p>
+          <p className="mt-0.5 break-words text-[9px] leading-tight text-lichen">{project.tagline}</p>
         </div>
       </div>
     );
@@ -135,7 +135,7 @@ function MiniPreview({ id, compact }: { id: WorkspaceShowcaseTab; compact?: bool
             <div className="relative h-5 w-5 overflow-hidden rounded-full">
               <Image src={DEMO_PROFILE.avatar_url!} alt="" fill className="object-cover" sizes="20px" />
             </div>
-            <p className="truncate text-[9px] text-vellum">{DEMO_PROFILE.display_name}</p>
+            <p className="break-words text-[9px] leading-tight text-vellum">{DEMO_PROFILE.display_name}</p>
           </div>
           {['Role', 'Bio'].map((f) => (
             <div key={f} className="h-3 rounded-[4px] border border-reactor/10 bg-void-canvas/50" />
@@ -164,7 +164,7 @@ function MiniPreview({ id, compact }: { id: WorkspaceShowcaseTab; compact?: bool
                 <Image src={c.avatarUrl} alt="" fill className="object-cover" sizes="16px" />
               )}
             </div>
-            <p className="min-w-0 flex-1 truncate text-[8px] text-lichen">{c.name}</p>
+            <p className="min-w-0 flex-1 break-words text-[8px] leading-tight text-lichen">{c.name}</p>
             <span className="shrink-0 text-[7px] text-graphite">{c.source}</span>
           </div>
         ))}

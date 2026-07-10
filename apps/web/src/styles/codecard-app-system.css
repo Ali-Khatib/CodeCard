@@ -312,7 +312,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-app-page-header {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-app-page-header::before {
@@ -349,18 +349,17 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: clamp(34px, 5.8vw, 58px);
   font-weight: 500;
-  line-height: 0.92;
-  letter-spacing: -0.065em;
+  line-height: 1.04;
+  letter-spacing: -0.055em;
   color: var(--app-ink);
   text-wrap: balance;
 }
 
 .cc-app-title span {
   display: inline;
-  background: linear-gradient(115deg, var(--app-ink) 0%, var(--app-ink) 46%, var(--app-iris) 88%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  background: none;
+  color: var(--app-ink);
+  -webkit-text-fill-color: var(--app-ink);
 }
 
 .cc-app-subtitle {
@@ -377,10 +376,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   font-weight: 520;
   line-height: 0.98;
   letter-spacing: -0.055em;
-  background: linear-gradient(110deg, var(--app-ink), var(--app-ink) 54%, var(--app-iris));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--app-ink);
 }
 
 /* ── Cards ── */
@@ -796,24 +792,33 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 /* ── Filters ── */
 .cc-app-filter-bar {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   border-radius: var(--app-radius-pill);
   border: 1px solid var(--app-border);
   background: var(--app-paper);
   padding: 4px;
   max-width: 100%;
+  overflow-x: auto;
+  box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cc-app-filter-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .cc-app-filter-pill {
   height: 32px;
   border-radius: var(--app-radius-pill);
-  padding: 0 14px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 650;
   color: var(--app-smoke);
   transition: color 0.28s ease, background 0.28s ease;
   flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .cc-app-filter-pill:hover {
@@ -830,15 +835,10 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-animated-dock {
   width: fit-content;
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  border-color: var(--app-border-strong);
-  background:
-    radial-gradient(circle at 20% 10%, rgba(192, 148, 228, 0.13), transparent 34%),
-    rgba(255, 255, 255, 0.72);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    0 14px 34px rgba(34, 34, 34, 0.08);
+  overflow: visible;
+  border-color: var(--app-border);
+  background: var(--app-paper);
+  box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -857,21 +857,23 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-animated-dock__item[data-active='true'] {
-  border-color: rgba(192, 148, 228, 0.42);
-  background: var(--app-iris);
-  color: #fff;
+  border-color: var(--app-ink);
+  background: var(--app-ink);
+  color: var(--app-paper);
 }
 
 .cc-filter-dock {
-  height: 54px;
+  height: 44px;
   align-items: center;
-  gap: 8px;
-  padding: 7px;
-  padding-bottom: 7px;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 5px;
+  padding-bottom: 5px;
 }
 
 .cc-filter-dock .cc-animated-dock__item {
-  height: 38px;
+  height: 32px;
   background: var(--app-paper);
   color: var(--app-smoke);
 }
@@ -883,14 +885,13 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-filter-dock__label {
   display: block;
-  max-width: 120px;
-  overflow: hidden;
-  padding-inline: 10px;
-  text-overflow: ellipsis;
+  max-width: none;
+  overflow: visible;
+  padding-inline: 8px;
   white-space: nowrap;
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-size: clamp(12px, 1.05vw, 14px);
+  font-weight: 750;
+  letter-spacing: -0.035em;
 }
 
 .cc-profile-link-dock,
@@ -906,16 +907,29 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   height: 38px;
 }
 
+.cc-profile-link-dock .cc-animated-dock__item {
+  border-color: var(--app-border-strong);
+  background: var(--app-ink);
+  color: var(--app-paper);
+  box-shadow: 0 8px 18px rgba(34, 34, 34, 0.1);
+}
+
+.cc-profile-link-dock .cc-animated-dock__item[data-active='true'] {
+  border-color: var(--app-ink);
+  background: var(--app-ink);
+  color: var(--app-paper);
+}
+
 .cc-project-link-dock {
-  background: rgba(5, 3, 15, 0.38);
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+  background: var(--app-paper);
+  border-color: var(--app-border);
+  box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
 }
 
 .cc-project-link-dock .cc-animated-dock__item {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.92);
-  color: #100a1f;
+  border-color: var(--app-border-strong);
+  background: var(--app-ink);
+  color: var(--app-paper);
 }
 
 /* ── Metric ── */
@@ -1137,7 +1151,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
   .cc-app-title {
     font-size: clamp(30px, 11vw, 44px);
-    line-height: 0.95;
+    line-height: 1.04;
   }
 
   .cc-app-subtitle {
@@ -1191,21 +1205,34 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    gap: clamp(1px, 0.7vw, 4px);
+    gap: clamp(1px, 0.55vw, 3px);
     overflow-x: visible;
     white-space: nowrap;
     width: 100%;
     max-width: 100%;
-    padding: clamp(4px, 1.1vw, 7px);
+    padding: clamp(3px, 1vw, 6px);
   }
 
   .cc-app-filter-pill {
     flex: 0 1 auto;
     min-width: 0;
     height: clamp(26px, 7.2vw, 34px);
-    padding-inline: clamp(4px, 1.45vw, 12px);
-    font-size: clamp(8px, 2.55vw, 13px);
-    letter-spacing: -0.02em;
+    padding-inline: clamp(3px, 1.15vw, 10px);
+    font-size: clamp(9px, 2.85vw, 12px);
+    letter-spacing: -0.035em;
+  }
+
+  .cc-filter-dock {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 5px;
+  }
+
+  .cc-filter-dock__label {
+    max-width: none;
+    padding-inline: 7px;
+    font-size: clamp(11px, 3.15vw, 13px);
   }
 
   .cc-app-mobile-nav {
@@ -1345,7 +1372,6 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   }
 
   .cc-connection-followup-card__note {
-    -webkit-line-clamp: 2;
     font-size: 12px;
   }
 }
@@ -1500,10 +1526,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-connection-followup-card__name {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
+  overflow: visible;
   overflow-wrap: anywhere;
   font-size: clamp(14px, 1.25vw, 16px);
   font-weight: 600;
@@ -1514,10 +1538,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-connection-followup-card__role {
   margin-top: 3px;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
+  overflow: visible;
   overflow-wrap: anywhere;
   font-size: clamp(11px, 1vw, 12px);
   line-height: 1.25;
@@ -1526,7 +1548,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-connection-followup-card__date {
   flex-shrink: 0;
-  max-width: 82px;
+  max-width: 96px;
   text-align: right;
   font-size: clamp(11px, 1.05vw, 13px);
   font-weight: 600;
@@ -1536,10 +1558,9 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-connection-followup-card__note {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
+  overflow: visible;
+  overflow-wrap: anywhere;
   font-size: clamp(12px, 1.05vw, 13px);
   line-height: 1.38;
   color: var(--app-smoke);
@@ -1648,10 +1669,9 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-connection-blob__preview {
   margin-top: 3px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  overflow: visible;
+  display: block;
+  overflow-wrap: anywhere;
   font-size: 11px;
   line-height: 1.35;
   color: var(--app-smoke);
@@ -1786,9 +1806,9 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-connection-grid-card__name {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
   font-size: 15px;
   font-weight: 560;
   letter-spacing: -0.02em;
@@ -1807,9 +1827,9 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-connection-grid-card__role {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
   font-size: 12px;
   line-height: 1.3;
   color: var(--app-smoke);
@@ -2102,21 +2122,18 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   letter-spacing: -0.065em;
   overflow-wrap: anywhere;
   text-wrap: balance;
-  background: linear-gradient(112deg, var(--app-ink) 0%, var(--app-ink) 58%, var(--app-iris) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--app-ink);
 }
 
 .cc-work-title--compact {
   font-size: clamp(1.55rem, 3vw, 2.25rem);
-  line-height: 1;
-  letter-spacing: -0.055em;
+  line-height: 1.08;
+  letter-spacing: -0.05em;
 }
 
 .cc-work-title--hero {
   font-size: clamp(2.15rem, 4.8vw, 4.6rem);
-  line-height: 0.9;
+  line-height: 1;
 }
 
 .cc-app-project-card__drag {
@@ -2295,9 +2312,7 @@ html.dark .cc-reactive-border:hover {
   font-size: 14px;
   font-weight: 500;
   color: var(--app-ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .cc-metric-chart__track {
@@ -2513,9 +2528,7 @@ html.dark .cc-reactive-border:hover {
   font-weight: 520;
   letter-spacing: -0.01em;
   color: var(--app-ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .cc-hume-chart__track {
@@ -2736,9 +2749,7 @@ html.dark .cc-reactive-border:hover {
 .cc-share-action__url {
   font-size: 13px;
   color: var(--app-smoke);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .cc-share-action__burst {
@@ -2867,18 +2878,20 @@ html.dark .cc-reactive-border:hover {
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 8px;
+  gap: 18px;
+  padding: 2px 0 14px;
   border-bottom: 1px solid var(--app-border);
 }
 
 .cc-profile-home__title {
-  margin-top: 8px;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  margin-top: 6px;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(2.45rem, 6.2vw, 4.7rem);
+  font-weight: 500;
+  letter-spacing: -0.068em;
+  line-height: 0.9;
   color: var(--app-ink);
+  text-wrap: balance;
 }
 
 .cc-profile-home__stat-pills {
@@ -3003,32 +3016,27 @@ html.dark .cc-reactive-border:hover {
   text-align: left;
   overflow: hidden;
   border-radius: 28px;
-  border: 1.5px solid var(--app-border-strong);
+  border: 1px solid var(--app-border);
   background:
-    radial-gradient(circle at 12% 20%, rgba(192, 148, 228, 0.18), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 249, 243, 0.72));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.44)),
+    var(--app-paper);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    0 22px 70px rgba(34, 34, 34, 0.07);
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 14px 38px rgba(34, 34, 34, 0.055);
 }
 
 .cc-projects-profile-strip__glow {
-  position: absolute;
-  inset: auto -8% -62% 44%;
-  height: 150px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(192, 148, 228, 0.18), rgba(247, 187, 230, 0.16));
-  filter: blur(22px);
-  pointer-events: none;
+  display: none;
 }
 
 .cc-projects-profile-strip__avatar-wrap {
   position: relative;
   flex-shrink: 0;
   border-radius: 999px;
-  padding: 5px;
-  background: linear-gradient(135deg, rgba(192, 148, 228, 0.42), rgba(255, 255, 255, 0.8));
-  box-shadow: 0 14px 34px rgba(34, 34, 34, 0.08);
+  padding: 4px;
+  background: var(--app-paper);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 10px 24px rgba(34, 34, 34, 0.07);
 }
 
 .cc-projects-profile-strip__avatar {
@@ -3051,6 +3059,14 @@ html.dark .cc-reactive-border:hover {
   align-items: flex-start;
 }
 
+.cc-projects-profile-strip .cc-profile-link-dock {
+  margin-top: 14px;
+  margin-inline: 0;
+  background: var(--app-paper);
+  border-color: var(--app-border);
+  box-shadow: 0 10px 24px rgba(34, 34, 34, 0.07);
+}
+
 .cc-projects-profile-strip__eyebrow {
   margin-bottom: 4px;
   font-family: var(--font-eyebrow), var(--font-sans), sans-serif;
@@ -3058,7 +3074,7 @@ html.dark .cc-reactive-border:hover {
   font-weight: 650;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--app-iris);
+  color: var(--app-smoke);
 }
 
 .cc-projects-profile-strip__name {
@@ -3109,10 +3125,10 @@ html.dark .cc-reactive-border:hover {
 
 .cc-projects-profile-strip__link:hover {
   transform: translateY(-3px) scale(1.06);
-  border-color: var(--app-iris);
-  background: rgba(192, 148, 228, 0.12);
-  color: var(--app-iris);
-  box-shadow: 0 12px 28px rgba(192, 148, 228, 0.14);
+  border-color: var(--app-ink);
+  background: var(--app-ink);
+  color: var(--app-paper);
+  box-shadow: 0 12px 28px rgba(34, 34, 34, 0.12);
 }
 
 .cc-projects-toolbar {
@@ -3218,12 +3234,11 @@ html.dark .cc-reactive-border:hover {
   font-size: clamp(16px, 1.75vw, 20px);
   font-weight: 520;
   letter-spacing: -0.055em;
-  line-height: 1.02;
+  line-height: 1.08;
   color: var(--app-ink);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
+  overflow-wrap: anywhere;
 }
 
 .cc-projects-bubble__badge {

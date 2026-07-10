@@ -15,7 +15,7 @@ export function AnalyticsTimeFilter({
 }) {
   return (
     <LayoutGroup id="analytics-range">
-      <div className="cc-analytics-filter inline-flex flex-wrap gap-1">
+      <div className="cc-app-filter-bar cc-analytics-filter inline-flex flex-nowrap">
         {RANGES.map((r) => {
           const active = value === r;
           return (
@@ -23,14 +23,12 @@ export function AnalyticsTimeFilter({
               key={r}
               type="button"
               onClick={() => onChange(r)}
-              className={`relative h-8 rounded-[80px] px-4 text-[13px] transition-colors ${
-                active ? 'bg-white text-black' : 'text-[var(--text-muted)] hover:text-white'
-              }`}
+              className={`cc-app-filter-pill relative ${active ? 'cc-app-filter-pill--active' : ''}`}
             >
               {active && (
                 <motion.span
                   layoutId="analytics-range-pill"
-                  className="absolute inset-0 rounded-[80px] bg-white"
+                  className="absolute inset-0 rounded-[inherit] bg-[var(--app-ink)]"
                   transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                 />
               )}

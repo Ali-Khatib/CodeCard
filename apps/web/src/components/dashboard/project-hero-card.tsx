@@ -76,10 +76,9 @@ export function ProjectHeroCard({
 
         <div className="flex flex-col justify-between p-7 md:p-8">
           <div>
-            <p className="text-[14px] leading-relaxed text-[var(--app-ink)]">
-              {project.description?.slice(0, 220) ??
+            <p className="break-words text-[14px] leading-relaxed text-[var(--app-ink)]">
+              {project.description ??
                 'Your strongest project — the first thing visitors see when they open your CodeCard.'}
-              {project.description && project.description.length > 220 ? '…' : ''}
             </p>
             {project.technologies.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">

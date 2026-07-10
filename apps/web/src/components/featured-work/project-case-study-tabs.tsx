@@ -288,7 +288,7 @@ export function ProjectCaseStudyTabs({
               </h3>
             )}
             {project.description && (
-              <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-ash">
+              <p className="mt-4 break-words text-[15px] leading-relaxed text-ash">
                 {project.description.split(/\n\n+/)[0]}
               </p>
             )}

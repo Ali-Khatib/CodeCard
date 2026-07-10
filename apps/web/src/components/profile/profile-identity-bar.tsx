@@ -39,11 +39,11 @@ export function ProfileIdentityBar({
       )}
 
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-base font-semibold tracking-tight text-zinc-50 md:text-lg">
+        <h1 className="break-words text-base font-semibold leading-tight tracking-tight text-zinc-50 md:text-lg">
           {displayName}
         </h1>
         {headline && (
-          <p className="truncate text-xs text-zinc-500 md:text-sm">{headline}</p>
+          <p className="mt-0.5 break-words text-xs leading-snug text-zinc-500 md:text-sm">{headline}</p>
         )}
       </div>
 

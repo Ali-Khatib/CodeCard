@@ -83,11 +83,11 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
         </div>
 
         <div className="cc-dash-project-card__body p-4">
-          <h3 className="font-display text-[20px] text-vellum transition-colors group-hover:text-reactorBright">
+          <h3 className="break-words font-display text-[20px] leading-tight text-vellum transition-colors group-hover:text-reactorBright">
             {card.title}
           </h3>
           {card.tagline && (
-            <p className="mt-1 line-clamp-2 text-[14px] leading-snug text-lichen">{card.tagline}</p>
+            <p className="mt-1 break-words text-[14px] leading-snug text-lichen">{card.tagline}</p>
           )}
 
           {card.technologies && card.technologies.length > 0 && (

@@ -188,10 +188,10 @@ export function DashboardShell({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-medium text-[var(--app-ink)]">
+              <p className="break-words text-[14px] font-medium leading-tight text-[var(--app-ink)]">
                 {displayName ?? 'Workspace'}
               </p>
-              <p className="truncate text-[12px] text-[var(--app-smoke)]">
+              <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
                 @{profileSlug ?? email?.split('@')[0] ?? 'you'}
               </p>
               {completion != null && (
@@ -225,7 +225,7 @@ export function DashboardShell({
           <div className="cc-app-mobile-theme-toggle md:hidden">
             <ThemeToggle />
           </div>
-          <h1 className="cc-app-topbar-title min-w-0 truncate text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
+          <h1 className="cc-app-topbar-title min-w-0 break-words text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
           <div className="flex-1" />
           <DashboardNotifications basePath={basePath} />
           <AppButton variant="primary" className="cc-app-topbar-cta shrink-0" href={`${basePath}/projects/new`}>

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ReactiveBorder } from '../reactive-border';
 import { cn } from '@/lib/cn';
-import { AnimatedDock } from '@/components/ui/animated-dock';
 
 export function AppMono({ children }: { children: ReactNode }) {
   return <p className="cc-app-mono">{children}</p>;
@@ -216,21 +215,23 @@ export function FilterBar<T extends string>({
   labels?: Record<T, string>;
 }) {
   return (
-    <AnimatedDock
-      className="cc-filter-dock min-w-0 max-w-full"
-      items={options.map((opt) => {
+    <div className="cc-app-filter-bar" role="tablist">
+      {options.map((opt) => {
         const active = value === opt;
         const label = labels?.[opt] ?? opt;
-        return {
-          label,
-          active,
-          role: 'tab' as const,
-          ariaSelected: active,
-          wide: true,
-          onClick: () => onChange(opt),
-          Icon: <span className="cc-filter-dock__label">{label}</span>,
-        };
+        return (
+          <button
+            key={opt}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt)}
+            className={`cc-app-filter-pill ${active ? 'cc-app-filter-pill--active' : ''}`}
+          >
+            {label}
+          </button>
+        );
       })}
-    />
+    </div>
   );
 }

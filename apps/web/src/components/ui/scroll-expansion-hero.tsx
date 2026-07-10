@@ -27,8 +27,8 @@ function useExpandedMediaSize() {
   useEffect(() => {
     const updateSize = () => {
       setSize({
-        width: Math.min(window.innerWidth * 0.94, 1180),
-        height: Math.min(window.innerHeight * 0.86, 780),
+        width: window.innerWidth,
+        height: window.innerHeight,
       });
     };
 
@@ -120,12 +120,19 @@ export default function ScrollExpandMedia({
   const mediaWidth = useSpring(mediaWidthTarget, { stiffness: 120, damping: 28, mass: 0.45 });
   const mediaHeight = useSpring(mediaHeightTarget, { stiffness: 120, damping: 28, mass: 0.45 });
   const mediaY = useTransform(scrollYProgress, [0, 0.3], ['0px', '-10px']);
+  const mediaRadius = useTransform(scrollYProgress, [0, 0.28, 0.34], ['34px', '22px', '0px']);
+  const mediaBorderOpacity = useTransform(scrollYProgress, [0, 0.28, 0.34], [1, 0.45, 0]);
+  const mediaBorderColor = useTransform(
+    mediaBorderOpacity,
+    (opacity) => `rgba(255,255,255,${opacity * 0.6})`,
+  );
   const bgOpacity = useTransform(scrollYProgress, [0, 0.28], [1, 0.18]);
   const titleXLeft = useTransform(scrollYProgress, [0, 0.3], ['0vw', '-22vw']);
   const titleXRight = useTransform(scrollYProgress, [0, 0.3], ['0vw', '22vw']);
   const titleOpacity = useTransform(scrollYProgress, [0, 0.2, 0.34], [1, 0.72, 0]);
-  const contentOpacity = useTransform(scrollYProgress, [0.24, 0.34], [0, 1]);
-  const contentY = useTransform(scrollYProgress, [0.24, 0.34], ['24px', '0px']);
+  const mediaOpacity = useTransform(scrollYProgress, [0, 0.22, 0.34], [1, 0.45, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0.34, 0.43], [0, 1]);
+  const contentY = useTransform(scrollYProgress, [0.34, 0.43], ['26px', '0px']);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     onExpandChange?.(latest >= 0.3);
@@ -181,29 +188,37 @@ export default function ScrollExpandMedia({
         </motion.div>
 
         <motion.div
-          className="relative z-10 overflow-hidden rounded-[34px] border border-white/60 bg-white/50 shadow-[0_30px_100px_rgba(35,35,36,0.16)] backdrop-blur-xl"
-          style={{ width: mediaWidth, height: mediaHeight, y: mediaY }}
+          className="relative z-10 overflow-hidden border border-white/60 bg-[#fffaf4] shadow-[0_30px_100px_rgba(35,35,36,0.16)] backdrop-blur-xl"
+          style={{
+            width: mediaWidth,
+            height: mediaHeight,
+            y: mediaY,
+            borderRadius: mediaRadius,
+            borderColor: mediaBorderColor,
+          }}
         >
-          {mediaType === 'qr' ? (
-            <FakeQrCode />
-          ) : mediaType === 'video' ? (
-            <video
-              src={mediaSrc}
-              poster={posterSrc}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              className="h-full w-full object-cover"
-              controls={false}
-            />
-          ) : (
-            <Image src={mediaSrc} alt={title ?? 'Expanded media'} fill className="object-cover" sizes="92vw" />
-          )}
+          <motion.div className="absolute inset-0" style={{ opacity: mediaOpacity }}>
+            {mediaType === 'qr' ? (
+              <FakeQrCode />
+            ) : mediaType === 'video' ? (
+              <video
+                src={mediaSrc}
+                poster={posterSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="h-full w-full object-cover"
+                controls={false}
+              />
+            ) : (
+              <Image src={mediaSrc} alt={title ?? 'Expanded media'} fill className="object-cover" sizes="92vw" />
+            )}
+          </motion.div>
 
           <motion.div
-            className="absolute inset-0 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,250,244,0.92),rgba(255,250,244,0.98))] p-6 md:p-10"
+            className="absolute inset-0 overflow-hidden bg-[#fffaf4] p-6 md:p-10"
             style={{ opacity: contentOpacity, y: contentY }}
           >
             {typeof children === 'function' ? children(scrollYProgress) : children}

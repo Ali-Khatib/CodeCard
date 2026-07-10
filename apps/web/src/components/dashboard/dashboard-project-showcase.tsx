@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { ProjectMedia } from '@/components/profile/project-media';
-import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { TYPE } from '@/lib/design/tokens';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
@@ -85,7 +84,7 @@ export function DashboardProjectShowcase({ project, index = 0 }: DashboardProjec
             </div>
 
             <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-void-canvas/95 via-void-canvas/40 to-transparent"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-[linear-gradient(0deg,rgba(5,3,15,0.94)_0%,rgba(5,3,15,0.74)_38%,rgba(5,3,15,0.28)_72%,transparent_100%)]"
               style={{ borderRadius: '16px' }}
             />
 
@@ -99,16 +98,19 @@ export function DashboardProjectShowcase({ project, index = 0 }: DashboardProjec
                 )}
               </div>
               {project.tagline && (
-                <p className="mt-2 max-w-[640px] text-[17px] text-ash md:text-[18px]">{project.tagline}</p>
+                <p className="mt-3 max-w-[680px] text-[17px] font-medium leading-relaxed text-white/92 drop-shadow-[0_2px_12px_rgba(0,0,0,0.58)] md:text-[18px]">{project.tagline}</p>
               )}
               {project.technologies.length > 0 && (
-                <TechLogoRow
-                  technologies={project.technologies.slice(0, 8)}
-                  hoverPop
-                  hoverActive={hovered}
-                  size="md"
-                  className="mt-5"
-                />
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {project.technologies.slice(0, 6).map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/35 bg-black/38 px-3 py-1.5 text-[12px] font-semibold text-white/90 shadow-[0_10px_26px_rgba(0,0,0,0.24)] backdrop-blur-md"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           </div>
