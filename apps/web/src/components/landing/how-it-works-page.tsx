@@ -179,11 +179,11 @@ function ExpandedStepCard({
       className="min-h-[198px] rounded-[26px] border border-[rgba(35,35,36,0.12)] bg-white/85 p-5 shadow-[0_18px_52px_rgba(35,35,36,0.11)] backdrop-blur-sm md:p-6"
       style={{ opacity, y, scale }}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/35 bg-[#f5e9ff] font-eyebrow text-[11px] text-[#7d5ca4] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <h4 className="font-display text-[24px] font-medium leading-[1.08] tracking-[-0.02em] text-[#232324] md:text-[25px]">
+        <h4 className="font-display text-[24px] font-medium leading-[1.02] tracking-[-0.02em] text-[#232324] md:text-[25px]">
           {step.title}
         </h4>
       </div>
