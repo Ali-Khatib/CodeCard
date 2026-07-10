@@ -5,6 +5,7 @@ import { CountUp } from '@/components/landing/count-up';
 import {
   buildAnalyticsData,
   TIME_RANGE_LABELS,
+  type ResearchPaperAnalytics,
   type TimeRange,
 } from '@/lib/dashboard/analytics-data';
 import { Sparkline } from './sparkline';
@@ -28,6 +29,7 @@ type DashboardAnalyticsViewProps = {
   pdfDownloads?: number;
   citationCopies?: number;
   topResearchTitle?: string;
+  perResearchPapers?: ResearchPaperAnalytics[];
 };
 
 export function DashboardAnalyticsView({
@@ -38,6 +40,7 @@ export function DashboardAnalyticsView({
   pdfDownloads,
   citationCopies,
   topResearchTitle,
+  perResearchPapers,
 }: DashboardAnalyticsViewProps) {
   const [range, setRange] = useState<TimeRange>('30d');
   const data = useMemo(
@@ -50,8 +53,9 @@ export function DashboardAnalyticsView({
         pdfDownloads,
         citationCopies,
         topResearchTitle,
+        perResearchPapers,
       }),
-    [range, displayName, profileViews, projectViews, researchViews, pdfDownloads, citationCopies, topResearchTitle],
+    [range, displayName, profileViews, projectViews, researchViews, pdfDownloads, citationCopies, topResearchTitle, perResearchPapers],
   );
 
   const rangeLabels = RANGES.reduce(

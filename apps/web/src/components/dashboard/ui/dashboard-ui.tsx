@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ReactiveBorder } from '../reactive-border';
 import { cn } from '@/lib/cn';
+import { AnimatedDock } from '@/components/ui/animated-dock';
 
 export function AppMono({ children }: { children: ReactNode }) {
   return <p className="cc-app-mono">{children}</p>;
@@ -168,10 +169,12 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-4 border-b border-[var(--app-border)] pb-6 md:flex-row md:items-end md:justify-between">
-      <div>
+    <header className="cc-app-page-header flex flex-col gap-4 border-b border-[var(--app-border)] pb-6 md:flex-row md:items-end md:justify-between">
+      <div className="cc-app-page-header__copy">
         {eyebrow && <AppMono>{eyebrow}</AppMono>}
-        <h1 className={`cc-app-title ${eyebrow ? 'mt-2' : ''}`}>{title}</h1>
+        <h1 className={`cc-app-title ${eyebrow ? 'mt-2' : ''}`}>
+          <span>{title}</span>
+        </h1>
         {description && <p className="cc-app-subtitle">{description}</p>}
         {children}
       </div>
@@ -213,19 +216,21 @@ export function FilterBar<T extends string>({
   labels?: Record<T, string>;
 }) {
   return (
-    <div className="cc-app-filter-bar min-w-0 max-w-full" role="tablist">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          type="button"
-          role="tab"
-          aria-selected={value === opt}
-          onClick={() => onChange(opt)}
-          className={`cc-app-filter-pill ${value === opt ? 'cc-app-filter-pill--active' : ''}`}
-        >
-          {labels?.[opt] ?? opt}
-        </button>
-      ))}
-    </div>
+    <AnimatedDock
+      className="cc-filter-dock min-w-0 max-w-full"
+      items={options.map((opt) => {
+        const active = value === opt;
+        const label = labels?.[opt] ?? opt;
+        return {
+          label,
+          active,
+          role: 'tab' as const,
+          ariaSelected: active,
+          wide: true,
+          onClick: () => onChange(opt),
+          Icon: <span className="cc-filter-dock__label">{label}</span>,
+        };
+      })}
+    />
   );
 }

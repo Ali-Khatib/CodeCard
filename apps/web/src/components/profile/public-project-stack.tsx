@@ -58,7 +58,7 @@ export function PublicProjectStack({
               </div>
 
               <div className="cc-app-project-card__body">
-                <h3 className="text-[28px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+                <h3 className="cc-fit-title cc-work-title">
                   {project.title}
                 </h3>
                 {project.tagline && (

@@ -104,6 +104,17 @@ export type ResearchAnalyticsSummary = {
   mostViewedTitle: string;
   mostEngagedProjectSection: string;
   projectTimeSpentSec: number;
+  perPaper: ResearchPaperAnalytics[];
+};
+
+export type ResearchPaperAnalytics = {
+  id: string;
+  title: string;
+  views: number;
+  pdfDownloads: number;
+  citationCopies: number;
+  avgReadTimeSec: number;
+  topSignal: string;
 };
 
 export type GuestStats = {
@@ -153,6 +164,7 @@ export function buildAnalyticsData(
     pdfDownloads?: number;
     citationCopies?: number;
     topResearchTitle?: string;
+    perResearchPapers?: ResearchPaperAnalytics[];
   },
 ): AnalyticsBundle {
   const baseReach = opts.profileViews && opts.profileViews > 0 ? opts.profileViews : 1284;
@@ -382,6 +394,37 @@ export function buildAnalyticsData(
       mostViewedTitle: opts.topResearchTitle ?? 'Retrieval Evaluation for Developer Tooling Agents',
       mostEngagedProjectSection: 'Results',
       projectTimeSpentSec: 94,
+      perPaper: opts.perResearchPapers?.length
+        ? opts.perResearchPapers
+        : [
+            {
+              id: 'retrieval-eval',
+              title: 'Retrieval Evaluation for Developer Tooling Agents',
+              views: scale(74, range),
+              pdfDownloads: scale(24, range),
+              citationCopies: scale(11, range),
+              avgReadTimeSec: 188,
+              topSignal: 'Figures',
+            },
+            {
+              id: 'schema-migration',
+              title: 'Safe Schema Migration Planning with LLM Agents',
+              views: scale(38, range),
+              pdfDownloads: scale(12, range),
+              citationCopies: scale(5, range),
+              avgReadTimeSec: 142,
+              topSignal: 'PDF',
+            },
+            {
+              id: 'observability-rag',
+              title: 'Observability-Guided RAG Debugging',
+              views: scale(16, range),
+              pdfDownloads: scale(6, range),
+              citationCopies: scale(3, range),
+              avgReadTimeSec: 126,
+              topSignal: 'Citation',
+            },
+          ],
     },
     roles: [
       { label: 'Recruiters', pct: 32 },

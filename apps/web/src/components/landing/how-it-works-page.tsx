@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTransform, type MotionValue } from 'framer-motion';
 import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -108,7 +109,7 @@ export function HowItWorksSection() {
           scrollToExpand="Scroll to expand the full flow"
           className="mt-[-10px]"
         >
-          <HowItWorksExpandedPage />
+          {(scrollProgress) => <HowItWorksExpandedPage scrollProgress={scrollProgress} />}
         </ScrollExpandMedia>
       )}
     </div>
@@ -123,11 +124,15 @@ export function HowItWorksPage() {
   );
 }
 
-function HowItWorksExpandedPage() {
+function HowItWorksExpandedPage({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
+  const introOpacity = useTransform(scrollProgress, [0.28, 0.4], [0, 1]);
+  const introY = useTransform(scrollProgress, [0.28, 0.4], ['18px', '0px']);
+  const stepsOpacity = useTransform(scrollProgress, [0.4, 0.48], [0, 1]);
+
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[980px] flex-col justify-center">
-      <div className="grid gap-8 lg:grid-cols-[0.95fr_1.25fr] lg:items-center">
-        <div>
+    <div className="mx-auto flex min-h-full w-full max-w-[1040px] flex-col justify-center">
+      <div className="grid gap-8 lg:grid-cols-[0.92fr_1.28fr] lg:items-center">
+        <motion.div style={{ opacity: introOpacity, y: introY }}>
           <p className="font-eyebrow text-[11px] uppercase tracking-[0.16em] text-[#8b7f76]">
             Expanded CodeCard
           </p>
@@ -138,38 +143,62 @@ function HowItWorksExpandedPage() {
             The QR starts small, then opens into a guided proof page with your profile, best work,
             filters, project details, and a saved connection moment.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <motion.div className="grid gap-3 sm:grid-cols-2" style={{ opacity: stepsOpacity }}>
           {STEPS.map((step, index) => (
-            <article
+            <ExpandedStepCard
               key={step.title}
-              className="rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/72 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/25 bg-[#f5e9ff] font-eyebrow text-[10px] text-[#7d5ca4]">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h4 className="font-display text-[20px] leading-tight text-[#232324]">{step.title}</h4>
-              </div>
-              <p className="mt-3 text-[14px] leading-relaxed text-[#6f6660]">{step.detail}</p>
-              {index === 3 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {['Screenshots', 'Repo link', 'Live demo'].map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-[#c094e4]/20 bg-[#c094e4]/10 px-3 py-1 text-[11px] font-medium text-[#6b527d]"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </article>
+              step={step}
+              index={index}
+              scrollProgress={scrollProgress}
+            />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
+  );
+}
+
+function ExpandedStepCard({
+  step,
+  index,
+  scrollProgress,
+}: {
+  step: (typeof STEPS)[number];
+  index: number;
+  scrollProgress: MotionValue<number>;
+}) {
+  const start = 0.46 + index * 0.075;
+  const opacity = useTransform(scrollProgress, [start, start + 0.045], [0, 1]);
+  const y = useTransform(scrollProgress, [start, start + 0.045], ['20px', '0px']);
+  const scale = useTransform(scrollProgress, [start, start + 0.045], [0.97, 1]);
+
+  return (
+    <motion.article
+      className="rounded-[22px] border border-[rgba(35,35,36,0.08)] bg-white/76 p-4 shadow-[0_14px_42px_rgba(35,35,36,0.08)] backdrop-blur-sm"
+      style={{ opacity, y, scale }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/25 bg-[#f5e9ff] font-eyebrow text-[10px] text-[#7d5ca4]">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <h4 className="font-display text-[20px] leading-tight text-[#232324]">{step.title}</h4>
+      </div>
+      <p className="mt-3 text-[14px] leading-relaxed text-[#6f6660]">{step.detail}</p>
+      {index === 3 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {['Screenshots', 'Repo link', 'Live demo'].map((label) => (
+            <span
+              key={label}
+              className="rounded-full border border-[#c094e4]/20 bg-[#c094e4]/10 px-3 py-1 text-[11px] font-medium text-[#6b527d]"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      )}
+    </motion.article>
   );
 }
 

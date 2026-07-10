@@ -13,6 +13,7 @@ import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
+import { AnimatedDock } from '@/components/ui/animated-dock';
 
 const SOCIAL_LABELS: Record<string, string> = {
   github: 'GitHub',
@@ -66,11 +67,6 @@ export function PublicProfileFocused({
     'I build developer tools that make complex workflows feel simple.';
 
   const actionPills = [
-    ...links.map((link) => ({
-      type: 'link' as const,
-      key: link.url + link.type,
-      link,
-    })),
     { type: 'copy' as const, key: 'copy' },
     { type: 'qr' as const, key: 'qr' },
   ];
@@ -120,36 +116,24 @@ export function PublicProfileFocused({
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              {links.length > 0 && (
+                <AnimatedDock
+                  className="cc-profile-link-dock"
+                  items={links.map((link) => {
+                    const Icon = resolveProfileLinkIcon(link.type);
+                    const label =
+                      link.label ?? SOCIAL_LABELS[link.type.toLowerCase()] ?? 'Link';
+                    return {
+                      link: link.url,
+                      target: '_blank',
+                      label: getProfileLinkAria(link.type, link.label) || label,
+                      Icon: <Icon className="text-sm" aria-hidden />,
+                    };
+                  })}
+                />
+              )}
               {actionPills.map((item, i) => {
-                if (item.type === 'link') {
-                  const Icon = resolveProfileLinkIcon(item.link.type);
-                  const label =
-                    item.link.label ?? SOCIAL_LABELS[item.link.type.toLowerCase()] ?? 'Link';
-                  return (
-                    <motion.div
-                      key={item.key}
-                      initial={reduced ? false : { opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: 0.12 + i * HUME_MOTION.pillStagger,
-                        duration: HUME_MOTION.cardReveal,
-                        ease: HUME_EASE,
-                      }}
-                    >
-                      <Link
-                        href={item.link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={getProfileLinkAria(item.link.type, item.link.label)}
-                        className="cc-app-btn cc-app-btn--ghost !h-10 !px-4 !text-[13px]"
-                      >
-                        <Icon className="text-sm" aria-hidden />
-                        {label}
-                      </Link>
-                    </motion.div>
-                  );
-                }
                 if (item.type === 'copy') {
                   return (
                     <motion.div

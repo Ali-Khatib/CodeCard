@@ -9,14 +9,15 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useScrollRestore } from '@/hooks/use-scroll-restore';
 import { clearOptimisticProject } from '@/lib/navigation/optimistic-project';
-import { MagneticIconButton } from '@/components/profile/magnetic-icon-button';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
 import { resolveProjectLinkIcon, getProjectLinkAria } from '@/lib/icons/project-links';
 import { COLORS, TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
 import { isProjectTransitionTarget, useProjectOpenOptional } from './project-open-overlay';
+import { ProjectCaseStudyTabs } from './project-case-study-tabs';
 import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
+import { AnimatedDock } from '@/components/ui/animated-dock';
 
 interface ProjectDetailViewProps {
   project: FeaturedProject;
@@ -160,22 +161,20 @@ export function ProjectDetailView({
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
               <span className="hidden sm:inline">{displayName}</span>
             </Link>
-            <div className="flex gap-2">
-              {project.links.map((link) => {
-                const Icon = resolveProjectLinkIcon(link.type);
-                return (
-                  <MagneticIconButton
-                    key={link.url + link.type}
-                    href={link.url}
-                    ariaLabel={getProjectLinkAria(link.type, link.label)}
-                    accent={accentColor}
-                    size="lg"
-                  >
-                    <Icon aria-hidden />
-                  </MagneticIconButton>
-                );
-              })}
-            </div>
+            {project.links.length > 0 && (
+              <AnimatedDock
+                className="cc-project-link-dock"
+                items={project.links.map((link) => {
+                  const Icon = resolveProjectLinkIcon(link.type);
+                  return {
+                    link: link.url,
+                    target: '_blank',
+                    label: getProjectLinkAria(link.type, link.label),
+                    Icon: <Icon aria-hidden />,
+                  };
+                })}
+              />
+            )}
           </div>
         </header>
 
@@ -246,29 +245,31 @@ export function ProjectDetailView({
               />
             )}
 
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void-canvas via-void-canvas/55 to-void-canvas/10" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.86)_0%,rgba(5,3,15,0.58)_36%,rgba(5,3,15,0.22)_68%,rgba(5,3,15,0.08)_100%),linear-gradient(90deg,rgba(5,3,15,0.62)_0%,rgba(5,3,15,0.28)_42%,rgba(5,3,15,0.08)_100%)]" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-lavender/50 to-transparent" />
 
             <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
-              <p className={TYPE.eyebrow}>Featured project</p>
-              <h1 className={`mt-3 max-w-[14ch] text-balance ${TYPE.projectTitle} text-lilac-white`}>
-                {project.title}
-              </h1>
-              {project.tagline && (
-                <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-ash`}>{project.tagline}</p>
-              )}
-              {(project.domains.length > 0 || project.focusAreas.length > 0) && (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {[...project.domains, ...project.focusAreas].map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-badge border border-lavender/30 bg-midnight/60 px-3 py-1 text-[13px] text-lilac-white backdrop-blur-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="max-w-[680px] rounded-[26px] border border-white/14 bg-black/24 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.26)] backdrop-blur-[2px] md:p-6">
+                <p className={`${TYPE.eyebrow} text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]`}>Featured project</p>
+                <h1 className={`cc-fit-title mt-3 max-w-[14ch] ${TYPE.projectTitle} text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.62)]`}>
+                  {project.title}
+                </h1>
+                {project.tagline && (
+                  <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-white/88 drop-shadow-[0_2px_12px_rgba(0,0,0,0.52)]`}>{project.tagline}</p>
+                )}
+                {(project.domains.length > 0 || project.focusAreas.length > 0) && (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {[...project.domains, ...project.focusAreas].map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-badge border border-white/18 bg-black/30 px-3 py-1 text-[13px] font-medium text-white/88 shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -300,6 +301,13 @@ export function ProjectDetailView({
               )}
             </nav>
           )}
+
+          <ProjectCaseStudyTabs
+            project={project}
+            onSectionInteract={(sectionName) =>
+              trackProjectSection(sectionName, 'project_section_hover_or_click')
+            }
+          />
 
           {project.technologies.length > 0 && (
             <section

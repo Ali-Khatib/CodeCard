@@ -72,6 +72,7 @@ export function DashboardShell({
   const pathname = usePathname();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('cc-sidebar-open');
@@ -82,6 +83,16 @@ export function DashboardShell({
     applyDarkMode(readDarkPreference());
   }, []);
 
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!pendingHref) return;
+    const timeout = window.setTimeout(() => setPendingHref(null), 5000);
+    return () => window.clearTimeout(timeout);
+  }, [pendingHref]);
+
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((open) => {
       const next = !open;
@@ -91,6 +102,14 @@ export function DashboardShell({
   }, []);
 
   const hrefFor = (segment: string) => (segment ? `${basePath}/${segment}` : basePath);
+
+  const markPending = useCallback(
+    (href: string) => {
+      if (href !== pathname) setPendingHref(href);
+      setUserMenuOpen(false);
+    },
+    [pathname],
+  );
 
   const isActive = (segment: string) => {
     const href = hrefFor(segment);
@@ -114,12 +133,15 @@ export function DashboardShell({
       {NAV_ITEMS.map((item) => {
         const href = hrefFor(item.segment);
         const active = isActive(item.segment);
+        const pending = pendingHref === href;
         const Icon = DASH_NAV_ICONS[item.icon];
         return (
           <Link
             key={href}
             href={href}
-            className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''}`}
+            onClick={() => markPending(href)}
+            className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''} ${pending ? 'cc-app-nav-link--pending' : ''}`}
+            aria-busy={pending}
           >
             <Icon />
             {item.label}
@@ -130,7 +152,8 @@ export function DashboardShell({
   );
 
   return (
-    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''}`}>
+    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref ? 'cc-app-root--route-pending' : ''}`}>
+      {pendingHref && <div className="cc-app-route-progress" aria-hidden />}
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
@@ -267,22 +290,31 @@ export function DashboardShell({
         </header>
 
         <div className="cc-app-content">
+          {pendingHref && (
+            <div className="cc-app-route-pending" role="status" aria-live="polite">
+              <span className="cc-app-route-pending__pulse" aria-hidden />
+              Loading next view
+            </div>
+          )}
           <DashboardPageTransition>{children}</DashboardPageTransition>
         </div>
       </div>
 
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
-        {NAV_ITEMS.slice(0, 5).map((item) => {
+        {NAV_ITEMS.map((item) => {
           const href = hrefFor(item.segment);
           const active = isActive(item.segment);
+          const pending = pendingHref === href;
           const Icon = DASH_NAV_ICONS[item.icon];
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] ${
+              onClick={() => markPending(href)}
+              className={`cc-app-mobile-nav__link ${
                 active ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
-              }`}
+              } ${pending ? 'cc-app-mobile-nav__link--pending' : ''}`}
+              aria-busy={pending}
             >
               <Icon />
               {item.label}

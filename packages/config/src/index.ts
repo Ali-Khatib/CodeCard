@@ -94,6 +94,7 @@ export const PLANS = {
       'Remove CodeCard branding',
       'Custom domain',
       'Premium analytics',
+      'Per research paper analytics',
       'Visitor insights',
       'AI insights',
       'AI project polishing',

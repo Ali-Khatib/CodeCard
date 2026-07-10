@@ -21,7 +21,7 @@ const FAQ = [
   },
   {
     q: 'What do I get with Pro?',
-    a: 'Pro is for when you want to use CodeCard seriously: look more professional, track more deeply, and customize more. You get unlimited projects, no CodeCard branding, a custom domain, premium analytics, visitor insights, AI insights, AI project polishing, guided project creation, and early access to new features.',
+    a: 'Pro is for when you want to use CodeCard seriously: look more professional, track more deeply, and customize more. You get unlimited projects, no CodeCard branding, a custom domain, premium analytics, per research paper analytics, visitor insights, AI insights, AI project polishing, guided project creation, and early access to new features.',
   },
   {
     q: 'How does billing work?',

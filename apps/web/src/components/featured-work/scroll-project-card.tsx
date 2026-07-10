@@ -198,7 +198,7 @@ export function ScrollProjectCard({
           />
 
           <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
-            <h3 className={`${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
+            <h3 className={`cc-fit-title ${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
             {project.tagline && (
               <p className="mt-2 max-w-[640px] text-[17px] text-ash md:text-[18px]">{project.tagline}</p>
             )}

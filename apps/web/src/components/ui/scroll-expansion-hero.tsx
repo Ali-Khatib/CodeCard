@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Image from 'next/image';
-import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ScrollExpandMediaProps {
@@ -16,10 +16,29 @@ interface ScrollExpandMediaProps {
   textBlend?: boolean;
   className?: string;
   onExpandChange?: (expanded: boolean) => void;
-  children?: ReactNode;
+  children?: ReactNode | ((scrollProgress: MotionValue<number>) => ReactNode);
 }
 
 const QR_SIZE = 17;
+
+function useExpandedMediaSize() {
+  const [size, setSize] = useState({ width: 1080, height: 680 });
+
+  useEffect(() => {
+    const updateSize = () => {
+      setSize({
+        width: Math.min(window.innerWidth * 0.94, 1180),
+        height: Math.min(window.innerHeight * 0.86, 780),
+      });
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  return size;
+}
 
 function isQrFinder(row: number, col: number, startRow: number, startCol: number) {
   const r = row - startRow;
@@ -90,30 +109,33 @@ export default function ScrollExpandMedia({
   children,
 }: ScrollExpandMediaProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const expandedSize = useExpandedMediaSize();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
   });
 
-  const mediaWidth = useTransform(scrollYProgress, [0, 0.72, 1], ['320px', 'min(92vw, 1080px)', 'min(92vw, 1080px)']);
-  const mediaHeight = useTransform(scrollYProgress, [0, 0.72, 1], ['360px', 'min(76vh, 680px)', 'min(76vh, 680px)']);
-  const mediaY = useTransform(scrollYProgress, [0, 0.72], ['0px', '-18px']);
-  const bgOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0.16]);
-  const titleXLeft = useTransform(scrollYProgress, [0, 0.68], ['0vw', '-22vw']);
-  const titleXRight = useTransform(scrollYProgress, [0, 0.68], ['0vw', '22vw']);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.58, 0.74], [1, 0.75, 0]);
-  const contentOpacity = useTransform(scrollYProgress, [0.62, 0.78], [0, 1]);
-  const contentY = useTransform(scrollYProgress, [0.62, 0.78], ['24px', '0px']);
+  const mediaWidthTarget = useTransform(scrollYProgress, [0, 0.3, 1], [320, expandedSize.width, expandedSize.width]);
+  const mediaHeightTarget = useTransform(scrollYProgress, [0, 0.3, 1], [360, expandedSize.height, expandedSize.height]);
+  const mediaWidth = useSpring(mediaWidthTarget, { stiffness: 120, damping: 28, mass: 0.45 });
+  const mediaHeight = useSpring(mediaHeightTarget, { stiffness: 120, damping: 28, mass: 0.45 });
+  const mediaY = useTransform(scrollYProgress, [0, 0.3], ['0px', '-10px']);
+  const bgOpacity = useTransform(scrollYProgress, [0, 0.28], [1, 0.18]);
+  const titleXLeft = useTransform(scrollYProgress, [0, 0.3], ['0vw', '-22vw']);
+  const titleXRight = useTransform(scrollYProgress, [0, 0.3], ['0vw', '22vw']);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.2, 0.34], [1, 0.72, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0.24, 0.34], [0, 1]);
+  const contentY = useTransform(scrollYProgress, [0.24, 0.34], ['24px', '0px']);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    onExpandChange?.(latest >= 0.72);
+    onExpandChange?.(latest >= 0.3);
   });
 
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
   return (
-    <section ref={sectionRef} className={cn('relative min-h-[240vh] overflow-x-clip', className)}>
+    <section ref={sectionRef} className={cn('relative min-h-[360vh] overflow-x-clip', className)}>
       <motion.div className="sticky top-0 flex min-h-[100dvh] items-center justify-center overflow-hidden">
         <motion.div className="absolute inset-0" style={{ opacity: bgOpacity }}>
           <Image
@@ -184,7 +206,7 @@ export default function ScrollExpandMedia({
             className="absolute inset-0 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,250,244,0.92),rgba(255,250,244,0.98))] p-6 md:p-10"
             style={{ opacity: contentOpacity, y: contentY }}
           >
-            {children}
+            {typeof children === 'function' ? children(scrollYProgress) : children}
           </motion.div>
         </motion.div>
       </motion.div>

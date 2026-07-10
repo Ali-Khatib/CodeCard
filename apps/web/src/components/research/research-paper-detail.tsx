@@ -124,7 +124,7 @@ export function ResearchPaperDetail({
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <p className={TYPE.eyebrow}>Research paper</p>
-              <h1 className={`mt-4 max-w-[14ch] text-balance ${TYPE.projectTitle} text-lilac-white`}>
+              <h1 className={`cc-fit-title mt-4 max-w-[14ch] font-display text-[clamp(3rem,9vw,8rem)] font-semibold leading-[0.86] tracking-[-0.085em] text-lilac-white`}>
                 {paper.title}
               </h1>
               <p className="mt-5 text-[17px] leading-relaxed text-ash md:text-[19px]">

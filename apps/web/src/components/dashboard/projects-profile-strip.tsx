@@ -1,11 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
+import { AnimatedDock } from '@/components/ui/animated-dock';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -27,37 +27,36 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
       }
       transition={{ duration: 0.55, ease: EASE }}
     >
-      <div className="cc-projects-profile-strip__avatar">
-        {creator.avatarUrl ? (
-          <Image src={creator.avatarUrl} alt="" fill className="object-cover" sizes="88px" priority />
-        ) : (
-          <span className="flex h-full w-full items-center justify-center text-2xl font-medium">
-            {creator.displayName?.[0] ?? '?'}
-          </span>
-        )}
+      <span className="cc-projects-profile-strip__glow" aria-hidden />
+      <div className="cc-projects-profile-strip__avatar-wrap">
+        <div className="cc-projects-profile-strip__avatar">
+          {creator.avatarUrl ? (
+            <Image src={creator.avatarUrl} alt="" fill className="object-cover" sizes="88px" priority />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-2xl font-medium">
+              {creator.displayName?.[0] ?? '?'}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="cc-projects-profile-strip__copy">
+        <p className="cc-projects-profile-strip__eyebrow">Creator workspace</p>
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
         {creator.links.length > 0 && (
-          <div className="cc-projects-profile-strip__links">
-            {creator.links.map((link) => {
+          <AnimatedDock
+            className="cc-profile-link-dock"
+            items={creator.links.map((link) => {
               const Icon = resolveProfileLinkIcon(link.type);
-              return (
-                <Link
-                  key={link.url + link.type}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={getProfileLinkAria(link.type, link.label)}
-                  className="cc-projects-profile-strip__link"
-                >
-                  <Icon className="text-[15px]" aria-hidden />
-                </Link>
-              );
+              return {
+                link: link.url,
+                target: '_blank',
+                label: getProfileLinkAria(link.type, link.label),
+                Icon: <Icon className="text-[15px]" aria-hidden />,
+              };
             })}
-          </div>
+          />
         )}
       </div>
     </motion.header>

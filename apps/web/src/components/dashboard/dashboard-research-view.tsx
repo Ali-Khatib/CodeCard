@@ -43,7 +43,7 @@ export function DashboardResearchView({
       ) : (
         <AppCard className="!p-8 text-center">
           <p className="cc-app-mono">No research yet</p>
-          <h2 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)]">
+          <h2 className="cc-work-title cc-work-title--compact mt-3">
             Add papers without changing your project workflow.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">

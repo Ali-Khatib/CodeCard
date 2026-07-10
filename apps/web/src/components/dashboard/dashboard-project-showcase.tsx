@@ -91,7 +91,7 @@ export function DashboardProjectShowcase({ project, index = 0 }: DashboardProjec
 
             <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
               <div className="flex flex-wrap items-end gap-3">
-                <h3 className={`${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
+                <h3 className={`cc-fit-title ${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
                 {project.isPublished === false && (
                   <span className="mb-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-200">
                     Draft

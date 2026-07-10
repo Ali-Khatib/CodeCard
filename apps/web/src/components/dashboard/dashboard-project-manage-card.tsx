@@ -82,7 +82,7 @@ export function DashboardProjectManageCard({
           </span>
         </div>
 
-        <h3 className="mt-4 text-[28px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+        <h3 className="cc-fit-title cc-work-title mt-4">
           {project.title}
         </h3>
 

@@ -1,10 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
-  HiOutlineArrowTopRightOnSquare,
   HiOutlineBeaker,
   HiOutlineChartBarSquare,
   HiOutlineCodeBracketSquare,
@@ -15,7 +13,7 @@ import {
 } from 'react-icons/hi2';
 import { ProjectMedia } from '@/components/profile/project-media';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import type { PortfolioProject } from '@/lib/dashboard/portfolio';
+import type { FeaturedProject } from '@/lib/projects/featured';
 import { cn } from '@/lib/cn';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -25,7 +23,7 @@ const PROJECT_PARTS = [
     id: 'overview',
     label: 'Overview',
     eyebrow: 'Main frame',
-    summary: 'A hero view for the finished product and the strongest first impression.',
+    summary: 'The finished product, main screenshot, and first proof point.',
     visual: 'overview',
     Icon: HiOutlineSquares2X2,
   },
@@ -33,7 +31,7 @@ const PROJECT_PARTS = [
     id: 'problem',
     label: 'Problem',
     eyebrow: 'Constraint',
-    summary: 'The user pain, system pressure, or technical gap this project was built to solve.',
+    summary: 'The technical or user problem this project was built to solve.',
     visual: 'problem',
     Icon: HiOutlineCubeTransparent,
   },
@@ -49,7 +47,7 @@ const PROJECT_PARTS = [
     id: 'dataset',
     label: 'Dataset',
     eyebrow: 'Inputs',
-    summary: 'Sample records, captures, events, or training material powering the experience.',
+    summary: 'Sample records, captures, events, or training material powering the project.',
     visual: 'dataset',
     Icon: HiOutlineBeaker,
   },
@@ -57,7 +55,7 @@ const PROJECT_PARTS = [
     id: 'model',
     label: 'Model',
     eyebrow: 'Intelligence',
-    summary: 'The model, inference path, prompt layer, or decision logic behind the product.',
+    summary: 'The model, prompt layer, inference path, or decision logic behind the product.',
     visual: 'model',
     Icon: HiOutlineCpuChip,
   },
@@ -89,17 +87,12 @@ const PROJECT_PARTS = [
 
 type ProjectPart = (typeof PROJECT_PARTS)[number];
 
-type A24ProjectShowcaseProps = {
-  projects: PortfolioProject[];
-  basePath?: string;
-};
-
-function getMediaForPart(project: PortfolioProject, part: ProjectPart) {
-  const screenshots = project.screenshots ?? [];
-
-  if (part.id === 'overview') return project.posterUrl ?? screenshots[0];
-  if (part.id === 'dataset') return screenshots[1] ?? screenshots[0] ?? project.posterUrl;
-  if (part.id === 'demo') return screenshots[2] ?? screenshots[0] ?? project.posterUrl;
+function mediaForPart(project: FeaturedProject, part: ProjectPart) {
+  if (part.id === 'overview') return project.posterUrl ?? project.screenshots[0];
+  if (part.id === 'pipeline') return project.screenshots[1];
+  if (part.id === 'dataset') return project.screenshots[2];
+  if (part.id === 'results') return project.screenshots[3];
+  if (part.id === 'demo') return project.screenshots[0] ?? project.posterUrl;
   return undefined;
 }
 
@@ -108,24 +101,21 @@ function GeneratedVisual({
   project,
 }: {
   kind: ProjectPart['visual'];
-  project: PortfolioProject;
+  project: FeaturedProject;
 }) {
   if (kind === 'pipeline') {
     return (
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(192,148,228,0.38),transparent_28%),linear-gradient(135deg,#07040f,#17112b_55%,#05030a)]">
-        <div className="absolute inset-8 grid grid-cols-3 items-center gap-5">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(192,148,228,0.35),transparent_28%),linear-gradient(135deg,#07040f,#17112b_55%,#05030a)]">
+        <div className="absolute inset-6 grid grid-cols-2 items-center gap-4 md:inset-8 md:grid-cols-3 md:gap-5">
           {['Client', 'API', 'Worker', 'Store', 'Model', 'Ship'].map((label, index) => (
             <div
               key={label}
-              className="relative rounded-[22px] border border-white/12 bg-white/[0.07] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur-md"
+              className="rounded-[18px] border border-white/12 bg-white/[0.07] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur-md"
             >
               <span className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <p className="mt-3 text-[18px] font-semibold text-lilac-white">{label}</p>
-              {index < 5 && (
-                <span className="absolute left-[calc(100%+0.45rem)] top-1/2 hidden h-px w-8 bg-lavender/45 md:block" />
-              )}
+              <p className="mt-3 text-[17px] font-semibold text-lilac-white">{label}</p>
             </div>
           ))}
         </div>
@@ -136,13 +126,13 @@ function GeneratedVisual({
   if (kind === 'dataset') {
     return (
       <div className="absolute inset-0 bg-[linear-gradient(145deg,#0a0612,#21183a)]">
-        <div className="absolute inset-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="absolute inset-6 grid grid-cols-2 gap-3 md:inset-8 md:grid-cols-4">
           {Array.from({ length: 12 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-[18px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(192,148,228,0.08))] p-3"
+              className="rounded-[16px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(192,148,228,0.08))] p-3"
             >
-              <div className="h-20 rounded-[12px] bg-[radial-gradient(circle_at_35%_35%,rgba(255,250,244,0.5),transparent_34%),linear-gradient(135deg,rgba(192,148,228,0.3),rgba(80,70,228,0.18))]" />
+              <div className="h-16 rounded-[12px] bg-[radial-gradient(circle_at_35%_35%,rgba(255,250,244,0.5),transparent_34%),linear-gradient(135deg,rgba(192,148,228,0.3),rgba(80,70,228,0.18))]" />
               <div className="mt-3 h-1.5 w-3/4 rounded-full bg-white/25" />
               <div className="mt-2 h-1.5 w-1/2 rounded-full bg-white/15" />
             </div>
@@ -156,7 +146,7 @@ function GeneratedVisual({
     return (
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(192,148,228,0.34),transparent_30%),linear-gradient(135deg,#030014,#131028)]">
         <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:44px_44px]" />
-        <div className="absolute inset-x-8 top-1/2 flex -translate-y-1/2 items-center justify-between">
+        <div className="absolute inset-x-10 top-1/2 flex -translate-y-1/2 items-center justify-between">
           {[0, 1, 2, 3].map((column) => (
             <div key={column} className="flex flex-col gap-5">
               {Array.from({ length: column === 0 || column === 3 ? 4 : 6 }).map((_, row) => (
@@ -175,14 +165,14 @@ function GeneratedVisual({
   if (kind === 'results') {
     return (
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#08050d,#201833_60%,#05030a)]">
-        <div className="absolute inset-x-8 bottom-10 flex items-end gap-4">
+        <div className="absolute inset-x-8 bottom-10 flex h-[62%] items-end gap-4">
           {[38, 62, 47, 82, 58, 92, 74].map((height, index) => (
-            <div key={index} className="flex flex-1 flex-col items-center gap-3">
+            <div key={index} className="flex h-full flex-1 flex-col justify-end gap-3">
               <div
                 className="w-full rounded-t-[18px] bg-[linear-gradient(180deg,#f3d6ff,#8f6bff)] shadow-[0_0_32px_rgba(192,148,228,0.35)]"
                 style={{ height: `${height}%` }}
               />
-              <span className="h-1.5 w-8 rounded-full bg-white/18" />
+              <span className="mx-auto h-1.5 w-8 rounded-full bg-white/18" />
             </div>
           ))}
         </div>
@@ -197,7 +187,7 @@ function GeneratedVisual({
   if (kind === 'github') {
     return (
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#050505,#111827_55%,#06030c)]">
-        <div className="absolute inset-8 rounded-[26px] border border-white/12 bg-[#06070b]/88 p-5 font-mono shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="absolute inset-6 rounded-[24px] border border-white/12 bg-[#06070b]/88 p-5 font-mono shadow-[0_28px_90px_rgba(0,0,0,0.45)] md:inset-8">
           <div className="flex gap-2">
             <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
             <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
@@ -217,65 +207,51 @@ function GeneratedVisual({
 
   return (
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(255,255,255,0.18),transparent_24%),linear-gradient(135deg,#07040f,#241936_58%,#06030c)]">
-      <div className="absolute inset-8 rounded-[28px] border border-white/12 bg-white/[0.07] p-6 backdrop-blur-md">
+      <div className="absolute inset-6 rounded-[26px] border border-white/12 bg-white/[0.07] p-6 backdrop-blur-md md:inset-8">
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">Technical brief</p>
         <p className="mt-5 max-w-[420px] text-[clamp(2rem,5vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.06em] text-lilac-white">
-          What changed after {project.title}
+          Why {project.title} exists
         </p>
       </div>
     </div>
   );
 }
 
-function ProjectCaseStudy({
+export function ProjectCaseStudyTabs({
   project,
-  index,
-  basePath,
+  onSectionInteract,
 }: {
-  project: PortfolioProject;
-  index: number;
-  basePath: string;
+  project: FeaturedProject;
+  onSectionInteract?: (sectionName: string) => void;
 }) {
   const reduced = useReducedMotion();
   const [activePartId, setActivePartId] = useState<ProjectPart['id']>('overview');
   const activePart = PROJECT_PARTS.find((part) => part.id === activePartId) ?? PROJECT_PARTS[0];
-  const activeMedia = getMediaForPart(project, activePart);
+  const activeMedia = mediaForPart(project, activePart);
   const showDemoVideo = activePart.id === 'demo' && project.videoUrl && !reduced;
-  const supportingCopy = project.description || project.tagline || 'A technical project presented as a focused product case study.';
-  const projectHref = project.href || `${basePath}/projects/${project.id}`;
 
-  const partStats = useMemo(
-    () => [
-      `${project.technologies.slice(0, 2).join(' + ') || 'TypeScript'}`,
-      `${project.views ?? 0} views`,
-      `${project.saves ?? 0} saves`,
-    ],
-    [project.saves, project.technologies, project.views],
-  );
+  const setActive = (id: ProjectPart['id'], label: string) => {
+    setActivePartId(id);
+    onSectionInteract?.(label);
+  };
 
   return (
-    <motion.article
-      initial={reduced ? false : { opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.65, delay: index * 0.04, ease: EASE }}
-      className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#07040f] shadow-[0_32px_110px_rgba(0,0,0,0.42)]"
-    >
-      <div className="grid min-h-[720px] lg:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
-        <div className="relative min-h-[430px] overflow-hidden lg:min-h-full">
+    <section className="mb-12 mt-10 rounded-[30px] border border-white/10 bg-[#07040f] shadow-[0_28px_90px_rgba(0,0,0,0.38)] md:mb-14 md:mt-14">
+      <div className="grid overflow-hidden rounded-[30px] lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)]">
+        <div className="relative min-h-[360px] overflow-hidden md:min-h-[520px]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={`${project.id}-${activePart.id}`}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.04, y: 16, filter: 'blur(14px)' }}
+              initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.035, y: 14, filter: 'blur(14px)' }}
               animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: -12, filter: 'blur(10px)' }}
-              transition={{ duration: reduced ? 0.18 : 0.58, ease: EASE }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: -10, filter: 'blur(10px)' }}
+              transition={{ duration: reduced ? 0.18 : 0.55, ease: EASE }}
               className="absolute inset-0"
             >
               {showDemoVideo ? (
                 <video
-                  src={project.videoUrl}
-                  poster={activeMedia ?? project.posterUrl}
+                  src={project.videoUrl ?? undefined}
+                  poster={activeMedia ?? project.posterUrl ?? undefined}
                   autoPlay
                   muted
                   loop
@@ -283,62 +259,39 @@ function ProjectCaseStudy({
                   className="h-full w-full object-cover object-top"
                 />
               ) : activeMedia ? (
-                <ProjectMedia
-                  src={activeMedia}
-                  priority={index === 0 && activePart.id === 'overview'}
-                  sizes="(max-width: 1024px) 100vw, 760px"
-                  className="object-cover object-top"
-                />
+                <ProjectMedia src={activeMedia} sizes="(max-width: 1024px) 100vw, 720px" className="object-cover object-top" />
               ) : (
                 <GeneratedVisual kind={activePart.visual} project={project} />
               )}
             </motion.div>
           </AnimatePresence>
 
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(3,0,12,0.28),rgba(3,0,12,0.05)_42%,rgba(3,0,12,0.42)),linear-gradient(0deg,rgba(3,0,12,0.9),rgba(3,0,12,0.1)_46%,rgba(3,0,12,0.22))]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(3,0,12,0.2),rgba(3,0,12,0.04)_44%,rgba(3,0,12,0.34)),linear-gradient(0deg,rgba(3,0,12,0.92),rgba(3,0,12,0.12)_48%,rgba(3,0,12,0.16))]" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
             <p className="font-eyebrow text-[10px] uppercase tracking-[0.2em] text-lavender/80">
               {activePart.eyebrow}
             </p>
-            <h3 className="mt-3 max-w-[12ch] text-[clamp(2.6rem,7vw,6.8rem)] font-semibold leading-[0.88] tracking-[-0.075em] text-lilac-white">
+            <h2 className="cc-fit-title mt-3 max-w-[12ch] text-[clamp(2.3rem,7vw,7rem)] font-semibold leading-[0.88] tracking-[-0.08em] text-lilac-white">
               {project.title}
-            </h3>
+            </h2>
           </div>
         </div>
 
-        <div className="relative flex flex-col justify-between border-t border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 backdrop-blur-xl md:p-8 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 backdrop-blur-xl md:p-8 lg:border-l lg:border-t-0">
           <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="font-eyebrow text-[10px] uppercase tracking-[0.2em] text-lavender/80">
-                Technical case study
-              </p>
-              {project.isPublished === false && (
-                <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[11px] text-amber-100">
-                  Draft
-                </span>
-              )}
-            </div>
-
+            <p className="font-eyebrow text-[10px] uppercase tracking-[0.2em] text-lavender/80">
+              Technical case study
+            </p>
             {project.tagline && (
-              <p className="mt-6 text-[20px] font-medium leading-snug tracking-[-0.03em] text-lilac-white md:text-[26px]">
+              <h3 className="mt-5 text-[22px] font-medium leading-snug tracking-[-0.03em] text-lilac-white md:text-[28px]">
                 {project.tagline}
+              </h3>
+            )}
+            {project.description && (
+              <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-ash">
+                {project.description.split(/\n\n+/)[0]}
               </p>
             )}
-
-            <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-ash">
-              {supportingCopy}
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              {partStats.map((stat) => (
-                <span
-                  key={stat}
-                  className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[12px] text-lilac-white/80"
-                >
-                  {stat}
-                </span>
-              ))}
-            </div>
           </div>
 
           <div className="mt-8">
@@ -349,9 +302,9 @@ function ProjectCaseStudy({
                   <button
                     key={id}
                     type="button"
-                    onMouseEnter={() => setActivePartId(id)}
-                    onFocus={() => setActivePartId(id)}
-                    onClick={() => setActivePartId(id)}
+                    onMouseEnter={() => setActive(id, label)}
+                    onFocus={() => setActive(id, label)}
+                    onClick={() => setActive(id, label)}
                     className={cn(
                       'group flex min-w-fit items-center justify-between gap-4 rounded-[20px] border px-4 py-3 text-left transition-all duration-300 lg:w-full',
                       active
@@ -384,68 +337,8 @@ function ProjectCaseStudy({
                 {activePart.summary}
               </motion.p>
             </AnimatePresence>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Link
-                href={projectHref}
-                className="cc-instant-press inline-flex items-center gap-2 rounded-full bg-lilac-white px-4 py-2 text-[13px] font-semibold text-void-canvas transition-transform hover:scale-[1.02]"
-              >
-                Open project
-                <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
-              </Link>
-              {project.repoUrl && (
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="cc-instant-press inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[13px] font-semibold text-lilac-white"
-                >
-                  GitHub
-                  <HiOutlineCodeBracketSquare className="h-4 w-4" aria-hidden />
-                </a>
-              )}
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="cc-instant-press inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[13px] font-semibold text-lilac-white"
-                >
-                  Demo
-                  <HiOutlinePlayCircle className="h-4 w-4" aria-hidden />
-                </a>
-              )}
-            </div>
           </div>
         </div>
-      </div>
-    </motion.article>
-  );
-}
-
-export function A24ProjectShowcase({ projects, basePath = '/dashboard' }: A24ProjectShowcaseProps) {
-  if (projects.length === 0) return null;
-
-  return (
-    <section className="space-y-8" aria-label="Interactive project showcase">
-      <div className="mx-auto max-w-[780px] text-center">
-        <p className="font-eyebrow text-[11px] uppercase tracking-[0.18em] text-[var(--app-smoke)]">
-          Editorial project showcase
-        </p>
-        <h2 className="mt-3 text-[clamp(2.2rem,5vw,4.8rem)] font-semibold leading-[0.94] tracking-[-0.07em] text-[var(--app-ink)]">
-          Hover through the proof, not just the poster.
-        </h2>
-      </div>
-
-      <div className="space-y-10">
-        {projects.map((project, index) => (
-          <ProjectCaseStudy
-            key={project.id}
-            project={project}
-            index={index}
-            basePath={basePath}
-          />
-        ))}
       </div>
     </section>
   );

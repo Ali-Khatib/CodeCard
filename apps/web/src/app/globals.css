@@ -19,6 +19,15 @@ svg {
   max-width: 100%;
 }
 
+.cc-fit-title {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  text-wrap: balance;
+}
+
 
 :root {
   --pointer-x: 0.5;

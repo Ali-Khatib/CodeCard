@@ -65,7 +65,7 @@ export function ProjectHeroCard({
             <div className="inline-flex rounded-full border border-white/18 bg-black/35 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90">
               Featured hero
             </div>
-            <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-[-0.03em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
+            <h2 className="cc-fit-title mt-3 font-display text-[clamp(2rem,5vw,3.6rem)] font-semibold leading-[0.92] tracking-[-0.075em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
               {project.title}
             </h2>
             {project.tagline && (

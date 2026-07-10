@@ -68,15 +68,17 @@ export function ProjectDetailLoading() {
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
             )}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void-canvas via-void-canvas/55 to-void-canvas/10" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.86)_0%,rgba(5,3,15,0.58)_36%,rgba(5,3,15,0.22)_68%,rgba(5,3,15,0.08)_100%),linear-gradient(90deg,rgba(5,3,15,0.62)_0%,rgba(5,3,15,0.28)_42%,rgba(5,3,15,0.08)_100%)]" />
             <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
-              <p className={TYPE.eyebrow}>Featured project</p>
-              <h1 className={`mt-3 max-w-[14ch] text-balance ${TYPE.projectTitle} text-lilac-white`}>
-                {snapshot.title}
-              </h1>
-              {snapshot.tagline && (
-                <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-ash`}>{snapshot.tagline}</p>
-              )}
+              <div className="max-w-[680px] rounded-[26px] border border-white/14 bg-black/24 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.26)] backdrop-blur-[2px] md:p-6">
+                <p className={`${TYPE.eyebrow} text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]`}>Featured project</p>
+                <h1 className={`cc-fit-title mt-3 max-w-[14ch] ${TYPE.projectTitle} text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.62)]`}>
+                  {snapshot.title}
+                </h1>
+                {snapshot.tagline && (
+                  <p className={`mt-4 max-w-[42ch] ${TYPE.subheading} text-white/88 drop-shadow-[0_2px_12px_rgba(0,0,0,0.52)]`}>{snapshot.tagline}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

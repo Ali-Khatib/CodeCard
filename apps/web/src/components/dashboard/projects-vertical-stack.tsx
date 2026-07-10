@@ -65,7 +65,7 @@ function ProjectRow({
 
           <div className="cc-project-row__body cc-project-hover-card__body">
             <div className="cc-project-hover-card__head flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="cc-project-hover-card__title text-[clamp(1.35rem,3vw,1.85rem)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+              <h2 className="cc-fit-title cc-work-title cc-work-title--compact cc-project-hover-card__title flex-1">
                 {project.title}
               </h2>
               <span

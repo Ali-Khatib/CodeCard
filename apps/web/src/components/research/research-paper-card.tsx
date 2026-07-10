@@ -83,7 +83,7 @@ export function ResearchPaperCard({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <Link href={href} className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]">
-                <h3 className="text-[28px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+                <h3 className="cc-fit-title cc-work-title cc-work-title--compact">
                   {paper.title}
                 </h3>
               </Link>

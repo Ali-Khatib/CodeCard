@@ -56,7 +56,7 @@ export function ProjectsBubbleGrid({
                 />
               </div>
               <div className="cc-projects-bubble__meta">
-                <p className="cc-projects-bubble__title">{project.title}</p>
+                <p className="cc-fit-title cc-projects-bubble__title">{project.title}</p>
                 <span
                   className={`cc-projects-bubble__badge ${isPublished ? 'cc-projects-bubble__badge--live' : ''}`}
                 >
