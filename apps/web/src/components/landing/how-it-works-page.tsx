@@ -106,7 +106,6 @@ export function HowItWorksSection() {
           bgImageSrc="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1920&q=80"
           title="Scan CodeCard"
           date="01 / QR to proof"
-          scrollToExpand="Scroll to expand the full flow"
           className="mt-[-10px]"
         >
           {(scrollProgress) => <HowItWorksExpandedPage scrollProgress={scrollProgress} />}

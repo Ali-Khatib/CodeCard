@@ -88,9 +88,6 @@ function FakeQrCode() {
           ))}
         </div>
       </div>
-      <p className="mt-5 font-eyebrow text-[11px] uppercase tracking-[0.14em] text-[#8b7f76]">
-        Scan to open CodeCard
-      </p>
     </div>
   );
 }
