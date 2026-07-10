@@ -826,7 +826,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   background: var(--app-bone);
 }
 
-.cc-app-filter-pill--active {
+.cc-app-filter-pill.cc-app-filter-pill--active,
+.cc-app-filter-pill.cc-app-filter-pill--active:hover {
   background: var(--app-ink);
   color: var(--app-paper);
 }
@@ -1233,6 +1234,12 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
     font-weight: 700;
     letter-spacing: -0.02em;
     color: color-mix(in srgb, var(--app-ink) 82%, transparent);
+  }
+
+  .cc-app-filter-pill.cc-app-filter-pill--active,
+  .cc-app-filter-pill.cc-app-filter-pill--active:hover {
+    background: var(--app-ink);
+    color: var(--app-paper);
   }
 
   .cc-profile-link-dock,
