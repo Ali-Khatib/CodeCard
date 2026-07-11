@@ -2,22 +2,24 @@
 
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
 const FOOTER_COLUMNS = [
   {
     title: 'Product',
     links: [
-      { label: 'Overview', href: '/' },
-      { label: 'Live demo', href: '/dashboard/preview/projects' },
+      { label: 'Overview', href: MARKETING_HOME_HREF },
+      { label: 'Live demo', href: LIVE_DEMO_HREF },
       { label: 'Pricing', href: '/pricing' },
     ],
   },
   {
     title: 'Resources',
     links: [
-      { label: 'Research', href: '/#research' },
-      { label: 'How it works', href: '/#how-it-works' },
+      { label: 'Research', href: `${MARKETING_HOME_HREF}#research` },
+      { label: 'How it works', href: `${MARKETING_HOME_HREF}#how-it-works` },
       { label: 'References', href: '/research/references' },
     ],
   },

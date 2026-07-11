@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signUpSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
+import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 
 const SETUP_MSG =
   'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
@@ -66,6 +67,7 @@ function SignUpForm() {
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
+          emailRedirectTo: authCallbackRedirectUrl('/dashboard'),
           data: {
             display_name: parsed.data.display_name,
             slug: parsed.data.slug,

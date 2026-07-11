@@ -1,5 +1,5 @@
 import { ProductPage } from '@/components/landing/product-page';
 
-export default function HomePage() {
+export default function LandingPage() {
   return <ProductPage />;
 }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 export type NavItem = {
   label: string;
@@ -27,9 +28,9 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
 
   const isActive = useCallback(
     (href: string, label: string) => {
-      if (href === '/') {
+      if (href === MARKETING_HOME_HREF) {
         return (
-          pathname === '/' ||
+          pathname === MARKETING_HOME_HREF ||
           pathname === '/how-it-works' ||
           pathname === '/research' ||
           pathname.startsWith('/research/')
@@ -82,11 +83,11 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     <nav className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
       <div className="cc-nav-veil__inner">
         <Link
-          href="/"
+          href={MARKETING_HOME_HREF}
           className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press"
           aria-label="CodeCard home"
-          onMouseEnter={() => router.prefetch('/')}
-          onFocus={() => router.prefetch('/')}
+          onMouseEnter={() => router.prefetch(MARKETING_HOME_HREF)}
+          onFocus={() => router.prefetch(MARKETING_HOME_HREF)}
         >
           CodeCard
         </Link>

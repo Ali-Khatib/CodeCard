@@ -12,6 +12,7 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -220,7 +221,7 @@ export function DashboardShell({
             <ThemeToggle />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
-          <AppButton variant="ghost" block href="/">
+          <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
             ← Back to landing
           </AppButton>
         </div>
@@ -267,7 +268,7 @@ export function DashboardShell({
                 {preview ? (
                   <>
                     <Link
-                      href="/"
+                      href={MARKETING_HOME_HREF}
                       className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)] md:hidden"
                       onClick={() => setUserMenuOpen(false)}
                     >

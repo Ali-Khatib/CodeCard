@@ -70,3 +70,4 @@ start.cmd
 # Local MVP planning (not in repo)
 docs/CODECARD_MVP_IMPLEMENTATION_PLAN.md
 docs/CODECARD_MVP_REQUIREMENTS_BRIEF.md
+.vercel

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LandingShellNav } from '@/components/landing/landing-shell-nav';
 import { HumeFooterCluster } from '@/components/landing/hume-footer-cluster';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 interface LegalPageProps {
   title: string;
@@ -24,7 +25,7 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
           <div className="mt-12 space-y-8 text-[16px] leading-relaxed text-smoke [&_h2]:font-display [&_h2]:text-[28px] [&_h2]:font-normal [&_h2]:leading-tight [&_h2]:tracking-[-0.03em] [&_h2]:text-ink [&_li]:pl-1 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
             {children}
           </div>
-          <Link href="/" className="cc-btn-pill-ghost mt-12 inline-flex h-11 px-6 text-[14px]">
+          <Link href={MARKETING_HOME_HREF} className="cc-btn-pill-ghost mt-12 inline-flex h-11 px-6 text-[14px]">
             Back to home
           </Link>
         </div>

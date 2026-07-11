@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ALL_SOURCES_LIST } from '@/lib/research/sources';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 export const metadata = {
   title: 'Research references | CodeCard',
@@ -57,7 +58,7 @@ export default function ResearchReferencesPage() {
         <div className="mt-16 rounded-[10px] border border-border bg-surface/60 p-8 text-center">
           <p className="text-[18px] text-text-secondary">See how this research shapes the CodeCard experience.</p>
           <Link
-            href="/#research"
+            href={`${MARKETING_HOME_HREF}#research`}
             className="mt-4 inline-flex h-12 items-center rounded-[10px] border border-border bg-surface px-6 text-[15px] font-semibold"
           >
             Back to evidence overview
