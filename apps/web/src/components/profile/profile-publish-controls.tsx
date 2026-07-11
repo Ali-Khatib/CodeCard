@@ -74,6 +74,7 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
                 type="button"
                 variant="outline"
                 disabled={pending}
+                aria-busy={pending}
                 onClick={() => setShowUnpublishConfirm(true)}
               >
                 Unpublish profile
@@ -84,7 +85,7 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
                   Unpublishing will remove public access to your profile URL. Visitors will see a
                   not-found page instead of your card.
                 </p>
-                <Button type="button" disabled={pending} onClick={runUnpublish}>
+                <Button type="button" disabled={pending} aria-busy={pending} onClick={runUnpublish}>
                   {pending ? 'Unpublishing…' : 'Confirm unpublish'}
                 </Button>
                 <Button
@@ -99,7 +100,7 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
             )}
           </>
         ) : (
-          <Button type="button" disabled={pending} onClick={runPublish}>
+          <Button type="button" disabled={pending} aria-busy={pending} onClick={runPublish}>
             {pending ? 'Publishing…' : 'Publish profile'}
           </Button>
         )}

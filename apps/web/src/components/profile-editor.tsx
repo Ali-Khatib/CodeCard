@@ -26,13 +26,21 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
   const router = useRouter();
   const [form, setForm] = useState(() => profileToFormState(profile));
   const [clientError, setClientError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
 
   useEffect(() => {
-    if (state.success) {
-      router.refresh();
-    }
+    if (!state.success) return;
+    setSaveSuccess(true);
+    router.refresh();
+    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
+    return () => window.clearTimeout(timeout);
   }, [state.success, router]);
+
+  useEffect(() => {
+    if (!saveSuccess) return;
+    setForm(profileToFormState(profile));
+  }, [profile, saveSuccess]);
 
   const displayError =
     clientError || state.fieldErrors?.slug || state.fieldErrors?.display_name || state.error || '';
@@ -136,7 +144,12 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           {displayError}
         </p>
       )}
-      <Button type="submit" disabled={pending}>
+      {saveSuccess && (
+        <p className="text-sm text-emerald-300" role="status" aria-live="polite">
+          Profile saved.
+        </p>
+      )}
+      <Button type="submit" disabled={pending} aria-busy={pending}>
         {pending ? 'Saving…' : 'Save changes'}
       </Button>
     </form>

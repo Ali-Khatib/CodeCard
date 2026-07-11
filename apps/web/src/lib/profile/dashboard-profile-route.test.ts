@@ -13,6 +13,7 @@ describe('canonical dashboard profile route', () => {
     expect(src).toContain("eq('owner_user_id', user!.id)");
     expect(src).toContain('DashboardProfileView');
     expect(src).toContain("select('id, type, label, url, sort_order')");
+    expect(src).not.toContain('notFound()');
   });
 
   it('points dashboard navigation to the canonical profile editor', () => {
