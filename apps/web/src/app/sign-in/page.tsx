@@ -37,6 +37,7 @@ function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') ?? '/dashboard';
+  const resetSuccess = searchParams.get('reset') === 'success';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -122,7 +123,20 @@ function SignInForm() {
             autoComplete="current-password"
             className="cc-input w-full"
           />
+          <p className="text-right">
+            <Link
+              href="/forgot-password"
+              className="text-[13px] font-medium text-[#7a7876] underline-offset-2 hover:text-[#222222] hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </p>
         </div>
+        {resetSuccess && (
+          <p className="text-[14px] text-[#2f6f4e]" role="status">
+            Your password was updated. Sign in with your new password.
+          </p>
+        )}
         {error && <p className="text-[14px] text-[#df6a6b]">{error}</p>}
         <button
           type="submit"
