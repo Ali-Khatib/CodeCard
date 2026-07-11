@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   buildProfileFormData,
+  checkProfileSlugAvailability,
   executeProfileUpdate,
   mapProfileUpdateDbError,
   parseTrustedProfileFormData,
   pickAllowedProfileUpdate,
   validateProfileEditPayload,
 } from './profile-update-core';
+import { PROFILE_SLUG_TAKEN_MESSAGE } from '@codecard/validation';
 
 function makeFormData(entries: Record<string, string>) {
   const fd = new FormData();
@@ -21,28 +23,61 @@ function createMockSupabase(options: {
   user?: { id: string } | null;
   profile?: Record<string, unknown> | null;
   updateError?: { code?: string; message?: string } | null;
+  slugTakenByProfileId?: string | null;
+  slugTakenByTenantId?: string | null;
 }) {
   const update = vi.fn().mockResolvedValue({ error: options.updateError ?? null });
 
   const from = vi.fn((table: string) => {
-    if (table !== 'profiles') throw new Error(`Unexpected table ${table}`);
-
-    return {
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn().mockResolvedValue({
-            data: options.profile ?? null,
-            error: options.profile ? null : { message: 'not found' },
+    if (table === 'profiles') {
+      return {
+        select: vi.fn((columns?: string) => {
+          if (columns === 'id') {
+            return {
+              eq: vi.fn(() => ({
+                neq: vi.fn(() => ({
+                  maybeSingle: vi.fn().mockResolvedValue({
+                    data: options.slugTakenByProfileId ? { id: options.slugTakenByProfileId } : null,
+                    error: null,
+                  }),
+                })),
+              })),
+            };
+          }
+          return {
+            eq: vi.fn(() => ({
+              single: vi.fn().mockResolvedValue({
+                data: options.profile ?? null,
+                error: options.profile ? null : { message: 'not found' },
+              }),
+            })),
+          };
+        }),
+        update: vi.fn((payload: unknown) => ({
+          eq: vi.fn(() => {
+            update(payload);
+            return Promise.resolve({ error: options.updateError ?? null });
           }),
         })),
-      })),
-      update: vi.fn((payload: unknown) => ({
-        eq: vi.fn(() => {
-          update(payload);
-          return Promise.resolve({ error: options.updateError ?? null });
-        }),
-      })),
-    };
+      };
+    }
+
+    if (table === 'tenants') {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            neq: vi.fn(() => ({
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: options.slugTakenByTenantId ? { id: options.slugTakenByTenantId } : null,
+                error: null,
+              }),
+            })),
+          })),
+        })),
+      };
+    }
+
+    throw new Error(`Unexpected table ${table}`);
   });
 
   const supabase = {
@@ -174,14 +209,24 @@ describe('pickAllowedProfileUpdate', () => {
 });
 
 describe('mapProfileUpdateDbError', () => {
-  it('does not expose raw database errors', () => {
+  it('maps unique violations to a friendly slug error', () => {
     const mapped = mapProfileUpdateDbError({
       code: '23505',
       message: 'duplicate key value violates unique constraint "profiles_tenant_id_slug_key"',
     });
-    expect(mapped.error).toBe('Could not save your profile. Please try again.');
+    expect(mapped.fieldErrors?.slug).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
+    expect(mapped.error).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
     expect(mapped.error).not.toContain('23505');
     expect(mapped.error).not.toContain('profiles_tenant_id_slug_key');
+  });
+
+  it('does not expose raw database errors for other failures', () => {
+    const mapped = mapProfileUpdateDbError({
+      code: 'XX000',
+      message: 'internal postgres detail',
+    });
+    expect(mapped.error).toBe('Could not save your profile. Please try again.');
+    expect(mapped.error).not.toContain('postgres');
   });
 });
 
@@ -276,6 +321,87 @@ describe('executeProfileUpdate', () => {
       makeFormData({ display_name: 'Alex', slug: 'alex-chen' }),
     );
     expect(result.error).toBe('Profile not found.');
+  });
+
+  it('rejects reserved slugs with a field error', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'dashboard',
+        bio: 'Bio',
+        location: '',
+        skills: '',
+      }),
+    );
+
+    expect(result.fieldErrors?.slug).toMatch(/reserved/i);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('rejects duplicate slugs with a friendly field error', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      slugTakenByProfileId: 'profile-2',
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'taken-slug',
+        bio: 'Bio',
+        location: '',
+        skills: '',
+      }),
+    );
+
+    expect(result.fieldErrors?.slug).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('falls back to database uniqueness when a race occurs', async () => {
+    const { supabase } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      updateError: { code: '23505', message: 'duplicate key' },
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'new-slug',
+        bio: 'Bio',
+        location: '',
+        skills: '',
+      }),
+    );
+
+    expect(result.fieldErrors?.slug).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
+  });
+});
+describe('checkProfileSlugAvailability', () => {
+  it('detects tenant slug conflicts for public routing safety', async () => {
+    const { supabase } = createMockSupabase({
+      profile: ownedProfile,
+      slugTakenByTenantId: 'tenant-2',
+    });
+
+    const message = await checkProfileSlugAvailability(supabase, 'shared-slug', {
+      id: 'profile-1',
+      tenant_id: 'tenant-1',
+    });
+    expect(message).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
   });
 });
 

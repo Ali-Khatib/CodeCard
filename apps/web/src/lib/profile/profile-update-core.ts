@@ -1,4 +1,10 @@
-import { updateProfileSchema, parseCommaSeparatedSkills } from '@codecard/validation';
+import {
+  isReservedProfileSlug,
+  PROFILE_SLUG_TAKEN_MESSAGE,
+  RESERVED_PROFILE_SLUG_MESSAGE,
+  updateProfileSchema,
+  parseCommaSeparatedSkills,
+} from '@codecard/validation';
 import type { Profile } from '@codecard/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -67,8 +73,48 @@ export function validateProfileEditPayload(payload: ReturnType<typeof parseTrust
   return profileEditSchema.safeParse(payload);
 }
 
-export function mapProfileUpdateDbError(_error: { code?: string; message?: string }): ProfileUpdateState {
+export function mapProfileUpdateDbError(error: { code?: string; message?: string }): ProfileUpdateState {
+  if (error.code === '23505') {
+    return {
+      fieldErrors: { slug: PROFILE_SLUG_TAKEN_MESSAGE },
+      error: PROFILE_SLUG_TAKEN_MESSAGE,
+    };
+  }
   return { error: 'Could not save your profile. Please try again.' };
+}
+
+export async function checkProfileSlugAvailability(
+  supabase: SupabaseClient,
+  slug: string,
+  profile: { id: string; tenant_id: string },
+): Promise<string | null> {
+  if (isReservedProfileSlug(slug)) {
+    return RESERVED_PROFILE_SLUG_MESSAGE;
+  }
+
+  const { data: otherProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('slug', slug)
+    .neq('id', profile.id)
+    .maybeSingle();
+
+  if (otherProfile) {
+    return PROFILE_SLUG_TAKEN_MESSAGE;
+  }
+
+  const { data: otherTenant } = await supabase
+    .from('tenants')
+    .select('id')
+    .eq('slug', slug)
+    .neq('id', profile.tenant_id)
+    .maybeSingle();
+
+  if (otherTenant) {
+    return PROFILE_SLUG_TAKEN_MESSAGE;
+  }
+
+  return null;
 }
 
 type AuthUser = { id: string };
@@ -116,6 +162,14 @@ export async function executeProfileUpdate(
 
   const updatePayload = pickAllowedProfileUpdate(parsed.data);
   const previousSlug = profile.slug;
+
+  const slugIssue = await checkProfileSlugAvailability(supabase, updatePayload.slug, profile);
+  if (slugIssue) {
+    return {
+      fieldErrors: { slug: slugIssue },
+      error: slugIssue,
+    };
+  }
 
   const { error: updateError } = await supabase
     .from('profiles')
