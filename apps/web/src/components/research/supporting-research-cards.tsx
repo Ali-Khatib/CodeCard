@@ -29,7 +29,7 @@ export function SupportingResearchCards() {
           <ScrollReveal key={card.title} delay={i * 0.08}>
             <article className="cc-surface-card relative h-full p-7 md:p-8">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="font-display text-[20px] font-medium leading-snug text-lilac-white">
+                <h3 className="font-display text-[20px] font-medium leading-snug text-ink">
                   {card.title}
                 </h3>
                 <SourceInfoIcon sourceId={card.sourceId} />

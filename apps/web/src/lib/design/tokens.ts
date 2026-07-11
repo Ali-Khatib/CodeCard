@@ -75,7 +75,10 @@ export const TYPE = {
     'font-display text-[32px] font-normal leading-[1.06] tracking-[-0.03em] md:text-[44px]',
   /** Section titles on light scroll surfaces (project/research detail body). */
   contentSectionTitle:
-    'mt-2 font-display text-[32px] font-normal leading-[1.1] tracking-[-0.02em] text-text-primary md:text-[46px]',
+    'mt-2 font-display text-[32px] font-normal leading-[1.1] tracking-[-0.02em] text-ink md:text-[46px]',
+  /** Hero titles on cream project/research pages (not dark media overlays). */
+  contentHeroTitle:
+    'cc-fit-title mt-4 max-w-[14ch] font-display text-[clamp(2rem,6vw,5rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-ink',
   heroHeading:
     'font-display text-[40px] font-normal leading-[1.02] tracking-[-0.03em] md:text-[56px] lg:text-[72px]',
   profileName:

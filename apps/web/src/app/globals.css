@@ -3290,6 +3290,17 @@ select,
     background: var(--void-canvas);
   }
 
+  /* Cream scroll bodies — lock ink type (fixes white/lilac-white on void-canvas) */
+  .cc-on-cream-surface {
+    --ink: #232324;
+    --text-primary: #232324;
+    color: #232324;
+  }
+
+  .cc-on-cream-surface :where(h1, h2, h3, h4) {
+    color: #232324;
+  }
+
   .cc-project-atmosphere__particles {
     position: absolute;
     inset: 0;
