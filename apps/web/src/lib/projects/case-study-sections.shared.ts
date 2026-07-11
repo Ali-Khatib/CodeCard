@@ -25,6 +25,8 @@ export type CaseStudySectionConfig = {
   label: string;
   eyebrow: string;
   summary: string;
+  /** Shown in the create form before a section is enabled. */
+  addHint: string;
   prompt: string;
   placeholder: string;
   inputKind: CaseStudyInputKind;

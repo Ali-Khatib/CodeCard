@@ -16,6 +16,7 @@ import { COLORS, TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
 import { isProjectTransitionTarget, useProjectOpenOptional } from './project-open-overlay';
 import { ProjectCaseStudyTabs } from './project-case-study-tabs';
+import { hasShowcaseExtras } from '@/lib/projects/case-study-sections';
 import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
 import { AnimatedDock } from '@/components/ui/animated-dock';
 
@@ -136,6 +137,7 @@ export function ProjectDetailView({
   const currentIndex = Math.max(0, projectList.findIndex((p) => p.id === project.id));
   const previousProject = projectList.length > 1 ? projectList[(currentIndex - 1 + projectList.length) % projectList.length] : null;
   const nextProject = projectList.length > 1 ? projectList[(currentIndex + 1) % projectList.length] : null;
+  const showcaseExtras = hasShowcaseExtras(project);
 
   const hiddenByTransition =
     !transitionHandoff &&
@@ -281,7 +283,9 @@ export function ProjectDetailView({
           </div>
         </div>
 
-        <article className="cc-container cc-content pb-24 pt-10 md:pt-14">
+        <article
+          className={`cc-container cc-content pb-24 ${showcaseExtras ? 'pt-10 md:pt-14' : 'pt-4 md:pt-6'}`}
+        >
           {(previousProject || nextProject) && (
             <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
               {previousProject ? (

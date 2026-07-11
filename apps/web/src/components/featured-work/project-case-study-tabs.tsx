@@ -42,35 +42,6 @@ function TextCaseStudyPanel({
   );
 }
 
-function SpotlightHero({ project }: { project: FeaturedProject }) {
-  const hero = project.posterUrl ?? project.screenshots[0];
-  return (
-    <section className="mb-8 mt-6 overflow-hidden rounded-[20px] border border-white/10 bg-[#07040f] shadow-[0_20px_60px_rgba(0,0,0,0.32)] md:mb-14 md:mt-14 md:rounded-[30px]">
-      <div className="relative min-h-[220px] overflow-hidden sm:min-h-[280px] md:min-h-[420px]">
-        {hero ? (
-          <ProjectMedia src={hero} sizes="(max-width: 1024px) 100vw, 960px" className="object-cover object-top" />
-        ) : (
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,#07040f,#241936_58%,#06030c)]" />
-        )}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(3,0,12,0.92),rgba(3,0,12,0.12)_48%,rgba(3,0,12,0.16))]" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-          <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-lavender/80 md:text-[10px]">
-            Project
-          </p>
-          <h2 className="mt-2 max-w-[12ch] text-[clamp(1.6rem,6vw,5rem)] font-semibold leading-[0.9] tracking-[-0.08em] text-lilac-white">
-            {project.title}
-          </h2>
-          {project.tagline && (
-            <p className="mt-3 max-w-prose text-[14px] leading-relaxed text-ash md:text-[18px]">
-              {project.tagline}
-            </p>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function ProjectCaseStudyTabs({
   project,
   onSectionInteract,
@@ -90,7 +61,7 @@ export function ProjectCaseStudyTabs({
   }, [activePartId, visibleSections]);
 
   if (!showcaseEnabled) {
-    return <SpotlightHero project={project} />;
+    return null;
   }
 
   const activePart = visibleSections.find((part) => part.id === activePartId) ?? visibleSections[0]!;
@@ -156,6 +127,9 @@ export function ProjectCaseStudyTabs({
           <div>
             <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-lavender/80 md:text-[10px]">
               Extra showcase
+            </p>
+            <p className="mt-2 text-[12px] leading-relaxed text-ash md:text-[13px]">
+              Optional story beats — tap a tab to read or view what was added.
             </p>
             {project.tagline && (
               <h3 className="mt-3 text-[16px] font-medium leading-snug tracking-[-0.03em] text-lilac-white sm:text-[18px] md:mt-5 md:text-[24px]">
