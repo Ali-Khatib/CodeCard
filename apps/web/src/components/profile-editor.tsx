@@ -7,6 +7,7 @@ import type { Profile } from '@codecard/types';
 import { parseProfileUpdate, profileToFormState } from '@/lib/profile/profile-form';
 import { buildProfileFormData } from '@/lib/profile/profile-update-core';
 import { ProfilePublishControls } from '@/components/profile/profile-publish-controls';
+import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import {
   updateProfileAction,
   type ProfileUpdateState,
@@ -109,6 +110,23 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
         />
       </div>
       <ProfilePublishControls isPublic={profile.is_public} />
+      {profile.slug && (
+        <p className="text-sm">
+          <a
+            href={getSavedProfilePreviewHref(profile)}
+            target={profile.is_public ? '_blank' : undefined}
+            rel={profile.is_public ? 'noopener noreferrer' : undefined}
+            className="font-medium text-violet-300 underline underline-offset-2"
+          >
+            Preview saved profile
+          </a>
+          {!profile.is_public && (
+            <span className="mt-1 block text-zinc-500">
+              Opens an owner-only preview of your saved card.
+            </span>
+          )}
+        </p>
+      )}
       {displayError && !state.fieldErrors?.slug && (
         <p className="text-sm text-red-400" role="alert">
           {displayError}

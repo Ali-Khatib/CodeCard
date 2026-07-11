@@ -8,6 +8,7 @@ import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
+import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { AppButton, AppCard, AppMono, PageHeader } from './ui/dashboard-ui';
@@ -95,7 +96,7 @@ export function DashboardProfileView({
           <div className="flex flex-wrap gap-2 border-t border-[var(--app-border)] pt-6">
             {!preview && <AppButton variant="primary">Save changes</AppButton>}
             {profile.slug && (
-              <AppButton variant="ghost" href={`/${profile.slug}`}>
+              <AppButton variant="ghost" href={getSavedProfilePreviewHref(profile)}>
                 Preview
               </AppButton>
             )}
