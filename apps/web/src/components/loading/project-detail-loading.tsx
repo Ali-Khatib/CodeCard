@@ -41,13 +41,10 @@ export function ProjectDetailLoading() {
 
       <div className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
-          <div className="flex items-center justify-between rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
+          <div className="flex items-center rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
             <div className="flex items-center gap-2 px-2 py-1 text-[15px] text-text-secondary">
               <span className="inline-block h-4 w-4 rounded-sm bg-lavender/30" aria-hidden />
               <span className="hidden sm:inline">{backLabel}</span>
-            </div>
-            <div className="flex gap-2">
-              <span className="h-10 w-10 rounded-full bg-midnight/80 ring-1 ring-border/40" aria-hidden />
             </div>
           </div>
         </header>

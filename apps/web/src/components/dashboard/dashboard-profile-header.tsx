@@ -1,21 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
-import { AnimatedDock } from '@/components/ui/animated-dock';
 import { AppButton } from './ui/dashboard-ui';
-
-const SOCIAL_LABELS: Record<string, string> = {
-  github: 'GitHub',
-  linkedin: 'LinkedIn',
-  website: 'Website',
-  twitter: 'X',
-  x: 'X',
-  resume: 'Resume',
-  email: 'Email',
-};
 
 type DashboardProfileHeaderProps = {
   creator: PortfolioCreator;
@@ -58,24 +46,6 @@ export function DashboardProfileHeader({
             </h2>
             {roleLine && <p className="mt-1 text-[15px] text-[var(--app-smoke)]">{roleLine}</p>}
             {creator.location && <p className="mt-1 text-[14px] text-[var(--app-smoke)]">{creator.location}</p>}
-          </div>
-
-          <div className="min-w-0 shrink-0">
-            {creator.links.length > 0 && (
-              <AnimatedDock
-                className="cc-profile-link-dock"
-                items={creator.links.map((link) => {
-                  const Icon = resolveProfileLinkIcon(link.type);
-                  const label = link.label ?? SOCIAL_LABELS[link.type.toLowerCase()] ?? 'Link';
-                  return {
-                    link: link.url,
-                    target: '_blank',
-                    label: getProfileLinkAria(link.type, link.label) || label,
-                    Icon: <Icon className="text-sm" aria-hidden />,
-                  };
-                })}
-              />
-            )}
           </div>
 
           {!embedded && (

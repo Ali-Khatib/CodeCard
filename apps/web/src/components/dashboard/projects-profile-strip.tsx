@@ -3,9 +3,7 @@
 import Image from 'next/image';
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
-import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
-import { AnimatedDock } from '@/components/ui/animated-dock';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -43,21 +41,6 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
       <div className="cc-projects-profile-strip__copy">
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
-        {creator.links.length > 0 && (
-          <AnimatedDock
-            className="cc-profile-link-dock"
-            items={creator.links.map((link) => {
-              const Icon = resolveProfileLinkIcon(link.type);
-              return {
-                link: link.url,
-                target: '_blank',
-                label: getProfileLinkAria(link.type, link.label),
-                staticWidth: 34,
-                Icon: <Icon className="h-[14px] w-[14px]" aria-hidden />,
-              };
-            })}
-          />
-        )}
       </div>
     </motion.header>
   );

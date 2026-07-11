@@ -11,14 +11,12 @@ import { useScrollRestore } from '@/hooks/use-scroll-restore';
 import { clearOptimisticProject } from '@/lib/navigation/optimistic-project';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
-import { resolveProjectLinkIcon, getProjectLinkAria } from '@/lib/icons/project-links';
 import { COLORS, TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
 import { isProjectTransitionTarget, useProjectOpenOptional } from './project-open-overlay';
 import { ProjectCaseStudyTabs } from './project-case-study-tabs';
 import { hasShowcaseExtras } from '@/lib/projects/case-study-sections';
 import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
-import { AnimatedDock } from '@/components/ui/animated-dock';
 
 const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
@@ -156,7 +154,7 @@ export function ProjectDetailView({
 
       <div className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
-          <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
+          <div className="flex items-center rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
               href={backHref}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
@@ -165,21 +163,6 @@ export function ProjectDetailView({
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
               <span className="hidden sm:inline">{displayName}</span>
             </Link>
-            {project.links.length > 0 && (
-              <AnimatedDock
-                className="cc-project-link-dock max-w-[min(100%,220px)] shrink-0"
-                items={project.links.map((link) => {
-                  const Icon = resolveProjectLinkIcon(link.type);
-                  return {
-                    link: link.url,
-                    target: '_blank',
-                    label: getProjectLinkAria(link.type, link.label),
-                    staticWidth: 34,
-                    Icon: <Icon className="h-[14px] w-[14px]" aria-hidden />,
-                  };
-                })}
-              />
-            )}
           </div>
         </header>
 
