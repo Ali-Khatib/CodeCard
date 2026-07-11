@@ -117,9 +117,9 @@ export function ProjectCreateForm() {
             Extra showcase (optional)
           </h2>
           <p className="mt-2 text-[14px] leading-relaxed text-ash">
-            Six quick extras for the cinematic header — separate from your description, tech stack,
-            and screenshot gallery below. Add only what helps. Problem, approach, and impact are
-            text; results, product, and system use a photo or screenshot.
+            Six optional beats for the cinematic block below your hero — separate from description,
+            stack, and screenshots. Skip any you do not need; projects with none go straight to stack
+            and overview.
           </p>
         </div>
 
@@ -138,6 +138,9 @@ export function ProjectCreateForm() {
                   <div className="min-w-0">
                     <p className="text-[14px] font-medium text-lilac-white">{section.label}</p>
                     <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.summary}</p>
+                    {!isOn && (
+                      <p className="mt-2 text-[11px] leading-relaxed text-graphite">{section.addHint}</p>
+                    )}
                   </div>
                   <label className="flex shrink-0 items-center gap-2 text-[12px] text-ash">
                     <input
