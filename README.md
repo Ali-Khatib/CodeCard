@@ -120,6 +120,7 @@ See:
 
 ```txt
 apps/web/.env.example
+docs/AUTH_PROVIDER_CONFIGURATION.md
 ```
 
 Important security rules:
