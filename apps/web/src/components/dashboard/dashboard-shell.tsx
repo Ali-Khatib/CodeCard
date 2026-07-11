@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { DASH_NAV_ICONS } from './dashboard-nav-icons';
+import { EmailVerificationBanner } from './email-verification-banner';
 import { DashboardPageTransition } from './dashboard-page-transition';
 import { DashboardNotifications } from './dashboard-notifications';
 import { AppButton } from './ui/dashboard-ui';
@@ -41,6 +42,7 @@ type DashboardShellProps = {
   completion?: number;
   basePath?: string;
   preview?: boolean;
+  emailVerificationRequired?: boolean;
 };
 
 function CopyProfileLinkButton({ slug }: { slug: string }) {
@@ -68,6 +70,7 @@ export function DashboardShell({
   completion,
   basePath = '/dashboard',
   preview = false,
+  emailVerificationRequired = false,
 }: DashboardShellProps) {
   const pathname = usePathname();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -295,6 +298,9 @@ export function DashboardShell({
               <span className="cc-app-route-pending__pulse" aria-hidden />
               Loading next view
             </div>
+          )}
+          {!preview && emailVerificationRequired && email && (
+            <EmailVerificationBanner email={email} />
           )}
           <DashboardPageTransition>{children}</DashboardPageTransition>
         </div>

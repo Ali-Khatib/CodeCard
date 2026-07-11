@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { userNeedsEmailVerification } from '@/lib/auth/email-verification';
 
 export default async function AuthenticatedDashboardLayout({
   children,
@@ -26,6 +27,7 @@ export default async function AuthenticatedDashboardLayout({
       displayName={profile?.display_name ?? user.email?.split('@')[0]}
       email={user.email}
       avatarUrl={profile?.avatar_url}
+      emailVerificationRequired={userNeedsEmailVerification(user)}
     >
       {children}
     </DashboardShell>
