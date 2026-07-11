@@ -253,6 +253,7 @@ export const dmcaNoticeSchema = z.object({
 
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export * from './reserved-profile-slugs';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
