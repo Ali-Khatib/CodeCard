@@ -1,49 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button, Input, Label } from '@codecard/ui';
 import type { Profile } from '@codecard/types';
 import { parseProfileUpdate, profileToFormState } from '@/lib/profile/profile-form';
+import { buildProfileFormData } from '@/lib/profile/profile-update-core';
+import {
+  updateProfileAction,
+  type ProfileUpdateState,
+} from '@/lib/profile/update-profile-action';
 
 interface ProfileEditorProps {
   profile: Profile;
 }
 
+const initialState: ProfileUpdateState = {};
+
 export function ProfileEditor({ profile }: ProfileEditorProps) {
   const router = useRouter();
   const [form, setForm] = useState(() => profileToFormState(profile));
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [clientError, setClientError] = useState('');
+  const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      router.refresh();
+    }
+  }, [state.success, router]);
+
+  const displayError =
+    clientError || state.fieldErrors?.slug || state.fieldErrors?.display_name || state.error || '';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading) return;
-    setError('');
+    if (pending) return;
+    setClientError('');
 
     const parsed = parseProfileUpdate(form);
     if (!parsed.success) {
-      setError(parsed.message);
+      setClientError(parsed.message);
       return;
     }
 
-    setLoading(true);
-
-    const supabase = createClient();
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update(parsed.data)
-      .eq('id', profile.id);
-
-    if (updateError) {
-      setError(updateError.message);
-      setLoading(false);
-      return;
-    }
-
-    router.refresh();
-    setLoading(false);
+    formAction(buildProfileFormData(form));
   }
 
   return (
@@ -71,7 +71,13 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           id="slug"
           value={form.slug}
           onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase() })}
+          aria-invalid={Boolean(state.fieldErrors?.slug)}
         />
+        {state.fieldErrors?.slug && (
+          <p className="text-sm text-red-400" role="alert">
+            {state.fieldErrors.slug}
+          </p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="bio">Bio (shown later on profile)</Label>
@@ -110,9 +116,13 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
         />
         <span className="text-sm">Make profile public</span>
       </label>
-      {error && <p className="text-sm text-red-400">{error}</p>}
-      <Button type="submit" disabled={loading}>
-        {loading ? 'Saving…' : 'Save changes'}
+      {displayError && !state.fieldErrors?.slug && (
+        <p className="text-sm text-red-400" role="alert">
+          {displayError}
+        </p>
+      )}
+      <Button type="submit" disabled={pending}>
+        {pending ? 'Saving…' : 'Save changes'}
       </Button>
     </form>
   );
