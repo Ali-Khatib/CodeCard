@@ -9,14 +9,16 @@ import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
-import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
+import type { Profile } from '@codecard/types';
 import { AppButton, AppCard, AppMono, PageHeader } from './ui/dashboard-ui';
 
 type DashboardProfileViewProps = {
   profile: Profile;
   completion: number;
   profileViews: number;
+  profileLinks?: ProfileLinkRow[];
   links?: ProfileLinkItem[];
   preview?: boolean;
 };
@@ -25,6 +27,7 @@ export function DashboardProfileView({
   profile,
   completion,
   profileViews,
+  profileLinks = [],
   links = [],
   preview = false,
 }: DashboardProfileViewProps) {
@@ -65,7 +68,7 @@ export function DashboardProfileView({
           </div>
 
           {!preview ? (
-            <ProfileEditor profile={profile} />
+            <ProfileEditor profile={profile} links={profileLinks} />
           ) : (
             <div className="space-y-4">
               <label className="block">

@@ -1,13 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { CountUp } from '@/components/landing/count-up';
-import { ProfileEditor } from '@/components/profile-editor';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
-import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import type { Profile } from '@codecard/types';
 import { Sparkline } from './sparkline';
@@ -15,8 +11,6 @@ import { ProfileShareHero } from './profile-share-hero';
 import { FadeInView } from './fade-in-view';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 export type OverviewProps = {
   greeting: string;
@@ -28,7 +22,6 @@ export type OverviewProps = {
   bio?: string | null;
   profileViews?: number;
   links?: ProfileLinkItem[];
-  profileLinks?: ProfileLinkRow[];
   profile?: Profile | null;
   preview?: boolean;
   stats: {
@@ -52,7 +45,6 @@ export function DashboardOverviewView({
   bio,
   profileViews = 0,
   links = [],
-  profileLinks = [],
   profile,
   preview = false,
   stats,
@@ -61,9 +53,6 @@ export function DashboardOverviewView({
   basePath = '/dashboard',
 }: OverviewProps) {
   const firstName = displayName.split(' ')[0];
-  const [editing, setEditing] = useState(false);
-  const company = 'Stripe';
-  const reduced = useReducedMotion() ?? false;
   const views = profileViews || stats.profileViews;
   const visibleLinks = toSafeProfileLinkItems(links);
 
@@ -105,11 +94,8 @@ export function DashboardOverviewView({
               <h2 className="cc-profile-home__zone-title">How people see you</h2>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AppButton
-                variant={editing ? 'primary' : 'ghost'}
-                onClick={() => setEditing((e) => !e)}
-              >
-                {editing ? 'Done editing' : 'Edit profile'}
+              <AppButton variant="ghost" href="/dashboard/profile">
+                Edit profile
               </AppButton>
             </div>
           </div>
@@ -130,10 +116,10 @@ export function DashboardOverviewView({
                   {displayName}
                 </h3>
                 <p className="mt-1 break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">{headline}</p>
-                {profile?.location && !editing && (
+                {profile?.location && (
                   <p className="mt-2 text-[14px] text-[var(--app-smoke)]">{profile.location}</p>
                 )}
-                {bio && !editing && (
+                {bio && (
                   <p className="mt-3 max-w-xl break-words text-[14px] leading-relaxed text-[var(--app-smoke)]">
                     {bio}
                   </p>
@@ -159,57 +145,6 @@ export function DashboardOverviewView({
                 )}
               </div>
             </div>
-
-            <AnimatePresence initial={false}>
-              {editing && (
-                <motion.div
-                  id="profile-edit"
-                  className="cc-profile-identity-card__editor scroll-mt-24 overflow-hidden"
-                  initial={reduced ? false : { height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={reduced ? undefined : { height: 0, opacity: 0 }}
-                  transition={{ duration: 0.45, ease: EASE }}
-                >
-                  <div className="space-y-5 border-t border-[var(--app-border)] p-6">
-                    <div className="flex items-center gap-4">
-                      <AppButton variant="ghost">Change photo</AppButton>
-                      {company && (
-                        <span className="text-[13px] text-[var(--app-smoke)]">{company}</span>
-                      )}
-                    </div>
-
-                    {!preview && profile ? (
-                      <ProfileEditor profile={profile} links={profileLinks} />
-                    ) : (
-                      <div className="space-y-4">
-                        <label className="block">
-                          <span className="cc-app-mono">Display name</span>
-                          <input className="cc-app-input mt-2" defaultValue={displayName} readOnly={preview} />
-                        </label>
-                        <label className="block">
-                          <span className="cc-app-mono">Headline</span>
-                          <input className="cc-app-input mt-2" defaultValue={headline ?? ''} readOnly={preview} />
-                        </label>
-                        <label className="block">
-                          <span className="cc-app-mono">Bio</span>
-                          <textarea
-                            className="cc-app-input mt-2 min-h-[96px] resize-y"
-                            defaultValue={bio ?? ''}
-                            readOnly={preview}
-                          />
-                        </label>
-                      </div>
-                    )}
-
-                    {!preview && (
-                      <AppButton variant="primary" onClick={() => setEditing(false)}>
-                        Done editing
-                      </AppButton>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </AppCard>
         </section>
       </FadeInView>

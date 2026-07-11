@@ -15,6 +15,7 @@ import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
+  { segment: 'profile', label: 'Profile', icon: 'profile' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
   { segment: 'research', label: 'Research', icon: 'research' as const },
   { segment: 'circle', label: 'Circle', icon: 'circle' as const },
@@ -27,6 +28,7 @@ const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}
 
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
+  profile: 'Profile',
   projects: 'Projects',
   research: 'Research',
   circle: 'Circle',
@@ -126,8 +128,7 @@ export function DashboardShell({
   };
 
   const segment = pathname.replace(basePath, '').replace(/^\//, '').split('/')[0] ?? '';
-  const pageTitle =
-    segment === 'profile' ? 'Home' : (PAGE_TITLES[segment] ?? 'Dashboard');
+  const pageTitle = PAGE_TITLES[segment] ?? 'Dashboard';
 
   const initials = (displayName ?? email ?? 'U')
     .split(' ')
