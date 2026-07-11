@@ -23,6 +23,7 @@ export type OverviewProps = {
   profileViews?: number;
   links?: ProfileLinkItem[];
   profile?: Profile | null;
+  preview?: boolean;
   stats: {
     profileViews: number;
     projectOpens: number;
