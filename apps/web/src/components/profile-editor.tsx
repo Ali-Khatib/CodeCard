@@ -6,6 +6,7 @@ import { Button, Input, Label } from '@codecard/ui';
 import type { Profile } from '@codecard/types';
 import { parseProfileUpdate, profileToFormState } from '@/lib/profile/profile-form';
 import { buildProfileFormData } from '@/lib/profile/profile-update-core';
+import { ProfilePublishControls } from '@/components/profile/profile-publish-controls';
 import {
   updateProfileAction,
   type ProfileUpdateState,
@@ -107,15 +108,7 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           placeholder="TypeScript, Next.js, C++"
         />
       </div>
-      <label className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          checked={form.is_public}
-          onChange={(e) => setForm({ ...form, is_public: e.target.checked })}
-          className="h-4 w-4 rounded border-zinc-600"
-        />
-        <span className="text-sm">Make profile public</span>
-      </label>
+      <ProfilePublishControls isPublic={profile.is_public} />
       {displayError && !state.fieldErrors?.slug && (
         <p className="text-sm text-red-400" role="alert">
           {displayError}
