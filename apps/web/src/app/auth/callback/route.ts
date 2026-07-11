@@ -1,16 +1,34 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
+import { isAuthConfigured } from '@/lib/auth/configured';
+import {
+  buildAuthErrorUrl,
+  logOAuthCallbackFailure,
+  resolveOAuthCallback,
+} from '@/lib/auth/oauth-callback';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  const redirect = sanitizeInternalRedirect(searchParams.get('redirect'));
+  const resolution = resolveOAuthCallback(searchParams, {
+    authConfigured: isAuthConfigured(),
+  });
 
-  if (code) {
-    const supabase = await createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+  if (resolution.kind === 'error') {
+    logOAuthCallbackFailure(resolution.reason);
+    return NextResponse.redirect(
+      buildAuthErrorUrl(origin, resolution.reason, resolution.redirectPath),
+    );
   }
 
-  return NextResponse.redirect(`${origin}${redirect}`);
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(resolution.code);
+
+  if (error) {
+    logOAuthCallbackFailure('exchange_failed');
+    return NextResponse.redirect(
+      buildAuthErrorUrl(origin, 'exchange_failed', resolution.redirectPath),
+    );
+  }
+
+  return NextResponse.redirect(`${origin}${resolution.redirectPath}`);
 }
