@@ -32,11 +32,12 @@ export default async function DashboardHomePage() {
 
   const { data: linkRows } = await supabase
     .from('profile_links')
-    .select('type, label, url, sort_order')
+    .select('id, type, label, url, sort_order')
     .eq('profile_id', profile?.id ?? '')
     .order('sort_order', { ascending: true });
 
-  const links = (linkRows ?? []).map((l) => ({
+  const profileLinks = linkRows ?? [];
+  const links = profileLinks.map((l) => ({
     type: l.type,
     label: l.label,
     url: l.url,
@@ -56,6 +57,7 @@ export default async function DashboardHomePage() {
       bio={profile?.bio}
       profileViews={profileViews ?? 0}
       links={links}
+      profileLinks={profileLinks}
       profile={profile}
       stats={{
         profileViews: profileViews || 1284,

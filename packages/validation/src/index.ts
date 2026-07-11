@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { profileLinkTypeSchema } from './profile-links';
 
 export const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
@@ -20,16 +21,6 @@ export const urlSchema = z
       return false;
     }
   }, 'Only HTTP(S) URLs allowed');
-
-export const profileLinkTypeSchema = z.enum([
-  'website',
-  'github',
-  'linkedin',
-  'twitter',
-  'resume',
-  'email',
-  'other',
-]);
 
 export const projectLinkTypeSchema = z.enum(['live', 'repo', 'demo', 'paper', 'other']);
 
@@ -254,6 +245,7 @@ export const dmcaNoticeSchema = z.object({
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export * from './reserved-profile-slugs';
+export * from './profile-links';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
