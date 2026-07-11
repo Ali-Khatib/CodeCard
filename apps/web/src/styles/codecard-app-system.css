@@ -896,6 +896,54 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   letter-spacing: -0.035em;
 }
 
+/* Fixed prev/next on project detail — always dark icon on solid white (immune to theme/dark mode) */
+.cc-project-nav-btn {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  color: #232324;
+  border: 1px solid rgba(35, 35, 36, 0.22);
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+  transition: transform 0.12s ease-out;
+}
+
+.cc-project-nav-btn:hover {
+  transform: scale(1.05);
+}
+
+.cc-project-nav-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.28),
+    0 0 0 2px #c094e4,
+    0 0 0 4px #ffffff;
+}
+
+.cc-project-nav-btn svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #232324;
+}
+
+html.dark .cc-project-nav-btn,
+[data-theme] .cc-project-nav-btn {
+  background-color: #ffffff;
+  color: #232324;
+  border-color: rgba(35, 35, 36, 0.22);
+}
+
+html.dark .cc-project-nav-btn svg,
+[data-theme] .cc-project-nav-btn svg {
+  color: #232324;
+}
+
 .cc-profile-link-dock,
 .cc-project-link-dock {
   height: 52px;
