@@ -6,7 +6,11 @@ import { getSupabasePublicKey } from '@/lib/supabase/public-key';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPreviewDashboard = pathname.startsWith('/dashboard/preview');
-  const isAuthRoute = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
+  const isAuthRoute =
+    pathname.startsWith('/sign-in') ||
+    pathname.startsWith('/sign-up') ||
+    pathname.startsWith('/forgot-password');
+  const isResetPasswordRoute = pathname.startsWith('/reset-password');
   const isDashboard = pathname.startsWith('/dashboard');
   const isAdmin = pathname.startsWith('/admin');
 
@@ -68,9 +72,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (isResetPasswordRoute && user) {
+    return supabaseResponse;
+  }
+
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/sign-in', '/sign-up'],
+  matcher: [
+    '/dashboard/:path*',
+    '/admin/:path*',
+    '/sign-in',
+    '/sign-up',
+    '/forgot-password',
+    '/reset-password',
+  ],
 };

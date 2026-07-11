@@ -118,15 +118,17 @@ export const collectionSchema = z.object({
   description: z.string().max(500).trim().optional().nullable(),
 });
 
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(128)
+  .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+  .regex(/[a-z]/, 'Password must contain a lowercase letter')
+  .regex(/[0-9]/, 'Password must contain a number');
+
 export const signUpSchema = z.object({
   email: z.string().email().max(255),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128)
-    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[a-z]/, 'Password must contain a lowercase letter')
-    .regex(/[0-9]/, 'Password must contain a number'),
+  password: passwordSchema,
   display_name: z.string().min(1).max(80).trim(),
   slug: slugSchema,
 });
@@ -135,6 +137,20 @@ export const signInSchema = z.object({
   email: z.string().email().max(255),
   password: z.string().min(1).max(128),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Enter a valid email address').max(255),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, 'Confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export const analyticsEventSchema = z.object({
   profile_id: z.string().uuid().optional(),
