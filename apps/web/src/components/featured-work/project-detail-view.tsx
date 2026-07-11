@@ -19,6 +19,9 @@ import { ProjectCaseStudyTabs } from './project-case-study-tabs';
 import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
 import { AnimatedDock } from '@/components/ui/animated-dock';
 
+const PROJECT_NAV_BTN =
+  'pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-black/12 bg-white text-ink shadow-[0_10px_36px_rgba(0,0,0,0.22),0_0_0_1px_rgba(0,0,0,0.06)] backdrop-blur-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+
 interface ProjectDetailViewProps {
   project: FeaturedProject;
   profileSlug: string;
@@ -184,7 +187,7 @@ export function ProjectDetailView({
             {previousProject ? (
               <Link
                 href={`${projectBase}/projects/${previousProject.id}`}
-                className="pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-lavender/25 bg-midnight/78 text-lilac-white shadow-rim backdrop-blur-md transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                className={PROJECT_NAV_BTN}
                 aria-label={`Previous project: ${previousProject.title}`}
                 title={previousProject.title}
               >
@@ -196,7 +199,7 @@ export function ProjectDetailView({
             {nextProject ? (
               <Link
                 href={`${projectBase}/projects/${nextProject.id}`}
-                className="pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-lavender/25 bg-midnight/78 text-lilac-white shadow-rim backdrop-blur-md transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                className={PROJECT_NAV_BTN}
                 aria-label={`Next project: ${nextProject.title}`}
                 title={nextProject.title}
               >
