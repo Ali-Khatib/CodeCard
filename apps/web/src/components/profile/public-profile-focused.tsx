@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { parseHeadline } from '@/lib/profile/lanyard-badge-images';
-import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -13,16 +12,6 @@ import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
-import { AnimatedDock } from '@/components/ui/animated-dock';
-
-const SOCIAL_LABELS: Record<string, string> = {
-  github: 'GitHub',
-  linkedin: 'LinkedIn',
-  website: 'Website',
-  resume: 'Resume',
-  twitter: 'X',
-  x: 'X',
-};
 
 export function PublicProfileFocused({
   profileSlug,
@@ -117,22 +106,6 @@ export function PublicProfileFocused({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              {links.length > 0 && (
-                <AnimatedDock
-                  className="cc-profile-link-dock"
-                  items={links.map((link) => {
-                    const Icon = resolveProfileLinkIcon(link.type);
-                    const label =
-                      link.label ?? SOCIAL_LABELS[link.type.toLowerCase()] ?? 'Link';
-                    return {
-                      link: link.url,
-                      target: '_blank',
-                      label: getProfileLinkAria(link.type, link.label) || label,
-                      Icon: <Icon className="text-sm" aria-hidden />,
-                    };
-                  })}
-                />
-              )}
               {actionPills.map((item, i) => {
                 if (item.type === 'copy') {
                   return (
