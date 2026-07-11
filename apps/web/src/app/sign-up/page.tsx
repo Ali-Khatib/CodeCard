@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -22,6 +22,7 @@ function SignUpForm() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const submitLock = useRef(false);
 
   const authConfigured = isSupabasePublicKeyConfigured();
 
@@ -36,46 +37,55 @@ function SignUpForm() {
       }
       return next;
     });
+    if (error) setError('');
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
 
+    if (submitLock.current || loading) return;
+
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
     }
 
+    submitLock.current = true;
     setLoading(true);
 
-    const parsed = signUpSchema.safeParse(form);
-    if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Invalid input');
-      setLoading(false);
-      return;
-    }
+    try {
+      const parsed = signUpSchema.safeParse(form);
+      if (!parsed.success) {
+        setError(parsed.error.errors[0]?.message ?? 'Invalid input');
+        return;
+      }
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
-      email: parsed.data.email,
-      password: parsed.data.password,
-      options: {
-        data: {
-          display_name: parsed.data.display_name,
-          slug: parsed.data.slug,
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signUp({
+        email: parsed.data.email,
+        password: parsed.data.password,
+        options: {
+          data: {
+            display_name: parsed.data.display_name,
+            slug: parsed.data.slug,
+          },
         },
-      },
-    });
+      });
 
-    if (authError) {
-      setError(authError.message);
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      router.push('/dashboard');
+      router.refresh();
+    } catch {
+      setError('Could not create your account. Please try again.');
+    } finally {
+      submitLock.current = false;
       setLoading(false);
-      return;
     }
-
-    router.push('/dashboard');
-    router.refresh();
   }
 
   return (
@@ -83,7 +93,7 @@ function SignUpForm() {
       title="Create your CodeCard"
       subtitle="Build your first profile in under five minutes."
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
         <div className="space-y-2">
           <label htmlFor="display_name" className="text-[13px] font-medium text-graphite">
             Display name
@@ -94,6 +104,7 @@ function SignUpForm() {
             onChange={(e) => update('display_name', e.target.value)}
             required={authConfigured}
             className="cc-input w-full"
+            disabled={loading}
           />
         </div>
         <div className="space-y-2">
@@ -109,6 +120,7 @@ function SignUpForm() {
               required={authConfigured}
               pattern="[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?"
               className="cc-input w-full"
+              disabled={loading}
             />
           </div>
         </div>
@@ -124,6 +136,7 @@ function SignUpForm() {
             required={authConfigured}
             autoComplete="email"
             className="cc-input w-full"
+            disabled={loading}
           />
         </div>
         <div className="space-y-2">
@@ -138,13 +151,23 @@ function SignUpForm() {
             required={authConfigured}
             autoComplete="new-password"
             className="cc-input w-full"
+            disabled={loading}
           />
         </div>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-400" role="alert">
+            {error}
+          </p>
+        )}
         {!authConfigured && !error && (
           <p className="text-[13px] leading-relaxed text-graphite">{SETUP_MSG}</p>
         )}
-        <button type="submit" className="cc-btn-pill-primary w-full py-2.5 text-[15px]" disabled={loading}>
+        <button
+          type="submit"
+          className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
+          disabled={loading}
+          aria-busy={loading}
+        >
           {loading ? 'Creating…' : 'Create account'}
         </button>
       </form>

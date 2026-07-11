@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -8,6 +8,12 @@ import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signInSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
+import { sanitizeInternalRedirect, authCallbackRedirectUrl } from '@/lib/auth/redirect';
+import {
+  isAuthSubmissionBlocked,
+  oauthButtonLabel,
+  type OAuthProvider,
+} from '@/lib/auth/auth-loading';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -16,16 +22,19 @@ function OAuthButton({
   label,
   onClick,
   disabled,
+  busy,
 }: {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  busy?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      aria-busy={busy}
       className="cc-btn-pill-ghost w-full py-2.5 text-[15px] disabled:opacity-50"
     >
       {label}
@@ -36,58 +45,92 @@ function OAuthButton({
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') ?? '/dashboard';
+  const redirectTo = sanitizeInternalRedirect(searchParams.get('redirect'));
   const resetSuccess = searchParams.get('reset') === 'success';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const submitLock = useRef(false);
+  const oauthLock = useRef(false);
 
   const authConfigured = isSupabasePublicKeyConfigured();
+  const authBlocked = isAuthSubmissionBlocked({
+    emailPending: emailLoading,
+    oauthPending: oauthLoading,
+  });
 
-  async function oauth(provider: 'google' | 'github') {
+  async function oauth(provider: OAuthProvider) {
+    if (oauthLock.current || authBlocked) return;
+
+    setError('');
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
     }
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
-      },
-    });
+
+    oauthLock.current = true;
+    setOauthLoading(provider);
+
+    try {
+      const supabase = createClient();
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: authCallbackRedirectUrl(redirectTo),
+        },
+      });
+
+      if (oauthError) {
+        setError('Could not start sign-in. Please try again.');
+        setOauthLoading(null);
+      }
+    } catch {
+      setError('Could not start sign-in. Please try again.');
+      setOauthLoading(null);
+    } finally {
+      oauthLock.current = false;
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
 
+    if (submitLock.current || authBlocked) return;
+
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
     }
 
-    setLoading(true);
+    submitLock.current = true;
+    setEmailLoading(true);
 
-    const parsed = signInSchema.safeParse({ email, password });
-    if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Invalid input');
-      setLoading(false);
-      return;
+    try {
+      const parsed = signInSchema.safeParse({ email, password });
+      if (!parsed.success) {
+        setError(parsed.error.errors[0]?.message ?? 'Invalid input');
+        return;
+      }
+
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword(parsed.data);
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
+      setError('Could not sign in. Please try again.');
+    } finally {
+      submitLock.current = false;
+      setEmailLoading(false);
     }
-
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword(parsed.data);
-
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
-    }
-
-    router.push(redirectTo);
-    router.refresh();
   }
 
   return (
@@ -95,7 +138,7 @@ function SignInForm() {
       title="Sign in to CodeCard"
       subtitle="Manage your projects, profile, analytics, and connections."
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" aria-busy={emailLoading}>
         <div className="space-y-2">
           <label htmlFor="email" className="text-[14px] font-medium text-[#222222]">
             Email
@@ -104,10 +147,14 @@ function SignInForm() {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError('');
+            }}
             required
             autoComplete="email"
             className="cc-input w-full"
+            disabled={authBlocked}
           />
         </div>
         <div className="space-y-2">
@@ -118,10 +165,14 @@ function SignInForm() {
             id="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError('');
+            }}
             required
             autoComplete="current-password"
             className="cc-input w-full"
+            disabled={authBlocked}
           />
           <p className="text-right">
             <Link
@@ -137,13 +188,18 @@ function SignInForm() {
             Your password was updated. Sign in with your new password.
           </p>
         )}
-        {error && <p className="text-[14px] text-[#df6a6b]">{error}</p>}
+        {error && (
+          <p className="text-[14px] text-[#df6a6b]" role="alert">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
-          disabled={loading}
+          disabled={authBlocked}
+          aria-busy={emailLoading}
         >
-          {loading ? 'Signing in…' : 'Sign in'}
+          {emailLoading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
 
@@ -153,9 +209,19 @@ function SignInForm() {
         <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
       </div>
 
-      <div className="space-y-3">
-        <OAuthButton label="Continue with GitHub" onClick={() => oauth('github')} disabled={loading} />
-        <OAuthButton label="Continue with Google" onClick={() => oauth('google')} disabled={loading} />
+      <div className="space-y-3" aria-busy={oauthLoading !== null}>
+        <OAuthButton
+          label={oauthButtonLabel('github', oauthLoading)}
+          onClick={() => void oauth('github')}
+          disabled={authBlocked}
+          busy={oauthLoading === 'github'}
+        />
+        <OAuthButton
+          label={oauthButtonLabel('google', oauthLoading)}
+          onClick={() => void oauth('google')}
+          disabled={authBlocked}
+          busy={oauthLoading === 'google'}
+        />
       </div>
 
       <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
