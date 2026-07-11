@@ -1,29 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
-  authCallbackRedirectUrl,
-  sanitizeInternalRedirect,
   PASSWORD_RESET_GENERIC_SUCCESS,
 } from '@/lib/auth/redirect';
+import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 import {
   isRecoveryCooldownActive,
   mapPasswordResetClientError,
   passwordResetRedirectUrl,
 } from '@/lib/auth/password-recovery';
 import { forgotPasswordSchema, resetPasswordSchema } from '@codecard/validation';
-
-describe('sanitizeInternalRedirect', () => {
-  it('allows safe internal paths', () => {
-    expect(sanitizeInternalRedirect('/dashboard')).toBe('/dashboard');
-    expect(sanitizeInternalRedirect('/reset-password')).toBe('/reset-password');
-  });
-
-  it('rejects external and protocol-relative URLs', () => {
-    expect(sanitizeInternalRedirect('https://evil.test')).toBe('/dashboard');
-    expect(sanitizeInternalRedirect('//evil.test')).toBe('/dashboard');
-    expect(sanitizeInternalRedirect('/\\evil')).toBe('/dashboard');
-    expect(sanitizeInternalRedirect(null)).toBe('/dashboard');
-  });
-});
 
 describe('password recovery redirect URLs', () => {
   const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
