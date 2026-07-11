@@ -9,6 +9,10 @@ import {
   EMAIL_VERIFICATION_GENERIC_SUCCESS,
   isVerificationCooldownActive,
 } from '@/lib/auth/email-verification';
+import {
+  handleSessionExpired,
+  isAuthSessionMissingError,
+} from '@/lib/auth/session-expiry';
 
 export function EmailVerificationBanner({ email }: { email: string }) {
   const router = useRouter();
@@ -37,6 +41,10 @@ export function EmailVerificationBanner({ email }: { email: string }) {
       });
 
       if (resendError) {
+        if (isAuthSessionMissingError(resendError)) {
+          handleSessionExpired(window.location.pathname);
+          return;
+        }
         setError(EMAIL_VERIFICATION_GENERIC_ERROR);
         return;
       }
@@ -60,7 +68,15 @@ export function EmailVerificationBanner({ email }: { email: string }) {
 
     try {
       const supabase = createClient();
-      await supabase.auth.refreshSession();
+      const { error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) {
+        if (isAuthSessionMissingError(refreshError)) {
+          handleSessionExpired(window.location.pathname);
+          return;
+        }
+        setError(EMAIL_VERIFICATION_GENERIC_ERROR);
+        return;
+      }
       router.refresh();
     } catch {
       setError(EMAIL_VERIFICATION_GENERIC_ERROR);

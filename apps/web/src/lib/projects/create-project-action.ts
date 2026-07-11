@@ -7,6 +7,7 @@ import {
   CASE_STUDY_SECTION_IDS,
   type CaseStudySectionContent,
 } from '@/lib/projects/case-study-sections.shared';
+import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { createClient } from '@/lib/supabase/server';
 
 export type CreateProjectState = {
@@ -23,7 +24,7 @@ export async function createProjectAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: 'You must be signed in to create a project.' };
+    redirect(buildSignInHref('/dashboard/projects/new', 'session_expired'));
   }
 
   const { data: profile } = await supabase

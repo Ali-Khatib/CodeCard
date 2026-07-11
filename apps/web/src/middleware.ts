@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { isAuthConfigured } from '@/lib/auth/configured';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
+import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
 
 export async function middleware(request: NextRequest) {
@@ -64,6 +65,9 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
     url.searchParams.set('redirect', sanitizeInternalRedirect(pathname));
+    if (hasSupabaseAuthCookie(request.cookies.getAll())) {
+      url.searchParams.set('reason', 'session_expired');
+    }
     return NextResponse.redirect(url);
   }
 

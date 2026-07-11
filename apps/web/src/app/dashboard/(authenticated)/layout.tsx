@@ -1,7 +1,9 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { userNeedsEmailVerification } from '@/lib/auth/email-verification';
+import { buildSignInHref } from '@/lib/auth/session-expiry';
 
 export default async function AuthenticatedDashboardLayout({
   children,
@@ -13,7 +15,10 @@ export default async function AuthenticatedDashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/sign-in');
+  if (!user) {
+    const pathname = (await headers()).get('x-pathname') ?? '/dashboard';
+    redirect(buildSignInHref(pathname));
+  }
 
   const { data: profile } = await supabase
     .from('profiles')

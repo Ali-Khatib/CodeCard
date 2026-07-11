@@ -14,6 +14,7 @@ import {
   oauthButtonLabel,
   type OAuthProvider,
 } from '@/lib/auth/auth-loading';
+import { signInStatusMessage } from '@/lib/auth/session-expiry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -47,6 +48,7 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const redirectTo = sanitizeInternalRedirect(searchParams.get('redirect'));
   const resetSuccess = searchParams.get('reset') === 'success';
+  const statusMessage = signInStatusMessage(searchParams.get('reason'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -186,6 +188,11 @@ function SignInForm() {
         {resetSuccess && (
           <p className="text-[14px] text-[#2f6f4e]" role="status">
             Your password was updated. Sign in with your new password.
+          </p>
+        )}
+        {statusMessage && (
+          <p className="text-[14px] text-[#df6a6b]" role="alert">
+            {statusMessage}
           </p>
         )}
         {error && (

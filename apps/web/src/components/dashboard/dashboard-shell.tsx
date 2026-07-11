@@ -11,6 +11,7 @@ import { AppButton } from './ui/dashboard-ui';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
+import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -76,6 +77,8 @@ export function DashboardShell({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useDashboardSessionGuard();
 
   useEffect(() => {
     const stored = localStorage.getItem('cc-sidebar-open');
