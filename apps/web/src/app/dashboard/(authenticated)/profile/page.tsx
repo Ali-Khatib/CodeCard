@@ -1,7 +1,10 @@
-import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { profileCompletion } from '@/lib/dashboard/profile-completion';
 import { DashboardProfileView } from '@/components/dashboard/dashboard-profile-view';
+import {
+  ProfileEditorLoadErrorState,
+  ProfileEditorMissingState,
+} from '@/components/profile/profile-editor-route-states';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 export default async function DashboardProfilePage() {
@@ -10,14 +13,18 @@ export default async function DashboardProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('owner_user_id', user!.id)
     .single();
 
+  if (profileError) {
+    return <ProfileEditorLoadErrorState />;
+  }
+
   if (!profile) {
-    notFound();
+    return <ProfileEditorMissingState />;
   }
 
   const { count: projectCount } = await supabase
@@ -30,11 +37,15 @@ export default async function DashboardProfilePage() {
     .select('*', { count: 'exact', head: true })
     .eq('profile_id', profile.id);
 
-  const { data: linkRows } = await supabase
+  const { data: linkRows, error: linksError } = await supabase
     .from('profile_links')
     .select('id, type, label, url, sort_order')
     .eq('profile_id', profile.id)
     .order('sort_order', { ascending: true });
+
+  if (linksError) {
+    return <ProfileEditorLoadErrorState />;
+  }
 
   const profileLinks = linkRows ?? [];
   const links: ProfileLinkItem[] = profileLinks.map((link) => ({

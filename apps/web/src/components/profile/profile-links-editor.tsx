@@ -32,6 +32,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<ProfileLinkMutationState['fieldErrors']>({});
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState('');
   const [createState, createAction, createPending] = useActionState(createProfileLinkAction, {});
   const [updateState, updateAction, updatePending] = useActionState(updateProfileLinkAction, {});
   const [isPending, startTransition] = useTransition();
@@ -71,7 +72,9 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     if (!state.success && !state.error && !state.fieldErrors) return;
     if (state.success) {
       resetEditor();
+      setActionSuccess(mode.kind === 'edit' ? 'Link updated.' : 'Link added.');
       router.refresh();
+      window.setTimeout(() => setActionSuccess(''), 3000);
       return;
     }
     if (state.error) setError(state.error);
@@ -103,7 +106,11 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     startTransition(async () => {
       const result = await deleteProfileLinkAction(link.id);
       if (result.error) setError(result.error);
-      else router.refresh();
+      else {
+        setActionSuccess('Link deleted.');
+        router.refresh();
+        window.setTimeout(() => setActionSuccess(''), 3000);
+      }
       setPendingAction(null);
     });
   }
@@ -114,7 +121,11 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     startTransition(async () => {
       const result = await moveProfileLinkAction(link.id, direction);
       if (result.error) setError(result.error);
-      else router.refresh();
+      else {
+        setActionSuccess('Link order updated.');
+        router.refresh();
+        window.setTimeout(() => setActionSuccess(''), 3000);
+      }
       setPendingAction(null);
     });
   }
@@ -166,6 +177,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                     type="button"
                     variant="outline"
                     disabled={busy || index === 0 || isPending}
+                    aria-busy={busy}
                     onClick={() => handleMove(link, 'up')}
                     aria-label={`Move ${getProfileLinkAria(link.type, link.label)} up`}
                   >
@@ -175,6 +187,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                     type="button"
                     variant="outline"
                     disabled={busy || index === sortedLinks.length - 1 || isPending}
+                    aria-busy={busy}
                     onClick={() => handleMove(link, 'down')}
                     aria-label={`Move ${getProfileLinkAria(link.type, link.label)} down`}
                   >
@@ -183,7 +196,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                   <Button type="button" variant="outline" disabled={busy} onClick={() => openEdit(link)}>
                     Edit
                   </Button>
-                  <Button type="button" variant="destructive" disabled={busy} onClick={() => handleDelete(link)}>
+                  <Button type="button" variant="destructive" disabled={busy} aria-busy={busy} onClick={() => handleDelete(link)}>
                     Delete
                   </Button>
                 </div>
@@ -256,6 +269,12 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
             </Button>
           </div>
         </form>
+      )}
+
+      {actionSuccess && mode.kind === 'idle' && (
+        <p className="text-sm text-emerald-300" role="status" aria-live="polite">
+          {actionSuccess}
+        </p>
       )}
 
       {error && mode.kind === 'idle' && (

@@ -31,7 +31,7 @@ function createMockSupabase(options: {
   insertResult?: { id: string; type: string; label: string | null; url: string; sort_order: number } | null;
   updateError?: { message?: string } | null;
 }) {
-  let links = [...(options.links ?? [])];
+  const links = [...(options.links ?? [])];
   const insert = vi.fn();
   const update = vi.fn();
   const del = vi.fn();

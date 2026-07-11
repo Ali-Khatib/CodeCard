@@ -23,7 +23,6 @@ export type OverviewProps = {
   profileViews?: number;
   links?: ProfileLinkItem[];
   profile?: Profile | null;
-  preview?: boolean;
   stats: {
     profileViews: number;
     projectOpens: number;
@@ -46,7 +45,6 @@ export function DashboardOverviewView({
   profileViews = 0,
   links = [],
   profile,
-  preview = false,
   stats,
   activity,
   suggested,

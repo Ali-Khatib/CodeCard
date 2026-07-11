@@ -30,6 +30,32 @@ export function ProfilePageSkeleton() {
   );
 }
 
+export function DashboardProfileEditorSkeleton() {
+  return (
+    <div className="cc-app-page cc-app-page--1120" aria-busy="true" aria-label="Loading profile editor">
+      <div className="space-y-3" aria-hidden>
+        <ThemedSkeleton className="h-4 w-20" />
+        <ThemedSkeleton className="h-8 w-[min(320px,70%)]" />
+        <ThemedSkeleton className="h-5 w-[min(480px,90%)]" />
+      </div>
+      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_400px]" aria-hidden>
+        <div className="space-y-4 rounded-[16px] border border-[var(--app-border)] p-6">
+          <ThemedSkeleton className="h-6 w-40" />
+          <ThemedSkeleton className="h-20 w-20 rounded-full" />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <ThemedSkeleton key={index} className="h-10 w-full" />
+          ))}
+          <ThemedSkeleton className="h-32 w-full rounded-lg" />
+        </div>
+        <div className="space-y-4">
+          <ThemedSkeleton className="h-48 w-full rounded-[16px]" />
+          <ThemedSkeleton className="h-40 w-full rounded-[16px]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProjectDetailSkeleton() {
   return (
     <div className="relative min-h-[100dvh] text-text-primary" aria-busy aria-label="Loading project">
