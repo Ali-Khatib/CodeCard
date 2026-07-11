@@ -73,6 +73,9 @@ export const TYPE = {
   nav: 'font-sans text-[14px] font-normal',
   sectionHeading:
     'font-display text-[32px] font-normal leading-[1.06] tracking-[-0.03em] md:text-[44px]',
+  /** Section titles on light scroll surfaces (project/research detail body). */
+  contentSectionTitle:
+    'mt-2 font-display text-[32px] font-normal leading-[1.1] tracking-[-0.02em] text-text-primary md:text-[46px]',
   heroHeading:
     'font-display text-[40px] font-normal leading-[1.02] tracking-[-0.03em] md:text-[56px] lg:text-[72px]',
   profileName:
