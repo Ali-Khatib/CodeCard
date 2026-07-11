@@ -24,6 +24,8 @@ const NAV_ITEMS = [
   { segment: 'settings', label: 'Settings', icon: 'settings' as const },
 ] as const;
 
+const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}`;
+
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
   projects: 'Projects',
@@ -213,6 +215,11 @@ export function DashboardShell({
         <div className="mt-6 flex-1 overflow-y-auto">{navLinks}</div>
 
         <div className="mt-4 space-y-2 border-t border-[var(--app-border)] pt-4">
+          {preview && (
+            <AppButton variant="primary" block href={DEMO_SIGN_IN_HREF}>
+              Sign in
+            </AppButton>
+          )}
           <div className="cc-app-sidebar-appearance">
             <div className="min-w-0">
               <p className="text-[13px] font-medium text-[var(--app-ink)]">Appearance</p>
@@ -273,6 +280,13 @@ export function DashboardShell({
                       onClick={() => setUserMenuOpen(false)}
                     >
                       ← Back to landing
+                    </Link>
+                    <Link
+                      href={DEMO_SIGN_IN_HREF}
+                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Sign in
                     </Link>
                     <Link
                       href="/sign-up"
