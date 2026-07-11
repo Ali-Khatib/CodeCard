@@ -75,12 +75,12 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
       approach: {
         text: 'Visual editor on top of GitHub Actions with instant preview environments and drift checks before merge.',
       },
-      takeaway: {
+      impact: {
         text: 'Reliable previews without adding ops overhead — the pipeline config you edit is the pipeline that runs.',
       },
       results: { mediaUrl: unsplash('1551288049-bebda4e38f71') },
-      demo: { mediaUrl: unsplash('1460925895917-afdab827c52f') },
-      build: { mediaUrl: unsplash('1555066931-4365d14bab8c') },
+      product: { mediaUrl: unsplash('1460925895917-afdab827c52f') },
+      architecture: { mediaUrl: unsplash('1555066931-4365d14bab8c') },
     },
   },
   {

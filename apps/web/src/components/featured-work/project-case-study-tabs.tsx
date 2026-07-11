@@ -96,8 +96,8 @@ export function ProjectCaseStudyTabs({
   const activePart = visibleSections.find((part) => part.id === activePartId) ?? visibleSections[0]!;
   const activeText = caseStudyTextForSection(project, activePart.id);
   const activeMedia = caseStudyMediaForSection(project, activePart.id);
-  const showDemoVideo = activePart.id === 'demo' && project.videoUrl && !activeMedia && !reduced;
-  const showTextPanel = Boolean(activeText) && !showDemoVideo && !activeMedia;
+  const showProductVideo = activePart.id === 'product' && project.videoUrl && !activeMedia && !reduced;
+  const showTextPanel = Boolean(activeText) && !showProductVideo && !activeMedia;
 
   const setActive = (id: CaseStudySectionId, label: string) => {
     setActivePartId(id);
@@ -117,7 +117,7 @@ export function ProjectCaseStudyTabs({
               transition={{ duration: reduced ? 0.18 : 0.4, ease: EASE }}
               className="absolute inset-0"
             >
-              {showDemoVideo ? (
+              {showProductVideo ? (
                 <video
                   src={project.videoUrl ?? undefined}
                   poster={project.posterUrl ?? undefined}

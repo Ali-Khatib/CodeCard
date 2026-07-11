@@ -3,10 +3,10 @@
 export const CASE_STUDY_SECTION_IDS = [
   'problem',
   'approach',
-  'takeaway',
+  'impact',
   'results',
-  'demo',
-  'build',
+  'product',
+  'architecture',
 ] as const;
 
 export type CaseStudySectionId = (typeof CASE_STUDY_SECTION_IDS)[number];
@@ -33,11 +33,14 @@ export type CaseStudySectionConfig = {
 };
 
 const LEGACY_SECTION_MAP: Record<string, CaseStudySectionId> = {
-  model: 'build',
+  takeaway: 'impact',
+  overview: 'impact',
+  github: 'impact',
+  demo: 'product',
+  build: 'architecture',
+  model: 'architecture',
   pipeline: 'approach',
   dataset: 'approach',
-  github: 'takeaway',
-  overview: 'takeaway',
 };
 
 function normalizeSectionValue(raw: unknown): CaseStudySectionContent | null {
@@ -95,9 +98,9 @@ export function caseStudyMediaForSection(
 ): string | null {
   const custom = project.caseStudySections?.[sectionId]?.mediaUrl?.trim();
   if (custom) return custom;
-  if (sectionId === 'demo') return project.videoUrl ?? project.posterUrl ?? project.screenshots?.[0] ?? null;
+  if (sectionId === 'product') return project.videoUrl ?? project.posterUrl ?? project.screenshots?.[0] ?? null;
   if (sectionId === 'results') return project.screenshots?.[3] ?? project.screenshots?.[1] ?? null;
-  if (sectionId === 'build') return project.screenshots?.[2] ?? project.screenshots?.[1] ?? null;
+  if (sectionId === 'architecture') return project.screenshots?.[2] ?? project.screenshots?.[1] ?? null;
   return null;
 }
 
