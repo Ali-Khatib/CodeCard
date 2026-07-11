@@ -11,8 +11,8 @@ export default function NewProjectPage() {
           Create a project card
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Start with the basics, then opt into case study sections. Each section is text-only — no
-          screenshots needed.
+          Start with the basics, then add up to six optional showcase extras — short text or photos for
+          the cinematic header. Your full description, tech stack, and screenshots stay below.
         </p>
       </div>
       <ProjectCreateForm />

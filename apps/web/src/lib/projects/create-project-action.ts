@@ -3,6 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createProjectSchema } from '@codecard/validation';
+import {
+  CASE_STUDY_SECTION_IDS,
+  type CaseStudySectionContent,
+} from '@/lib/projects/case-study-sections.shared';
 import { createClient } from '@/lib/supabase/server';
 
 export type CreateProjectState = {
@@ -32,12 +36,23 @@ export async function createProjectAction(
     return { error: 'Profile not found. Finish sign-up before creating a project.' };
   }
 
-  const enabledSections = formData.getAll('enabled_section').map(String);
-  const caseStudySections: Record<string, string> = {};
+  const enabledSections = new Set(formData.getAll('enabled_section').map(String));
+  const caseStudySections: Record<string, CaseStudySectionContent> = {};
 
-  for (const sectionId of enabledSections) {
-    const body = String(formData.get(`section_${sectionId}`) ?? '').trim();
-    if (body) caseStudySections[sectionId] = body;
+  for (const sectionId of CASE_STUDY_SECTION_IDS) {
+    if (!enabledSections.has(sectionId)) continue;
+
+    const text = String(formData.get(`section_text_${sectionId}`) ?? '').trim();
+    const mediaUrl =
+      String(formData.get(`section_media_upload_${sectionId}`) ?? '').trim() ||
+      String(formData.get(`section_media_${sectionId}`) ?? '').trim();
+
+    if (!text && !mediaUrl) continue;
+
+    caseStudySections[sectionId] = {
+      ...(text ? { text } : {}),
+      ...(mediaUrl ? { mediaUrl } : {}),
+    };
   }
 
   const parsed = createProjectSchema.safeParse({

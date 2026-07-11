@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   CASE_STUDY_SECTIONS,
   type CaseStudySectionId,
@@ -10,22 +11,55 @@ import { createProjectAction, type CreateProjectState } from '@/lib/projects/cre
 import { cn } from '@/lib/cn';
 
 const initialState: CreateProjectState = {};
+const MAX_IMAGE_BYTES = 400_000;
+
+const defaultEnabled = Object.fromEntries(
+  CASE_STUDY_SECTIONS.map((section) => [section.id, false]),
+) as Record<CaseStudySectionId, boolean>;
 
 export function ProjectCreateForm() {
   const [state, formAction, pending] = useActionState(createProjectAction, initialState);
-  const [enabled, setEnabled] = useState<Record<CaseStudySectionId, boolean>>({
-    overview: true,
-    problem: false,
-    pipeline: false,
-    dataset: false,
-    model: false,
-    results: false,
-    demo: false,
-    github: false,
-  });
+  const [enabled, setEnabled] = useState(defaultEnabled);
+  const [mediaPreview, setMediaPreview] = useState<Partial<Record<CaseStudySectionId, string>>>({});
+  const [mediaError, setMediaError] = useState<Partial<Record<CaseStudySectionId, string>>>({});
 
   function toggleSection(id: CaseStudySectionId, next: boolean) {
     setEnabled((prev) => ({ ...prev, [id]: next }));
+    if (!next) {
+      setMediaPreview((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+      setMediaError((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+    }
+  }
+
+  async function handleImagePick(sectionId: CaseStudySectionId, file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setMediaError((prev) => ({ ...prev, [sectionId]: 'Please choose an image file.' }));
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setMediaError((prev) => ({
+        ...prev,
+        [sectionId]: 'Image must be under 400 KB, or paste an image URL instead.',
+      }));
+      return;
+    }
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error('Could not read image'));
+      reader.readAsDataURL(file);
+    });
+    setMediaPreview((prev) => ({ ...prev, [sectionId]: dataUrl }));
+    setMediaError((prev) => ({ ...prev, [sectionId]: '' }));
   }
 
   return (
@@ -80,11 +114,12 @@ export function ProjectCreateForm() {
       <div className="space-y-4 rounded-[20px] border border-border/50 bg-midnight/30 p-4 md:p-6">
         <div>
           <h2 className="text-[18px] font-medium tracking-[-0.02em] text-lilac-white">
-            Case study sections
+            Extra showcase (optional)
           </h2>
           <p className="mt-2 text-[14px] leading-relaxed text-ash">
-            No images required. Turn on the sections you want, then write short text for each. We
-            render it in the cinematic project view on mobile and desktop.
+            Six quick extras for the cinematic header — separate from your description, tech stack,
+            and screenshot gallery below. Add only what helps. Problem and approach are text; results,
+            demo, and under the hood use a photo or screenshot.
           </p>
         </div>
 
@@ -104,38 +139,70 @@ export function ProjectCreateForm() {
                     <p className="text-[14px] font-medium text-lilac-white">{section.label}</p>
                     <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.summary}</p>
                   </div>
-                  {section.optional ? (
-                    <label className="flex shrink-0 items-center gap-2 text-[12px] text-ash">
-                      <input
-                        type="checkbox"
-                        checked={isOn}
-                        onChange={(e) => toggleSection(section.id, e.target.checked)}
-                      />
-                      Add
-                    </label>
-                  ) : (
-                    <span className="shrink-0 text-[11px] uppercase tracking-[0.14em] text-lavender/80">
-                      Required
-                    </span>
-                  )}
+                  <label className="flex shrink-0 items-center gap-2 text-[12px] text-ash">
+                    <input
+                      type="checkbox"
+                      checked={isOn}
+                      onChange={(e) => toggleSection(section.id, e.target.checked)}
+                    />
+                    Add
+                  </label>
                 </div>
 
                 {isOn && (
                   <div className="mt-3 space-y-2">
                     <p className="text-[12px] font-medium text-lavender/90">{section.prompt}</p>
-                    <textarea
-                      name={`section_${section.id}`}
-                      rows={3}
-                      className="cc-input w-full resize-y text-[13px]"
-                      placeholder={section.placeholder}
-                      defaultValue={section.id === 'overview' ? '' : undefined}
-                    />
-                    {section.optional && <input type="hidden" name="enabled_section" value={section.id} />}
+                    {section.inputKind === 'text' ? (
+                      <textarea
+                        name={`section_text_${section.id}`}
+                        rows={3}
+                        className="cc-input w-full resize-y text-[13px]"
+                        placeholder={section.placeholder}
+                      />
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-[11px] text-ash">{section.mediaHint}</p>
+                        <input
+                          type="url"
+                          name={`section_media_${section.id}`}
+                          className="cc-input w-full text-[13px]"
+                          placeholder={section.placeholder}
+                          defaultValue=""
+                        />
+                        <label className="flex cursor-pointer flex-col gap-2 rounded-[12px] border border-dashed border-white/12 bg-white/[0.03] p-3 text-[12px] text-ash">
+                          <span>Or upload a photo / screenshot (max 400 KB)</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="text-[12px] text-ash file:mr-3 file:rounded-full file:border-0 file:bg-lavender/20 file:px-3 file:py-1.5 file:text-[12px] file:text-lilac-white"
+                            onChange={(e) => {
+                              void handleImagePick(section.id, e.target.files?.[0] ?? null);
+                            }}
+                          />
+                        </label>
+                        {mediaError[section.id] && (
+                          <p className="text-[12px] text-red-400">{mediaError[section.id]}</p>
+                        )}
+                        {mediaPreview[section.id] && (
+                          <div className="relative h-28 overflow-hidden rounded-[12px] border border-white/10">
+                            <Image
+                              src={mediaPreview[section.id]!}
+                              alt={`${section.label} preview`}
+                              fill
+                              unoptimized
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                        <input
+                          type="hidden"
+                          name={`section_media_upload_${section.id}`}
+                          value={mediaPreview[section.id] ?? ''}
+                        />
+                      </div>
+                    )}
+                    <input type="hidden" name="enabled_section" value={section.id} />
                   </div>
-                )}
-
-                {!section.optional && isOn && (
-                  <input type="hidden" name="enabled_section" value={section.id} />
                 )}
               </div>
             );
