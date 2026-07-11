@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
+import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AppButton } from './ui/dashboard-ui';
 
@@ -46,6 +47,28 @@ export function DashboardProfileHeader({
             </h2>
             {roleLine && <p className="mt-1 text-[15px] text-[var(--app-smoke)]">{roleLine}</p>}
             {creator.location && <p className="mt-1 text-[14px] text-[var(--app-smoke)]">{creator.location}</p>}
+            {creator.links.length > 0 && (
+              <nav
+                className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start"
+                aria-label="Profile links"
+              >
+                {creator.links.map((link) => {
+                  const Icon = resolveProfileLinkIcon(link.type);
+                  return (
+                    <a
+                      key={link.url + link.type}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={getProfileLinkAria(link.type, link.label)}
+                      className="cc-profile-identity-card__social"
+                    >
+                      <Icon className="text-sm" aria-hidden />
+                    </a>
+                  );
+                })}
+              </nav>
+            )}
           </div>
 
           {!embedded && (

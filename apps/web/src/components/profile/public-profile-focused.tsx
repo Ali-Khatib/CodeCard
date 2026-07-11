@@ -8,6 +8,7 @@ import { parseHeadline } from '@/lib/profile/lanyard-badge-images';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
@@ -102,6 +103,25 @@ export function PublicProfileFocused({
                 <p className="mt-4 max-w-lg text-[16px] leading-relaxed text-[var(--app-ink)]">
                   {intro}
                 </p>
+                {links.length > 0 && (
+                  <nav className="mt-4 flex flex-wrap gap-2" aria-label="Profile links">
+                    {links.map((link) => {
+                      const Icon = resolveProfileLinkIcon(link.type);
+                      return (
+                        <a
+                          key={link.url + link.type}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={getProfileLinkAria(link.type, link.label)}
+                          className="cc-profile-identity-card__social"
+                        >
+                          <Icon className="text-sm" aria-hidden />
+                        </a>
+                      );
+                    })}
+                  </nav>
+                )}
               </div>
             </div>
 
