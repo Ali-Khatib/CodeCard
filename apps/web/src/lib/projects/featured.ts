@@ -1,12 +1,12 @@
-import { parseCaseStudySections, type CaseStudySections } from '@/lib/projects/case-study-sections';
+import { parseCaseStudySections, type CaseStudySections } from '@/lib/projects/case-study-sections.shared';
+
+export type { CaseStudySections };
 
 export interface FeaturedProjectLink {
   type: string;
   label: string | null;
   url: string;
 }
-
-export type { CaseStudySections };
 
 export interface FeaturedProject {
   id: string;

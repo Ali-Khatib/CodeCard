@@ -54,8 +54,26 @@ export const profileLinkSchema = z.object({
 
 export const caseStudySectionBodySchema = z.string().max(2000).trim();
 
+const caseStudyMediaUrlSchema = z
+  .string()
+  .trim()
+  .max(600_000, 'Image is too large')
+  .refine(
+    (value) => value.startsWith('data:image/') || /^https?:\/\//i.test(value),
+    'Image must be a valid URL or uploaded photo',
+  );
+
+export const caseStudySectionContentSchema = z
+  .object({
+    text: caseStudySectionBodySchema.optional(),
+    mediaUrl: caseStudyMediaUrlSchema.optional(),
+  })
+  .refine((value) => Boolean(value.text?.trim() || value.mediaUrl?.trim()), {
+    message: 'Each showcase section needs text or an image',
+  });
+
 export const caseStudySectionsSchema = z
-  .record(caseStudySectionBodySchema)
+  .record(z.union([caseStudySectionBodySchema, caseStudySectionContentSchema]))
   .optional()
   .default({});
 
