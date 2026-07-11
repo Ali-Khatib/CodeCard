@@ -1396,6 +1396,7 @@ html.dark .cc-project-nav-btn svg,
     gap: 14px;
     padding: 16px;
     border-radius: 22px;
+    flex-wrap: wrap;
   }
 
   .cc-projects-profile-strip__avatar {
@@ -1411,6 +1412,10 @@ html.dark .cc-project-nav-btn svg,
     font-size: 12px;
     font-weight: 600;
     color: color-mix(in srgb, var(--app-ink) 76%, transparent);
+  }
+
+  .cc-projects-profile-strip__links {
+    width: 100%;
   }
 
   .cc-projects-profile-strip__link {

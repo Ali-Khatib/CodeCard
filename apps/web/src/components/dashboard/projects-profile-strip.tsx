@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
+import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -41,6 +42,25 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
       <div className="cc-projects-profile-strip__copy">
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
+        {creator.links.length > 0 && (
+          <nav className="cc-projects-profile-strip__links" aria-label="Profile links">
+            {creator.links.map((link) => {
+              const Icon = resolveProfileLinkIcon(link.type);
+              return (
+                <a
+                  key={link.url + link.type}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={getProfileLinkAria(link.type, link.label)}
+                  className="cc-projects-profile-strip__link"
+                >
+                  <Icon aria-hidden />
+                </a>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </motion.header>
   );
