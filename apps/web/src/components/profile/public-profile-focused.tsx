@@ -9,6 +9,7 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
+import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
@@ -52,6 +53,7 @@ export function PublicProfileFocused({
     }
   }, [profileSlug]);
 
+  const safeLinks = toSafeProfileLinkItems(links);
   const intro =
     bio ??
     'I build developer tools that make complex workflows feel simple.';
@@ -103,9 +105,9 @@ export function PublicProfileFocused({
                 <p className="mt-4 max-w-lg text-[16px] leading-relaxed text-[var(--app-ink)]">
                   {intro}
                 </p>
-                {links.length > 0 && (
+                {safeLinks.length > 0 && (
                   <nav className="mt-4 flex flex-wrap gap-2" aria-label="Profile links">
-                    {links.map((link) => {
+                    {safeLinks.map((link) => {
                       const Icon = resolveProfileLinkIcon(link.type);
                       return (
                         <a

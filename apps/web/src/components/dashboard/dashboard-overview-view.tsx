@@ -7,6 +7,8 @@ import { CountUp } from '@/components/landing/count-up';
 import { ProfileEditor } from '@/components/profile-editor';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
+import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import type { Profile } from '@codecard/types';
 import { Sparkline } from './sparkline';
 import { ProfileShareHero } from './profile-share-hero';
@@ -26,6 +28,7 @@ export type OverviewProps = {
   bio?: string | null;
   profileViews?: number;
   links?: ProfileLinkItem[];
+  profileLinks?: ProfileLinkRow[];
   profile?: Profile | null;
   preview?: boolean;
   stats: {
@@ -49,6 +52,7 @@ export function DashboardOverviewView({
   bio,
   profileViews = 0,
   links = [],
+  profileLinks = [],
   profile,
   preview = false,
   stats,
@@ -61,6 +65,7 @@ export function DashboardOverviewView({
   const company = 'Stripe';
   const reduced = useReducedMotion() ?? false;
   const views = profileViews || stats.profileViews;
+  const visibleLinks = toSafeProfileLinkItems(links);
 
   return (
     <div className="cc-profile-home">
@@ -133,9 +138,9 @@ export function DashboardOverviewView({
                     {bio}
                   </p>
                 )}
-                {links.length > 0 && (
+                {visibleLinks.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {links.map((link) => {
+                    {visibleLinks.map((link) => {
                       const Icon = resolveProfileLinkIcon(link.type);
                       return (
                         <a
@@ -174,7 +179,7 @@ export function DashboardOverviewView({
                     </div>
 
                     {!preview && profile ? (
-                      <ProfileEditor profile={profile} />
+                      <ProfileEditor profile={profile} links={profileLinks} />
                     ) : (
                       <div className="space-y-4">
                         <label className="block">
