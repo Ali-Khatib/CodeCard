@@ -58,8 +58,7 @@ export function DashboardOverviewView({
 }: OverviewProps) {
   const firstName = displayName.split(' ')[0];
   const [editing, setEditing] = useState(false);
-  const [company, setCompany] = useState('Stripe');
-  const [location, setLocation] = useState('San Francisco');
+  const company = 'Stripe';
   const reduced = useReducedMotion() ?? false;
   const views = profileViews || stats.profileViews;
 
@@ -126,6 +125,9 @@ export function DashboardOverviewView({
                   {displayName}
                 </h3>
                 <p className="mt-1 break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">{headline}</p>
+                {profile?.location && !editing && (
+                  <p className="mt-2 text-[14px] text-[var(--app-smoke)]">{profile.location}</p>
+                )}
                 {bio && !editing && (
                   <p className="mt-3 max-w-xl break-words text-[14px] leading-relaxed text-[var(--app-smoke)]">
                     {bio}
@@ -166,9 +168,9 @@ export function DashboardOverviewView({
                   <div className="space-y-5 border-t border-[var(--app-border)] p-6">
                     <div className="flex items-center gap-4">
                       <AppButton variant="ghost">Change photo</AppButton>
-                      <span className="text-[13px] text-[var(--app-smoke)]">
-                        {company} · {location}
-                      </span>
+                      {company && (
+                        <span className="text-[13px] text-[var(--app-smoke)]">{company}</span>
+                      )}
                     </div>
 
                     {!preview && profile ? (
@@ -194,30 +196,9 @@ export function DashboardOverviewView({
                       </div>
                     )}
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <label className="block">
-                        <span className="cc-app-mono">Company</span>
-                        <input
-                          className="cc-app-input mt-2"
-                          value={company}
-                          onChange={(e) => setCompany(e.target.value)}
-                          disabled={preview}
-                        />
-                      </label>
-                      <label className="block">
-                        <span className="cc-app-mono">Location</span>
-                        <input
-                          className="cc-app-input mt-2"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          disabled={preview}
-                        />
-                      </label>
-                    </div>
-
                     {!preview && (
                       <AppButton variant="primary" onClick={() => setEditing(false)}>
-                        Save changes
+                        Done editing
                       </AppButton>
                     )}
                   </div>

@@ -14,7 +14,7 @@ export default async function ProjectsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, slug, display_name, headline, avatar_url, bio, is_public')
+    .select('id, slug, display_name, headline, avatar_url, bio, is_public, location')
     .eq('owner_user_id', user!.id)
     .single();
 

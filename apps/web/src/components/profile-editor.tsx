@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { updateProfileSchema } from '@codecard/validation';
 import { Button, Input, Label } from '@codecard/ui';
 import type { Profile } from '@codecard/types';
+import { parseProfileUpdate, profileToFormState } from '@/lib/profile/profile-form';
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -13,32 +13,22 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ profile }: ProfileEditorProps) {
   const router = useRouter();
-  const [form, setForm] = useState({
-    display_name: profile.display_name,
-    headline: profile.headline ?? '',
-    slug: profile.slug,
-    bio: profile.bio ?? '',
-    is_public: profile.is_public,
-  });
+  const [form, setForm] = useState(() => profileToFormState(profile));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setError('');
-    setLoading(true);
 
-    const parsed = updateProfileSchema.safeParse({
-      ...form,
-      headline: form.headline || null,
-      bio: form.bio || null,
-    });
-
+    const parsed = parseProfileUpdate(form);
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Invalid input');
-      setLoading(false);
+      setError(parsed.message);
       return;
     }
+
+    setLoading(true);
 
     const supabase = createClient();
     const { error: updateError } = await supabase
@@ -91,6 +81,24 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           onChange={(e) => setForm({ ...form, bio: e.target.value })}
           rows={4}
           className="flex w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="location">Location</Label>
+        <Input
+          id="location"
+          value={form.location}
+          onChange={(e) => setForm({ ...form, location: e.target.value })}
+          placeholder="e.g. San Francisco, CA"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="skills">Skills (comma-separated)</Label>
+        <Input
+          id="skills"
+          value={form.skillsInput}
+          onChange={(e) => setForm({ ...form, skillsInput: e.target.value })}
+          placeholder="TypeScript, Next.js, C++"
         />
       </div>
       <label className="flex items-center gap-3">
