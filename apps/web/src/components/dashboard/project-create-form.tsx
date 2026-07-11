@@ -118,8 +118,8 @@ export function ProjectCreateForm() {
           </h2>
           <p className="mt-2 text-[14px] leading-relaxed text-ash">
             Six quick extras for the cinematic header — separate from your description, tech stack,
-            and screenshot gallery below. Add only what helps. Problem and approach are text; results,
-            demo, and under the hood use a photo or screenshot.
+            and screenshot gallery below. Add only what helps. Problem, approach, and impact are
+            text; results, product, and system use a photo or screenshot.
           </p>
         </div>
 
