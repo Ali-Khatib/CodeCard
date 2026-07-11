@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 import { CountUp } from '@/components/landing/count-up';
 import { ProfileEditor } from '@/components/profile-editor';
 import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile-header';
@@ -34,12 +33,10 @@ export function DashboardProfileView({
       headline: profile.headline,
       avatar_url: profile.avatar_url,
       slug: profile.slug,
+      location: profile.location,
     },
     links,
   );
-
-  const [company, setCompany] = useState('Stripe');
-  const [location, setLocation] = useState('San Francisco');
 
   return (
     <div className="cc-app-page cc-app-page--1120">
@@ -64,27 +61,6 @@ export function DashboardProfileView({
               )}
             </div>
             <AppButton variant="ghost">Change photo</AppButton>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="cc-app-mono">Company</span>
-              <input
-                className="cc-app-input mt-2"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                disabled={preview}
-              />
-            </label>
-            <label className="block">
-              <span className="cc-app-mono">Location</span>
-              <input
-                className="cc-app-input mt-2"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                disabled={preview}
-              />
-            </label>
           </div>
 
           {!preview ? (

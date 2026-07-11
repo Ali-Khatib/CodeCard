@@ -18,6 +18,8 @@ const demoProfile: Profile = {
   headline: DEMO_PROFILE.headline,
   avatar_url: DEMO_PROFILE.avatar_url,
   bio: DEMO_PROFILE.bio,
+  location: DEMO_PROFILE.location,
+  skills: [],
   is_public: true,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),

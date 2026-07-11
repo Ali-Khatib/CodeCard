@@ -57,6 +57,8 @@ export interface Profile {
   headline: string | null;
   avatar_url: string | null;
   bio: string | null;
+  location: string | null;
+  skills: string[];
   is_public: boolean;
   created_at: string;
   updated_at: string;

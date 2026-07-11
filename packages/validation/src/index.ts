@@ -35,11 +35,64 @@ export const projectLinkTypeSchema = z.enum(['live', 'repo', 'demo', 'paper', 'o
 
 export const connectionSourceSchema = z.enum(['qr', 'nfc', 'direct_link', 'manual', 'app']);
 
+export const PROFILE_LOCATION_MAX_LENGTH = 120;
+export const PROFILE_SKILLS_MAX_COUNT = 30;
+export const PROFILE_SKILL_MAX_LENGTH = 50;
+
+export function normalizeProfileLocation(value: string | null | undefined): string | null {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  return trimmed === '' ? null : trimmed;
+}
+
+export function parseCommaSeparatedSkills(input: string): string[] {
+  if (!input.trim()) return [];
+  return input.split(',').map((part) => part.trim()).filter(Boolean);
+}
+
+/** Trim, drop empties, dedupe case-insensitively, preserve first-entered capitalization. */
+export function normalizeProfileSkills(skills: string[]): string[] {
+  const seen = new Set<string>();
+  const normalized: string[] = [];
+  for (const raw of skills) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    normalized.push(trimmed);
+  }
+  return normalized;
+}
+
+export const profileLocationSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((value) => (value === undefined ? undefined : normalizeProfileLocation(value)))
+  .refine(
+    (value) => value === undefined || value === null || value.length <= PROFILE_LOCATION_MAX_LENGTH,
+    `Location must be at most ${PROFILE_LOCATION_MAX_LENGTH} characters`,
+  );
+
+export const profileSkillsSchema = z
+  .array(z.string())
+  .transform((items) => normalizeProfileSkills(items))
+  .refine(
+    (items) => items.length <= PROFILE_SKILLS_MAX_COUNT,
+    `At most ${PROFILE_SKILLS_MAX_COUNT} skills allowed`,
+  )
+  .refine(
+    (items) => items.every((skill) => skill.length >= 1 && skill.length <= PROFILE_SKILL_MAX_LENGTH),
+    `Each skill must be 1–${PROFILE_SKILL_MAX_LENGTH} characters`,
+  );
+
 export const createProfileSchema = z.object({
   display_name: z.string().min(1).max(80).trim(),
   headline: z.string().max(120).trim().optional().nullable(),
   slug: slugSchema,
   bio: z.string().max(2000).trim().optional().nullable(),
+  location: profileLocationSchema,
+  skills: profileSkillsSchema.default([]).optional(),
   is_public: z.boolean().default(false),
 });
 

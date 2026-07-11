@@ -98,6 +98,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         projects={featuredProjects}
         researchPapers={publishedResearch}
         profileId={profile.id}
+        location={profile.location}
       />
     </>
   );

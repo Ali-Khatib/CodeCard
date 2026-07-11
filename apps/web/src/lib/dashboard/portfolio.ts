@@ -37,6 +37,7 @@ type DbProfile = {
   headline: string | null;
   avatar_url: string | null;
   slug?: string | null;
+  location?: string | null;
 };
 
 type DbProject = {
@@ -65,7 +66,7 @@ export function profileToPortfolioCreator(
     company,
     links,
     profileSlug: profile.slug ?? null,
-    location: extras?.location ?? null,
+    location: extras?.location ?? profile.location ?? null,
     followers: extras?.followers ?? 0,
   };
 }
