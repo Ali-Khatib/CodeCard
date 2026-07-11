@@ -233,7 +233,7 @@ export function ResearchPaperDetail({
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <p className={TYPE.eyebrow}>Figures</p>
-                  <h2 className="mt-2 font-display text-[32px] font-normal leading-[1.1] tracking-[-0.02em] text-lilac-white md:text-[46px]">
+                  <h2 className={TYPE.contentSectionTitle}>
                     Evidence &amp; previews
                   </h2>
                 </div>
