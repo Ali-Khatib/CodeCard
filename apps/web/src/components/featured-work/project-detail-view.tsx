@@ -19,8 +19,7 @@ import { ProjectCaseStudyTabs } from './project-case-study-tabs';
 import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
 import { AnimatedDock } from '@/components/ui/animated-dock';
 
-const PROJECT_NAV_BTN =
-  'pointer-events-auto cc-instant-press group flex h-14 w-14 items-center justify-center rounded-full border border-black/12 bg-white text-ink shadow-[0_10px_36px_rgba(0,0,0,0.22),0_0_0_1px_rgba(0,0,0,0.06)] backdrop-blur-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
 interface ProjectDetailViewProps {
   project: FeaturedProject;
@@ -191,7 +190,7 @@ export function ProjectDetailView({
                 aria-label={`Previous project: ${previousProject.title}`}
                 title={previousProject.title}
               >
-                <HiOutlineChevronLeft className="h-7 w-7 transition-transform group-hover:-translate-x-0.5" aria-hidden />
+                <HiOutlineChevronLeft className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
               </Link>
             ) : (
               <span />
@@ -203,7 +202,7 @@ export function ProjectDetailView({
                 aria-label={`Next project: ${nextProject.title}`}
                 title={nextProject.title}
               >
-                <HiOutlineChevronRight className="h-7 w-7 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                <HiOutlineChevronRight className="transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
             ) : (
               <span />
