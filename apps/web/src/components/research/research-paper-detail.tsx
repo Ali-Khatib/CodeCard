@@ -120,11 +120,11 @@ export function ResearchPaperDetail({
           </div>
         </header>
 
-        <section className="cc-container pb-12 pt-10 md:pb-16 md:pt-14">
+        <section className="cc-container cc-on-cream-surface pb-12 pt-10 md:pb-16 md:pt-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <p className={TYPE.eyebrow}>Research paper</p>
-              <h1 className={`cc-fit-title mt-4 max-w-[14ch] font-display text-[clamp(3rem,9vw,8rem)] font-semibold leading-[0.86] tracking-[-0.085em] text-lilac-white`}>
+              <h1 className={TYPE.contentHeroTitle}>
                 {paper.title}
               </h1>
               <p className="mt-5 text-[17px] leading-relaxed text-ash md:text-[19px]">
@@ -152,7 +152,7 @@ export function ResearchPaperDetail({
           </div>
         </section>
 
-        <article className="cc-container cc-content pb-24">
+        <article className="cc-container cc-content cc-on-cream-surface pb-24">
           <section className="rounded-card border border-border/40 bg-midnight/50 p-8 shadow-rim md:p-10">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <p className={TYPE.eyebrow}>Abstract</p>
@@ -183,7 +183,7 @@ export function ResearchPaperDetail({
               <p className={TYPE.eyebrow}>Keywords</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {paper.tags.map((tag) => (
-                  <span key={tag} className="rounded-badge border border-lavender/30 bg-midnight/60 px-3 py-1 text-[13px] text-lilac-white backdrop-blur-sm">
+                  <span key={tag} className="rounded-badge border border-lavender/30 bg-midnight/10 px-3 py-1 text-[13px] text-ink">
                     {tag}
                   </span>
                 ))}
@@ -207,7 +207,7 @@ export function ResearchPaperDetail({
               {paper.relatedProjectHref && (
                 <div className="rounded-card border border-border/40 bg-midnight/50 p-6 shadow-rim">
                   <p className={TYPE.eyebrow}>Related project</p>
-                  <h2 className="mt-4 font-display text-[28px] tracking-[-0.03em] text-lilac-white">
+                  <h2 className="mt-4 font-display text-[28px] tracking-[-0.03em] text-ink">
                     {paper.relatedProjectTitle ?? 'Open related project'}
                   </h2>
                   <Link

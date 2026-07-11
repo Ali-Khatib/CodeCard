@@ -113,7 +113,7 @@ export function ProjectCreateForm() {
 
       <div className="space-y-4 rounded-[20px] border border-border/50 bg-midnight/30 p-4 md:p-6">
         <div>
-          <h2 className="text-[18px] font-medium tracking-[-0.02em] text-lilac-white">
+          <h2 className="text-[18px] font-medium tracking-[-0.02em] text-[var(--app-ink)]">
             Extra showcase (optional)
           </h2>
           <p className="mt-2 text-[14px] leading-relaxed text-ash">
@@ -136,7 +136,7 @@ export function ProjectCreateForm() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[14px] font-medium text-lilac-white">{section.label}</p>
+                    <p className="text-[14px] font-medium text-[var(--app-ink)]">{section.label}</p>
                     <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.summary}</p>
                     {!isOn && (
                       <p className="mt-2 text-[11px] leading-relaxed text-graphite">{section.addHint}</p>
@@ -177,7 +177,7 @@ export function ProjectCreateForm() {
                           <input
                             type="file"
                             accept="image/*"
-                            className="text-[12px] text-ash file:mr-3 file:rounded-full file:border-0 file:bg-lavender/20 file:px-3 file:py-1.5 file:text-[12px] file:text-lilac-white"
+                            className="text-[12px] text-ash file:mr-3 file:rounded-full file:border-0 file:bg-lavender/20 file:px-3 file:py-1.5 file:text-[12px] file:text-[var(--app-ink)]"
                             onChange={(e) => {
                               void handleImagePick(section.id, e.target.files?.[0] ?? null);
                             }}

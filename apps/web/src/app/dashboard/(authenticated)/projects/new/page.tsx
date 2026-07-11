@@ -7,7 +7,7 @@ export default function NewProjectPage() {
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
           New project
         </p>
-        <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-lilac-white md:text-[36px]">
+        <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
           Create a project card
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">

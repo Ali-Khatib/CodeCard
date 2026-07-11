@@ -267,7 +267,7 @@ export function ProjectDetailView({
         </div>
 
         <article
-          className={`cc-container cc-content pb-24 ${showcaseExtras ? 'pt-10 md:pt-14' : 'pt-4 md:pt-6'}`}
+          className={`cc-container cc-content cc-on-cream-surface pb-24 ${showcaseExtras ? 'pt-10 md:pt-14' : 'pt-4 md:pt-6'}`}
         >
           {(previousProject || nextProject) && (
             <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
