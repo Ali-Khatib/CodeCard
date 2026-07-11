@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { isAuthConfigured } from '@/lib/auth/configured';
+import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
 
 export async function middleware(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function middleware(request: NextRequest) {
     if (isDashboard && !isPreviewDashboard) {
       const url = request.nextUrl.clone();
       url.pathname = '/sign-in';
-      url.searchParams.set('redirect', pathname);
+      url.searchParams.set('redirect', sanitizeInternalRedirect(pathname));
       return NextResponse.redirect(url);
     }
     const requestHeaders = new Headers(request.headers);
@@ -62,7 +63,7 @@ export async function middleware(request: NextRequest) {
   if ((isDashboard || isAdmin) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
-    url.searchParams.set('redirect', pathname);
+    url.searchParams.set('redirect', sanitizeInternalRedirect(pathname));
     return NextResponse.redirect(url);
   }
 
