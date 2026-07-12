@@ -1,5 +1,19 @@
 import { z } from 'zod';
 import { profileLinkTypeSchema } from './profile-links';
+import {
+  isAllowedProjectDomain,
+  isAllowedProjectFocusArea,
+  PROJECT_DOMAIN_OPTIONS,
+  PROJECT_FOCUS_AREA_OPTIONS,
+} from './project-options';
+
+export {
+  PROJECT_DOMAIN_OPTIONS,
+  PROJECT_FOCUS_AREA_OPTIONS,
+  isAllowedProjectDomain,
+  isAllowedProjectFocusArea,
+} from './project-options';
+export type { ProjectDomainOption, ProjectFocusAreaOption } from './project-options';
 
 export const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
@@ -32,6 +46,14 @@ export const PROFILE_SKILL_MAX_LENGTH = 50;
 
 export const PROJECT_USER_ROLE_MAX_LENGTH = 120;
 export const PROJECT_STATUS_MAX_LENGTH = 40;
+export const PROJECT_TITLE_MAX_LENGTH = 120;
+export const PROJECT_TAGLINE_MAX_LENGTH = 160;
+export const PROJECT_DESCRIPTION_MAX_LENGTH = 10000;
+export const PROJECT_TECH_MAX_LENGTH = 40;
+export const PROJECT_TECH_MAX_COUNT = 20;
+export const PROJECT_DOMAIN_MAX_COUNT = 10;
+export const PROJECT_FOCUS_AREA_MAX_COUNT = 10;
+export const PROJECT_SLUG_TAKEN_MESSAGE = 'This project URL is already in use.';
 
 /** Provisional lifecycle labels for future CRUD; not enforced at DB level in WS03-T002. */
 export const PROJECT_LIFECYCLE_STATUSES = ['draft', 'active', 'completed', 'on_hold'] as const;
@@ -111,6 +133,151 @@ export const projectStatusSchema = z
       value === undefined || value === null || value.length <= PROJECT_STATUS_MAX_LENGTH,
     `Status must be at most ${PROJECT_STATUS_MAX_LENGTH} characters`,
   );
+
+export const projectLifecycleStatusSchema = z.enum(PROJECT_LIFECYCLE_STATUSES);
+
+/** Trim, drop empties, dedupe case-insensitively, preserve first-entered capitalization. */
+export function normalizeProjectTechnologies(technologies: string[]): string[] {
+  const seen = new Set<string>();
+  const normalized: string[] = [];
+  for (const raw of technologies) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    normalized.push(trimmed);
+  }
+  return normalized;
+}
+
+export const projectTechnologiesSchema = z
+  .array(z.string())
+  .transform((items) => normalizeProjectTechnologies(items))
+  .refine(
+    (items) => items.length <= PROJECT_TECH_MAX_COUNT,
+    `At most ${PROJECT_TECH_MAX_COUNT} technologies allowed`,
+  )
+  .refine(
+    (items) =>
+      items.every(
+        (tech) => tech.length >= 1 && tech.length <= PROJECT_TECH_MAX_LENGTH,
+      ),
+    `Each technology must be 1–${PROJECT_TECH_MAX_LENGTH} characters`,
+  );
+
+function dedupeTrimmedLabels(items: string[]): string[] {
+  const seen = new Set<string>();
+  const normalized: string[] = [];
+  for (const raw of items) {
+    const trimmed = raw.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    normalized.push(trimmed);
+  }
+  return normalized;
+}
+
+export const projectDomainsInputSchema = z
+  .array(z.string())
+  .transform((items) => dedupeTrimmedLabels(items))
+  .refine(
+    (items) => items.length <= PROJECT_DOMAIN_MAX_COUNT,
+    `At most ${PROJECT_DOMAIN_MAX_COUNT} domains allowed`,
+  )
+  .refine(
+    (items) => items.every(isAllowedProjectDomain),
+    'Unsupported domain',
+  );
+
+export const projectFocusAreasInputSchema = z
+  .array(z.string())
+  .transform((items) => dedupeTrimmedLabels(items))
+  .refine(
+    (items) => items.length <= PROJECT_FOCUS_AREA_MAX_COUNT,
+    `At most ${PROJECT_FOCUS_AREA_MAX_COUNT} focus areas allowed`,
+  )
+  .refine(
+    (items) => items.every(isAllowedProjectFocusArea),
+    'Unsupported focus area',
+  );
+
+export const FORBIDDEN_CREATE_PROJECT_FIELDS = [
+  'owner_user_id',
+  'tenant_id',
+  'profile_id',
+  'user_id',
+  'is_published',
+  'plan',
+  'is_owner',
+  'membership_role',
+] as const;
+
+export function findForbiddenCreateProjectFields(
+  input: Record<string, unknown>,
+): string | null {
+  for (const key of FORBIDDEN_CREATE_PROJECT_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(input, key)) {
+      return `Unexpected field: ${key}`;
+    }
+  }
+  return null;
+}
+
+export function findForbiddenCreateProjectFormData(formData: FormData): string | null {
+  const forbidden = new Set<string>(FORBIDDEN_CREATE_PROJECT_FIELDS);
+  for (const key of formData.keys()) {
+    if (forbidden.has(key)) {
+      return 'Invalid submission.';
+    }
+  }
+  return null;
+}
+
+export const createProjectInputSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, 'Title is required')
+      .max(PROJECT_TITLE_MAX_LENGTH)
+      .trim(),
+    slug: projectSlugSchema,
+    tagline: z
+      .string()
+      .max(PROJECT_TAGLINE_MAX_LENGTH)
+      .trim()
+      .optional()
+      .nullable()
+      .transform((value) => (value == null || value === '' ? null : value)),
+    description: z
+      .string()
+      .max(PROJECT_DESCRIPTION_MAX_LENGTH)
+      .trim()
+      .optional()
+      .nullable()
+      .transform((value) => (value == null || value === '' ? null : value)),
+    technologies: projectTechnologiesSchema.default([]),
+    domains: projectDomainsInputSchema.default([]),
+    focus_areas: projectFocusAreasInputSchema.default([]),
+    user_role: projectUserRoleSchema,
+    started_at: projectDateSchema,
+    ended_at: projectDateSchema,
+    status: projectLifecycleStatusSchema.default('draft'),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    const dateError = validateProjectDateRange({
+      started_at: data.started_at ?? null,
+      ended_at: data.ended_at ?? null,
+    });
+    if (dateError) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: dateError,
+        path: ['ended_at'],
+      });
+    }
+  });
 
 export function normalizeProfileLocation(value: string | null | undefined): string | null {
   if (value == null) return null;
@@ -329,6 +496,7 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export * from './reserved-profile-slugs';
 export * from './profile-links';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
+export type CreateProjectInputPayload = z.infer<typeof createProjectInputSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
