@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import type { PortfolioCreator } from '@/lib/dashboard/portfolio';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
+import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AppButton } from './ui/dashboard-ui';
 
@@ -31,7 +32,13 @@ export function DashboardProfileHeader({
         <div className="flex justify-center">
           <div className="relative h-[82px] w-[82px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
             {creator.avatarUrl ? (
-              <Image src={creator.avatarUrl} alt="" fill className="object-cover" sizes="82px" />
+              <Image
+                src={creator.avatarUrl}
+                alt={profileAvatarAltText(creator.displayName ?? '')}
+                fill
+                className="object-cover"
+                sizes="82px"
+              />
             ) : (
               <span className="flex h-full w-full items-center justify-center text-xl font-medium">
                 {creator.displayName?.[0] ?? '?'}
