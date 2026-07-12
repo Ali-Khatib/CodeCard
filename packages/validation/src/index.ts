@@ -30,6 +30,88 @@ export const PROFILE_LOCATION_MAX_LENGTH = 120;
 export const PROFILE_SKILLS_MAX_COUNT = 30;
 export const PROFILE_SKILL_MAX_LENGTH = 50;
 
+export const PROJECT_USER_ROLE_MAX_LENGTH = 120;
+export const PROJECT_STATUS_MAX_LENGTH = 40;
+
+/** Provisional lifecycle labels for future CRUD; not enforced at DB level in WS03-T002. */
+export const PROJECT_LIFECYCLE_STATUSES = ['draft', 'active', 'completed', 'on_hold'] as const;
+export type ProjectLifecycleStatus = (typeof PROJECT_LIFECYCLE_STATUSES)[number];
+
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+export function normalizeProjectSlug(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export const projectSlugSchema = z
+  .string()
+  .refine((value) => !/(?:\.\.|\/|\\)/.test(value), 'Invalid slug')
+  .transform((value) => normalizeProjectSlug(value))
+  .pipe(slugSchema);
+
+export function normalizeProjectUserRole(value: string | null | undefined): string | null {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  return trimmed === '' ? null : trimmed;
+}
+
+export const projectUserRoleSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((value) => (value === undefined ? undefined : normalizeProjectUserRole(value)))
+  .refine(
+    (value) =>
+      value === undefined || value === null || value.length <= PROJECT_USER_ROLE_MAX_LENGTH,
+    `Role must be at most ${PROJECT_USER_ROLE_MAX_LENGTH} characters`,
+  );
+
+export const projectDateSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((value) => {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  })
+  .refine(
+    (value) => value === undefined || value === null || ISO_DATE_REGEX.test(value),
+    'Date must use YYYY-MM-DD format',
+  );
+
+export function validateProjectDateRange(input: {
+  started_at?: string | null;
+  ended_at?: string | null;
+}): string | null {
+  const started = input.started_at ?? null;
+  const ended = input.ended_at ?? null;
+  if (!started || !ended) return null;
+  if (ended < started) {
+    return 'End date cannot be earlier than start date.';
+  }
+  return null;
+}
+
+export const projectStatusSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((value) => {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  })
+  .refine(
+    (value) =>
+      value === undefined || value === null || value.length <= PROJECT_STATUS_MAX_LENGTH,
+    `Status must be at most ${PROJECT_STATUS_MAX_LENGTH} characters`,
+  );
+
 export function normalizeProfileLocation(value: string | null | undefined): string | null {
   if (value == null) return null;
   const trimmed = value.trim();

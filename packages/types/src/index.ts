@@ -82,11 +82,17 @@ export interface Project {
   profile_id: UUID;
   owner_user_id: UUID;
   title: string;
+  slug: string;
   tagline: string | null;
   description: string | null;
   technologies: string[];
+  user_role: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  status: string | null;
   is_published: boolean;
   sort_order: number;
+  case_study_sections: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
