@@ -2,12 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { CountUp } from '@/components/landing/count-up';
+import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { ProfileEditor } from '@/components/profile-editor';
 import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile-header';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
+import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
@@ -31,11 +34,17 @@ export function DashboardProfileView({
   links = [],
   preview = false,
 }: DashboardProfileViewProps) {
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
+
+  useEffect(() => {
+    setAvatarUrl(profile.avatar_url);
+  }, [profile.avatar_url]);
+
   const creator = profileToPortfolioCreator(
     {
       display_name: profile.display_name,
       headline: profile.headline,
-      avatar_url: profile.avatar_url,
+      avatar_url: avatarUrl,
       slug: profile.slug,
       location: profile.location,
     },
@@ -54,18 +63,31 @@ export function DashboardProfileView({
         <AppCard className="space-y-6">
           <h2 className="text-[20px] font-medium text-[var(--app-ink)]">Profile details</h2>
 
-          <div className="flex items-center gap-4">
-            <div className="relative h-20 w-20 overflow-hidden rounded-full border border-[var(--app-border)]">
-              {profile.avatar_url ? (
-                <Image src={profile.avatar_url} alt="" fill className="object-cover" sizes="80px" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[var(--app-bone)] text-2xl">
-                  {profile.display_name[0]}
-                </div>
-              )}
+          {!preview ? (
+            <AvatarUpload
+              displayName={profile.display_name}
+              initialAvatarUrl={avatarUrl}
+              onAvatarSaved={setAvatarUrl}
+            />
+          ) : (
+            <div className="flex items-center gap-4">
+              <div className="relative h-20 w-20 overflow-hidden rounded-full border border-[var(--app-border)]">
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={profileAvatarAltText(profile.display_name)}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-[var(--app-bone)] text-2xl">
+                    {profile.display_name[0]}
+                  </div>
+                )}
+              </div>
             </div>
-            <AppButton variant="ghost">Change photo</AppButton>
-          </div>
+          )}
 
           {!preview ? (
             <ProfileEditor profile={profile} links={profileLinks} />

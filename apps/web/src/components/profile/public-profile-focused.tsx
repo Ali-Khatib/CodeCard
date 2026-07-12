@@ -10,6 +10,7 @@ import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
+import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
@@ -81,7 +82,13 @@ export function PublicProfileFocused({
                 transition={{ duration: HUME_MOTION.cardReveal, ease: HUME_EASE }}
               >
                 {avatarUrl ? (
-                  <Image src={avatarUrl} alt="" fill className="object-cover" sizes="96px" />
+                  <Image
+                    src={avatarUrl}
+                    alt={profileAvatarAltText(displayName)}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                  />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-3xl font-medium">
                     {displayName[0]}
