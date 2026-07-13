@@ -9,6 +9,10 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useScrollRestore } from '@/hooks/use-scroll-restore';
 import { clearOptimisticProject } from '@/lib/navigation/optimistic-project';
+import {
+  buildPublicProjectDetailHref,
+  getAdjacentProjects,
+} from '@/lib/projects/project-navigation';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
 import { COLORS, TYPE } from '@/lib/design/tokens';
@@ -130,11 +134,11 @@ export function ProjectDetailView({
   ]);
 
   const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
-  const projectBase = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
   const projectList = projects?.length ? projects : [project];
-  const currentIndex = Math.max(0, projectList.findIndex((p) => p.id === project.id));
-  const previousProject = projectList.length > 1 ? projectList[(currentIndex - 1 + projectList.length) % projectList.length] : null;
-  const nextProject = projectList.length > 1 ? projectList[(currentIndex + 1) % projectList.length] : null;
+  const { previous: previousProject, next: nextProject } = getAdjacentProjects(
+    projectList,
+    project.id,
+  );
   const showcaseExtras = hasShowcaseExtras(project);
 
   const hiddenByTransition =
@@ -170,7 +174,7 @@ export function ProjectDetailView({
           <nav className="pointer-events-none fixed inset-x-0 top-1/2 z-30 hidden -translate-y-1/2 justify-between px-4 md:flex lg:px-8" aria-label="Project navigation">
             {previousProject ? (
               <Link
-                href={`${projectBase}/projects/${previousProject.id}`}
+                href={buildPublicProjectDetailHref(profileSlug, previousProject.id)}
                 className={PROJECT_NAV_BTN}
                 aria-label={`Previous project: ${previousProject.title}`}
                 title={previousProject.title}
@@ -182,7 +186,7 @@ export function ProjectDetailView({
             )}
             {nextProject ? (
               <Link
-                href={`${projectBase}/projects/${nextProject.id}`}
+                href={buildPublicProjectDetailHref(profileSlug, nextProject.id)}
                 className={PROJECT_NAV_BTN}
                 aria-label={`Next project: ${nextProject.title}`}
                 title={nextProject.title}
@@ -273,7 +277,7 @@ export function ProjectDetailView({
             <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
               {previousProject ? (
                 <Link
-                  href={`${projectBase}/projects/${previousProject.id}`}
+                  href={buildPublicProjectDetailHref(profileSlug, previousProject.id)}
                   className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Previous project: ${previousProject.title}`}
                 >
@@ -284,7 +288,7 @@ export function ProjectDetailView({
               )}
               {nextProject ? (
                 <Link
-                  href={`${projectBase}/projects/${nextProject.id}`}
+                  href={buildPublicProjectDetailHref(profileSlug, nextProject.id)}
                   className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Next project: ${nextProject.title}`}
                 >

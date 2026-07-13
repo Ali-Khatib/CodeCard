@@ -7,6 +7,7 @@ import {
   type ProjectReorderState,
 } from '@/lib/projects/project-order-core';
 import { resolveOwnedProfile } from '@/lib/projects/project-access-core';
+import { revalidatePublicProjectNavigation } from '@/lib/projects/project-revalidate';
 
 export type { ProjectReorderState };
 
@@ -25,7 +26,10 @@ export async function reorderProjectsAction(
       const profileResult = await resolveOwnedProfile(supabase, user.id);
       revalidatePath('/dashboard/projects');
       if (!('error' in profileResult) && profileResult.profile.slug) {
-        revalidatePath(`/${profileResult.profile.slug}`);
+        revalidatePublicProjectNavigation({
+          profileSlug: profileResult.profile.slug,
+          projectIds,
+        });
       }
     }
   }

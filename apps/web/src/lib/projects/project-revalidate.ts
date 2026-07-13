@@ -17,6 +17,16 @@ export function revalidateOwnedProjectPaths(input: {
   }
 }
 
+export function revalidatePublicProjectNavigation(input: {
+  profileSlug: string;
+  projectIds: string[];
+}) {
+  revalidatePath(`/${input.profileSlug}`);
+  for (const projectId of input.projectIds) {
+    revalidatePath(`/${input.profileSlug}/projects/${projectId}`);
+  }
+}
+
 export function revalidateDeletedProjectPaths(input: {
   projectId: string;
   profileSlug?: string | null;
