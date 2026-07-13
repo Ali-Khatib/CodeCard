@@ -1,4 +1,5 @@
 import { FILE_LIMITS } from '@codecard/config';
+import { PROJECT_MEDIA_IMAGE_MIME_TYPES } from '@codecard/validation';
 import type { StorageResourceType } from '@/lib/storage/path';
 import { isAllowedStorageExtension, normalizeStorageExtension } from '@/lib/storage/path';
 
@@ -45,7 +46,14 @@ function maxBytesForResourceType(resourceType: StorageResourceType): number {
   }
 }
 
-function allowedMimeTypesForResourceType(resourceType: StorageResourceType): readonly string[] {
+function allowedMimeTypesForResourceType(
+  resourceType: StorageResourceType,
+  mediaRole?: 'poster' | 'screenshot',
+): readonly string[] {
+  if (resourceType === 'project-media' && mediaRole) {
+    return PROJECT_MEDIA_IMAGE_MIME_TYPES;
+  }
+
   switch (resourceType) {
     case 'avatar':
       return FILE_LIMITS.image.mimeTypes;
@@ -82,6 +90,7 @@ export function validateUploadMetadata(input: {
   filename: string;
   mimeType: string;
   size: number;
+  mediaRole?: 'poster' | 'screenshot';
 }): UploadValidationResult {
   if (!Number.isFinite(input.size) || input.size <= 0) {
     return { ok: false, status: 400, message: 'File size must be greater than zero.' };
@@ -97,7 +106,7 @@ export function validateUploadMetadata(input: {
   }
 
   const normalizedMime = input.mimeType.trim().toLowerCase();
-  const allowedMimeTypes = allowedMimeTypesForResourceType(input.resourceType);
+  const allowedMimeTypes = allowedMimeTypesForResourceType(input.resourceType, input.mediaRole);
   if (!allowedMimeTypes.includes(normalizedMime as (typeof allowedMimeTypes)[number])) {
     return { ok: false, status: 415, message: 'Unsupported file type.' };
   }

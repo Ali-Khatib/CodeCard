@@ -28,6 +28,13 @@ vi.mock('@/lib/profile/profile-auth-core', () => ({
   resolveOwnedProfile: (...args: unknown[]) => mockResolveOwnedProfile(...args),
 }));
 
+const mockAssertProjectMediaUploadAllowed = vi.fn();
+
+vi.mock('@/lib/projects/project-media-core', () => ({
+  assertProjectMediaUploadAllowed: (...args: unknown[]) =>
+    mockAssertProjectMediaUploadAllowed(...args),
+}));
+
 const profile = {
   id: '33333333-3333-4333-8333-333333333333',
   tenant_id: '11111111-1111-4111-8111-111111111111',
@@ -55,6 +62,7 @@ describe('POST /api/upload', () => {
     mockRateLimit.mockResolvedValue({ success: true });
     mockGetUser.mockResolvedValue({ data: { user: { id: profile.owner_user_id } } });
     mockResolveOwnedProfile.mockResolvedValue({ profile });
+    mockAssertProjectMediaUploadAllowed.mockResolvedValue({ ok: true });
     mockCreateSignedUploadUrl.mockResolvedValue({
       data: {
         signedUrl: 'https://storage.example/upload',
@@ -159,6 +167,75 @@ describe('POST /api/upload', () => {
     );
 
     expect(response.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('authorizes owned project cover uploads and rejects unsupported MIME', async () => {
+    const projectId = '44444444-4444-4444-8444-444444444444';
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'projects') {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: {
+                    id: projectId,
+                    tenant_id: profile.tenant_id,
+                    owner_user_id: profile.owner_user_id,
+                  },
+                  error: null,
+                }),
+              })),
+            })),
+          })),
+        };
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn().mockResolvedValue({ data: profile, error: null }),
+          })),
+        })),
+      };
+    });
+
+    const ok = await POST(
+      makeRequest({
+        resourceType: 'project-media',
+        resourceId: projectId,
+        mediaRole: 'poster',
+        filename: 'cover.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+    expect(ok.status).toBe(200);
+
+    const bad = await POST(
+      makeRequest({
+        resourceType: 'project-media',
+        resourceId: projectId,
+        mediaRole: 'poster',
+        filename: 'cover.svg',
+        mimeType: 'image/svg+xml',
+        size: 100,
+      }),
+    );
+    expect(bad.status).toBe(415);
+    expect(mockAssertProjectMediaUploadAllowed).toHaveBeenCalled();
+  });
+
+  it('rejects project-media uploads without media role', async () => {
+    const response = await POST(
+      makeRequest({
+        resourceType: 'project-media',
+        resourceId: '44444444-4444-4444-8444-444444444444',
+        filename: 'cover.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+    expect(response.status).toBe(400);
   });
 });
 

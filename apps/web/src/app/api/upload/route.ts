@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
+import {
+  projectCoverUploadSchema,
+  projectScreenshotUploadSchema,
+  type ProjectMediaRole,
+} from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { getClientIp, rateLimited, unauthorized } from '@/lib/api-utils';
 import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 import { rateLimit } from '@/lib/rate-limit';
+import { assertProjectMediaUploadAllowed } from '@/lib/projects/project-media-core';
 import { createSignedUploadIntent } from '@/lib/storage/upload-core';
 import { resolveUploadOwnership } from '@/lib/storage/upload-ownership';
 import { uploadRequestSchema } from '@/lib/storage/upload-request';
@@ -58,11 +64,42 @@ export async function POST(request: Request) {
     return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
   }
 
+  if (validated.data.resourceType === 'project-media') {
+    if (!validated.data.resourceId || !validated.data.mediaRole) {
+      return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
+    }
+
+    const projectUploadSchema =
+      validated.data.mediaRole === 'poster'
+        ? projectCoverUploadSchema
+        : projectScreenshotUploadSchema;
+
+    const projectValidated = projectUploadSchema.safeParse({
+      project_id: validated.data.resourceId,
+      media_role: validated.data.mediaRole,
+      filename: validated.data.filename,
+      mime_type: validated.data.mimeType,
+      size: validated.data.size,
+    });
+
+    if (!projectValidated.success) {
+      const issue = projectValidated.error.issues[0];
+      if (issue?.message === 'File is too large') {
+        return jsonNoStore({ error: 'File is too large.' }, 413);
+      }
+      if (issue?.message === 'Unsupported file type' || issue?.message === 'File type does not match filename') {
+        return jsonNoStore({ error: 'Unsupported file type.' }, 415);
+      }
+      return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
+    }
+  }
+
   const metadata = validateUploadMetadata({
     resourceType: validated.data.resourceType,
     filename: validated.data.filename,
     mimeType: validated.data.mimeType,
     size: validated.data.size,
+    mediaRole: validated.data.mediaRole as ProjectMediaRole | undefined,
   });
 
   if (!metadata.ok) {
@@ -78,6 +115,17 @@ export async function POST(request: Request) {
 
   if (!ownership.ok) {
     return jsonNoStore({ error: ownership.message }, ownership.status);
+  }
+
+  if (validated.data.resourceType === 'project-media' && validated.data.resourceId && validated.data.mediaRole) {
+    const allowed = await assertProjectMediaUploadAllowed(supabase, {
+      userId: user.id,
+      projectId: validated.data.resourceId,
+      mediaRole: validated.data.mediaRole,
+    });
+    if (!allowed.ok) {
+      return jsonNoStore({ error: allowed.message }, allowed.status);
+    }
   }
 
   const signed = await createSignedUploadIntent(supabase, ownership.ownership, metadata);
