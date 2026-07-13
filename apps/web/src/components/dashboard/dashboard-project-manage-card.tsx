@@ -26,7 +26,7 @@ export function DashboardProjectManageCard({
   const [hovered, setHovered] = useState(false);
   const impact = firstSentence(project.description);
   const githubClicks = Math.round((project.views ?? 0) * 0.28);
-  const editLink = editHref ?? project.href;
+  const editLink = editHref ?? `${project.href}/edit`;
 
   return (
     <article

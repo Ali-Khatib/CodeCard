@@ -100,7 +100,7 @@ export function ProjectHeroCard({
             onClick={(event) => event.stopPropagation()}
             onKeyDown={(event) => event.stopPropagation()}
           >
-            <Link href={`${basePath}/projects/${project.id}`}>
+            <Link href={`${basePath}/projects/${project.id}/edit`}>
               <AppButton variant="primary">
                 <HiOutlinePencil className="h-4 w-4" aria-hidden />
                 Edit

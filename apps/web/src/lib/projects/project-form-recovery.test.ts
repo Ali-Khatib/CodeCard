@@ -55,7 +55,7 @@ describe('project form recovery UI contract', () => {
       'utf8',
     );
 
-    expect(form).toContain('submitLockRef');
+    expect(form).toContain('isRecoverableProjectFailure');
     expect(form).toContain('completedRef');
     expect(form).toContain('recoverableError');
     expect(form).toContain('Try again');
