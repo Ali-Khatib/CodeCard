@@ -234,41 +234,41 @@ export function findForbiddenCreateProjectFormData(formData: FormData): string |
   return null;
 }
 
-export const createProjectInputSchema = z
-  .object({
-    title: z
-      .string()
-      .min(1, 'Title is required')
-      .max(PROJECT_TITLE_MAX_LENGTH)
-      .trim(),
-    slug: projectSlugSchema,
-    tagline: z
-      .string()
-      .max(PROJECT_TAGLINE_MAX_LENGTH)
-      .trim()
-      .optional()
-      .nullable()
-      .transform((value) => (value == null || value === '' ? null : value)),
-    description: z
-      .string()
-      .max(PROJECT_DESCRIPTION_MAX_LENGTH)
-      .trim()
-      .optional()
-      .nullable()
-      .transform((value) => (value == null || value === '' ? null : value)),
-    technologies: projectTechnologiesSchema.default([]),
-    domains: projectDomainsInputSchema.default([]),
-    focus_areas: projectFocusAreasInputSchema.default([]),
-    user_role: projectUserRoleSchema,
-    started_at: projectDateSchema,
-    ended_at: projectDateSchema,
-    status: projectLifecycleStatusSchema.default('draft'),
-  })
-  .strict()
-  .superRefine((data, ctx) => {
+export const projectCoreInputSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(PROJECT_TITLE_MAX_LENGTH)
+    .trim(),
+  slug: projectSlugSchema,
+  tagline: z
+    .string()
+    .max(PROJECT_TAGLINE_MAX_LENGTH)
+    .trim()
+    .optional()
+    .nullable()
+    .transform((value) => (value == null || value === '' ? null : value)),
+  description: z
+    .string()
+    .max(PROJECT_DESCRIPTION_MAX_LENGTH)
+    .trim()
+    .optional()
+    .nullable()
+    .transform((value) => (value == null || value === '' ? null : value)),
+  technologies: projectTechnologiesSchema.default([]),
+  domains: projectDomainsInputSchema.default([]),
+  focus_areas: projectFocusAreasInputSchema.default([]),
+  user_role: projectUserRoleSchema,
+  started_at: projectDateSchema,
+  ended_at: projectDateSchema,
+  status: projectLifecycleStatusSchema.default('draft'),
+});
+
+function applyProjectDateRangeRefine<T extends z.ZodTypeAny>(schema: T) {
+  return schema.superRefine((data, ctx) => {
     const dateError = validateProjectDateRange({
-      started_at: data.started_at ?? null,
-      ended_at: data.ended_at ?? null,
+      started_at: (data as { started_at?: string | null }).started_at ?? null,
+      ended_at: (data as { ended_at?: string | null }).ended_at ?? null,
     });
     if (dateError) {
       ctx.addIssue({
@@ -278,6 +278,38 @@ export const createProjectInputSchema = z
       });
     }
   });
+}
+
+export const createProjectInputSchema = applyProjectDateRangeRefine(
+  projectCoreInputSchema.strict(),
+);
+
+export const FORBIDDEN_UPDATE_PROJECT_FIELDS = FORBIDDEN_CREATE_PROJECT_FIELDS;
+
+export const updateProjectInputSchema = applyProjectDateRangeRefine(
+  projectCoreInputSchema
+    .extend({
+      project_id: z.string().uuid('Invalid project ID'),
+    })
+    .strict(),
+);
+
+export function findForbiddenUpdateProjectFields(
+  input: Record<string, unknown>,
+): string | null {
+  return findForbiddenCreateProjectFields(input);
+}
+
+export function findForbiddenUpdateProjectFormData(formData: FormData): string | null {
+  const forbidden = new Set<string>(FORBIDDEN_UPDATE_PROJECT_FIELDS);
+  for (const key of formData.keys()) {
+    if (key === 'project_id') continue;
+    if (forbidden.has(key)) {
+      return 'Invalid submission.';
+    }
+  }
+  return null;
+}
 
 export function normalizeProfileLocation(value: string | null | undefined): string | null {
   if (value == null) return null;
@@ -497,6 +529,7 @@ export * from './reserved-profile-slugs';
 export * from './profile-links';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateProjectInputPayload = z.infer<typeof createProjectInputSchema>;
+export type UpdateProjectInputPayload = z.infer<typeof updateProjectInputSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
