@@ -69,6 +69,55 @@ export function buildCreateProjectFormData(values: ProjectFormValues): FormData 
   return fd;
 }
 
+export function buildUpdateProjectFormData(
+  projectId: string,
+  values: ProjectFormValues,
+): FormData {
+  const fd = buildCreateProjectFormData(values);
+  fd.set('project_id', projectId);
+  return fd;
+}
+
+export function formatProjectDateForInput(value: string | null | undefined): string {
+  if (!value) return '';
+  return value.slice(0, 10);
+}
+
+export function projectRecordToFormValues(
+  project: {
+    title: string;
+    slug: string;
+    tagline?: string | null;
+    description?: string | null;
+    technologies?: string[] | null;
+    user_role?: string | null;
+    started_at?: string | null;
+    ended_at?: string | null;
+    status?: string | null;
+  },
+  relations: { domains: string[]; focus_areas: string[] },
+): ProjectFormValues {
+  const status = PROJECT_LIFECYCLE_STATUSES.includes(
+    (project.status ?? 'draft') as ProjectLifecycleStatus,
+  )
+    ? ((project.status ?? 'draft') as ProjectLifecycleStatus)
+    : 'draft';
+
+  return {
+    title: project.title,
+    slug: project.slug,
+    tagline: project.tagline ?? '',
+    description: project.description ?? '',
+    technologies: project.technologies ?? [],
+    domains: relations.domains,
+    focus_areas: relations.focus_areas,
+    user_role: project.user_role ?? '',
+    started_at: formatProjectDateForInput(project.started_at),
+    ended_at: formatProjectDateForInput(project.ended_at),
+    status,
+  };
+}
+
 export type ProjectFormClientValidationResult =
   | { success: true }
   | { success: false; message: string; field?: string };

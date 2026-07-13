@@ -93,7 +93,7 @@ export function ProjectsImageAccordion({
           )}
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link href={`${basePath}/projects/${active.id}`}>
+            <Link href={`${basePath}/projects/${active.id}/edit`}>
               <AppButton variant="primary">
                 <HiOutlinePencil className="h-4 w-4" aria-hidden />
                 Edit

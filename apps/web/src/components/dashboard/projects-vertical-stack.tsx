@@ -108,7 +108,7 @@ function ProjectRow({
             >
               <PopIconButton
                 variant="primary"
-                href={`${basePath}/projects/${project.id}`}
+                href={`${basePath}/projects/${project.id}/edit`}
                 icon={<HiOutlinePencil aria-hidden />}
               >
                 Edit

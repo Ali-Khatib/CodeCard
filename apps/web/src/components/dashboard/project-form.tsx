@@ -3,10 +3,11 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createProjectAction, type ProjectCreateState } from '@/app/actions/projects';
+import { createProjectAction, updateProjectAction, type ProjectCreateState, type ProjectUpdateState } from '@/app/actions/projects';
 import { handleSessionExpired } from '@/lib/auth/session-expiry';
 import {
   buildCreateProjectFormData,
+  buildUpdateProjectFormData,
   createEmptyProjectFormValues,
   PROJECT_FORM_DOMAIN_OPTIONS,
   PROJECT_FORM_FOCUS_AREA_OPTIONS,
@@ -19,9 +20,12 @@ import {
 } from '@/lib/projects/project-form';
 import { cn } from '@/lib/cn';
 
-const initialState: ProjectCreateState = {};
+const initialCreateState: ProjectCreateState = {};
+const initialUpdateState: ProjectUpdateState = {};
 
-function isRecoverableProjectCreateFailure(state: ProjectCreateState): boolean {
+type ProjectFormState = ProjectCreateState | ProjectUpdateState;
+
+function isRecoverableProjectFailure(state: ProjectFormState): boolean {
   return state.errorCode === 'server';
 }
 
@@ -63,36 +67,65 @@ function ToggleChip({
 export function ProjectForm({
   mode,
   initialUsage = null,
+  projectId,
+  initialValues,
 }: {
   mode: ProjectFormMode;
   initialUsage?: { count: number; limit: number | null } | null;
+  projectId?: string;
+  initialValues?: ProjectFormValues;
 }) {
   const router = useRouter();
+  const editPath =
+    mode === 'edit' && projectId ? `/dashboard/projects/${projectId}/edit` : '/dashboard/projects/new';
   const slugInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
   const completedRef = useRef(false);
-  const [form, setForm] = useState<ProjectFormValues>(() => createEmptyProjectFormValues());
-  const [slugEdited, setSlugEdited] = useState(false);
+  const [form, setForm] = useState<ProjectFormValues>(
+    () => initialValues ?? createEmptyProjectFormValues(),
+  );
+  const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [techInput, setTechInput] = useState('');
   const [clientError, setClientError] = useState('');
   const [recoverableError, setRecoverableError] = useState('');
-  const [state, formAction, pending] = useActionState(createProjectAction, initialState);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [createState, createAction, createPending] = useActionState(
+    createProjectAction,
+    initialCreateState,
+  );
+  const [updateState, updateAction, updatePending] = useActionState(
+    updateProjectAction,
+    initialUpdateState,
+  );
 
-  const usage = state.usage ?? initialUsage;
+  const state = mode === 'edit' ? updateState : createState;
+  const formAction = mode === 'edit' ? updateAction : createAction;
+  const pending = mode === 'edit' ? updatePending : createPending;
+  const usage = mode === 'create' ? (createState.usage ?? initialUsage) : null;
   const limitReached =
-    usage?.limit != null && usage.count >= usage.limit;
+    mode === 'create' && usage?.limit != null && usage.count >= usage.limit;
 
   useEffect(() => {
-    if (!state.success || !state.redirectTo) return;
+    if (mode !== 'create' || !state.success || !('redirectTo' in state) || !state.redirectTo) {
+      return;
+    }
     completedRef.current = true;
     router.push(state.redirectTo);
-  }, [state.success, state.redirectTo, router]);
+  }, [mode, state, router]);
+
+  useEffect(() => {
+    if (mode !== 'edit' || !state.success) return;
+    setSaveSuccess(true);
+    router.refresh();
+    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [mode, state.success, router]);
 
   useEffect(() => {
     if (state.errorCode === 'auth') {
-      handleSessionExpired('/dashboard/projects/new');
+      handleSessionExpired(editPath);
     }
-  }, [state.errorCode]);
+  }, [state.errorCode, editPath]);
 
   useEffect(() => {
     if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
@@ -101,8 +134,8 @@ export function ProjectForm({
   }, [state.errorCode, state.fieldErrors?.slug]);
 
   useEffect(() => {
-    if (isRecoverableProjectCreateFailure(state)) {
-      setRecoverableError(state.error ?? 'Could not create project. Please try again.');
+    if (isRecoverableProjectFailure(state)) {
+      setRecoverableError(state.error ?? 'Could not save your project. Please try again.');
       return;
     }
     if (state.success) {
@@ -161,13 +194,14 @@ export function ProjectForm({
   }
 
   async function submitProject() {
-    if (pending || submitLockRef.current || limitReached || completedRef.current || mode !== 'create') {
-      return;
-    }
+    if (pending || submitLockRef.current || completedRef.current) return;
+    if (mode === 'create' && limitReached) return;
+    if (mode === 'edit' && !projectId) return;
 
     submitLockRef.current = true;
     setClientError('');
     setRecoverableError('');
+    setSaveSuccess(false);
 
     const validation = validateProjectFormClient(form);
     if (!validation.success) {
@@ -177,7 +211,11 @@ export function ProjectForm({
     }
 
     try {
-      await formAction(buildCreateProjectFormData(form));
+      const payload =
+        mode === 'edit'
+          ? buildUpdateProjectFormData(projectId!, form)
+          : buildCreateProjectFormData(form);
+      await formAction(payload);
     } catch {
       setRecoverableError(
         'We could not reach the server. Your entries are still here — try again.',
@@ -203,7 +241,7 @@ export function ProjectForm({
   const fieldErrors = state.fieldErrors ?? {};
   const globalError =
     clientError ||
-    (state.errorCode === 'limit' ? state.error : '') ||
+    (mode === 'create' && state.errorCode === 'limit' ? state.error : '') ||
     state.error ||
     (state.errorCode === 'auth' ? state.error : '') ||
     '';
@@ -215,13 +253,13 @@ export function ProjectForm({
       aria-busy={pending}
       noValidate
     >
-      {usage?.limit != null && (
+      {usage?.limit != null && mode === 'create' && (
         <p className="rounded-[12px] border border-charcoal/70 bg-charcoal/30 px-4 py-3 text-[13px] text-lichen">
           {usage.count} of {usage.limit} projects used on the Free plan.
         </p>
       )}
 
-      {limitReached && (
+      {limitReached && mode === 'create' && (
         <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-vellum" role="alert">
           <p>{state.error ?? `You've reached the ${usage?.limit}-project limit on the Free plan.`}</p>
           <Link href={state.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-reactorBright underline underline-offset-2">
@@ -464,6 +502,12 @@ export function ProjectForm({
         </div>
       )}
 
+      {saveSuccess && mode === 'edit' && (
+        <p className="rounded-[12px] border border-reactor/30 bg-reactor/10 px-4 py-3 text-[13px] text-vellum" role="status">
+          Project saved.
+        </p>
+      )}
+
       {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && !recoverableError && (
         <p className="text-[13px] text-red-400" role="alert" aria-live="polite">
           {globalError}
@@ -473,10 +517,16 @@ export function ProjectForm({
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={pending || limitReached || completedRef.current}
+          disabled={pending || (mode === 'create' && limitReached) || (mode === 'create' && completedRef.current)}
           className="cc-btn-pill-primary inline-flex h-11 items-center px-6 text-[14px] disabled:opacity-60"
         >
-          {pending ? 'Creating project…' : 'Create project'}
+          {pending
+            ? mode === 'edit'
+              ? 'Saving changes…'
+              : 'Creating project…'
+            : mode === 'edit'
+              ? 'Save changes'
+              : 'Create project'}
         </button>
         <Link href="/dashboard/projects" className="cc-btn-pill-ghost inline-flex h-11 items-center px-6 text-[14px]">
           Cancel
