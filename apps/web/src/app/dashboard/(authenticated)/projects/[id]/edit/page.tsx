@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ProjectForm } from '@/components/dashboard/project-form';
 import { ProjectPublishControls } from '@/components/dashboard/project-publish-controls';
+import { ProjectDeleteDialog } from '@/components/dashboard/project-delete-dialog';
 import { loadOwnedProjectWithRelations } from '@/lib/projects/project-access-core';
 import { projectRecordToFormValues } from '@/lib/projects/project-form';
 import { createClient } from '@/lib/supabase/server';
@@ -53,6 +54,7 @@ export default async function EditProjectPage({
         isPublished={loaded.project.is_published}
         profileIsPublic={loaded.profile.is_public}
       />
+      <ProjectDeleteDialog projectId={id} projectTitle={loaded.project.title} />
     </div>
   );
 }

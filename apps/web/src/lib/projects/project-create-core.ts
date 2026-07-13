@@ -238,7 +238,7 @@ export async function executeCreateProject(
 
   if (data.domains.length > 0) {
     const { error: domainsError } = await supabase.from('project_domains').insert(
-      data.domains.map((name) => ({
+      data.domains.map((name: string) => ({
         tenant_id: ownedProfile.tenant_id,
         project_id: projectId,
         name,
@@ -256,7 +256,7 @@ export async function executeCreateProject(
 
   if (data.focus_areas.length > 0) {
     const { error: focusError } = await supabase.from('project_focus_areas').insert(
-      data.focus_areas.map((name) => ({
+      data.focus_areas.map((name: string) => ({
         tenant_id: ownedProfile.tenant_id,
         project_id: projectId,
         name,

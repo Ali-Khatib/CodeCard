@@ -16,11 +16,15 @@ import {
   type ProjectPublishState,
 } from '@/lib/projects/project-publish-core';
 import {
+  executeDeleteProject,
+  type ProjectDeleteState,
+} from '@/lib/projects/project-delete-core';
+import {
   revalidateDeletedProjectPaths,
   revalidateOwnedProjectPaths,
 } from '@/lib/projects/project-revalidate';
 
-export type { ProjectCreateState, ProjectUpdateState, ProjectPublishState };
+export type { ProjectCreateState, ProjectUpdateState, ProjectPublishState, ProjectDeleteState };
 
 export async function createProjectAction(
   _prev: ProjectCreateState,
@@ -84,6 +88,23 @@ export async function unpublishProjectAction(
       profileSlug: result.profileSlug,
       isPublished: false,
       touchPublicRoutes: true,
+    });
+  }
+
+  return result;
+}
+
+export async function deleteProjectAction(
+  projectId: string,
+): Promise<ProjectDeleteState> {
+  const supabase = await createClient();
+  const result = await executeDeleteProject(supabase, projectId);
+
+  if (result.success && result.projectId) {
+    revalidateDeletedProjectPaths({
+      projectId: result.projectId,
+      profileSlug: result.profileSlug,
+      wasPublished: result.wasPublished,
     });
   }
 
