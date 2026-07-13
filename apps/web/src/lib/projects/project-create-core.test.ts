@@ -40,6 +40,7 @@ function createMockSupabase(options: {
   user?: { id: string } | null;
   profile?: Record<string, unknown> | null;
   projectCount?: number;
+  plan?: 'free' | 'pro';
   insertError?: { code?: string; message?: string } | null;
   domainsError?: { code?: string; message?: string } | null;
   focusError?: { code?: string; message?: string } | null;
@@ -50,6 +51,21 @@ function createMockSupabase(options: {
   const focusInsert = vi.fn().mockResolvedValue({ error: options.focusError ?? null });
 
   const from = vi.fn((table: string) => {
+    if (table === 'subscriptions') {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            in: vi.fn(() => ({
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: options.plan === 'pro' ? { status: 'active' } : null,
+                error: null,
+              }),
+            })),
+          })),
+        })),
+      };
+    }
+
     if (table === 'profiles') {
       return {
         select: vi.fn(() => ({
@@ -297,5 +313,38 @@ describe('executeCreateProject persistence', () => {
 
     expect(result.errorCode).toBe('server');
     expect(projectDelete).toHaveBeenCalled();
+  });
+
+  it('blocks free users who already own five projects', async () => {
+    const { supabase, insertedProjectPayload } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      projectCount: 5,
+      plan: 'free',
+    });
+
+    const result = await executeCreateProject(supabase, makeFormData(validEntries), {
+      user: { id: 'user-1' },
+    });
+
+    expect(result.errorCode).toBe('limit');
+    expect(result.error).toContain('5-project limit');
+    expect(result.upgradeTo).toBe('/dashboard/billing');
+    expect(insertedProjectPayload()).toBeUndefined();
+  });
+
+  it('rejects client-supplied plan form fields before creation', async () => {
+    const { supabase, insertedProjectPayload } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      projectCount: 5,
+      plan: 'free',
+    });
+
+    const fd = makeFormData({ ...validEntries, plan: 'pro' });
+    const result = await executeCreateProject(supabase, fd, { user: { id: 'user-1' } });
+
+    expect(result.errorCode).toBe('validation');
+    expect(insertedProjectPayload()).toBeUndefined();
   });
 });

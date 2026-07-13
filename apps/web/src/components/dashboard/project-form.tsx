@@ -55,13 +55,23 @@ function ToggleChip({
   );
 }
 
-export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
+export function ProjectForm({
+  mode,
+  initialUsage = null,
+}: {
+  mode: ProjectFormMode;
+  initialUsage?: { count: number; limit: number | null } | null;
+}) {
   const router = useRouter();
   const [form, setForm] = useState<ProjectFormValues>(() => createEmptyProjectFormValues());
   const [slugEdited, setSlugEdited] = useState(false);
   const [techInput, setTechInput] = useState('');
   const [clientError, setClientError] = useState('');
   const [state, formAction, pending] = useActionState(createProjectAction, initialState);
+
+  const usage = state.usage ?? initialUsage;
+  const limitReached =
+    usage?.limit != null && usage.count >= usage.limit;
 
   useEffect(() => {
     if (!state.success || !state.redirectTo) return;
@@ -120,7 +130,7 @@ export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (pending || mode !== 'create') return;
+    if (pending || mode !== 'create' || limitReached) return;
     setClientError('');
 
     const validation = validateProjectFormClient(form);
@@ -135,6 +145,7 @@ export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
   const fieldErrors = state.fieldErrors ?? {};
   const globalError =
     clientError ||
+    (state.errorCode === 'limit' ? state.error : '') ||
     state.error ||
     (state.errorCode === 'auth' ? state.error : '') ||
     '';
@@ -146,6 +157,20 @@ export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
       aria-busy={pending}
       noValidate
     >
+      {usage?.limit != null && (
+        <p className="rounded-[12px] border border-charcoal/70 bg-charcoal/30 px-4 py-3 text-[13px] text-lichen">
+          {usage.count} of {usage.limit} projects used on the Free plan.
+        </p>
+      )}
+
+      {limitReached && (
+        <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-vellum" role="alert">
+          <p>{state.error ?? `You've reached the ${usage?.limit}-project limit on the Free plan.`}</p>
+          <Link href={state.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-reactorBright underline underline-offset-2">
+            View upgrade options
+          </Link>
+        </div>
+      )}
       <section className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="project-title" className="text-[13px] font-medium text-graphite">
@@ -362,7 +387,7 @@ export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
         </div>
       </section>
 
-      {globalError && !fieldErrors.slug && !fieldErrors.title && (
+      {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && (
         <p className="text-[13px] text-red-400" role="alert">
           {globalError}
         </p>
@@ -371,7 +396,7 @@ export function ProjectForm({ mode }: { mode: ProjectFormMode }) {
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || limitReached}
           className="cc-btn-pill-primary inline-flex h-11 items-center px-6 text-[14px] disabled:opacity-60"
         >
           {pending ? 'Creating project…' : 'Create project'}

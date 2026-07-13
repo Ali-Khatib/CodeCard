@@ -72,6 +72,9 @@ export const PLANS = {
     name: 'Free',
     tagline: 'Good enough to launch and share.',
     priceMonthly: 0,
+    limits: {
+      projects: 5,
+    },
     features: [
       'Up to 5 projects',
       'Basic project media',
@@ -89,6 +92,9 @@ export const PLANS = {
     stripePriceEnvKey: 'STRIPE_PRO_PRICE_ID',
     /** Global checkout where Stripe is unavailable — Paddle acts as merchant of record */
     paddlePriceEnvKey: 'PADDLE_PRO_PRICE_ID',
+    limits: {
+      projects: null,
+    },
     features: [
       'Unlimited projects',
       'Remove CodeCard branding',
