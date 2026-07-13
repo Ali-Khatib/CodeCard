@@ -6,6 +6,10 @@ import { normalizeResearchPaper } from '@/lib/research/research';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import {
+  loadProfileProjectOrderings,
+  sortProjectsByEffectiveOrder,
+} from '@/lib/projects/project-order-core';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -66,11 +70,19 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   if (!profile) notFound();
 
-  const publishedProjects = (profile.projects ?? [])
-    .filter((p: { is_published: boolean }) => p.is_published)
-    .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
+  const orderings = await loadProfileProjectOrderings(supabase, profile.id);
+  const publishedProjects = sortProjectsByEffectiveOrder(
+    (profile.projects ?? []) as Array<
+      Parameters<typeof normalizeFeaturedProject>[0] & {
+        is_published: boolean;
+        created_at: string;
+        sort_order: number;
+      }
+    >,
+    orderings,
+  ).filter((project) => project.is_published);
 
-  const featuredProjects = publishedProjects.map(normalizeFeaturedProject);
+  const featuredProjects = publishedProjects.map((project) => normalizeFeaturedProject(project));
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
   const publishedResearch = researchRows
     .filter((p: ResearchPaperRow) => p.is_published)

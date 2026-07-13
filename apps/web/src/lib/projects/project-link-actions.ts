@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { loadOwnedProject } from '@/lib/projects/project-access-core';
 import { revalidateOwnedProjectPaths } from '@/lib/projects/project-revalidate';

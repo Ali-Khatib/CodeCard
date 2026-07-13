@@ -11,6 +11,7 @@ import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import { FadeInView } from './fade-in-view';
 import { ProjectHoverCard } from './project-hover-card';
 import { PopIconButton } from './ui/dashboard-ui';
+import { ProjectReorderToolbar } from './project-reorder-toolbar';
 
 const FALLBACK =
   'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80';
@@ -19,10 +20,14 @@ function ProjectRow({
   project,
   index,
   basePath,
+  orderedProjectIds,
+  canReorder,
 }: {
   project: PortfolioProject;
   index: number;
   basePath: string;
+  orderedProjectIds: string[];
+  canReorder: boolean;
 }) {
   const isPublished = project.isPublished !== false;
   const reduced = useReducedMotion();
@@ -102,10 +107,19 @@ function ProjectRow({
             )}
 
             <div
-              className="cc-project-card-actions mt-5 flex flex-wrap gap-2"
+              className="cc-project-card-actions mt-5 flex flex-col gap-3"
               onClick={(event) => event.stopPropagation()}
               onKeyDown={(event) => event.stopPropagation()}
             >
+              {canReorder ? (
+                <ProjectReorderToolbar
+                  projectId={project.id}
+                  index={index}
+                  total={orderedProjectIds.length}
+                  orderedProjectIds={orderedProjectIds}
+                />
+              ) : null}
+              <div className="flex flex-wrap gap-2">
               <PopIconButton
                 variant="primary"
                 href={`${basePath}/projects/${project.id}/edit`}
@@ -116,6 +130,7 @@ function ProjectRow({
               <PopIconButton href={project.href} icon={<HiOutlineEye aria-hidden />} popDelay={60}>
                 Preview
               </PopIconButton>
+              </div>
             </div>
           </div>
         </div>
@@ -127,14 +142,27 @@ function ProjectRow({
 export function ProjectsVerticalStack({
   projects,
   basePath = '/dashboard',
+  orderedProjectIds,
+  canReorder = false,
 }: {
   projects: PortfolioProject[];
   basePath?: string;
+  orderedProjectIds?: string[];
+  canReorder?: boolean;
 }) {
+  const ids = orderedProjectIds ?? projects.map((project) => project.id);
+
   return (
     <div className="cc-project-stack">
       {projects.map((project, index) => (
-        <ProjectRow key={project.id} project={project} index={index} basePath={basePath} />
+        <ProjectRow
+          key={project.id}
+          project={project}
+          index={index}
+          basePath={basePath}
+          orderedProjectIds={ids}
+          canReorder={canReorder}
+        />
       ))}
     </div>
   );
