@@ -5,6 +5,10 @@ import {
 } from '@/lib/dashboard/portfolio';
 import { DashboardProjectsPortfolio } from '@/components/dashboard/dashboard-projects-portfolio';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import {
+  loadProfileProjectOrderings,
+  sortProjectsByEffectiveOrder,
+} from '@/lib/projects/project-order-core';
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
@@ -34,13 +38,15 @@ export default async function ProjectsPage() {
     .from('projects')
     .select(
       `
-      id, title, tagline, description, is_published, technologies, updated_at, sort_order, case_study_sections,
+      id, title, tagline, description, is_published, technologies, updated_at, sort_order, created_at, case_study_sections,
       project_media_assets(*),
       project_links(*)
     `,
     )
-    .eq('profile_id', profile?.id ?? '')
-    .order('sort_order', { ascending: true });
+    .eq('profile_id', profile?.id ?? '');
+
+  const orderings = profile?.id ? await loadProfileProjectOrderings(supabase, profile.id) : [];
+  const orderedProjects = sortProjectsByEffectiveOrder(projects ?? [], orderings);
 
   const creator = profileToPortfolioCreator(
     {
@@ -55,8 +61,8 @@ export default async function ProjectsPage() {
   return (
     <DashboardProjectsPortfolio
       creator={creator}
-      projects={(projects ?? []).map(dbProjectToPortfolioProject)}
-      emptyState={(projects?.length ?? 0) === 0}
+      projects={orderedProjects.map(dbProjectToPortfolioProject)}
+      emptyState={(orderedProjects.length ?? 0) === 0}
     />
   );
 }

@@ -163,7 +163,7 @@ function createMockSupabase(options: {
     auth,
   };
 
-  return Object.assign(supabase, { insert, update, del }) as SupabaseClient & {
+  return Object.assign(supabase, { insert, update, del }) as unknown as SupabaseClient & {
     insert: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     del: ReturnType<typeof vi.fn>;

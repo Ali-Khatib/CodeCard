@@ -162,7 +162,12 @@ export function DashboardProjectsPortfolio({
         viewMode === 'grid' ? (
           <ProjectsBubbleGrid projects={filteredProjects} basePath={basePath} />
         ) : (
-          <ProjectsVerticalStack projects={filteredProjects} basePath={basePath} />
+          <ProjectsVerticalStack
+            projects={filteredProjects}
+            basePath={basePath}
+            orderedProjectIds={projects.map((project) => project.id)}
+            canReorder={sort === 'Visitor order'}
+          />
         )
       ) : (        <FadeInView>
           <p className="py-12 text-center text-[15px] text-[var(--app-smoke)]">

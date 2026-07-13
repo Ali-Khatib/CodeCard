@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
+import {
+  loadProfileProjectOrderings,
+  sortProjectsByEffectiveOrder,
+} from '@/lib/projects/project-order-core';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 
@@ -35,14 +39,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     `,
     )
     .eq('profile_id', profile.id)
-    .eq('is_published', true)
-    .order('sort_order', { ascending: true });
+    .eq('is_published', true);
 
-  const project = projectRows?.find((row) => row.id === id);
+  const orderings = await loadProfileProjectOrderings(supabase, profile.id);
+  const orderedRows = sortProjectsByEffectiveOrder(projectRows ?? [], orderings);
+
+  const project = orderedRows.find((row) => row.id === id);
   if (!project) notFound();
 
   const featured = normalizeFeaturedProject(project);
-  const featuredProjects = (projectRows ?? []).map(normalizeFeaturedProject);
+  const featuredProjects = orderedRows.map(normalizeFeaturedProject);
 
   return (
     <>
