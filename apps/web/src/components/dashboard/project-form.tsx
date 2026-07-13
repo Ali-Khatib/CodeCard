@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createProjectAction, type ProjectCreateState } from '@/app/actions/projects';
+import { handleSessionExpired } from '@/lib/auth/session-expiry';
 import {
   buildCreateProjectFormData,
   createEmptyProjectFormValues,
@@ -19,6 +20,10 @@ import {
 import { cn } from '@/lib/cn';
 
 const initialState: ProjectCreateState = {};
+
+function isRecoverableProjectCreateFailure(state: ProjectCreateState): boolean {
+  return state.errorCode === 'server';
+}
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -63,10 +68,14 @@ export function ProjectForm({
   initialUsage?: { count: number; limit: number | null } | null;
 }) {
   const router = useRouter();
+  const slugInputRef = useRef<HTMLInputElement>(null);
+  const submitLockRef = useRef(false);
+  const completedRef = useRef(false);
   const [form, setForm] = useState<ProjectFormValues>(() => createEmptyProjectFormValues());
   const [slugEdited, setSlugEdited] = useState(false);
   const [techInput, setTechInput] = useState('');
   const [clientError, setClientError] = useState('');
+  const [recoverableError, setRecoverableError] = useState('');
   const [state, formAction, pending] = useActionState(createProjectAction, initialState);
 
   const usage = state.usage ?? initialUsage;
@@ -75,8 +84,31 @@ export function ProjectForm({
 
   useEffect(() => {
     if (!state.success || !state.redirectTo) return;
+    completedRef.current = true;
     router.push(state.redirectTo);
   }, [state.success, state.redirectTo, router]);
+
+  useEffect(() => {
+    if (state.errorCode === 'auth') {
+      handleSessionExpired('/dashboard/projects/new');
+    }
+  }, [state.errorCode]);
+
+  useEffect(() => {
+    if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
+      slugInputRef.current?.focus();
+    }
+  }, [state.errorCode, state.fieldErrors?.slug]);
+
+  useEffect(() => {
+    if (isRecoverableProjectCreateFailure(state)) {
+      setRecoverableError(state.error ?? 'Could not create project. Please try again.');
+      return;
+    }
+    if (state.success) {
+      setRecoverableError('');
+    }
+  }, [state]);
 
   function updateTitle(value: string) {
     setForm((prev) => ({
@@ -128,18 +160,44 @@ export function ProjectForm({
     }));
   }
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (pending || mode !== 'create' || limitReached) return;
+  async function submitProject() {
+    if (pending || submitLockRef.current || limitReached || completedRef.current || mode !== 'create') {
+      return;
+    }
+
+    submitLockRef.current = true;
     setClientError('');
+    setRecoverableError('');
 
     const validation = validateProjectFormClient(form);
     if (!validation.success) {
       setClientError(validation.message);
+      submitLockRef.current = false;
       return;
     }
 
-    formAction(buildCreateProjectFormData(form));
+    try {
+      await formAction(buildCreateProjectFormData(form));
+    } catch {
+      setRecoverableError(
+        'We could not reach the server. Your entries are still here — try again.',
+      );
+    } finally {
+      submitLockRef.current = false;
+    }
+  }
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    await submitProject();
+  }
+
+  async function handleRetry() {
+    if (completedRef.current) {
+      router.refresh();
+      return;
+    }
+    await submitProject();
   }
 
   const fieldErrors = state.fieldErrors ?? {};
@@ -199,6 +257,7 @@ export function ProjectForm({
             id="project-slug"
             name="slug"
             required
+            ref={slugInputRef}
             value={form.slug}
             onChange={(e) => updateSlug(e.target.value)}
             className="cc-input w-full"
@@ -387,8 +446,26 @@ export function ProjectForm({
         </div>
       </section>
 
-      {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && (
-        <p className="text-[13px] text-red-400" role="alert">
+      {recoverableError && (
+        <div
+          className="rounded-[12px] border border-red-500/30 bg-red-500/10 px-4 py-3 text-[13px] text-vellum"
+          role="alert"
+          aria-live="polite"
+        >
+          <p>{recoverableError}</p>
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={pending || limitReached || completedRef.current}
+            className="mt-3 inline-flex h-9 items-center rounded-full border border-charcoal/70 px-4 text-[13px] text-vellum hover:border-graphite disabled:opacity-60"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && !recoverableError && (
+        <p className="text-[13px] text-red-400" role="alert" aria-live="polite">
           {globalError}
         </p>
       )}
@@ -396,7 +473,7 @@ export function ProjectForm({
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={pending || limitReached}
+          disabled={pending || limitReached || completedRef.current}
           className="cc-btn-pill-primary inline-flex h-11 items-center px-6 text-[14px] disabled:opacity-60"
         >
           {pending ? 'Creating project…' : 'Create project'}
