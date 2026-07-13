@@ -24,3 +24,7 @@ export function resolveProjectMediaDisplayUrl(
   }
   return getPublicProjectMediaUrl(supabase, storagePath);
 }
+
+export function createProjectMediaUrlResolver(supabase: SupabaseClient) {
+  return (storagePath: string) => resolveProjectMediaDisplayUrl(supabase, storagePath);
+}
