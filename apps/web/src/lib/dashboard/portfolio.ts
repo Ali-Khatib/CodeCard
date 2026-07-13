@@ -49,7 +49,7 @@ type DbProject = {
   is_published: boolean;
   technologies?: string[] | null;
   case_study_sections?: unknown;
-  project_media_assets?: { type: string; storage_path: string }[];
+  project_media_assets?: { type: string; storage_path: string; sort_order?: number }[];
   project_links?: { type: string; label: string | null; url: string }[];
 };
 
@@ -72,17 +72,20 @@ export function profileToPortfolioCreator(
   };
 }
 
-export function dbProjectToPortfolioProject(project: DbProject): PortfolioProject {
-  const featured = normalizeFeaturedProject({
-    id: project.id,
-    title: project.title,
-    tagline: project.tagline,
-    description: project.description ?? null,
-    technologies: project.technologies ?? [],
-    case_study_sections: project.case_study_sections,
-    project_media_assets: project.project_media_assets,
-    project_links: project.project_links,
-  });
+export function dbProjectToPortfolioProject(
+  project: DbProject,
+  options?: {
+    resolveStoragePath?: (storagePath: string) => string;
+  },
+): PortfolioProject {
+  const featured = normalizeFeaturedProject(
+    {
+      ...project,
+      description: project.description ?? null,
+      technologies: project.technologies ?? [],
+    },
+    options,
+  );
   const live = firstSafeProjectLink(featured.links, ['live', 'demo']);
   const repo = firstSafeProjectLink(featured.links, ['repo']);
 

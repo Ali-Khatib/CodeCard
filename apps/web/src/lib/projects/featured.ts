@@ -23,7 +23,8 @@ export interface FeaturedProject {
   caseStudySections: CaseStudySections;
 }
 
-export function normalizeFeaturedProject(project: {
+export function normalizeFeaturedProject(
+  project: {
   id: string;
   title: string;
   tagline: string | null;
@@ -32,10 +33,30 @@ export function normalizeFeaturedProject(project: {
   case_study_sections?: unknown;
   project_domains?: { name: string }[];
   project_focus_areas?: { name: string }[];
-  project_media_assets?: { type: string; storage_path: string }[];
+  project_media_assets?: {
+    type: string;
+    storage_path: string;
+    sort_order?: number;
+  }[];
   project_links?: { type: string; label: string | null; url: string; sort_order?: number }[];
-}): FeaturedProject {
+},
+  options?: {
+    resolveStoragePath?: (storagePath: string) => string;
+  },
+): FeaturedProject {
+  const resolveStoragePath = options?.resolveStoragePath ?? ((path: string) => path);
+  const resolve = (path: string) => {
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+    return resolveStoragePath(path);
+  };
   const assets = project.project_media_assets ?? [];
+  const posterAsset = assets.find((a) => a.type === 'poster');
+  const screenshotAssets = assets
+    .filter((a) => a.type === 'screenshot')
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
   return {
     id: project.id,
     title: project.title,
@@ -44,8 +65,10 @@ export function normalizeFeaturedProject(project: {
     technologies: project.technologies ?? [],
     domains: (project.project_domains ?? []).map((d) => d.name),
     focusAreas: (project.project_focus_areas ?? []).map((f) => f.name),
-    posterUrl: assets.find((a) => a.type === 'poster')?.storage_path ?? null,
-    videoUrl: assets.find((a) => a.type === 'hero_video')?.storage_path ?? null,
+    posterUrl: posterAsset?.storage_path ? resolve(posterAsset.storage_path) : null,
+    videoUrl: assets.find((a) => a.type === 'hero_video')?.storage_path
+      ? resolve(assets.find((a) => a.type === 'hero_video')!.storage_path)
+      : null,
     links: [...(project.project_links ?? [])]
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       .map((l) => ({
@@ -53,7 +76,10 @@ export function normalizeFeaturedProject(project: {
       label: l.label,
       url: l.url,
     })),
-    screenshots: assets.filter((a) => a.type === 'screenshot').map((a) => a.storage_path),
+    screenshots: screenshotAssets
+      .map((a) => a.storage_path)
+      .filter(Boolean)
+      .map((path) => resolve(path)),
     caseStudySections: parseCaseStudySections(project.case_study_sections),
   };
 }

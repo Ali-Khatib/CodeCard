@@ -173,6 +173,31 @@ export async function assertProjectMediaUploadAllowed(
   return { ok: true };
 }
 
+export async function loadOwnedProjectMediaAssets(
+  supabase: SupabaseClient,
+  input: { userId: string; projectId: string },
+): Promise<
+  | { assets: ProjectMediaAssetRecord[] }
+  | { error: string }
+> {
+  const owned = await loadOwnedProject(supabase, input);
+  if ('error' in owned) {
+    return { error: owned.error };
+  }
+
+  const { data, error } = await supabase
+    .from('project_media_assets')
+    .select('id, type, storage_path, mime_type, file_size, sort_order')
+    .eq('project_id', owned.project.id)
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    return { error: 'Could not load project media.' };
+  }
+
+  return { assets: (data ?? []) as ProjectMediaAssetRecord[] };
+}
+
 export async function executeFinalizeProjectMediaUpload(
   supabase: SupabaseClient,
   input: {

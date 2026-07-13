@@ -9,6 +9,7 @@ import {
   loadProfileProjectOrderings,
   sortProjectsByEffectiveOrder,
 } from '@/lib/projects/project-order-core';
+import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
@@ -47,6 +48,7 @@ export default async function ProjectsPage() {
 
   const orderings = profile?.id ? await loadProfileProjectOrderings(supabase, profile.id) : [];
   const orderedProjects = sortProjectsByEffectiveOrder(projects ?? [], orderings);
+  const resolveMediaUrl = createProjectMediaUrlResolver(supabase);
 
   const creator = profileToPortfolioCreator(
     {
@@ -61,7 +63,9 @@ export default async function ProjectsPage() {
   return (
     <DashboardProjectsPortfolio
       creator={creator}
-      projects={orderedProjects.map(dbProjectToPortfolioProject)}
+      projects={orderedProjects.map((project) =>
+        dbProjectToPortfolioProject(project, { resolveStoragePath: resolveMediaUrl }),
+      )}
       emptyState={(orderedProjects.length ?? 0) === 0}
     />
   );

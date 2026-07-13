@@ -185,17 +185,7 @@ export function ProjectMediaUpload({
       setCoverSuccess(false);
       setCoverPhase('idle');
     }, 2500);
-  }, [
-    coverFile,
-    coverPending,
-    coverPreviewUrl,
-    disabled,
-    hasCover,
-    projectId,
-    revokePreviewUrl,
-    router,
-    savedCoverUrl,
-  ]);
+  }, [coverFile, coverPending, coverPreviewUrl, disabled, hasCover, projectId, router]);
 
   const handleScreenshotFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,7 +309,7 @@ export function ProjectMediaUpload({
       }));
       router.refresh();
     },
-    [projectId, revokePreviewUrl, router],
+    [projectId, router],
   );
 
   const uploadAllLocalScreenshots = useCallback(async () => {
@@ -505,9 +495,15 @@ export function ProjectMediaUpload({
                   <AppButton
                     type="button"
                     variant="ghost"
-                    aria-label={`Remove ${selection.file.name} from selection`}
+                    ariaLabel={`Remove ${selection.file.name} from selection`}
+                    className={
+                      selection.phase === 'preparing' ||
+                      selection.phase === 'uploading' ||
+                      selection.phase === 'saving'
+                        ? 'pointer-events-none opacity-50'
+                        : undefined
+                    }
                     onClick={() => removeLocalScreenshot(selection.id)}
-                    disabled={selection.phase === 'preparing' || selection.phase === 'uploading' || selection.phase === 'saving'}
                   >
                     Remove
                   </AppButton>

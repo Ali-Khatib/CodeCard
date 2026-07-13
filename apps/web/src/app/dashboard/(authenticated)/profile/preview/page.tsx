@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
+import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import { normalizeResearchPaper } from '@/lib/research/research';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
@@ -58,7 +59,11 @@ export default async function OwnerProfilePreviewPage() {
     .filter((p: { is_published: boolean }) => p.is_published)
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
 
-  const featuredProjects = publishedProjects.map(normalizeFeaturedProject);
+  const resolveMediaUrl = createProjectMediaUrlResolver(supabase);
+  const featuredProjects = publishedProjects.map(
+    (project: Parameters<typeof normalizeFeaturedProject>[0]) =>
+      normalizeFeaturedProject(project, { resolveStoragePath: resolveMediaUrl }),
+  );
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
   const publishedResearch = researchRows
     .filter((p: ResearchPaperRow) => p.is_published)

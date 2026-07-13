@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
+import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import {
   loadProfileProjectOrderings,
   sortProjectsByEffectiveOrder,
@@ -47,8 +48,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const project = orderedRows.find((row) => row.id === id);
   if (!project) notFound();
 
-  const featured = normalizeFeaturedProject(project);
-  const featuredProjects = orderedRows.map(normalizeFeaturedProject);
+  const resolveMediaUrl = createProjectMediaUrlResolver(supabase);
+  const featured = normalizeFeaturedProject(project, { resolveStoragePath: resolveMediaUrl });
+  const featuredProjects = orderedRows.map((row) =>
+    normalizeFeaturedProject(row, { resolveStoragePath: resolveMediaUrl }),
+  );
 
   return (
     <>

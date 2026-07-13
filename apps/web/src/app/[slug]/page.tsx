@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
+import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import { normalizeResearchPaper } from '@/lib/research/research';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
@@ -82,7 +83,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
     orderings,
   ).filter((project) => project.is_published);
 
-  const featuredProjects = publishedProjects.map((project) => normalizeFeaturedProject(project));
+  const featuredProjects = publishedProjects.map((project) =>
+    normalizeFeaturedProject(project, {
+      resolveStoragePath: createProjectMediaUrlResolver(supabase),
+    }),
+  );
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
   const publishedResearch = researchRows
     .filter((p: ResearchPaperRow) => p.is_published)
