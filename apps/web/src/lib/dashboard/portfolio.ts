@@ -1,5 +1,6 @@
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { parseHeadline } from '@/lib/profile/lanyard-badge-images';
+import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
 
@@ -82,8 +83,8 @@ export function dbProjectToPortfolioProject(project: DbProject): PortfolioProjec
     project_media_assets: project.project_media_assets,
     project_links: project.project_links,
   });
-  const live = featured.links.find((l) => l.type === 'live' || l.type === 'demo');
-  const repo = featured.links.find((l) => l.type === 'repo');
+  const live = firstSafeProjectLink(featured.links, ['live', 'demo']);
+  const repo = firstSafeProjectLink(featured.links, ['repo']);
 
   return {
     id: project.id,
@@ -107,8 +108,8 @@ export function featuredToPortfolioProject(
   project: FeaturedProject,
   href?: string,
 ): PortfolioProject {
-  const live = project.links.find((l) => l.type === 'live' || l.type === 'demo');
-  const repo = project.links.find((l) => l.type === 'repo');
+  const live = firstSafeProjectLink(project.links, ['live', 'demo']);
+  const repo = firstSafeProjectLink(project.links, ['repo']);
 
   return {
     id: project.id,
