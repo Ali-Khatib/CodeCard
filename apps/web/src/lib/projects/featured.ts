@@ -33,7 +33,7 @@ export function normalizeFeaturedProject(project: {
   project_domains?: { name: string }[];
   project_focus_areas?: { name: string }[];
   project_media_assets?: { type: string; storage_path: string }[];
-  project_links?: { type: string; label: string | null; url: string }[];
+  project_links?: { type: string; label: string | null; url: string; sort_order?: number }[];
 }): FeaturedProject {
   const assets = project.project_media_assets ?? [];
   return {
@@ -46,7 +46,9 @@ export function normalizeFeaturedProject(project: {
     focusAreas: (project.project_focus_areas ?? []).map((f) => f.name),
     posterUrl: assets.find((a) => a.type === 'poster')?.storage_path ?? null,
     videoUrl: assets.find((a) => a.type === 'hero_video')?.storage_path ?? null,
-    links: (project.project_links ?? []).map((l) => ({
+    links: [...(project.project_links ?? [])]
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .map((l) => ({
       type: l.type,
       label: l.label,
       url: l.url,

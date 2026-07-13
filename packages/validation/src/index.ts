@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { profileLinkTypeSchema } from './profile-links';
+import { projectLinkTypeSchema } from './project-links';
 import {
   isAllowedProjectDomain,
   isAllowedProjectFocusArea,
@@ -35,8 +36,6 @@ export const urlSchema = z
       return false;
     }
   }, 'Only HTTP(S) URLs allowed');
-
-export const projectLinkTypeSchema = z.enum(['live', 'repo', 'demo', 'paper', 'other']);
 
 export const connectionSourceSchema = z.enum(['qr', 'nfc', 'direct_link', 'manual', 'app']);
 
@@ -527,6 +526,7 @@ export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export * from './reserved-profile-slugs';
 export * from './profile-links';
+export * from './project-links';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateProjectInputPayload = z.infer<typeof createProjectInputSchema>;
 export type UpdateProjectInputPayload = z.infer<typeof updateProjectInputSchema>;

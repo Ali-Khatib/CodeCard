@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { FeaturedProject } from '@/lib/projects/featured';
+import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import { HUME_EASE, HUME_MOTION, HUME_SPRING } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 
@@ -31,8 +32,8 @@ export function PublicProjectStack({
     <div className="flex flex-col gap-8">
       {projects.map((project, index) => {
         const isOpen = openId === project.id;
-        const liveUrl = project.links?.find((l) => l.type === 'live')?.url;
-        const repoUrl = project.links?.find((l) => l.type === 'repo')?.url;
+        const liveUrl = firstSafeProjectLink(project.links ?? [], ['live', 'demo'])?.url;
+        const repoUrl = firstSafeProjectLink(project.links ?? [], ['repo'])?.url;
         const { lead, rest } = descriptionParts(project.description);
         const views = demoViews?.[project.id]?.views ?? 280 + index * 40;
         const saves = demoViews?.[project.id]?.saves ?? 24 + index * 8;
@@ -94,12 +95,12 @@ export function PublicProjectStack({
                     {isOpen ? 'Close project' : 'Open project'}
                   </button>
                   {liveUrl && (
-                    <a href={liveUrl} target="_blank" rel="noreferrer" className="cc-app-btn cc-app-btn--ghost">
+                    <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost">
                       Live demo
                     </a>
                   )}
                   {repoUrl && (
-                    <a href={repoUrl} target="_blank" rel="noreferrer" className="cc-app-btn cc-app-btn--ghost">
+                    <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost">
                       GitHub
                     </a>
                   )}

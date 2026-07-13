@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
 import { ProjectForm } from '@/components/dashboard/project-form';
+import { ProjectLinksEditor } from '@/components/dashboard/project-links-editor';
 import { ProjectPublishControls } from '@/components/dashboard/project-publish-controls';
 import { ProjectDeleteDialog } from '@/components/dashboard/project-delete-dialog';
 import { loadOwnedProjectWithRelations } from '@/lib/projects/project-access-core';
+import { loadOwnedProjectLinksForProject } from '@/lib/projects/project-link-core';
 import { projectRecordToFormValues } from '@/lib/projects/project-form';
 import { createClient } from '@/lib/supabase/server';
 
@@ -35,6 +37,12 @@ export default async function EditProjectPage({
     focus_areas: loaded.focus_areas,
   });
 
+  const linksResult = await loadOwnedProjectLinksForProject(supabase, {
+    userId: user.id,
+    projectId: id,
+  });
+  const projectLinks = 'error' in linksResult ? [] : linksResult;
+
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
@@ -49,6 +57,7 @@ export default async function EditProjectPage({
         </p>
       </div>
       <ProjectForm mode="edit" projectId={id} initialValues={initialValues} />
+      <ProjectLinksEditor projectId={id} links={projectLinks} />
       <ProjectPublishControls
         projectId={id}
         isPublished={loaded.project.is_published}
