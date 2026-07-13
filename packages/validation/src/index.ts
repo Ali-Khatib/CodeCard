@@ -527,6 +527,7 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export * from './reserved-profile-slugs';
 export * from './profile-links';
 export * from './project-links';
+export * from './upload-schemas';
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateProjectInputPayload = z.infer<typeof createProjectInputSchema>;
 export type UpdateProjectInputPayload = z.infer<typeof updateProjectInputSchema>;
