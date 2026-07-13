@@ -6,6 +6,8 @@ export function revalidateOwnedProjectPaths(input: {
   isPublished?: boolean;
   touchPublicRoutes?: boolean;
 }) {
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/profile');
   revalidatePath('/dashboard/projects');
   revalidatePath(`/dashboard/projects/${input.projectId}/edit`);
 
@@ -20,6 +22,8 @@ export function revalidateDeletedProjectPaths(input: {
   profileSlug?: string | null;
   wasPublished?: boolean;
 }) {
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/profile');
   revalidatePath('/dashboard/projects');
   revalidatePath(`/dashboard/projects/${input.projectId}/edit`);
 

@@ -1,7 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { greetingForHour, profileCompletion } from '@/lib/dashboard/profile-completion';
+import { greetingForHour } from '@/lib/dashboard/profile-completion';
 import { DashboardOverviewView } from '@/components/dashboard/dashboard-overview-view';
-import { DEMO_OVERVIEW_ACTIVITY, DEMO_SUGGESTED_STEP } from '@/lib/dashboard/workspace-demo';
+import {
+  DashboardOverviewLoadErrorState,
+  DashboardOverviewMissingState,
+} from '@/components/dashboard/dashboard-overview-route-states';
+import { DEMO_OVERVIEW_ACTIVITY } from '@/lib/dashboard/workspace-demo';
+import { getProfileCompletionNextStep } from '@/lib/profile/completion';
+import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
 export default async function DashboardHomePage() {
   const supabase = await createClient();
@@ -9,31 +15,39 @@ export default async function DashboardHomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('owner_user_id', user!.id)
     .single();
 
-  const { count: projectCount } = await supabase
-    .from('projects')
-    .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile?.id ?? '');
+  if (profileError) {
+    return <DashboardOverviewLoadErrorState />;
+  }
+
+  if (!profile) {
+    return <DashboardOverviewMissingState />;
+  }
+
+  const completionResult = await loadProfileCompletion(supabase, profile);
+  if (!completionResult.ok) {
+    return <DashboardOverviewLoadErrorState />;
+  }
 
   const { count: profileViews } = await supabase
     .from('public_profile_events')
     .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile?.id ?? '');
+    .eq('profile_id', profile.id);
 
   const { count: projectViews } = await supabase
     .from('project_view_events')
     .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile?.id ?? '');
+    .eq('profile_id', profile.id);
 
   const { data: linkRows } = await supabase
     .from('profile_links')
     .select('id, type, label, url, sort_order')
-    .eq('profile_id', profile?.id ?? '')
+    .eq('profile_id', profile.id)
     .order('sort_order', { ascending: true });
 
   const profileLinks = linkRows ?? [];
@@ -43,18 +57,21 @@ export default async function DashboardHomePage() {
     url: l.url,
   }));
 
-  const completion = profileCompletion(profile ?? {}, projectCount ?? 0);
-  const displayName = profile?.display_name ?? user?.email?.split('@')[0] ?? 'there';
+  const completion = completionResult.completion;
+  const suggested = getProfileCompletionNextStep(completion, {
+    hasAnyProject: completionResult.hasAnyProject,
+  });
+  const displayName = profile.display_name ?? user?.email?.split('@')[0] ?? 'there';
 
   return (
     <DashboardOverviewView
       greeting={greetingForHour()}
       displayName={displayName}
       completion={completion}
-      profileSlug={profile?.slug}
-      avatarUrl={profile?.avatar_url}
-      headline={profile?.headline}
-      bio={profile?.bio}
+      profileSlug={profile.slug}
+      avatarUrl={profile.avatar_url}
+      headline={profile.headline}
+      bio={profile.bio}
       profileViews={profileViews ?? 0}
       links={links}
       profile={profile}
@@ -65,10 +82,7 @@ export default async function DashboardHomePage() {
         qrScans: 128,
       }}
       activity={DEMO_OVERVIEW_ACTIVITY}
-      suggested={{
-        ...DEMO_SUGGESTED_STEP,
-        href: '/dashboard/projects',
-      }}
+      suggested={suggested}
     />
   );
 }

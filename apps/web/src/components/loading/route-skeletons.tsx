@@ -56,6 +56,28 @@ export function DashboardProfileEditorSkeleton() {
   );
 }
 
+export function DashboardOverviewSkeleton() {
+  return (
+    <div className="cc-profile-home" aria-busy="true" aria-label="Loading dashboard">
+      <div className="cc-profile-home__greeting" aria-hidden>
+        <div className="space-y-3">
+          <ThemedSkeleton className="h-4 w-16" />
+          <ThemedSkeleton className="h-9 w-[min(360px,80%)]" />
+        </div>
+        <div className="flex gap-2">
+          <ThemedSkeleton className="h-8 w-28 rounded-full" />
+          <ThemedSkeleton className="h-8 w-24 rounded-full" />
+        </div>
+      </div>
+      <div className="mt-8 space-y-4" aria-hidden>
+        <ThemedSkeleton className="h-40 w-full rounded-[16px]" />
+        <ThemedSkeleton className="h-48 w-full rounded-[16px]" />
+        <ThemedSkeleton className="h-56 w-full rounded-[16px]" />
+      </div>
+    </div>
+  );
+}
+
 export function ProjectDetailSkeleton() {
   return (
     <div className="relative min-h-[100dvh] text-text-primary" aria-busy aria-label="Loading project">

@@ -18,6 +18,7 @@ export async function updateProfileAction(
 
   if (result.success) {
     revalidatePath('/dashboard');
+    revalidatePath('/dashboard/profile');
     if (result.previousSlug) {
       revalidatePath(`/${result.previousSlug}`);
     }
