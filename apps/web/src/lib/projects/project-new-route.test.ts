@@ -11,7 +11,8 @@ describe('dashboard new project route', () => {
 
     expect(page).toContain('ProjectCreateForm');
     expect(page).not.toContain('mock');
-    expect(page).not.toContain('redirect(');
+    expect(page).toContain('countOwnedProjects');
+    expect(page).toContain('usage={usage}');
   });
 
   it('uses the secure create action through the shared project form', () => {
@@ -37,7 +38,9 @@ describe('dashboard new project route', () => {
     expect(form).not.toContain('section_media');
     expect(form).toContain('suggestProjectSlugFromTitle');
     expect(form).toContain('slugEdited');
-    expect(form).toContain('/dashboard/projects');
+    expect(form).toContain('initialUsage');
+    expect(form).toContain('limitReached');
+    expect(form).toContain('/dashboard/billing');
   });
 
   it('keeps dashboard CTAs pointed at the new project route', () => {

@@ -6,6 +6,7 @@ import {
   type CreateProjectInputPayload,
 } from '@codecard/validation';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { evaluateProjectCreationQuota } from '@/lib/projects/project-plan-core';
 
 export type ProjectCreateFieldErrors = Partial<
   Record<
@@ -31,6 +32,8 @@ export type ProjectCreateState = {
   error?: string;
   fieldErrors?: ProjectCreateFieldErrors;
   errorCode?: 'auth' | 'validation' | 'slug_taken' | 'limit' | 'server';
+  upgradeTo?: string;
+  usage?: { count: number; limit: number | null };
 };
 
 type AuthUser = { id: string };
@@ -181,6 +184,21 @@ export async function executeCreateProject(
   }
 
   const ownedProfile = profile as OwnedProfileRow;
+
+  const quota = await evaluateProjectCreationQuota(supabase, {
+    tenantId: ownedProfile.tenant_id,
+    profileId: ownedProfile.id,
+  });
+
+  if (!quota.allowed) {
+    return {
+      error: quota.error,
+      errorCode: 'limit',
+      upgradeTo: quota.upgradeTo,
+      usage: quota.usage,
+    };
+  }
+
   const payload = parseCreateProjectFormData(formData);
   const validated = validateCreateProjectPayload(payload);
   if (!validated.success) {

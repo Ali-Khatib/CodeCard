@@ -1,6 +1,34 @@
 import { ProjectCreateForm } from '@/components/dashboard/project-create-form';
+import { createClient } from '@/lib/supabase/server';
+import {
+  countOwnedProjects,
+  getProjectLimitForPlan,
+  resolveTenantPlanId,
+} from '@/lib/projects/project-plan-core';
 
-export default function NewProjectPage() {
+export default async function NewProjectPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let usage: { count: number; limit: number | null } | null = null;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, tenant_id')
+      .eq('owner_user_id', user.id)
+      .single();
+
+    if (profile) {
+      const planId = await resolveTenantPlanId(supabase, profile.tenant_id);
+      const limit = getProjectLimitForPlan(planId);
+      const count = await countOwnedProjects(supabase, profile.id);
+      usage = { count, limit };
+    }
+  }
+
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
@@ -15,7 +43,7 @@ export default function NewProjectPage() {
           later steps.
         </p>
       </div>
-      <ProjectCreateForm />
+      <ProjectCreateForm usage={usage} />
     </div>
   );
 }
