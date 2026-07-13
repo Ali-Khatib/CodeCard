@@ -10,9 +10,17 @@ import {
   executeUpdateProject,
   type ProjectUpdateState,
 } from '@/lib/projects/project-update-core';
-import { revalidateOwnedProjectPaths } from '@/lib/projects/project-revalidate';
+import {
+  executePublishProject,
+  executeUnpublishProject,
+  type ProjectPublishState,
+} from '@/lib/projects/project-publish-core';
+import {
+  revalidateDeletedProjectPaths,
+  revalidateOwnedProjectPaths,
+} from '@/lib/projects/project-revalidate';
 
-export type { ProjectCreateState, ProjectUpdateState };
+export type { ProjectCreateState, ProjectUpdateState, ProjectPublishState };
 
 export async function createProjectAction(
   _prev: ProjectCreateState,
@@ -40,6 +48,42 @@ export async function updateProjectAction(
       projectId: result.projectId,
       profileSlug: result.profileSlug,
       isPublished: result.isPublished,
+    });
+  }
+
+  return result;
+}
+
+export async function publishProjectAction(
+  projectId: string,
+): Promise<ProjectPublishState> {
+  const supabase = await createClient();
+  const result = await executePublishProject(supabase, projectId);
+
+  if (result.success && result.projectId) {
+    revalidateOwnedProjectPaths({
+      projectId: result.projectId,
+      profileSlug: result.profileSlug,
+      isPublished: true,
+      touchPublicRoutes: true,
+    });
+  }
+
+  return result;
+}
+
+export async function unpublishProjectAction(
+  projectId: string,
+): Promise<ProjectPublishState> {
+  const supabase = await createClient();
+  const result = await executeUnpublishProject(supabase, projectId);
+
+  if (result.success && result.projectId) {
+    revalidateOwnedProjectPaths({
+      projectId: result.projectId,
+      profileSlug: result.profileSlug,
+      isPublished: false,
+      touchPublicRoutes: true,
     });
   }
 
