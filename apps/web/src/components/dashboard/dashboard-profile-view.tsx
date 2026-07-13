@@ -7,6 +7,7 @@ import { CountUp } from '@/components/landing/count-up';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { ProfileEditor } from '@/components/profile-editor';
 import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile-header';
+import { ProfileCompletionIndicator } from '@/components/dashboard/profile-completion-indicator';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
@@ -14,12 +15,13 @@ import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
+import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import type { Profile } from '@codecard/types';
 import { AppButton, AppCard, AppMono, PageHeader } from './ui/dashboard-ui';
 
 type DashboardProfileViewProps = {
   profile: Profile;
-  completion: number;
+  completion: ProfileCompletionResult;
   profileViews: number;
   profileLinks?: ProfileLinkRow[];
   links?: ProfileLinkItem[];
@@ -175,10 +177,7 @@ export function DashboardProfileView({
 
           <div className="grid grid-cols-2 gap-3">
             <AppCard className="!p-4">
-              <AppMono>Completion</AppMono>
-              <p className="mt-2 text-[28px] font-medium">
-                <CountUp value={completion} />%
-              </p>
+              <ProfileCompletionIndicator completion={completion} variant="compact" />
             </AppCard>
             <AppCard className="!p-4">
               <AppMono>Views</AppMono>

@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
-import { profileCompletion } from '@/lib/dashboard/profile-completion';
 import { DashboardProfileView } from '@/components/dashboard/dashboard-profile-view';
 import {
   ProfileEditorLoadErrorState,
   ProfileEditorMissingState,
 } from '@/components/profile/profile-editor-route-states';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
 export default async function DashboardProfilePage() {
   const supabase = await createClient();
@@ -27,10 +27,10 @@ export default async function DashboardProfilePage() {
     return <ProfileEditorMissingState />;
   }
 
-  const { count: projectCount } = await supabase
-    .from('projects')
-    .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile.id);
+  const completionResult = await loadProfileCompletion(supabase, profile);
+  if (!completionResult.ok) {
+    return <ProfileEditorLoadErrorState />;
+  }
 
   const { count: profileViews } = await supabase
     .from('public_profile_events')
@@ -54,13 +54,11 @@ export default async function DashboardProfilePage() {
     url: link.url,
   }));
 
-  const completion = profileCompletion(profile, projectCount ?? 0, profileLinks.length);
-
   return (
     <DashboardProfileView
       profile={profile}
       profileLinks={profileLinks}
-      completion={completion}
+      completion={completionResult.completion}
       profileViews={profileViews ?? 0}
       links={links}
     />

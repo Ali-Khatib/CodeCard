@@ -6,6 +6,7 @@ import {
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
+import { calculateProfileCompletion, deriveProfileCompletionInput } from '@/lib/profile/completion';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import type { Profile } from '@codecard/types';
 
@@ -26,11 +27,19 @@ const demoProfile: Profile = {
 };
 
 export default function PreviewOverviewPage() {
+  const completion = calculateProfileCompletion(
+    deriveProfileCompletionInput(DEMO_PROFILE, {
+      hasProfileLink: DEMO_PROFILE_LINKS.length > 0,
+      hasPublishedProject: true,
+    }),
+    { hasAnyProject: true },
+  );
+
   return (
     <DashboardOverviewView
       greeting={greetingForHour()}
       displayName={DEMO_WORKSPACE.displayName}
-      completion={DEMO_WORKSPACE.completion}
+      completion={completion}
       profileSlug={DEMO_WORKSPACE.profileSlug}
       avatarUrl={DEMO_WORKSPACE.avatarUrl}
       headline={DEMO_PROFILE.headline}

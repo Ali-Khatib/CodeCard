@@ -10,12 +10,14 @@ import { Sparkline } from './sparkline';
 import { ProfileShareHero } from './profile-share-hero';
 import { FadeInView } from './fade-in-view';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
+import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
+import { ProfileCompletionIndicator } from './profile-completion-indicator';
 
 export type OverviewProps = {
   greeting: string;
   displayName: string;
-  completion: number;
+  completion: ProfileCompletionResult;
   profileSlug?: string | null;
   avatarUrl?: string | null;
   headline?: string | null;
@@ -31,7 +33,7 @@ export type OverviewProps = {
     qrScans: number;
   };
   activity: WorkspaceActivity[];
-  suggested: { title: string; detail: string; href: string };
+  suggested: { title: string; detail: string; href: string } | null;
   basePath?: string;
 };
 
@@ -68,7 +70,7 @@ export function DashboardOverviewView({
           </div>
           <div className="cc-profile-home__stat-pills">
             <span className="cc-profile-home__stat-pill cc-profile-home__stat-pill--iris">
-              <CountUp value={completion} />% ready
+              Profile <CountUp value={completion.percentage} />% complete
             </span>
             <span className="cc-profile-home__stat-pill">
               <CountUp value={views} /> views
@@ -77,15 +79,22 @@ export function DashboardOverviewView({
         </header>
       </FadeInView>
 
-      {/* ── Zone 2: Share — copy link + QR (hero) ── */}
+      {/* ── Zone 2: Profile completion ── */}
       <FadeInView delay={0.04}>
+        <section aria-label="Profile completion">
+          <ProfileCompletionIndicator completion={completion} />
+        </section>
+      </FadeInView>
+
+      {/* ── Zone 3: Share — copy link + QR (hero) ── */}
+      <FadeInView delay={0.08}>
         <section aria-label="Share your CodeCard">
           <ProfileShareHero profileSlug={profileSlug} />
         </section>
       </FadeInView>
 
-      {/* ── Zone 3: Identity + edit ── */}
-      <FadeInView delay={0.08}>
+      {/* ── Zone 4: Identity + edit ── */}
+      <FadeInView delay={0.12}>
         <section id="profile" className="cc-profile-home__zone scroll-mt-24">
           <div className="cc-profile-home__zone-head">
             <div>
@@ -148,32 +157,34 @@ export function DashboardOverviewView({
         </section>
       </FadeInView>
 
-      {/* ── Zone 4: Do this next (single action card) ── */}
-      <FadeInView delay={0.12}>
-        <section className="cc-profile-home__zone">
-          <AppCard tone="rose" className="cc-profile-next-card !p-6">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-              <div className="max-w-lg">
-                <AppMono>Suggested next step</AppMono>
-                <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
-                  {suggested.title}
-                </h2>
-                <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-                  {suggested.detail}
-                </p>
+      {/* ── Zone 5: Do this next (single action card) ── */}
+      {suggested ? (
+        <FadeInView delay={0.16}>
+          <section className="cc-profile-home__zone">
+            <AppCard tone="rose" className="cc-profile-next-card !p-6">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div className="max-w-lg">
+                  <AppMono>Suggested next step</AppMono>
+                  <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
+                    {suggested.title}
+                  </h2>
+                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
+                    {suggested.detail}
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <AppButton variant="primary" href={suggested.href}>
+                    Do this now →
+                  </AppButton>
+                </div>
               </div>
-              <div className="flex shrink-0 flex-wrap gap-2">
-                <AppButton variant="primary" href={suggested.href}>
-                  Do this now →
-                </AppButton>
-              </div>
-            </div>
-          </AppCard>
-        </section>
-      </FadeInView>
+            </AppCard>
+          </section>
+        </FadeInView>
+      ) : null}
 
-      {/* ── Zone 5: Reach snapshot ── */}
-      <FadeInView delay={0.16}>
+      {/* ── Zone 6: Reach snapshot ── */}
+      <FadeInView delay={0.2}>
         <section className="cc-profile-home__zone">
           <div className="cc-profile-home__zone-head">
             <div>
@@ -199,8 +210,8 @@ export function DashboardOverviewView({
         </section>
       </FadeInView>
 
-      {/* ── Zone 6: Activity ── */}
-      <FadeInView delay={0.2}>
+      {/* ── Zone 7: Activity ── */}
+      <FadeInView delay={0.24}>
         <section className="cc-profile-home__zone">
           <AppMono>Recent activity</AppMono>
           <ul className="cc-profile-activity-list mt-4">
