@@ -32,9 +32,9 @@ describe('project ordering integration', () => {
     expect(projectPage).toContain('sortProjectsByEffectiveOrder');
   });
 
-  it('revalidates dashboard and public profile routes after reorder', () => {
+  it('revalidates dashboard and public project navigation routes after reorder', () => {
     const actions = read('src/lib/projects/project-order-actions.ts');
     expect(actions).toContain("revalidatePath('/dashboard/projects')");
-    expect(actions).toContain('revalidatePath(`/${profileResult.profile.slug}`)');
+    expect(actions).toContain('revalidatePublicProjectNavigation');
   });
 });
