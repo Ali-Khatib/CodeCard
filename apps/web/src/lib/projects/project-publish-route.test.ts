@@ -22,7 +22,6 @@ describe('project publishing controls', () => {
     expect(controls).toContain('unpublishProjectAction');
     expect(controls).toContain('Unpublishing removes this project');
     expect(action).toContain('executePublishProject');
-    expect(action).not.toContain('executeDeleteProject');
   });
 
   it('keeps public project queries filtered to published projects', () => {

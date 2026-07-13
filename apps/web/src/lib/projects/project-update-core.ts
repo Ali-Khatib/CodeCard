@@ -239,7 +239,12 @@ export async function executeUpdateProject(
     .eq('owner_user_id', auth.user.id);
 
   if (updateError) {
-    return mapProjectCreateDbError(updateError);
+    const mapped = mapProjectCreateDbError(updateError);
+    return {
+      ...mapped,
+      errorCode:
+        mapped.errorCode === 'limit' ? 'server' : (mapped.errorCode as ProjectUpdateState['errorCode']),
+    };
   }
 
   const relationsUpdated = await replaceProjectRelations(

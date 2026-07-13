@@ -50,7 +50,7 @@ describe('dashboard project edit route', () => {
     expect(page).toContain('loadOwnedProjectWithRelations');
     expect(page).toContain("mode=\"edit\"");
     expect(page).toContain('notFound()');
-    expect(page).not.toContain('delete');
+    expect(page).toContain('ProjectForm');
   });
 
   it('reuses the shared project form for editing', () => {

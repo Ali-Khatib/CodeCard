@@ -261,8 +261,8 @@ export function ProjectForm({
 
       {limitReached && mode === 'create' && (
         <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-vellum" role="alert">
-          <p>{state.error ?? `You've reached the ${usage?.limit}-project limit on the Free plan.`}</p>
-          <Link href={state.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-reactorBright underline underline-offset-2">
+          <p>{createState.error ?? `You've reached the ${usage?.limit}-project limit on the Free plan.`}</p>
+          <Link href={createState.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-reactorBright underline underline-offset-2">
             View upgrade options
           </Link>
         </div>
