@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { normalizeResearchSlug } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { ResearchPaperDetail } from '@/components/research/research-paper-detail';
 import { ProfileAnalytics } from '@/components/profile-analytics';
@@ -9,6 +10,7 @@ import {
   toPublicResearchPaper,
 } from '@/lib/research/research-public';
 import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
+import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 
 interface PageProps {
   params: Promise<{ slug: string; paperSlug: string }>;
@@ -17,7 +19,13 @@ interface PageProps {
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug, paperSlug } = await params;
+  const { slug: rawSlug, paperSlug: rawPaperSlug } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  const paperSlug = rawPaperSlug ? normalizeResearchSlug(rawPaperSlug) : '';
+  if (!slug || !paperSlug) {
+    return { title: 'Research not found', robots: { index: false, follow: false } };
+  }
+
   const supabase = await createClient();
 
   const { data: profile } = await supabase
@@ -53,7 +61,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ResearchDetailPage({ params }: PageProps) {
-  const { slug, paperSlug } = await params;
+  const { slug: rawSlug, paperSlug: rawPaperSlug } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  const paperSlug = rawPaperSlug ? normalizeResearchSlug(rawPaperSlug) : '';
+  if (!slug || !paperSlug) notFound();
+
   const supabase = await createClient();
 
   const { data: profile } = await supabase
