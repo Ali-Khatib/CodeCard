@@ -51,6 +51,47 @@ export async function POST(request: Request) {
       });
     }
 
+    if (
+      (event_type === 'profile_share' || event_type === 'qr_download') &&
+      profile_id
+    ) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // Owner-only actions: never accept client claims of another profile.
+      if (!user) {
+        return NextResponse.json({ ok: true });
+      }
+
+      const { data: ownedProfile } = await supabase
+        .from('profiles')
+        .select('tenant_id, is_public')
+        .eq('id', profile_id)
+        .eq('owner_user_id', user.id)
+        .maybeSingle();
+
+      if (!ownedProfile) {
+        return NextResponse.json({ ok: true });
+      }
+
+      // Existing RLS only allows profile-target inserts when the profile is public.
+      if (ownedProfile.is_public) {
+        await supabase.from('analytics_events').insert({
+          tenant_id: ownedProfile.tenant_id,
+          profile_id,
+          user_id: user.id,
+          target_type: 'profile',
+          target_id: profile_id,
+          event_type,
+          metadata: metadata ?? {},
+          session_id,
+        });
+      }
+
+      return NextResponse.json({ ok: true });
+    }
+
     if (event_type === 'project_view' && project_id && profile_id) {
       const { data: project } = await supabase
         .from('projects')

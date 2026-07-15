@@ -17,6 +17,5 @@ describe('WS07-T006 ProfileShareHero native share wiring', () => {
     expect(hero).not.toContain('Shared successfully to');
     expect(hero).not.toContain('WhatsApp');
     expect(hero).not.toContain('?source=share');
-    expect(hero).not.toContain('profile_share');
   });
 });
