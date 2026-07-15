@@ -20,7 +20,26 @@ describe('ProjectMediaUpload component', () => {
     expect(component).toContain('deleteProjectScreenshotAction');
     expect(component).toContain('Confirm delete');
     expect(component).toContain('finalizeProjectMediaUploadAction');
+    expect(component).toContain('UploadProgressIndicator');
+    expect(component).toContain('AbortController');
+    expect(component).toContain('Retry upload for');
+    expect(component).toContain('progressPercent');
+    expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toContain('compress');
     expect(component).not.toMatch(/service.?role/i);
+  });
+});
+
+describe('UploadProgressIndicator', () => {
+  it('exposes progressbar semantics without timer-driven percentages', () => {
+    const indicator = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/upload-progress-indicator.tsx'),
+      'utf8',
+    );
+    expect(indicator).toContain('role="progressbar"');
+    expect(indicator).toContain('aria-valuemin');
+    expect(indicator).toContain('aria-valuemax');
+    expect(indicator).toContain('Never invents percentages with timers');
+    expect(indicator).not.toMatch(/setInterval/);
   });
 });

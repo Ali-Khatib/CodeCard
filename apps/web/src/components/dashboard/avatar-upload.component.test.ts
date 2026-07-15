@@ -17,13 +17,15 @@ describe('AvatarUpload component', () => {
     expect(component).toContain('Replace photo');
     expect(component).toContain('aria-busy={pending}');
     expect(component).toContain('role="status"');
-    expect(component).toContain('Preparing upload');
-    expect(component).toContain('Uploading image');
-    expect(component).toContain('Saving avatar');
+    expect(component).toContain('UploadProgressIndicator');
+    expect(component).toContain('AbortController');
+    expect(component).toContain('Retry');
+    expect(component).toContain('Cancel upload');
     expect(component).toContain('Avatar saved');
     expect(component).toContain('URL.revokeObjectURL');
     expect(component).toContain('finalizeAvatarUploadAction');
     expect(component).toContain('uploadAvatarToSignedUrl');
+    expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toMatch(/service.?role/i);
   });
 

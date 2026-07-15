@@ -3,6 +3,8 @@ import {
   validateProjectMediaFile,
   executeProjectMediaUploadFlow,
 } from './project-media-upload-client';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 function makeFile(name: string, type: string, size: number): File {
   const buffer = new ArrayBuffer(size);
@@ -59,7 +61,7 @@ describe('executeProjectMediaUploadFlow', () => {
       file: makeFile('bad.svg', 'image/svg+xml', 10),
       requestInit: async () => {
         requested = true;
-        return { ok: false, message: 'nope' };
+        return { ok: false, message: 'nope', failureClass: 'upload_authorization', retryable: true };
       },
       uploadToStorage: async () => ({ ok: true }),
       finalizeUpload: async () => ({ success: true, assetId: 'asset-1' }),
@@ -67,5 +69,66 @@ describe('executeProjectMediaUploadFlow', () => {
 
     expect(result.ok).toBe(false);
     expect(requested).toBe(false);
+    if (!result.ok) {
+      expect(result.retryable).toBe(false);
+      expect(result.failureClass).toBe('validation');
+    }
+  });
+
+  it('keeps transfer-complete separate from finalizing for screenshot retries', async () => {
+    const phases: string[] = [];
+    const result = await executeProjectMediaUploadFlow({
+      projectId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      mediaRole: 'screenshot',
+      file: makeFile('one.png', 'image/png', 100),
+      onPhaseChange: (phase) => phases.push(phase),
+      onProgress: (progress) => {
+        if (progress.percent === 100) {
+          expect(phases.includes('finalizing')).toBe(false);
+        }
+      },
+      requestInit: async () => ({
+        ok: true,
+        init: {
+          path: 'tenant/user/project-media/project/one.png',
+          signedUrl: 'https://example/upload?token=t',
+          token: 'token',
+          mimeType: 'image/png',
+          maxBytes: 5 * 1024 * 1024,
+        },
+      }),
+      uploadToStorage: async (_init, _file, options) => {
+        options?.onProgress?.({ loaded: 100, total: 100, percent: 100 });
+        return { ok: true };
+      },
+      finalizeUpload: async () => ({ success: true, assetId: 'asset-1' }),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
+  });
+
+  it('does not use timer-based fake progress in upload clients or UI', () => {
+    const client = readFileSync(
+      resolve(process.cwd(), 'src/lib/projects/project-media-upload-client.ts'),
+      'utf8',
+    );
+    const transport = readFileSync(
+      resolve(process.cwd(), 'src/lib/storage/signed-upload-transport.ts'),
+      'utf8',
+    );
+    const avatarUi = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/avatar-upload.tsx'),
+      'utf8',
+    );
+    const mediaUi = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/project-media-upload.tsx'),
+      'utf8',
+    );
+
+    for (const source of [client, transport, avatarUi, mediaUi]) {
+      expect(source).not.toMatch(/setInterval\s*\([^)]*progress/i);
+      expect(source).not.toMatch(/fakeProgress|Math\.random\(\)\s*\*\s*100/);
+    }
   });
 });

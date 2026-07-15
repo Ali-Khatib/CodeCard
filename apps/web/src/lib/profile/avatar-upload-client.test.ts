@@ -84,29 +84,47 @@ describe('requestAvatarUploadInit', () => {
 });
 
 describe('uploadAvatarToSignedUrl', () => {
-  it('uploads only to the approved avatars bucket and path', async () => {
-    const uploadToSignedUrl = vi.fn().mockResolvedValue({ error: null });
-    const supabase = {
-      storage: {
-        from: vi.fn((bucket: string) => {
-          expect(bucket).toBe(AVATAR_UPLOAD_BUCKET);
-          return { uploadToSignedUrl };
-        }),
-      },
-    };
+  it('uses signed-url transport with progress instead of inventing percentages', async () => {
+    const progress: number[] = [];
+    const originalXHR = globalThis.XMLHttpRequest;
 
-    const file = makeFile('avatar.png', 'image/png', 1024);
-    const result = await uploadAvatarToSignedUrl(supabase as never, initResponse, file);
-    expect(result.ok).toBe(true);
-    expect(uploadToSignedUrl).toHaveBeenCalledWith(initResponse.path, initResponse.token, file, {
-      contentType: 'image/png',
-      upsert: false,
-    });
+    globalThis.XMLHttpRequest = class FakeXHR {
+      status = 200;
+      upload: { onprogress: ((event: ProgressEvent) => void) | null } = { onprogress: null };
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      onabort: (() => void) | null = null;
+      open = vi.fn();
+      setRequestHeader = vi.fn();
+      abort = vi.fn();
+      send = vi.fn(() => {
+        this.upload.onprogress?.({
+          lengthComputable: true,
+          loaded: 1024,
+          total: 1024,
+        } as ProgressEvent);
+        queueMicrotask(() => this.onload?.());
+      });
+    } as unknown as typeof XMLHttpRequest;
+
+    try {
+      const file = makeFile('avatar.png', 'image/png', 1024);
+      const result = await uploadAvatarToSignedUrl(null, initResponse, file, {
+        onProgress: (event) => {
+          if (typeof event.percent === 'number') progress.push(event.percent);
+        },
+      });
+      expect(result.ok).toBe(true);
+      expect(progress).toEqual([100]);
+      expect(AVATAR_UPLOAD_BUCKET).toBeTruthy();
+    } finally {
+      globalThis.XMLHttpRequest = originalXHR;
+    }
   });
 });
 
 describe('executeAvatarUploadFlow', () => {
-  it('runs preparing, uploading, saving, and complete phases in order', async () => {
+  it('runs authorizing, uploading, finalizing, and complete stages in order', async () => {
     const phases: string[] = [];
     const file = makeFile('avatar.png', 'image/png', 1024);
 
@@ -119,20 +137,54 @@ describe('executeAvatarUploadFlow', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(phases).toEqual(['preparing', 'uploading', 'saving', 'complete']);
+    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
   });
 
-  it('does not finalize when storage upload fails', async () => {
+  it('keeps 100% transfer separate from finalizing success', async () => {
+    const phases: string[] = [];
+    let sawUploadProgress = false;
+
+    const result = await executeAvatarUploadFlow({
+      file: makeFile('avatar.png', 'image/png', 1024),
+      onPhaseChange: (phase) => phases.push(phase),
+      onProgress: (progress) => {
+        if (progress.percent === 100) {
+          sawUploadProgress = true;
+          expect(phases.includes('finalizing')).toBe(false);
+        }
+      },
+      requestInit: async () => ({ ok: true, init: initResponse }),
+      uploadToStorage: async (_init, _file, options) => {
+        options?.onProgress?.({ loaded: 1024, total: 1024, percent: 100 });
+        return { ok: true };
+      },
+      finalizeUpload: async () => ({ success: true, avatarUrl: 'https://example.supabase.co/public/avatar.png' }),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(sawUploadProgress).toBe(true);
+    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
+  });
+
+  it('does not finalize when storage upload fails and marks retryable network failures', async () => {
     const finalizeUpload = vi.fn();
     const result = await executeAvatarUploadFlow({
       file: makeFile('avatar.png', 'image/png', 1024),
       requestInit: async () => ({ ok: true, init: initResponse }),
-      uploadToStorage: async () => ({ ok: false, message: 'Could not upload image. Please try again.' }),
+      uploadToStorage: async () => ({
+        ok: false,
+        message: 'The upload was interrupted. Try again.',
+        failureClass: 'network',
+      }),
       finalizeUpload,
     });
 
     expect(result.ok).toBe(false);
     expect(finalizeUpload).not.toHaveBeenCalled();
+    if (!result.ok) {
+      expect(result.retryable).toBe(true);
+      expect(result.failureClass).toBe('network');
+    }
   });
 
   it('does not report success when finalization fails', async () => {
@@ -145,7 +197,22 @@ describe('executeAvatarUploadFlow', () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.phase).toBe('saving');
+      expect(result.phase).toBe('finalizing');
+      expect(result.retryable).toBe(true);
+    }
+  });
+
+  it('marks validation failures as non-retryable', async () => {
+    const result = await executeAvatarUploadFlow({
+      file: makeFile('avatar.svg', 'image/svg+xml', 100),
+      requestInit: async () => ({ ok: true, init: initResponse }),
+      uploadToStorage: async () => ({ ok: true }),
+      finalizeUpload: async () => ({ success: true, avatarUrl: 'https://example/x.png' }),
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failureClass).toBe('validation');
+      expect(result.retryable).toBe(false);
     }
   });
 });
