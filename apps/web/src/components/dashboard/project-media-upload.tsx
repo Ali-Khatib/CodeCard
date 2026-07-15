@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROJECT_SCREENSHOT_MAX_COUNT } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/client';
+import { deleteProjectScreenshotAction } from '@/lib/projects/delete-project-screenshot-action';
 import { finalizeProjectMediaUploadAction } from '@/lib/projects/finalize-project-media-upload-action';
 import {
   executeProjectMediaUploadFlow,
@@ -72,8 +73,19 @@ export function ProjectMediaUpload({
   const [coverPhase, setCoverPhase] = useState<ProjectMediaUploadPhase>('idle');
   const [coverError, setCoverError] = useState('');
   const [coverSuccess, setCoverSuccess] = useState(false);
+  const [coverCleanupWarning, setCoverCleanupWarning] = useState(false);
 
   const [localScreenshots, setLocalScreenshots] = useState<LocalScreenshotSelection[]>([]);
+  const [deletingAssetId, setDeletingAssetId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState('');
+
+  useEffect(() => {
+    setSavedCover(cover);
+    setSavedCoverUrl(coverUrl);
+    setSavedScreenshots(screenshots);
+    setSavedScreenshotUrls(screenshotUrls);
+  }, [cover, coverUrl, screenshots, screenshotUrls]);
 
   const coverPending = coverPhase !== 'idle' && coverPhase !== 'complete';
   const hasCover = Boolean(savedCover);
@@ -91,30 +103,34 @@ export function ProjectMediaUpload({
     }
   }, []);
 
+  const resetCoverSelection = useCallback(() => {
+    if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
+    setCoverPreviewUrl(null);
+    setCoverFile(null);
+    if (coverInputRef.current) coverInputRef.current.value = '';
+  }, [coverPreviewUrl, revokePreviewUrl]);
+
   const handleCoverFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (coverPending || hasCover) {
+      if (coverPending) {
         event.target.value = '';
         return;
       }
 
       setCoverError('');
       setCoverSuccess(false);
+      setCoverCleanupWarning(false);
       setCoverPhase('idle');
 
       const file = event.target.files?.[0];
       if (!file) {
-        if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
-        setCoverPreviewUrl(null);
-        setCoverFile(null);
+        resetCoverSelection();
         return;
       }
 
       const validation = validateProjectMediaFile(file);
       if (!validation.ok) {
-        if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
-        setCoverPreviewUrl(null);
-        setCoverFile(null);
+        resetCoverSelection();
         event.target.value = '';
         setCoverError(validation.message);
         return;
@@ -126,14 +142,15 @@ export function ProjectMediaUpload({
       setCoverPreviewUrl(objectUrl);
       setCoverFile(file);
     },
-    [coverPending, coverPreviewUrl, hasCover, revokePreviewUrl, trackPreviewUrl],
+    [coverPending, coverPreviewUrl, resetCoverSelection, revokePreviewUrl, trackPreviewUrl],
   );
 
   const handleCoverUpload = useCallback(async () => {
-    if (coverPending || disabled || !coverFile || hasCover) return;
+    if (coverPending || disabled || !coverFile) return;
 
     setCoverError('');
     setCoverSuccess(false);
+    setCoverCleanupWarning(false);
 
     const file = coverFile;
     const supabase = createClient();
@@ -151,7 +168,11 @@ export function ProjectMediaUpload({
           path,
         });
         if (finalized.success && finalized.asset) {
-          return { success: true as const, assetId: finalized.asset.id };
+          return {
+            success: true as const,
+            assetId: finalized.asset.id,
+            cleanupWarning: finalized.cleanupWarning,
+          };
         }
         return { success: false as const, error: finalized.error };
       },
@@ -177,6 +198,7 @@ export function ProjectMediaUpload({
       file_size: file.size,
       sort_order: 0,
     });
+    setCoverCleanupWarning(Boolean(result.cleanupWarning));
     setCoverSuccess(true);
     setCoverPhase('complete');
     router.refresh();
@@ -185,7 +207,7 @@ export function ProjectMediaUpload({
       setCoverSuccess(false);
       setCoverPhase('idle');
     }, 2500);
-  }, [coverFile, coverPending, coverPreviewUrl, disabled, hasCover, projectId, router]);
+  }, [coverFile, coverPending, coverPreviewUrl, disabled, projectId, router]);
 
   const handleScreenshotFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,7 +228,7 @@ export function ProjectMediaUpload({
         const validation = validateProjectMediaFile(file);
         if (!validation.ok) {
           nextSelections.push({
-            id: `${file.name}-${file.size}-${file.lastModified}`,
+            id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
             file,
             previewUrl: '',
             phase: 'error',
@@ -218,7 +240,7 @@ export function ProjectMediaUpload({
         const previewUrl = URL.createObjectURL(file);
         trackPreviewUrl(previewUrl);
         nextSelections.push({
-          id: `${file.name}-${file.size}-${file.lastModified}`,
+          id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
           file,
           previewUrl,
           phase: 'idle',
@@ -319,6 +341,41 @@ export function ProjectMediaUpload({
     }
   }, [localScreenshots, uploadLocalScreenshot]);
 
+  const handleDeleteScreenshot = useCallback(
+    async (assetId: string) => {
+      if (deletingAssetId || disabled) return;
+
+      setDeleteError('');
+      setDeletingAssetId(assetId);
+
+      const result = await deleteProjectScreenshotAction({
+        projectId,
+        assetId,
+      });
+
+      setDeletingAssetId(null);
+      setConfirmDeleteId(null);
+
+      if (!result.success) {
+        setDeleteError(result.error ?? 'Could not delete this screenshot. Please try again.');
+        return;
+      }
+
+      setSavedScreenshots((current) =>
+        current
+          .filter((asset) => asset.id !== assetId)
+          .map((asset, index) => ({ ...asset, sort_order: index })),
+      );
+      setSavedScreenshotUrls((current) => {
+        const next = { ...current };
+        delete next[assetId];
+        return next;
+      });
+      router.refresh();
+    },
+    [deletingAssetId, disabled, projectId, router],
+  );
+
   const displayCoverUrl = coverPreviewUrl ?? savedCoverUrl;
 
   return (
@@ -356,55 +413,63 @@ export function ProjectMediaUpload({
           </div>
 
           <div className="flex min-w-0 flex-col gap-2">
-            {hasCover ? (
-              <p className="text-[14px] text-[var(--app-smoke)]">
-                This project already has a saved cover. Replacement will be available in a future
-                update.
-              </p>
-            ) : (
-              <>
-                <label htmlFor={coverInputId} className="sr-only">
-                  Choose project cover image
-                </label>
-                <input
-                  ref={coverInputRef}
-                  id={coverInputId}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  disabled={disabled || coverPending}
-                  onChange={handleCoverFileChange}
-                />
-                <div className="flex flex-wrap gap-2">
-                  <AppButton
-                    type="button"
-                    variant="ghost"
-                    className={disabled || coverPending ? 'pointer-events-none opacity-50' : ''}
-                    onClick={
-                      disabled || coverPending
-                        ? undefined
-                        : () => coverInputRef.current?.click()
-                    }
-                  >
-                    Choose cover
+            <label htmlFor={coverInputId} className="sr-only">
+              {hasCover ? 'Choose replacement project cover image' : 'Choose project cover image'}
+            </label>
+            <input
+              ref={coverInputRef}
+              id={coverInputId}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              disabled={disabled || coverPending}
+              onChange={handleCoverFileChange}
+            />
+            <div className="flex flex-wrap gap-2">
+              <AppButton
+                type="button"
+                variant="ghost"
+                className={disabled || coverPending ? 'pointer-events-none opacity-50' : ''}
+                onClick={
+                  disabled || coverPending ? undefined : () => coverInputRef.current?.click()
+                }
+              >
+                {hasCover ? 'Replace cover' : 'Choose cover'}
+              </AppButton>
+              {coverFile && !coverPending && (
+                <>
+                  <AppButton type="button" variant="primary" onClick={handleCoverUpload}>
+                    {hasCover ? 'Upload replacement' : 'Upload cover'}
                   </AppButton>
-                  {coverFile && !coverPending && (
-                    <AppButton type="button" variant="primary" onClick={handleCoverUpload}>
-                      Upload cover
-                    </AppButton>
-                  )}
-                </div>
-              </>
-            )}
+                  <AppButton type="button" variant="ghost" onClick={resetCoverSelection}>
+                    Cancel
+                  </AppButton>
+                </>
+              )}
+            </div>
+            {hasCover && !coverFile ? (
+              <p className="text-[13px] text-[var(--app-smoke)]">
+                The current cover stays visible until the replacement uploads successfully.
+              </p>
+            ) : null}
           </div>
         </div>
-        {(coverError || coverPending || coverSuccess) && (
+        {(coverError || coverPending || coverSuccess || coverCleanupWarning) && (
           <p
             role="status"
             className={`text-[14px] ${coverError ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
             aria-live="polite"
           >
-            {coverError || (coverPending ? phaseLabel(coverPhase) : coverSuccess ? phaseLabel('complete') : '')}
+            {coverError ||
+              (coverPending
+                ? phaseLabel(coverPhase)
+                : coverSuccess
+                  ? coverCleanupWarning
+                    ? 'Cover replaced. Cleanup of the previous file is still pending.'
+                    : phaseLabel('complete')
+                  : coverCleanupWarning
+                    ? 'Cover replaced. Cleanup of the previous file is still pending.'
+                    : '')}
           </p>
         )}
       </div>
@@ -421,21 +486,70 @@ export function ProjectMediaUpload({
             {savedScreenshots.map((asset) => (
               <li
                 key={asset.id}
-                className="relative aspect-video overflow-hidden rounded-lg border border-[var(--app-border)]"
+                className="relative overflow-hidden rounded-lg border border-[var(--app-border)]"
               >
-                {savedScreenshotUrls[asset.id] ? (
-                  <Image
-                    src={savedScreenshotUrls[asset.id]}
-                    alt={`Saved screenshot ${asset.sort_order + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                  />
-                ) : null}
+                <div className="relative aspect-video">
+                  {savedScreenshotUrls[asset.id] ? (
+                    <Image
+                      src={savedScreenshotUrls[asset.id]}
+                      alt={`Saved screenshot ${asset.sort_order + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="200px"
+                    />
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 p-2">
+                  {confirmDeleteId === asset.id ? (
+                    <>
+                      <AppButton
+                        type="button"
+                        variant="primary"
+                        className={
+                          deletingAssetId === asset.id ? 'pointer-events-none opacity-50' : ''
+                        }
+                        ariaLabel={`Confirm delete screenshot ${asset.sort_order + 1}`}
+                        onClick={() => handleDeleteScreenshot(asset.id)}
+                      >
+                        {deletingAssetId === asset.id ? 'Deleting…' : 'Confirm delete'}
+                      </AppButton>
+                      <AppButton
+                        type="button"
+                        variant="ghost"
+                        className={deletingAssetId ? 'pointer-events-none opacity-50' : ''}
+                        ariaLabel={`Cancel delete screenshot ${asset.sort_order + 1}`}
+                        onClick={() => setConfirmDeleteId(null)}
+                      >
+                        Cancel
+                      </AppButton>
+                    </>
+                  ) : (
+                    <AppButton
+                      type="button"
+                      variant="ghost"
+                      className={
+                        deletingAssetId || disabled ? 'pointer-events-none opacity-50' : ''
+                      }
+                      ariaLabel={`Delete screenshot ${asset.sort_order + 1}`}
+                      onClick={() => {
+                        setDeleteError('');
+                        setConfirmDeleteId(asset.id);
+                      }}
+                    >
+                      Delete
+                    </AppButton>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
         )}
+
+        {deleteError ? (
+          <p role="status" className="text-[14px] text-red-600" aria-live="polite">
+            {deleteError}
+          </p>
+        ) : null}
 
         {screenshotSlotsRemaining > 0 && (
           <>
