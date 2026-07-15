@@ -3910,8 +3910,43 @@ html.dark [class*='uppercase'][class*='tracking'] {
   --app-font: var(--font-sans), 'Inter', system-ui, sans-serif;
   --app-mono: ui-monospace, 'JetBrains Mono', monospace;
 
-  min-height: 100dvh;
+.min-height: 100dvh;
   background: var(--app-bone);
   color: var(--app-ink);
   font-family: var(--app-font);
+  max-width: 100%;
+}
+
+.cc-public-profile .cc-app-page {
+  max-width: min(100%, var(--app-page-public));
+  width: 100%;
+  min-width: 0;
+}
+
+.cc-public-profile .cc-app-project-card,
+.cc-public-profile .cc-app-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cc-public-profile .cc-app-project-card__body,
+.cc-public-profile .cc-app-project-card__media {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cc-public-breakable {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 430px) {
+  .cc-public-profile .cc-app-page {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .cc-public-profile .cc-app-btn {
+    min-height: 44px;
+  }
 }

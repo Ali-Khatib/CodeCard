@@ -12,18 +12,18 @@ export function PublicNotFoundView({
   message?: string;
 }) {
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center px-6 py-16 text-[var(--app-ink)]">
+    <main className="relative flex min-h-[100dvh] max-w-[100vw] items-center justify-center px-6 py-16 text-[var(--app-ink)]">
       <div className="mx-auto w-full max-w-lg text-center">
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
           CodeCard
         </p>
-        <h1 className="mt-4 text-[32px] font-medium tracking-[-0.03em] md:text-[40px]">{heading}</h1>
-        <p className="mt-4 text-[16px] leading-relaxed text-[var(--app-smoke)]">{message}</p>
+        <h1 className="mt-4 break-words text-[32px] font-medium tracking-[-0.03em] md:text-[40px]">{heading}</h1>
+        <p className="mt-4 break-words text-[16px] leading-relaxed text-[var(--app-smoke)]">{message}</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/" className="cc-app-btn cc-app-btn--primary">
+          <Link href="/" className="cc-app-btn cc-app-btn--primary min-h-11">
             Back to CodeCard
           </Link>
-          <Link href="/pricing" className="cc-app-btn cc-app-btn--ghost">
+          <Link href="/pricing" className="cc-app-btn cc-app-btn--ghost min-h-11">
             View pricing
           </Link>
         </div>

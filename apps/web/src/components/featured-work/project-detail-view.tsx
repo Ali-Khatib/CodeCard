@@ -245,11 +245,11 @@ export function ProjectDetailView({
                 <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
                   Featured project
                 </p>
-                <h1 className="cc-fit-title mt-3 max-w-[14ch] font-display text-[clamp(2rem,8vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)]">
+                <h1 className="cc-fit-title mt-3 max-w-full break-words font-display text-[clamp(1.75rem,8vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] md:max-w-[14ch]">
                   {project.title}
                 </h1>
                 {project.tagline && (
-                  <p className="mt-4 max-w-[42ch] text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
+                  <p className="mt-4 max-w-[42ch] break-words text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
                     {project.tagline}
                   </p>
                 )}
@@ -331,7 +331,7 @@ export function ProjectDetailView({
                   .map((paragraph) => paragraph.trim())
                   .filter(Boolean)
                   .map((paragraph) => (
-                    <p key={paragraph} className="text-pretty">
+                    <p key={paragraph} className="break-words text-pretty">
                       {paragraph}
                     </p>
                   ))}

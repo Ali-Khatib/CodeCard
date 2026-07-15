@@ -59,14 +59,14 @@ export function PublicProjectStack({
               </div>
 
               <div className="cc-app-project-card__body">
-                <h3 className="cc-fit-title cc-work-title">
+                <h3 className="cc-fit-title cc-work-title break-words">
                   {project.title}
                 </h3>
                 {project.tagline && (
-                  <p className="mt-2 text-[16px] text-[var(--app-ink)]">{project.tagline}</p>
+                  <p className="mt-2 break-words text-[16px] text-[var(--app-ink)]">{project.tagline}</p>
                 )}
                 {lead && (
-                  <p className="mt-2 max-w-[640px] text-[15px] leading-relaxed text-[var(--app-smoke)]">
+                  <p className="mt-2 max-w-[640px] break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">
                     {lead}
                   </p>
                 )}
