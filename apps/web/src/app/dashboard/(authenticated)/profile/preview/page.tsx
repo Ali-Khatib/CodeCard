@@ -5,6 +5,7 @@ import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
 import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import { normalizeResearchPaper } from '@/lib/research/research';
+import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
 import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
@@ -67,9 +68,12 @@ export default async function OwnerProfilePreviewPage() {
       normalizeFeaturedProject(project, { resolveStoragePath: resolveMediaUrl }),
   );
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
+  const resolveFigureUrl = createResearchFigureUrlResolver(supabase);
   const publishedResearch = sortResearchBySortOrder(
     researchRows.filter((p: ResearchPaperRow) => p.is_published),
-  ).map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, profile.slug));
+  ).map((paper: ResearchPaperRow) =>
+    normalizeResearchPaper(paper, profile.slug, { resolveFigureUrl }),
+  );
 
   const links: ProfileLinkItem[] = (profile.profile_links ?? [])
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)

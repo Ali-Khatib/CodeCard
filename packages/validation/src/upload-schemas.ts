@@ -30,9 +30,18 @@ export const RESEARCH_FIGURE_MIME_TYPES = [
   'image/webp',
 ] as const;
 
-export const STORAGE_RESOURCE_TYPES = ['avatar', 'project-media', 'private-doc'] as const;
+export const STORAGE_RESOURCE_TYPES = [
+  'avatar',
+  'project-media',
+  'private-doc',
+  'research-figure',
+] as const;
 
 export type StorageResourceType = (typeof STORAGE_RESOURCE_TYPES)[number];
+
+export const RESEARCH_FIGURE_MAX_COUNT = 12;
+
+export const RESEARCH_FIGURE_CAPTION_MAX_LENGTH = 500;
 
 export const FORBIDDEN_UPLOAD_OWNERSHIP_FIELDS = [
   'owner_user_id',
@@ -229,6 +238,82 @@ export const projectMediaFinalizeSchema = z
   })
   .strict();
 
+const storagePathSchema = z
+  .string()
+  .trim()
+  .min(1, 'Storage path is required')
+  .max(512, 'Storage path is too long')
+  .refine((value) => !/^https?:\/\//i.test(value), 'Invalid storage path')
+  .refine((value) => !value.includes('..'), 'Invalid storage path')
+  .refine((value) => !value.startsWith('/'), 'Invalid storage path');
+
+export const researchFigureUploadSchema = z
+  .object({
+    research_paper_id: z.string().uuid('Invalid research paper ID'),
+    filename: uploadFilenameSchema(),
+    mime_type: uploadMimeTypeSchema(RESEARCH_FIGURE_MIME_TYPES),
+    size: uploadSizeSchema(UPLOAD_IMAGE_MAX_BYTES),
+  })
+  .strict()
+  .superRefine((data, ctx) => refineFilenameMimeCompatibility(data, ctx));
+
+export const researchFigureFinalizeSchema = z
+  .object({
+    research_paper_id: z.string().uuid('Invalid research paper ID'),
+    path: storagePathSchema,
+    replace_figure_id: z.string().uuid('Invalid figure ID').optional(),
+  })
+  .strict();
+
+export const researchFigureCaptionSchema = z
+  .object({
+    research_paper_id: z.string().uuid('Invalid research paper ID'),
+    figure_id: z.string().uuid('Invalid figure ID'),
+    caption: z
+      .union([z.string(), z.null()])
+      .transform((value) => {
+        if (value === null) return null;
+        const trimmed = value.trim();
+        return trimmed === '' ? null : trimmed;
+      })
+      .refine(
+        (value) => value === null || value.length <= RESEARCH_FIGURE_CAPTION_MAX_LENGTH,
+        `Caption must be at most ${RESEARCH_FIGURE_CAPTION_MAX_LENGTH} characters`,
+      ),
+  })
+  .strict();
+
+export const researchFigureReorderSchema = z
+  .object({
+    research_paper_id: z.string().uuid('Invalid research paper ID'),
+    ordered_figure_ids: z
+      .array(z.string().uuid('Invalid figure ID'))
+      .min(1)
+      .max(RESEARCH_FIGURE_MAX_COUNT),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    const seen = new Set<string>();
+    for (const id of data.ordered_figure_ids) {
+      if (seen.has(id)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Duplicate figure ID',
+          path: ['ordered_figure_ids'],
+        });
+        return;
+      }
+      seen.add(id);
+    }
+  });
+
+export const researchFigureDeleteSchema = z
+  .object({
+    research_paper_id: z.string().uuid('Invalid research paper ID'),
+    figure_id: z.string().uuid('Invalid figure ID'),
+  })
+  .strict();
+
 export const signedUploadRequestSchema = z
   .object({
     resource_type: z.enum(STORAGE_RESOURCE_TYPES),
@@ -295,6 +380,33 @@ export const signedUploadRequestSchema = z
           ctx.addIssue({ ...issue, path: mappedPath });
         }
       }
+      return;
+    }
+
+    if (data.resource_type === 'research-figure') {
+      if (!data.resource_id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Research paper ID is required',
+          path: ['resource_id'],
+        });
+        return;
+      }
+
+      const figureUpload = researchFigureUploadSchema.safeParse({
+        research_paper_id: data.resource_id,
+        filename: data.filename,
+        mime_type: data.mime_type,
+        size: data.size,
+      });
+
+      if (!figureUpload.success) {
+        for (const issue of figureUpload.error.issues) {
+          const mappedPath =
+            issue.path[0] === 'research_paper_id' ? ['resource_id'] : issue.path;
+          ctx.addIssue({ ...issue, path: mappedPath });
+        }
+      }
     }
   });
 
@@ -327,5 +439,10 @@ export type AvatarUploadMetadataInput = z.infer<typeof avatarUploadMetadataSchem
 export type ProjectCoverUploadInput = z.infer<typeof projectCoverUploadSchema>;
 export type ProjectScreenshotUploadInput = z.infer<typeof projectScreenshotUploadSchema>;
 export type ProjectMediaFinalizeInput = z.infer<typeof projectMediaFinalizeSchema>;
+export type ResearchFigureUploadInput = z.infer<typeof researchFigureUploadSchema>;
+export type ResearchFigureFinalizeInput = z.infer<typeof researchFigureFinalizeSchema>;
+export type ResearchFigureCaptionInput = z.infer<typeof researchFigureCaptionSchema>;
+export type ResearchFigureReorderInput = z.infer<typeof researchFigureReorderSchema>;
+export type ResearchFigureDeleteInput = z.infer<typeof researchFigureDeleteSchema>;
 export type SignedUploadRequestInput = z.infer<typeof signedUploadRequestSchema>;
 export type ResearchUploadInput = z.infer<ReturnType<typeof createResearchUploadSchema>>;

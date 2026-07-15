@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { FILE_LIMITS, STORAGE_BUCKETS } from '@codecard/config';
 
-export const STORAGE_RESOURCE_TYPES = ['avatar', 'project-media', 'private-doc'] as const;
+export const STORAGE_RESOURCE_TYPES = [
+  'avatar',
+  'project-media',
+  'private-doc',
+  'research-figure',
+] as const;
 
 export type StorageResourceType = (typeof STORAGE_RESOURCE_TYPES)[number];
 
@@ -33,12 +38,16 @@ const RESOURCE_TYPE_TO_BUCKET: Record<StorageResourceType, string> = {
   avatar: STORAGE_BUCKETS.avatars,
   'project-media': STORAGE_BUCKETS.projectMedia,
   'private-doc': STORAGE_BUCKETS.privateDocs,
+  'research-figure': STORAGE_BUCKETS.projectMedia,
 };
 
 const RESOURCE_TYPE_EXTENSIONS: Record<StorageResourceType, readonly string[]> = {
   avatar: FILE_LIMITS.image.extensions,
   'project-media': [...FILE_LIMITS.image.extensions, ...FILE_LIMITS.video.extensions],
   'private-doc': FILE_LIMITS.document.extensions,
+  'research-figure': FILE_LIMITS.image.extensions.filter((ext) =>
+    ['jpg', 'jpeg', 'png', 'webp'].includes(ext),
+  ),
 };
 
 export function isStorageResourceType(value: string): value is StorageResourceType {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import {
   projectCoverUploadSchema,
   projectScreenshotUploadSchema,
+  researchFigureUploadSchema,
   type ProjectMediaRole,
 } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
@@ -10,6 +11,7 @@ import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 import { rateLimit } from '@/lib/rate-limit';
 import { assertProjectMediaUploadAllowed } from '@/lib/projects/project-media-core';
+import { assertResearchFigureUploadAllowed } from '@/lib/research/research-figure-core';
 import { createSignedUploadIntent } from '@/lib/storage/upload-core';
 import { resolveUploadOwnership } from '@/lib/storage/upload-ownership';
 import { uploadRequestSchema } from '@/lib/storage/upload-request';
@@ -64,6 +66,11 @@ export async function POST(request: Request) {
     return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
   }
 
+  // Private PDF uploads remain intentionally disabled (WS04-T007 external links only).
+  if (validated.data.resourceType === 'private-doc') {
+    return jsonNoStore({ error: 'Private document uploads are not available.' }, 403);
+  }
+
   if (validated.data.resourceType === 'project-media') {
     if (!validated.data.resourceId || !validated.data.mediaRole) {
       return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
@@ -84,6 +91,30 @@ export async function POST(request: Request) {
 
     if (!projectValidated.success) {
       const issue = projectValidated.error.issues[0];
+      if (issue?.message === 'File is too large') {
+        return jsonNoStore({ error: 'File is too large.' }, 413);
+      }
+      if (issue?.message === 'Unsupported file type' || issue?.message === 'File type does not match filename') {
+        return jsonNoStore({ error: 'Unsupported file type.' }, 415);
+      }
+      return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
+    }
+  }
+
+  if (validated.data.resourceType === 'research-figure') {
+    if (!validated.data.resourceId) {
+      return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
+    }
+
+    const figureValidated = researchFigureUploadSchema.safeParse({
+      research_paper_id: validated.data.resourceId,
+      filename: validated.data.filename,
+      mime_type: validated.data.mimeType,
+      size: validated.data.size,
+    });
+
+    if (!figureValidated.success) {
+      const issue = figureValidated.error.issues[0];
       if (issue?.message === 'File is too large') {
         return jsonNoStore({ error: 'File is too large.' }, 413);
       }
@@ -122,6 +153,16 @@ export async function POST(request: Request) {
       userId: user.id,
       projectId: validated.data.resourceId,
       mediaRole: validated.data.mediaRole,
+    });
+    if (!allowed.ok) {
+      return jsonNoStore({ error: allowed.message }, allowed.status);
+    }
+  }
+
+  if (validated.data.resourceType === 'research-figure' && validated.data.resourceId) {
+    const allowed = await assertResearchFigureUploadAllowed(supabase, {
+      userId: user.id,
+      researchPaperId: validated.data.resourceId,
     });
     if (!allowed.ok) {
       return jsonNoStore({ error: allowed.message }, allowed.status);

@@ -247,7 +247,7 @@ export function ResearchPaperDetail({
               <div className="mt-10 grid gap-6 sm:grid-cols-2">
                 {paper.figures.map((figure, index) => (
                   <figure
-                    key={figure.imageUrl + index}
+                    key={figure.id ?? figure.imageUrl + index}
                     className="overflow-hidden rounded-card border border-border/40 bg-midnight shadow-rim"
                     onMouseEnter={() =>
                       trackResearchEvent({
@@ -259,7 +259,13 @@ export function ResearchPaperDetail({
                     }
                   >
                     <div className="relative aspect-[16/10]">
-                      <Image src={figure.imageUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 520px" />
+                      <Image
+                        src={figure.imageUrl}
+                        alt={figure.caption?.trim() || 'Research figure'}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 520px"
+                      />
                     </div>
                     {figure.caption && (
                       <figcaption className="border-t border-border/40 p-4 text-[14px] leading-relaxed text-ash">

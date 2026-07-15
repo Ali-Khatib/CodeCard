@@ -1,3 +1,5 @@
+import { isAbsoluteMediaUrl } from '@/lib/projects/project-media-url';
+
 export interface ResearchFigure {
   id?: string;
   imageUrl: string;
@@ -26,9 +28,10 @@ export interface ResearchPaper {
   avgReadTimeSec?: number;
 }
 
-type DbResearchFigure = {
+export type DbResearchFigure = {
   id?: string;
   image_url: string;
+  storage_path?: string | null;
   caption?: string | null;
   sort_order?: number | null;
 };
@@ -52,9 +55,16 @@ type DbResearchPaper = {
   related_project?: { id: string; title: string; is_published?: boolean | null } | null;
 };
 
+export type ResearchFigureDisplayResolver = (figure: DbResearchFigure) => string | null;
+
+/**
+ * Map DB paper rows to the public/client shape.
+ * Callers that render figures must pass resolveFigureUrl so storage_path is never exposed.
+ */
 export function normalizeResearchPaper(
   paper: DbResearchPaper,
   profileSlug?: string,
+  options?: { resolveFigureUrl?: ResearchFigureDisplayResolver },
 ): ResearchPaper {
   const related = paper.related_project;
   const relatedIsPublic = related?.is_published === true;
@@ -86,11 +96,20 @@ export function normalizeResearchPaper(
     figures: (paper.research_figures ?? [])
       .slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-      .map((figure) => ({
-        id: figure.id,
-        imageUrl: figure.image_url,
-        caption: figure.caption ?? null,
-      })),
+      .map((figure) => {
+        const resolved = options?.resolveFigureUrl?.(figure);
+        let imageUrl = resolved ?? '';
+        if (!imageUrl) {
+          const legacy = figure.image_url?.trim() ?? '';
+          imageUrl = isAbsoluteMediaUrl(legacy) ? legacy : '';
+        }
+        return {
+          id: figure.id,
+          imageUrl,
+          caption: figure.caption ?? null,
+        };
+      })
+      .filter((figure) => Boolean(figure.imageUrl)),
   };
 }
 
