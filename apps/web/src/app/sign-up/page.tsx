@@ -1,13 +1,18 @@
 'use client';
 
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signUpSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
+import { AuthField } from '@/components/auth/auth-field';
+import { AuthPasswordField } from '@/components/auth/auth-password-field';
+import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
+import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
+import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 
 const SETUP_MSG =
   'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
@@ -22,10 +27,17 @@ function SignUpForm() {
     slug: '',
   });
   const [error, setError] = useState('');
+  const [fieldError, setFieldError] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [loading, setLoading] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
   const submitLock = useRef(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const authConfigured = isSupabasePublicKeyConfigured();
+
+  useEffect(() => {
+    router.prefetch('/sign-in');
+  }, [router]);
 
   function update(field: keyof typeof form, value: string) {
     setForm((prev) => {
@@ -39,11 +51,15 @@ function SignUpForm() {
       return next;
     });
     if (error) setError('');
+    if (fieldError[field]) {
+      setFieldError((prev) => ({ ...prev, [field]: undefined }));
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setFieldError({});
 
     if (submitLock.current || loading) return;
 
@@ -58,7 +74,19 @@ function SignUpForm() {
     try {
       const parsed = signUpSchema.safeParse(form);
       if (!parsed.success) {
-        setError(parsed.error.errors[0]?.message ?? 'Invalid input');
+        const first = parsed.error.errors[0];
+        const message = first?.message ?? 'Invalid input';
+        const path = first?.path?.[0];
+        if (
+          path === 'email' ||
+          path === 'password' ||
+          path === 'display_name' ||
+          path === 'slug'
+        ) {
+          setFieldError({ [path]: message });
+        } else {
+          setError(mapAuthFormError(message, 'sign-up'));
+        }
         return;
       }
 
@@ -76,14 +104,16 @@ function SignUpForm() {
       });
 
       if (authError) {
-        setError(authError.message);
+        setError(mapAuthFormError(authError.message, 'sign-up'));
+        requestAnimationFrame(() => errorRef.current?.focus());
         return;
       }
 
+      setFadingOut(true);
       router.push('/dashboard');
       router.refresh();
     } catch {
-      setError('Could not create your account. Please try again.');
+      setError(mapAuthFormError('network', 'sign-up'));
     } finally {
       submitLock.current = false;
       setLoading(false);
@@ -92,94 +122,88 @@ function SignUpForm() {
 
   return (
     <AuthShell
+      mode="sign-up"
+      showCollage
       title="Create your CodeCard"
       subtitle="Build your first profile in under five minutes."
     >
-      <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
-        <div className="space-y-2">
-          <label htmlFor="display_name" className="text-[13px] font-medium text-graphite">
-            Display name
-          </label>
-          <input
+      <div
+        className={`transition-opacity duration-150 motion-reduce:transition-none ${
+          fadingOut ? 'opacity-90' : 'opacity-100'
+        }`}
+      >
+        <form onSubmit={handleSubmit} className="space-y-1" aria-busy={loading} noValidate>
+          <AuthField
             id="display_name"
+            label="Display name"
             value={form.display_name}
-            onChange={(e) => update('display_name', e.target.value)}
+            onChange={(value) => update('display_name', value)}
             required={authConfigured}
-            className="cc-input w-full"
+            autoComplete="name"
             disabled={loading}
+            error={fieldError.display_name}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="slug" className="text-[13px] font-medium text-graphite">
-            Profile URL
-          </label>
-          <div className="flex items-center gap-2">
-            <span className="shrink-0 text-sm text-graphite">codecard.app/</span>
-            <input
-              id="slug"
-              value={form.slug}
-              onChange={(e) => update('slug', e.target.value.toLowerCase())}
-              required={authConfigured}
-              pattern="[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?"
-              className="cc-input w-full"
-              disabled={loading}
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-[13px] font-medium text-graphite">
-            Email
-          </label>
-          <input
+          <AuthField
+            id="slug"
+            label="Profile URL"
+            value={form.slug}
+            onChange={(value) => update('slug', value.toLowerCase())}
+            required={authConfigured}
+            autoComplete="username"
+            disabled={loading}
+            pattern="[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?"
+            prefix="codecard.app/"
+            error={fieldError.slug}
+          />
+          <AuthField
             id="email"
+            label="Email"
             type="email"
             value={form.email}
-            onChange={(e) => update('email', e.target.value)}
+            onChange={(value) => update('email', value)}
             required={authConfigured}
             autoComplete="email"
-            className="cc-input w-full"
             disabled={loading}
+            error={fieldError.email}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-[13px] font-medium text-graphite">
-            Password
-          </label>
-          <input
+          <AuthPasswordField
             id="password"
-            type="password"
             value={form.password}
-            onChange={(e) => update('password', e.target.value)}
+            onChange={(value) => update('password', value)}
             required={authConfigured}
             autoComplete="new-password"
-            className="cc-input w-full"
+            disabled={loading}
+            showGuidance
+            error={fieldError.password}
+          />
+
+          <div ref={errorRef} tabIndex={-1} className="mb-3 outline-none">
+            <AuthErrorAlert message={error} />
+          </div>
+
+          {!authConfigured && !error ? (
+            <p className="mb-3 text-[13px] leading-relaxed text-smoke">{SETUP_MSG}</p>
+          ) : null}
+
+          <AuthPrimaryButton
+            pending={loading}
+            pendingLabel="Creating account…"
+            idleLabel="Create account"
             disabled={loading}
           />
-        </div>
-        {error && (
-          <p className="text-sm text-red-400" role="alert">
-            {error}
-          </p>
-        )}
-        {!authConfigured && !error && (
-          <p className="text-[13px] leading-relaxed text-graphite">{SETUP_MSG}</p>
-        )}
-        <button
-          type="submit"
-          className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
-          disabled={loading}
-          aria-busy={loading}
-        >
-          {loading ? 'Creating…' : 'Create account'}
-        </button>
-      </form>
+        </form>
 
-      <p className="mt-6 text-center text-sm text-graphite">
-        Already have an account?{' '}
-        <Link href="/sign-in" className="text-reactor hover:text-phosphor">
-          Sign in
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-[14px] text-smoke">
+          Already have an account?{' '}
+          <Link
+            href="/sign-in"
+            className="font-medium text-ink underline-offset-2 hover:underline"
+            prefetch
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
     </AuthShell>
   );
 }

@@ -10,9 +10,23 @@ test.describe('Authentication pages', () => {
   test('sign-in page loads', async ({ page }) => {
     await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /Sign in to CodeCard/i })).toBeVisible();
-    await expect(page.getByLabel('Email')).toBeVisible();
-    await expect(page.getByLabel('Password')).toBeVisible();
+    await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+    await expect(page.locator('#password')).toBeVisible();
     await expect(page.getByRole('button', { name: /^Sign in$/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Continue with GitHub/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Continue with Google/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Show (characters|password)/i })).toBeVisible();
+  });
+
+  test('sign-in to sign-up keeps URL correct without carrying password', async ({ page }) => {
+    await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+    await page.getByLabel('Email', { exact: true }).fill('alex@example.com');
+    await page.locator('#password').fill('TempPass1');
+    await page.getByRole('link', { name: /Create one/i }).click();
+    await expect(page).toHaveURL(/\/sign-up/);
+    await expect(page.getByRole('heading', { name: /Create your CodeCard/i })).toBeVisible();
+    await expect(page.locator('#password')).toHaveValue('');
+    await expect(page.getByRole('button', { name: /Continue with Google/i })).toHaveCount(0);
   });
 
   test('sign-up page loads', async ({ page }) => {
@@ -24,11 +38,13 @@ test.describe('Authentication pages', () => {
 
   test('sign-in shows validation error for invalid email', async ({ page }) => {
     await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
-    await page.getByLabel('Email').fill('not-an-email');
-    await page.getByLabel('Password').fill('short');
+    await page.getByLabel('Email', { exact: true }).fill('not-an-email');
+    await page.locator('#password').fill('short');
     await page.getByRole('button', { name: /^Sign in$/i }).click();
-    await expect(page.getByRole('alert')).toBeVisible();
-    await expect(page.getByRole('alert')).not.toContainText(/access_token|refresh_token|code=/i);
+    const formAlert = page.getByTestId('auth-shell').getByRole('alert');
+    await expect(formAlert).toBeVisible();
+    await expect(formAlert).toContainText(/invalid email/i);
+    await expect(formAlert).not.toContainText(/access_token|refresh_token|code=/i);
   });
 
   test('sign-in form exposes loading accessibility state', async ({ page }) => {

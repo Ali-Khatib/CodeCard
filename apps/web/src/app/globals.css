@@ -4781,4 +4781,152 @@ select,
 .cc-theme-picker__frame {
   border-width: 1px;
 }
+
+/* ── Auth experience polish ── */
+.cc-auth-input {
+  height: 46px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(34, 34, 34, 0.14);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0 14px;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.cc-auth-input:hover:not(:disabled) {
+  border-color: rgba(34, 34, 34, 0.24);
+}
+
+.cc-auth-input:focus,
+.cc-auth-input--focused {
+  border-color: rgba(var(--accent-rgb), 0.72);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18);
+}
+
+.cc-auth-input--error {
+  border-color: rgba(223, 106, 107, 0.7);
+  box-shadow: 0 0 0 1px rgba(223, 106, 107, 0.12);
+}
+
+.cc-auth-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cc-auth-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 14px;
+  padding: 0 20px;
+  font-size: 15px;
+  font-weight: 520;
+  letter-spacing: -0.01em;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.cc-auth-primary-btn:hover:not(:disabled) {
+  background: #242424;
+  border-color: rgba(var(--accent-rgb), 0.45);
+  box-shadow:
+    0 8px 22px rgba(35, 35, 36, 0.12),
+    0 0 0 1px rgba(var(--accent-rgb), 0.12);
+}
+
+.cc-auth-primary-btn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.cc-auth-github-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 14px;
+  padding: 0 20px;
+  font-size: 15px;
+  font-weight: 480;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(34, 34, 34, 0.14);
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.cc-auth-github-btn:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: rgba(34, 34, 34, 0.22);
+}
+
+.cc-auth-github-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cc-auth-demo-link {
+  display: inline-flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px dashed rgba(34, 34, 34, 0.16);
+  background: rgba(255, 255, 255, 0.35);
+  color: var(--smoke);
+  font-size: 14px;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.cc-auth-demo-link:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(34, 34, 34, 0.22);
+}
+
+@keyframes auth-qr-scan {
+  0% {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(108px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-auth-input,
+  .cc-auth-primary-btn,
+  .cc-auth-github-btn,
+  .cc-auth-demo-link {
+    transition: none;
+  }
+}
+
 @import '../styles/codecard-app-system.css';

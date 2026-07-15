@@ -1,47 +1,25 @@
 'use client';
 
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { signInSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
+import { AuthField } from '@/components/auth/auth-field';
+import { AuthPasswordField } from '@/components/auth/auth-password-field';
+import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
+import { AuthGithubButton } from '@/components/auth/auth-github-button';
+import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { sanitizeInternalRedirect, authCallbackRedirectUrl } from '@/lib/auth/redirect';
-import {
-  isAuthSubmissionBlocked,
-  oauthButtonLabel,
-  type OAuthProvider,
-} from '@/lib/auth/auth-loading';
+import { isAuthSubmissionBlocked, oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { signInStatusMessage } from '@/lib/auth/session-expiry';
+import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
-
-function OAuthButton({
-  label,
-  onClick,
-  disabled,
-  busy,
-}: {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-  busy?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-busy={busy}
-      className="cc-btn-pill-ghost w-full py-2.5 text-[15px] disabled:opacity-50"
-    >
-      {label}
-    </button>
-  );
-}
 
 function SignInForm() {
   const router = useRouter();
@@ -52,10 +30,13 @@ function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
   const [emailLoading, setEmailLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<'github' | null>(null);
+  const [fadingOut, setFadingOut] = useState(false);
   const submitLock = useRef(false);
   const oauthLock = useRef(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const authConfigured = isSupabasePublicKeyConfigured();
   const authBlocked = isAuthSubmissionBlocked({
@@ -63,7 +44,11 @@ function SignInForm() {
     oauthPending: oauthLoading,
   });
 
-  async function oauth(provider: OAuthProvider) {
+  useEffect(() => {
+    router.prefetch('/sign-up');
+  }, [router]);
+
+  async function oauthGithub() {
     if (oauthLock.current || authBlocked) return;
 
     setError('');
@@ -73,23 +58,23 @@ function SignInForm() {
     }
 
     oauthLock.current = true;
-    setOauthLoading(provider);
+    setOauthLoading('github');
 
     try {
       const supabase = createClient();
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'github',
         options: {
           redirectTo: authCallbackRedirectUrl(redirectTo),
         },
       });
 
       if (oauthError) {
-        setError('Could not start sign-in. Please try again.');
+        setError(mapAuthFormError(oauthError.message, 'sign-in'));
         setOauthLoading(null);
       }
     } catch {
-      setError('Could not start sign-in. Please try again.');
+      setError(mapAuthFormError('network', 'sign-in'));
       setOauthLoading(null);
     } finally {
       oauthLock.current = false;
@@ -99,6 +84,7 @@ function SignInForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setFieldError({});
 
     if (submitLock.current || authBlocked) return;
 
@@ -113,7 +99,15 @@ function SignInForm() {
     try {
       const parsed = signInSchema.safeParse({ email, password });
       if (!parsed.success) {
-        setError(parsed.error.errors[0]?.message ?? 'Invalid input');
+        const first = parsed.error.errors[0];
+        const message = first?.message ?? 'Invalid input';
+        if (first?.path?.[0] === 'email') {
+          setFieldError({ email: message });
+        } else if (first?.path?.[0] === 'password') {
+          setFieldError({ password: message });
+        }
+        setError(mapAuthFormError(message, 'sign-in'));
+        requestAnimationFrame(() => errorRef.current?.focus());
         return;
       }
 
@@ -121,14 +115,16 @@ function SignInForm() {
       const { error: authError } = await supabase.auth.signInWithPassword(parsed.data);
 
       if (authError) {
-        setError(authError.message);
+        setError(mapAuthFormError(authError.message, 'sign-in'));
+        requestAnimationFrame(() => errorRef.current?.focus());
         return;
       }
 
+      setFadingOut(true);
       router.push(redirectTo);
       router.refresh();
     } catch {
-      setError('Could not sign in. Please try again.');
+      setError(mapAuthFormError('network', 'sign-in'));
     } finally {
       submitLock.current = false;
       setEmailLoading(false);
@@ -137,112 +133,125 @@ function SignInForm() {
 
   return (
     <AuthShell
+      mode="sign-in"
+      showCollage
       title="Sign in to CodeCard"
       subtitle="Manage your projects, profile, analytics, and connections."
     >
-      <form onSubmit={handleSubmit} className="space-y-4" aria-busy={emailLoading}>
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-[14px] font-medium text-[#222222]">
-            Email
-          </label>
-          <input
+      <div
+        className={`transition-opacity duration-150 motion-reduce:transition-none ${
+          fadingOut ? 'opacity-90' : 'opacity-100'
+        }`}
+      >
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-1"
+          aria-busy={emailLoading}
+          noValidate
+        >
+          <AuthField
             id="email"
+            label="Email"
             type="email"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
+            onChange={(value) => {
+              setEmail(value);
               if (error) setError('');
+              if (fieldError.email) setFieldError((prev) => ({ ...prev, email: undefined }));
             }}
             required
             autoComplete="email"
-            className="cc-input w-full"
             disabled={authBlocked}
+            error={fieldError.email}
+          />
+          <div>
+            <AuthPasswordField
+              id="password"
+              value={password}
+              onChange={(value) => {
+                setPassword(value);
+                if (error) setError('');
+                if (fieldError.password) setFieldError((prev) => ({ ...prev, password: undefined }));
+              }}
+              required
+              autoComplete="current-password"
+              disabled={authBlocked}
+              error={fieldError.password}
+            />
+            <p className="-mt-1 mb-3 text-right">
+              <Link
+                href="/forgot-password"
+                className="text-[13px] font-medium text-[#7a7876] underline-offset-2 hover:text-[#222222] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </p>
+          </div>
+
+          {resetSuccess ? (
+            <p className="mb-3 text-[14px] text-[#2f6f4e]" role="status">
+              Your password was updated. Sign in with your new password.
+            </p>
+          ) : null}
+
+          {statusMessage ? (
+            <div className="mb-3">
+              <AuthErrorAlert message={statusMessage} />
+            </div>
+          ) : null}
+
+          <div ref={errorRef} tabIndex={-1} className="mb-3 outline-none">
+            <AuthErrorAlert message={error} />
+          </div>
+
+          <AuthPrimaryButton
+            pending={emailLoading}
+            pendingLabel="Signing in…"
+            idleLabel="Sign in"
+            disabled={authBlocked && !emailLoading}
+          />
+        </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+          <span className="cc-app-mono text-[11px] uppercase tracking-[0.08em] text-smoke">or</span>
+          <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+        </div>
+
+        <div aria-busy={oauthLoading !== null}>
+          <AuthGithubButton
+            label={oauthButtonLabel('github', oauthLoading)}
+            onClick={() => void oauthGithub()}
+            disabled={authBlocked}
+            pending={oauthLoading === 'github'}
           />
         </div>
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-[14px] font-medium text-[#222222]">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (error) setError('');
-            }}
-            required
-            autoComplete="current-password"
-            className="cc-input w-full"
-            disabled={authBlocked}
-          />
-          <p className="text-right">
-            <Link
-              href="/forgot-password"
-              className="text-[13px] font-medium text-[#7a7876] underline-offset-2 hover:text-[#222222] hover:underline"
-            >
-              Forgot password?
-            </Link>
+
+        <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
+          <Link
+            href={LIVE_DEMO_HREF}
+            className="cc-auth-demo-link"
+            title="Explore CodeCard using sample data."
+            aria-label="Explore demo workspace — sample data only, not a real account"
+          >
+            Explore demo workspace
+          </Link>
+          <p className="mt-2 text-center text-[12px] text-smoke">
+            Explore CodeCard using sample data. No account required.
           </p>
         </div>
-        {resetSuccess && (
-          <p className="text-[14px] text-[#2f6f4e]" role="status">
-            Your password was updated. Sign in with your new password.
-          </p>
-        )}
-        {statusMessage && (
-          <p className="text-[14px] text-[#df6a6b]" role="alert">
-            {statusMessage}
-          </p>
-        )}
-        {error && (
-          <p className="text-[14px] text-[#df6a6b]" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
-          disabled={authBlocked}
-          aria-busy={emailLoading}
-        >
-          {emailLoading ? 'Signing in…' : 'Sign in'}
-        </button>
-      </form>
 
-      <div className="my-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
-        <span className="cc-app-mono">or</span>
-        <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+        <p className="mt-6 text-center text-[14px] text-[#7a7876]">
+          No account?{' '}
+          <Link
+            href="/sign-up"
+            className="font-medium text-[#222222] underline-offset-2 hover:underline"
+            prefetch
+          >
+            Create one
+          </Link>
+        </p>
       </div>
-
-      <div className="space-y-3" aria-busy={oauthLoading !== null}>
-        <OAuthButton
-          label={oauthButtonLabel('github', oauthLoading)}
-          onClick={() => void oauth('github')}
-          disabled={authBlocked}
-          busy={oauthLoading === 'github'}
-        />
-        <OAuthButton
-          label={oauthButtonLabel('google', oauthLoading)}
-          onClick={() => void oauth('google')}
-          disabled={authBlocked}
-          busy={oauthLoading === 'google'}
-        />
-      </div>
-
-      <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
-        <Link href={LIVE_DEMO_HREF} className="cc-btn-pill-ghost flex w-full justify-center py-2.5 text-[15px]">
-          Explore demo workspace
-        </Link>
-      </div>
-
-      <p className="mt-6 text-center text-[14px] text-[#7a7876]">
-        No account?{' '}
-        <Link href="/sign-up" className="font-medium text-[#222222] underline-offset-2 hover:underline">
-          Create one
-        </Link>
-      </p>
     </AuthShell>
   );
 }
