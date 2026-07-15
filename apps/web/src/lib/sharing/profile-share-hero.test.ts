@@ -16,6 +16,9 @@ describe('WS07-T003 dashboard QR preview', () => {
     expect(hero).not.toContain('function QrPattern');
     expect(hero).not.toContain('cc-share-qr-pattern');
     expect(hero).toContain('generateProfileQrPreview');
+    expect(hero).toContain('generateProfileQrDownload');
+    expect(hero).toContain('downloadProfileQrPng');
+    expect(hero).toContain('Download QR');
     expect(hero).toContain('buildCanonicalPublicProfileUrl');
     expect(hero).toContain('QR code for public CodeCard profile');
     expect(hero).toContain('isPublic');
