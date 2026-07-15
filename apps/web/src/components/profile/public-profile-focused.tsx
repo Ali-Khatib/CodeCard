@@ -97,19 +97,19 @@ export function PublicProfileFocused({
               </motion.div>
 
               <div className="min-w-0 flex-1">
-                <h1 className="text-[36px] font-medium tracking-[-0.03em] text-[var(--app-ink)]">
+                <h1 className="break-words text-[clamp(1.75rem,7vw,2.25rem)] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
                   {displayName}
                 </h1>
                 {role && (
-                  <p className="mt-1 text-[16px] text-[var(--app-smoke)]">{role}</p>
+                  <p className="mt-1 break-words text-[16px] text-[var(--app-smoke)]">{role}</p>
                 )}
                 {company && (
-                  <p className="mt-0.5 text-[16px] text-[var(--app-smoke)]">{company}</p>
+                  <p className="mt-0.5 break-words text-[16px] text-[var(--app-smoke)]">{company}</p>
                 )}
                 {location && (
-                  <p className="mt-1 text-[15px] text-[var(--app-smoke)]">{location}</p>
+                  <p className="mt-1 break-words text-[15px] text-[var(--app-smoke)]">{location}</p>
                 )}
-                <p className="mt-4 max-w-lg text-[16px] leading-relaxed text-[var(--app-ink)]">
+                <p className="mt-4 max-w-lg break-words text-[16px] leading-relaxed text-[var(--app-ink)]">
                   {intro}
                 </p>
                 {safeLinks.length > 0 && (
@@ -186,10 +186,10 @@ export function PublicProfileFocused({
               <motion.div
                 initial={reduced ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="inline-flex flex-col items-start rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
+                className="flex max-w-full flex-col items-start rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
               >
                 <p className="cc-app-mono mb-3">Scan to open</p>
-                <div className="grid h-40 w-40 grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
+                <div className="grid h-40 w-40 max-w-full grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
                   {Array.from({ length: 25 }).map((_, i) => (
                     <div
                       key={i}
@@ -197,7 +197,7 @@ export function PublicProfileFocused({
                     />
                   ))}
                 </div>
-                <p className="mt-3 text-[14px] text-[var(--app-smoke)]">
+                <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-smoke)]">
                   codecard.app/{profileSlug}
                 </p>
               </motion.div>
@@ -208,7 +208,7 @@ export function PublicProfileFocused({
         <section className="mt-16">
           <AppReveal>
             <p className="cc-app-mono">Featured work</p>
-            <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+            <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
               What {displayName.split(' ')[0]} built
             </h2>
             <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">

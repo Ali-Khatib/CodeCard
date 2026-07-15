@@ -117,10 +117,10 @@ export function ResearchPaperDetail({
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <p className={TYPE.eyebrow}>Research paper</p>
-              <h1 className={TYPE.contentHeroTitle}>
+              <h1 className={`${TYPE.contentHeroTitle} break-words`}>
                 {paper.title}
               </h1>
-              <p className="mt-5 text-[17px] leading-relaxed text-ash md:text-[19px]">
+              <p className="mt-5 break-words text-[17px] leading-relaxed text-ash md:text-[19px]">
                 {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
               </p>
               <p className="mt-2 text-[15px] text-text-secondary">
@@ -171,7 +171,7 @@ export function ResearchPaperDetail({
                 </button>
               )}
             </div>
-            <p className="mt-5 text-[19px] leading-[1.65] text-ash md:text-[21px]">
+            <p className="mt-5 break-words text-[19px] leading-[1.65] text-ash md:text-[21px]">
               {abstractExpanded ? abstract : abstractPreview}
             </p>
           </section>
@@ -194,7 +194,7 @@ export function ResearchPaperDetail({
               {paper.citationText && (
                 <div className="rounded-card border border-border/40 bg-midnight/50 p-6 shadow-rim">
                   <p className={TYPE.eyebrow}>Citation</p>
-                  <p className="mt-4 text-[15px] leading-relaxed text-ash">{paper.citationText}</p>
+                  <p className="mt-4 break-words text-[15px] leading-relaxed text-ash">{paper.citationText}</p>
                   <CitationCopyButton
                     citationText={paper.citationText}
                     className="cc-app-btn cc-app-btn--primary mt-5"
@@ -270,7 +270,7 @@ export function ResearchPaperDetail({
                       />
                     </div>
                     {figure.caption && (
-                      <figcaption className="border-t border-border/40 p-4 text-[14px] leading-relaxed text-ash">
+                      <figcaption className="break-words border-t border-border/40 p-4 text-[14px] leading-relaxed text-ash">
                         {figure.caption}
                       </figcaption>
                     )}
