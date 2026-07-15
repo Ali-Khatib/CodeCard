@@ -22,8 +22,8 @@ export function DashboardResearchView({
         title="Papers & publications"
         description="Showcase abstracts, citations, PDFs, figures, and the projects connected to your research."
         actions={
-          <AppButton variant="primary" href="/dashboard/projects">
-            Add from projects
+          <AppButton variant="primary" href="/dashboard/research/new">
+            Add research
           </AppButton>
         }
       />
@@ -44,12 +44,17 @@ export function DashboardResearchView({
         <AppCard className="!p-8 text-center">
           <p className="cc-app-mono">No research yet</p>
           <h2 className="cc-work-title cc-work-title--compact mt-3">
-            Add papers without changing your project workflow.
+            Add your first paper
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
-            Research support is ready for abstracts, authors, venues, PDFs, citations, figures,
-            and related projects. Existing projects stay exactly where they are.
+            Capture title, authors, venue, DOI, citation, and links. Papers stay unpublished until you
+            choose to share them.
           </p>
+          <div className="mt-6 flex justify-center">
+            <AppButton variant="primary" href="/dashboard/research/new">
+              Create paper
+            </AppButton>
+          </div>
         </AppCard>
       )}
     </div>
