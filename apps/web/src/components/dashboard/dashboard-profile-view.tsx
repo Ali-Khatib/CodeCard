@@ -13,6 +13,7 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
@@ -129,9 +130,13 @@ export function DashboardProfileView({
             )}
             {profile.slug && (
               <CopyLinkButton
-                getText={() => `${window.location.origin}/${profile.slug}`}
+                getText={() => getPublicProfileLinkForClipboard(profile.slug) ?? ''}
+                ariaLabel="Copy public link"
+                successLabel="Public link copied"
                 variant="soft"
-              />
+              >
+                Copy public link
+              </CopyLinkButton>
             )}
             <AsyncActionButton
               variant="ghost"

@@ -9,6 +9,7 @@ import {
   buildCanonicalPublicProfileUrl,
   generateProfileQrDownload,
   generateProfileQrPreview,
+  getPublicProfileLinkForClipboard,
 } from '@/lib/sharing/qr';
 import { downloadProfileQrPng } from '@/lib/sharing/qr-download';
 
@@ -34,12 +35,14 @@ export function ProfileShareHero({
   const downloadStatusId = useId();
 
   const canonical = buildCanonicalPublicProfileUrl(profileSlug);
-  const displayUrl = canonical.ok
-    ? canonical.url
+  const clipboardUrl = getPublicProfileLinkForClipboard(profileSlug);
+  const displayUrl = clipboardUrl
+    ? clipboardUrl
     : profileSlug
       ? `/${profileSlug}`
       : 'Add a profile slug to share';
-  const canShare = canonical.ok;
+  const canShare = Boolean(clipboardUrl && canonical.ok);
+
 
   const { copy, isLoading, isSuccess, isError, status } = useCopyToClipboard({
     successDuration: 2400,
@@ -78,8 +81,8 @@ export function ProfileShareHero({
   }, [qrOpen, canShare, profileSlug]);
 
   const copyLink = async () => {
-    if (!canonical.ok) return;
-    await copy(canonical.url);
+    if (!clipboardUrl) return;
+    await copy(clipboardUrl);
   };
 
   const copyAnnouncement = isSuccess

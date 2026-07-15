@@ -92,6 +92,18 @@ export function buildCanonicalPublicProfileUrl(
   };
 }
 
+/**
+ * Absolute public profile URL for clipboard / displayed share text.
+ * Returns null when slug or trusted origin is invalid — callers must not copy.
+ */
+export function getPublicProfileLinkForClipboard(
+  profileSlug: string | null | undefined,
+  env: NodeJS.ProcessEnv = process.env,
+): string | null {
+  const canonical = buildCanonicalPublicProfileUrl(profileSlug, env);
+  return canonical.ok ? canonical.url : null;
+}
+
 export function buildProfileQrFilename(slug: string): string {
   const safe = normalizePublicProfileSlug(slug);
   if (!safe) return 'codecard-profile-qr.png';

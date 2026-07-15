@@ -91,7 +91,9 @@ export function downloadProfileQrPng(
 
   let objectUrl: string | null = null;
   try {
-    const blob = new Blob([bytes], { type: 'image/png' });
+    const copy = new Uint8Array(bytes.byteLength);
+    copy.set(bytes);
+    const blob = new Blob([copy.buffer], { type: 'image/png' });
     objectUrl = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
