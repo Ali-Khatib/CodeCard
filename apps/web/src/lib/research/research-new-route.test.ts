@@ -41,12 +41,22 @@ describe('dashboard new research route', () => {
     expect(form).toContain('Citation text');
     expect(form).not.toContain('is_published');
     expect(form).not.toContain('sort_order');
-    expect(form).not.toContain('related_project');
+    expect(form).toContain('related-project');
+    expect(form).toContain('No related project');
     expect(form).not.toContain('type="file"');
     expect(form).not.toContain('createSignedUpload');
     expect(form).not.toContain('ResearchFigure');
     expect(form).not.toMatch(/\bUnpublish\b/);
     expect(form).not.toMatch(/>\s*Publish\s*</);
+  });
+
+  it('loads owned projects for the related-project picker', () => {
+    const page = readFileSync(
+      resolve(process.cwd(), 'src/app/dashboard/(authenticated)/research/new/page.tsx'),
+      'utf8',
+    );
+    expect(page).toContain('loadOwnedProjectsForResearchPicker');
+    expect(page).toContain('relatedProjectOptions');
   });
 
   it('keeps dashboard research CTAs pointed at the new research route', () => {

@@ -60,7 +60,7 @@ describe('buildUpdateResearchFormData', () => {
     expect(fd.get('is_published')).toBeNull();
     expect(fd.get('sort_order')).toBeNull();
     expect(fd.get('owner_user_id')).toBeNull();
-    expect(fd.get('related_project_id')).toBeNull();
+    expect(fd.get('related_project_id')).toBe('');
   });
 });
 
@@ -94,7 +94,8 @@ describe('dashboard research edit route', () => {
     expect(form).toContain('Save changes');
     expect(form).not.toContain('Research editing will be available');
     expect(form).not.toContain('type="file"');
-    expect(form).not.toContain('related_project');
+    expect(form).toContain('related-project');
+    expect(form).toContain('No related project');
     expect(form).not.toContain('publishResearchAction');
     expect(form).not.toContain('unpublishResearchAction');
   });

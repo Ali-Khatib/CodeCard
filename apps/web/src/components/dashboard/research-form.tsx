@@ -18,6 +18,8 @@ import {
   validateResearchFormClient,
   type ResearchFormMode,
   type ResearchFormValues,
+  type ResearchRelatedProjectOption,
+  formatRelatedProjectOptionLabel,
 } from '@/lib/research/research-form';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { cn } from '@/lib/cn';
@@ -67,11 +69,13 @@ export function ResearchForm({
   researchPaperId,
   initialValues,
   isPublished = false,
+  relatedProjectOptions = [],
 }: {
   mode: ResearchFormMode;
   researchPaperId?: string;
   initialValues?: ResearchFormValues;
   isPublished?: boolean;
+  relatedProjectOptions?: ResearchRelatedProjectOption[];
 }) {
   const router = useRouter();
   const formId = useId();
@@ -421,6 +425,43 @@ export function ResearchForm({
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
         <FieldError id={`${formId}-citation-error`} message={fieldErrors.citation_text} />
+      </div>
+
+      <div className="space-y-2">
+        <label
+          htmlFor={`${formId}-related-project`}
+          className="block text-[14px] font-medium text-[var(--app-ink)]"
+        >
+          Related project
+        </label>
+        <select
+          id={`${formId}-related-project`}
+          value={form.related_project_id}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, related_project_id: event.target.value }))
+          }
+          aria-invalid={Boolean(fieldErrors.related_project_id)}
+          aria-describedby={`${formId}-related-project-help${
+            fieldErrors.related_project_id ? ` ${formId}-related-project-error` : ''
+          }`}
+          className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
+        >
+          <option value="">No related project</option>
+          {relatedProjectOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {formatRelatedProjectOptionLabel(option, relatedProjectOptions)}
+            </option>
+          ))}
+        </select>
+        <p id={`${formId}-related-project-help`} className="text-[13px] text-[var(--app-smoke)]">
+          {relatedProjectOptions.length === 0
+            ? 'You have no projects yet. You can still save this paper and link a project later.'
+            : 'Optional. Only your own projects appear here. Draft projects stay private on public pages.'}
+        </p>
+        <FieldError
+          id={`${formId}-related-project-error`}
+          message={fieldErrors.related_project_id}
+        />
       </div>
 
       {generalError ? (

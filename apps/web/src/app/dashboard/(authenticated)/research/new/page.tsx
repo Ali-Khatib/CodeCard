@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ResearchCreateForm } from '@/components/dashboard/research-create-form';
+import { loadOwnedProjectsForResearchPicker } from '@/lib/research/research-related-project';
 
 export default async function NewResearchPage() {
   const supabase = await createClient();
@@ -14,7 +15,7 @@ export default async function NewResearchPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, tenant_id')
     .eq('owner_user_id', user.id)
     .maybeSingle();
 
@@ -32,6 +33,12 @@ export default async function NewResearchPage() {
     );
   }
 
+  const relatedProjectOptions = await loadOwnedProjectsForResearchPicker(supabase, {
+    userId: user.id,
+    profileId: profile.id,
+    tenantId: profile.tenant_id,
+  });
+
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
@@ -42,11 +49,11 @@ export default async function NewResearchPage() {
           Add a research paper
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Create a draft paper with core details. Publishing, PDF uploads, figures, and project links come
-          in later steps.
+          Create a draft paper with core details. You can optionally link one of your projects. PDF
+          uploads and figures come later.
         </p>
       </div>
-      <ResearchCreateForm />
+      <ResearchCreateForm relatedProjectOptions={relatedProjectOptions} />
     </div>
   );
 }

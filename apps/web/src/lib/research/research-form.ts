@@ -14,6 +14,12 @@ import type { OwnedResearchRecord } from '@/lib/research/research-access-core';
 
 export type ResearchFormMode = 'create' | 'edit';
 
+export type ResearchRelatedProjectOption = {
+  id: string;
+  title: string;
+  slug: string;
+};
+
 export type ResearchFormValues = {
   title: string;
   slug: string;
@@ -26,6 +32,7 @@ export type ResearchFormValues = {
   pdf_url: string;
   citation_text: string;
   tags: string[];
+  related_project_id: string;
 };
 
 export const RESEARCH_FORM_LIMITS = {
@@ -52,11 +59,22 @@ export function createEmptyResearchFormValues(): ResearchFormValues {
     pdf_url: '',
     citation_text: '',
     tags: [],
+    related_project_id: '',
   };
 }
 
 export function suggestResearchSlugFromTitle(title: string): string {
   return normalizeResearchSlug(title);
+}
+
+export function formatRelatedProjectOptionLabel(
+  option: ResearchRelatedProjectOption,
+  allOptions: ResearchRelatedProjectOption[],
+): string {
+  const duplicateTitle =
+    allOptions.filter((item) => item.title.trim().toLowerCase() === option.title.trim().toLowerCase())
+      .length > 1;
+  return duplicateTitle ? `${option.title} (${option.slug})` : option.title;
 }
 
 export function buildCreateResearchFormData(values: ResearchFormValues): FormData {
@@ -76,6 +94,7 @@ export function buildCreateResearchFormData(values: ResearchFormValues): FormDat
   for (const tag of values.tags.map((item) => item.trim()).filter(Boolean)) {
     fd.append('tags', tag);
   }
+  fd.set('related_project_id', values.related_project_id);
   return fd;
 }
 
@@ -101,11 +120,13 @@ export function researchRecordToFormValues(paper: OwnedResearchRecord): Research
     pdf_url: paper.pdf_url ?? '',
     citation_text: paper.citation_text ?? '',
     tags: [...(paper.tags ?? [])],
+    related_project_id: paper.related_project_id ?? '',
   };
 }
 
 export function validateResearchFormClient(values: ResearchFormValues): string | null {
   const authors = values.authors.map((item) => item.trim()).filter(Boolean);
+  const related = values.related_project_id.trim();
   const parsed = createResearchSchema.safeParse({
     title: values.title,
     slug: values.slug,
@@ -118,7 +139,7 @@ export function validateResearchFormClient(values: ResearchFormValues): string |
     pdf_url: values.pdf_url || null,
     citation_text: values.citation_text || null,
     tags: values.tags,
-    related_project_id: null,
+    related_project_id: related === '' ? null : related,
   });
 
   if (!parsed.success) {

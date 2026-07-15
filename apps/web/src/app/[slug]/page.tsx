@@ -63,7 +63,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
       research_papers(
         *,
         research_figures(*),
-        related_project:related_project_id(id, title)
+        related_project:related_project_id(id, title, is_published)
       )
     `,
     )

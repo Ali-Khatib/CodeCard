@@ -49,14 +49,19 @@ type DbResearchPaper = {
   cover_image_url?: string | null;
   related_project_id?: string | null;
   research_figures?: DbResearchFigure[] | null;
-  related_project?: { id: string; title: string } | null;
+  related_project?: { id: string; title: string; is_published?: boolean | null } | null;
 };
 
 export function normalizeResearchPaper(
   paper: DbResearchPaper,
   profileSlug?: string,
 ): ResearchPaper {
-  const relatedProjectId = paper.related_project_id ?? paper.related_project?.id ?? null;
+  const related = paper.related_project;
+  const relatedIsPublic = related?.is_published === true;
+  const relatedProjectId =
+    relatedIsPublic
+      ? (paper.related_project_id ?? related?.id ?? null)
+      : null;
 
   return {
     id: paper.id,
@@ -73,7 +78,7 @@ export function normalizeResearchPaper(
     tags: paper.tags ?? [],
     coverImageUrl: paper.cover_image_url ?? null,
     relatedProjectId,
-    relatedProjectTitle: paper.related_project?.title ?? null,
+    relatedProjectTitle: relatedIsPublic ? (related?.title ?? null) : null,
     relatedProjectHref:
       relatedProjectId && profileSlug
         ? `${profileSlug === 'demo' ? '/demo' : `/${profileSlug}`}/projects/${relatedProjectId}`

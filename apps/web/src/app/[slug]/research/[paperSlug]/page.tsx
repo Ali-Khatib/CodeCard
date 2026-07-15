@@ -25,7 +25,7 @@ export default async function ResearchDetailPage({ params }: PageProps) {
 
   const { data: paper } = await supabase
     .from('research_papers')
-    .select('*, research_figures(*), related_project:related_project_id(id, title)')
+    .select('*, research_figures(*), related_project:related_project_id(id, title, is_published)')
     .eq('profile_id', profile.id)
     .eq('slug', paperSlug)
     .eq('is_published', true)

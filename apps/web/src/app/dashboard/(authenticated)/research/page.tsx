@@ -16,7 +16,7 @@ export default async function ResearchPage() {
 
   const { data: papers } = await supabase
     .from('research_papers')
-    .select('*, research_figures(*), related_project:related_project_id(id, title)')
+    .select('*, research_figures(*), related_project:related_project_id(id, title, is_published)')
     .eq('profile_id', profile?.id ?? '')
     .order('sort_order', { ascending: true });
 
