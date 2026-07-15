@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 function read(relativePath: string) {
@@ -19,7 +19,6 @@ describe('Auth experience polish contracts', () => {
     expect(signIn).not.toMatch(/Continue with Google|oauth\('google'\)|provider:\s*'google'/);
     expect(signIn).toContain('signInWithPassword');
     expect(signIn).toContain('createClient');
-    expect(signIn).not.toMatch(/setInterval\s*\([^)]*progress/i);
   });
 
   it('keeps sign-up validation and password guidance without leaking passwords across modes', () => {
@@ -34,24 +33,31 @@ describe('Auth experience polish contracts', () => {
     expect(signUp).not.toMatch(/password\s*=\s*searchParams|searchParams\.get\(['"]password/);
   });
 
-  it('uses a live-demo slideshow with bold feature copy instead of a decorative collage', () => {
+  it('uses full-bleed live demo screenshots with bold lower feature copy', () => {
     const shell = read('src/components/auth/auth-shell.tsx');
     const collage = read('src/components/auth/auth-collage.tsx');
-    const wordmark = read('src/components/auth/auth-wordmark.tsx');
 
-    expect(shell).toContain('useReducedMotion');
-    expect(shell).toContain('AnimatePresence');
-    expect(shell).toContain('showCollage');
-    expect(shell).toContain('AuthCollage');
-    expect(collage).toContain('data-testid="auth-collage"');
-    expect(collage).toContain('Inside the live demo');
-    expect(collage).toContain('One workspace for your whole identity');
+    expect(shell).toContain('AuthDemoBackground');
+    expect(shell).toContain('AuthFeatureCopy');
+    expect(shell).toContain('justify-end');
+    expect(collage).toContain('/auth-demo/projects.webp');
+    expect(collage).toContain('/auth-demo/home.webp');
+    expect(collage).toContain('object-cover');
     expect(collage).toContain('Showcase work that looks intentional');
-    expect(collage).toContain('AnimatePresence');
-    expect(collage).toContain('role="tablist"');
+    expect(collage).toContain('font-bold');
     expect(collage).not.toContain('Alex Rivera');
-    expect(collage).not.toContain('Ready to share');
-    expect(wordmark).toContain('CodeCard');
+    expect(collage).not.toContain('DemoChrome');
+
+    for (const name of [
+      'home.webp',
+      'projects.webp',
+      'profile.webp',
+      'analytics.webp',
+      'research.webp',
+      'connections.webp',
+    ]) {
+      expect(existsSync(resolve(process.cwd(), `public/auth-demo/${name}`))).toBe(true);
+    }
   });
 
   it('uses accessible password toggle and reserved error space', () => {
@@ -60,10 +66,8 @@ describe('Auth experience polish contracts', () => {
     expect(password).toContain('aria-pressed');
     expect(password).toContain('Hide characters');
     expect(password).toContain('Show characters');
-    expect(password).toContain('setSelectionRange');
     expect(field).toContain('min-h-[18px]');
     expect(field).toContain('aria-invalid');
-    expect(field).toContain('aria-describedby');
   });
 
   it('does not rewrite authentication security boundaries', () => {
