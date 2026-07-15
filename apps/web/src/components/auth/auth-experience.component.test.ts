@@ -39,7 +39,9 @@ describe('Auth experience polish contracts', () => {
 
     expect(shell).toContain('AuthDemoBackground');
     expect(shell).toContain('AuthFeatureCopy');
-    expect(shell).toContain('justify-end');
+    expect(shell).toContain('auth-side-panel');
+    expect(shell).toContain('lg:w-[40%]');
+    expect(shell).toContain('lg:rounded-l-[28px]');
     expect(collage).toContain('/auth-demo/projects.webp');
     expect(collage).toContain('/auth-demo/home.webp');
     expect(collage).toContain('object-cover');
