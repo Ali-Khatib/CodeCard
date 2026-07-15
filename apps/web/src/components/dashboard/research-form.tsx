@@ -210,7 +210,7 @@ export function ResearchForm({
           role="status"
         >
           Visibility: <strong className="text-[var(--app-ink)]">{isPublished ? 'Published' : 'Draft'}</strong>
-          . Publishing controls arrive in the next step. Saving this form does not change visibility.
+          . Saving this form does not change visibility — use the visibility controls below.
         </div>
       ) : null}
 
@@ -441,7 +441,7 @@ export function ResearchForm({
             ? 'Saving research paper…'
             : 'Creating research paper…'
           : mode === 'edit'
-            ? 'Saving updates does not publish or unpublish this paper.'
+            ? 'Saving updates does not change paper visibility.'
             : 'New papers stay unpublished until you choose to publish later.'}
       </p>
 

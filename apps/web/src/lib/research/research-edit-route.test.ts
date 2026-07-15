@@ -77,6 +77,7 @@ describe('dashboard research edit route', () => {
     expect(page).toContain('loadOwnedResearchPaper');
     expect(page).toContain('ResearchEditForm');
     expect(page).toContain('ResearchDeleteDialog');
+    expect(page).toContain('ResearchPublishControls');
     expect(page).toContain('notFound()');
     expect(page).not.toContain('mock');
   });
@@ -94,8 +95,8 @@ describe('dashboard research edit route', () => {
     expect(form).not.toContain('Research editing will be available');
     expect(form).not.toContain('type="file"');
     expect(form).not.toContain('related_project');
-    expect(form).not.toContain('publishResearch');
-    expect(form).not.toContain('unpublishResearch');
+    expect(form).not.toContain('publishResearchAction');
+    expect(form).not.toContain('unpublishResearchAction');
   });
 
   it('points dashboard edit controls at the edit route', () => {

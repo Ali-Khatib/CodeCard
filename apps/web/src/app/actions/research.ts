@@ -15,11 +15,21 @@ import {
   type ResearchDeleteState,
 } from '@/lib/research/research-delete-core';
 import {
+  executePublishResearch,
+  executeUnpublishResearch,
+  type ResearchPublishState,
+} from '@/lib/research/research-publish-core';
+import {
   revalidateDeletedResearchPaths,
   revalidateOwnedResearchPaths,
 } from '@/lib/research/research-revalidate';
 
-export type { ResearchCreateState, ResearchUpdateState, ResearchDeleteState };
+export type {
+  ResearchCreateState,
+  ResearchUpdateState,
+  ResearchDeleteState,
+  ResearchPublishState,
+};
 
 export async function createResearchAction(
   _prev: ResearchCreateState,
@@ -80,6 +90,44 @@ export async function deleteResearchAction(
 
   if (result.success && result.alreadyDeleted) {
     revalidatePath('/dashboard/research');
+  }
+
+  return result;
+}
+
+export async function publishResearchAction(
+  researchPaperId: string,
+): Promise<ResearchPublishState> {
+  const supabase = await createClient();
+  const result = await executePublishResearch(supabase, researchPaperId);
+
+  if (result.success && result.researchPaperId) {
+    revalidateOwnedResearchPaths({
+      researchPaperId: result.researchPaperId,
+      paperSlug: result.paperSlug,
+      profileSlug: result.profileSlug,
+      isPublished: true,
+      touchPublicRoutes: true,
+    });
+  }
+
+  return result;
+}
+
+export async function unpublishResearchAction(
+  researchPaperId: string,
+): Promise<ResearchPublishState> {
+  const supabase = await createClient();
+  const result = await executeUnpublishResearch(supabase, researchPaperId);
+
+  if (result.success && result.researchPaperId) {
+    revalidateOwnedResearchPaths({
+      researchPaperId: result.researchPaperId,
+      paperSlug: result.paperSlug,
+      profileSlug: result.profileSlug,
+      isPublished: false,
+      touchPublicRoutes: true,
+    });
   }
 
   return result;
