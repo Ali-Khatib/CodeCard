@@ -29,9 +29,12 @@ describe('project publishing controls', () => {
       resolve(process.cwd(), 'src/app/[slug]/projects/[id]/page.tsx'),
       'utf8',
     );
-    const profilePage = readFileSync(resolve(process.cwd(), 'src/app/[slug]/page.tsx'), 'utf8');
+    const profileLoader = readFileSync(
+      resolve(process.cwd(), 'src/lib/profile/public-profile.ts'),
+      'utf8',
+    );
 
     expect(publicPage).toContain(".eq('is_published', true)");
-    expect(profilePage).toContain('is_published');
+    expect(profileLoader).toContain('is_published === true');
   });
 });

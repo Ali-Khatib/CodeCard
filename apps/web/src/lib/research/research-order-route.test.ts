@@ -24,14 +24,17 @@ describe('research ordering wiring', () => {
   });
 
   it('orders public and preview research with the shared sorter', () => {
-    const publicPage = readFileSync(resolve(process.cwd(), 'src/app/[slug]/page.tsx'), 'utf8');
+    const publicLoader = readFileSync(
+      resolve(process.cwd(), 'src/lib/profile/public-profile.ts'),
+      'utf8',
+    );
     const preview = readFileSync(
       resolve(process.cwd(), 'src/app/dashboard/(authenticated)/profile/preview/page.tsx'),
       'utf8',
     );
 
-    expect(publicPage).toContain('sortResearchBySortOrder');
+    expect(publicLoader).toContain('sortResearchBySortOrder');
     expect(preview).toContain('sortResearchBySortOrder');
-    expect(publicPage).toContain('is_published');
+    expect(publicLoader).toContain('is_published === true');
   });
 });
