@@ -42,11 +42,7 @@ describe('Auth experience polish contracts', () => {
     expect(shell).toContain('auth-side-panel');
     expect(shell).toContain('lg:w-[40%]');
     expect(shell).toContain('lg:rounded-l-[28px]');
-    expect(shell).toContain('variant="hero"');
-    expect(shell).toContain('items-center justify-center');
-    const wordmark = read('src/components/auth/auth-wordmark.tsx');
-    expect(wordmark).toContain('#e95a0b');
-    expect(wordmark).toContain('backdrop-blur-md');
+    expect(shell).not.toContain('variant="hero"');
     expect(collage).toContain('/auth-demo/projects.webp');
     expect(collage).toContain('/auth-demo/home.webp');
     expect(collage).toContain('object-cover');
