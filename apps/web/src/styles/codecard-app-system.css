@@ -2945,12 +2945,40 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-profile-share-qr-panel__code {
-  width: 140px;
-  height: 140px;
+  width: min(100%, 280px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px;
   border-radius: 16px;
   border: 1px solid var(--app-border);
-  background: var(--app-bone);
+  background: #ffffff;
+}
+
+.cc-share-qr-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: 1;
+  image-rendering: pixelated;
+}
+
+.cc-share-qr-thumb {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.cc-share-qr-thumb--placeholder {
+  background:
+    linear-gradient(90deg, rgba(34, 34, 34, 0.08) 1px, transparent 1px) 0 0 / 9px 9px,
+    linear-gradient(rgba(34, 34, 34, 0.08) 1px, transparent 1px) 0 0 / 9px 9px,
+    #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -89,7 +89,10 @@ export function DashboardOverviewView({
       {/* ── Zone 3: Share — copy link + QR (hero) ── */}
       <FadeInView delay={0.08}>
         <section aria-label="Share your CodeCard">
-          <ProfileShareHero profileSlug={profileSlug} />
+          <ProfileShareHero
+            profileSlug={profileSlug}
+            isPublic={profile?.is_public ?? true}
+          />
         </section>
       </FadeInView>
 
