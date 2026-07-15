@@ -62,7 +62,9 @@ export function ResearchPaperDetail({
 
   const abstract = paper.abstract ?? 'Abstract coming soon.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;
-  const externalPdfLabel = describeExternalPdfSource(paper.pdfUrl);
+  const safePdfUrl = paper.pdfUrl;
+  const safeDoiUrl = paper.doiUrl;
+  const externalPdfLabel = describeExternalPdfSource(safePdfUrl);
 
   return (
     <div className="relative min-h-[100dvh] text-text-primary">
@@ -81,9 +83,9 @@ export function ResearchPaperDetail({
             </Link>
 
             <div className="flex gap-2">
-              {paper.pdfUrl && (
+              {safePdfUrl && (
                 <a
-                  href={paper.pdfUrl}
+                  href={safePdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cc-app-btn cc-app-btn--primary !h-10"
@@ -101,8 +103,8 @@ export function ResearchPaperDetail({
                   Open paper
                 </a>
               )}
-              {paper.doiUrl && (
-                <a href={paper.doiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10">
+              {safeDoiUrl && (
+                <a href={safeDoiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10">
                   <HiOutlineLink className="h-4 w-4" aria-hidden />
                   DOI
                 </a>

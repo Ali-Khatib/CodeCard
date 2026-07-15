@@ -26,9 +26,9 @@ describe('project ordering integration', () => {
   });
 
   it('uses effective ordering on public profile and project detail routes', () => {
-    const profilePage = read('src/app/[slug]/page.tsx');
+    const publicLoader = read('src/lib/profile/public-profile.ts');
     const projectPage = read('src/app/[slug]/projects/[id]/page.tsx');
-    expect(profilePage).toContain('sortProjectsByEffectiveOrder');
+    expect(publicLoader).toContain('sortProjectsByEffectiveOrder');
     expect(projectPage).toContain('sortProjectsByEffectiveOrder');
   });
 
