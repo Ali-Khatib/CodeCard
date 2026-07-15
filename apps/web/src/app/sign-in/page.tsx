@@ -135,8 +135,8 @@ function SignInForm() {
     <AuthShell
       mode="sign-in"
       showCollage
-      title="Sign in to CodeCard"
-      subtitle="Manage your projects, profile, analytics, and connections."
+      title="Welcome back"
+      subtitle="Sign in to manage your profile, projects, and public CodeCard."
     >
       <div
         className={`transition-opacity duration-150 motion-reduce:transition-none ${

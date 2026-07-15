@@ -124,8 +124,8 @@ function SignUpForm() {
     <AuthShell
       mode="sign-up"
       showCollage
-      title="Create your CodeCard"
-      subtitle="Build your first profile in under five minutes."
+      title="Create your account"
+      subtitle="Set up your public CodeCard and start adding projects."
     >
       <div
         className={`transition-opacity duration-150 motion-reduce:transition-none ${

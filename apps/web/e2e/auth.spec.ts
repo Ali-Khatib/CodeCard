@@ -9,7 +9,7 @@ test.describe('Authentication pages', () => {
 
   test('sign-in page loads', async ({ page }) => {
     await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: /Sign in to CodeCard/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Welcome back/i })).toBeVisible();
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
     await expect(page.locator('#password')).toBeVisible();
     await expect(page.getByRole('button', { name: /^Sign in$/i })).toBeVisible();
@@ -24,14 +24,14 @@ test.describe('Authentication pages', () => {
     await page.locator('#password').fill('TempPass1');
     await page.getByRole('link', { name: /Create one/i }).click();
     await expect(page).toHaveURL(/\/sign-up/);
-    await expect(page.getByRole('heading', { name: /Create your CodeCard/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Create your account/i })).toBeVisible();
     await expect(page.locator('#password')).toHaveValue('');
     await expect(page.getByRole('button', { name: /Continue with Google/i })).toHaveCount(0);
   });
 
   test('sign-up page loads', async ({ page }) => {
     await page.goto('/sign-up', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: /Create your CodeCard/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Create your account/i })).toBeVisible();
     await expect(page.getByLabel('Display name')).toBeVisible();
     await expect(page.getByRole('button', { name: /Create account/i })).toBeVisible();
   });
@@ -87,7 +87,7 @@ test.describe('Authentication pages', () => {
     await page.goto('/sign-in?redirect=https%3A%2F%2Fevil.example', {
       waitUntil: 'domcontentloaded',
     });
-    await expect(page.getByRole('heading', { name: /Sign in to CodeCard/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Welcome back/i })).toBeVisible();
     await expect(page).toHaveURL(/\/sign-in/);
   });
 
@@ -100,6 +100,6 @@ test.describe('Authentication pages', () => {
   test('auth routes work regardless of home route (mvp/main safe)', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: /Sign in to CodeCard/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Welcome back/i })).toBeVisible();
   });
 });

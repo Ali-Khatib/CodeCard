@@ -12,6 +12,7 @@ describe('Auth experience polish contracts', () => {
     expect(signIn).toContain('href="/sign-up"');
     expect(signIn).toContain('AuthGithubButton');
     expect(signIn).toContain('Signing in…');
+    expect(signIn).toContain('Welcome back');
     expect(signIn).toContain('Explore demo workspace');
     expect(signIn).toContain('sample data');
     expect(signIn).toContain('AuthPasswordField');
@@ -25,6 +26,7 @@ describe('Auth experience polish contracts', () => {
     const signUp = read('src/app/sign-up/page.tsx');
     expect(signUp).toContain('href="/sign-in"');
     expect(signUp).toContain('Creating account…');
+    expect(signUp).toContain('Create your account');
     expect(signUp).toContain('showGuidance');
     expect(signUp).toContain('signUpSchema');
     expect(signUp).toContain('autoComplete="new-password"');
@@ -32,7 +34,7 @@ describe('Auth experience polish contracts', () => {
     expect(signUp).not.toMatch(/password\s*=\s*searchParams|searchParams\.get\(['"]password/);
   });
 
-  it('animates entrance with reduced-motion support and collage interactions', () => {
+  it('uses a live-demo slideshow with bold feature copy instead of a decorative collage', () => {
     const shell = read('src/components/auth/auth-shell.tsx');
     const collage = read('src/components/auth/auth-collage.tsx');
     const wordmark = read('src/components/auth/auth-wordmark.tsx');
@@ -40,12 +42,16 @@ describe('Auth experience polish contracts', () => {
     expect(shell).toContain('useReducedMotion');
     expect(shell).toContain('AnimatePresence');
     expect(shell).toContain('showCollage');
-    expect(shell).toContain('cc-auth-mode');
+    expect(shell).toContain('AuthCollage');
     expect(collage).toContain('data-testid="auth-collage"');
-    expect(collage).toContain('aria-hidden="true"');
-    expect(collage).toContain('Ready to share');
-    expect(collage).toContain('pointer: fine');
-    expect(wordmark).toContain('text-[var(--iris)]');
+    expect(collage).toContain('Inside the live demo');
+    expect(collage).toContain('One workspace for your whole identity');
+    expect(collage).toContain('Showcase work that looks intentional');
+    expect(collage).toContain('AnimatePresence');
+    expect(collage).toContain('role="tablist"');
+    expect(collage).not.toContain('Alex Rivera');
+    expect(collage).not.toContain('Ready to share');
+    expect(wordmark).toContain('CodeCard');
   });
 
   it('uses accessible password toggle and reserved error space', () => {
