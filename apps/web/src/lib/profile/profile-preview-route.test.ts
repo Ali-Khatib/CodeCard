@@ -20,7 +20,10 @@ describe('owner profile preview route', () => {
 
   it('does not weaken the public slug route', () => {
     const publicPage = readFileSync(resolve(process.cwd(), 'src/app/[slug]/page.tsx'), 'utf8');
-    expect(publicPage).toContain(".eq('is_public', true)");
+    const loader = readFileSync(resolve(process.cwd(), 'src/lib/profile/public-profile.ts'), 'utf8');
+    expect(publicPage).toContain('loadPublicProfileBySlug');
+    expect(loader).toContain(".eq('is_public', true)");
+    expect(loader).toContain('is_published === true');
   });
 });
 

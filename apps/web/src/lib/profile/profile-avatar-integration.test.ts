@@ -53,7 +53,8 @@ describe('profile avatar integration', () => {
     );
 
     expect(preview).toContain('avatarUrl={profile.avatar_url}');
-    expect(publicProfile).toContain('avatarUrl={profile.avatar_url}');
+    expect(publicProfile).toContain('avatarUrl={payload.avatarUrl}');
+    expect(publicProfile).toContain('loadPublicProfileBySlug');
     expect(publicView).toContain('profileAvatarAltText(displayName)');
     expect(preview).not.toContain('AvatarUpload');
     expect(publicProfile).not.toContain('AvatarUpload');

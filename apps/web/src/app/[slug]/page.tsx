@@ -1,126 +1,59 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { normalizeFeaturedProject } from '@/lib/projects/featured';
-import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
-import { normalizeResearchPaper } from '@/lib/research/research';
-import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
-import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
+import {
+  loadPublicProfileBySlug,
+  mapPublicProfileMetadata,
+  normalizePublicProfileSlug,
+} from '@/lib/profile/public-profile';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
-import type { ProfileLinkItem } from '@/lib/icons/profile-links';
-import {
-  loadProfileProjectOrderings,
-  sortProjectsByEffectiveOrder,
-} from '@/lib/projects/project-order-core';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-type ResearchPaperRow = Parameters<typeof normalizeResearchPaper>[0] & {
-  is_published: boolean;
-  sort_order: number;
-  created_at?: string | null;
-};
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  if (!slug) {
+    return mapPublicProfileMetadata(null);
+  }
+
   const supabase = await createClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('display_name, headline')
     .eq('slug', slug)
     .eq('is_public', true)
-    .single();
+    .maybeSingle();
 
-  if (!profile) return { title: 'Profile not found' };
-
-  return {
-    title: profile.display_name,
-    description: profile.headline ?? `${profile.display_name} on CodeCard`,
-  };
+  return mapPublicProfileMetadata(profile);
 }
 
 export const revalidate = 60;
 
 export default async function PublicProfilePage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
   const supabase = await createClient();
+  const payload = await loadPublicProfileBySlug(supabase, rawSlug);
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select(
-      `
-      *,
-      profile_links(*),
-      projects(
-        *,
-        project_domains(*),
-        project_focus_areas(*),
-        project_media_assets(*),
-        project_links(*)
-      ),
-      research_papers(
-        *,
-        research_figures(*),
-        related_project:related_project_id(id, title, is_published)
-      )
-    `,
-    )
-    .eq('slug', slug)
-    .eq('is_public', true)
-    .single();
-
-  if (!profile) notFound();
-
-  const orderings = await loadProfileProjectOrderings(supabase, profile.id);
-  const publishedProjects = sortProjectsByEffectiveOrder(
-    (profile.projects ?? []) as Array<
-      Parameters<typeof normalizeFeaturedProject>[0] & {
-        is_published: boolean;
-        created_at: string;
-        sort_order: number;
-      }
-    >,
-    orderings,
-  ).filter((project) => project.is_published);
-
-  const featuredProjects = publishedProjects.map((project) =>
-    normalizeFeaturedProject(project, {
-      resolveStoragePath: createProjectMediaUrlResolver(supabase),
-    }),
-  );
-  const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
-  const resolveFigureUrl = createResearchFigureUrlResolver(supabase);
-  const publishedResearch = sortResearchBySortOrder(
-    researchRows.filter((p: ResearchPaperRow) => p.is_published),
-  ).map((paper: ResearchPaperRow) =>
-    normalizeResearchPaper(paper, slug, { resolveFigureUrl }),
-  );
-
-  const links: ProfileLinkItem[] = (profile.profile_links ?? [])
-    .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
-    .map((l: { type: string; label: string | null; url: string }) => ({
-      type: l.type,
-      label: l.label,
-      url: l.url,
-    }));
+  if (!payload) notFound();
 
   return (
     <>
-      <ProfileAnalytics profileId={profile.id} />
+      <ProfileAnalytics profileId={payload.profileId} />
       <PublicProfileExperience
-        profileSlug={slug}
-        displayName={profile.display_name}
-        headline={profile.headline}
-        avatarUrl={profile.avatar_url}
-        bio={profile.bio}
-        links={links}
-        projects={featuredProjects}
-        researchPapers={publishedResearch}
-        profileId={profile.id}
-        location={profile.location}
+        profileSlug={payload.profileSlug}
+        displayName={payload.displayName}
+        headline={payload.headline}
+        avatarUrl={payload.avatarUrl}
+        bio={payload.bio}
+        links={payload.links}
+        projects={payload.projects}
+        researchPapers={payload.researchPapers}
+        profileId={payload.profileId}
+        location={payload.location}
       />
     </>
   );
