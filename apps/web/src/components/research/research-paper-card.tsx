@@ -2,13 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { HiOutlineArrowDownTray, HiOutlineClipboardDocument, HiOutlineDocumentText } from 'react-icons/hi2';
+import { HiOutlineArrowDownTray, HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
+import { CitationCopyButton } from '@/components/research/citation-copy-button';
 import { trackResearchEvent } from './research-analytics';
 
 function formatReadTime(seconds?: number) {
@@ -34,20 +34,7 @@ export function ResearchPaperCard({
   delay?: number;
 }) {
   const reduced = useReducedMotion();
-  const [copied, setCopied] = useState(false);
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
-
-  const copyCitation = async () => {
-    if (!paper.citationText) return;
-    await navigator.clipboard.writeText(paper.citationText);
-    setCopied(true);
-    trackResearchEvent({
-      eventType: 'citation_copy',
-      profileId,
-      researchPaperId: paper.id,
-    });
-    window.setTimeout(() => setCopied(false), 1800);
-  };
 
   return (
     <AppReveal delay={delay}>
@@ -146,10 +133,17 @@ export function ResearchPaperCard({
               </a>
             )}
             {paper.citationText && (
-              <button type="button" className="cc-app-btn cc-app-btn--ghost" onClick={copyCitation}>
-                <HiOutlineClipboardDocument className="h-4 w-4" aria-hidden />
-                {copied ? 'Copied' : 'Citation'}
-              </button>
+              <CitationCopyButton
+                citationText={paper.citationText}
+                compactLabel="Citation"
+                onCopied={() =>
+                  trackResearchEvent({
+                    eventType: 'citation_copy',
+                    profileId,
+                    researchPaperId: paper.id,
+                  })
+                }
+              />
             )}
             {paper.relatedProjectHref && (
               <Link

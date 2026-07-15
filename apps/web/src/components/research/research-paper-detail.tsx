@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import {
   HiOutlineArrowDownTray,
   HiOutlineArrowLeft,
-  HiOutlineClipboardDocument,
   HiOutlineDocumentText,
   HiOutlineLink,
 } from 'react-icons/hi2';
@@ -14,6 +13,7 @@ import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
+import { CitationCopyButton } from '@/components/research/citation-copy-button';
 import { trackResearchEvent } from './research-analytics';
 
 function metadataLine(paper: ResearchPaper) {
@@ -36,7 +36,6 @@ export function ResearchPaperDetail({
   profileId?: string;
   displayName: string;
 }) {
-  const [copied, setCopied] = useState(false);
   const [abstractExpanded, setAbstractExpanded] = useState(false);
   const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
@@ -59,18 +58,6 @@ export function ResearchPaperDetail({
       });
     };
   }, [paper.id, profileId]);
-
-  const copyCitation = async () => {
-    if (!paper.citationText) return;
-    await navigator.clipboard.writeText(paper.citationText);
-    setCopied(true);
-    trackResearchEvent({
-      eventType: 'citation_copy',
-      profileId,
-      researchPaperId: paper.id,
-    });
-    window.setTimeout(() => setCopied(false), 1800);
-  };
 
   const abstract = paper.abstract ?? 'Abstract coming soon.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;
@@ -197,10 +184,17 @@ export function ResearchPaperDetail({
                 <div className="rounded-card border border-border/40 bg-midnight/50 p-6 shadow-rim">
                   <p className={TYPE.eyebrow}>Citation</p>
                   <p className="mt-4 text-[15px] leading-relaxed text-ash">{paper.citationText}</p>
-                  <button type="button" className="cc-app-btn cc-app-btn--primary mt-5" onClick={copyCitation}>
-                    <HiOutlineClipboardDocument className="h-4 w-4" aria-hidden />
-                    {copied ? 'Copied' : 'Copy citation'}
-                  </button>
+                  <CitationCopyButton
+                    citationText={paper.citationText}
+                    className="cc-app-btn cc-app-btn--primary mt-5"
+                    onCopied={() =>
+                      trackResearchEvent({
+                        eventType: 'citation_copy',
+                        profileId,
+                        researchPaperId: paper.id,
+                      })
+                    }
+                  />
                 </div>
               )}
 
