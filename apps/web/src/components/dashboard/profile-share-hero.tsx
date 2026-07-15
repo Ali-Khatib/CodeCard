@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
@@ -12,17 +12,24 @@ import {
   getPublicProfileLinkForClipboard,
 } from '@/lib/sharing/qr';
 import { downloadProfileQrPng } from '@/lib/sharing/qr-download';
+import {
+  buildProfileNativeSharePayload,
+  isNativeShareSupported,
+  shareProfileNative,
+} from '@/lib/sharing/native-share';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 type ProfileShareHeroProps = {
   profileSlug?: string | null;
   isPublic?: boolean | null;
+  displayName?: string | null;
 };
 
 export function ProfileShareHero({
   profileSlug,
   isPublic = true,
+  displayName,
 }: ProfileShareHeroProps) {
   const [qrOpen, setQrOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -30,9 +37,14 @@ export function ProfileShareHero({
   const [qrError, setQrError] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [nativeShareAvailable, setNativeShareAvailable] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const shareBusyRef = useRef(false);
   const reduced = useReducedMotion() ?? false;
   const statusId = useId();
   const downloadStatusId = useId();
+  const shareStatusId = useId();
 
   const canonical = buildCanonicalPublicProfileUrl(profileSlug);
   const clipboardUrl = getPublicProfileLinkForClipboard(profileSlug);
@@ -43,10 +55,13 @@ export function ProfileShareHero({
       : 'Add a profile slug to share';
   const canShare = Boolean(clipboardUrl && canonical.ok);
 
-
   const { copy, isLoading, isSuccess, isError, status } = useCopyToClipboard({
     successDuration: 2400,
   });
+
+  useEffect(() => {
+    setNativeShareAvailable(isNativeShareSupported());
+  }, []);
 
   useEffect(() => {
     if (!qrOpen) return;
@@ -85,6 +100,42 @@ export function ProfileShareHero({
     await copy(clipboardUrl);
   };
 
+  const shareProfile = async () => {
+    if (shareBusyRef.current || !canShare) return;
+    shareBusyRef.current = true;
+    setShareBusy(true);
+    setShareMessage(null);
+
+    try {
+      const built = buildProfileNativeSharePayload({
+        displayName,
+        profileSlug,
+      });
+      if (!built.ok) {
+        setShareMessage(built.error);
+        return;
+      }
+
+      if (qrUrl && built.payload.url !== qrUrl) {
+        setShareMessage('Share URL does not match the QR preview.');
+        return;
+      }
+
+      const result = await shareProfileNative(built.payload);
+      if (!result.ok) {
+        setShareMessage(result.error);
+        return;
+      }
+      if (result.status === 'shared') {
+        setShareMessage('Sharing options opened');
+      }
+      // Cancellation: quiet return, no alarming message.
+    } finally {
+      shareBusyRef.current = false;
+      setShareBusy(false);
+    }
+  };
+
   const copyAnnouncement = isSuccess
     ? 'Public link copied'
     : isError
@@ -93,7 +144,11 @@ export function ProfileShareHero({
 
   return (
     <div className="cc-profile-share-hero">
-      <div className="cc-profile-share-hero__grid">
+      <div
+        className={`cc-profile-share-hero__grid${
+          nativeShareAvailable ? ' cc-profile-share-hero__grid--with-share' : ''
+        }`}
+      >
         <motion.button
           type="button"
           onClick={copyLink}
@@ -230,6 +285,57 @@ export function ProfileShareHero({
           </AnimatePresence>
         </motion.button>
 
+        {nativeShareAvailable ? (
+          <motion.button
+            type="button"
+            onClick={() => void shareProfile()}
+            disabled={!canShare || shareBusy}
+            aria-busy={shareBusy}
+            aria-label="Share profile"
+            aria-describedby={shareStatusId}
+            className="cc-share-action cc-share-action--native"
+            whileHover={reduced ? undefined : { y: -4, scale: 1.01 }}
+            whileTap={reduced ? undefined : { scale: 0.985 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+          >
+            <span className="cc-share-action__glow cc-share-action__glow--coral" aria-hidden />
+            <span className="cc-share-action__shine" aria-hidden />
+
+            <span className="cc-share-action__icon-wrap" aria-hidden>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M16 6l-4-4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 2v13"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+
+            <span className="cc-share-action__copy">
+              <span className="cc-share-action__eyebrow">Open share sheet</span>
+              <span className="cc-share-action__title">
+                {shareBusy ? 'Opening…' : 'Share profile'}
+              </span>
+              <span className="cc-share-action__url">Messages, mail, and more</span>
+            </span>
+          </motion.button>
+        ) : null}
+
         <motion.button
           type="button"
           onClick={() => setQrOpen((o) => !o)}
@@ -269,10 +375,19 @@ export function ProfileShareHero({
         </motion.button>
       </div>
 
+      <p id={shareStatusId} className="sr-only" role="status" aria-live="polite">
+        {shareMessage ?? ''}
+      </p>
+      {shareMessage && !shareMessage.startsWith('Sharing options') ? (
+        <p className="mt-3 text-[13px] text-[var(--app-smoke)]" role="status">
+          {shareMessage}
+        </p>
+      ) : null}
+
       {!isPublic && canShare ? (
         <p className="mt-4 text-[14px] leading-relaxed text-[var(--app-smoke)]" role="status">
-          Your profile is private. The QR and link still point to your public URL, but visitors will
-          not see it until you{' '}
+          Your profile is private. Shared links and QR codes still point to your public URL, but
+          visitors will not see it until you{' '}
           <Link href="/dashboard/profile" className="underline underline-offset-2">
             publish your profile
           </Link>
