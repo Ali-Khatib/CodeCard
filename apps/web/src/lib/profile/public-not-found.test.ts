@@ -41,8 +41,13 @@ describe('WS06-T002 public not-found states', () => {
   });
 
   it('does not reveal private profile titles in missing metadata', () => {
-    const loader = readFileSync(resolve(process.cwd(), 'src/lib/profile/public-profile.ts'), 'utf8');
-    expect(loader).toContain("title: 'Profile not found'");
-    expect(loader).toContain('robots: { index: false, follow: false }');
+    const metadata = readFileSync(
+      resolve(process.cwd(), 'src/lib/profile/public-metadata.ts'),
+      'utf8',
+    );
+    expect(metadata).toContain("'Profile not found'");
+    expect(metadata).toContain('robots: { index: false, follow: false }');
+    expect(metadata).toContain('buildUnavailablePublicMetadata');
   });
 });
+

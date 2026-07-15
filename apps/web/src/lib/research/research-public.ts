@@ -4,18 +4,22 @@ import {
   type ResearchFigureDisplayResolver,
   type ResearchPaper,
 } from '@/lib/research/research';
+import {
+  buildPublicResearchPageMetadata,
+  buildPublicResearchPath as buildSharedPublicResearchPath,
+  normalizePublicMetadataText,
+  PUBLIC_METADATA_DESCRIPTION_MAX,
+} from '@/lib/profile/public-metadata';
 
 export const PUBLIC_RESEARCH_PAPER_SELECT =
   'id, slug, title, abstract, authors, venue, publication_status, year, pdf_url, doi_url, citation_text, tags, cover_image_url, related_project_id, research_figures(id, image_url, storage_path, caption, sort_order), related_project:related_project_id(id, title, is_published)';
 
 export function truncatePlainText(value: string, maxLength: number): string {
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  if (normalized.length <= maxLength) return normalized;
-  return `${normalized.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
+  return normalizePublicMetadataText(value, maxLength);
 }
 
 export function buildPublicResearchPath(profileSlug: string, paperSlug: string): string {
-  return `/${profileSlug}/research/${paperSlug}`;
+  return buildSharedPublicResearchPath(profileSlug, paperSlug);
 }
 
 export function buildPublicResearchMetadata(input: {
@@ -25,22 +29,13 @@ export function buildPublicResearchMetadata(input: {
   profileSlug: string;
   paperSlug: string;
 }): Metadata {
-  const description = input.abstract
-    ? truncatePlainText(input.abstract, 160)
-    : `${input.paperTitle} by ${input.profileDisplayName} on CodeCard`;
-
-  return {
-    title: `${input.paperTitle} · ${input.profileDisplayName}`,
-    description,
-    alternates: {
-      canonical: buildPublicResearchPath(input.profileSlug, input.paperSlug),
-    },
-    openGraph: {
-      title: `${input.paperTitle} · ${input.profileDisplayName}`,
-      description,
-      type: 'article',
-    },
-  };
+  return buildPublicResearchPageMetadata({
+    profileDisplayName: input.profileDisplayName,
+    paperTitle: input.paperTitle,
+    abstract: input.abstract,
+    profileSlug: input.profileSlug,
+    paperSlug: input.paperSlug,
+  });
 }
 
 export function toPublicResearchPaper(
@@ -64,3 +59,5 @@ export const FORBIDDEN_PUBLIC_RESEARCH_KEYS = [
   'updated_at',
   'storage_path',
 ] as const;
+
+export { PUBLIC_METADATA_DESCRIPTION_MAX };

@@ -1,4 +1,5 @@
 import { SLUG_REGEX } from '@codecard/validation';
+import type { Metadata } from 'next';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { normalizeFeaturedProject, type FeaturedProject } from '@/lib/projects/featured';
@@ -7,6 +8,10 @@ import {
   loadProfileProjectOrderings,
   sortProjectsByEffectiveOrder,
 } from '@/lib/projects/project-order-core';
+import {
+  buildPublicProfileMetadata,
+  buildUnavailablePublicMetadata,
+} from '@/lib/profile/public-metadata';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import {
   normalizeResearchPaper,
@@ -179,20 +184,22 @@ export async function loadPublicProfileBySlug(
   };
 }
 
-export function mapPublicProfileMetadata(profile: {
-  display_name: string;
-  headline: string | null;
-} | null): { title: string; description: string; robots?: { index: false; follow: false } } {
+export function mapPublicProfileMetadata(
+  profile: {
+    display_name: string;
+    headline: string | null;
+    bio?: string | null;
+    slug: string;
+  } | null,
+): Metadata {
   if (!profile) {
-    return {
-      title: 'Profile not found',
-      description: 'This profile could not be found on CodeCard.',
-      robots: { index: false, follow: false },
-    };
+    return buildUnavailablePublicMetadata('profile');
   }
 
-  return {
-    title: profile.display_name,
-    description: profile.headline?.trim() || `${profile.display_name} on CodeCard`,
-  };
+  return buildPublicProfileMetadata({
+    profileSlug: profile.slug,
+    displayName: profile.display_name,
+    headline: profile.headline,
+    bio: profile.bio,
+  });
 }
