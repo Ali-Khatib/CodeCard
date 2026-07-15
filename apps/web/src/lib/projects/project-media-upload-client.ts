@@ -5,15 +5,23 @@ import {
   type ProjectMediaRole,
 } from '@codecard/validation';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { uploadFileToSignedUrlWithProgress } from '@/lib/storage/signed-upload-transport';
+import {
+  classifyInitFailure,
+  isRetryableUploadFailure,
+  messageForUploadFailure,
+  type UploadFailureClass,
+} from '@/lib/storage/upload-failure';
+import type { UploadStage } from '@/lib/storage/upload-progress';
 
 export const PROJECT_MEDIA_UPLOAD_BUCKET = STORAGE_BUCKETS.projectMedia;
 
 export type ProjectMediaUploadPhase =
-  | 'idle'
+  | UploadStage
   | 'preparing'
-  | 'uploading'
   | 'saving'
-  | 'complete';
+  | 'validation'
+  | 'error';
 
 export type ProjectMediaUploadInitResponse = {
   path: string;
@@ -25,7 +33,14 @@ export type ProjectMediaUploadInitResponse = {
 
 export type ProjectMediaUploadFlowResult =
   | { ok: true; path: string; assetId: string; cleanupWarning?: boolean }
-  | { ok: false; message: string; phase: ProjectMediaUploadPhase | 'validation' };
+  | {
+      ok: false;
+      message: string;
+      phase: ProjectMediaUploadPhase;
+      failureClass: UploadFailureClass;
+      retryable: boolean;
+      cancelled?: boolean;
+    };
 
 const GENERIC_UPLOAD_ERROR = 'Could not upload image. Please try again.';
 const GENERIC_SAVE_ERROR = 'Could not save project media. Please try again.';
@@ -112,61 +127,113 @@ export async function requestProjectMediaUploadInit(
     file: File;
   },
   fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
 ): Promise<
   | { ok: true; init: ProjectMediaUploadInitResponse }
-  | { ok: false; message: string }
+  | { ok: false; message: string; failureClass: UploadFailureClass; retryable: boolean }
 > {
   const validation = validateProjectMediaFile(input.file);
   if (!validation.ok) {
-    return { ok: false, message: validation.message };
+    return {
+      ok: false,
+      message: validation.message,
+      failureClass: 'validation',
+      retryable: false,
+    };
   }
 
-  const response = await fetchImpl('/api/upload', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      resourceType: 'project-media',
-      resourceId: input.projectId,
-      mediaRole: input.mediaRole,
-      filename: input.file.name,
-      mimeType: validation.mimeType,
-      size: input.file.size,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetchImpl('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resourceType: 'project-media',
+        resourceId: input.projectId,
+        mediaRole: input.mediaRole,
+        filename: input.file.name,
+        mimeType: validation.mimeType,
+        size: input.file.size,
+      }),
+      signal,
+    });
+  } catch (error) {
+    if (signal?.aborted || (error instanceof DOMException && error.name === 'AbortError')) {
+      return {
+        ok: false,
+        message: messageForUploadFailure('cancelled'),
+        failureClass: 'cancelled',
+        retryable: true,
+      };
+    }
+    return {
+      ok: false,
+      message: messageForUploadFailure('network'),
+      failureClass: 'network',
+      retryable: true,
+    };
+  }
 
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as { error?: string } | null;
-    if (body?.error && body.error !== 'Forbidden') {
-      return { ok: false, message: body.error };
-    }
-    return { ok: false, message: GENERIC_UPLOAD_ERROR };
+    const failure = classifyInitFailure(response.status, body?.error);
+    return { ok: false as const, ...failure };
   }
 
   const init = (await response.json()) as ProjectMediaUploadInitResponse;
-  if (!init.path || !init.token) {
-    return { ok: false, message: GENERIC_UPLOAD_ERROR };
+  if (!init.path || !init.token || !init.signedUrl) {
+    return {
+      ok: false,
+      message: GENERIC_UPLOAD_ERROR,
+      failureClass: 'upload_authorization',
+      retryable: true,
+    };
   }
 
   return { ok: true, init };
 }
 
 export async function uploadProjectMediaToSignedUrl(
-  supabase: Pick<SupabaseClient, 'storage'>,
+  _supabase: Pick<SupabaseClient, 'storage'> | null,
   init: ProjectMediaUploadInitResponse,
   file: File,
-): Promise<{ ok: true } | { ok: false; message: string }> {
-  const { error } = await supabase.storage
-    .from(PROJECT_MEDIA_UPLOAD_BUCKET)
-    .uploadToSignedUrl(init.path, init.token, file, {
-      contentType: init.mimeType,
-      upsert: false,
-    });
+  options?: {
+    onProgress?: (progress: { loaded: number; total: number; percent: number | null }) => void;
+    signal?: AbortSignal;
+  },
+): Promise<
+  | { ok: true }
+  | {
+      ok: false;
+      message: string;
+      failureClass: UploadFailureClass;
+      cancelled?: boolean;
+    }
+> {
+  void _supabase;
+  void PROJECT_MEDIA_UPLOAD_BUCKET;
 
-  if (error) {
-    return { ok: false, message: GENERIC_UPLOAD_ERROR };
+  const result = await uploadFileToSignedUrlWithProgress({
+    signedUrl: init.signedUrl.includes('token=')
+      ? init.signedUrl
+      : `${init.signedUrl}${init.signedUrl.includes('?') ? '&' : '?'}token=${encodeURIComponent(init.token)}`,
+    file,
+    contentType: init.mimeType,
+    upsert: false,
+    onProgress: options?.onProgress,
+    signal: options?.signal,
+  });
+
+  if (result.ok) {
+    return { ok: true };
   }
 
-  return { ok: true };
+  return {
+    ok: false,
+    message: result.message,
+    failureClass: result.failureClass,
+    cancelled: result.cancelled,
+  };
 }
 
 export async function executeProjectMediaUploadFlow(input: {
@@ -177,7 +244,19 @@ export async function executeProjectMediaUploadFlow(input: {
   uploadToStorage: (
     init: ProjectMediaUploadInitResponse,
     file: File,
-  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+    options?: {
+      onProgress?: (progress: { loaded: number; total: number; percent: number | null }) => void;
+      signal?: AbortSignal;
+    },
+  ) => Promise<
+    | { ok: true }
+    | {
+        ok: false;
+        message: string;
+        failureClass?: UploadFailureClass;
+        cancelled?: boolean;
+      }
+  >;
   finalizeUpload: (
     path: string,
   ) => Promise<
@@ -185,35 +264,90 @@ export async function executeProjectMediaUploadFlow(input: {
     | { success: false; error?: string }
   >;
   onPhaseChange?: (phase: ProjectMediaUploadPhase) => void;
+  onProgress?: (progress: { loaded: number; total: number; percent: number | null }) => void;
+  signal?: AbortSignal;
 }): Promise<ProjectMediaUploadFlowResult> {
   const validation = validateProjectMediaFile(input.file);
   if (!validation.ok) {
-    return { ok: false, phase: 'validation', message: validation.message };
+    return {
+      ok: false,
+      phase: 'validation',
+      failureClass: 'validation',
+      retryable: false,
+      message: validation.message,
+    };
   }
 
-  input.onPhaseChange?.('preparing');
+  if (input.signal?.aborted) {
+    return {
+      ok: false,
+      phase: 'cancelled',
+      failureClass: 'cancelled',
+      retryable: true,
+      cancelled: true,
+      message: messageForUploadFailure('cancelled'),
+    };
+  }
+
+  input.onPhaseChange?.('authorizing');
   const requestInit = input.requestInit ?? requestProjectMediaUploadInit;
-  const initResult = await requestInit({
-    projectId: input.projectId,
-    mediaRole: input.mediaRole,
-    file: input.file,
-  });
+  const initResult = await requestInit(
+    {
+      projectId: input.projectId,
+      mediaRole: input.mediaRole,
+      file: input.file,
+    },
+    fetch,
+    input.signal,
+  );
   if (!initResult.ok) {
-    return { ok: false, phase: 'preparing', message: initResult.message };
+    const failureClass = initResult.failureClass ?? 'upload_authorization';
+    return {
+      ok: false,
+      phase: failureClass === 'cancelled' ? 'cancelled' : 'authorizing',
+      failureClass,
+      retryable: initResult.retryable ?? isRetryableUploadFailure(failureClass),
+      cancelled: failureClass === 'cancelled',
+      message: initResult.message,
+    };
+  }
+
+  if (input.signal?.aborted) {
+    return {
+      ok: false,
+      phase: 'cancelled',
+      failureClass: 'cancelled',
+      retryable: true,
+      cancelled: true,
+      message: messageForUploadFailure('cancelled'),
+    };
   }
 
   input.onPhaseChange?.('uploading');
-  const uploadResult = await input.uploadToStorage(initResult.init, input.file);
+  const uploadResult = await input.uploadToStorage(initResult.init, input.file, {
+    onProgress: input.onProgress,
+    signal: input.signal,
+  });
   if (!uploadResult.ok) {
-    return { ok: false, phase: 'uploading', message: uploadResult.message };
+    const failureClass = uploadResult.failureClass ?? 'network';
+    return {
+      ok: false,
+      phase: uploadResult.cancelled ? 'cancelled' : 'uploading',
+      failureClass,
+      retryable: isRetryableUploadFailure(failureClass),
+      cancelled: uploadResult.cancelled,
+      message: uploadResult.message,
+    };
   }
 
-  input.onPhaseChange?.('saving');
+  input.onPhaseChange?.('finalizing');
   const finalizeResult = await input.finalizeUpload(initResult.init.path);
   if (!finalizeResult.success) {
     return {
       ok: false,
-      phase: 'saving',
+      phase: 'finalizing',
+      failureClass: 'finalization',
+      retryable: true,
       message: finalizeResult.error ?? GENERIC_SAVE_ERROR,
     };
   }

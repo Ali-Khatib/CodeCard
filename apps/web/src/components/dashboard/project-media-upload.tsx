@@ -4,24 +4,28 @@ import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROJECT_SCREENSHOT_MAX_COUNT } from '@codecard/validation';
-import { createClient } from '@/lib/supabase/client';
+import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
+import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { deleteProjectScreenshotAction } from '@/lib/projects/delete-project-screenshot-action';
 import { finalizeProjectMediaUploadAction } from '@/lib/projects/finalize-project-media-upload-action';
 import {
   executeProjectMediaUploadFlow,
   uploadProjectMediaToSignedUrl,
   validateProjectMediaFile,
-  type ProjectMediaUploadPhase,
 } from '@/lib/projects/project-media-upload-client';
 import type { ProjectMediaAssetRecord } from '@/lib/projects/project-media-core';
-import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
+import { messageForUploadFailure, type UploadFailureClass } from '@/lib/storage/upload-failure';
+import { isActiveUploadStage, stageLabel, type UploadStage } from '@/lib/storage/upload-progress';
 
 type LocalScreenshotSelection = {
   id: string;
   file: File;
   previewUrl: string;
-  phase: ProjectMediaUploadPhase | 'validation' | 'error';
+  stage: UploadStage | 'error';
+  progressPercent: number | null;
   error?: string;
+  failureClass?: UploadFailureClass;
+  retryable?: boolean;
 };
 
 type ProjectMediaUploadProps = {
@@ -33,19 +37,29 @@ type ProjectMediaUploadProps = {
   disabled?: boolean;
 };
 
-function phaseLabel(phase: ProjectMediaUploadPhase): string {
-  switch (phase) {
-    case 'preparing':
-      return 'Preparing upload…';
-    case 'uploading':
-      return 'Uploading image…';
-    case 'saving':
-      return 'Saving…';
-    case 'complete':
-      return 'Saved.';
-    default:
-      return '';
+function normalizeStage(phase: string): UploadStage {
+  if (phase === 'preparing') return 'authorizing';
+  if (phase === 'saving') return 'finalizing';
+  if (
+    phase === 'idle' ||
+    phase === 'validating' ||
+    phase === 'authorizing' ||
+    phase === 'uploading' ||
+    phase === 'finalizing' ||
+    phase === 'complete' ||
+    phase === 'failed' ||
+    phase === 'cancelled'
+  ) {
+    return phase;
   }
+  return 'idle';
+}
+
+function createClientId(file: File): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2)}`;
 }
 
 export function ProjectMediaUpload({
@@ -62,6 +76,10 @@ export function ProjectMediaUpload({
   const coverInputRef = useRef<HTMLInputElement>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<Set<string>>(new Set());
+  const coverAbortRef = useRef<AbortController | null>(null);
+  const coverInFlightRef = useRef(false);
+  const screenshotAbortRef = useRef<Map<string, AbortController>>(new Map());
+  const screenshotInFlightRef = useRef<Set<string>>(new Set());
 
   const [savedCover, setSavedCover] = useState(cover);
   const [savedCoverUrl, setSavedCoverUrl] = useState(coverUrl);
@@ -70,8 +88,10 @@ export function ProjectMediaUpload({
 
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [coverPhase, setCoverPhase] = useState<ProjectMediaUploadPhase>('idle');
+  const [coverStage, setCoverStage] = useState<UploadStage>('idle');
+  const [coverProgress, setCoverProgress] = useState<number | null>(null);
   const [coverError, setCoverError] = useState('');
+  const [coverRetryable, setCoverRetryable] = useState(false);
   const [coverSuccess, setCoverSuccess] = useState(false);
   const [coverCleanupWarning, setCoverCleanupWarning] = useState(false);
 
@@ -79,6 +99,7 @@ export function ProjectMediaUpload({
   const [deletingAssetId, setDeletingAssetId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState('');
+  const [selectionError, setSelectionError] = useState('');
 
   useEffect(() => {
     setSavedCover(cover);
@@ -87,7 +108,22 @@ export function ProjectMediaUpload({
     setSavedScreenshotUrls(screenshotUrls);
   }, [cover, coverUrl, screenshots, screenshotUrls]);
 
-  const coverPending = coverPhase !== 'idle' && coverPhase !== 'complete';
+  useEffect(() => {
+    const screenshotAborts = screenshotAbortRef.current;
+    const previewUrls = previewUrlsRef.current;
+    return () => {
+      coverAbortRef.current?.abort();
+      for (const controller of screenshotAborts.values()) {
+        controller.abort();
+      }
+      for (const url of previewUrls) {
+        URL.revokeObjectURL(url);
+      }
+      previewUrls.clear();
+    };
+  }, []);
+
+  const coverPending = isActiveUploadStage(coverStage);
   const hasCover = Boolean(savedCover);
   const screenshotSlotsRemaining =
     PROJECT_SCREENSHOT_MAX_COUNT - savedScreenshots.length - localScreenshots.length;
@@ -107,6 +143,9 @@ export function ProjectMediaUpload({
     if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
     setCoverPreviewUrl(null);
     setCoverFile(null);
+    setCoverError('');
+    setCoverRetryable(false);
+    setCoverProgress(null);
     if (coverInputRef.current) coverInputRef.current.value = '';
   }, [coverPreviewUrl, revokePreviewUrl]);
 
@@ -118,9 +157,11 @@ export function ProjectMediaUpload({
       }
 
       setCoverError('');
+      setCoverRetryable(false);
       setCoverSuccess(false);
       setCoverCleanupWarning(false);
-      setCoverPhase('idle');
+      setCoverStage('idle');
+      setCoverProgress(null);
 
       const file = event.target.files?.[0];
       if (!file) {
@@ -133,6 +174,8 @@ export function ProjectMediaUpload({
         resetCoverSelection();
         event.target.value = '';
         setCoverError(validation.message);
+        setCoverRetryable(false);
+        setCoverStage('failed');
         return;
       }
 
@@ -146,21 +189,28 @@ export function ProjectMediaUpload({
   );
 
   const handleCoverUpload = useCallback(async () => {
-    if (coverPending || disabled || !coverFile) return;
+    if (coverPending || disabled || !coverFile || coverInFlightRef.current) return;
 
+    coverInFlightRef.current = true;
     setCoverError('');
+    setCoverRetryable(false);
     setCoverSuccess(false);
     setCoverCleanupWarning(false);
+    setCoverProgress(null);
 
     const file = coverFile;
-    const supabase = createClient();
+    const controller = new AbortController();
+    coverAbortRef.current = controller;
+
     const result = await executeProjectMediaUploadFlow({
       projectId,
       mediaRole: 'poster',
       file,
-      onPhaseChange: setCoverPhase,
-      uploadToStorage: (init, uploadFile) =>
-        uploadProjectMediaToSignedUrl(supabase, init, uploadFile),
+      signal: controller.signal,
+      onPhaseChange: (phase) => setCoverStage(normalizeStage(phase)),
+      onProgress: (progress) => setCoverProgress(progress.percent),
+      uploadToStorage: (init, uploadFile, options) =>
+        uploadProjectMediaToSignedUrl(null, init, uploadFile, options),
       finalizeUpload: async (path) => {
         const finalized = await finalizeProjectMediaUploadAction({
           projectId,
@@ -178,9 +228,14 @@ export function ProjectMediaUpload({
       },
     });
 
+    coverAbortRef.current = null;
+    coverInFlightRef.current = false;
+
     if (!result.ok) {
-      setCoverPhase('idle');
+      setCoverStage(result.cancelled ? 'cancelled' : 'failed');
       setCoverError(result.message);
+      setCoverRetryable(result.retryable);
+      setCoverProgress(null);
       return;
     }
 
@@ -200,14 +255,20 @@ export function ProjectMediaUpload({
     });
     setCoverCleanupWarning(Boolean(result.cleanupWarning));
     setCoverSuccess(true);
-    setCoverPhase('complete');
+    setCoverStage('complete');
+    setCoverProgress(null);
     router.refresh();
 
     window.setTimeout(() => {
       setCoverSuccess(false);
-      setCoverPhase('idle');
+      setCoverStage('idle');
     }, 2500);
   }, [coverFile, coverPending, coverPreviewUrl, disabled, projectId, router]);
+
+  const handleCancelCoverUpload = useCallback(() => {
+    if (!coverPending) return;
+    coverAbortRef.current?.abort();
+  }, [coverPending]);
 
   const handleScreenshotFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,11 +289,14 @@ export function ProjectMediaUpload({
         const validation = validateProjectMediaFile(file);
         if (!validation.ok) {
           nextSelections.push({
-            id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+            id: createClientId(file),
             file,
             previewUrl: '',
-            phase: 'error',
+            stage: 'error',
+            progressPercent: null,
             error: validation.message,
+            failureClass: 'validation',
+            retryable: false,
           });
           continue;
         }
@@ -240,15 +304,16 @@ export function ProjectMediaUpload({
         const previewUrl = URL.createObjectURL(file);
         trackPreviewUrl(previewUrl);
         nextSelections.push({
-          id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+          id: createClientId(file),
           file,
           previewUrl,
-          phase: 'idle',
+          stage: 'idle',
+          progressPercent: null,
         });
         remaining -= 1;
       }
 
-      if (batchError) setCoverError(batchError);
+      setSelectionError(batchError);
       if (nextSelections.length > 0) {
         setLocalScreenshots((current) => [...current, ...nextSelections]);
       }
@@ -258,6 +323,11 @@ export function ProjectMediaUpload({
 
   const removeLocalScreenshot = useCallback(
     (id: string) => {
+      const controller = screenshotAbortRef.current.get(id);
+      controller?.abort();
+      screenshotAbortRef.current.delete(id);
+      screenshotInFlightRef.current.delete(id);
+
       setLocalScreenshots((current) => {
         const target = current.find((item) => item.id === id);
         if (target?.previewUrl) revokePreviewUrl(target.previewUrl);
@@ -269,26 +339,57 @@ export function ProjectMediaUpload({
 
   const uploadLocalScreenshot = useCallback(
     async (selection: LocalScreenshotSelection) => {
-      if (selection.phase !== 'idle' && selection.phase !== 'error') return;
+      const retryableStage =
+        selection.stage === 'idle' ||
+        selection.stage === 'failed' ||
+        selection.stage === 'cancelled' ||
+        selection.stage === 'error';
+      if (!retryableStage) return;
+      if (selection.failureClass === 'validation') return;
+      if (screenshotInFlightRef.current.has(selection.id)) return;
+
+      screenshotInFlightRef.current.add(selection.id);
+      const controller = new AbortController();
+      screenshotAbortRef.current.set(selection.id, controller);
 
       setLocalScreenshots((current) =>
         current.map((item) =>
-          item.id === selection.id ? { ...item, phase: 'preparing', error: undefined } : item,
+          item.id === selection.id
+            ? {
+                ...item,
+                stage: 'authorizing',
+                error: undefined,
+                progressPercent: null,
+                retryable: undefined,
+                failureClass: undefined,
+              }
+            : item,
         ),
       );
 
-      const supabase = createClient();
       const result = await executeProjectMediaUploadFlow({
         projectId,
         mediaRole: 'screenshot',
         file: selection.file,
+        signal: controller.signal,
         onPhaseChange: (phase) => {
           setLocalScreenshots((current) =>
-            current.map((item) => (item.id === selection.id ? { ...item, phase } : item)),
+            current.map((item) =>
+              item.id === selection.id ? { ...item, stage: normalizeStage(phase) } : item,
+            ),
           );
         },
-        uploadToStorage: (init, uploadFile) =>
-          uploadProjectMediaToSignedUrl(supabase, init, uploadFile),
+        onProgress: (progress) => {
+          setLocalScreenshots((current) =>
+            current.map((item) =>
+              item.id === selection.id
+                ? { ...item, progressPercent: progress.percent }
+                : item,
+            ),
+          );
+        },
+        uploadToStorage: (init, uploadFile, options) =>
+          uploadProjectMediaToSignedUrl(null, init, uploadFile, options),
         finalizeUpload: async (path) => {
           const finalized = await finalizeProjectMediaUploadAction({
             projectId,
@@ -302,18 +403,34 @@ export function ProjectMediaUpload({
         },
       });
 
+      screenshotAbortRef.current.delete(selection.id);
+      screenshotInFlightRef.current.delete(selection.id);
+
       if (!result.ok) {
         setLocalScreenshots((current) =>
           current.map((item) =>
             item.id === selection.id
-              ? { ...item, phase: 'error', error: result.message }
+              ? {
+                  ...item,
+                  stage: result.cancelled ? 'cancelled' : 'failed',
+                  error: result.message,
+                  failureClass: result.failureClass,
+                  retryable: result.retryable,
+                  progressPercent: null,
+                }
               : item,
           ),
         );
         return;
       }
 
-      setLocalScreenshots((current) => current.filter((item) => item.id !== selection.id));
+      setLocalScreenshots((current) => {
+        const target = current.find((item) => item.id === selection.id);
+        if (target?.previewUrl) {
+          // Keep preview URL mapped to the saved asset; do not revoke yet.
+        }
+        return current.filter((item) => item.id !== selection.id);
+      });
       setSavedScreenshots((current) => [
         ...current,
         {
@@ -335,7 +452,11 @@ export function ProjectMediaUpload({
   );
 
   const uploadAllLocalScreenshots = useCallback(async () => {
-    const pending = localScreenshots.filter((item) => item.phase === 'idle' || item.phase === 'error');
+    const pending = localScreenshots.filter(
+      (item) =>
+        (item.stage === 'idle' || item.stage === 'failed' || item.stage === 'cancelled') &&
+        item.failureClass !== 'validation',
+    );
     for (const selection of pending) {
       await uploadLocalScreenshot(selection);
     }
@@ -436,7 +557,7 @@ export function ProjectMediaUpload({
               >
                 {hasCover ? 'Replace cover' : 'Choose cover'}
               </AppButton>
-              {coverFile && !coverPending && (
+              {coverFile && !coverPending && coverStage !== 'failed' && coverStage !== 'cancelled' && (
                 <>
                   <AppButton type="button" variant="primary" onClick={handleCoverUpload}>
                     {hasCover ? 'Upload replacement' : 'Upload cover'}
@@ -446,6 +567,28 @@ export function ProjectMediaUpload({
                   </AppButton>
                 </>
               )}
+              {coverFile &&
+                (coverStage === 'failed' || coverStage === 'cancelled') &&
+                coverRetryable && (
+                  <AppButton
+                    type="button"
+                    variant="primary"
+                    ariaLabel={`Retry upload for ${coverFile.name}`}
+                    onClick={handleCoverUpload}
+                  >
+                    Retry
+                  </AppButton>
+                )}
+              {coverPending && coverStage === 'uploading' && (
+                <AppButton
+                  type="button"
+                  variant="ghost"
+                  ariaLabel={`Cancel upload for ${coverFile?.name ?? 'cover'}`}
+                  onClick={handleCancelCoverUpload}
+                >
+                  Cancel upload
+                </AppButton>
+              )}
             </div>
             {hasCover && !coverFile ? (
               <p className="text-[13px] text-[var(--app-smoke)]">
@@ -454,22 +597,28 @@ export function ProjectMediaUpload({
             ) : null}
           </div>
         </div>
-        {(coverError || coverPending || coverSuccess || coverCleanupWarning) && (
+        {coverPending ? (
+          <UploadProgressIndicator
+            stage={coverStage}
+            percent={coverProgress}
+            label={stageLabel(coverStage, { percent: coverProgress })}
+            testId="cover-upload-progress"
+          />
+        ) : null}
+        {(coverError || coverSuccess || coverCleanupWarning) && !coverPending && (
           <p
             role="status"
             className={`text-[14px] ${coverError ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
             aria-live="polite"
           >
             {coverError ||
-              (coverPending
-                ? phaseLabel(coverPhase)
-                : coverSuccess
-                  ? coverCleanupWarning
-                    ? 'Cover replaced. Cleanup of the previous file is still pending.'
-                    : phaseLabel('complete')
-                  : coverCleanupWarning
-                    ? 'Cover replaced. Cleanup of the previous file is still pending.'
-                    : '')}
+              (coverSuccess
+                ? coverCleanupWarning
+                  ? messageForUploadFailure('cleanup_warning')
+                  : 'Cover saved.'
+                : coverCleanupWarning
+                  ? messageForUploadFailure('cleanup_warning')
+                  : '')}
           </p>
         )}
       </div>
@@ -551,6 +700,12 @@ export function ProjectMediaUpload({
           </p>
         ) : null}
 
+        {selectionError ? (
+          <p role="status" className="text-[14px] text-red-600" aria-live="polite">
+            {selectionError}
+          </p>
+        ) : null}
+
         {screenshotSlotsRemaining > 0 && (
           <>
             <label htmlFor={screenshotInputId} className="sr-only">
@@ -579,50 +734,86 @@ export function ProjectMediaUpload({
         {localScreenshots.length > 0 && (
           <div className="space-y-3">
             <ul className="space-y-2">
-              {localScreenshots.map((selection) => (
-                <li
-                  key={selection.id}
-                  className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--app-border)] p-3"
-                >
-                  {selection.previewUrl ? (
-                    <div className="relative h-14 w-24 overflow-hidden rounded-md">
-                      <Image
-                        src={selection.previewUrl}
-                        alt={`Selected screenshot ${selection.file.name}`}
-                        fill
-                        className="object-cover"
-                        sizes="96px"
-                        unoptimized
-                      />
-                    </div>
-                  ) : null}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] text-[var(--app-ink)]">{selection.file.name}</p>
-                    {selection.error ? (
-                      <p className="text-[13px] text-red-600">{selection.error}</p>
-                    ) : selection.phase !== 'idle' && selection.phase !== 'complete' ? (
-                      <p className="text-[13px] text-[var(--app-smoke)]" role="status">
-                        {phaseLabel(selection.phase as ProjectMediaUploadPhase)}
-                      </p>
-                    ) : null}
-                  </div>
-                  <AppButton
-                    type="button"
-                    variant="ghost"
-                    ariaLabel={`Remove ${selection.file.name} from selection`}
-                    className={
-                      selection.phase === 'preparing' ||
-                      selection.phase === 'uploading' ||
-                      selection.phase === 'saving'
-                        ? 'pointer-events-none opacity-50'
-                        : undefined
-                    }
-                    onClick={() => removeLocalScreenshot(selection.id)}
+              {localScreenshots.map((selection) => {
+                const active = isActiveUploadStage(
+                  selection.stage === 'error' ? 'failed' : selection.stage,
+                );
+                return (
+                  <li
+                    key={selection.id}
+                    className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--app-border)] p-3"
+                    data-testid={`screenshot-upload-item-${selection.id}`}
                   >
-                    Remove
-                  </AppButton>
-                </li>
-              ))}
+                    {selection.previewUrl ? (
+                      <div className="relative h-14 w-24 overflow-hidden rounded-md">
+                        <Image
+                          src={selection.previewUrl}
+                          alt={`Selected screenshot ${selection.file.name}`}
+                          fill
+                          className="object-cover"
+                          sizes="96px"
+                          unoptimized
+                        />
+                      </div>
+                    ) : null}
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="truncate text-[14px] text-[var(--app-ink)]">
+                        {selection.file.name}
+                      </p>
+                      {selection.error ? (
+                        <p className="text-[13px] text-red-600" role="status">
+                          {selection.error}
+                        </p>
+                      ) : active ? (
+                        <UploadProgressIndicator
+                          stage={selection.stage === 'error' ? 'failed' : selection.stage}
+                          percent={selection.progressPercent}
+                          label={stageLabel(
+                            selection.stage === 'error' ? 'failed' : selection.stage,
+                            { percent: selection.progressPercent },
+                          )}
+                        />
+                      ) : selection.stage === 'complete' ? (
+                        <p className="text-[13px] text-[var(--app-smoke)]" role="status">
+                          Complete
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(selection.stage === 'failed' || selection.stage === 'cancelled') &&
+                      selection.retryable ? (
+                        <AppButton
+                          type="button"
+                          variant="primary"
+                          ariaLabel={`Retry upload for ${selection.file.name}`}
+                          onClick={() => uploadLocalScreenshot(selection)}
+                        >
+                          Retry
+                        </AppButton>
+                      ) : null}
+                      {active && selection.stage === 'uploading' ? (
+                        <AppButton
+                          type="button"
+                          variant="ghost"
+                          ariaLabel={`Cancel upload for ${selection.file.name}`}
+                          onClick={() => screenshotAbortRef.current.get(selection.id)?.abort()}
+                        >
+                          Cancel
+                        </AppButton>
+                      ) : null}
+                      <AppButton
+                        type="button"
+                        variant="ghost"
+                        ariaLabel={`Remove ${selection.file.name} from selection`}
+                        className={active ? 'pointer-events-none opacity-50' : undefined}
+                        onClick={() => removeLocalScreenshot(selection.id)}
+                      >
+                        Remove
+                      </AppButton>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
             <AppButton type="button" variant="primary" onClick={uploadAllLocalScreenshots}>
               Upload selected screenshots
