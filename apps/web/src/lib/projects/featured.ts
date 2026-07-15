@@ -1,4 +1,5 @@
 import { parseCaseStudySections, type CaseStudySections } from '@/lib/projects/case-study-sections.shared';
+import { toSafeProjectLinkItems } from '@/lib/projects/safe-project-link-url';
 
 export type { CaseStudySections };
 
@@ -69,13 +70,15 @@ export function normalizeFeaturedProject(
     videoUrl: assets.find((a) => a.type === 'hero_video')?.storage_path
       ? resolve(assets.find((a) => a.type === 'hero_video')!.storage_path)
       : null,
-    links: [...(project.project_links ?? [])]
-      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-      .map((l) => ({
-      type: l.type,
-      label: l.label,
-      url: l.url,
-    })),
+    links: toSafeProjectLinkItems(
+      [...(project.project_links ?? [])]
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map((l) => ({
+          type: l.type,
+          label: l.label,
+          url: l.url,
+        })),
+    ),
     screenshots: screenshotAssets
       .map((a) => a.storage_path)
       .filter(Boolean)

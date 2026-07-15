@@ -1,4 +1,8 @@
 import { isAbsoluteMediaUrl } from '@/lib/projects/project-media-url';
+import {
+  toSafeDoiHref,
+  toSafeExternalPdfHref,
+} from '@/lib/security/safe-href';
 
 export interface ResearchFigure {
   id?: string;
@@ -82,8 +86,8 @@ export function normalizeResearchPaper(
     venue: paper.venue ?? null,
     publicationStatus: paper.publication_status ?? null,
     year: paper.year ?? null,
-    pdfUrl: paper.pdf_url ?? null,
-    doiUrl: paper.doi_url ?? null,
+    pdfUrl: toSafeExternalPdfHref(paper.pdf_url),
+    doiUrl: toSafeDoiHref(paper.doi_url),
     citationText: paper.citation_text ?? null,
     tags: paper.tags ?? [],
     coverImageUrl: paper.cover_image_url ?? null,
