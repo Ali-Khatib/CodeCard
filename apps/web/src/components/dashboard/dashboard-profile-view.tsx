@@ -9,7 +9,6 @@ import { ProfileEditor } from '@/components/profile-editor';
 import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile-header';
 import { ProfileCompletionIndicator } from '@/components/dashboard/profile-completion-indicator';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
-import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
@@ -138,16 +137,6 @@ export function DashboardProfileView({
                 Copy public link
               </CopyLinkButton>
             )}
-            <AsyncActionButton
-              variant="ghost"
-              className="mt-0"
-              successLabel="Saved"
-              onAction={async () => {
-                await new Promise((r) => setTimeout(r, 450));
-              }}
-            >
-              Download QR
-            </AsyncActionButton>
           </div>
         </AppCard>
 
@@ -159,25 +148,15 @@ export function DashboardProfileView({
             </div>
           </AppCard>
 
-          <AppCard className="text-center">
-            <AppMono>QR code</AppMono>
-            <div className="mx-auto mt-4 grid h-32 w-32 grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
-              {Array.from({ length: 25 }).map((_, i) => (
-                <div key={i} className={i % 2 === 0 ? 'bg-[var(--app-ink)]' : 'bg-transparent'} />
-              ))}
-            </div>
-            <p className="mt-3 text-[13px] text-[var(--app-smoke)]">codecard.app/{profile.slug}</p>
-            <AsyncActionButton
-              variant="primary"
-              block
-              className="mt-4"
-              successLabel="Saved"
-              onAction={async () => {
-                await new Promise((r) => setTimeout(r, 450));
-              }}
-            >
-              Download QR
-            </AsyncActionButton>
+          <AppCard>
+            <AppMono>Share tools</AppMono>
+            <p className="mt-3 text-[14px] leading-relaxed text-[var(--app-smoke)]">
+              Use Home for the real QR preview, PNG download, Copy public link, and Share profile
+              (where your browser supports it). Wallet and NFC are not available in the MVP.
+            </p>
+            <AppButton variant="ghost" className="mt-4" href="/dashboard">
+              Open Home share tools
+            </AppButton>
           </AppCard>
 
           <div className="grid grid-cols-2 gap-3">

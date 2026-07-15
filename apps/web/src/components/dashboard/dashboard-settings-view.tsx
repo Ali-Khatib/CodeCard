@@ -58,14 +58,29 @@ const SECTIONS: SettingSection[] = [
   {
     id: 'sharing',
     eyebrow: 'Share',
-    title: 'QR, NFC & wallet pass',
-    navHint: 'How you hand off your card',
+    title: 'QR & profile sharing',
+    navHint: 'Home share tools',
     description:
-      'Physical and digital ways to share your CodeCard — booth QR codes, tap-to-share NFC, and Apple Wallet.',
+      'Share from Home with Copy public link, Share profile (where supported), QR preview, and Download QR. Wallet passes and NFC are not part of the MVP.',
     rows: [
-      { label: 'QR code', hint: 'Print for events & slides', action: 'Download QR', control: 'button' },
-      { label: 'NFC link', hint: 'Program a tag or card', action: 'Configure tag', control: 'button' },
-      { label: 'Wallet pass', hint: 'Quick share from lock screen', action: 'Add to Apple Wallet', control: 'button' },
+      {
+        label: 'Share tools',
+        hint: 'Copy link, native share, QR preview, and PNG download',
+        value: 'Available on Home',
+        control: 'status',
+      },
+      {
+        label: 'Wallet passes',
+        hint: 'Apple Wallet and Google Wallet',
+        value: 'Coming later',
+        control: 'status',
+      },
+      {
+        label: 'NFC tags',
+        hint: 'Programmable tap-to-open tags',
+        value: 'Coming later',
+        control: 'status',
+      },
       { label: 'Default share page', hint: 'What opens first', value: 'Public profile', control: 'status' },
     ],
   },
@@ -137,9 +152,6 @@ export function DashboardSettingsView({
   const successLabels: Record<string, string> = {
     'Change password': 'Email sent',
     Connect: 'Connected',
-    'Download QR': 'Saved',
-    'Configure tag': 'Saved',
-    'Add to Apple Wallet': 'Added',
     'Upload logo': 'Uploaded',
     'View history': 'Opened',
     Enable: 'Enabled',
