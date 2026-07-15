@@ -394,20 +394,23 @@ export function ResearchForm({
 
       <div className="space-y-2">
         <label htmlFor={`${formId}-pdf-url`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          Paper URL
+          External paper URL
         </label>
         <input
           id={`${formId}-pdf-url`}
           type="url"
+          inputMode="url"
+          autoComplete="off"
           value={form.pdf_url}
           onChange={(event) => setForm((prev) => ({ ...prev, pdf_url: event.target.value }))}
-          placeholder="https://"
+          placeholder="https://example.com/paper.pdf"
           aria-describedby={`${formId}-pdf-url-help`}
           aria-invalid={Boolean(fieldErrors.pdf_url)}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
         <p id={`${formId}-pdf-url-help`} className="text-[13px] text-[var(--app-smoke)]">
-          Optional HTTPS link to a paper page or PDF. File upload comes later.
+          Optional HTTPS link to an externally hosted paper or PDF. Clear the field to remove it.
+          CodeCard does not host, scan, or verify this file. Private PDF uploads stay disabled.
         </p>
         <FieldError id={`${formId}-pdf-url-error`} message={fieldErrors.pdf_url} />
       </div>

@@ -51,6 +51,59 @@ const httpUrlSchema = z
     }
   }, 'Only HTTP(S) URLs allowed');
 
+/**
+ * External research PDF / paper link (MVP).
+ * HTTPS only; no embedded credentials; no storage paths or signed URLs.
+ * CodeCard does not host, scan, or verify the remote document.
+ */
+export function normalizeExternalPdfUrl(
+  value: string | null | undefined,
+): string | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  const trimmed = value.trim();
+  if (trimmed === '') return null;
+  return trimmed;
+}
+
+export function isValidExternalPdfUrl(value: string): boolean {
+  if (!value || typeof value !== 'string') return false;
+  if (value.includes('://') === false && value.startsWith('//')) return false;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return false;
+  }
+
+  if (parsed.protocol !== 'https:') return false;
+  if (parsed.username || parsed.password) return false;
+  if (!parsed.hostname) return false;
+  return true;
+}
+
+export function externalPdfHostname(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:') return null;
+    return parsed.hostname || null;
+  } catch {
+    return null;
+  }
+}
+
+const externalPdfUrlSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((value) => normalizeExternalPdfUrl(value))
+  .refine(
+    (value) =>
+      value === undefined || value === null || isValidExternalPdfUrl(value),
+    'Enter a valid HTTPS URL without credentials',
+  );
+
 export const FORBIDDEN_CREATE_RESEARCH_FIELDS = [
   'owner_user_id',
   'owner_id',
@@ -195,7 +248,7 @@ export function normalizeResearchTags(input: unknown): string[] {
   return tags;
 }
 
-const nullableUrlSchema = z
+const nullableHttpUrlSchema = z
   .union([z.string(), z.null()])
   .optional()
   .transform((value) => {
@@ -208,6 +261,9 @@ const nullableUrlSchema = z
     (value) => value === undefined || value === null || httpUrlSchema.safeParse(value).success,
     'Only HTTP(S) URLs allowed',
   );
+
+/** @deprecated Prefer externalPdfUrlSchema for research PDF links; kept for non-PDF HTTP fields. */
+const nullableUrlSchema = nullableHttpUrlSchema;
 
 const doiUrlSchema = z
   .union([z.string(), z.null()])
@@ -313,7 +369,7 @@ export const researchCoreInputSchema = z.object({
     ),
   year: yearSchema,
   doi_url: doiUrlSchema,
-  pdf_url: nullableUrlSchema,
+  pdf_url: externalPdfUrlSchema,
   citation_text: z
     .union([z.string(), z.null()])
     .optional()

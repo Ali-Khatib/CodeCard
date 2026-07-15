@@ -20,7 +20,7 @@ This document does **not** claim that antivirus, magic-byte sniffing, or content
 **Private-beta conditions (all must remain true):**
 
 1. Live upload surface stays JPEG / PNG / WebP images for avatar, cover, and screenshots only.
-2. Research PDF upload UI stays disabled until a separate PDF gate passes.
+2. Research **private** PDF upload UI stays disabled (external HTTPS `pdf_url` links are the MVP path only).
 3. SVG, HTML, archives, executables, and office documents stay rejected.
 4. Authenticated upload API, ownership checks, UUID object names, owner-scoped paths, storage RLS, MIME+extension pairing, size limits, and upload rate limits stay in place.
 5. Beta audience is intentionally limited (manual ops / invite — not yet enforced in application code).
@@ -178,7 +178,7 @@ Implemented in `apps/web/src/lib/storage/path.ts`.
 
 1. Confirm ops process for limited audience (invite / closed signup / manual allowlist).
 2. Confirm monitoring (Sentry / error logs) and ability to delete abusive media for an owner.
-3. Keep research PDF and video product features disabled.
+3. Keep research **private** PDF and video product features disabled (external PDF links remain allowed).
 4. Do not send beta uploads to third-party scanners without privacy review.
 
 **Not a green light for:** open public signup at scale, PDFs, SVG, video, archives, or automated AI document ingest.
@@ -210,16 +210,34 @@ Revisit scanning **before** wide public launch. At minimum require:
 
 ## 10. PDF and research-upload requirements
 
-Before enabling research PDFs:
+### MVP decision (updated for WS04-T007)
 
-1. Keep storage in `private-docs` (non-public).  
-2. Authenticated download / signed URL only.  
-3. Prefer `Content-Disposition: attachment` for downloads.  
-4. Do not inline-render untrusted PDFs without additional controls.  
-5. Plan scan states (`pending_scan` / `clean` / `blocked` / `failed`) or equivalent.  
-6. Block download until clean **or** refuse broad public PDF uploads.  
-7. Separate privacy review if using any third-party scanner.  
-8. Complete WS04-T007/T008 with this gate — do not treat image GO as PDF GO.
+| Mode | Status |
+|------|--------|
+| External HTTPS PDF / paper URL (`research_papers.pdf_url`) | **Supported** for MVP |
+| Private CodeCard-hosted PDF upload (`private-docs`) | **Intentionally disabled** |
+| Malware / virus scanning of documents | **Not implemented** — do not claim otherwise |
+| Signed PDF download routes | **Not shipped** (no private PDF objects) |
+
+External PDF links:
+
+1. HTTPS only; reject credentials, `javascript:`, `data:`, `file:`, and non-HTTPS schemes.
+2. Persist the normalized external URL only — never signed URLs, Blob URLs, or storage paths in `pdf_url`.
+3. Public UI labels the source as externally hosted and offers “Open paper” / “Open external paper”.
+4. CodeCard does **not** host, scan, proxy, or verify the remote document.
+5. Draft papers and private profiles must not expose the link publicly (existing publication RLS / route gates).
+
+Before enabling **private** research PDFs later:
+
+1. Keep storage in `private-docs` (non-public).
+2. Authenticated download / signed URL only.
+3. Prefer `Content-Disposition: attachment` for downloads.
+4. Do not inline-render untrusted PDFs without additional controls.
+5. Plan scan states (`pending_scan` / `clean` / `blocked` / `failed`) or equivalent.
+6. Block download until clean **or** refuse broad public PDF uploads.
+7. Separate privacy review if using any third-party scanner.
+8. Add a schema discriminator (for example `pdf_storage_path` + source type) so external URLs are never mixed with private object keys.
+9. Do not treat the image GO or external-URL MVP as private-PDF GO.
 
 ---
 
@@ -293,7 +311,8 @@ Reopen this decision when any of the following occur:
 | Migration added | **No** |
 | Private-beta raster images | **CONDITIONAL GO** |
 | Public launch | **NO-GO without reassessment** |
-| Research PDFs | **NO-GO until separate gate** |
+| Research PDFs (private upload) | **NO-GO** — intentionally disabled |
+| Research PDF external HTTPS links | **Supported for MVP** (`pdf_url` only; no hosting/scanning claim) |
 | SVG / archives / executables | **REJECT** |
 
 **Sign-off:** Engineering assessment documented for WS04-T013 (2026-07-15). Product/security owners should acknowledge the operational conditions (limited audience, PDF UI off) before expanding invites.
