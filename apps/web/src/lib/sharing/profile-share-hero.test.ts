@@ -18,6 +18,9 @@ describe('WS07-T003 dashboard QR preview', () => {
     expect(hero).toContain('generateProfileQrPreview');
     expect(hero).toContain('generateProfileQrDownload');
     expect(hero).toContain('downloadProfileQrPng');
+    expect(hero).toContain('buildProfileNativeSharePayload');
+    expect(hero).toContain('shareProfileNative');
+    expect(hero).toContain('Share profile');
     expect(hero).toContain('Download QR');
     expect(hero).toContain('buildCanonicalPublicProfileUrl');
     expect(hero).toContain('QR code for public CodeCard profile');
@@ -25,6 +28,7 @@ describe('WS07-T003 dashboard QR preview', () => {
     expect(hero).toContain('publish your profile');
     expect(hero).toContain('aria-live="polite"');
     expect(overview).toContain('isPublic={profile?.is_public');
+    expect(overview).toContain('displayName={displayName}');
   });
 
   it('does not use remote QR generation services for the dashboard share panel', () => {

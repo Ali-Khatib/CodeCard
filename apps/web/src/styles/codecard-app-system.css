@@ -2719,6 +2719,20 @@ html.dark .cc-reactive-border:hover {
   .cc-profile-share-hero__grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .cc-profile-share-hero__grid--with-share {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.cc-share-action--native {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 244, 238, 0.9)),
+    var(--app-paper);
+}
+
+.cc-share-action__glow--coral {
+  background: radial-gradient(circle at 30% 20%, rgba(232, 120, 92, 0.35), transparent 70%);
 }
 
 .cc-share-action {
@@ -3461,6 +3475,12 @@ html.dark .cc-projects-view-toggle__btn--active {
 html.dark .cc-share-action--link {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
+    var(--app-paper);
+}
+
+html.dark .cc-share-action--native {
+  background:
+    linear-gradient(145deg, rgba(40, 28, 24, 0.9), rgba(28, 24, 22, 0.95)),
     var(--app-paper);
 }
 

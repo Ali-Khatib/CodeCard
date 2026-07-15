@@ -92,6 +92,7 @@ export function DashboardOverviewView({
           <ProfileShareHero
             profileSlug={profileSlug}
             isPublic={profile?.is_public ?? true}
+            displayName={displayName}
           />
         </section>
       </FadeInView>
