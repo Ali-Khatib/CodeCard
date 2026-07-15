@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return mapPublicProfileMetadata(profile);
 }
 
+/** Must be a literal for Next.js segment config; keep equal to PUBLIC_CACHE_SECONDS. */
 export const revalidate = 60;
 
 export default async function PublicProfilePage({ params }: PageProps) {

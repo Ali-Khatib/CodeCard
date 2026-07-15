@@ -72,13 +72,16 @@ describe('project editor media route contract', () => {
 
 describe('public project media route contract', () => {
   it('resolves media URLs on public profile and project detail routes', () => {
-    const profilePage = readFileSync(resolve(process.cwd(), 'src/app/[slug]/page.tsx'), 'utf8');
+    const publicLoader = readFileSync(
+      resolve(process.cwd(), 'src/lib/profile/public-profile.ts'),
+      'utf8',
+    );
     const detailPage = readFileSync(
       resolve(process.cwd(), 'src/app/[slug]/projects/[id]/page.tsx'),
       'utf8',
     );
 
-    expect(profilePage).toContain('createProjectMediaUrlResolver');
+    expect(publicLoader).toContain('createProjectMediaUrlResolver');
     expect(detailPage).toContain('createProjectMediaUrlResolver');
     expect(detailPage).toContain('normalizeFeaturedProject');
   });

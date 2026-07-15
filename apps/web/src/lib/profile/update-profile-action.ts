@@ -6,6 +6,7 @@ import {
   executeProfileUpdate,
   type ProfileUpdateState,
 } from '@/lib/profile/profile-update-core';
+import { revalidatePublicProfileSlugChange } from '@/lib/profile/public-cache';
 
 export type { ProfileUpdateState };
 
@@ -19,12 +20,11 @@ export async function updateProfileAction(
   if (result.success) {
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/profile');
-    if (result.previousSlug) {
-      revalidatePath(`/${result.previousSlug}`);
-    }
-    if (result.nextSlug && result.nextSlug !== result.previousSlug) {
-      revalidatePath(`/${result.nextSlug}`);
-    }
+    revalidatePath('/dashboard/profile/preview');
+    revalidatePublicProfileSlugChange({
+      previousSlug: result.previousSlug,
+      nextSlug: result.nextSlug,
+    });
   }
 
   return result;

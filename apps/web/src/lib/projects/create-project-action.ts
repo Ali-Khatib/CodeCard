@@ -93,9 +93,9 @@ export async function createProjectAction(
   }
 
   revalidatePath('/dashboard/projects');
-  if (profile.slug) {
-    revalidatePath(`/${profile.slug}`);
-    revalidatePath(`/${profile.slug}/projects/${project.id}`);
+  if (profile.slug && parsed.data.is_published) {
+    const { revalidatePublicProject } = await import('@/lib/profile/public-cache');
+    revalidatePublicProject(profile.slug, project.id);
   }
 
   redirect(`/dashboard/projects`);

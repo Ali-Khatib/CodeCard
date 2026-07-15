@@ -6,6 +6,7 @@ import {
   executeFinalizeAvatarUpload,
   type AvatarFinalizeState,
 } from '@/lib/profile/profile-avatar-core';
+import { revalidatePublicProfile } from '@/lib/profile/public-cache';
 
 export type { AvatarFinalizeState };
 
@@ -20,7 +21,7 @@ export async function finalizeAvatarUploadAction(input: {
     revalidatePath('/dashboard/profile');
     revalidatePath('/dashboard/profile/preview');
     if (result.slug) {
-      revalidatePath(`/${result.slug}`);
+      revalidatePublicProfile(result.slug);
     }
   }
 

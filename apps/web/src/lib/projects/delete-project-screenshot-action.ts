@@ -6,6 +6,7 @@ import {
   executeDeleteProjectScreenshot,
   type ProjectMediaDeleteState,
 } from '@/lib/projects/project-media-core';
+import { revalidatePublicProject } from '@/lib/profile/public-cache';
 
 export type { ProjectMediaDeleteState };
 
@@ -23,11 +24,8 @@ export async function deleteProjectScreenshotAction(input: {
     revalidatePath(`/dashboard/projects/${result.projectId}/edit`);
     revalidatePath('/dashboard/projects');
     revalidatePath('/dashboard/profile/preview');
-    if (result.slug) {
-      revalidatePath(`/${result.slug}`);
-      if (result.isPublished && result.profileIsPublic) {
-        revalidatePath(`/${result.slug}/projects/${result.projectId}`);
-      }
+    if (result.slug && result.isPublished && result.profileIsPublic) {
+      revalidatePublicProject(result.slug, result.projectId);
     }
   }
 

@@ -7,6 +7,7 @@ import {
   executeUnpublishProfile,
   type ProfilePublishState,
 } from '@/lib/profile/profile-publish-core';
+import { revalidatePublicProfile } from '@/lib/profile/public-cache';
 
 export type { ProfilePublishState };
 
@@ -16,7 +17,9 @@ export async function publishProfileAction(): Promise<ProfilePublishState> {
 
   if (result.success && result.slug) {
     revalidatePath('/dashboard');
-    revalidatePath(`/${result.slug}`);
+    revalidatePath('/dashboard/profile');
+    revalidatePath('/dashboard/profile/preview');
+    revalidatePublicProfile(result.slug);
   }
 
   return result;
@@ -28,7 +31,10 @@ export async function unpublishProfileAction(): Promise<ProfilePublishState> {
 
   if (result.success && result.slug) {
     revalidatePath('/dashboard');
-    revalidatePath(`/${result.slug}`);
+    revalidatePath('/dashboard/profile');
+    revalidatePath('/dashboard/profile/preview');
+    // Critical: drop stale ISR of previously public profile immediately.
+    revalidatePublicProfile(result.slug);
   }
 
   return result;
