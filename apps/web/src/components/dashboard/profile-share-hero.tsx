@@ -17,17 +17,23 @@ import {
   isNativeShareSupported,
   shareProfileNative,
 } from '@/lib/sharing/native-share';
+import {
+  trackProfileShareEvent,
+  trackQrDownloadEvent,
+} from '@/lib/sharing/share-analytics';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 type ProfileShareHeroProps = {
   profileSlug?: string | null;
+  profileId?: string | null;
   isPublic?: boolean | null;
   displayName?: string | null;
 };
 
 export function ProfileShareHero({
   profileSlug,
+  profileId,
   isPublic = true,
   displayName,
 }: ProfileShareHeroProps) {
@@ -57,6 +63,9 @@ export function ProfileShareHero({
 
   const { copy, isLoading, isSuccess, isError, status } = useCopyToClipboard({
     successDuration: 2400,
+    onSuccess: () => {
+      void trackProfileShareEvent(profileId, 'copy');
+    },
   });
 
   useEffect(() => {
@@ -116,8 +125,8 @@ export function ProfileShareHero({
         return;
       }
 
-      if (qrUrl && built.payload.url !== qrUrl) {
-        setShareMessage('Share URL does not match the QR preview.');
+      if (clipboardUrl && built.payload.url !== clipboardUrl) {
+        setShareMessage('Share URL does not match the public profile link.');
         return;
       }
 
@@ -128,8 +137,9 @@ export function ProfileShareHero({
       }
       if (result.status === 'shared') {
         setShareMessage('Sharing options opened');
+        void trackProfileShareEvent(profileId, 'native_share');
       }
-      // Cancellation: quiet return, no alarming message.
+      // Cancellation: quiet return, no alarming message and no analytics.
     } finally {
       shareBusyRef.current = false;
       setShareBusy(false);
@@ -469,6 +479,7 @@ export function ProfileShareHero({
                         setDownloadError(result.error);
                         throw new Error(result.error);
                       }
+                      void trackQrDownloadEvent(profileId);
                     }}
                   >
                     Download QR
