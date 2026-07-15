@@ -33,23 +33,24 @@ describe('Auth experience polish contracts', () => {
     expect(signUp).not.toMatch(/password\s*=\s*searchParams|searchParams\.get\(['"]password/);
   });
 
-  it('uses full-bleed live demo screenshots with bold lower feature copy', () => {
+  it('uses a static Facebook-style collage with CodeCard colors', () => {
     const shell = read('src/components/auth/auth-shell.tsx');
     const collage = read('src/components/auth/auth-collage.tsx');
 
-    expect(shell).toContain('AuthDemoBackground');
-    expect(shell).toContain('AuthFeatureCopy');
+    expect(shell).toContain('AuthShowcaseStage');
     expect(shell).toContain('auth-side-panel');
     expect(shell).toContain('lg:w-[40%]');
     expect(shell).toContain('lg:rounded-l-[28px]');
-    expect(shell).not.toContain('variant="hero"');
+    expect(shell).not.toContain('slideIndex');
+    expect(collage).toContain('AuthShowcaseStage');
     expect(collage).toContain('/auth-demo/projects.webp');
     expect(collage).toContain('/auth-demo/home.webp');
-    expect(collage).toContain('object-cover');
-    expect(collage).toContain('Showcase work that looks intentional');
-    expect(collage).toContain('font-bold');
+    expect(collage).toContain('#e95a0b');
+    expect(collage).toContain('proud of');
+    expect(collage).not.toContain('Inside the live demo');
+    expect(collage).not.toContain('setInterval');
+    expect(collage).not.toContain('#7a4ea8');
     expect(collage).not.toContain('Alex Rivera');
-    expect(collage).not.toContain('DemoChrome');
 
     for (const name of [
       'home.webp',

@@ -1,192 +1,165 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
+import { AuthWordmark } from '@/components/auth/auth-wordmark';
 
-type ShowcaseSlide = {
-  id: string;
-  tab: string;
-  title: string;
-  body: string;
-  image: string;
-};
+const CARD_SHADOW = '0 18px 40px rgba(35, 35, 36, 0.12)';
 
-const SLIDES: ShowcaseSlide[] = [
-  {
-    id: 'home',
-    tab: 'Home',
-    title: 'One workspace for your whole identity',
-    body: 'The same Home tab as the live demo — completion, activity, and what to publish next.',
-    image: '/auth-demo/home.webp',
-  },
-  {
-    id: 'projects',
-    tab: 'Projects',
-    title: 'Showcase work that looks intentional',
-    body: 'Covers, screenshots, links, and ordering so people understand what you built in seconds.',
-    image: '/auth-demo/projects.webp',
-  },
-  {
-    id: 'profile',
-    tab: 'Profile',
-    title: 'A public card people can scan and share',
-    body: 'Avatar, bio, links, and QR — your CodeCard, ready when someone asks who you are.',
-    image: '/auth-demo/profile.webp',
-  },
-  {
-    id: 'analytics',
-    tab: 'Analytics',
-    title: 'Know what actually gets attention',
-    body: 'Views and traffic from the same Analytics tab you can open in the live demo.',
-    image: '/auth-demo/analytics.webp',
-  },
-  {
-    id: 'research',
-    tab: 'Research',
-    title: 'Publish research next to your projects',
-    body: 'Keep papers visible beside product work instead of hiding them in another profile.',
-    image: '/auth-demo/research.webp',
-  },
-  {
-    id: 'connections',
-    tab: 'Connections',
-    title: 'Remember the people behind the meetings',
-    body: 'Contacts, notes, and follow-ups in the same workspace that hosts your card.',
-    image: '/auth-demo/connections.webp',
-  },
-];
-
-const SLIDE_MS = 4500;
-
-type AuthDemoBackgroundProps = {
-  index: number;
-  onIndexChange: (index: number) => void;
-};
-
-export function AuthDemoBackground({ index, onIndexChange }: AuthDemoBackgroundProps) {
-  const reduced = useReducedMotion();
-  const slide = SLIDES[index] ?? SLIDES[0];
-
-  useEffect(() => {
-    if (reduced) return;
-    const timer = window.setInterval(() => {
-      onIndexChange((index + 1) % SLIDES.length);
-    }, SLIDE_MS);
-    return () => window.clearInterval(timer);
-  }, [index, onIndexChange, reduced]);
-
+function FloatCard({
+  src,
+  className,
+  priority = false,
+  sizes,
+}: {
+  src: string;
+  className: string;
+  priority?: boolean;
+  sizes: string;
+}) {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <AnimatePresence mode="sync" initial={false}>
-        <motion.div
-          key={slide.id}
-          className="absolute inset-0"
-          initial={reduced ? { opacity: 0.28 } : { opacity: 0 }}
-          animate={{ opacity: 0.3 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduced ? 0.01 : 0.7, ease: 'easeInOut' }}
-        >
-          <Image
-            src={slide.image}
-            alt=""
-            fill
-            priority={index === 0}
-            sizes="100vw"
-            className="object-cover object-top"
-            unoptimized
-          />
-        </motion.div>
-      </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#f3f1ec]/92 via-[#f3f1ec]/78 to-[#f3f1ec]/45" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#f3f1ec] via-[#f3f1ec]/35 to-transparent" />
+    <div
+      className={`overflow-hidden rounded-[28px] bg-white ${className}`}
+      style={{ boxShadow: CARD_SHADOW }}
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        priority={priority}
+        sizes={sizes}
+        className="object-cover object-top"
+        unoptimized
+      />
     </div>
   );
 }
 
-type AuthFeatureCopyProps = {
-  index: number;
-  onIndexChange: (index: number) => void;
-};
-
-export function AuthFeatureCopy({ index, onIndexChange }: AuthFeatureCopyProps) {
+/** Facebook-style left stage: layered cards, soft chips, brand headline. */
+export function AuthShowcaseStage() {
   const reduced = useReducedMotion();
-  const slide = SLIDES[index] ?? SLIDES[0];
 
   return (
     <div
-      className="relative z-[2] max-w-[540px]"
+      className="relative flex h-full min-h-[420px] w-full flex-col px-6 py-8 sm:px-10 lg:min-h-screen lg:px-12 lg:py-10"
       data-testid="auth-collage"
-      aria-roledescription="carousel"
-      aria-label="CodeCard live demo feature showcase"
     >
-      <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#6f6c69]">
-        Inside the live demo
-      </p>
+      <div className="relative z-[3]">
+        <AuthWordmark />
+      </div>
 
-      <div className="relative mt-4 min-h-[150px]">
-        <AnimatePresence mode="wait" initial={false}>
+      <div className="relative mx-auto mt-8 w-full max-w-[620px] flex-1 lg:mt-4">
+        <div className="relative mx-auto h-[min(52vh,420px)] w-full max-w-[520px] lg:h-[min(58vh,480px)]">
           <motion.div
-            key={slide.id}
-            initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 1 } : { opacity: 0, y: -6 }}
-            transition={{ duration: reduced ? 0.01 : 0.35, ease: 'easeOut' }}
+            className="absolute left-[8%] top-[6%] z-[1] h-[58%] w-[46%]"
+            initial={reduced ? false : { opacity: 0, y: 18, rotate: -4 }}
+            animate={{ opacity: 1, y: 0, rotate: -6 }}
+            transition={{ duration: reduced ? 0.01 : 0.55, ease: 'easeOut' }}
           >
-            <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-[#7a4ea8]">
-              {slide.tab}
-            </p>
-            <h2 className="mt-2 text-[34px] font-bold leading-[1.08] tracking-[-0.04em] text-[#141416] sm:text-[42px]">
-              {slide.title}
-            </h2>
-            <p className="mt-3 max-w-[38ch] text-[16px] font-medium leading-relaxed text-[#3f3d3b]">
-              {slide.body}
-            </p>
+            <FloatCard src="/auth-demo/projects.webp" className="absolute inset-0" sizes="240px" />
           </motion.div>
-        </AnimatePresence>
+
+          <motion.div
+            className="absolute right-[4%] top-[2%] z-[2] h-[62%] w-[52%]"
+            initial={reduced ? false : { opacity: 0, y: 22, rotate: 3 }}
+            animate={{ opacity: 1, y: 0, rotate: 4 }}
+            transition={{ duration: reduced ? 0.01 : 0.6, delay: reduced ? 0 : 0.06, ease: 'easeOut' }}
+          >
+            <FloatCard
+              src="/auth-demo/home.webp"
+              className="absolute inset-0"
+              priority
+              sizes="280px"
+            />
+          </motion.div>
+
+          <motion.div
+            className="absolute bottom-[6%] left-[18%] z-[3] h-[42%] w-[48%]"
+            initial={reduced ? false : { opacity: 0, y: 20, rotate: 2 }}
+            animate={{ opacity: 1, y: 0, rotate: 2 }}
+            transition={{ duration: reduced ? 0.01 : 0.55, delay: reduced ? 0 : 0.1, ease: 'easeOut' }}
+          >
+            <FloatCard src="/auth-demo/research.webp" className="absolute inset-0" sizes="250px" />
+          </motion.div>
+
+          <motion.div
+            className="absolute bottom-[2%] right-[12%] z-[4] h-[88px] w-[88px] overflow-hidden rounded-full border-[3px] border-white bg-[#efeae3]"
+            style={{ boxShadow: CARD_SHADOW }}
+            initial={reduced ? false : { opacity: 0, scale: 0.86 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: reduced ? 0.01 : 0.45, delay: reduced ? 0 : 0.16, ease: 'easeOut' }}
+          >
+            <Image
+              src="/auth-demo/profile.webp"
+              alt=""
+              fill
+              sizes="88px"
+              className="object-cover object-[30%_18%]"
+              unoptimized
+            />
+          </motion.div>
+
+          <motion.div
+            className="absolute left-[2%] top-[14%] z-[5] rounded-full bg-[#fff8f0] px-3 py-1.5 text-[12px] font-semibold text-[#e95a0b]"
+            style={{ boxShadow: '0 10px 24px rgba(233, 90, 11, 0.18)' }}
+            initial={reduced ? false : { opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.18 }}
+          >
+            +24 saves
+          </motion.div>
+
+          <motion.div
+            className="absolute right-0 top-[22%] z-[5] flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#17171a]"
+            style={{ boxShadow: CARD_SHADOW }}
+            initial={reduced ? false : { opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.2 }}
+          >
+            <span className="inline-block h-2 w-2 rounded-full bg-[#e95a0b]" aria-hidden />
+            1.2k views
+          </motion.div>
+
+          <motion.div
+            className="absolute bottom-[28%] right-[2%] z-[5] flex h-11 w-11 items-center justify-center rounded-full bg-[#17171a] text-[15px] font-bold text-white"
+            style={{ boxShadow: CARD_SHADOW }}
+            initial={reduced ? false : { opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.22 }}
+            aria-hidden
+          >
+            QR
+          </motion.div>
+        </div>
       </div>
 
-      <div
-        className="pointer-events-auto mt-6 flex flex-wrap gap-2"
-        role="tablist"
-        aria-label="Live demo tabs"
+      <motion.div
+        className="relative z-[3] mt-auto max-w-[520px] pb-2 pt-6 lg:pb-6"
+        initial={reduced ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduced ? 0.01 : 0.45, delay: reduced ? 0 : 0.12, ease: 'easeOut' }}
       >
-        {SLIDES.map((item, i) => {
-          const active = i === index;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              aria-label={`${item.tab}: ${item.title}`}
-              onClick={() => onIndexChange(i)}
-              className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
-                active
-                  ? 'bg-[#141416] text-white'
-                  : 'bg-white/70 text-[#3f3d3b] hover:bg-white'
-              }`}
-            >
-              {item.tab}
-            </button>
-          );
-        })}
-      </div>
+        <h2 className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.04em] text-[#17171a] sm:text-[48px] lg:text-[54px]">
+          Show the work{' '}
+          <span className="text-[#e95a0b]">you&apos;re proud of.</span>
+        </h2>
+        <p className="mt-4 max-w-[36ch] text-[16px] leading-relaxed text-[#5c5956]">
+          Projects, research, and a public card people can actually share.
+        </p>
+      </motion.div>
     </div>
   );
 }
 
-/** @deprecated Kept for import paths that still expect AuthCollage. */
+/** @deprecated Legacy export names kept for existing imports/tests. */
+export function AuthDemoBackground() {
+  return null;
+}
+
+export function AuthFeatureCopy() {
+  return null;
+}
+
 export function AuthCollage() {
-  const [index, setIndex] = useState(0);
-  return (
-    <div className="relative min-h-[420px] overflow-hidden rounded-[28px]">
-      <AuthDemoBackground index={index} onIndexChange={setIndex} />
-      <div className="relative z-[2] flex h-full min-h-[420px] items-end p-6">
-        <AuthFeatureCopy index={index} onIndexChange={setIndex} />
-      </div>
-    </div>
-  );
+  return <AuthShowcaseStage />;
 }
-
-export { SLIDES as AUTH_DEMO_SLIDES };
