@@ -3,9 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
-import { HiOutlineArrowDownTray, HiOutlineDocumentText } from 'react-icons/hi2';
+import { HiOutlineArrowTopRightOnSquare, HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
+import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
@@ -120,6 +121,8 @@ export function ResearchPaperCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cc-app-btn cc-app-btn--ghost"
+                aria-label="Open external paper"
+                title={describeExternalPdfSource(paper.pdfUrl) ?? 'Open external paper'}
                 onClick={() =>
                   trackResearchEvent({
                     eventType: 'paper_download',
@@ -128,8 +131,8 @@ export function ResearchPaperCard({
                   })
                 }
               >
-                <HiOutlineArrowDownTray className="h-4 w-4" aria-hidden />
-                PDF
+                <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
+                Open paper
               </a>
             )}
             {paper.citationText && (

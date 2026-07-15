@@ -59,7 +59,7 @@ Scaffolding only (not approved live product features until separately gated):
 - Archives (zip/rar/7z — fail allowlist)
 - Office documents
 - AVIF in the **live avatar/project-media client schemas** (config may still list AVIF for buckets — keep product clients restricted)
-- Research PDFs until a PDF-specific security gate
+- Research PDFs until a separate private-upload gate (external HTTPS links are the MVP path)
 - Video until a separate assessment
 
 ### Size limits
@@ -116,7 +116,7 @@ Server validates declared size at signed-upload authorization; buckets enforce o
 |-------|----------|
 | Controlled private beta (images only) | **Conditional deferral** — see decision doc |
 | Wide public launch | **Reassess; scanning or equivalent hardening required before expansion** |
-| Research PDFs | **Not approved** under image deferral; separate gate required |
+| Research PDFs | Private uploads **not approved**; external HTTPS links supported for MVP | Separate gate required for private hosting |
 | SVG / archives / executables | **Reject** |
 
 Scanning is **not** implemented. Do not claim otherwise.
@@ -125,7 +125,7 @@ Scanning is **not** implemented. Do not claim otherwise.
 
 - Audience limited by ops (invite / closed signup)
 - Only approved raster types above
-- PDF / video product UI off
+- PDF product private-upload UI off; external HTTPS `pdf_url` links allowed
 - Manual takedown ability available
 - Monitoring enabled
 
@@ -139,10 +139,14 @@ Scanning is **not** implemented. Do not claim otherwise.
 
 ### PDF-specific policy
 
-- Store only in private bucket
-- Prefer attachment downloads; avoid naïve inline trust
-- Plan `pending_scan` / `clean` / `blocked` (or refuse public PDFs)
+- **MVP:** External HTTPS paper/PDF links only via `research_papers.pdf_url`
+- Private CodeCard-hosted PDF uploads remain **disabled**
+- Do not store storage paths or signed URLs in `pdf_url`
+- Label public links as externally hosted; do not claim CodeCard hosts, scans, or verifies the file
+- Store private PDFs only after a future gate: private bucket, signed download, attachment disposition, scan/quarantine (or refuse)
+- Prefer attachment downloads; avoid naïve inline trust for hosted PDFs later
 - No automatic third-party public sample sharing without privacy review
+- Scanning is **not** implemented
 
 ### Manual moderation expectations
 

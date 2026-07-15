@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   createResearchSchema,
+  externalPdfHostname,
   findForbiddenCreateResearchFields,
+  isValidExternalPdfUrl,
   normalizeDoiUrl,
+  normalizeExternalPdfUrl,
   normalizeResearchAuthors,
   normalizeResearchSlug,
   reorderResearchSchema,
@@ -99,6 +102,44 @@ describe('createResearchSchema', () => {
         doi_url: 'not-a-doi',
       }).success,
     ).toBe(false);
+  });
+
+  it('accepts HTTPS external PDF URLs and rejects unsafe PDF links', () => {
+    expect(
+      createResearchSchema.safeParse({
+        ...validMin,
+        pdf_url: 'https://arxiv.org/pdf/1706.03762.pdf',
+      }).success,
+    ).toBe(true);
+    expect(
+      createResearchSchema.safeParse({
+        ...validMin,
+        pdf_url: 'http://example.com/paper.pdf',
+      }).success,
+    ).toBe(false);
+    expect(
+      createResearchSchema.safeParse({
+        ...validMin,
+        pdf_url: 'https://user:pass@example.com/paper.pdf',
+      }).success,
+    ).toBe(false);
+    expect(
+      createResearchSchema.safeParse({
+        ...validMin,
+        pdf_url: 'data:application/pdf;base64,AAA',
+      }).success,
+    ).toBe(false);
+    expect(
+      createResearchSchema.safeParse({
+        ...validMin,
+        pdf_url: 'file:///tmp/paper.pdf',
+      }).success,
+    ).toBe(false);
+    expect(isValidExternalPdfUrl('//example.com/paper.pdf')).toBe(false);
+    expect(normalizeExternalPdfUrl('  https://example.com/a.pdf  ')).toBe(
+      'https://example.com/a.pdf',
+    );
+    expect(externalPdfHostname('https://arxiv.org/pdf/x.pdf')).toBe('arxiv.org');
   });
 
   it('normalizes authors and rejects overlong author names', () => {

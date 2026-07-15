@@ -4,13 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-  HiOutlineArrowDownTray,
   HiOutlineArrowLeft,
+  HiOutlineArrowTopRightOnSquare,
   HiOutlineDocumentText,
   HiOutlineLink,
 } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
+import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
@@ -61,6 +62,7 @@ export function ResearchPaperDetail({
 
   const abstract = paper.abstract ?? 'Abstract coming soon.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;
+  const externalPdfLabel = describeExternalPdfSource(paper.pdfUrl);
 
   return (
     <div className="relative min-h-[100dvh] text-text-primary">
@@ -85,6 +87,8 @@ export function ResearchPaperDetail({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cc-app-btn cc-app-btn--primary !h-10"
+                  aria-label="Open external paper"
+                  title={externalPdfLabel ?? 'Open external paper'}
                   onClick={() =>
                     trackResearchEvent({
                       eventType: 'paper_download',
@@ -93,8 +97,8 @@ export function ResearchPaperDetail({
                     })
                   }
                 >
-                  <HiOutlineArrowDownTray className="h-4 w-4" aria-hidden />
-                  PDF
+                  <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
+                  Open paper
                 </a>
               )}
               {paper.doiUrl && (
@@ -120,6 +124,11 @@ export function ResearchPaperDetail({
               <p className="mt-2 text-[15px] text-text-secondary">
                 {metadataLine(paper) || 'Publication details pending'} · {formatReadTime(readTime)}
               </p>
+              {externalPdfLabel && (
+                <p className="mt-3 text-[13px] text-text-secondary">
+                  {externalPdfLabel}. CodeCard does not host or verify this file.
+                </p>
+              )}
             </div>
 
             <div className="relative aspect-[16/11] overflow-hidden rounded-card border border-border/40 bg-midnight shadow-rim">
