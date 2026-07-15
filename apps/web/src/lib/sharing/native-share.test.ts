@@ -44,8 +44,8 @@ describe('WS07-T006 native profile sharing', () => {
 
     expect(built.payload.url).toBe('https://codecard.app/ada-lovelace');
     expect(built.payload.url).toBe(clipboard);
-    expect(preview.ok && preview.url).toBe(built.payload.url);
-    expect(download.ok && download.url).toBe(built.payload.url);
+    expect(preview.ok && preview.url).toBe('https://codecard.app/ada-lovelace?source=qr');
+    expect(download.ok && download.url).toBe(preview.ok ? preview.url : '');
     expect(built.payload.title).toBe('Ada Lovelace on CodeCard');
     expect(built.payload.text).toBe('View my public CodeCard profile.');
     expect(built.payload.url).not.toContain('?');

@@ -104,6 +104,26 @@ export function getPublicProfileLinkForClipboard(
   return canonical.ok ? canonical.url : null;
 }
 
+/**
+ * QR destinations use the canonical public profile URL plus an approved source marker.
+ * Copy link and native share must continue to use the untagged canonical URL.
+ */
+export function buildQrProfileUrl(canonicalProfileUrl: string): string | null {
+  try {
+    const parsed = new URL(canonicalProfileUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+    if (parsed.username || parsed.password) return null;
+    if (!parsed.pathname || parsed.pathname === '/') return null;
+
+    // Replace any prior source value with exactly one approved qr marker.
+    parsed.searchParams.set('source', 'qr');
+    parsed.hash = '';
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function buildProfileQrFilename(slug: string): string {
   const safe = normalizePublicProfileSlug(slug);
   if (!safe) return 'codecard-profile-qr.png';
@@ -136,8 +156,8 @@ export function readQrSegmentPayload(url: string): string {
 }
 
 /**
- * Generate a scannable profile QR for the canonical public URL.
- * Preview and download must call this with the same URL helper.
+ * Generate a scannable profile QR for the QR-tagged public profile URL.
+ * Preview and download encode the same tagged URL; copy/native share stay untagged.
  */
 export async function generateProfileQr(
   profileSlug: string | null | undefined,
@@ -147,13 +167,18 @@ export async function generateProfileQr(
   const canonical = buildCanonicalPublicProfileUrl(profileSlug, env);
   if (!canonical.ok) return { ok: false, error: canonical.error };
 
+  const qrUrl = buildQrProfileUrl(canonical.url);
+  if (!qrUrl) {
+    return { ok: false, error: 'Could not build a QR destination URL for this profile.' };
+  }
+
   const size = options?.size ?? PROFILE_QR_PREVIEW_SIZE;
   const render = qrRenderOptions(size, options);
 
   try {
     const [pngDataUrl, svg] = await Promise.all([
-      QRCode.toDataURL(canonical.url, render),
-      QRCode.toString(canonical.url, { ...render, type: 'svg' }),
+      QRCode.toDataURL(qrUrl, render),
+      QRCode.toString(qrUrl, { ...render, type: 'svg' }),
     ]);
 
     if (!pngDataUrl.startsWith('data:image/png;base64,')) {
@@ -163,14 +188,14 @@ export async function generateProfileQr(
       return { ok: false, error: 'QR generation did not return SVG markup.' };
     }
 
-    const encoded = readQrSegmentPayload(canonical.url);
-    if (encoded !== canonical.url) {
-      return { ok: false, error: 'QR payload does not match the canonical profile URL.' };
+    const encoded = readQrSegmentPayload(qrUrl);
+    if (encoded !== qrUrl) {
+      return { ok: false, error: 'QR payload does not match the QR profile URL.' };
     }
 
     return {
       ok: true,
-      url: canonical.url,
+      url: qrUrl,
       slug: canonical.slug,
       pngDataUrl,
       svg,

@@ -15,7 +15,7 @@ const testEnv = {
 } as NodeJS.ProcessEnv;
 
 describe('WS07-T005 public link copy verification', () => {
-  it('uses one canonical URL for clipboard, QR preview, and PNG download', async () => {
+  it('keeps clipboard and native/canonical URL untagged while QR is tagged', async () => {
     const clipboard = getPublicProfileLinkForClipboard('jane-doe', testEnv);
     const canonical = buildCanonicalPublicProfileUrl('jane-doe', testEnv);
     const [preview, download] = await Promise.all([
@@ -28,10 +28,9 @@ describe('WS07-T005 public link copy verification', () => {
     if (!canonical.ok || !preview.ok || !download.ok) return;
 
     expect(clipboard).toBe(canonical.url);
-    expect(preview.url).toBe(clipboard);
-    expect(download.url).toBe(clipboard);
-    expect(readQrSegmentPayload(preview.url)).toBe(clipboard);
-    expect(readQrSegmentPayload(download.url)).toBe(clipboard);
+    expect(preview.url).toBe('https://codecard.app/jane-doe?source=qr');
+    expect(download.url).toBe(preview.url);
+    expect(readQrSegmentPayload(preview.url)).toBe(preview.url);
     expect(clipboard).not.toContain('?');
     expect(clipboard).not.toContain('source=');
     expect(clipboard).not.toContain('/dashboard');

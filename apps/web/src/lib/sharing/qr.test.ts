@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCanonicalPublicProfileUrl,
   buildProfileQrFilename,
+  buildQrProfileUrl,
   generateProfileQr,
   generateProfileQrDownload,
   generateProfileQrPreview,
+  getPublicProfileLinkForClipboard,
   getTrustedAppOrigin,
   normalizeTrustedAppOrigin,
   PROFILE_QR_DOWNLOAD_SIZE,
@@ -66,14 +68,14 @@ describe('canonical public profile URL', () => {
 });
 
 describe('profile QR generation', () => {
-  it('generates deterministic PNG and SVG for the same canonical URL', async () => {
+  it('generates deterministic PNG and SVG for the QR-tagged profile URL', async () => {
     const preview = await generateProfileQrPreview('ada', TEST_ENV);
     const again = await generateProfileQrPreview('ada', TEST_ENV);
     expect(preview.ok).toBe(true);
     expect(again.ok).toBe(true);
     if (!preview.ok || !again.ok) return;
 
-    expect(preview.url).toBe('https://app.codecard.test/ada');
+    expect(preview.url).toBe('https://app.codecard.test/ada?source=qr');
     expect(preview.pngDataUrl).toBe(again.pngDataUrl);
     expect(preview.svg).toBe(again.svg);
     expect(preview.pngDataUrl.startsWith('data:image/png;base64,')).toBe(true);
@@ -81,18 +83,36 @@ describe('profile QR generation', () => {
     expect(preview.size).toBe(PROFILE_QR_PREVIEW_SIZE);
     expect(preview.filename).toBe('codecard-ada-qr.png');
     expect(readQrSegmentPayload(preview.url)).toBe(preview.url);
+    expect(getPublicProfileLinkForClipboard('ada', TEST_ENV)).toBe(
+      'https://app.codecard.test/ada',
+    );
   });
 
-  it('keeps preview and download payloads identical', async () => {
+  it('keeps preview and download QR payloads identical and tagged once', async () => {
     const preview = await generateProfileQrPreview('ada-lovelace', TEST_ENV);
     const download = await generateProfileQrDownload('ada-lovelace', TEST_ENV);
     expect(preview.ok && download.ok).toBe(true);
     if (!preview.ok || !download.ok) return;
 
     expect(preview.url).toBe(download.url);
+    expect(preview.url).toBe('https://app.codecard.test/ada-lovelace?source=qr');
+    expect(preview.url.match(/source=qr/g)?.length).toBe(1);
     expect(readQrSegmentPayload(preview.url)).toBe(download.url);
     expect(download.size).toBe(PROFILE_QR_DOWNLOAD_SIZE);
     expect(download.filename).toBe(buildProfileQrFilename('ada-lovelace'));
+  });
+
+  it('builds QR URLs without duplicating the source marker', () => {
+    expect(buildQrProfileUrl('https://app.codecard.test/ada')).toBe(
+      'https://app.codecard.test/ada?source=qr',
+    );
+    expect(buildQrProfileUrl('https://app.codecard.test/ada?source=qr')).toBe(
+      'https://app.codecard.test/ada?source=qr',
+    );
+    expect(buildQrProfileUrl('https://app.codecard.test/ada?source=direct_link')).toBe(
+      'https://app.codecard.test/ada?source=qr',
+    );
+    expect(buildQrProfileUrl('javascript:alert(1)')).toBeNull();
   });
 
   it('uses a quiet zone and high-contrast modules', async () => {
@@ -125,7 +145,7 @@ describe('profile QR generation', () => {
     } as NodeJS.ProcessEnv);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.url).toBe(`https://codecard.app/${slug}`);
+    expect(result.url).toBe(`https://codecard.app/${slug}?source=qr`);
     expect(readQrSegmentPayload(result.url)).toBe(result.url);
   });
 });
