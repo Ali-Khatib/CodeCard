@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ResearchEditForm } from '@/components/dashboard/research-edit-form';
 import { ResearchDeleteDialog } from '@/components/dashboard/research-delete-dialog';
+import { ResearchPublishControls } from '@/components/dashboard/research-publish-controls';
 import { loadOwnedResearchPaper } from '@/lib/research/research-access-core';
 import { researchRecordToFormValues } from '@/lib/research/research-form';
 import { createClient } from '@/lib/supabase/server';
@@ -41,14 +42,21 @@ export default async function EditResearchPage({
           {loaded.paper.title}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Update core details for this paper. Visibility stays {loaded.paper.is_published ? 'published' : 'draft'}{' '}
-          until publishing controls are used in a later step.
+          Update core details for this paper. Use the visibility controls below to publish or
+          unpublish.
         </p>
       </div>
       <ResearchEditForm
         researchPaperId={id}
         initialValues={initialValues}
         isPublished={loaded.paper.is_published}
+      />
+      <ResearchPublishControls
+        researchPaperId={id}
+        paperSlug={loaded.paper.slug}
+        isPublished={loaded.paper.is_published}
+        profileIsPublic={loaded.profile.is_public}
+        profileSlug={loaded.profile.slug}
       />
       <ResearchDeleteDialog researchPaperId={id} paperTitle={loaded.paper.title} />
     </div>
