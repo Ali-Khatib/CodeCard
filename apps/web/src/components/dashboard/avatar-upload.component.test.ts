@@ -22,6 +22,7 @@ describe('AvatarUpload component', () => {
     expect(component).toContain('Retry');
     expect(component).toContain('Cancel upload');
     expect(component).toContain('Avatar saved');
+    expect(component).toContain("'optimizing'");
     expect(component).toContain('URL.revokeObjectURL');
     expect(component).toContain('finalizeAvatarUploadAction');
     expect(component).toContain('uploadAvatarToSignedUrl');

@@ -26,12 +26,28 @@ describe('validateProjectMediaFile', () => {
 });
 
 describe('executeProjectMediaUploadFlow', () => {
+  const skipOptimize = async (file: File) =>
+    ({
+      ok: true as const,
+      file,
+      transformed: false,
+      originalWidth: 100,
+      originalHeight: 100,
+      outputWidth: 100,
+      outputHeight: 100,
+      originalBytes: file.size,
+      outputBytes: file.size,
+      mimeType: file.type,
+      skippedReason: 'within_limits' as const,
+    });
+
   it('preserves successful screenshot uploads when another file fails', async () => {
     let finalizeCalls = 0;
     const result = await executeProjectMediaUploadFlow({
       projectId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
       mediaRole: 'screenshot',
       file: makeFile('one.png', 'image/png', 100),
+      optimizeImage: skipOptimize,
       requestInit: async () => ({
         ok: true,
         init: {
@@ -59,6 +75,7 @@ describe('executeProjectMediaUploadFlow', () => {
       projectId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
       mediaRole: 'screenshot',
       file: makeFile('bad.svg', 'image/svg+xml', 10),
+      optimizeImage: skipOptimize,
       requestInit: async () => {
         requested = true;
         return { ok: false, message: 'nope', failureClass: 'upload_authorization', retryable: true };
@@ -75,12 +92,59 @@ describe('executeProjectMediaUploadFlow', () => {
     }
   });
 
+  it('optimizes large covers before authorization and preserves aspect metadata', async () => {
+    const original = makeFile('cover.jpg', 'image/jpeg', 5000);
+    const optimized = makeFile('cover-optimized.jpg', 'image/jpeg', 1200);
+    let authorizedSize: number | null = null;
+
+    const result = await executeProjectMediaUploadFlow({
+      projectId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      mediaRole: 'poster',
+      file: original,
+      optimizeImage: async () => ({
+        ok: true,
+        file: optimized,
+        transformed: true,
+        originalWidth: 4000,
+        originalHeight: 3000,
+        outputWidth: 2000,
+        outputHeight: 1500,
+        originalBytes: original.size,
+        outputBytes: optimized.size,
+        mimeType: 'image/jpeg',
+      }),
+      requestInit: async (input) => {
+        authorizedSize = input.file.size;
+        return {
+          ok: true,
+          init: {
+            path: 'tenant/user/project-media/project/cover.jpg',
+            signedUrl: 'https://example/upload',
+            token: 'token',
+            mimeType: 'image/jpeg',
+            maxBytes: 5 * 1024 * 1024,
+          },
+        };
+      },
+      uploadToStorage: async () => ({ ok: true }),
+      finalizeUpload: async () => ({ success: true, assetId: 'asset-cover' }),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(authorizedSize).toBe(1200);
+    if (result.ok) {
+      expect(result.uploadFileBytes).toBe(1200);
+      expect(result.optimizationNote).toContain('Optimized from');
+    }
+  });
+
   it('keeps transfer-complete separate from finalizing for screenshot retries', async () => {
     const phases: string[] = [];
     const result = await executeProjectMediaUploadFlow({
       projectId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
       mediaRole: 'screenshot',
       file: makeFile('one.png', 'image/png', 100),
+      optimizeImage: skipOptimize,
       onPhaseChange: (phase) => phases.push(phase),
       onProgress: (progress) => {
         if (progress.percent === 100) {
@@ -105,7 +169,7 @@ describe('executeProjectMediaUploadFlow', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
+    expect(phases).toEqual(['optimizing', 'authorizing', 'uploading', 'finalizing', 'complete']);
   });
 
   it('does not use timer-based fake progress in upload clients or UI', () => {

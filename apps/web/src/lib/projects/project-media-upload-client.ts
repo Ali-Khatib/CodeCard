@@ -7,6 +7,11 @@ import {
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { uploadFileToSignedUrlWithProgress } from '@/lib/storage/signed-upload-transport';
 import {
+  formatOptimizationSavings,
+  optimizeImageForUpload,
+  type OptimizeImageResult,
+} from '@/lib/storage/optimize-image';
+import {
   classifyInitFailure,
   isRetryableUploadFailure,
   messageForUploadFailure,
@@ -32,7 +37,14 @@ export type ProjectMediaUploadInitResponse = {
 };
 
 export type ProjectMediaUploadFlowResult =
-  | { ok: true; path: string; assetId: string; cleanupWarning?: boolean }
+  | {
+      ok: true;
+      path: string;
+      assetId: string;
+      cleanupWarning?: boolean;
+      optimizationNote?: string | null;
+      uploadFileBytes?: number;
+    }
   | {
       ok: false;
       message: string;
@@ -263,6 +275,7 @@ export async function executeProjectMediaUploadFlow(input: {
     | { success: true; assetId: string; cleanupWarning?: boolean }
     | { success: false; error?: string }
   >;
+  optimizeImage?: (file: File, options?: { signal?: AbortSignal }) => Promise<OptimizeImageResult>;
   onPhaseChange?: (phase: ProjectMediaUploadPhase) => void;
   onProgress?: (progress: { loaded: number; total: number; percent: number | null }) => void;
   signal?: AbortSignal;
@@ -289,13 +302,66 @@ export async function executeProjectMediaUploadFlow(input: {
     };
   }
 
+  input.onPhaseChange?.('optimizing');
+  const optimize = input.optimizeImage ?? optimizeImageForUpload;
+  const optimized = await optimize(input.file, { signal: input.signal });
+  if (!optimized.ok) {
+    if (optimized.cancelled) {
+      return {
+        ok: false,
+        phase: 'cancelled',
+        failureClass: 'cancelled',
+        retryable: true,
+        cancelled: true,
+        message: messageForUploadFailure('cancelled'),
+      };
+    }
+    if (!optimized.canUseOriginal) {
+      return {
+        ok: false,
+        phase: 'optimizing',
+        failureClass: 'validation',
+        retryable: false,
+        message: optimized.message,
+      };
+    }
+  }
+
+  const uploadFile = optimized.ok ? optimized.file : input.file;
+  const uploadValidation = validateProjectMediaFile(uploadFile);
+  if (!uploadValidation.ok) {
+    return {
+      ok: false,
+      phase: 'validation',
+      failureClass: 'validation',
+      retryable: false,
+      message: uploadValidation.message,
+    };
+  }
+
+  const optimizationNote =
+    optimized.ok && optimized.transformed
+      ? formatOptimizationSavings(optimized.originalBytes, optimized.outputBytes)
+      : null;
+
+  if (input.signal?.aborted) {
+    return {
+      ok: false,
+      phase: 'cancelled',
+      failureClass: 'cancelled',
+      retryable: true,
+      cancelled: true,
+      message: messageForUploadFailure('cancelled'),
+    };
+  }
+
   input.onPhaseChange?.('authorizing');
   const requestInit = input.requestInit ?? requestProjectMediaUploadInit;
   const initResult = await requestInit(
     {
       projectId: input.projectId,
       mediaRole: input.mediaRole,
-      file: input.file,
+      file: uploadFile,
     },
     fetch,
     input.signal,
@@ -324,7 +390,7 @@ export async function executeProjectMediaUploadFlow(input: {
   }
 
   input.onPhaseChange?.('uploading');
-  const uploadResult = await input.uploadToStorage(initResult.init, input.file, {
+  const uploadResult = await input.uploadToStorage(initResult.init, uploadFile, {
     onProgress: input.onProgress,
     signal: input.signal,
   });
@@ -358,5 +424,7 @@ export async function executeProjectMediaUploadFlow(input: {
     path: initResult.init.path,
     assetId: finalizeResult.assetId,
     cleanupWarning: finalizeResult.cleanupWarning,
+    optimizationNote,
+    uploadFileBytes: uploadFile.size,
   };
 }

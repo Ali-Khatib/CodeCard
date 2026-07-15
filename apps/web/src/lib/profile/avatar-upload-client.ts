@@ -4,6 +4,11 @@ import {
   mapAvatarValidationMessage,
   validateAvatarFileMetadata,
 } from '@/lib/profile/avatar-file-validation';
+import {
+  formatOptimizationSavings,
+  optimizeImageForUpload,
+  type OptimizeImageResult,
+} from '@/lib/storage/optimize-image';
 import { uploadFileToSignedUrlWithProgress } from '@/lib/storage/signed-upload-transport';
 import {
   classifyInitFailure,
@@ -30,7 +35,14 @@ export type AvatarUploadInitResponse = {
 };
 
 export type AvatarUploadFlowResult =
-  | { ok: true; avatarUrl: string; path: string; cleanupWarning?: boolean }
+  | {
+      ok: true;
+      avatarUrl: string;
+      path: string;
+      cleanupWarning?: boolean;
+      optimizationNote?: string | null;
+      uploadFileBytes?: number;
+    }
   | {
       ok: false;
       message: string;
@@ -198,6 +210,7 @@ export async function executeAvatarUploadFlow(input: {
   requestInit?: UploadInitFetcher;
   uploadToStorage: StorageUploader;
   finalizeUpload: FinalizeUpload;
+  optimizeImage?: (file: File, options?: { signal?: AbortSignal }) => Promise<OptimizeImageResult>;
   onPhaseChange?: (phase: AvatarUploadPhase) => void;
   onProgress?: (progress: { loaded: number; total: number; percent: number | null }) => void;
   signal?: AbortSignal;
@@ -224,9 +237,62 @@ export async function executeAvatarUploadFlow(input: {
     };
   }
 
+  input.onPhaseChange?.('optimizing');
+  const optimize = input.optimizeImage ?? optimizeImageForUpload;
+  const optimized = await optimize(input.file, { signal: input.signal });
+  if (!optimized.ok) {
+    if (optimized.cancelled) {
+      return {
+        ok: false,
+        phase: 'cancelled',
+        failureClass: 'cancelled',
+        retryable: true,
+        cancelled: true,
+        message: messageForUploadFailure('cancelled'),
+      };
+    }
+    if (!optimized.canUseOriginal) {
+      return {
+        ok: false,
+        phase: 'optimizing',
+        failureClass: 'validation',
+        retryable: false,
+        message: optimized.message,
+      };
+    }
+  }
+
+  const uploadFile = optimized.ok ? optimized.file : input.file;
+  const uploadValidation = validateAvatarFile(uploadFile);
+  if (!uploadValidation.ok) {
+    return {
+      ok: false,
+      phase: 'validation',
+      failureClass: 'validation',
+      retryable: false,
+      message: mapAvatarValidationMessage(uploadValidation),
+    };
+  }
+
+  const optimizationNote =
+    optimized.ok && optimized.transformed
+      ? formatOptimizationSavings(optimized.originalBytes, optimized.outputBytes)
+      : null;
+
+  if (input.signal?.aborted) {
+    return {
+      ok: false,
+      phase: 'cancelled',
+      failureClass: 'cancelled',
+      retryable: true,
+      cancelled: true,
+      message: messageForUploadFailure('cancelled'),
+    };
+  }
+
   input.onPhaseChange?.('authorizing');
   const requestInit = input.requestInit ?? ((file: File) => requestAvatarUploadInit(file, fetch, input.signal));
-  const initResult = await requestInit(input.file);
+  const initResult = await requestInit(uploadFile);
   if (!initResult.ok) {
     const failureClass = initResult.failureClass ?? 'upload_authorization';
     return {
@@ -251,7 +317,7 @@ export async function executeAvatarUploadFlow(input: {
   }
 
   input.onPhaseChange?.('uploading');
-  const uploadResult = await input.uploadToStorage(initResult.init, input.file, {
+  const uploadResult = await input.uploadToStorage(initResult.init, uploadFile, {
     onProgress: input.onProgress,
     signal: input.signal,
   });
@@ -285,5 +351,7 @@ export async function executeAvatarUploadFlow(input: {
     avatarUrl: finalizeResult.avatarUrl,
     path: initResult.init.path,
     cleanupWarning: finalizeResult.cleanupWarning,
+    optimizationNote,
+    uploadFileBytes: uploadFile.size,
   };
 }

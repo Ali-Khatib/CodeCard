@@ -1,6 +1,7 @@
 export type UploadStage =
   | 'idle'
   | 'validating'
+  | 'optimizing'
   | 'authorizing'
   | 'uploading'
   | 'finalizing'
@@ -15,6 +16,8 @@ export function stageLabel(stage: UploadStage, options?: { percent?: number | nu
   switch (stage) {
     case 'validating':
       return 'Validating file…';
+    case 'optimizing':
+      return 'Optimizing image…';
     case 'authorizing':
       return 'Requesting upload authorization…';
     case 'uploading': {
@@ -40,6 +43,7 @@ export function stageLabel(stage: UploadStage, options?: { percent?: number | nu
 export function isActiveUploadStage(stage: UploadStage): boolean {
   return (
     stage === 'validating' ||
+    stage === 'optimizing' ||
     stage === 'authorizing' ||
     stage === 'uploading' ||
     stage === 'finalizing'
