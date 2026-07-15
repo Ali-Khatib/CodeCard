@@ -83,7 +83,7 @@ export function ResearchPaperDetail({
                 <a
                   href={paper.pdfUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="cc-app-btn cc-app-btn--primary !h-10"
                   onClick={() =>
                     trackResearchEvent({
@@ -98,7 +98,7 @@ export function ResearchPaperDetail({
                 </a>
               )}
               {paper.doiUrl && (
-                <a href={paper.doiUrl} target="_blank" rel="noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10">
+                <a href={paper.doiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10">
                   <HiOutlineLink className="h-4 w-4" aria-hidden />
                   DOI
                 </a>

@@ -1,14 +1,55 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { normalizeResearchPaper } from '@/lib/research/research';
 import { ResearchPaperDetail } from '@/components/research/research-paper-detail';
 import { ProfileAnalytics } from '@/components/profile-analytics';
+import {
+  buildPublicResearchMetadata,
+  PUBLIC_RESEARCH_PAPER_SELECT,
+  toPublicResearchPaper,
+} from '@/lib/research/research-public';
 
 interface PageProps {
   params: Promise<{ slug: string; paperSlug: string }>;
 }
 
 export const revalidate = 60;
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug, paperSlug } = await params;
+  const supabase = await createClient();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, display_name')
+    .eq('slug', slug)
+    .eq('is_public', true)
+    .maybeSingle();
+
+  if (!profile) {
+    return { title: 'Research not found', robots: { index: false, follow: false } };
+  }
+
+  const { data: paper } = await supabase
+    .from('research_papers')
+    .select('title, abstract, slug')
+    .eq('profile_id', profile.id)
+    .eq('slug', paperSlug)
+    .eq('is_published', true)
+    .maybeSingle();
+
+  if (!paper) {
+    return { title: 'Research not found', robots: { index: false, follow: false } };
+  }
+
+  return buildPublicResearchMetadata({
+    profileDisplayName: profile.display_name,
+    paperTitle: paper.title,
+    abstract: paper.abstract,
+    profileSlug: slug,
+    paperSlug: paper.slug,
+  });
+}
 
 export default async function ResearchDetailPage({ params }: PageProps) {
   const { slug, paperSlug } = await params;
@@ -19,25 +60,31 @@ export default async function ResearchDetailPage({ params }: PageProps) {
     .select('id, display_name, slug')
     .eq('slug', slug)
     .eq('is_public', true)
-    .single();
+    .maybeSingle();
 
   if (!profile) notFound();
 
   const { data: paper } = await supabase
     .from('research_papers')
-    .select('*, research_figures(*), related_project:related_project_id(id, title, is_published)')
+    .select(PUBLIC_RESEARCH_PAPER_SELECT)
     .eq('profile_id', profile.id)
     .eq('slug', paperSlug)
     .eq('is_published', true)
-    .single();
+    .maybeSingle();
 
   if (!paper) notFound();
+
+  // PostgREST embed is a single object; generated client types may widen to an array.
+  const publicPaper = toPublicResearchPaper(
+    paper as unknown as Parameters<typeof toPublicResearchPaper>[0],
+    slug,
+  );
 
   return (
     <>
       <ProfileAnalytics profileId={profile.id} />
       <ResearchPaperDetail
-        paper={normalizeResearchPaper(paper, slug)}
+        paper={publicPaper}
         profileSlug={slug}
         profileId={profile.id}
         displayName={profile.display_name}
