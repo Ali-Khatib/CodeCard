@@ -23,10 +23,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const supabase = await createClient();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, headline')
+    .select('slug, display_name, headline, bio')
     .eq('slug', slug)
     .eq('is_public', true)
     .maybeSingle();
+
+  if (!profile) {
+    return mapPublicProfileMetadata(null);
+  }
 
   return mapPublicProfileMetadata(profile);
 }

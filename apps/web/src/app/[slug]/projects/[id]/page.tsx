@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
@@ -6,6 +7,10 @@ import {
   loadProfileProjectOrderings,
   sortProjectsByEffectiveOrder,
 } from '@/lib/projects/project-order-core';
+import {
+  buildPublicProjectMetadata,
+  buildUnavailablePublicMetadata,
+} from '@/lib/profile/public-metadata';
 import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { ProfileAnalytics } from '@/components/profile-analytics';
@@ -15,6 +20,46 @@ interface PageProps {
 }
 
 export const revalidate = 60;
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug: rawSlug, id } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  if (!slug || !id?.trim()) {
+    return buildUnavailablePublicMetadata('project');
+  }
+
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, display_name, slug')
+    .eq('slug', slug)
+    .eq('is_public', true)
+    .maybeSingle();
+
+  if (!profile) {
+    return buildUnavailablePublicMetadata('project');
+  }
+
+  const { data: project } = await supabase
+    .from('projects')
+    .select('id, title, description')
+    .eq('id', id)
+    .eq('profile_id', profile.id)
+    .eq('is_published', true)
+    .maybeSingle();
+
+  if (!project) {
+    return buildUnavailablePublicMetadata('project');
+  }
+
+  return buildPublicProjectMetadata({
+    profileSlug: profile.slug,
+    profileDisplayName: profile.display_name,
+    projectId: project.id,
+    projectTitle: project.title,
+    description: project.description,
+  });
+}
 
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { slug: rawSlug, id } = await params;

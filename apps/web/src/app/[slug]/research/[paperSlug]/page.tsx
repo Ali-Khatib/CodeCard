@@ -4,6 +4,7 @@ import { normalizeResearchSlug } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { ResearchPaperDetail } from '@/components/research/research-paper-detail';
 import { ProfileAnalytics } from '@/components/profile-analytics';
+import { buildUnavailablePublicMetadata } from '@/lib/profile/public-metadata';
 import {
   buildPublicResearchMetadata,
   PUBLIC_RESEARCH_PAPER_SELECT,
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const slug = normalizePublicProfileSlug(rawSlug);
   const paperSlug = rawPaperSlug ? normalizeResearchSlug(rawPaperSlug) : '';
   if (!slug || !paperSlug) {
-    return { title: 'Research not found', robots: { index: false, follow: false } };
+    return buildUnavailablePublicMetadata('research');
   }
 
   const supabase = await createClient();
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .maybeSingle();
 
   if (!profile) {
-    return { title: 'Research not found', robots: { index: false, follow: false } };
+    return buildUnavailablePublicMetadata('research');
   }
 
   const { data: paper } = await supabase
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .maybeSingle();
 
   if (!paper) {
-    return { title: 'Research not found', robots: { index: false, follow: false } };
+    return buildUnavailablePublicMetadata('research');
   }
 
   return buildPublicResearchMetadata({

@@ -22,26 +22,30 @@ describe('normalizePublicProfileSlug', () => {
 
 describe('mapPublicProfileMetadata', () => {
   it('returns noindex metadata for missing/private profiles', () => {
-    expect(mapPublicProfileMetadata(null)).toEqual({
-      title: 'Profile not found',
-      description: 'This profile could not be found on CodeCard.',
-      robots: { index: false, follow: false },
-    });
+    const metadata = mapPublicProfileMetadata(null);
+    expect(metadata.title).toBe('Profile not found');
+    expect(metadata.description).toBe('This profile could not be found on CodeCard.');
+    expect(metadata.robots).toEqual({ index: false, follow: false });
   });
 
   it('uses headline or CodeCard fallback for public profiles', () => {
-    expect(
-      mapPublicProfileMetadata({ display_name: 'Ada', headline: 'Builder' }),
-    ).toEqual({
-      title: 'Ada',
-      description: 'Builder',
+    const withHeadline = mapPublicProfileMetadata({
+      slug: 'ada',
+      display_name: 'Ada',
+      headline: 'Builder',
     });
-    expect(
-      mapPublicProfileMetadata({ display_name: 'Ada', headline: null }),
-    ).toEqual({
-      title: 'Ada',
-      description: 'Ada on CodeCard',
+    expect(withHeadline.title).toBe('Ada');
+    expect(withHeadline.description).toBe('Builder');
+    expect(withHeadline.alternates?.canonical).toBe('/ada');
+    expect(withHeadline.openGraph).toMatchObject({ url: '/ada' });
+
+    const fallback = mapPublicProfileMetadata({
+      slug: 'ada',
+      display_name: 'Ada',
+      headline: null,
     });
+    expect(fallback.title).toBe('Ada');
+    expect(fallback.description).toBe('Ada on CodeCard');
   });
 });
 

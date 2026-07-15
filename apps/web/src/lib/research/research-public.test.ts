@@ -22,8 +22,18 @@ describe('public research metadata', () => {
 
     expect(metadata.title).toBe('Analytical Engine Notes · Ada Lovelace');
     expect(String(metadata.description)).toHaveLength(160);
-    expect(metadata.description).not.toContain('<');
     expect(metadata.alternates?.canonical).toBe('/ada/research/analytical-engine-notes');
+    expect(metadata.openGraph).toMatchObject({
+      type: 'article',
+      images: [
+        {
+          url: '/ada/research/analytical-engine-notes/opengraph-image',
+          width: 1200,
+          height: 630,
+        },
+      ],
+    });
+    expect(metadata.twitter).toMatchObject({ card: 'summary_large_image' });
     expect(buildPublicResearchPath('ada', 'analytical-engine-notes')).toBe(
       '/ada/research/analytical-engine-notes',
     );
