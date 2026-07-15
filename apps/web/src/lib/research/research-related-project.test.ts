@@ -68,10 +68,10 @@ describe('related project editor wiring', () => {
   });
 
   it('queries related project publication state for public surfaces', () => {
-    const detail = readFileSync(
-      resolve(process.cwd(), 'src/app/[slug]/research/[paperSlug]/page.tsx'),
+    const publicHelper = readFileSync(
+      resolve(process.cwd(), 'src/lib/research/research-public.ts'),
       'utf8',
     );
-    expect(detail).toContain('related_project:related_project_id(id, title, is_published)');
+    expect(publicHelper).toContain('related_project:related_project_id(id, title, is_published)');
   });
 });

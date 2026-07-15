@@ -118,7 +118,7 @@ export function ResearchPaperCard({
               <a
                 href={paper.pdfUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="cc-app-btn cc-app-btn--ghost"
                 onClick={() =>
                   trackResearchEvent({
