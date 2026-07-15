@@ -43,24 +43,18 @@ describe('Auth experience polish contracts', () => {
     expect(shell).toContain('lg:rounded-l-[28px]');
     expect(shell).not.toContain('slideIndex');
     expect(collage).toContain('AuthShowcaseStage');
-    expect(collage).toContain('images.unsplash.com');
+    expect(collage).toContain('/auth-collage/team.jpg');
+    expect(collage).toContain('/auth-collage/code.jpg');
     expect(collage).toContain('#f7bbe6');
     expect(collage).toContain('#c094e4');
     expect(collage).toContain('proud of');
     expect(collage).not.toContain('Inside the live demo');
     expect(collage).not.toContain('setInterval');
-    expect(collage).not.toContain('/auth-demo/home.webp');
+    expect(collage).not.toContain('images.unsplash.com');
     expect(collage).not.toContain('Alex Rivera');
 
-    for (const name of [
-      'home.webp',
-      'projects.webp',
-      'profile.webp',
-      'analytics.webp',
-      'research.webp',
-      'connections.webp',
-    ]) {
-      expect(existsSync(resolve(process.cwd(), `public/auth-demo/${name}`))).toBe(true);
+    for (const name of ['team.jpg', 'code.jpg', 'desk.jpg', 'avatar.jpg']) {
+      expect(existsSync(resolve(process.cwd(), `public/auth-collage/${name}`))).toBe(true);
     }
   });
 

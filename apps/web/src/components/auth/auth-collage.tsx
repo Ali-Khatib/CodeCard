@@ -11,10 +11,10 @@ const PINK = '#f7bbe6';
 const LAVENDER = '#c094e4';
 
 const MEDIA = {
-  hero: 'https://images.unsplash.com/photo-1522075469751-645b4e8881cd?auto=format&fit=crop&w=900&q=80',
-  code: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=80',
-  desk: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80',
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=240&q=80',
+  hero: '/auth-collage/team.jpg',
+  code: '/auth-collage/code.jpg',
+  desk: '/auth-collage/desk.jpg',
+  avatar: '/auth-collage/avatar.jpg',
 };
 
 function PhotoCard({
@@ -32,7 +32,7 @@ function PhotoCard({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[28px] bg-white ${className}`}
+      className={`relative overflow-hidden rounded-[28px] bg-[#efeae3] ${className}`}
       style={{ boxShadow: CARD_SHADOW }}
     >
       <Image
@@ -43,6 +43,7 @@ function PhotoCard({
         sizes={sizes}
         className="object-cover"
         style={{ objectPosition }}
+        unoptimized
       />
     </div>
   );
@@ -51,12 +52,19 @@ function PhotoCard({
 function MiniProfileCard({ className }: { className: string }) {
   return (
     <div
-      className={`flex flex-col justify-between overflow-hidden rounded-[28px] bg-white p-4 ${className}`}
+      className={`relative flex flex-col justify-between overflow-hidden rounded-[28px] bg-white p-4 ${className}`}
       style={{ boxShadow: CARD_SHADOW }}
     >
       <div className="flex items-center gap-3">
-        <div className="relative h-11 w-11 overflow-hidden rounded-full bg-[#efeae3]">
-          <Image src={MEDIA.avatar} alt="" fill sizes="44px" className="object-cover" />
+        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#efeae3]">
+          <Image
+            src={MEDIA.avatar}
+            alt=""
+            fill
+            sizes="44px"
+            className="object-cover"
+            unoptimized
+          />
         </div>
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#17171a]">Alex Chen</p>
@@ -109,12 +117,7 @@ export function AuthShowcaseStage() {
             animate={{ opacity: 1, y: 0, rotate: -7 }}
             transition={{ duration: reduced ? 0.01 : 0.55, ease: 'easeOut' }}
           >
-            <PhotoCard
-              src={MEDIA.code}
-              className="absolute inset-0"
-              sizes="260px"
-              objectPosition="center"
-            />
+            <PhotoCard src={MEDIA.code} className="absolute inset-0" sizes="260px" />
           </motion.div>
 
           <motion.div
@@ -128,7 +131,7 @@ export function AuthShowcaseStage() {
               className="absolute inset-0"
               priority
               sizes="300px"
-              objectPosition="center top"
+              objectPosition="center"
             />
           </motion.div>
 
@@ -157,7 +160,14 @@ export function AuthShowcaseStage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: reduced ? 0.01 : 0.45, delay: reduced ? 0 : 0.16, ease: 'easeOut' }}
           >
-            <Image src={MEDIA.avatar} alt="" fill sizes="84px" className="object-cover" />
+            <Image
+              src={MEDIA.avatar}
+              alt=""
+              fill
+              sizes="84px"
+              className="object-cover"
+              unoptimized
+            />
           </motion.div>
 
           <motion.div
