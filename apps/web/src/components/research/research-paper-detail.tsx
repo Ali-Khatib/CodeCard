@@ -70,7 +70,7 @@ export function ResearchPaperDetail({
     <div className="relative min-h-[100dvh] text-text-primary">
       <ProjectWorkAtmosphere variant="page" />
 
-      <div className="relative z-[1]">
+      <main className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
           <div className="flex items-center justify-between rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
             <Link
@@ -89,7 +89,7 @@ export function ResearchPaperDetail({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cc-app-btn cc-app-btn--primary !h-10"
-                  aria-label="Open external paper"
+                  aria-label="Open external paper (opens in a new tab)"
                   title={externalPdfLabel ?? 'Open external paper'}
                   onClick={() =>
                     trackResearchEvent({
@@ -104,7 +104,7 @@ export function ResearchPaperDetail({
                 </a>
               )}
               {safeDoiUrl && (
-                <a href={safeDoiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10">
+                <a href={safeDoiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10" aria-label="Open DOI (opens in a new tab)">
                   <HiOutlineLink className="h-4 w-4" aria-hidden />
                   DOI
                 </a>
@@ -263,7 +263,7 @@ export function ResearchPaperDetail({
                     <div className="relative aspect-[16/10]">
                       <Image
                         src={figure.imageUrl}
-                        alt={figure.caption?.trim() || 'Research figure'}
+                        alt={figure.caption?.trim() ? '' : 'Research figure'}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 520px"
@@ -280,7 +280,7 @@ export function ResearchPaperDetail({
             </section>
           )}
         </article>
-      </div>
+      </main>
     </div>
   );
 }
