@@ -43,13 +43,13 @@ describe('Auth experience polish contracts', () => {
     expect(shell).toContain('lg:rounded-l-[28px]');
     expect(shell).not.toContain('slideIndex');
     expect(collage).toContain('AuthShowcaseStage');
-    expect(collage).toContain('/auth-demo/projects.webp');
-    expect(collage).toContain('/auth-demo/home.webp');
-    expect(collage).toContain('#e95a0b');
+    expect(collage).toContain('images.unsplash.com');
+    expect(collage).toContain('#f7bbe6');
+    expect(collage).toContain('#c094e4');
     expect(collage).toContain('proud of');
     expect(collage).not.toContain('Inside the live demo');
     expect(collage).not.toContain('setInterval');
-    expect(collage).not.toContain('#7a4ea8');
+    expect(collage).not.toContain('/auth-demo/home.webp');
     expect(collage).not.toContain('Alex Rivera');
 
     for (const name of [
