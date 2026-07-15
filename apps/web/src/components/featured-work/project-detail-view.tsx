@@ -156,7 +156,7 @@ export function ProjectDetailView({
     >
       <ProjectWorkAtmosphere variant="page" />
 
-      <div className="relative z-[1]">
+      <main className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
           <div className="flex items-center rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
@@ -378,13 +378,14 @@ export function ProjectDetailView({
             </section>
           )}
         </article>
-      </div>
+      </main>
 
       {lightbox && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-void-canvas/95 p-4 backdrop-blur-sm"
           role="dialog"
-          aria-modal
+          aria-modal="true"
+          aria-label="Project image viewer"
         >
           <button
             type="button"

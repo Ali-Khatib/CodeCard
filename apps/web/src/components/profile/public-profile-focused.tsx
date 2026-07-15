@@ -66,7 +66,7 @@ export function PublicProfileFocused({
 
   return (
     <div className="cc-public-profile">
-      <div className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16">
+      <main className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16">
         <motion.header
           className="cc-app-profile-preview cc-app-profile-preview--hero"
           initial={reduced ? false : { opacity: 0, y: 16 }}
@@ -90,7 +90,7 @@ export function PublicProfileFocused({
                     sizes="96px"
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-3xl font-medium">
+                  <span className="flex h-full w-full items-center justify-center text-3xl font-medium" aria-hidden>
                     {displayName[0]}
                   </span>
                 )}
@@ -152,8 +152,9 @@ export function PublicProfileFocused({
                         type="button"
                         className="cc-app-btn cc-app-btn--primary !h-10"
                         onClick={copyLink}
+                        aria-live="polite"
                       >
-                        {copied ? 'Copied ✓' : 'Copy link'}
+                        {copied ? 'Profile link copied' : 'Copy link'}
                       </button>
                     </motion.div>
                   );
@@ -263,8 +264,8 @@ export function PublicProfileFocused({
               Copy the link, scan the QR, or save the contact for your next conversation.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <button type="button" className="cc-app-btn cc-app-btn--primary" onClick={copyLink}>
-                {copied ? 'Copied ✓' : 'Copy link'}
+              <button type="button" className="cc-app-btn cc-app-btn--primary" onClick={copyLink} aria-live="polite">
+                {copied ? 'Profile link copied' : 'Copy link'}
               </button>
               <button
                 type="button"
@@ -278,11 +279,11 @@ export function PublicProfileFocused({
         </AppReveal>
 
         <footer className="mt-16 border-t border-[var(--app-border)] pt-8 text-center">
-          <Link href="/" className="text-[14px] text-[var(--app-smoke)] hover:text-[var(--app-ink)]">
-            CodeCard
+          <Link href="/" className="text-[14px] text-[var(--app-smoke)] hover:text-[var(--app-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)]">
+            CodeCard home
           </Link>
         </footer>
-      </div>
+      </main>
     </div>
   );
 }
