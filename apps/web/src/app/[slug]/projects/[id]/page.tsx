@@ -19,6 +19,7 @@ interface PageProps {
   params: Promise<{ slug: string; id: string }>;
 }
 
+/** Must be a literal for Next.js segment config; keep equal to PUBLIC_CACHE_SECONDS. */
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

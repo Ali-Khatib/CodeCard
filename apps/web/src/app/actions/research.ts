@@ -26,6 +26,7 @@ import {
 import {
   revalidateDeletedResearchPaths,
   revalidateOwnedResearchPaths,
+  revalidateResearchOrderPaths,
 } from '@/lib/research/research-revalidate';
 
 export type {
@@ -61,18 +62,10 @@ export async function updateResearchAction(
     revalidateOwnedResearchPaths({
       researchPaperId: result.researchPaperId,
       paperSlug: result.slug ?? result.previousSlug,
+      previousPaperSlug: result.previousSlug,
       profileSlug: result.profileSlug,
       isPublished: result.isPublished,
     });
-    if (
-      result.previousSlug &&
-      result.slug &&
-      result.previousSlug !== result.slug &&
-      result.profileSlug &&
-      result.isPublished
-    ) {
-      revalidatePath(`/${result.profileSlug}/research/${result.previousSlug}`);
-    }
   }
 
   return result;
@@ -145,11 +138,7 @@ export async function reorderResearchAction(
   const result = await executeReorderResearch(supabase, researchPaperIds);
 
   if (result.success) {
-    revalidatePath('/dashboard/research');
-    if (result.profileSlug) {
-      revalidatePath(`/${result.profileSlug}`);
-      revalidatePath('/dashboard/profile/preview');
-    }
+    revalidateResearchOrderPaths({ profileSlug: result.profileSlug });
   }
 
   return result;

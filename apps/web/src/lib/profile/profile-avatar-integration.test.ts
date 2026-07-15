@@ -37,7 +37,7 @@ describe('profile avatar integration', () => {
 
     expect(action).toContain("revalidatePath('/dashboard/profile')");
     expect(action).toContain("revalidatePath('/dashboard/profile/preview')");
-    expect(action).toMatch(/revalidatePath\(`\/\$\{result\.slug\}`\)/);
+    expect(action).toContain('revalidatePublicProfile');
     expect(action).not.toContain('revalidatePath("/")');
   });
 

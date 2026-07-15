@@ -10,6 +10,7 @@ import {
   type ProfileLinkMutationState,
 } from '@/lib/profile/profile-link-core';
 import { resolveOwnedProfile } from '@/lib/profile/profile-auth-core';
+import { revalidatePublicProfile } from '@/lib/profile/public-cache';
 
 export type { ProfileLinkMutationState };
 
@@ -22,8 +23,9 @@ async function revalidateProfilePaths(supabase: Awaited<ReturnType<typeof create
   if ('error' in resolved) return;
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/profile');
+  revalidatePath('/dashboard/profile/preview');
   if (resolved.profile.slug) {
-    revalidatePath(`/${resolved.profile.slug}`);
+    revalidatePublicProfile(resolved.profile.slug);
   }
 }
 
