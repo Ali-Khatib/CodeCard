@@ -20,6 +20,10 @@ import {
   type ResearchPublishState,
 } from '@/lib/research/research-publish-core';
 import {
+  executeReorderResearch,
+  type ResearchReorderState,
+} from '@/lib/research/research-order-core';
+import {
   revalidateDeletedResearchPaths,
   revalidateOwnedResearchPaths,
 } from '@/lib/research/research-revalidate';
@@ -29,6 +33,7 @@ export type {
   ResearchUpdateState,
   ResearchDeleteState,
   ResearchPublishState,
+  ResearchReorderState,
 };
 
 export async function createResearchAction(
@@ -128,6 +133,23 @@ export async function unpublishResearchAction(
       isPublished: false,
       touchPublicRoutes: true,
     });
+  }
+
+  return result;
+}
+
+export async function reorderResearchAction(
+  researchPaperIds: string[],
+): Promise<ResearchReorderState> {
+  const supabase = await createClient();
+  const result = await executeReorderResearch(supabase, researchPaperIds);
+
+  if (result.success) {
+    revalidatePath('/dashboard/research');
+    if (result.profileSlug) {
+      revalidatePath(`/${result.profileSlug}`);
+      revalidatePath('/dashboard/profile/preview');
+    }
   }
 
   return result;

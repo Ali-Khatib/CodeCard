@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
 import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import { normalizeResearchPaper } from '@/lib/research/research';
+import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -19,6 +20,7 @@ interface PageProps {
 type ResearchPaperRow = Parameters<typeof normalizeResearchPaper>[0] & {
   is_published: boolean;
   sort_order: number;
+  created_at?: string | null;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -89,10 +91,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
     }),
   );
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
-  const publishedResearch = researchRows
-    .filter((p: ResearchPaperRow) => p.is_published)
-    .sort((a: ResearchPaperRow, b: ResearchPaperRow) => a.sort_order - b.sort_order)
-    .map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, slug));
+  const publishedResearch = sortResearchBySortOrder(
+    researchRows.filter((p: ResearchPaperRow) => p.is_published),
+  ).map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, slug));
 
   const links: ProfileLinkItem[] = (profile.profile_links ?? [])
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
