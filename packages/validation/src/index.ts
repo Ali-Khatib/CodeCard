@@ -476,29 +476,33 @@ export const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const analyticsEventTypeSchema = z.enum([
+  'profile_view',
+  'project_view',
+  'link_click',
+  'resume_click',
+  'research_view',
+  'paper_download',
+  'citation_copy',
+  'abstract_expand',
+  'figure_view',
+  'related_project_click',
+  'time_spent_on_research',
+  'project_time_spent',
+  'project_section_time_spent',
+  'project_section_view',
+  'project_section_hover_or_click',
+  'profile_share',
+  'qr_download',
+]);
+
 export const analyticsEventSchema = z.object({
   profile_id: z.string().uuid().optional(),
   project_id: z.string().uuid().optional(),
   research_paper_id: z.string().uuid().optional(),
   target_type: z.enum(['profile', 'project', 'research']).optional(),
   target_id: z.string().uuid().optional(),
-  event_type: z.enum([
-    'profile_view',
-    'project_view',
-    'link_click',
-    'resume_click',
-    'research_view',
-    'paper_download',
-    'citation_copy',
-    'abstract_expand',
-    'figure_view',
-    'related_project_click',
-    'time_spent_on_research',
-    'project_time_spent',
-    'project_section_time_spent',
-    'project_section_view',
-    'project_section_hover_or_click',
-  ]),
+  event_type: analyticsEventTypeSchema,
   section_name: z.string().max(120).optional().nullable(),
   metadata: z.record(z.unknown()).optional().nullable(),
   source: connectionSourceSchema.optional().nullable(),
@@ -536,3 +540,5 @@ export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
+export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;
+export type AnalyticsEventInput = z.infer<typeof analyticsEventSchema>;

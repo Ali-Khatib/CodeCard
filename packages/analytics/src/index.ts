@@ -1,22 +1,8 @@
 import type { ConnectionSource } from '@codecard/types';
+import type { AnalyticsEventType as ValidationAnalyticsEventType } from '@codecard/validation';
 
-export type AnalyticsEventType =
-  | 'profile_view'
-  | 'project_view'
-  | 'link_click'
-  | 'resume_click'
-  | 'save_connection'
-  | 'research_view'
-  | 'paper_download'
-  | 'citation_copy'
-  | 'abstract_expand'
-  | 'figure_view'
-  | 'related_project_click'
-  | 'time_spent_on_research'
-  | 'project_time_spent'
-  | 'project_section_time_spent'
-  | 'project_section_view'
-  | 'project_section_hover_or_click';
+/** Kept in sync with `analyticsEventTypeSchema` in `@codecard/validation`. */
+export type AnalyticsEventType = ValidationAnalyticsEventType;
 
 export interface AnalyticsEventPayload {
   event_type: AnalyticsEventType;
