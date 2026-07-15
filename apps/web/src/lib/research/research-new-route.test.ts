@@ -25,7 +25,7 @@ describe('dashboard new research route', () => {
 
     expect(form).toContain("from '@/app/actions/research'");
     expect(form).toContain('createResearchAction');
-    expect(form).toContain("mode !== 'create'");
+    expect(form).toContain('updateResearchAction');
     expect(form).toContain("mode === 'edit'");
     expect(form).toContain('suggestResearchSlugFromTitle');
     expect(form).toContain('slugEdited');

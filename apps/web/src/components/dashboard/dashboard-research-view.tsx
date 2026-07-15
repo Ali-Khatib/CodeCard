@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
@@ -31,13 +32,23 @@ export function DashboardResearchView({
       {papers.length > 0 ? (
         <div className="flex flex-col gap-8">
           {papers.map((paper, index) => (
-            <ResearchPaperCard
-              key={paper.id}
-              paper={paper}
-              href={baseProfileHref ? `${baseProfileHref}/research/${paper.slug}` : '#'}
-              profileId={profileId}
-              delay={index * 0.06}
-            />
+            <div key={paper.id} className="space-y-3">
+              <div className="flex justify-end">
+                <Link
+                  href={`/dashboard/research/${paper.id}/edit`}
+                  className="cc-app-btn cc-app-btn--ghost text-[13px]"
+                  aria-label={`Edit research paper ${paper.title}`}
+                >
+                  Edit
+                </Link>
+              </div>
+              <ResearchPaperCard
+                paper={paper}
+                href={baseProfileHref ? `${baseProfileHref}/research/${paper.slug}` : '#'}
+                profileId={profileId}
+                delay={index * 0.06}
+              />
+            </div>
           ))}
         </div>
       ) : (

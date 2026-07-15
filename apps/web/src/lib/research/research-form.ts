@@ -10,6 +10,7 @@ import {
   RESEARCH_YEAR_MAX,
   RESEARCH_YEAR_MIN,
 } from '@codecard/validation';
+import type { OwnedResearchRecord } from '@/lib/research/research-access-core';
 
 export type ResearchFormMode = 'create' | 'edit';
 
@@ -76,6 +77,31 @@ export function buildCreateResearchFormData(values: ResearchFormValues): FormDat
     fd.append('tags', tag);
   }
   return fd;
+}
+
+export function buildUpdateResearchFormData(
+  researchPaperId: string,
+  values: ResearchFormValues,
+): FormData {
+  const fd = buildCreateResearchFormData(values);
+  fd.set('research_paper_id', researchPaperId);
+  return fd;
+}
+
+export function researchRecordToFormValues(paper: OwnedResearchRecord): ResearchFormValues {
+  return {
+    title: paper.title,
+    slug: paper.slug,
+    abstract: paper.abstract ?? '',
+    authors: paper.authors.length > 0 ? [...paper.authors] : [''],
+    venue: paper.venue ?? '',
+    publication_status: paper.publication_status ?? '',
+    year: paper.year == null ? '' : String(paper.year),
+    doi_url: paper.doi_url ?? '',
+    pdf_url: paper.pdf_url ?? '',
+    citation_text: paper.citation_text ?? '',
+    tags: [...(paper.tags ?? [])],
+  };
 }
 
 export function validateResearchFormClient(values: ResearchFormValues): string | null {
