@@ -24,8 +24,8 @@ describe('ProjectMediaUpload component', () => {
     expect(component).toContain('AbortController');
     expect(component).toContain('Retry upload for');
     expect(component).toContain('progressPercent');
+    expect(component).toContain("'optimizing'");
     expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
-    expect(component).not.toContain('compress');
     expect(component).not.toMatch(/service.?role/i);
   });
 });

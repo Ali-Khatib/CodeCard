@@ -21,7 +21,7 @@ export function UploadProgressIndicator({
 }: UploadProgressIndicatorProps) {
   const determinate = stage === 'uploading' && typeof percent === 'number';
   const clamped = clampUploadPercent(percent);
-  const showBar = stage === 'uploading' || stage === 'finalizing';
+  const showBar = stage === 'uploading' || stage === 'finalizing' || stage === 'optimizing';
 
   if (!showBar && stage !== 'authorizing' && stage !== 'validating') {
     return null;
@@ -43,7 +43,11 @@ export function UploadProgressIndicator({
             ? { 'aria-valuenow': clamped, 'aria-valuetext': `${clamped}% transferred` }
             : {
                 'aria-valuetext':
-                  stage === 'finalizing' ? 'Finalizing upload' : 'Uploading, progress unknown',
+                  stage === 'finalizing'
+                    ? 'Finalizing upload'
+                    : stage === 'optimizing'
+                      ? 'Optimizing image'
+                      : 'Uploading, progress unknown',
               })}
         >
           <div

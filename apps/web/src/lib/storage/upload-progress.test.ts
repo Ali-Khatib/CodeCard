@@ -34,6 +34,7 @@ describe('upload failure classification', () => {
 
 describe('upload progress helpers', () => {
   it('labels stages without inventing percentages', () => {
+    expect(stageLabel('optimizing')).toBe('Optimizing image…');
     expect(stageLabel('authorizing')).toContain('authorization');
     expect(stageLabel('uploading')).toBe('Uploading image…');
     expect(stageLabel('uploading', { percent: 42 })).toBe('Uploading image… 42%');
@@ -46,7 +47,8 @@ describe('upload progress helpers', () => {
     expect(clampUploadPercent(null)).toBeNull();
   });
 
-  it('identifies active stages', () => {
+  it('identifies active stages including optimizing', () => {
+    expect(isActiveUploadStage('optimizing')).toBe(true);
     expect(isActiveUploadStage('uploading')).toBe(true);
     expect(isActiveUploadStage('finalizing')).toBe(true);
     expect(isActiveUploadStage('complete')).toBe(false);

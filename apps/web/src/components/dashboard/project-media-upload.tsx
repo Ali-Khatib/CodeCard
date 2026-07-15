@@ -43,6 +43,7 @@ function normalizeStage(phase: string): UploadStage {
   if (
     phase === 'idle' ||
     phase === 'validating' ||
+    phase === 'optimizing' ||
     phase === 'authorizing' ||
     phase === 'uploading' ||
     phase === 'finalizing' ||
@@ -94,6 +95,7 @@ export function ProjectMediaUpload({
   const [coverRetryable, setCoverRetryable] = useState(false);
   const [coverSuccess, setCoverSuccess] = useState(false);
   const [coverCleanupWarning, setCoverCleanupWarning] = useState(false);
+  const [coverOptimizationNote, setCoverOptimizationNote] = useState<string | null>(null);
 
   const [localScreenshots, setLocalScreenshots] = useState<LocalScreenshotSelection[]>([]);
   const [deletingAssetId, setDeletingAssetId] = useState<string | null>(null);
@@ -196,6 +198,7 @@ export function ProjectMediaUpload({
     setCoverRetryable(false);
     setCoverSuccess(false);
     setCoverCleanupWarning(false);
+    setCoverOptimizationNote(null);
     setCoverProgress(null);
 
     const file = coverFile;
@@ -250,10 +253,11 @@ export function ProjectMediaUpload({
       type: 'poster',
       storage_path: result.path,
       mime_type: file.type,
-      file_size: file.size,
+      file_size: result.uploadFileBytes ?? file.size,
       sort_order: 0,
     });
     setCoverCleanupWarning(Boolean(result.cleanupWarning));
+    setCoverOptimizationNote(result.optimizationNote ?? null);
     setCoverSuccess(true);
     setCoverStage('complete');
     setCoverProgress(null);
@@ -261,6 +265,7 @@ export function ProjectMediaUpload({
 
     window.setTimeout(() => {
       setCoverSuccess(false);
+      setCoverOptimizationNote(null);
       setCoverStage('idle');
     }, 2500);
   }, [coverFile, coverPending, coverPreviewUrl, disabled, projectId, router]);
@@ -357,7 +362,7 @@ export function ProjectMediaUpload({
           item.id === selection.id
             ? {
                 ...item,
-                stage: 'authorizing',
+                stage: 'optimizing',
                 error: undefined,
                 progressPercent: null,
                 retryable: undefined,
@@ -615,7 +620,9 @@ export function ProjectMediaUpload({
               (coverSuccess
                 ? coverCleanupWarning
                   ? messageForUploadFailure('cleanup_warning')
-                  : 'Cover saved.'
+                  : coverOptimizationNote
+                    ? `Cover saved. ${coverOptimizationNote}.`
+                    : 'Cover saved.'
                 : coverCleanupWarning
                   ? messageForUploadFailure('cleanup_warning')
                   : '')}

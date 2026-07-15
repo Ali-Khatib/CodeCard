@@ -29,6 +29,7 @@ function normalizeStage(phase: string): UploadStage {
   if (
     phase === 'idle' ||
     phase === 'validating' ||
+    phase === 'optimizing' ||
     phase === 'authorizing' ||
     phase === 'uploading' ||
     phase === 'finalizing' ||
@@ -63,6 +64,7 @@ export function AvatarUpload({
   const [retryable, setRetryable] = useState(false);
   const [success, setSuccess] = useState(false);
   const [cleanupWarning, setCleanupWarning] = useState(false);
+  const [optimizationNote, setOptimizationNote] = useState<string | null>(null);
 
   const pending = isActiveUploadStage(stage);
   const displayUrl = previewUrl ?? savedAvatarUrl;
@@ -158,6 +160,7 @@ export function AvatarUpload({
     setRetryable(false);
     setSuccess(false);
     setCleanupWarning(false);
+    setOptimizationNote(null);
     setProgressPercent(null);
 
     const file = selectedFile;
@@ -204,6 +207,7 @@ export function AvatarUpload({
 
     setSavedAvatarUrl(result.avatarUrl);
     setCleanupWarning(Boolean(result.cleanupWarning));
+    setOptimizationNote(result.optimizationNote ?? null);
     setSuccess(true);
     setStage('complete');
     setProgressPercent(null);
@@ -212,6 +216,7 @@ export function AvatarUpload({
 
     window.setTimeout(() => {
       setSuccess(false);
+      setOptimizationNote(null);
       setStage('idle');
     }, 2500);
   }, [disabled, onAvatarSaved, pending, revokePreviewUrl, router, selectedFile]);
@@ -223,7 +228,9 @@ export function AvatarUpload({
       : pending
         ? stageLabel(stage, { percent: progressPercent })
         : success
-          ? 'Avatar saved.'
+          ? optimizationNote
+            ? `Avatar saved. ${optimizationNote}.`
+            : 'Avatar saved.'
           : '');
 
   return (

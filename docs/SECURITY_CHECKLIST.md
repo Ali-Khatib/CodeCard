@@ -2,7 +2,7 @@
 
 Use before production deploys and audience expansion. Companion assessment: [`WS04_T013_UPLOAD_SECURITY_DECISION.md`](./WS04_T013_UPLOAD_SECURITY_DECISION.md).
 
-Client-side image resizing/compression (WS04-T012), if present, is a **performance** optimization only. It does **not** replace MIME, extension, size, ownership, RLS, rate-limit, or malware decisions.
+Client-side image resizing/compression (WS04-T012) is a **performance** optimization only. It does **not** replace MIME, extension, size, ownership, RLS, rate-limit, or malware decisions. See [`CLIENT_IMAGE_OPTIMIZATION.md`](./CLIENT_IMAGE_OPTIMIZATION.md).
 
 ---
 
@@ -68,8 +68,9 @@ Scaffolding only (not approved live product features until separately gated):
 |-------|--------|---------------------|---------------------|
 | App / schemas | 5 MB | 10 MB | 50 MB |
 | Storage buckets | 5 MB (`avatars`); 50 MB (`project-media`) | 10 MB (`private-docs`) | included in project-media cap |
+| Client dimension cap (WS04-T012) | max 2000×2000 before upload (performance only) | — | — |
 
-Server validates declared size at signed-upload authorization; buckets enforce object size.
+Server validates declared size at signed-upload authorization; buckets enforce object size. Client resize does not expand the MIME allowlist.
 
 ### MIME / extension enforcement
 

@@ -36,6 +36,20 @@ export const FILE_LIMITS = {
   },
 } as const;
 
+/**
+ * Client-side image resize/re-encode before signed upload (WS04-T012).
+ * Performance only — not a security control. Live allowlist matches upload schemas (no AVIF/SVG).
+ */
+export const IMAGE_UPLOAD_OPTIMIZATION = {
+  maxWidth: 2000,
+  maxHeight: 2000,
+  /** Restrained JPEG quality (~0.88–0.92 band). */
+  jpegQuality: 0.9,
+  /** Restrained WebP quality (~0.88–0.92 band). */
+  webpQuality: 0.9,
+  mimeTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
+} as const;
+
 export const RATE_LIMITS = {
   auth: { requests: 10, window: '1 m' as const },
   profileLookup: { requests: 60, window: '1 m' as const },

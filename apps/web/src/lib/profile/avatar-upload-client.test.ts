@@ -124,12 +124,70 @@ describe('uploadAvatarToSignedUrl', () => {
 });
 
 describe('executeAvatarUploadFlow', () => {
+  const skipOptimize = async (file: File) =>
+    ({
+      ok: true as const,
+      file,
+      transformed: false,
+      originalWidth: 100,
+      originalHeight: 100,
+      outputWidth: 100,
+      outputHeight: 100,
+      originalBytes: file.size,
+      outputBytes: file.size,
+      mimeType: file.type,
+      skippedReason: 'within_limits' as const,
+    });
+
+  it('runs optimizing before authorizing and uses transformed metadata for authorization', async () => {
+    const phases: string[] = [];
+    const original = makeFile('avatar.png', 'image/png', 4096);
+    const optimized = makeFile('avatar-optimized.png', 'image/png', 1024);
+    let authorizedSize: number | null = null;
+    let uploadedSize: number | null = null;
+
+    const result = await executeAvatarUploadFlow({
+      file: original,
+      optimizeImage: async () => ({
+        ok: true,
+        file: optimized,
+        transformed: true,
+        originalWidth: 4000,
+        originalHeight: 3000,
+        outputWidth: 2000,
+        outputHeight: 1500,
+        originalBytes: original.size,
+        outputBytes: optimized.size,
+        mimeType: 'image/png',
+      }),
+      onPhaseChange: (phase) => phases.push(phase),
+      requestInit: async (file) => {
+        authorizedSize = file.size;
+        return { ok: true, init: { ...initResponse, mimeType: file.type } };
+      },
+      uploadToStorage: async (_init, file) => {
+        uploadedSize = file.size;
+        return { ok: true };
+      },
+      finalizeUpload: async () => ({ success: true, avatarUrl: 'https://example.supabase.co/public/avatar.png' }),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(phases).toEqual(['optimizing', 'authorizing', 'uploading', 'finalizing', 'complete']);
+    expect(authorizedSize).toBe(1024);
+    expect(uploadedSize).toBe(1024);
+    if (result.ok) {
+      expect(result.optimizationNote).toContain('Optimized from');
+    }
+  });
+
   it('runs authorizing, uploading, finalizing, and complete stages in order', async () => {
     const phases: string[] = [];
     const file = makeFile('avatar.png', 'image/png', 1024);
 
     const result = await executeAvatarUploadFlow({
       file,
+      optimizeImage: skipOptimize,
       onPhaseChange: (phase) => phases.push(phase),
       requestInit: async () => ({ ok: true, init: initResponse }),
       uploadToStorage: async () => ({ ok: true }),
@@ -137,7 +195,7 @@ describe('executeAvatarUploadFlow', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
+    expect(phases).toEqual(['optimizing', 'authorizing', 'uploading', 'finalizing', 'complete']);
   });
 
   it('keeps 100% transfer separate from finalizing success', async () => {
@@ -146,6 +204,7 @@ describe('executeAvatarUploadFlow', () => {
 
     const result = await executeAvatarUploadFlow({
       file: makeFile('avatar.png', 'image/png', 1024),
+      optimizeImage: skipOptimize,
       onPhaseChange: (phase) => phases.push(phase),
       onProgress: (progress) => {
         if (progress.percent === 100) {
@@ -163,13 +222,14 @@ describe('executeAvatarUploadFlow', () => {
 
     expect(result.ok).toBe(true);
     expect(sawUploadProgress).toBe(true);
-    expect(phases).toEqual(['authorizing', 'uploading', 'finalizing', 'complete']);
+    expect(phases).toEqual(['optimizing', 'authorizing', 'uploading', 'finalizing', 'complete']);
   });
 
   it('does not finalize when storage upload fails and marks retryable network failures', async () => {
     const finalizeUpload = vi.fn();
     const result = await executeAvatarUploadFlow({
       file: makeFile('avatar.png', 'image/png', 1024),
+      optimizeImage: skipOptimize,
       requestInit: async () => ({ ok: true, init: initResponse }),
       uploadToStorage: async () => ({
         ok: false,
@@ -190,6 +250,7 @@ describe('executeAvatarUploadFlow', () => {
   it('does not report success when finalization fails', async () => {
     const result = await executeAvatarUploadFlow({
       file: makeFile('avatar.png', 'image/png', 1024),
+      optimizeImage: skipOptimize,
       requestInit: async () => ({ ok: true, init: initResponse }),
       uploadToStorage: async () => ({ ok: true }),
       finalizeUpload: async () => ({ success: false, error: 'Could not save your avatar. Please try again.' }),
@@ -205,6 +266,7 @@ describe('executeAvatarUploadFlow', () => {
   it('marks validation failures as non-retryable', async () => {
     const result = await executeAvatarUploadFlow({
       file: makeFile('avatar.svg', 'image/svg+xml', 100),
+      optimizeImage: skipOptimize,
       requestInit: async () => ({ ok: true, init: initResponse }),
       uploadToStorage: async () => ({ ok: true }),
       finalizeUpload: async () => ({ success: true, avatarUrl: 'https://example/x.png' }),
