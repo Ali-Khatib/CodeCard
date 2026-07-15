@@ -190,7 +190,7 @@ describe('executeCreateResearch', () => {
 
     expect(result.success).toBe(true);
     expect(result.researchPaperId).toBe('paper-new');
-    expect(result.redirectTo).toBe('/dashboard/research');
+    expect(result.redirectTo).toBe('/dashboard/research/paper-new/edit');
     expect(insertedPayload()?.is_published).toBe(false);
     expect(insertedPayload()?.owner_user_id).toBe('user-1');
     expect(insertedPayload()?.profile_id).toBe('profile-1');

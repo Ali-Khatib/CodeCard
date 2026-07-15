@@ -4,6 +4,8 @@ import {
   resolveAuthenticatedUser,
   type AuthUser,
 } from '@/lib/research/research-access-core';
+import { listTrustedResearchFigureStoragePaths } from '@/lib/research/research-figure-core';
+import { bestEffortRemoveTrustedStorageObject } from '@/lib/storage/storage-cleanup';
 
 export type ResearchDeleteState = {
   success?: boolean;
@@ -15,6 +17,7 @@ export type ResearchDeleteState = {
   profileSlug?: string | null;
   wasPublished?: boolean;
   redirectTo?: string;
+  cleanupWarning?: boolean;
 };
 
 /**
@@ -22,9 +25,10 @@ export type ResearchDeleteState = {
  *
  * Idempotency: if the paper is already gone or not visible to this owner,
  * return a safe already-removed success without revealing whether a foreign
- * paper exists. Related projects and external URLs are never deleted.
- * research_figures cascade via FK. CodeCard storage cleanup is N/A until
- * research PDF/figure uploads land (WS04-T007/T008).
+ * paper exists. Related projects and external PDF URLs are never deleted remotely.
+ * research_figures cascade via FK after the paper row is removed.
+ * CodeCard-owned figure objects are cleaned up best-effort beforehand;
+ * residual orphans remain WS04-T010.
  */
 export async function executeDeleteResearch(
   supabase: SupabaseClient,
@@ -63,6 +67,13 @@ export async function executeDeleteResearch(
 
   const { paper, profile } = owned;
 
+  const figurePaths = await listTrustedResearchFigureStoragePaths(
+    supabase,
+    paper.id,
+    paper,
+    auth.user.id,
+  );
+
   const { error } = await supabase
     .from('research_papers')
     .delete()
@@ -76,6 +87,17 @@ export async function executeDeleteResearch(
     };
   }
 
+  let cleanupWarning = false;
+  for (const path of figurePaths) {
+    const cleanup = await bestEffortRemoveTrustedStorageObject(supabase, {
+      resourceType: 'research-figure',
+      path,
+    });
+    if (!cleanup.cleaned) {
+      cleanupWarning = true;
+    }
+  }
+
   return {
     success: true,
     researchPaperId: paper.id,
@@ -83,7 +105,9 @@ export async function executeDeleteResearch(
     profileSlug: profile.slug,
     wasPublished: paper.is_published,
     redirectTo: '/dashboard/research',
+    cleanupWarning: cleanupWarning || undefined,
   };
 }
 
+/** Figure object cleanup is best-effort; orphans remain for WS04-T010. */
 export const RESEARCH_DELETE_STORAGE_DEFERRED = true;

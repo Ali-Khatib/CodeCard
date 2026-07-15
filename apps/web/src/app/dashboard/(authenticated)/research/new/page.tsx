@@ -49,8 +49,8 @@ export default async function NewResearchPage() {
           Add a research paper
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Create a draft paper with core details. You can optionally link one of your projects. PDF
-          uploads and figures come later.
+          Create the paper first, then add its PDF and figures. After saving, you can attach an
+          external HTTPS paper link and upload research figures on the edit page.
         </p>
       </div>
       <ResearchCreateForm relatedProjectOptions={relatedProjectOptions} />

@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import { ResearchEditForm } from '@/components/dashboard/research-edit-form';
 import { ResearchDeleteDialog } from '@/components/dashboard/research-delete-dialog';
 import { ResearchPublishControls } from '@/components/dashboard/research-publish-controls';
+import { ResearchMediaSection } from '@/components/dashboard/research-media-section';
 import { loadOwnedResearchPaper } from '@/lib/research/research-access-core';
+import { loadOwnedResearchFigures } from '@/lib/research/research-figure-core';
 import { researchRecordToFormValues } from '@/lib/research/research-form';
 import { loadOwnedProjectsForResearchPicker } from '@/lib/research/research-related-project';
 import { createClient } from '@/lib/supabase/server';
@@ -38,6 +40,12 @@ export default async function EditResearchPage({
     tenantId: loaded.profile.tenant_id,
   });
 
+  const figuresResult = await loadOwnedResearchFigures(supabase, {
+    userId: user.id,
+    researchPaperId: id,
+  });
+  const figures = 'figures' in figuresResult ? figuresResult.figures : [];
+
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
@@ -48,8 +56,8 @@ export default async function EditResearchPage({
           {loaded.paper.title}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Update core details for this paper. Use the visibility controls below to publish or
-          unpublish.
+          Update paper details, publication, related project, then manage external PDF links and
+          research figures below.
         </p>
       </div>
       <ResearchEditForm
@@ -64,6 +72,11 @@ export default async function EditResearchPage({
         isPublished={loaded.paper.is_published}
         profileIsPublic={loaded.profile.is_public}
         profileSlug={loaded.profile.slug}
+      />
+      <ResearchMediaSection
+        researchPaperId={id}
+        pdfUrl={loaded.paper.pdf_url}
+        figures={figures}
       />
       <ResearchDeleteDialog researchPaperId={id} paperTitle={loaded.paper.title} />
     </div>

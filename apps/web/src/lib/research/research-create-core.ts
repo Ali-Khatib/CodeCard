@@ -297,6 +297,6 @@ export async function executeCreateResearch(
     success: true,
     researchPaperId: paper.id as string,
     slug: paper.slug as string,
-    redirectTo: '/dashboard/research',
+    redirectTo: `/dashboard/research/${paper.id}/edit`,
   };
 }
