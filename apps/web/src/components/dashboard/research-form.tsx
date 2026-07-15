@@ -2,10 +2,16 @@
 
 import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createResearchAction, type ResearchCreateState } from '@/app/actions/research';
+import {
+  createResearchAction,
+  updateResearchAction,
+  type ResearchCreateState,
+  type ResearchUpdateState,
+} from '@/app/actions/research';
 import { handleSessionExpired } from '@/lib/auth/session-expiry';
 import {
   buildCreateResearchFormData,
+  buildUpdateResearchFormData,
   createEmptyResearchFormValues,
   RESEARCH_FORM_LIMITS,
   suggestResearchSlugFromTitle,
@@ -17,6 +23,7 @@ import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { cn } from '@/lib/cn';
 
 const initialCreateState: ResearchCreateState = {};
+const initialUpdateState: ResearchUpdateState = {};
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -57,13 +64,21 @@ function GhostButton({
 
 export function ResearchForm({
   mode,
+  researchPaperId,
   initialValues,
+  isPublished = false,
 }: {
   mode: ResearchFormMode;
+  researchPaperId?: string;
   initialValues?: ResearchFormValues;
+  isPublished?: boolean;
 }) {
   const router = useRouter();
   const formId = useId();
+  const editPath =
+    mode === 'edit' && researchPaperId
+      ? `/dashboard/research/${researchPaperId}/edit`
+      : '/dashboard/research/new';
   const slugInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
   const completedRef = useRef(false);
@@ -72,26 +87,41 @@ export function ResearchForm({
   );
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [clientError, setClientError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [createState, createAction, createPending] = useActionState(
     createResearchAction,
     initialCreateState,
   );
+  const [updateState, updateAction, updatePending] = useActionState(
+    updateResearchAction,
+    initialUpdateState,
+  );
 
-  const state = createState;
-  const pending = createPending;
+  const state = mode === 'edit' ? updateState : createState;
+  const pending = mode === 'edit' ? updatePending : createPending;
   const fieldErrors = state.fieldErrors ?? {};
 
   useEffect(() => {
-    if (mode !== 'create' || !state.success || !state.redirectTo) return;
+    if (mode !== 'create' || !state.success || !('redirectTo' in state) || !state.redirectTo) {
+      return;
+    }
     completedRef.current = true;
     router.push(state.redirectTo);
   }, [mode, state, router]);
 
   useEffect(() => {
+    if (mode !== 'edit' || !state.success) return;
+    setSaveSuccess(true);
+    router.refresh();
+    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [mode, state.success, router]);
+
+  useEffect(() => {
     if (state.errorCode === 'auth') {
-      handleSessionExpired('/dashboard/research/new');
+      handleSessionExpired(editPath);
     }
-  }, [state.errorCode]);
+  }, [state.errorCode, editPath]);
 
   useEffect(() => {
     if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
@@ -132,19 +162,19 @@ export function ResearchForm({
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (mode !== 'create') {
-      event.preventDefault();
+    event.preventDefault();
+
+    if (submitLockRef.current || pending || (mode === 'create' && completedRef.current)) {
       return;
     }
 
-    if (submitLockRef.current || pending || completedRef.current) {
-      event.preventDefault();
+    if (mode === 'edit' && !researchPaperId) {
+      setClientError('Research paper is missing.');
       return;
     }
 
     const clientMessage = validateResearchFormClient(form);
     if (clientMessage) {
-      event.preventDefault();
       setClientError(clientMessage);
       return;
     }
@@ -152,20 +182,15 @@ export function ResearchForm({
     setClientError('');
     submitLockRef.current = true;
 
-    const fd = buildCreateResearchFormData(form);
-    event.preventDefault();
-    createAction(fd);
+    if (mode === 'edit' && researchPaperId) {
+      updateAction(buildUpdateResearchFormData(researchPaperId, form));
+    } else {
+      createAction(buildCreateResearchFormData(form));
+    }
+
     window.setTimeout(() => {
       submitLockRef.current = false;
     }, 400);
-  }
-
-  if (mode === 'edit') {
-    return (
-      <p className="text-[15px] text-[var(--app-smoke)]" role="status">
-        Research editing will be available in a later step.
-      </p>
-    );
   }
 
   const generalError = clientError || (!state.fieldErrors ? state.error : undefined);
@@ -176,8 +201,19 @@ export function ResearchForm({
       className="mx-auto max-w-[720px] space-y-6"
       aria-busy={pending}
       data-testid="research-form"
+      data-mode={mode}
       noValidate
     >
+      {mode === 'edit' ? (
+        <div
+          className="rounded-xl border border-[var(--app-border)] bg-[var(--app-surface,white)] px-3 py-2 text-[13px] text-[var(--app-smoke)]"
+          role="status"
+        >
+          Visibility: <strong className="text-[var(--app-ink)]">{isPublished ? 'Published' : 'Draft'}</strong>
+          . Publishing controls arrive in the next step. Saving this form does not change visibility.
+        </div>
+      ) : null}
+
       <div className="space-y-2">
         <label htmlFor={`${formId}-title`} className="block text-[14px] font-medium text-[var(--app-ink)]">
           Title
@@ -312,7 +348,10 @@ export function ResearchForm({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-publication-status`} className="block text-[14px] font-medium text-[var(--app-ink)]">
+        <label
+          htmlFor={`${formId}-publication-status`}
+          className="block text-[14px] font-medium text-[var(--app-ink)]"
+        >
           Publication status
         </label>
         <input
@@ -390,8 +429,20 @@ export function ResearchForm({
         </p>
       ) : null}
 
+      {saveSuccess ? (
+        <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[14px] text-emerald-800" role="status">
+          Research paper saved.
+        </p>
+      ) : null}
+
       <p className="text-[13px] text-[var(--app-smoke)]" role="status" aria-live="polite">
-        {pending ? 'Creating research paper…' : 'New papers stay unpublished until you choose to publish later.'}
+        {pending
+          ? mode === 'edit'
+            ? 'Saving research paper…'
+            : 'Creating research paper…'
+          : mode === 'edit'
+            ? 'Saving updates does not publish or unpublish this paper.'
+            : 'New papers stay unpublished until you choose to publish later.'}
       </p>
 
       <div className="flex flex-wrap gap-3">
@@ -401,7 +452,13 @@ export function ResearchForm({
           aria-busy={pending}
           className="cc-app-btn cc-app-btn--primary disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {pending ? 'Creating…' : 'Create research paper'}
+          {pending
+            ? mode === 'edit'
+              ? 'Saving…'
+              : 'Creating…'
+            : mode === 'edit'
+              ? 'Save changes'
+              : 'Create research paper'}
         </button>
         <AppButton href="/dashboard/research">Cancel</AppButton>
       </div>
