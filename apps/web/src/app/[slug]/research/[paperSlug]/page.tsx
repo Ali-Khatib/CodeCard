@@ -8,6 +8,7 @@ import {
   PUBLIC_RESEARCH_PAPER_SELECT,
   toPublicResearchPaper,
 } from '@/lib/research/research-public';
+import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
 
 interface PageProps {
   params: Promise<{ slug: string; paperSlug: string }>;
@@ -74,10 +75,11 @@ export default async function ResearchDetailPage({ params }: PageProps) {
 
   if (!paper) notFound();
 
-  // PostgREST embed is a single object; generated client types may widen to an array.
+  const resolveFigureUrl = createResearchFigureUrlResolver(supabase);
   const publicPaper = toPublicResearchPaper(
     paper as unknown as Parameters<typeof toPublicResearchPaper>[0],
     slug,
+    resolveFigureUrl,
   );
 
   return (

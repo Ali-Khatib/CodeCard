@@ -41,6 +41,8 @@ function maxBytesForResourceType(resourceType: StorageResourceType): number {
       return Math.max(FILE_LIMITS.image.maxBytes, FILE_LIMITS.video.maxBytes);
     case 'private-doc':
       return FILE_LIMITS.document.maxBytes;
+    case 'research-figure':
+      return FILE_LIMITS.image.maxBytes;
     default:
       return FILE_LIMITS.image.maxBytes;
   }
@@ -61,6 +63,8 @@ function allowedMimeTypesForResourceType(
       return [...FILE_LIMITS.image.mimeTypes, ...FILE_LIMITS.video.mimeTypes];
     case 'private-doc':
       return FILE_LIMITS.document.mimeTypes;
+    case 'research-figure':
+      return PROJECT_MEDIA_IMAGE_MIME_TYPES;
     default:
       return FILE_LIMITS.image.mimeTypes;
   }

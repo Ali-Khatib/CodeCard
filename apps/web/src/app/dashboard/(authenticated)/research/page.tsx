@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { DashboardResearchView } from '@/components/dashboard/dashboard-research-view';
 import { normalizeResearchPaper } from '@/lib/research/research';
+import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
 
 export default async function ResearchPage() {
   const supabase = await createClient();
@@ -20,9 +21,13 @@ export default async function ResearchPage() {
     .eq('profile_id', profile?.id ?? '')
     .order('sort_order', { ascending: true });
 
+  const resolveFigureUrl = createResearchFigureUrlResolver(supabase);
+
   return (
     <DashboardResearchView
-      papers={(papers ?? []).map((paper) => normalizeResearchPaper(paper, profile?.slug ?? undefined))}
+      papers={(papers ?? []).map((paper) =>
+        normalizeResearchPaper(paper, profile?.slug ?? undefined, { resolveFigureUrl }),
+      )}
       profileSlug={profile?.slug}
       profileId={profile?.id}
     />

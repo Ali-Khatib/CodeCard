@@ -63,6 +63,10 @@ export async function resolveUploadOwnership(
     };
   }
 
+  if (resourceType !== 'research-figure' && resourceType !== 'private-doc') {
+    return { ok: false, status: 400, message: 'Unsupported resource type.' };
+  }
+
   const { data: paper } = await supabase
     .from('research_papers')
     .select('id, tenant_id, owner_user_id')

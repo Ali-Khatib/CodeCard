@@ -167,6 +167,7 @@ export interface ResearchFigure {
   tenant_id: UUID;
   research_paper_id: UUID;
   image_url: string;
+  storage_path: string | null;
   caption: string | null;
   sort_order: number;
   created_at: string;

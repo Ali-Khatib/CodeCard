@@ -44,6 +44,7 @@ export async function removeTrustedStorageObject(
   if (
     (input.resourceType === 'avatar' && bucket !== STORAGE_BUCKETS.avatars) ||
     (input.resourceType === 'project-media' && bucket !== STORAGE_BUCKETS.projectMedia) ||
+    (input.resourceType === 'research-figure' && bucket !== STORAGE_BUCKETS.projectMedia) ||
     (input.resourceType === 'private-doc' && bucket !== STORAGE_BUCKETS.privateDocs)
   ) {
     return { ok: false, reason: 'invalid_path' };

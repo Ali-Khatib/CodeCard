@@ -32,6 +32,20 @@ describe('buildCanonicalStoragePath', () => {
     expect(result.path.split('/')).toHaveLength(5);
   });
 
+  it('maps research-figure to the project-media bucket with image extensions only', () => {
+    const figure = buildCanonicalStoragePath({
+      tenantId,
+      ownerUserId,
+      resourceType: 'research-figure',
+      resourceId,
+      extension: 'png',
+    });
+    expect(figure.bucket).toBe(STORAGE_BUCKETS.projectMedia);
+    expect(figure.path).toContain('/research-figure/');
+    expect(isAllowedStorageExtension('research-figure', 'pdf')).toBe(false);
+    expect(isAllowedStorageExtension('research-figure', 'png')).toBe(true);
+  });
+
   it('maps project-media and private-doc resource types to the correct buckets', () => {
     const project = buildCanonicalStoragePath({
       tenantId,

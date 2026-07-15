@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
-import { normalizeResearchPaper, type ResearchPaper } from '@/lib/research/research';
+import {
+  normalizeResearchPaper,
+  type ResearchFigureDisplayResolver,
+  type ResearchPaper,
+} from '@/lib/research/research';
 
 export const PUBLIC_RESEARCH_PAPER_SELECT =
-  'id, slug, title, abstract, authors, venue, publication_status, year, pdf_url, doi_url, citation_text, tags, cover_image_url, related_project_id, research_figures(id, image_url, caption, sort_order), related_project:related_project_id(id, title, is_published)';
+  'id, slug, title, abstract, authors, venue, publication_status, year, pdf_url, doi_url, citation_text, tags, cover_image_url, related_project_id, research_figures(id, image_url, storage_path, caption, sort_order), related_project:related_project_id(id, title, is_published)';
 
 export function truncatePlainText(value: string, maxLength: number): string {
   const normalized = value.replace(/\s+/g, ' ').trim();
@@ -42,8 +46,11 @@ export function buildPublicResearchMetadata(input: {
 export function toPublicResearchPaper(
   paper: Parameters<typeof normalizeResearchPaper>[0],
   profileSlug: string,
+  resolveFigureUrl?: ResearchFigureDisplayResolver,
 ): ResearchPaper {
-  return normalizeResearchPaper(paper, profileSlug);
+  return normalizeResearchPaper(paper, profileSlug, {
+    resolveFigureUrl,
+  });
 }
 
 /** Fields that must never appear on the public research client payload. */
@@ -55,4 +62,5 @@ export const FORBIDDEN_PUBLIC_RESEARCH_KEYS = [
   'sort_order',
   'created_at',
   'updated_at',
+  'storage_path',
 ] as const;
