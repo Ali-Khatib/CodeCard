@@ -5,6 +5,7 @@ import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
 import { createProjectMediaUrlResolver } from '@/lib/projects/project-media-url';
 import { normalizeResearchPaper } from '@/lib/research/research';
+import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 type ResearchPaperRow = Parameters<typeof normalizeResearchPaper>[0] & {
   is_published: boolean;
   sort_order: number;
+  created_at?: string | null;
 };
 
 export default async function OwnerProfilePreviewPage() {
@@ -65,10 +67,9 @@ export default async function OwnerProfilePreviewPage() {
       normalizeFeaturedProject(project, { resolveStoragePath: resolveMediaUrl }),
   );
   const researchRows = (profile.research_papers ?? []) as ResearchPaperRow[];
-  const publishedResearch = researchRows
-    .filter((p: ResearchPaperRow) => p.is_published)
-    .sort((a: ResearchPaperRow, b: ResearchPaperRow) => a.sort_order - b.sort_order)
-    .map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, profile.slug));
+  const publishedResearch = sortResearchBySortOrder(
+    researchRows.filter((p: ResearchPaperRow) => p.is_published),
+  ).map((paper: ResearchPaperRow) => normalizeResearchPaper(paper, profile.slug));
 
   const links: ProfileLinkItem[] = (profile.profile_links ?? [])
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)

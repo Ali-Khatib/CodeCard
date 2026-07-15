@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
+import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
 export function DashboardResearchView({
@@ -15,6 +16,7 @@ export function DashboardResearchView({
   profileId?: string;
 }) {
   const baseProfileHref = profileSlug ? `/${profileSlug}` : null;
+  const orderedPaperIds = papers.map((paper) => paper.id);
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -33,7 +35,14 @@ export function DashboardResearchView({
         <div className="flex flex-col gap-8">
           {papers.map((paper, index) => (
             <div key={paper.id} className="space-y-3">
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <ResearchReorderToolbar
+                  paperId={paper.id}
+                  paperTitle={paper.title}
+                  index={index}
+                  total={papers.length}
+                  orderedPaperIds={orderedPaperIds}
+                />
                 <Link
                   href={`/dashboard/research/${paper.id}/edit`}
                   className="cc-app-btn cc-app-btn--ghost text-[13px]"
