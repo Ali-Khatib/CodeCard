@@ -37,9 +37,10 @@ describe('dashboard new research route', () => {
     expect(form).toContain('Venue');
     expect(form).toContain('Year');
     expect(form).toContain('DOI');
-    expect(form).toContain('Paper URL');
+    expect(form).toContain('External paper URL');
     expect(form).toContain('Citation text');
     expect(form).not.toContain('is_published');
+    expect(form).toContain('Private PDF uploads stay disabled');
     expect(form).not.toContain('sort_order');
     expect(form).toContain('related-project');
     expect(form).toContain('No related project');

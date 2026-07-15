@@ -78,6 +78,8 @@ describe('dashboard research edit route', () => {
     expect(page).toContain('ResearchEditForm');
     expect(page).toContain('ResearchDeleteDialog');
     expect(page).toContain('ResearchPublishControls');
+    expect(page).toContain('ResearchMediaSection');
+    expect(page).toContain('loadOwnedResearchFigures');
     expect(page).toContain('notFound()');
     expect(page).not.toContain('mock');
   });

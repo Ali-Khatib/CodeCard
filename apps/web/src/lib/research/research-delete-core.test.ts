@@ -83,6 +83,17 @@ function createMockSupabase(options: {
       };
     }
 
+    if (table === 'research_figures') {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn().mockResolvedValue({
+            data: [],
+            error: null,
+          }),
+        })),
+      };
+    }
+
     throw new Error(`Unexpected table ${table}`);
   });
 
