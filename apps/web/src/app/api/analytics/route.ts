@@ -16,7 +16,6 @@ export async function POST(request: Request) {
       section_name,
       metadata,
       source,
-      referrer,
       session_id,
     } = data;
 
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
         tenant_id: profile.tenant_id,
         profile_id,
         source,
-        referrer,
+        referrer: null,
         session_id,
       });
 

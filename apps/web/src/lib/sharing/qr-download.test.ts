@@ -40,7 +40,7 @@ describe('WS07-T004 QR PNG download', () => {
     expect(hasPngSignature(new Uint8Array([1, 2, 3]))).toBe(false);
   });
 
-  it('encodes the same canonical URL as preview', async () => {
+  it('encodes the same QR-tagged URL as preview', async () => {
     const env = {
       NODE_ENV: 'test',
       NEXT_PUBLIC_APP_URL: 'https://codecard.app',
@@ -54,7 +54,7 @@ describe('WS07-T004 QR PNG download', () => {
     expect(preview.ok && download.ok).toBe(true);
     if (!preview.ok || !download.ok) return;
 
-    expect(preview.url).toBe('https://codecard.app/jane-doe');
+    expect(preview.url).toBe('https://codecard.app/jane-doe?source=qr');
     expect(download.url).toBe(preview.url);
     expect(readQrSegmentPayload(preview.url)).toBe(preview.url);
     expect(readQrSegmentPayload(download.url)).toBe(download.url);
