@@ -65,6 +65,7 @@ describe('buildCreateResearchFormData', () => {
       pdf_url: 'https://example.com/paper.pdf',
       citation_text: 'Ada et al.',
       tags: ['ml'],
+      related_project_id: '33333333-3333-4333-8333-333333333333',
     });
 
     expect(fd.get('title')).toBe('Graph Neural Nets');
@@ -77,11 +78,11 @@ describe('buildCreateResearchFormData', () => {
     expect(fd.get('pdf_url')).toBe('https://example.com/paper.pdf');
     expect(fd.get('citation_text')).toBe('Ada et al.');
     expect(fd.getAll('tags')).toEqual(['ml']);
+    expect(fd.get('related_project_id')).toBe('33333333-3333-4333-8333-333333333333');
     expect(fd.get('is_published')).toBeNull();
     expect(fd.get('sort_order')).toBeNull();
     expect(fd.get('owner_user_id')).toBeNull();
     expect(fd.get('profile_id')).toBeNull();
     expect(fd.get('tenant_id')).toBeNull();
-    expect(fd.get('related_project_id')).toBeNull();
   });
 });

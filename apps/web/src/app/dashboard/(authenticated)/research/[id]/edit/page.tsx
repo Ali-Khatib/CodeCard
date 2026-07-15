@@ -4,6 +4,7 @@ import { ResearchDeleteDialog } from '@/components/dashboard/research-delete-dia
 import { ResearchPublishControls } from '@/components/dashboard/research-publish-controls';
 import { loadOwnedResearchPaper } from '@/lib/research/research-access-core';
 import { researchRecordToFormValues } from '@/lib/research/research-form';
+import { loadOwnedProjectsForResearchPicker } from '@/lib/research/research-related-project';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function EditResearchPage({
@@ -31,6 +32,11 @@ export default async function EditResearchPage({
   }
 
   const initialValues = researchRecordToFormValues(loaded.paper);
+  const relatedProjectOptions = await loadOwnedProjectsForResearchPicker(supabase, {
+    userId: user.id,
+    profileId: loaded.profile.id,
+    tenantId: loaded.profile.tenant_id,
+  });
 
   return (
     <div className="cc-container cc-content py-8 md:py-12">
@@ -50,6 +56,7 @@ export default async function EditResearchPage({
         researchPaperId={id}
         initialValues={initialValues}
         isPublished={loaded.paper.is_published}
+        relatedProjectOptions={relatedProjectOptions}
       />
       <ResearchPublishControls
         researchPaperId={id}
