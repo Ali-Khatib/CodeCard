@@ -1,7 +1,7 @@
 {
   "git": {
     "deploymentEnabled": {
-      "mvp": false
+      "mvp": true
     }
   }
 }
