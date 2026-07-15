@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 function read(relativePath: string) {
@@ -33,7 +33,7 @@ describe('Auth experience polish contracts', () => {
     expect(signUp).not.toMatch(/password\s*=\s*searchParams|searchParams\.get\(['"]password/);
   });
 
-  it('uses a static Facebook-style collage with CodeCard colors', () => {
+  it('uses landing-style centered copy with floating tech icons', () => {
     const shell = read('src/components/auth/auth-shell.tsx');
     const collage = read('src/components/auth/auth-collage.tsx');
 
@@ -43,19 +43,17 @@ describe('Auth experience polish contracts', () => {
     expect(shell).toContain('lg:rounded-l-[28px]');
     expect(shell).not.toContain('slideIndex');
     expect(collage).toContain('AuthShowcaseStage');
-    expect(collage).toContain('/auth-collage/team.jpg');
-    expect(collage).toContain('/auth-collage/code.jpg');
-    expect(collage).toContain('#f7bbe6');
-    expect(collage).toContain('#c094e4');
-    expect(collage).toContain('proud of');
+    expect(collage).toContain('cc-hume-hero__float-icon');
+    expect(collage).toContain('cc-hume-gradient-text');
+    expect(collage).toContain('share in seconds');
+    expect(collage).toContain('CODECARD_TAGLINE');
+    expect(collage).toContain('Code2');
+    expect(collage).toContain('GitBranch');
     expect(collage).not.toContain('Inside the live demo');
     expect(collage).not.toContain('setInterval');
     expect(collage).not.toContain('images.unsplash.com');
-    expect(collage).not.toContain('Alex Rivera');
-
-    for (const name of ['team.jpg', 'code.jpg', 'desk.jpg', 'avatar.jpg']) {
-      expect(existsSync(resolve(process.cwd(), `public/auth-collage/${name}`))).toBe(true);
-    }
+    expect(collage).not.toContain('auth-collage/team.jpg');
+    expect(collage).not.toContain('Alex Chen');
   });
 
   it('uses accessible password toggle and reserved error space', () => {

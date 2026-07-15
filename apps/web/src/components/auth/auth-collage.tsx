@@ -1,240 +1,92 @@
 'use client';
 
-import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import {
+  Braces,
+  Cloud,
+  Code2,
+  Cpu,
+  Database,
+  GitBranch,
+  Globe,
+  Layers,
+  Terminal,
+  Workflow,
+  Zap,
+} from 'lucide-react';
 import { AuthWordmark } from '@/components/auth/auth-wordmark';
+import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
-const CARD_SHADOW = '0 22px 48px rgba(35, 35, 36, 0.14)';
+/** Same float constellation as the landing product hero. */
+const FLOAT_ICONS = [
+  { Icon: Code2, x: '12%', y: '22%', size: 30, delay: 0, duration: 9 },
+  { Icon: GitBranch, x: '86%', y: '18%', size: 32, delay: 0.6, duration: 10 },
+  { Icon: Terminal, x: '18%', y: '48%', size: 28, delay: 1.2, duration: 8.5 },
+  { Icon: Database, x: '82%', y: '55%', size: 31, delay: 0.3, duration: 11 },
+  { Icon: Cpu, x: '72%', y: '30%', size: 25, delay: 1.8, duration: 9.5 },
+  { Icon: Layers, x: '28%', y: '32%', size: 24, delay: 0.9, duration: 10.5 },
+  { Icon: Globe, x: '62%', y: '62%', size: 27, delay: 1.5, duration: 8 },
+  { Icon: Zap, x: '48%', y: '14%', size: 22, delay: 2.1, duration: 7.5 },
+  { Icon: Braces, x: '38%', y: '68%', size: 27, delay: 0.45, duration: 9.8 },
+  { Icon: Cloud, x: '90%', y: '42%', size: 30, delay: 1.05, duration: 10.8 },
+  { Icon: Workflow, x: '8%', y: '38%', size: 28, delay: 1.65, duration: 9.2 },
+] as const;
 
-/** Landing accent pair (reactor / specter). */
-const PINK = '#f7bbe6';
-const LAVENDER = '#c094e4';
-
-const MEDIA = {
-  hero: '/auth-collage/team.jpg',
-  code: '/auth-collage/code.jpg',
-  desk: '/auth-collage/desk.jpg',
-  avatar: '/auth-collage/avatar.jpg',
-};
-
-function PhotoCard({
-  src,
-  className,
-  priority = false,
-  sizes,
-  objectPosition = 'center',
-}: {
-  src: string;
-  className: string;
-  priority?: boolean;
-  sizes: string;
-  objectPosition?: string;
-}) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[28px] bg-[#efeae3] ${className}`}
-      style={{ boxShadow: CARD_SHADOW }}
-    >
-      <Image
-        src={src}
-        alt=""
-        fill
-        priority={priority}
-        sizes={sizes}
-        className="object-cover"
-        style={{ objectPosition }}
-        unoptimized
-      />
-    </div>
-  );
-}
-
-function MiniProfileCard({ className }: { className: string }) {
-  return (
-    <div
-      className={`relative flex flex-col justify-between overflow-hidden rounded-[28px] bg-white p-4 ${className}`}
-      style={{ boxShadow: CARD_SHADOW }}
-    >
-      <div className="flex items-center gap-3">
-        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#efeae3]">
-          <Image
-            src={MEDIA.avatar}
-            alt=""
-            fill
-            sizes="44px"
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-[14px] font-semibold text-[#17171a]">Alex Chen</p>
-          <p className="truncate text-[12px] text-[#7a7876]">AI Engineer</p>
-        </div>
-      </div>
-      <div className="mt-4 space-y-2">
-        <div
-          className="h-2.5 w-full rounded-full"
-          style={{
-            background: `linear-gradient(90deg, ${LAVENDER} 0%, ${PINK} 100%)`,
-          }}
-        />
-        <div className="h-2.5 w-[72%] rounded-full bg-[#f3ebe4]" />
-        <div className="h-2.5 w-[48%] rounded-full bg-[#f3ebe4]" />
-      </div>
-      <div className="mt-4 flex gap-2">
-        <span
-          className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#17171a]"
-          style={{ background: PINK }}
-        >
-          DevFlow
-        </span>
-        <span className="rounded-full bg-[#f3ebe4] px-2.5 py-1 text-[11px] font-semibold text-[#5c5956]">
-          Pulse
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/** Facebook-style left stage: layered cards, soft chips, brand headline. */
+/** Left auth stage: centered landing-style statement + floating tech icons. */
 export function AuthShowcaseStage() {
   const reduced = useReducedMotion();
 
   return (
     <div
-      className="relative flex h-full min-h-[420px] w-full flex-col px-6 py-8 sm:px-10 lg:min-h-screen lg:px-12 lg:py-10"
+      className="relative flex h-full min-h-[420px] w-full flex-col overflow-hidden px-6 py-8 sm:px-10 lg:min-h-screen lg:px-12 lg:py-10"
       data-testid="auth-collage"
     >
       <div className="relative z-[3]">
         <AuthWordmark />
       </div>
 
-      <div className="relative mx-auto mt-8 w-full max-w-[620px] flex-1 lg:mt-4">
-        <div className="relative mx-auto h-[min(52vh,420px)] w-full max-w-[520px] lg:h-[min(58vh,480px)]">
-          <motion.div
-            className="absolute left-[6%] top-[4%] z-[1] h-[64%] w-[48%]"
-            initial={reduced ? false : { opacity: 0, y: 18, rotate: -4 }}
-            animate={{ opacity: 1, y: 0, rotate: -7 }}
-            transition={{ duration: reduced ? 0.01 : 0.55, ease: 'easeOut' }}
-          >
-            <PhotoCard src={MEDIA.code} className="absolute inset-0" sizes="260px" />
-          </motion.div>
+      <div className="relative z-[2] flex flex-1 flex-col items-center justify-center py-10">
+        {!reduced ? (
+          <div className="cc-hume-hero__float-icons pointer-events-none" aria-hidden>
+            {FLOAT_ICONS.map(({ Icon, x, y, size, delay, duration }, i) => (
+              <span
+                key={i}
+                className="cc-hume-hero__float-icon"
+                data-auth-tech-icon
+                style={
+                  {
+                    left: x,
+                    top: y,
+                    '--float-size': `${size}px`,
+                    '--float-delay': `${delay}s`,
+                    '--float-duration': `${duration}s`,
+                  } as CSSProperties
+                }
+              >
+                <span className="cc-hume-hero__float-icon-inner">
+                  <Icon size={size} strokeWidth={1.55} />
+                </span>
+              </span>
+            ))}
+          </div>
+        ) : null}
 
-          <motion.div
-            className="absolute right-[2%] top-[0%] z-[2] h-[68%] w-[54%]"
-            initial={reduced ? false : { opacity: 0, y: 22, rotate: 3 }}
-            animate={{ opacity: 1, y: 0, rotate: 5 }}
-            transition={{ duration: reduced ? 0.01 : 0.6, delay: reduced ? 0 : 0.06, ease: 'easeOut' }}
-          >
-            <PhotoCard
-              src={MEDIA.hero}
-              className="absolute inset-0"
-              priority
-              sizes="300px"
-              objectPosition="center"
-            />
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-[4%] left-[10%] z-[3] h-[44%] w-[46%]"
-            initial={reduced ? false : { opacity: 0, y: 20, rotate: 2 }}
-            animate={{ opacity: 1, y: 0, rotate: 2 }}
-            transition={{ duration: reduced ? 0.01 : 0.55, delay: reduced ? 0 : 0.1, ease: 'easeOut' }}
-          >
-            <MiniProfileCard className="absolute inset-0" />
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-[8%] right-[6%] z-[3] h-[36%] w-[40%]"
-            initial={reduced ? false : { opacity: 0, y: 16, rotate: -2 }}
-            animate={{ opacity: 1, y: 0, rotate: -3 }}
-            transition={{ duration: reduced ? 0.01 : 0.5, delay: reduced ? 0 : 0.12, ease: 'easeOut' }}
-          >
-            <PhotoCard src={MEDIA.desk} className="absolute inset-0" sizes="200px" />
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-[0%] right-[28%] z-[4] h-[84px] w-[84px] overflow-hidden rounded-full border-[3px] border-white bg-[#efeae3]"
-            style={{ boxShadow: CARD_SHADOW }}
-            initial={reduced ? false : { opacity: 0, scale: 0.86 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduced ? 0.01 : 0.45, delay: reduced ? 0 : 0.16, ease: 'easeOut' }}
-          >
-            <Image
-              src={MEDIA.avatar}
-              alt=""
-              fill
-              sizes="84px"
-              className="object-cover"
-              unoptimized
-            />
-          </motion.div>
-
-          <motion.div
-            className="absolute left-[0%] top-[12%] z-[5] rounded-full px-3 py-1.5 text-[12px] font-semibold text-[#17171a]"
-            style={{
-              background: PINK,
-              boxShadow: '0 10px 24px rgba(247, 187, 230, 0.45)',
-            }}
-            initial={reduced ? false : { opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.18 }}
-          >
-            +24 saves
-          </motion.div>
-
-          <motion.div
-            className="absolute right-[-2%] top-[20%] z-[5] flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#17171a]"
-            style={{ boxShadow: CARD_SHADOW }}
-            initial={reduced ? false : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.2 }}
-          >
-            <span
-              className="inline-block h-2 w-2 rounded-full"
-              style={{ background: LAVENDER }}
-              aria-hidden
-            />
-            1.2k views
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-[36%] right-[-4%] z-[5] flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-bold text-[#17171a]"
-            style={{
-              background: `linear-gradient(145deg, ${PINK} 0%, ${LAVENDER} 100%)`,
-              boxShadow: CARD_SHADOW,
-            }}
-            initial={reduced ? false : { opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduced ? 0.01 : 0.4, delay: reduced ? 0 : 0.22 }}
-            aria-hidden
-          >
-            QR
-          </motion.div>
-        </div>
+        <motion.div
+          className="relative z-[1] mx-auto flex w-full max-w-[520px] flex-col items-center text-center"
+          initial={reduced ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduced ? 0.01 : 0.55, ease: 'easeOut' }}
+        >
+          <h2 className="font-display text-balance text-[clamp(2.35rem,4.6vw,3.65rem)] font-normal leading-[1.05] tracking-[-0.03em] text-[#17171a]">
+            Your best work. Ready to{' '}
+            <span className="cc-hume-gradient-text">share in seconds.</span>
+          </h2>
+          <p className="mt-5 max-w-[34ch] text-balance text-[17px] leading-relaxed text-[#5c5956] sm:text-[18px]">
+            {CODECARD_TAGLINE}
+          </p>
+        </motion.div>
       </div>
-
-      <motion.div
-        className="relative z-[3] mt-auto max-w-[520px] pb-2 pt-6 lg:pb-6"
-        initial={reduced ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: reduced ? 0.01 : 0.45, delay: reduced ? 0 : 0.12, ease: 'easeOut' }}
-      >
-        <h2 className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.04em] text-[#17171a] sm:text-[48px] lg:text-[54px]">
-          Show the work{' '}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage: `linear-gradient(110deg, ${LAVENDER} 0%, ${PINK} 55%, ${LAVENDER} 100%)`,
-            }}
-          >
-            you&apos;re proud of.
-          </span>
-        </h2>
-        <p className="mt-4 max-w-[36ch] text-[16px] leading-relaxed text-[#5c5956]">
-          Projects, research, and a public card people can actually share.
-        </p>
-      </motion.div>
     </div>
   );
 }
