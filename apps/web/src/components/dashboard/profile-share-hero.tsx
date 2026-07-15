@@ -7,8 +7,10 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
 import {
   buildCanonicalPublicProfileUrl,
+  generateProfileQrDownload,
   generateProfileQrPreview,
 } from '@/lib/sharing/qr';
+import { downloadProfileQrPng } from '@/lib/sharing/qr-download';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -26,8 +28,10 @@ export function ProfileShareHero({
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [qrError, setQrError] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const reduced = useReducedMotion() ?? false;
   const statusId = useId();
+  const downloadStatusId = useId();
 
   const canonical = buildCanonicalPublicProfileUrl(profileSlug);
   const displayUrl = canonical.ok
@@ -324,15 +328,42 @@ export function ProfileShareHero({
                 <div className="mt-5 flex flex-wrap gap-2">
                   <AsyncActionButton
                     variant="primary"
-                    successLabel="Saved"
-                    disabled
+                    successLabel="Downloaded"
+                    ariaLabel="Download QR as PNG"
+                    disabled={!canShare || qrLoading || !qrDataUrl}
                     onAction={async () => {
-                      await new Promise((r) => setTimeout(r, 0));
+                      setDownloadError(null);
+                      const generated = await generateProfileQrDownload(profileSlug);
+                      if (!generated.ok) {
+                        setDownloadError(generated.error);
+                        throw new Error(generated.error);
+                      }
+                      if (qrUrl && generated.url !== qrUrl) {
+                        const mismatch = 'Download QR URL does not match the preview.';
+                        setDownloadError(mismatch);
+                        throw new Error(mismatch);
+                      }
+                      const result = downloadProfileQrPng({
+                        pngDataUrl: generated.pngDataUrl,
+                        filename: generated.filename,
+                      });
+                      if (!result.ok) {
+                        setDownloadError(result.error);
+                        throw new Error(result.error);
+                      }
                     }}
                   >
-                    Download PNG
+                    Download QR
                   </AsyncActionButton>
                 </div>
+                <p
+                  id={downloadStatusId}
+                  className="mt-2 text-[13px] text-[var(--app-smoke)]"
+                  role="status"
+                  aria-live="polite"
+                >
+                  {downloadError ?? ''}
+                </p>
               </div>
             </div>
           </motion.div>
