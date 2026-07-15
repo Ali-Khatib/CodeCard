@@ -6,6 +6,7 @@ import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AppButton } from './ui/dashboard-ui';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 
 type DashboardProfileHeaderProps = {
   creator: PortfolioCreator;
@@ -84,9 +85,13 @@ export function DashboardProfileHeader({
                 <AsyncActionButton
                   variant="ghost"
                   ariaLabel="Copy public link"
-                  successLabel="Copied"
+                  successLabel="Public link copied"
                   onAction={async () => {
-                    await navigator.clipboard.writeText(`${window.location.origin}/${slug}`);
+                    const url = getPublicProfileLinkForClipboard(slug);
+                    if (!url) {
+                      throw new Error('Public profile link is unavailable.');
+                    }
+                    await navigator.clipboard.writeText(url);
                   }}
                 >
                   Copy public link

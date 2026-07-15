@@ -43,8 +43,10 @@ export function CopyLinkButton({
       showIcon={showIcon}
       successLabel={successLabel}
       onAction={async () => {
-        const value = getText?.() ?? text ?? '';
-        if (!value) return;
+        const value = (getText?.() ?? text ?? '').trim();
+        if (!value) {
+          throw new Error('Nothing to copy');
+        }
         await navigator.clipboard.writeText(value);
       }}
     >

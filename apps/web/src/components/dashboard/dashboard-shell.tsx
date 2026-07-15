@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -56,13 +57,17 @@ function CopyProfileLinkButton({ slug }: { slug: string }) {
     <AsyncActionButton
       variant="primary"
       block
-      ariaLabel="Copy profile link"
-      successLabel="Copied"
+      ariaLabel="Copy public link"
+      successLabel="Public link copied"
       onAction={async () => {
-        await navigator.clipboard.writeText(`${window.location.origin}/${slug}`);
+        const url = getPublicProfileLinkForClipboard(slug);
+        if (!url) {
+          throw new Error('Public profile link is unavailable.');
+        }
+        await navigator.clipboard.writeText(url);
       }}
     >
-      Copy profile link
+      Copy public link
     </AsyncActionButton>
   );
 }

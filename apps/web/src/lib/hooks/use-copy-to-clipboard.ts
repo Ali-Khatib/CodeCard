@@ -15,7 +15,11 @@ export function useCopyToClipboard(options: UseCopyToClipboardOptions = {}) {
   const copy = useCallback(
     async (text: string) => {
       await run(async () => {
-        await navigator.clipboard.writeText(text);
+        const value = text.trim();
+        if (!value) {
+          throw new Error('Nothing to copy');
+        }
+        await navigator.clipboard.writeText(value);
       });
     },
     [run],
