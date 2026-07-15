@@ -6,6 +6,7 @@ import {
   loadProfileProjectOrderings,
   sortProjectsByEffectiveOrder,
 } from '@/lib/projects/project-order-core';
+import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 
@@ -16,7 +17,10 @@ interface PageProps {
 export const revalidate = 60;
 
 export default async function ProjectDetailPage({ params }: PageProps) {
-  const { slug, id } = await params;
+  const { slug: rawSlug, id } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  if (!slug) notFound();
+
   const supabase = await createClient();
 
   const { data: profile } = await supabase
@@ -24,7 +28,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     .select('id, display_name, slug')
     .eq('slug', slug)
     .eq('is_public', true)
-    .single();
+    .maybeSingle();
 
   if (!profile) notFound();
 
@@ -32,11 +36,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     .from('projects')
     .select(
       `
-      *,
-      project_domains(*),
-      project_focus_areas(*),
-      project_media_assets(*),
-      project_links(*)
+      id, title, tagline, description, technologies, case_study_sections, sort_order, created_at, is_published,
+      project_domains(name),
+      project_focus_areas(name),
+      project_media_assets(type, storage_path, sort_order),
+      project_links(type, label, url, sort_order)
     `,
     )
     .eq('profile_id', profile.id)
