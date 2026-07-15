@@ -78,10 +78,10 @@ export function AuthShell({
 
       <div className="relative z-[2] flex min-h-screen w-full flex-col lg:flex-row">
         <div className="relative flex min-h-[42vh] flex-1 flex-col px-5 py-8 sm:px-8 lg:min-h-screen lg:w-[60%] lg:max-w-[60%] lg:px-10 lg:py-10">
-          <div className="mb-6">
-            <AuthWordmark />
+          <div className="flex flex-1 items-center justify-center py-8 lg:py-0">
+            <AuthWordmark variant="hero" />
           </div>
-          <div className="mt-auto hidden pb-4 md:block lg:pb-10">
+          <div className="hidden pb-4 md:block lg:pb-10">
             <AuthFeatureCopy index={slideIndex} onIndexChange={setSlideIndex} />
           </div>
         </div>
