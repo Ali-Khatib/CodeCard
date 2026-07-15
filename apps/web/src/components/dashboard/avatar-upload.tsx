@@ -212,12 +212,12 @@ export function AvatarUpload({
                 disabled || pending ? undefined : () => fileInputRef.current?.click()
               }
             >
-              Choose photo
+              {savedAvatarUrl ? 'Replace photo' : 'Choose photo'}
             </AppButton>
             {selectedFile && !pending && (
               <>
                 <AppButton type="button" variant="primary" onClick={handleUpload}>
-                  Upload photo
+                  {savedAvatarUrl ? 'Upload replacement' : 'Upload photo'}
                 </AppButton>
                 <AppButton type="button" variant="ghost" onClick={handleCancel}>
                   Cancel

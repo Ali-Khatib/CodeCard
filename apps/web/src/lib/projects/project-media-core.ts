@@ -10,6 +10,7 @@ import {
   parseCanonicalStoragePath,
 } from '@/lib/storage/path';
 import { loadOwnedProject } from '@/lib/projects/project-access-core';
+import { bestEffortRemoveTrustedStorageObject } from '@/lib/storage/storage-cleanup';
 
 export type ProjectMediaAssetRecord = {
   id: string;
@@ -28,11 +29,23 @@ export type ProjectMediaFinalizeState = {
   slug?: string;
   isPublished?: boolean;
   profileIsPublic?: boolean;
+  cleanupWarning?: boolean;
+  replaced?: boolean;
+};
+
+export type ProjectMediaDeleteState = {
+  success?: boolean;
+  error?: string;
+  projectId?: string;
+  slug?: string;
+  isPublished?: boolean;
+  profileIsPublic?: boolean;
+  cleanupWarning?: boolean;
+  alreadyDeleted?: boolean;
 };
 
 const GENERIC_ERROR = 'Could not save project media. Please try again.';
-const COVER_EXISTS_ERROR =
-  'This project already has a cover image. Cover replacement is not available yet.';
+const GENERIC_DELETE_ERROR = 'Could not delete this screenshot. Please try again.';
 const SCREENSHOT_LIMIT_ERROR = `You can upload up to ${PROJECT_SCREENSHOT_MAX_COUNT} screenshots per project.`;
 
 export function assertOwnedProjectMediaStoragePath(
@@ -92,15 +105,30 @@ async function projectMediaObjectExists(
   return (data ?? []).some((item) => item.name === filename);
 }
 
-async function bestEffortRemoveUploadedObject(
+async function readObjectMetadata(
   supabase: SupabaseClient,
   path: string,
-): Promise<void> {
-  try {
-    await supabase.storage.from(STORAGE_BUCKETS.projectMedia).remove([path]);
-  } catch {
-    // Orphan reconciliation deferred to WS04-T010.
-  }
+): Promise<{ mimeType: string; fileSize: number }> {
+  const slash = path.lastIndexOf('/');
+  const folder = slash >= 0 ? path.slice(0, slash) : '';
+  const filename = path.slice(slash + 1);
+  const { data: listed } = await supabase.storage
+    .from(STORAGE_BUCKETS.projectMedia)
+    .list(folder, { limit: 1, search: filename });
+
+  const objectMeta = (listed ?? []).find((item) => item.name === filename);
+  const mimeType =
+    typeof objectMeta?.metadata?.mimetype === 'string'
+      ? objectMeta.metadata.mimetype
+      : 'image/png';
+  const fileSize =
+    typeof objectMeta?.metadata?.size === 'number'
+      ? objectMeta.metadata.size
+      : typeof objectMeta?.metadata?.size === 'string'
+        ? Number.parseInt(objectMeta.metadata.size, 10) || 0
+        : 0;
+
+  return { mimeType, fileSize };
 }
 
 export async function countProjectMediaByRole(
@@ -138,7 +166,12 @@ export async function projectMediaPathAlreadyFinalized(
 
 export async function assertProjectMediaUploadAllowed(
   supabase: SupabaseClient,
-  input: { userId: string; projectId: string; mediaRole: ProjectMediaRole },
+  input: {
+    userId: string;
+    projectId: string;
+    mediaRole: ProjectMediaRole;
+    replace?: boolean;
+  },
 ): Promise<{ ok: true } | { ok: false; status: 403 | 409; message: string }> {
   const owned = await loadOwnedProject(supabase, {
     userId: input.userId,
@@ -153,10 +186,10 @@ export async function assertProjectMediaUploadAllowed(
   }
 
   if (input.mediaRole === 'poster') {
-    const coverCount = await countProjectMediaByRole(supabase, input.projectId, 'poster');
-    if (coverCount > 0) {
-      return { ok: false, status: 409, message: COVER_EXISTS_ERROR };
-    }
+    // Cover upload and cover replacement both mint a new object path.
+    // Replacement finalization updates the existing poster row.
+    void input.replace;
+    return { ok: true };
   }
 
   if (input.mediaRole === 'screenshot') {
@@ -204,9 +237,14 @@ export async function executeFinalizeProjectMediaUpload(
     project_id: string;
     media_role: ProjectMediaRole;
     path: string;
+    replace?: boolean;
   },
 ): Promise<ProjectMediaFinalizeState> {
-  const parsed = projectMediaFinalizeSchema.safeParse(input);
+  const parsed = projectMediaFinalizeSchema.safeParse({
+    project_id: input.project_id,
+    media_role: input.media_role,
+    path: input.path,
+  });
   if (!parsed.success) {
     return { error: GENERIC_ERROR };
   }
@@ -260,43 +298,84 @@ export async function executeFinalizeProjectMediaUpload(
     return { error: GENERIC_ERROR };
   }
 
+  const exists = await projectMediaObjectExists(supabase, parsed.data.path);
+  if (!exists) {
+    return { error: GENERIC_ERROR };
+  }
+
+  const { mimeType, fileSize } = await readObjectMetadata(supabase, parsed.data.path);
+
   if (parsed.data.media_role === 'poster') {
-    const coverCount = await countProjectMediaByRole(supabase, project.id, 'poster');
-    if (coverCount > 0) {
-      return { error: COVER_EXISTS_ERROR };
+    const { data: existingCover } = await supabase
+      .from('project_media_assets')
+      .select('id, type, storage_path, mime_type, file_size, sort_order')
+      .eq('project_id', project.id)
+      .eq('type', 'poster')
+      .maybeSingle();
+
+    if (existingCover) {
+      const previousPath = existingCover.storage_path as string;
+      const { data: updated, error: updateError } = await supabase
+        .from('project_media_assets')
+        .update({
+          storage_path: parsed.data.path,
+          mime_type: mimeType,
+          file_size: fileSize,
+        })
+        .eq('id', existingCover.id)
+        .eq('project_id', project.id)
+        .eq('type', 'poster')
+        .select('id, type, storage_path, mime_type, file_size, sort_order')
+        .single();
+
+      if (updateError || !updated) {
+        await bestEffortRemoveTrustedStorageObject(supabase, {
+          resourceType: 'project-media',
+          path: parsed.data.path,
+        });
+        return { error: GENERIC_ERROR };
+      }
+
+      let cleanupWarning = false;
+      if (previousPath && previousPath !== parsed.data.path) {
+        const previousCheck = assertOwnedProjectMediaStoragePath(
+          previousPath,
+          project,
+          user.id,
+          'poster',
+        );
+        if (previousCheck.ok) {
+          const cleanup = await bestEffortRemoveTrustedStorageObject(supabase, {
+            resourceType: 'project-media',
+            path: previousPath,
+          });
+          cleanupWarning = !cleanup.cleaned;
+        }
+      }
+
+      return {
+        success: true,
+        asset: updated as ProjectMediaAssetRecord,
+        projectId: project.id,
+        slug: profile.slug ?? undefined,
+        isPublished: project.is_published,
+        profileIsPublic: profile.is_public,
+        replaced: true,
+        cleanupWarning: cleanupWarning || undefined,
+      };
     }
   }
 
   if (parsed.data.media_role === 'screenshot') {
     const screenshotCount = await countProjectMediaByRole(supabase, project.id, 'screenshot');
     if (screenshotCount >= PROJECT_SCREENSHOT_MAX_COUNT) {
+      await bestEffortRemoveTrustedStorageObject(supabase, {
+        resourceType: 'project-media',
+        path: parsed.data.path,
+      });
       return { error: SCREENSHOT_LIMIT_ERROR };
     }
   }
-
-  const exists = await projectMediaObjectExists(supabase, parsed.data.path);
-  if (!exists) {
-    return { error: GENERIC_ERROR };
-  }
-
-  const slash = parsed.data.path.lastIndexOf('/');
-  const folder = slash >= 0 ? parsed.data.path.slice(0, slash) : '';
-  const filename = parsed.data.path.slice(slash + 1);
-  const { data: listed } = await supabase.storage
-    .from(STORAGE_BUCKETS.projectMedia)
-    .list(folder, { limit: 1, search: filename });
-
-  const objectMeta = (listed ?? []).find((item) => item.name === filename);
-  const mimeType =
-    typeof objectMeta?.metadata?.mimetype === 'string'
-      ? objectMeta.metadata.mimetype
-      : 'image/png';
-  const fileSize =
-    typeof objectMeta?.metadata?.size === 'number'
-      ? objectMeta.metadata.size
-      : typeof objectMeta?.metadata?.size === 'string'
-        ? Number.parseInt(objectMeta.metadata.size, 10) || 0
-        : 0;
 
   let sortOrder = 0;
   if (parsed.data.media_role === 'screenshot') {
@@ -327,7 +406,10 @@ export async function executeFinalizeProjectMediaUpload(
     .single();
 
   if (insertError || !inserted) {
-    await bestEffortRemoveUploadedObject(supabase, parsed.data.path);
+    await bestEffortRemoveTrustedStorageObject(supabase, {
+      resourceType: 'project-media',
+      path: parsed.data.path,
+    });
     return { error: GENERIC_ERROR };
   }
 
@@ -338,5 +420,118 @@ export async function executeFinalizeProjectMediaUpload(
     slug: profile.slug ?? undefined,
     isPublished: project.is_published,
     profileIsPublic: profile.is_public,
+  };
+}
+
+export async function executeDeleteProjectScreenshot(
+  supabase: SupabaseClient,
+  input: {
+    projectId: string;
+    assetId: string;
+  },
+): Promise<ProjectMediaDeleteState> {
+  if (
+    typeof input.projectId !== 'string' ||
+    typeof input.assetId !== 'string' ||
+    !input.projectId.trim() ||
+    !input.assetId.trim()
+  ) {
+    return { error: GENERIC_DELETE_ERROR };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'You must be signed in.' };
+  }
+
+  const owned = await loadOwnedProject(supabase, {
+    userId: user.id,
+    projectId: input.projectId,
+  });
+  if ('error' in owned) {
+    return { error: GENERIC_DELETE_ERROR };
+  }
+
+  const { project, profile } = owned;
+
+  const { data: asset } = await supabase
+    .from('project_media_assets')
+    .select('id, type, storage_path, sort_order')
+    .eq('id', input.assetId)
+    .eq('project_id', project.id)
+    .maybeSingle();
+
+  if (!asset) {
+    return {
+      success: true,
+      alreadyDeleted: true,
+      projectId: project.id,
+      slug: profile.slug ?? undefined,
+      isPublished: project.is_published,
+      profileIsPublic: profile.is_public,
+    };
+  }
+
+  if (asset.type !== 'screenshot') {
+    return { error: GENERIC_DELETE_ERROR };
+  }
+
+  const pathCheck = assertOwnedProjectMediaStoragePath(
+    asset.storage_path,
+    project,
+    user.id,
+    'screenshot',
+  );
+  if (!pathCheck.ok) {
+    return { error: GENERIC_DELETE_ERROR };
+  }
+
+  const trustedPath = asset.storage_path as string;
+
+  const { error: deleteError } = await supabase
+    .from('project_media_assets')
+    .delete()
+    .eq('id', asset.id)
+    .eq('project_id', project.id)
+    .eq('type', 'screenshot');
+
+  if (deleteError) {
+    return { error: GENERIC_DELETE_ERROR };
+  }
+
+  const { data: remaining } = await supabase
+    .from('project_media_assets')
+    .select('id')
+    .eq('project_id', project.id)
+    .eq('type', 'screenshot')
+    .order('sort_order', { ascending: true });
+
+  if (remaining && remaining.length > 0) {
+    await Promise.all(
+      remaining.map((row, index) =>
+        supabase
+          .from('project_media_assets')
+          .update({ sort_order: index })
+          .eq('id', row.id)
+          .eq('project_id', project.id)
+          .eq('type', 'screenshot'),
+      ),
+    );
+  }
+
+  const cleanup = await bestEffortRemoveTrustedStorageObject(supabase, {
+    resourceType: 'project-media',
+    path: trustedPath,
+  });
+
+  return {
+    success: true,
+    projectId: project.id,
+    slug: profile.slug ?? undefined,
+    isPublished: project.is_published,
+    profileIsPublic: profile.is_public,
+    cleanupWarning: cleanup.cleaned ? undefined : true,
   };
 }

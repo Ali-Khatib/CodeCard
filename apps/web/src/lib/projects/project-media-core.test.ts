@@ -4,6 +4,7 @@ import {
   assertOwnedProjectMediaStoragePath,
   assertProjectMediaUploadAllowed,
   countProjectMediaByRole,
+  executeDeleteProjectScreenshot,
   executeFinalizeProjectMediaUpload,
   projectMediaPathAlreadyFinalized,
 } from './project-media-core';
@@ -40,6 +41,8 @@ const profile = {
 };
 
 const validPath = `${tenantId}/${userId}/project-media/${projectId}/cover.png`;
+const replacementPath = `${tenantId}/${userId}/project-media/${projectId}/cover-new.png`;
+const screenshotPath = `${tenantId}/${userId}/project-media/${projectId}/shot.png`;
 
 function makeSupabase(options?: {
   user?: { id: string } | null;
@@ -48,13 +51,37 @@ function makeSupabase(options?: {
   screenshotCount?: number;
   objectExists?: boolean;
   existingPath?: boolean;
+  existingCover?: { id: string; storage_path: string } | null;
   insertError?: boolean;
+  updateError?: boolean;
+  deleteError?: boolean;
+  asset?: {
+    id: string;
+    type: string;
+    storage_path: string;
+    sort_order: number;
+  } | null;
+  removeError?: boolean;
 }) {
   const coverCount = options?.coverCount ?? 0;
   const screenshotCount = options?.screenshotCount ?? 0;
   const objectExists = options?.objectExists ?? true;
   const existingPath = options?.existingPath ?? false;
   const insertError = options?.insertError ?? false;
+  const updateError = options?.updateError ?? false;
+  const deleteError = options?.deleteError ?? false;
+  const existingCover =
+    options?.existingCover === undefined
+      ? coverCount > 0
+        ? {
+            id: 'cover-1',
+            storage_path: validPath,
+          }
+        : null
+      : options.existingCover;
+  const remove = vi.fn().mockResolvedValue({
+    error: options?.removeError ? { message: 'cleanup failed' } : null,
+  });
 
   const from = vi.fn((table: string) => {
     if (table === 'profiles') {
@@ -90,7 +117,6 @@ function makeSupabase(options?: {
       return {
         select: vi.fn((columns: string, opts?: { count?: string; head?: boolean }) => {
           if (opts?.head) {
-            const role = 'poster';
             void columns;
             return {
               eq: vi.fn(() => ({
@@ -105,8 +131,97 @@ function makeSupabase(options?: {
           }
 
           return {
-            eq: vi.fn(() => ({
-              eq: vi.fn(() => ({
+            eq: vi.fn((col: string, value: string) => {
+              if (col === 'id') {
+                return {
+                  eq: vi.fn(() => ({
+                    maybeSingle: vi.fn().mockResolvedValue({
+                      data:
+                        options?.asset === undefined
+                          ? {
+                              id: value,
+                              type: 'screenshot',
+                              storage_path: screenshotPath,
+                              sort_order: 0,
+                            }
+                          : options.asset,
+                      error: null,
+                    }),
+                  })),
+                };
+              }
+
+              return {
+                eq: vi.fn((_col2: string, typeOrPath: string) => {
+                  if (typeOrPath === 'poster' || typeOrPath === 'screenshot') {
+                    return {
+                      maybeSingle: vi.fn().mockResolvedValue({
+                        data: typeOrPath === 'poster' && existingCover
+                          ? {
+                              id: existingCover.id,
+                              type: 'poster',
+                              storage_path: existingCover.storage_path,
+                              mime_type: 'image/png',
+                              file_size: 100,
+                              sort_order: 0,
+                            }
+                          : null,
+                        error: null,
+                      }),
+                      order: vi.fn(() => ({
+                        limit: vi.fn().mockResolvedValue({
+                          data: [{ sort_order: 0 }],
+                          error: null,
+                        }),
+                      })),
+                      single: vi.fn().mockResolvedValue({
+                        data: existingPath
+                          ? {
+                              id: 'asset-1',
+                              type: 'poster',
+                              storage_path: validPath,
+                              mime_type: 'image/png',
+                              file_size: 100,
+                              sort_order: 0,
+                            }
+                          : null,
+                        error: null,
+                      }),
+                    };
+                  }
+
+                  return {
+                    maybeSingle: vi.fn().mockResolvedValue({
+                      data: existingPath
+                        ? {
+                            id: 'asset-1',
+                            type: 'poster',
+                            storage_path: validPath,
+                            mime_type: 'image/png',
+                            file_size: 100,
+                            sort_order: 0,
+                          }
+                        : null,
+                      error: null,
+                    }),
+                    single: vi.fn().mockResolvedValue({
+                      data: existingPath
+                        ? {
+                            id: 'asset-1',
+                            type: 'poster',
+                            storage_path: validPath,
+                            mime_type: 'image/png',
+                            file_size: 100,
+                            sort_order: 0,
+                          }
+                        : null,
+                      error: null,
+                    }),
+                  };
+                }),
+                order: vi.fn(() => ({
+                  limit: vi.fn().mockResolvedValue({ data: [{ sort_order: 0 }], error: null }),
+                })),
                 maybeSingle: vi.fn().mockResolvedValue({
                   data: existingPath
                     ? {
@@ -120,24 +235,8 @@ function makeSupabase(options?: {
                     : null,
                   error: null,
                 }),
-                single: vi.fn().mockResolvedValue({
-                  data: existingPath
-                    ? {
-                        id: 'asset-1',
-                        type: 'poster',
-                        storage_path: validPath,
-                        mime_type: 'image/png',
-                        file_size: 100,
-                        sort_order: 0,
-                      }
-                    : null,
-                  error: null,
-                }),
-              })),
-              order: vi.fn(() => ({
-                limit: vi.fn().mockResolvedValue({ data: [{ sort_order: 0 }], error: null }),
-              })),
-            })),
+              };
+            }),
           };
         }),
         insert: vi.fn(() => ({
@@ -157,6 +256,53 @@ function makeSupabase(options?: {
                     error: null,
                   },
             ),
+          })),
+        })),
+        update: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                select: vi.fn(() => ({
+                  single: vi.fn().mockResolvedValue(
+                    updateError
+                      ? { data: null, error: { message: 'db' } }
+                      : {
+                          data: {
+                            id: existingCover?.id ?? 'cover-1',
+                            type: 'poster',
+                            storage_path: replacementPath,
+                            mime_type: 'image/png',
+                            file_size: 100,
+                            sort_order: 0,
+                          },
+                          error: null,
+                        },
+                  ),
+                })),
+              })),
+              select: vi.fn(() => ({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: existingCover?.id ?? 'cover-1',
+                    type: 'poster',
+                    storage_path: replacementPath,
+                    mime_type: 'image/png',
+                    file_size: 100,
+                    sort_order: 0,
+                  },
+                  error: null,
+                }),
+              })),
+            })),
+          })),
+        })),
+        delete: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn().mockResolvedValue({
+                error: deleteError ? { message: 'db' } : null,
+              }),
+            })),
           })),
         })),
       };
@@ -180,16 +326,24 @@ function makeSupabase(options?: {
     from,
     storage: {
       from: vi.fn(() => ({
-        list: vi.fn().mockResolvedValue({
-          data: objectExists
-            ? [{ name: 'cover.png', metadata: { mimetype: 'image/png', size: 100 } }]
-            : [],
-          error: null,
-        }),
-        remove: vi.fn().mockResolvedValue({ data: [], error: null }),
+        list: vi.fn((_folder: string, opts?: { search?: string }) =>
+          Promise.resolve({
+            data: objectExists
+              ? [
+                  {
+                    name: opts?.search ?? 'cover.png',
+                    metadata: { mimetype: 'image/png', size: 100 },
+                  },
+                ]
+              : [],
+            error: null,
+          }),
+        ),
+        remove,
       })),
     },
-  } as unknown as SupabaseClient;
+    remove,
+  } as unknown as SupabaseClient & { remove: ReturnType<typeof vi.fn> };
 }
 
 describe('assertOwnedProjectMediaStoragePath', () => {
@@ -210,12 +364,22 @@ describe('assertOwnedProjectMediaStoragePath', () => {
 });
 
 describe('assertProjectMediaUploadAllowed', () => {
-  it('rejects a second cover upload', async () => {
+  it('allows cover upload when a cover already exists so replacement can finalize', async () => {
     const supabase = makeSupabase({ coverCount: 1 });
     const result = await assertProjectMediaUploadAllowed(supabase, {
       userId,
       projectId,
       mediaRole: 'poster',
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('still enforces screenshot capacity', async () => {
+    const supabase = makeSupabase({ screenshotCount: 12 });
+    const result = await assertProjectMediaUploadAllowed(supabase, {
+      userId,
+      projectId,
+      mediaRole: 'screenshot',
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -250,8 +414,8 @@ describe('executeFinalizeProjectMediaUpload', () => {
     expect(result.error).toBeTruthy();
   });
 
-  it('creates one media row for a valid object', async () => {
-    const supabase = makeSupabase();
+  it('creates one media row for a valid initial cover', async () => {
+    const supabase = makeSupabase({ coverCount: 0, existingCover: null });
     const result = await executeFinalizeProjectMediaUpload(supabase, {
       project_id: projectId,
       media_role: 'poster',
@@ -259,6 +423,22 @@ describe('executeFinalizeProjectMediaUpload', () => {
     });
     expect(result.success).toBe(true);
     expect(result.asset?.storage_path).toBe(validPath);
+  });
+
+  it('replaces an existing cover and removes the old object after DB success', async () => {
+    const supabase = makeSupabase({
+      coverCount: 1,
+      existingCover: { id: 'cover-1', storage_path: validPath },
+    });
+    const result = await executeFinalizeProjectMediaUpload(supabase, {
+      project_id: projectId,
+      media_role: 'poster',
+      path: replacementPath,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.replaced).toBe(true);
+    expect(supabase.remove).toHaveBeenCalledWith([validPath]);
   });
 
   it('returns existing asset for duplicate finalization', async () => {
@@ -273,13 +453,69 @@ describe('executeFinalizeProjectMediaUpload', () => {
   });
 
   it('does not expose raw database errors', async () => {
-    const supabase = makeSupabase({ insertError: true });
+    const supabase = makeSupabase({ insertError: true, existingCover: null });
     const result = await executeFinalizeProjectMediaUpload(supabase, {
       project_id: projectId,
       media_role: 'poster',
       path: validPath,
     });
     expect(result.error).toBe('Could not save project media. Please try again.');
+  });
+});
+
+describe('executeDeleteProjectScreenshot', () => {
+  it('deletes an owned screenshot and removes its storage object', async () => {
+    const supabase = makeSupabase({
+      asset: {
+        id: 'shot-1',
+        type: 'screenshot',
+        storage_path: screenshotPath,
+        sort_order: 0,
+      },
+    });
+
+    const result = await executeDeleteProjectScreenshot(supabase, {
+      projectId,
+      assetId: 'shot-1',
+    });
+
+    expect(result.success).toBe(true);
+    expect(supabase.remove).toHaveBeenCalledWith([screenshotPath]);
+  });
+
+  it('returns a safe confirmed state when the screenshot is already deleted', async () => {
+    const supabase = makeSupabase({ asset: null });
+    const result = await executeDeleteProjectScreenshot(supabase, {
+      projectId,
+      assetId: 'shot-missing',
+    });
+    expect(result.success).toBe(true);
+    expect(result.alreadyDeleted).toBe(true);
+  });
+
+  it('denies unauthenticated deletion', async () => {
+    const supabase = makeSupabase({ user: null });
+    const result = await executeDeleteProjectScreenshot(supabase, {
+      projectId,
+      assetId: 'shot-1',
+    });
+    expect(result.error).toBe('You must be signed in.');
+  });
+
+  it('rejects deleting a non-screenshot asset', async () => {
+    const supabase = makeSupabase({
+      asset: {
+        id: 'cover-1',
+        type: 'poster',
+        storage_path: validPath,
+        sort_order: 0,
+      },
+    });
+    const result = await executeDeleteProjectScreenshot(supabase, {
+      projectId,
+      assetId: 'cover-1',
+    });
+    expect(result.error).toBe('Could not delete this screenshot. Please try again.');
   });
 });
 

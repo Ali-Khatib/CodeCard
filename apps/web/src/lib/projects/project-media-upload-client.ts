@@ -24,7 +24,7 @@ export type ProjectMediaUploadInitResponse = {
 };
 
 export type ProjectMediaUploadFlowResult =
-  | { ok: true; path: string; assetId: string }
+  | { ok: true; path: string; assetId: string; cleanupWarning?: boolean }
   | { ok: false; message: string; phase: ProjectMediaUploadPhase | 'validation' };
 
 const GENERIC_UPLOAD_ERROR = 'Could not upload image. Please try again.';
@@ -180,7 +180,10 @@ export async function executeProjectMediaUploadFlow(input: {
   ) => Promise<{ ok: true } | { ok: false; message: string }>;
   finalizeUpload: (
     path: string,
-  ) => Promise<{ success: true; assetId: string } | { success: false; error?: string }>;
+  ) => Promise<
+    | { success: true; assetId: string; cleanupWarning?: boolean }
+    | { success: false; error?: string }
+  >;
   onPhaseChange?: (phase: ProjectMediaUploadPhase) => void;
 }): Promise<ProjectMediaUploadFlowResult> {
   const validation = validateProjectMediaFile(input.file);
@@ -220,5 +223,6 @@ export async function executeProjectMediaUploadFlow(input: {
     ok: true,
     path: initResult.init.path,
     assetId: finalizeResult.assetId,
+    cleanupWarning: finalizeResult.cleanupWarning,
   };
 }

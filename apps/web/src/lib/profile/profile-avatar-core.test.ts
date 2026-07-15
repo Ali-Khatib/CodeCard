@@ -19,6 +19,7 @@ const ownedProfile = {
   owner_user_id: ownerUserId,
   slug: 'alex-chen',
   is_public: true,
+  avatar_url: null as string | null,
 };
 
 const ownedPath = `${tenantId}/${ownerUserId}/avatar/${profileId}/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.png`;
@@ -29,12 +30,14 @@ function createMockSupabase(options: {
   listResult?: { name: string }[];
   listError?: { message: string } | null;
   updateError?: { message: string } | null;
+  removeError?: { message: string } | null;
 }) {
   const update = vi.fn().mockResolvedValue({ error: options.updateError ?? null });
   const list = vi.fn().mockResolvedValue({
     data: options.listResult ?? [{ name: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.png' }],
     error: options.listError ?? null,
   });
+  const remove = vi.fn().mockResolvedValue({ error: options.removeError ?? null });
 
   const sessionUser =
     options.user === undefined ? { id: ownerUserId } : options.user;
@@ -69,6 +72,7 @@ function createMockSupabase(options: {
         expect(bucket).toBe(STORAGE_BUCKETS.avatars);
         return {
           list,
+          remove,
           getPublicUrl: vi.fn((path: string) => ({
             data: {
               publicUrl: `https://example.supabase.co/storage/v1/object/public/avatars/${path}`,
@@ -79,7 +83,7 @@ function createMockSupabase(options: {
     },
   } as unknown as SupabaseClient;
 
-  return { supabase, update, list };
+  return { supabase, update, list, remove };
 }
 
 describe('assertOwnedAvatarStoragePath', () => {
@@ -175,6 +179,42 @@ describe('executeFinalizeAvatarUpload', () => {
     expect(result.success).toBeUndefined();
     expect(result.error).toBe('Could not save your avatar. Please try again.');
     expect(update).toHaveBeenCalledTimes(1);
+  });
+
+  it('removes the previous avatar object only after a successful replacement', async () => {
+    const previousPath = `${tenantId}/${ownerUserId}/avatar/${profileId}/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.png`;
+    const previousUrl = `https://example.supabase.co/storage/v1/object/public/avatars/${previousPath}`;
+    const { supabase, remove } = createMockSupabase({
+      profile: { ...ownedProfile, avatar_url: previousUrl },
+    });
+
+    const result = await executeFinalizeAvatarUpload(
+      supabase,
+      { path: ownedPath },
+      { user: { id: ownerUserId } },
+    );
+
+    expect(result.success).toBe(true);
+    expect(remove).toHaveBeenCalledWith([previousPath]);
+  });
+
+  it('keeps the new avatar when old-object cleanup fails', async () => {
+    const previousPath = `${tenantId}/${ownerUserId}/avatar/${profileId}/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.png`;
+    const previousUrl = `https://example.supabase.co/storage/v1/object/public/avatars/${previousPath}`;
+    const { supabase } = createMockSupabase({
+      profile: { ...ownedProfile, avatar_url: previousUrl },
+      removeError: { message: 'cleanup failed' },
+    });
+
+    const result = await executeFinalizeAvatarUpload(
+      supabase,
+      { path: ownedPath },
+      { user: { id: ownerUserId } },
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.cleanupWarning).toBe(true);
+    expect(result.avatarUrl).toContain(ownedPath);
   });
 
   it('updates only avatar_url and hides raw storage errors', async () => {

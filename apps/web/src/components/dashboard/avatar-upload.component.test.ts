@@ -14,6 +14,7 @@ describe('AvatarUpload component', () => {
     expect(component).toContain('displayName.trim()[0]');
     expect(component).toContain('accept="image/jpeg,image/png,image/webp"');
     expect(component).toContain('Choose profile photo');
+    expect(component).toContain('Replace photo');
     expect(component).toContain('aria-busy={pending}');
     expect(component).toContain('role="status"');
     expect(component).toContain('Preparing upload');
@@ -26,14 +27,15 @@ describe('AvatarUpload component', () => {
     expect(component).not.toMatch(/service.?role/i);
   });
 
-  it('does not delete previous avatar storage objects', () => {
+  it('delegates previous avatar cleanup to trusted server-side finalization', () => {
     const core = readFileSync(resolve(process.cwd(), 'src/lib/profile/profile-avatar-core.ts'), 'utf8');
     const component = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/avatar-upload.tsx'),
       'utf8',
     );
 
-    expect(core).not.toMatch(/\.remove\(/);
+    expect(core).toContain('bestEffortRemoveTrustedStorageObject');
+    expect(core).toContain('extractAvatarPathFromPublicUrl');
     expect(component).not.toMatch(/\.remove\(/);
   });
 });

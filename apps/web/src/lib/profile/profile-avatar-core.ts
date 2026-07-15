@@ -3,6 +3,10 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { bucketForStorageResourceType, parseCanonicalStoragePath } from '@/lib/storage/path';
 import { getPublicAvatarUrl } from '@/lib/profile/avatar-url';
 import { resolveOwnedProfile, type AuthUser } from '@/lib/profile/profile-auth-core';
+import {
+  bestEffortRemoveTrustedStorageObject,
+  extractAvatarPathFromPublicUrl,
+} from '@/lib/storage/storage-cleanup';
 
 export type AvatarFinalizeState = {
   success?: boolean;
@@ -10,6 +14,7 @@ export type AvatarFinalizeState = {
   avatarUrl?: string;
   slug?: string;
   isPublic?: boolean;
+  cleanupWarning?: boolean;
 };
 
 const GENERIC_ERROR = 'Could not save your avatar. Please try again.';
@@ -107,6 +112,22 @@ export async function executeFinalizeAvatarUpload(
     return { error: GENERIC_ERROR };
   }
 
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('avatar_url')
+    .eq('id', profile.id)
+    .single();
+
+  const previousPath = extractAvatarPathFromPublicUrl(currentProfile?.avatar_url ?? null);
+  if (previousPath && previousPath === input.path) {
+    return {
+      success: true,
+      avatarUrl: getPublicAvatarUrl(supabase, input.path),
+      slug: profile.slug,
+      isPublic: profile.is_public,
+    };
+  }
+
   const avatarUrl = getPublicAvatarUrl(supabase, input.path);
   const { error: updateError } = await supabase
     .from('profiles')
@@ -114,7 +135,23 @@ export async function executeFinalizeAvatarUpload(
     .eq('id', profile.id);
 
   if (updateError) {
+    await bestEffortRemoveTrustedStorageObject(supabase, {
+      resourceType: 'avatar',
+      path: input.path,
+    });
     return { error: GENERIC_ERROR };
+  }
+
+  let cleanupWarning = false;
+  if (previousPath && previousPath !== input.path) {
+    const previousCheck = assertOwnedAvatarStoragePath(previousPath, profile, user.id);
+    if (previousCheck.ok) {
+      const cleanup = await bestEffortRemoveTrustedStorageObject(supabase, {
+        resourceType: 'avatar',
+        path: previousPath,
+      });
+      cleanupWarning = !cleanup.cleaned;
+    }
   }
 
   return {
@@ -122,5 +159,6 @@ export async function executeFinalizeAvatarUpload(
     avatarUrl,
     slug: profile.slug,
     isPublic: profile.is_public,
+    cleanupWarning: cleanupWarning || undefined,
   };
 }
