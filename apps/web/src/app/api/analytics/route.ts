@@ -7,6 +7,10 @@ import {
   isAuthenticatedContentOwner,
   isOwnerExcludedAudienceEvent,
 } from '@/lib/analytics/owner-exclusion';
+import {
+  isDuplicateAnalyticsEvent,
+  normalizeAnalyticsSessionId,
+} from '@/lib/analytics/dedupe';
 
 export async function POST(request: Request) {
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
@@ -21,8 +25,21 @@ export async function POST(request: Request) {
       section_name,
       metadata,
       source,
-      session_id,
     } = data;
+    const session_id = normalizeAnalyticsSessionId(data.session_id);
+
+    const eventForDedupe = {
+      event_type,
+      session_id,
+      profile_id,
+      project_id,
+      research_paper_id,
+      target_type,
+      target_id,
+      section_name,
+      source,
+      metadata: metadata ?? null,
+    };
 
     if (event_type === 'link_click' && profile_id) {
       const linkKind = metadata?.link_kind === 'project' ? 'project' : 'profile';
@@ -58,6 +75,10 @@ export async function POST(request: Request) {
           return NextResponse.json({ ok: true, status: 'ignored' });
         }
 
+        if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
         await supabase.from('analytics_events').insert({
           tenant_id: project.tenant_id,
           profile_id: project.profile_id,
@@ -82,6 +103,10 @@ export async function POST(request: Request) {
         .maybeSingle();
 
       if (!profile) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
+      }
+
+      if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
         return NextResponse.json({ ok: true, status: 'ignored' });
       }
 
@@ -127,6 +152,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
       }
 
+      if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
+      }
+
       await supabase.from('public_profile_events').insert({
         tenant_id: profile.tenant_id,
         profile_id,
@@ -144,6 +173,8 @@ export async function POST(request: Request) {
         metadata: metadata ?? {},
         session_id,
       });
+
+      return NextResponse.json({ ok: true, status: 'recorded' });
     }
 
     if (
@@ -172,6 +203,10 @@ export async function POST(request: Request) {
 
       // Existing RLS only allows profile-target inserts when the profile is public.
       if (ownedProfile.is_public) {
+        if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
         await supabase.from('analytics_events').insert({
           tenant_id: ownedProfile.tenant_id,
           profile_id,
@@ -190,13 +225,17 @@ export async function POST(request: Request) {
     if (event_type === 'project_view' && project_id && profile_id) {
       const { data: project } = await supabase
         .from('projects')
-        .select('tenant_id')
+        .select('tenant_id, profile_id')
         .eq('id', project_id)
         .eq('is_published', true)
         .single();
 
       if (!project) {
         return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      }
+
+      if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
       }
 
       await supabase.from('project_view_events').insert({
@@ -206,6 +245,19 @@ export async function POST(request: Request) {
         source,
         session_id,
       });
+
+      await supabase.from('analytics_events').insert({
+        tenant_id: project.tenant_id,
+        profile_id: project.profile_id ?? profile_id,
+        target_type: 'project',
+        target_id: project_id,
+        event_type,
+        section_name,
+        metadata: metadata ?? {},
+        session_id,
+      });
+
+      return NextResponse.json({ ok: true, status: 'recorded' });
     }
 
     const resolvedTargetType =
@@ -221,6 +273,10 @@ export async function POST(request: Request) {
         .single();
 
       if (project) {
+        if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
         await supabase.from('analytics_events').insert({
           tenant_id: project.tenant_id,
           profile_id: project.profile_id ?? profile_id,
@@ -247,6 +303,10 @@ export async function POST(request: Request) {
       }
 
       if (paper) {
+        if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
         await supabase.from('analytics_events').insert({
           tenant_id: paper.tenant_id,
           profile_id: paper.profile_id,
