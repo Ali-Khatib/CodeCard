@@ -6,6 +6,7 @@ import type { AnalyticsTrendSeries } from '@/lib/dashboard/analytics-trends';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
+  AppButton,
   AppCard,
   MetricCard,
   MetricLabel,
@@ -43,20 +44,54 @@ export function DashboardAnalyticsView({
     { id: 'shares', label: 'Profile shares', value: summary.profileShares },
     { id: 'research-views', label: 'Research views', value: summary.researchViews },
   ];
+  const isZeroState = !summary.hasAnyEvents;
+  const publicHref = profileSlug ? `/${profileSlug}` : null;
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader
         title="How your work is performing"
-        description="Audience engagement from your public CodeCard — profile views, projects, research, shares, and time spent."
+        description={
+          isZeroState
+            ? 'Analytics appear after people engage with your public CodeCard.'
+            : 'Audience engagement from your public CodeCard — profile views, projects, research, shares, and time spent.'
+        }
       />
 
       {!summary.isPublic && (
-        <AppCard tone="meringue" className="!p-5">
-          <p className="text-[15px] text-[var(--app-ink)]">
-            Your profile is private. Public audience analytics stay at zero until you publish.
-          </p>
-        </AppCard>
+        <div role="status">
+          <AppCard tone="meringue" className="!p-5">
+            <h2 className="text-[16px] font-medium text-[var(--app-ink)]">Profile is private</h2>
+            <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
+              Public audience analytics stay at zero until you publish your CodeCard.
+            </p>
+            <AppButton variant="ghost" href="/dashboard/profile" className="mt-3">
+              Open profile settings
+            </AppButton>
+          </AppCard>
+        </div>
+      )}
+
+      {isZeroState && summary.isPublic && (
+        <div role="status">
+          <AppCard tone="seafoam" className="!p-6">
+            <h2 className="text-[18px] font-medium text-[var(--app-ink)]">No audience activity yet</h2>
+            <p className="mt-2 max-w-xl text-[15px] text-[var(--app-smoke)]">
+              Totals below are real zeros — not sample data. They update when visitors view your
+              profile, open projects, click links, share, or download your QR code.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {publicHref ? (
+                <AppButton variant="primary" href={publicHref}>
+                  View public profile
+                </AppButton>
+              ) : null}
+              <AppButton variant="ghost" href="/dashboard">
+                Share from home
+              </AppButton>
+            </div>
+          </AppCard>
+        </div>
       )}
 
       <FadeInView delay={0}>
@@ -84,7 +119,11 @@ export function DashboardAnalyticsView({
       </FadeInView>
 
       <FadeInView delay={0.06}>
-        <AnalyticsTrendChart trends={trends} activeRange={trends.range} />
+        <AnalyticsTrendChart
+          trends={trends}
+          activeRange={trends.range}
+          hasLifetimeEvents={summary.hasAnyEvents}
+        />
       </FadeInView>
 
       <FadeInView delay={0.08}>
@@ -110,7 +149,7 @@ export function DashboardAnalyticsView({
         </div>
       </FadeInView>
 
-      {summary.sources.length > 0 && (
+      {summary.sources.length > 0 ? (
         <FadeInView delay={0.12}>
           <section>
             <SectionLabel>How people reach you</SectionLabel>
@@ -131,6 +170,17 @@ export function DashboardAnalyticsView({
                 );
               })}
             </div>
+          </section>
+        </FadeInView>
+      ) : (
+        <FadeInView delay={0.12}>
+          <section>
+            <SectionLabel>How people reach you</SectionLabel>
+            <AppCard className="mt-4 !p-5">
+              <p className="text-[14px] text-[var(--app-smoke)]">
+                Traffic sources appear after public profile visits are recorded.
+              </p>
+            </AppCard>
           </section>
         </FadeInView>
       )}
@@ -213,7 +263,13 @@ export function DashboardAnalyticsView({
               </p>
             </AppCard>
           </div>
-          {summary.topResearch.length > 0 && (
+          {summary.topResearch.length === 0 ? (
+            <AppCard className="mt-4 !p-5">
+              <p className="text-[14px] text-[var(--app-smoke)]">
+                No research engagement recorded yet.
+              </p>
+            </AppCard>
+          ) : (
             <div className="mt-4 space-y-3">
               {summary.topResearch.map((paper) => (
                 <AppCard key={paper.id} className="!p-5">
