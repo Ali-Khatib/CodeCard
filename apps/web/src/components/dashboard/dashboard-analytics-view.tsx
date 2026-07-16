@@ -1,176 +1,239 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { CountUp } from '@/components/landing/count-up';
-import {
-  buildAnalyticsData,
-  TIME_RANGE_LABELS,
-  type ResearchPaperAnalytics,
-  type TimeRange,
-} from '@/lib/dashboard/analytics-data';
-import { Sparkline } from './sparkline';
+import type { OwnerAnalyticsSummary } from '@/lib/dashboard/analytics-aggregate';
 import { FadeInView } from './fade-in-view';
-import { AnalyticsHumeChart } from './analytics/analytics-hume-chart';
-import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
-import { AnalyticsGuestStats } from './analytics/analytics-guest-stats';
-import { AnalyticsGeoPanel } from './analytics/analytics-geo-panel';
-import { AnalyticsProjectPanel } from './analytics/analytics-project-panel';
-import { AnalyticsResearchPanel } from './analytics/analytics-research-panel';
-import { AnalyticsAudiencePanel } from './analytics/analytics-audience-panel';
-import { AppCard, FilterBar, MetricCard, MetricLabel, PageHeader, SectionLabel } from './ui/dashboard-ui';
+import {
+  AppCard,
+  MetricCard,
+  MetricLabel,
+  PageHeader,
+  SectionLabel,
+} from './ui/dashboard-ui';
 
-const RANGES: TimeRange[] = ['7d', '30d', '90d', 'lifetime'];
+function formatDuration(totalSec: number) {
+  if (totalSec < 60) return `${totalSec}s`;
+  const min = Math.floor(totalSec / 60);
+  const rem = totalSec % 60;
+  return rem ? `${min}m ${rem}s` : `${min}m`;
+}
 
 type DashboardAnalyticsViewProps = {
-  displayName: string;
-  profileViews?: number;
-  projectViews?: number;
-  researchViews?: number;
-  pdfDownloads?: number;
-  citationCopies?: number;
-  topResearchTitle?: string;
-  perResearchPapers?: ResearchPaperAnalytics[];
+  summary: OwnerAnalyticsSummary;
+  profileSlug?: string;
 };
 
+/**
+ * Authenticated analytics — real owner aggregates only.
+ * Preview/demo charts live in `preview-analytics-view.tsx`.
+ */
 export function DashboardAnalyticsView({
-  displayName,
-  profileViews,
-  projectViews,
-  researchViews,
-  pdfDownloads,
-  citationCopies,
-  topResearchTitle,
-  perResearchPapers,
+  summary,
+  profileSlug,
 }: DashboardAnalyticsViewProps) {
-  const [range, setRange] = useState<TimeRange>('30d');
-  const data = useMemo(
-    () =>
-      buildAnalyticsData(range, {
-        displayName,
-        profileViews,
-        projectViews,
-        researchViews,
-        pdfDownloads,
-        citationCopies,
-        topResearchTitle,
-        perResearchPapers,
-      }),
-    [range, displayName, profileViews, projectViews, researchViews, pdfDownloads, citationCopies, topResearchTitle, perResearchPapers],
-  );
-
-  const rangeLabels = RANGES.reduce(
-    (acc, r) => ({ ...acc, [r]: TIME_RANGE_LABELS[r] }),
-    {} as Record<TimeRange, string>,
-  );
-
-  const topKpis = data.kpis.slice(0, 4);
+  const kpis = [
+    { id: 'profile-views', label: 'Profile views', value: summary.profileViews },
+    { id: 'project-views', label: 'Project views', value: summary.projectViews },
+    { id: 'link-clicks', label: 'Link clicks', value: summary.linkClicks },
+    { id: 'qr-downloads', label: 'QR downloads', value: summary.qrDownloads },
+    { id: 'shares', label: 'Profile shares', value: summary.profileShares },
+    { id: 'research-views', label: 'Research views', value: summary.researchViews },
+  ];
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader
         title="How your work is performing"
-        description="Reach, engagement, per-project depth, and who is viewing."
-        actions={
-          <FilterBar options={RANGES} value={range} onChange={setRange} labels={rangeLabels} />
-        }
+        description="Audience engagement from your public CodeCard — profile views, projects, research, shares, and time spent."
       />
 
-      <FadeInView delay={0}>
-        <AnalyticsAiInsights insights={data.insights} />
-      </FadeInView>
+      {!summary.isPublic && (
+        <AppCard tone="meringue" className="!p-5">
+          <p className="text-[15px] text-[var(--app-ink)]">
+            Your profile is private. Public audience analytics stay at zero until you publish.
+          </p>
+        </AppCard>
+      )}
 
-      <FadeInView delay={0.04}>
+      <FadeInView delay={0}>
         <AppCard tone="blush" className="!p-8">
-          <MetricLabel>Profile reach</MetricLabel>
+          <MetricLabel>Profile views</MetricLabel>
           <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">
-            <CountUp key={range} value={data.profileReach} />
+            <CountUp value={summary.profileViews} />
           </p>
           <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
-            people reached in the selected period
-          </p>
-          <p className="mt-3 text-[14px] font-medium text-[var(--app-iris)]">
-            ↑ {data.reachChange}% this month
+            Lifetime public profile views
           </p>
         </AppCard>
       </FadeInView>
 
-      <FadeInView delay={0.08}>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {topKpis.map((kpi) => (
+      <FadeInView delay={0.04}>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {kpis.map((kpi) => (
             <MetricCard
               key={kpi.id}
               label={kpi.label}
-              value={<CountUp key={`${kpi.id}-${range}`} value={kpi.value} />}
-              delta={`${kpi.trendUp ? '↑' : '↓'} ${Math.abs(kpi.change)}%`}
-            >
-              <Sparkline points={kpi.spark} className="mt-3 h-6 w-full opacity-60" />
-            </MetricCard>
+              value={<CountUp value={kpi.value} />}
+            />
           ))}
         </div>
       </FadeInView>
 
-      <FadeInView delay={0.12}>
-        <div className="grid gap-4 lg:grid-cols-2">
+      <FadeInView delay={0.08}>
+        <div className="grid gap-4 sm:grid-cols-2">
           <AppCard className="!p-6">
-            <AnalyticsHumeChart range={range} />
+            <MetricLabel>Project time spent</MetricLabel>
+            <p className="mt-3 text-[28px] font-medium text-[var(--app-ink)]">
+              {formatDuration(summary.projectTimeSpentSec)}
+            </p>
+            <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+              Total active seconds recorded on published projects
+            </p>
           </AppCard>
-          <AnalyticsGuestStats stats={data.guestStats} />
+          <AppCard className="!p-6">
+            <MetricLabel>Research time spent</MetricLabel>
+            <p className="mt-3 text-[28px] font-medium text-[var(--app-ink)]">
+              {formatDuration(summary.researchTimeSpentSec)}
+            </p>
+            <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+              Total active seconds recorded on published papers
+            </p>
+          </AppCard>
         </div>
       </FadeInView>
 
+      {summary.sources.length > 0 && (
+        <FadeInView delay={0.12}>
+          <section>
+            <SectionLabel>How people reach you</SectionLabel>
+            <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+              Profile visit sources
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {summary.sources.map((s, i) => {
+                const tones = ['blush', 'meringue', 'mint', 'seafoam', 'rose'] as const;
+                return (
+                  <AppCard key={s.label} tone={tones[i % tones.length]} className="!p-4">
+                    <p className="text-[14px] font-medium text-[var(--app-ink)]">{s.label}</p>
+                    <p className="mt-2 text-[24px] font-medium tabular-nums">{s.pct}%</p>
+                    <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+                      {s.value.toLocaleString()} visits
+                    </p>
+                  </AppCard>
+                );
+              })}
+            </div>
+          </section>
+        </FadeInView>
+      )}
+
       <FadeInView delay={0.16}>
-        <AnalyticsGeoPanel
-          topCountries={data.topCountries}
-          topCities={data.topCities}
-        />
+        <section>
+          <SectionLabel>Top projects</SectionLabel>
+          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+            Views, link clicks, and active time
+          </p>
+          {summary.topProjects.length === 0 ? (
+            <AppCard className="mt-4 !p-5">
+              <p className="text-[14px] text-[var(--app-smoke)]">
+                No project engagement recorded yet.
+              </p>
+            </AppCard>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {summary.topProjects.map((project) => (
+                <AppCard key={project.id} className="!p-5">
+                  <h3 className="text-[17px] font-semibold text-[var(--app-ink)]">
+                    {project.title}
+                  </h3>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    <div>
+                      <MetricLabel>Views</MetricLabel>
+                      <p className="mt-1 text-[20px] font-medium">
+                        <CountUp value={project.views} />
+                      </p>
+                    </div>
+                    <div>
+                      <MetricLabel>Link clicks</MetricLabel>
+                      <p className="mt-1 text-[20px] font-medium">
+                        <CountUp value={project.linkClicks} />
+                      </p>
+                    </div>
+                    <div>
+                      <MetricLabel>Time</MetricLabel>
+                      <p className="mt-1 text-[20px] font-medium">
+                        {formatDuration(project.timeSpentSec)}
+                      </p>
+                    </div>
+                  </div>
+                </AppCard>
+              ))}
+            </div>
+          )}
+        </section>
       </FadeInView>
 
       <FadeInView delay={0.2}>
         <section>
-          <SectionLabel>How people reach you</SectionLabel>
-          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">Traffic sources to your CodeCard</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {data.sources.map((s, i) => {
-              const tones = ['blush', 'meringue', 'mint', 'seafoam', 'rose'] as const;
-              return (
-                <AppCard key={s.label} tone={tones[i % tones.length]} className="!p-4">
-                  <p className="text-[14px] font-medium text-[var(--app-ink)]">{s.label}</p>
-                  <p className="mt-2 text-[24px] font-medium tabular-nums">{s.pct}%</p>
-                  <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
-                    {s.value.toLocaleString()} visits
+          <SectionLabel>Research</SectionLabel>
+          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+            Paper views, PDFs, citations, and read time
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <AppCard className="!p-4">
+              <MetricLabel>Views</MetricLabel>
+              <p className="mt-1 text-[22px] font-medium">
+                <CountUp value={summary.researchViews} />
+              </p>
+            </AppCard>
+            <AppCard className="!p-4">
+              <MetricLabel>PDF downloads</MetricLabel>
+              <p className="mt-1 text-[22px] font-medium">
+                <CountUp value={summary.pdfDownloads} />
+              </p>
+            </AppCard>
+            <AppCard className="!p-4">
+              <MetricLabel>Citation copies</MetricLabel>
+              <p className="mt-1 text-[22px] font-medium">
+                <CountUp value={summary.citationCopies} />
+              </p>
+            </AppCard>
+            <AppCard className="!p-4">
+              <MetricLabel>Time spent</MetricLabel>
+              <p className="mt-1 text-[22px] font-medium">
+                {formatDuration(summary.researchTimeSpentSec)}
+              </p>
+            </AppCard>
+          </div>
+          {summary.topResearch.length > 0 && (
+            <div className="mt-4 space-y-3">
+              {summary.topResearch.map((paper) => (
+                <AppCard key={paper.id} className="!p-5">
+                  <h3 className="text-[16px] font-semibold text-[var(--app-ink)]">
+                    {paper.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+                    {paper.views} views · {paper.pdfDownloads} PDFs · {paper.citationCopies}{' '}
+                    citations · avg {formatDuration(paper.avgReadTimeSec)}
                   </p>
                 </AppCard>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </FadeInView>
 
-      <FadeInView delay={0.24}>
-        <AnalyticsProjectPanel projects={data.projectDetails} />
-      </FadeInView>
-
-      <FadeInView delay={0.28}>
-        <AnalyticsResearchPanel summary={data.researchSummary} />
-      </FadeInView>
-
-      <FadeInView delay={0.32}>
-        <AnalyticsAudiencePanel roles={data.roles} />
-      </FadeInView>
-
-      <FadeInView delay={0.36}>
-        <AppCard>
-          <SectionLabel>Recent activity</SectionLabel>
-          <ul className="mt-4 divide-y divide-[var(--app-border)]">
-            {data.activity.map((event) => (
-              <li key={event.id} className="flex items-center justify-between gap-4 py-3 text-[14px]">
-                <span className="text-[var(--app-ink)]">{event.text}</span>
-                <time className="shrink-0 text-[13px] text-[var(--app-smoke)]">{event.time}</time>
-              </li>
-            ))}
-          </ul>
-        </AppCard>
-      </FadeInView>
+      {profileSlug && summary.isPublic && (
+        <p className="text-[13px] text-[var(--app-smoke)]">
+          Public profile:{' '}
+          <a
+            href={`/${profileSlug}`}
+            className="font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
+          >
+            /{profileSlug}
+          </a>
+        </p>
+      )}
     </div>
   );
 }
