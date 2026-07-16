@@ -51,8 +51,8 @@ export default function PreviewOverviewPage() {
       stats={{
         profileViews: 1284,
         projectOpens: 342,
-        saves: 47,
-        qrScans: 128,
+        linkClicks: 47,
+        qrDownloads: 128,
       }}
       activity={DEMO_OVERVIEW_ACTIVITY}
       suggested={{

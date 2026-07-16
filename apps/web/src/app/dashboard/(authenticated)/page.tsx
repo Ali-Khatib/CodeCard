@@ -5,7 +5,7 @@ import {
   DashboardOverviewLoadErrorState,
   DashboardOverviewMissingState,
 } from '@/components/dashboard/dashboard-overview-route-states';
-import { DEMO_OVERVIEW_ACTIVITY } from '@/lib/dashboard/workspace-demo';
+import { loadOwnerAnalytics } from '@/lib/dashboard/analytics-queries';
 import { getProfileCompletionNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
@@ -29,20 +29,14 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const completionResult = await loadProfileCompletion(supabase, profile);
+  const [completionResult, analyticsResult] = await Promise.all([
+    loadProfileCompletion(supabase, profile),
+    loadOwnerAnalytics(supabase, user!.id),
+  ]);
+
   if (!completionResult.ok) {
     return <DashboardOverviewLoadErrorState />;
   }
-
-  const { count: profileViews } = await supabase
-    .from('public_profile_events')
-    .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile.id);
-
-  const { count: projectViews } = await supabase
-    .from('project_view_events')
-    .select('*', { count: 'exact', head: true })
-    .eq('profile_id', profile.id);
 
   const { data: linkRows } = await supabase
     .from('profile_links')
@@ -63,6 +57,16 @@ export default async function DashboardHomePage() {
   });
   const displayName = profile.display_name ?? user?.email?.split('@')[0] ?? 'there';
 
+  const statsError = !analyticsResult.ok;
+  const stats = analyticsResult.ok
+    ? {
+        profileViews: analyticsResult.summary.profileViews,
+        projectOpens: analyticsResult.summary.projectViews,
+        linkClicks: analyticsResult.summary.linkClicks,
+        qrDownloads: analyticsResult.summary.qrDownloads,
+      }
+    : null;
+
   return (
     <DashboardOverviewView
       greeting={greetingForHour()}
@@ -72,16 +76,12 @@ export default async function DashboardHomePage() {
       avatarUrl={profile.avatar_url}
       headline={profile.headline}
       bio={profile.bio}
-      profileViews={profileViews ?? 0}
+      profileViews={stats?.profileViews}
       links={links}
       profile={profile}
-      stats={{
-        profileViews: profileViews || 1284,
-        projectOpens: projectViews || 342,
-        saves: 47,
-        qrScans: 128,
-      }}
-      activity={DEMO_OVERVIEW_ACTIVITY}
+      stats={stats}
+      statsError={statsError}
+      activity={[]}
       suggested={suggested}
     />
   );
