@@ -15,6 +15,8 @@ import { finalizeAvatarUploadAction } from '@/lib/profile/finalize-avatar-upload
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { messageForUploadFailure } from '@/lib/storage/upload-failure';
 import { isActiveUploadStage, stageLabel, type UploadStage } from '@/lib/storage/upload-progress';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type AvatarUploadProps = {
   displayName: string;
@@ -49,6 +51,7 @@ export function AvatarUpload({
   onAvatarSaved,
 }: AvatarUploadProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -195,6 +198,9 @@ export function AvatarUpload({
       setError(result.message);
       setRetryable(result.retryable);
       setProgressPercent(null);
+      if (!result.cancelled) {
+        notifyError(result.message, MUTATION_FEEDBACK.profile.photoFailed);
+      }
       return;
     }
 
@@ -211,6 +217,7 @@ export function AvatarUpload({
     setSuccess(true);
     setStage('complete');
     setProgressPercent(null);
+    notifySuccess(MUTATION_FEEDBACK.profile.photoUpdated);
     onAvatarSaved?.(result.avatarUrl);
     router.refresh();
 
@@ -219,7 +226,7 @@ export function AvatarUpload({
       setOptimizationNote(null);
       setStage('idle');
     }, 2500);
-  }, [disabled, onAvatarSaved, pending, revokePreviewUrl, router, selectedFile]);
+  }, [disabled, notifyError, notifySuccess, onAvatarSaved, pending, revokePreviewUrl, router, selectedFile]);
 
   const statusMessage =
     error ||

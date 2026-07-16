@@ -13,6 +13,8 @@ import {
   type ProfileLinkMutationState,
 } from '@/lib/profile/profile-link-actions';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProfileLinksEditorProps = {
   links: ProfileLinkRow[];
@@ -27,12 +29,12 @@ const emptyForm = { type: 'website', label: '', url: '' };
 
 export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [mode, setMode] = useState<EditorMode>({ kind: 'idle' });
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<ProfileLinkMutationState['fieldErrors']>({});
   const [pendingAction, setPendingAction] = useState<string | null>(null);
-  const [actionSuccess, setActionSuccess] = useState('');
   const [createState, createAction, createPending] = useActionState(createProfileLinkAction, {});
   const [updateState, updateAction, updatePending] = useActionState(updateProfileLinkAction, {});
   const [isPending, startTransition] = useTransition();
@@ -72,14 +74,20 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     if (!state.success && !state.error && !state.fieldErrors) return;
     if (state.success) {
       resetEditor();
-      setActionSuccess(mode.kind === 'edit' ? 'Link updated.' : 'Link added.');
+      notifySuccess(
+        mode.kind === 'edit' ? MUTATION_FEEDBACK.profile.linkUpdated : MUTATION_FEEDBACK.profile.linkAdded,
+      );
       router.refresh();
-      window.setTimeout(() => setActionSuccess(''), 3000);
       return;
     }
-    if (state.error) setError(state.error);
+    if (state.error) {
+      setError(state.error);
+      if (!state.fieldErrors) {
+        notifyError(state.error, MUTATION_FEEDBACK.profile.linkFailed);
+      }
+    }
     if (state.fieldErrors) setFieldErrors(state.fieldErrors);
-  }, [createState, updateState, mode.kind, router]);
+  }, [createState, updateState, mode.kind, router, notifySuccess, notifyError]);
 
   function submitLink(e: React.FormEvent) {
     e.preventDefault();
@@ -105,11 +113,12 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     setPendingAction(`delete:${link.id}`);
     startTransition(async () => {
       const result = await deleteProfileLinkAction(link.id);
-      if (result.error) setError(result.error);
-      else {
-        setActionSuccess('Link deleted.');
+      if (result.error) {
+        setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.profile.linkFailed);
+      } else {
+        notifySuccess(MUTATION_FEEDBACK.profile.linkDeleted);
         router.refresh();
-        window.setTimeout(() => setActionSuccess(''), 3000);
       }
       setPendingAction(null);
     });
@@ -120,11 +129,12 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     setPendingAction(`move:${link.id}:${direction}`);
     startTransition(async () => {
       const result = await moveProfileLinkAction(link.id, direction);
-      if (result.error) setError(result.error);
-      else {
-        setActionSuccess('Link order updated.');
+      if (result.error) {
+        setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.profile.linkFailed);
+      } else {
+        notifySuccess(MUTATION_FEEDBACK.profile.linkOrderUpdated);
         router.refresh();
-        window.setTimeout(() => setActionSuccess(''), 3000);
       }
       setPendingAction(null);
     });
@@ -269,12 +279,6 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
             </Button>
           </div>
         </form>
-      )}
-
-      {actionSuccess && mode.kind === 'idle' && (
-        <p className="text-sm text-emerald-300" role="status" aria-live="polite">
-          {actionSuccess}
-        </p>
       )}
 
       {error && mode.kind === 'idle' && (

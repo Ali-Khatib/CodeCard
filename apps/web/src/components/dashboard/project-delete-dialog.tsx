@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteProjectAction } from '@/app/actions/projects';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProjectDeleteDialogProps = {
   projectId: string;
@@ -14,6 +16,7 @@ export function ProjectDeleteDialog({
   projectTitle,
 }: ProjectDeleteDialogProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState('');
@@ -25,8 +28,10 @@ export function ProjectDeleteDialog({
       const result = await deleteProjectAction(projectId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.project.deleteFailed);
         return;
       }
+      notifySuccess(MUTATION_FEEDBACK.project.deleted);
       if (result.redirectTo) {
         router.push(result.redirectTo);
       }

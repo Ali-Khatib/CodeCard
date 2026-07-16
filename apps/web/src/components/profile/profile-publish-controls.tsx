@@ -7,6 +7,8 @@ import {
   publishProfileAction,
   unpublishProfileAction,
 } from '@/lib/profile/publish-profile-action';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProfilePublishControlsProps = {
   isPublic: boolean;
@@ -14,6 +16,7 @@ type ProfilePublishControlsProps = {
 
 export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState('');
   const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
@@ -24,10 +27,13 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
     startTransition(async () => {
       const result = await publishProfileAction();
       if (result.error) {
-        setError(result.error);
+        const message = result.error;
+        setError(message);
+        notifyError(message, MUTATION_FEEDBACK.profile.publishFailed);
         return;
       }
       setShowUnpublishConfirm(false);
+      notifySuccess(MUTATION_FEEDBACK.profile.published);
       router.refresh();
     });
   }
@@ -38,10 +44,13 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
     startTransition(async () => {
       const result = await unpublishProfileAction();
       if (result.error) {
-        setError(result.error);
+        const message = result.error;
+        setError(message);
+        notifyError(message, MUTATION_FEEDBACK.profile.publishFailed);
         return;
       }
       setShowUnpublishConfirm(false);
+      notifySuccess(MUTATION_FEEDBACK.profile.unpublished);
       router.refresh();
     });
   }

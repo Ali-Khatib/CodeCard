@@ -6,6 +6,8 @@ import {
   publishProjectAction,
   unpublishProjectAction,
 } from '@/app/actions/projects';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProjectPublishControlsProps = {
   projectId: string;
@@ -19,6 +21,7 @@ export function ProjectPublishControls({
   profileIsPublic,
 }: ProjectPublishControlsProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [pending, startTransition] = useTransition();
   const [published, setPublished] = useState(isPublished);
   const [error, setError] = useState('');
@@ -31,10 +34,12 @@ export function ProjectPublishControls({
       const result = await publishProjectAction(projectId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.project.publishFailed);
         return;
       }
       setPublished(true);
       setShowUnpublishConfirm(false);
+      notifySuccess(MUTATION_FEEDBACK.project.published);
       router.refresh();
     });
   }
@@ -46,10 +51,12 @@ export function ProjectPublishControls({
       const result = await unpublishProjectAction(projectId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.project.publishFailed);
         return;
       }
       setPublished(false);
       setShowUnpublishConfirm(false);
+      notifySuccess(MUTATION_FEEDBACK.project.unpublished);
       router.refresh();
     });
   }

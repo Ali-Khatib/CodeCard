@@ -22,6 +22,8 @@ import {
 } from '@/lib/research/research-figure-upload-client';
 import { isRetryableUploadFailure } from '@/lib/storage/upload-failure';
 import { stageLabel, type UploadStage } from '@/lib/storage/upload-progress';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type LocalFigureJob = {
   clientId: string;
@@ -44,6 +46,7 @@ export function ResearchFigureManager({
   const inputId = useId();
   const liveId = useId();
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [figures, setFigures] = useState(initialFigures);
   const [jobs, setJobs] = useState<LocalFigureJob[]>([]);
@@ -79,6 +82,7 @@ export function ResearchFigureManager({
         retryable: result.retryable && isRetryableUploadFailure(result.failureClass),
       });
       setStatusMessage(result.message);
+      notifyError(result.message, MUTATION_FEEDBACK.research.figureFailed);
       return;
     }
 
@@ -125,6 +129,7 @@ export function ResearchFigureManager({
         ? 'Figure saved. Previous file cleanup pending.'
         : 'Figure uploaded.',
     );
+    notifySuccess(MUTATION_FEEDBACK.research.figureAdded);
     router.refresh();
   }
 
@@ -187,12 +192,14 @@ export function ResearchFigureManager({
       if (!result.success) {
         setFigures(initialFigures);
         setStatusMessage(result.error ?? 'Could not reorder figures.');
+        notifyError(result.error, MUTATION_FEEDBACK.research.figureFailed);
         return;
       }
       if (result.figures) {
         setFigures(result.figures);
       }
       setStatusMessage('Figure order saved.');
+      notifySuccess(MUTATION_FEEDBACK.research.figureOrderSaved);
     });
   }
 
@@ -205,6 +212,7 @@ export function ResearchFigureManager({
       });
       if (!result.success) {
         setStatusMessage(result.error ?? 'Could not save caption.');
+        notifyError(result.error, MUTATION_FEEDBACK.research.figureFailed);
         return;
       }
       setFigures((prev) =>
@@ -213,6 +221,7 @@ export function ResearchFigureManager({
         ),
       );
       setStatusMessage('Caption saved.');
+      notifySuccess(MUTATION_FEEDBACK.research.captionSaved);
     });
   }
 
@@ -225,6 +234,7 @@ export function ResearchFigureManager({
       setConfirmDeleteId(null);
       if (!result.success) {
         setStatusMessage(result.error ?? 'Could not delete figure.');
+        notifyError(result.error, MUTATION_FEEDBACK.research.figureFailed);
         return;
       }
       setFigures((prev) => prev.filter((figure) => figure.id !== figureId));
@@ -233,6 +243,7 @@ export function ResearchFigureManager({
           ? 'Figure removed. Storage cleanup pending.'
           : 'Figure deleted.',
       );
+      notifySuccess(MUTATION_FEEDBACK.research.figureRemoved);
     });
   }
 

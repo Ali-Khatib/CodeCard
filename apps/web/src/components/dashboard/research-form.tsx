@@ -23,6 +23,8 @@ import {
 } from '@/lib/research/research-form';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { cn } from '@/lib/cn';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 const initialCreateState: ResearchCreateState = {};
 const initialUpdateState: ResearchUpdateState = {};
@@ -78,6 +80,7 @@ export function ResearchForm({
   relatedProjectOptions?: ResearchRelatedProjectOption[];
 }) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const formId = useId();
   const editPath =
     mode === 'edit' && researchPaperId
@@ -86,12 +89,13 @@ export function ResearchForm({
   const slugInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
   const completedRef = useRef(false);
+  const notifiedSuccessRef = useRef(false);
+  const notifiedErrorRef = useRef<string | null>(null);
   const [form, setForm] = useState<ResearchFormValues>(
     () => initialValues ?? createEmptyResearchFormValues(),
   );
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [clientError, setClientError] = useState('');
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [createState, createAction, createPending] = useActionState(
     createResearchAction,
     initialCreateState,
@@ -106,32 +110,54 @@ export function ResearchForm({
   const fieldErrors = state.fieldErrors ?? {};
 
   useEffect(() => {
-    if (mode !== 'create' || !state.success || !('redirectTo' in state) || !state.redirectTo) {
+    if (!state.success) {
+      notifiedSuccessRef.current = false;
       return;
     }
-    completedRef.current = true;
-    router.push(state.redirectTo);
-  }, [mode, state, router]);
+    if (notifiedSuccessRef.current) return;
+    notifiedSuccessRef.current = true;
 
-  useEffect(() => {
-    if (mode !== 'edit' || !state.success) return;
-    setSaveSuccess(true);
-    router.refresh();
-    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
-    return () => window.clearTimeout(timeout);
-  }, [mode, state.success, router]);
+    if (mode === 'create' && 'redirectTo' in state && state.redirectTo) {
+      completedRef.current = true;
+      notifySuccess(MUTATION_FEEDBACK.research.created);
+      router.push(state.redirectTo);
+      return;
+    }
+
+    if (mode === 'edit') {
+      notifySuccess(MUTATION_FEEDBACK.research.saved);
+      router.refresh();
+    }
+  }, [mode, state, router, notifySuccess]);
 
   useEffect(() => {
     if (state.errorCode === 'auth') {
       handleSessionExpired(editPath);
+      notifyError(MUTATION_FEEDBACK.sessionExpired);
     }
-  }, [state.errorCode, editPath]);
+  }, [state.errorCode, editPath, notifyError]);
 
   useEffect(() => {
     if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
       slugInputRef.current?.focus();
     }
   }, [state.errorCode, state.fieldErrors?.slug]);
+
+  useEffect(() => {
+    if (
+      !state.error ||
+      state.errorCode === 'auth' ||
+      state.fieldErrors?.slug ||
+      state.fieldErrors?.title
+    ) {
+      return;
+    }
+    const fallback =
+      mode === 'create' ? MUTATION_FEEDBACK.research.createFailed : MUTATION_FEEDBACK.research.saveFailed;
+    if (notifiedErrorRef.current === state.error) return;
+    notifiedErrorRef.current = state.error;
+    notifyError(state.error, fallback);
+  }, [state.error, state.errorCode, state.fieldErrors, mode, notifyError]);
 
   function updateTitle(value: string) {
     setForm((prev) => ({
@@ -470,12 +496,6 @@ export function ResearchForm({
       {generalError ? (
         <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[14px] text-red-700" role="alert">
           {generalError}
-        </p>
-      ) : null}
-
-      {saveSuccess ? (
-        <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[14px] text-emerald-800" role="status">
-          Research paper saved.
         </p>
       ) : null}
 

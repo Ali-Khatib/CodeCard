@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteResearchAction } from '@/app/actions/research';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ResearchDeleteDialogProps = {
   researchPaperId: string;
@@ -14,6 +16,7 @@ export function ResearchDeleteDialog({
   paperTitle,
 }: ResearchDeleteDialogProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState('');
@@ -25,8 +28,10 @@ export function ResearchDeleteDialog({
       const result = await deleteResearchAction(researchPaperId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.research.deleteFailed);
         return;
       }
+      notifySuccess(MUTATION_FEEDBACK.research.deleted);
       if (result.redirectTo) {
         router.push(result.redirectTo);
       }

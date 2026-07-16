@@ -19,6 +19,8 @@ import {
   type ProjectFormValues,
 } from '@/lib/projects/project-form';
 import { cn } from '@/lib/cn';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 const initialCreateState: ProjectCreateState = {};
 const initialUpdateState: ProjectUpdateState = {};
@@ -76,11 +78,14 @@ export function ProjectForm({
   initialValues?: ProjectFormValues;
 }) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const editPath =
     mode === 'edit' && projectId ? `/dashboard/projects/${projectId}/edit` : '/dashboard/projects/new';
   const slugInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
   const completedRef = useRef(false);
+  const notifiedSuccessRef = useRef(false);
+  const notifiedErrorRef = useRef<string | null>(null);
   const [form, setForm] = useState<ProjectFormValues>(
     () => initialValues ?? createEmptyProjectFormValues(),
   );
@@ -88,7 +93,6 @@ export function ProjectForm({
   const [techInput, setTechInput] = useState('');
   const [clientError, setClientError] = useState('');
   const [recoverableError, setRecoverableError] = useState('');
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [createState, createAction, createPending] = useActionState(
     createProjectAction,
     initialCreateState,
@@ -106,26 +110,32 @@ export function ProjectForm({
     mode === 'create' && usage?.limit != null && usage.count >= usage.limit;
 
   useEffect(() => {
-    if (mode !== 'create' || !state.success || !('redirectTo' in state) || !state.redirectTo) {
+    if (!state.success) {
+      notifiedSuccessRef.current = false;
       return;
     }
-    completedRef.current = true;
-    router.push(state.redirectTo);
-  }, [mode, state, router]);
+    if (notifiedSuccessRef.current) return;
+    notifiedSuccessRef.current = true;
 
-  useEffect(() => {
-    if (mode !== 'edit' || !state.success) return;
-    setSaveSuccess(true);
-    router.refresh();
-    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
-    return () => window.clearTimeout(timeout);
-  }, [mode, state.success, router]);
+    if (mode === 'create' && 'redirectTo' in state && state.redirectTo) {
+      completedRef.current = true;
+      notifySuccess(MUTATION_FEEDBACK.project.created);
+      router.push(state.redirectTo);
+      return;
+    }
+
+    if (mode === 'edit') {
+      notifySuccess(MUTATION_FEEDBACK.project.saved);
+      router.refresh();
+    }
+  }, [mode, state, router, notifySuccess]);
 
   useEffect(() => {
     if (state.errorCode === 'auth') {
       handleSessionExpired(editPath);
+      notifyError(MUTATION_FEEDBACK.sessionExpired);
     }
-  }, [state.errorCode, editPath]);
+  }, [state.errorCode, editPath, notifyError]);
 
   useEffect(() => {
     if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
@@ -135,13 +145,34 @@ export function ProjectForm({
 
   useEffect(() => {
     if (isRecoverableProjectFailure(state)) {
-      setRecoverableError(state.error ?? 'Could not save your project. Please try again.');
+      const message = state.error ?? MUTATION_FEEDBACK.project.saveFailed;
+      setRecoverableError(message);
+      if (notifiedErrorRef.current !== message) {
+        notifiedErrorRef.current = message;
+        notifyError(message, MUTATION_FEEDBACK.project.saveFailed);
+      }
       return;
     }
     if (state.success) {
       setRecoverableError('');
+      notifiedErrorRef.current = null;
+      return;
     }
-  }, [state]);
+    if (
+      state.error &&
+      state.errorCode !== 'limit' &&
+      state.errorCode !== 'auth' &&
+      !state.fieldErrors?.slug &&
+      !state.fieldErrors?.title
+    ) {
+      const fallback =
+        mode === 'create' ? MUTATION_FEEDBACK.project.createFailed : MUTATION_FEEDBACK.project.saveFailed;
+      if (notifiedErrorRef.current !== state.error) {
+        notifiedErrorRef.current = state.error;
+        notifyError(state.error, fallback);
+      }
+    }
+  }, [state, mode, notifyError]);
 
   function updateTitle(value: string) {
     setForm((prev) => ({
@@ -201,7 +232,6 @@ export function ProjectForm({
     submitLockRef.current = true;
     setClientError('');
     setRecoverableError('');
-    setSaveSuccess(false);
 
     const validation = validateProjectFormClient(form);
     if (!validation.success) {
@@ -500,12 +530,6 @@ export function ProjectForm({
             Try again
           </button>
         </div>
-      )}
-
-      {saveSuccess && mode === 'edit' && (
-        <p className="rounded-[12px] border border-reactor/30 bg-reactor/10 px-4 py-3 text-[13px] text-vellum" role="status">
-          Project saved.
-        </p>
       )}
 
       {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && !recoverableError && (

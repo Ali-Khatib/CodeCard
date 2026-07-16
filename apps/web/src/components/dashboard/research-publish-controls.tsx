@@ -7,6 +7,8 @@ import {
   publishResearchAction,
   unpublishResearchAction,
 } from '@/app/actions/research';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ResearchPublishControlsProps = {
   researchPaperId: string;
@@ -24,6 +26,7 @@ export function ResearchPublishControls({
   profileSlug,
 }: ResearchPublishControlsProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [pending, startTransition] = useTransition();
   const [published, setPublished] = useState(isPublished);
   const [error, setError] = useState('');
@@ -43,11 +46,13 @@ export function ResearchPublishControls({
       const result = await publishResearchAction(researchPaperId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.research.publishFailed);
         return;
       }
       if (result.success && result.is_published) {
         setPublished(true);
         setShowUnpublishConfirm(false);
+        notifySuccess(MUTATION_FEEDBACK.research.published);
         router.refresh();
       }
     });
@@ -60,11 +65,13 @@ export function ResearchPublishControls({
       const result = await unpublishResearchAction(researchPaperId);
       if (result.error) {
         setError(result.error);
+        notifyError(result.error, MUTATION_FEEDBACK.research.publishFailed);
         return;
       }
       if (result.success) {
         setPublished(false);
         setShowUnpublishConfirm(false);
+        notifySuccess(MUTATION_FEEDBACK.research.unpublished);
         router.refresh();
       }
     });
