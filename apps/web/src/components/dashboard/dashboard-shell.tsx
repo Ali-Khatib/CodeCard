@@ -154,6 +154,7 @@ export function DashboardShell({
             href={href}
             onClick={() => markPending(href)}
             className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''} ${pending ? 'cc-app-nav-link--pending' : ''}`}
+            aria-current={active ? 'page' : undefined}
             aria-busy={pending}
           >
             <Icon />
@@ -342,6 +343,7 @@ export function DashboardShell({
               className={`cc-app-mobile-nav__link ${
                 active ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
               } ${pending ? 'cc-app-mobile-nav__link--pending' : ''}`}
+              aria-current={active ? 'page' : undefined}
               aria-busy={pending}
             >
               <Icon />
