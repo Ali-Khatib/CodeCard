@@ -4,14 +4,18 @@ export const metadata = { title: 'Privacy Policy' };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" lastUpdated="June 27, 2025">
+    <LegalPage title="Privacy Policy" lastUpdated="July 16, 2026">
       <section>
         <h2>What we collect</h2>
         <p>
           When you create a CodeCard account, we collect your email address, display name, and
           profile information you choose to provide. When visitors view your public profile, we
-          collect basic analytics such as view counts, referrer, and session identifiers, not
-          personally identifiable information about visitors unless they create an account.
+          collect basic first-party analytics such as event type, approximate referrer or traffic
+          source category, opaque session identifiers used for duplicate suppression, and optional
+          non-identifying metadata (for example time spent). We do not use device fingerprinting.
+          We do not intentionally store full visitor User-Agent strings in analytics records.
+          Hosting and rate-limiting infrastructure may process network metadata such as IP addresses
+          transiently to operate the service; those values are not product analytics columns.
         </p>
       </section>
       <section>
@@ -43,7 +47,12 @@ export default function PrivacyPage() {
         <h2>Retention</h2>
         <p>
           We retain your account data while your account is active. You may request deletion by
-          contacting us. Analytics events are retained for 12 months.
+          contacting us. Raw analytics events are retained for up to 90 days from the server
+          timestamp when they were recorded, then deleted during the next cleanup cycle. Owner
+          analytics dashboards currently summarize those raw events, so older history is not kept
+          as a separate lifetime aggregate store. Billing, audit, moderation, and security records
+          follow separate retention rules. Account deletion workflows may remove owner-linked
+          analytics earlier than the 90-day maximum once that deletion process is available.
         </p>
       </section>
       <section>

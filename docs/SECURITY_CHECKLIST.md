@@ -4,6 +4,8 @@ Use before production deploys and audience expansion. Companion assessment: [`WS
 
 Client-side image resizing/compression (WS04-T012) is a **performance** optimization only. It does **not** replace MIME, extension, size, ownership, RLS, rate-limit, or malware decisions. See [`CLIENT_IMAGE_OPTIMIZATION.md`](./CLIENT_IMAGE_OPTIMIZATION.md).
 
+Analytics retention (WS08-T012): raw analytics events are retained for **up to 90 days**. See [`ANALYTICS_RETENTION.md`](./ANALYTICS_RETENTION.md) and [`RUNBOOK.md`](./RUNBOOK.md). Do not confuse analytics cleanup with billing, audit, or moderation retention.
+
 ---
 
 ## Secrets & configuration
