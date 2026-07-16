@@ -30,6 +30,8 @@ export interface ResearchPaper {
   figures: ResearchFigure[];
   downloadCount?: number;
   avgReadTimeSec?: number;
+  /** Owner dashboard publication flag from `research_papers.is_published`. */
+  isPublished?: boolean;
 }
 
 export type DbResearchFigure = {
@@ -55,6 +57,7 @@ type DbResearchPaper = {
   tags?: string[] | null;
   cover_image_url?: string | null;
   related_project_id?: string | null;
+  is_published?: boolean | null;
   research_figures?: DbResearchFigure[] | null;
   related_project?: { id: string; title: string; is_published?: boolean | null } | null;
 };
@@ -97,6 +100,7 @@ export function normalizeResearchPaper(
       relatedProjectId && profileSlug
         ? `${profileSlug === 'demo' ? '/demo' : `/${profileSlug}`}/projects/${relatedProjectId}`
         : null,
+    isPublished: Boolean(paper.is_published),
     figures: (paper.research_figures ?? [])
       .slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))

@@ -7,8 +7,10 @@ export const dynamic = 'force-static';
 export default function PreviewResearchPage() {
   return (
     <DashboardResearchView
-      papers={DEMO_RESEARCH_PAPERS}
+      papers={DEMO_RESEARCH_PAPERS.map((paper) => ({ ...paper, isPublished: true }))}
       profileSlug={DEMO_WORKSPACE.profileSlug}
+      isProfilePublic
+      basePath="/dashboard/preview"
     />
   );
 }

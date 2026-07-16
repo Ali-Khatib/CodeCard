@@ -6,17 +6,35 @@ import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
+function paperPublicHref(
+  paper: ResearchPaper,
+  profileSlug: string | null | undefined,
+  isProfilePublic: boolean,
+): string | null {
+  if (!paper.isPublished || !isProfilePublic || !profileSlug || !paper.slug) {
+    return null;
+  }
+  if (profileSlug === 'demo') {
+    return `/demo/research/${paper.slug}`;
+  }
+  return `/${profileSlug}/research/${paper.slug}`;
+}
+
 export function DashboardResearchView({
   papers,
   profileSlug,
   profileId,
+  isProfilePublic = false,
+  basePath = '/dashboard',
 }: {
   papers: ResearchPaper[];
   profileSlug?: string | null;
   profileId?: string;
+  isProfilePublic?: boolean;
+  basePath?: string;
 }) {
-  const baseProfileHref = profileSlug ? `/${profileSlug}` : null;
   const orderedPaperIds = papers.map((paper) => paper.id);
+  const createHref = `${basePath}/research/new`;
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -25,7 +43,7 @@ export function DashboardResearchView({
         title="Papers & publications"
         description="Showcase abstracts, citations, PDFs, figures, and the projects connected to your research."
         actions={
-          <AppButton variant="primary" href="/dashboard/research/new">
+          <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
             Add research
           </AppButton>
         }
@@ -33,32 +51,47 @@ export function DashboardResearchView({
 
       {papers.length > 0 ? (
         <div className="flex flex-col gap-8">
-          {papers.map((paper, index) => (
-            <div key={paper.id} className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <ResearchReorderToolbar
-                  paperId={paper.id}
-                  paperTitle={paper.title}
-                  index={index}
-                  total={papers.length}
-                  orderedPaperIds={orderedPaperIds}
+          {papers.map((paper, index) => {
+            const editHref = `${basePath}/research/${paper.id}/edit`;
+            const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
+            return (
+              <div key={paper.id} className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <ResearchReorderToolbar
+                    paperId={paper.id}
+                    paperTitle={paper.title}
+                    index={index}
+                    total={papers.length}
+                    orderedPaperIds={orderedPaperIds}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={editHref}
+                      className="cc-app-btn cc-app-btn--ghost text-[13px]"
+                      aria-label={`Edit research paper ${paper.title}`}
+                    >
+                      Edit
+                    </Link>
+                    {publicHref ? (
+                      <Link
+                        href={publicHref}
+                        className="cc-app-btn cc-app-btn--ghost text-[13px]"
+                        aria-label={`View ${paper.title} publicly`}
+                      >
+                        View public
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+                <ResearchPaperCard
+                  paper={paper}
+                  href={publicHref ?? editHref}
+                  profileId={profileId}
+                  delay={index * 0.06}
                 />
-                <Link
-                  href={`/dashboard/research/${paper.id}/edit`}
-                  className="cc-app-btn cc-app-btn--ghost text-[13px]"
-                  aria-label={`Edit research paper ${paper.title}`}
-                >
-                  Edit
-                </Link>
               </div>
-              <ResearchPaperCard
-                paper={paper}
-                href={baseProfileHref ? `${baseProfileHref}/research/${paper.slug}` : '#'}
-                profileId={profileId}
-                delay={index * 0.06}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <AppCard className="!p-8 text-center">
@@ -71,7 +104,7 @@ export function DashboardResearchView({
             choose to share them.
           </p>
           <div className="mt-6 flex justify-center">
-            <AppButton variant="primary" href="/dashboard/research/new">
+            <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
               Create paper
             </AppButton>
           </div>
