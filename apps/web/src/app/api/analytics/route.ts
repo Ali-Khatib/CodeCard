@@ -12,6 +12,13 @@ import {
   normalizeAnalyticsSessionId,
 } from '@/lib/analytics/dedupe';
 import { isObviousAnalyticsBot, sanitizeAnalyticsMetadata } from '@/lib/analytics/bot-filter';
+import { parseActiveTimeSeconds } from '@/lib/analytics/active-time';
+
+const TIME_SPENT_EVENTS = new Set([
+  'project_time_spent',
+  'project_section_time_spent',
+  'time_spent_on_research',
+]);
 
 export async function POST(request: Request) {
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
@@ -34,6 +41,14 @@ export async function POST(request: Request) {
     } = data;
     const session_id = normalizeAnalyticsSessionId(data.session_id);
     const safeMetadata = sanitizeAnalyticsMetadata(metadata);
+
+    if (TIME_SPENT_EVENTS.has(event_type)) {
+      const seconds = parseActiveTimeSeconds(safeMetadata.seconds);
+      if (seconds == null) {
+        return NextResponse.json({ error: 'Invalid duration' }, { status: 400 });
+      }
+      safeMetadata.seconds = seconds;
+    }
 
     const eventForDedupe = {
       event_type,

@@ -15,7 +15,8 @@ import { describeExternalPdfSource } from '@/lib/research/research-external-pdf'
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
-import { trackResearchEvent } from './research-analytics';
+import { canTrackId, trackResearchEvent } from './research-analytics';
+import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 
 function metadataLine(paper: ResearchPaper) {
   return [paper.venue, paper.publicationStatus, paper.year].filter(Boolean).join(' · ');
@@ -42,23 +43,25 @@ export function ResearchPaperDetail({
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
   useEffect(() => {
-    const startedAt = Date.now();
     trackResearchEvent({
       eventType: 'research_view',
       profileId,
       researchPaperId: paper.id,
     });
+  }, [paper.id, profileId]);
 
-    return () => {
-      const seconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+  useActiveTimeTracking({
+    enabled: canTrackId(profileId) && canTrackId(paper.id),
+    targetKey: `research:${paper.id}`,
+    onFlush: (seconds) => {
       trackResearchEvent({
         eventType: 'time_spent_on_research',
         profileId,
         researchPaperId: paper.id,
         metadata: { seconds },
       });
-    };
-  }, [paper.id, profileId]);
+    },
+  });
 
   const abstract = paper.abstract ?? 'Abstract coming soon.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;

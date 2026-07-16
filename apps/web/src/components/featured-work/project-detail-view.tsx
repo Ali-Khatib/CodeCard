@@ -20,7 +20,8 @@ import { ProjectWorkAtmosphere } from './project-work-atmosphere';
 import { isProjectTransitionTarget, useProjectOpenOptional } from './project-open-overlay';
 import { ProjectCaseStudyTabs } from './project-case-study-tabs';
 import { hasShowcaseExtras } from '@/lib/projects/case-study-sections';
-import { trackProjectEngagementEvent } from '@/components/research/research-analytics';
+import { trackProjectEngagementEvent, canTrackId } from '@/components/research/research-analytics';
+import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 
 const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
@@ -83,26 +84,18 @@ export function ProjectDetailView({
     clearOptimisticProject();
   }, [project.id, profileId, transitionHandoff]);
 
-  useEffect(() => {
-    if (transitionHandoff) return;
-    const startedAt = Date.now();
-    return () => {
-      const seconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+  useActiveTimeTracking({
+    enabled: !transitionHandoff && canTrackId(profileId) && canTrackId(project.id),
+    targetKey: `project:${project.id}`,
+    onFlush: (seconds) => {
       trackProjectEngagementEvent({
         eventType: 'project_time_spent',
         profileId,
         projectId: project.id,
         metadata: { seconds },
       });
-      trackProjectEngagementEvent({
-        eventType: 'project_section_time_spent',
-        profileId,
-        projectId: project.id,
-        sectionName: 'Project page',
-        metadata: { seconds },
-      });
-    };
-  }, [project.id, profileId, transitionHandoff]);
+    },
+  });
 
   const trackProjectSection = useCallback(
     (sectionName: string, eventType: 'project_section_view' | 'project_section_hover_or_click' = 'project_section_view') => {

@@ -477,3 +477,27 @@ describe('WS08-T005 POST /api/analytics bot filtering', () => {
     expect(JSON.stringify(inserted).toLowerCase()).not.toContain('googlebot');
   });
 });
+
+describe('WS08-T009 POST /api/analytics duration validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRateLimit.mockResolvedValue({ success: true });
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+  });
+
+  it('rejects oversized and non-integer time_spent durations', async () => {
+    for (const seconds of [2, 1801, 3.5, -1] as const) {
+      const response = await POST(
+        makeRequest({
+          event_type: 'project_time_spent',
+          profile_id: PROFILE_ID,
+          project_id: PROJECT_ID,
+          target_type: 'project',
+          target_id: PROJECT_ID,
+          metadata: { seconds },
+        }),
+      );
+      expect(response.status).toBe(400);
+    }
+  });
+});
