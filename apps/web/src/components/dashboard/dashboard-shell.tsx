@@ -102,6 +102,20 @@ export function DashboardShell({
   }, [pathname]);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const active = document.querySelector('.cc-app-mobile-nav a[aria-current="page"]');
+    if (!(active instanceof HTMLElement)) return;
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    active.scrollIntoView({
+      inline: 'center',
+      block: 'nearest',
+      behavior: reduced ? 'auto' : 'smooth',
+    });
+  }, [pathname]);
+
+  useEffect(() => {
     if (!pendingHref) return;
     const timeout = window.setTimeout(() => setPendingHref(null), 5000);
     return () => window.clearTimeout(timeout);
