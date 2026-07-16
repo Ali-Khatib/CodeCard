@@ -6,6 +6,7 @@ import {
   DashboardOverviewMissingState,
 } from '@/components/dashboard/dashboard-overview-route-states';
 import { loadOwnerAnalytics } from '@/lib/dashboard/analytics-queries';
+import { loadOwnerOverviewContent } from '@/lib/dashboard/overview-queries';
 import { getProfileCompletionNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
@@ -29,9 +30,10 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult] = await Promise.all([
+  const [completionResult, analyticsResult, contentResult] = await Promise.all([
     loadProfileCompletion(supabase, profile),
     loadOwnerAnalytics(supabase, user!.id),
+    loadOwnerOverviewContent(supabase, user!.id),
   ]);
 
   if (!completionResult.ok) {
@@ -67,6 +69,10 @@ export default async function DashboardHomePage() {
       }
     : null;
 
+  const contentError = !contentResult.ok;
+  const projectsSummary = contentResult.ok ? contentResult.projects : null;
+  const researchSummary = contentResult.ok ? contentResult.research : null;
+
   return (
     <DashboardOverviewView
       greeting={greetingForHour()}
@@ -81,6 +87,9 @@ export default async function DashboardHomePage() {
       profile={profile}
       stats={stats}
       statsError={statsError}
+      projectsSummary={projectsSummary}
+      researchSummary={researchSummary}
+      contentError={contentError}
       activity={[]}
       suggested={suggested}
     />

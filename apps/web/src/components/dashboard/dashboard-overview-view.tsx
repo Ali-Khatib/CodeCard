@@ -10,6 +10,7 @@ import { Sparkline } from './sparkline';
 import { ProfileShareHero } from './profile-share-hero';
 import { FadeInView } from './fade-in-view';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
+import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
@@ -37,6 +38,12 @@ export type OverviewProps = {
   stats: OverviewReachStats | null;
   /** True when reach stats could not be loaded (not the same as zero). */
   statsError?: boolean;
+  /** Real project inventory, or null when the query failed. */
+  projectsSummary: OverviewContentSummary | null;
+  /** Real research inventory, or null when the query failed. */
+  researchSummary: OverviewContentSummary | null;
+  /** True when project/research inventory could not be loaded. */
+  contentError?: boolean;
   activity: WorkspaceActivity[];
   suggested: { title: string; detail: string; href: string } | null;
   basePath?: string;
@@ -63,6 +70,9 @@ export function DashboardOverviewView({
   preview = false,
   stats,
   statsError = false,
+  projectsSummary,
+  researchSummary,
+  contentError = false,
   activity,
   suggested,
   basePath = '/dashboard',
@@ -210,6 +220,118 @@ export function DashboardOverviewView({
           </section>
         </FadeInView>
       ) : null}
+
+      {/* ── Zone 5b: Real projects & research inventory ── */}
+      <FadeInView delay={0.18}>
+        <section className="cc-profile-home__zone" aria-label="Your work">
+          <div className="cc-profile-home__zone-head">
+            <div>
+              <AppMono>Your work</AppMono>
+              <h2 className="cc-profile-home__zone-title">Projects and research</h2>
+            </div>
+          </div>
+          {contentError || !projectsSummary || !researchSummary ? (
+            <AppCard tone="rose" className="!p-5">
+              <p className="text-[15px] text-[var(--app-ink)]">
+                Project and research summaries could not be loaded. Open Projects or Research to
+                continue editing.
+              </p>
+            </AppCard>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2">
+              <AppCard className="!p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[13px] text-[var(--app-smoke)]">Projects</p>
+                    <p className="mt-1 text-[28px] font-medium tabular-nums text-[var(--app-ink)]">
+                      <CountUp value={projectsSummary.total} />
+                    </p>
+                    <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+                      {projectsSummary.published} published
+                    </p>
+                  </div>
+                  <AppButton variant="ghost" href={`${basePath}/projects`}>
+                    View all
+                  </AppButton>
+                </div>
+                {projectsSummary.total === 0 ? (
+                  <div className="mt-4">
+                    <p className="text-[14px] text-[var(--app-smoke)]">
+                      No projects yet. Create your first project to show on your CodeCard.
+                    </p>
+                    <AppButton variant="primary" href={`${basePath}/projects/new`} className="mt-3">
+                      Add project
+                    </AppButton>
+                  </div>
+                ) : (
+                  <ul className="mt-4 space-y-2">
+                    {projectsSummary.recent.map((item) => (
+                      <li key={item.id}>
+                        <a
+                          href={item.href.startsWith('/') ? item.href : `${basePath}/projects/${item.id}/edit`}
+                          className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                        >
+                          <span className="min-w-0 truncate font-medium">{item.title}</span>
+                          <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
+                            {item.isPublished ? 'Published' : 'Draft'}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AppCard>
+
+              <AppCard className="!p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[13px] text-[var(--app-smoke)]">Research</p>
+                    <p className="mt-1 text-[28px] font-medium tabular-nums text-[var(--app-ink)]">
+                      <CountUp value={researchSummary.total} />
+                    </p>
+                    <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+                      {researchSummary.published} published
+                    </p>
+                  </div>
+                  <AppButton variant="ghost" href={`${basePath}/research`}>
+                    View all
+                  </AppButton>
+                </div>
+                {researchSummary.total === 0 ? (
+                  <div className="mt-4">
+                    <p className="text-[14px] text-[var(--app-smoke)]">
+                      No research papers yet. Add a paper when you are ready.
+                    </p>
+                    <AppButton variant="primary" href={`${basePath}/research/new`} className="mt-3">
+                      Add paper
+                    </AppButton>
+                  </div>
+                ) : (
+                  <ul className="mt-4 space-y-2">
+                    {researchSummary.recent.map((item) => (
+                      <li key={item.id}>
+                        <a
+                          href={
+                            item.href.startsWith('/')
+                              ? item.href
+                              : `${basePath}/research/${item.id}/edit`
+                          }
+                          className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                        >
+                          <span className="min-w-0 truncate font-medium">{item.title}</span>
+                          <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
+                            {item.isPublished ? 'Published' : 'Draft'}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AppCard>
+            </div>
+          )}
+        </section>
+      </FadeInView>
 
       {/* ── Zone 6: Reach snapshot ── */}
       <FadeInView delay={0.2}>
