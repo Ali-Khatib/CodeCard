@@ -21,7 +21,12 @@ export type PortfolioProject = {
   title: string;
   tagline?: string;
   description?: string;
+  /** Primary navigation target (public when available, otherwise edit). */
   href: string;
+  /** Authenticated editor route. */
+  editHref: string;
+  /** Canonical public project URL when publication rules allow it. */
+  publicHref?: string;
   posterUrl?: string;
   videoUrl?: string;
   technologies: string[];
@@ -76,6 +81,9 @@ export function dbProjectToPortfolioProject(
   project: DbProject,
   options?: {
     resolveStoragePath?: (storagePath: string) => string;
+    profileSlug?: string | null;
+    isProfilePublic?: boolean;
+    basePath?: string;
   },
 ): PortfolioProject {
   const featured = normalizeFeaturedProject(
@@ -88,18 +96,27 @@ export function dbProjectToPortfolioProject(
   );
   const live = firstSafeProjectLink(featured.links, ['live', 'demo']);
   const repo = firstSafeProjectLink(featured.links, ['repo']);
+  const basePath = options?.basePath ?? '/dashboard';
+  const editHref = `${basePath}/projects/${project.id}/edit`;
+  const canViewPublic =
+    Boolean(project.is_published) &&
+    Boolean(options?.isProfilePublic) &&
+    Boolean(options?.profileSlug);
+  const publicHref = canViewPublic
+    ? `/${options!.profileSlug}/projects/${project.id}`
+    : undefined;
 
   return {
     id: project.id,
     title: project.title,
     tagline: project.tagline ?? undefined,
     description: project.description ?? featured.description ?? undefined,
-    href: `/dashboard/projects/${project.id}`,
+    href: publicHref ?? editHref,
+    editHref,
+    publicHref,
     posterUrl: featured.posterUrl ?? undefined,
     videoUrl: featured.videoUrl ?? undefined,
     technologies: featured.technologies,
-    views: 120 + Math.floor(Math.random() * 280),
-    saves: 8 + Math.floor(Math.random() * 40),
     liveUrl: live?.url,
     repoUrl: repo?.url,
     screenshots: featured.screenshots,
@@ -113,13 +130,19 @@ export function featuredToPortfolioProject(
 ): PortfolioProject {
   const live = firstSafeProjectLink(project.links, ['live', 'demo']);
   const repo = firstSafeProjectLink(project.links, ['repo']);
+  const editHref = `/dashboard/preview/projects`;
+  const resolvedHref = href ?? editHref;
 
   return {
     id: project.id,
     title: project.title,
     tagline: project.tagline ?? undefined,
     description: project.description ?? undefined,
-    href: href ?? `/dashboard/projects/${project.id}`,
+    href: resolvedHref,
+    editHref,
+    publicHref: resolvedHref.startsWith('/demo') || resolvedHref.startsWith('/')
+      ? resolvedHref
+      : undefined,
     posterUrl: project.posterUrl ?? undefined,
     videoUrl: project.videoUrl ?? undefined,
     technologies: project.technologies,

@@ -42,9 +42,10 @@ export function ProjectsBubbleGrid({
             transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             <Link
-              href={`${basePath}/projects/${project.id}`}
+              href={project.editHref}
               className="cc-projects-bubble group"
               title={project.title}
+              aria-label={`Edit ${project.title}`}
             >
               <div className="cc-projects-bubble__thumb">
                 <Image

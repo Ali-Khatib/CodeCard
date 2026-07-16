@@ -64,7 +64,12 @@ export default async function ProjectsPage() {
     <DashboardProjectsPortfolio
       creator={creator}
       projects={orderedProjects.map((project) =>
-        dbProjectToPortfolioProject(project, { resolveStoragePath: resolveMediaUrl }),
+        dbProjectToPortfolioProject(project, {
+          resolveStoragePath: resolveMediaUrl,
+          profileSlug: profile?.slug,
+          isProfilePublic: Boolean(profile?.is_public),
+          basePath: '/dashboard',
+        }),
       )}
       emptyState={(orderedProjects.length ?? 0) === 0}
     />
