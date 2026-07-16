@@ -21,15 +21,40 @@ export interface AnalyticsEventPayload {
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const SESSION_STORAGE_KEY = 'cc_analytics_sid';
+
 export function isAnalyticsResourceId(id: string | undefined): id is string {
   return Boolean(id && UUID_RE.test(id));
 }
 
-export function createSessionId(): string {
+function createEphemeralSessionId(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+/** Opaque first-party analytics session id (tab-scoped via sessionStorage). */
+export function getAnalyticsSessionId(): string {
+  if (typeof window === 'undefined') {
+    return createEphemeralSessionId();
+  }
+  try {
+    const existing = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (existing && existing.length >= 8 && existing.length <= 64) {
+      return existing;
+    }
+    const created = createEphemeralSessionId();
+    window.sessionStorage.setItem(SESSION_STORAGE_KEY, created);
+    return created;
+  } catch {
+    return createEphemeralSessionId();
+  }
+}
+
+/** Stable alias — returns the sticky first-party session id. */
+export function createSessionId(): string {
+  return getAnalyticsSessionId();
 }
 
 export async function trackEvent(
@@ -41,11 +66,16 @@ export async function trackEvent(
   if (payload.research_paper_id && !isAnalyticsResourceId(payload.research_paper_id)) return;
   if (payload.target_id && !isAnalyticsResourceId(payload.target_id)) return;
 
+  const body: AnalyticsEventPayload = {
+    ...payload,
+    session_id: payload.session_id ?? getAnalyticsSessionId(),
+  };
+
   try {
     await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
       keepalive: true,
     });
   } catch {

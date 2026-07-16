@@ -3,7 +3,7 @@ import { Redis } from '@upstash/redis';
 import { RATE_LIMITS } from '@codecard/config';
 import { isProduction } from '@/lib/security/env';
 
-function getRedis(): Redis | null {
+export function getRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return null;

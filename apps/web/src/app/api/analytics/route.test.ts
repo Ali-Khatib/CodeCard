@@ -4,9 +4,11 @@ import { POST } from './route';
 const mockRateLimit = vi.fn();
 const mockFrom = vi.fn();
 const mockGetUser = vi.fn();
+const mockGetRedis = vi.fn(() => null);
 
 vi.mock('@/lib/rate-limit', () => ({
   rateLimit: (...args: unknown[]) => mockRateLimit(...args),
+  getRedis: () => mockGetRedis(),
 }));
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -41,6 +43,10 @@ function chainable(result: { data: Row | Row[] | null; error?: unknown | null })
   builder.select = vi.fn(self);
   builder.insert = vi.fn(async () => ({ data: null, error: null }));
   builder.eq = vi.fn(self);
+  builder.gt = vi.fn(self);
+  builder.gte = vi.fn(self);
+  builder.limit = vi.fn(self);
+  builder.contains = vi.fn(self);
   builder.maybeSingle = vi.fn(async () => ({
     data: Array.isArray(result.data) ? result.data[0] ?? null : result.data,
     error: result.error ?? null,
@@ -338,5 +344,68 @@ describe('WS08-T003 POST /api/analytics owner self-view exclusion', () => {
     );
     expect(await response.json()).toEqual({ ok: true, status: 'recorded' });
     expect(insertQuery.insert).toHaveBeenCalled();
+  });
+});
+
+describe('WS08-T004 POST /api/analytics deduplication', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRateLimit.mockResolvedValue({ success: true });
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+  });
+
+  it('ignores a duplicate profile_view within the 30-second window', async () => {
+    const profileQuery = chainable({ data: { tenant_id: TENANT_ID } });
+    const recent = chainable({ data: { id: 'existing-event' } });
+    const inserts = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return profileQuery;
+      if (table === 'analytics_events') return recent;
+      return inserts;
+    });
+
+    const response = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      }),
+    );
+
+    expect(await response.json()).toEqual({ ok: true, status: 'ignored' });
+    expect(inserts.insert).not.toHaveBeenCalled();
+    expect(recent.insert).not.toHaveBeenCalled();
+  });
+
+  it('records the first profile_view when no recent duplicate exists', async () => {
+    const profileQuery = chainable({ data: { tenant_id: TENANT_ID } });
+    const analytics = chainable({ data: null });
+    const publicEvents = chainable({ data: null });
+    let analyticsSelects = 0;
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return profileQuery;
+      if (table === 'public_profile_events') return publicEvents;
+      if (table === 'analytics_events') {
+        analyticsSelects += 1;
+        // First call is the dedupe lookup (no row); later calls are inserts on same builder.
+        if (analyticsSelects === 1) {
+          return analytics;
+        }
+        return analytics;
+      }
+      return chainable({ data: null });
+    });
+
+    const response = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+      }),
+    );
+
+    expect(await response.json()).toEqual({ ok: true, status: 'recorded' });
+    expect(publicEvents.insert).toHaveBeenCalled();
+    expect(analytics.insert).toHaveBeenCalled();
   });
 });
