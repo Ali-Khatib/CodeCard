@@ -3,6 +3,10 @@ import { analyticsEventSchema } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { secureJsonRoute } from '@/lib/security/secure-route';
 import { isApprovedLinkCategory } from '@/lib/analytics/link-click';
+import {
+  isAuthenticatedContentOwner,
+  isOwnerExcludedAudienceEvent,
+} from '@/lib/analytics/owner-exclusion';
 
 export async function POST(request: Request) {
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
@@ -95,6 +99,20 @@ export async function POST(request: Request) {
       });
 
       return NextResponse.json({ ok: true, status: 'recorded' });
+    }
+
+    // Audience views/time: skip when authenticated viewer owns the target (server-resolved).
+    if (isOwnerExcludedAudienceEvent(event_type)) {
+      const isOwner = await isAuthenticatedContentOwner(supabase, {
+        profile_id,
+        project_id,
+        research_paper_id,
+        target_type,
+        target_id,
+      });
+      if (isOwner) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
+      }
     }
 
     if (event_type === 'profile_view' && profile_id) {
