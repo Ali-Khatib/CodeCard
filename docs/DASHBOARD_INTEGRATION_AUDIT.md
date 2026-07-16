@@ -182,10 +182,19 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 ## Batch 1 intended outcomes
 
 1. **T001** — This inventory (complete).
-2. **T002** — Remove Circle and Connections from active MVP `NAV_ITEMS` (preferred); leave preview routes intact.
+2. **T002** — **Done:** Circle and Connections removed from authenticated MVP `NAV_ITEMS` (preferred). Preview routes and legacy `/dashboard/circle` / `/dashboard/connections` pages remain reachable by direct URL only; they are not advertised in MVP nav.
 3. **T003** — Overview shows real project/research summaries without demo fill.
 4. **T004** — Projects tab CRUD navigation verified/fixed if gaps.
 5. **T005** — Research tab CRUD navigation verified/fixed (`#` fallback, consistent paths).
+
+### T002 navigation decision (recorded)
+
+| Item | Decision |
+|---|---|
+| Circle | **Removed** from active MVP navigation |
+| Connections | **Removed** from active MVP navigation |
+| Preview Circle/Connections | **Retained** under `/dashboard/preview/*` |
+| Auth Circle/Connections pages | **Retained** as non-nav legacy demo routes (not linked) |
 
 ---
 

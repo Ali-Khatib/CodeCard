@@ -19,9 +19,7 @@ const NAV_ITEMS = [
   { segment: 'profile', label: 'Profile', icon: 'profile' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
   { segment: 'research', label: 'Research', icon: 'research' as const },
-  { segment: 'circle', label: 'Circle', icon: 'circle' as const },
   { segment: 'analytics', label: 'Analytics', icon: 'analytics' as const },
-  { segment: 'connections', label: 'Connections', icon: 'connections' as const },
   { segment: 'settings', label: 'Settings', icon: 'settings' as const },
 ] as const;
 
