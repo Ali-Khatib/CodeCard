@@ -25,36 +25,46 @@ const TENANT_ID = '44444444-4444-4444-8444-444444444444';
 
 type Row = Record<string, unknown>;
 
-function makeRequest(body: unknown) {
+function makeRequest(body: unknown, headers: Record<string, string> = {}) {
   return new Request('https://codecard.app/api/analytics', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       origin: 'https://codecard.app',
       'sec-fetch-site': 'same-origin',
+      'user-agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      ...headers,
     },
     body: JSON.stringify(body),
   });
 }
 
 function chainable(result: { data: Row | Row[] | null; error?: unknown | null }) {
-  const builder: Record<string, unknown> = {};
+  const builder = {
+    select: vi.fn(),
+    insert: vi.fn(async (_row?: Row) => ({ data: null, error: null })),
+    eq: vi.fn(),
+    gt: vi.fn(),
+    gte: vi.fn(),
+    limit: vi.fn(),
+    contains: vi.fn(),
+    maybeSingle: vi.fn(async () => ({
+      data: Array.isArray(result.data) ? result.data[0] ?? null : result.data,
+      error: result.error ?? null,
+    })),
+    single: vi.fn(async () => ({
+      data: Array.isArray(result.data) ? result.data[0] ?? null : result.data,
+      error: result.error ?? null,
+    })),
+  };
   const self = () => builder;
-  builder.select = vi.fn(self);
-  builder.insert = vi.fn(async () => ({ data: null, error: null }));
-  builder.eq = vi.fn(self);
-  builder.gt = vi.fn(self);
-  builder.gte = vi.fn(self);
-  builder.limit = vi.fn(self);
-  builder.contains = vi.fn(self);
-  builder.maybeSingle = vi.fn(async () => ({
-    data: Array.isArray(result.data) ? result.data[0] ?? null : result.data,
-    error: result.error ?? null,
-  }));
-  builder.single = vi.fn(async () => ({
-    data: Array.isArray(result.data) ? result.data[0] ?? null : result.data,
-    error: result.error ?? null,
-  }));
+  builder.select.mockImplementation(self);
+  builder.eq.mockImplementation(self);
+  builder.gt.mockImplementation(self);
+  builder.gte.mockImplementation(self);
+  builder.limit.mockImplementation(self);
+  builder.contains.mockImplementation(self);
   return builder;
 }
 
@@ -103,7 +113,8 @@ describe('WS08-T002 POST /api/analytics link_click', () => {
         metadata: { link_category: 'github', link_kind: 'profile' },
       }),
     );
-    const inserted = vi.mocked(insertQuery.insert).mock.calls[0]?.[0] as Row;
+    const inserted = insertQuery.insert.mock.calls[0]?.[0];
+    expect(inserted).toBeDefined();
     expect(JSON.stringify(inserted)).not.toContain('https://github.com');
   });
 
@@ -407,5 +418,62 @@ describe('WS08-T004 POST /api/analytics deduplication', () => {
     expect(await response.json()).toEqual({ ok: true, status: 'recorded' });
     expect(publicEvents.insert).toHaveBeenCalled();
     expect(analytics.insert).toHaveBeenCalled();
+  });
+});
+
+describe('WS08-T005 POST /api/analytics bot filtering', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRateLimit.mockResolvedValue({ success: true });
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+  });
+
+  it('ignores Googlebot without inserting events', async () => {
+    const inserts = chainable({ data: null });
+    mockFrom.mockReturnValue(inserts);
+
+    const response = await POST(
+      makeRequest(
+        {
+          event_type: 'profile_view',
+          profile_id: PROFILE_ID,
+          session_id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+        },
+        {
+          'user-agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        },
+      ),
+    );
+
+    expect(await response.json()).toEqual({ ok: true, status: 'ignored' });
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+
+  it('does not trust a user-agent field in the JSON body', async () => {
+    const profileQuery = chainable({ data: { tenant_id: TENANT_ID } });
+    const analytics = chainable({ data: null });
+    const publicEvents = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return profileQuery;
+      if (table === 'public_profile_events') return publicEvents;
+      if (table === 'analytics_events') return analytics;
+      return chainable({ data: null });
+    });
+
+    const response = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        user_agent: 'Googlebot/2.1',
+        metadata: { userAgent: 'Googlebot/2.1' },
+      }),
+    );
+
+    expect(await response.json()).toEqual({ ok: true, status: 'recorded' });
+    expect(analytics.insert).toHaveBeenCalled();
+    const inserted = analytics.insert.mock.calls[0]?.[0];
+    expect(inserted).toBeDefined();
+    expect(JSON.stringify(inserted).toLowerCase()).not.toContain('googlebot');
   });
 });

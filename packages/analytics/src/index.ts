@@ -34,18 +34,36 @@ function createEphemeralSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+type SessionStore = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+};
+
+function getSessionStore(): SessionStore | null {
+  try {
+    const root = globalThis as typeof globalThis & {
+      sessionStorage?: SessionStore;
+      window?: { sessionStorage?: SessionStore };
+    };
+    return root.sessionStorage ?? root.window?.sessionStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Opaque first-party analytics session id (tab-scoped via sessionStorage). */
 export function getAnalyticsSessionId(): string {
-  if (typeof window === 'undefined') {
+  const store = getSessionStore();
+  if (!store) {
     return createEphemeralSessionId();
   }
   try {
-    const existing = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    const existing = store.getItem(SESSION_STORAGE_KEY);
     if (existing && existing.length >= 8 && existing.length <= 64) {
       return existing;
     }
     const created = createEphemeralSessionId();
-    window.sessionStorage.setItem(SESSION_STORAGE_KEY, created);
+    store.setItem(SESSION_STORAGE_KEY, created);
     return created;
   } catch {
     return createEphemeralSessionId();

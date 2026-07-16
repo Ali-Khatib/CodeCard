@@ -8,14 +8,14 @@ describe('WS08-T004 sticky analytics session', () => {
 
   it('reuses the same sessionStorage id within a tab', async () => {
     const store = new Map<string, string>();
-    vi.stubGlobal('window', {
-      sessionStorage: {
-        getItem: (k: string) => store.get(k) ?? null,
-        setItem: (k: string, v: string) => {
-          store.set(k, v);
-        },
+    const sessionStorage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
       },
-    });
+    };
+    vi.stubGlobal('sessionStorage', sessionStorage);
+    vi.stubGlobal('window', { sessionStorage });
     vi.stubGlobal('crypto', {
       randomUUID: () => '11111111-1111-4111-8111-111111111111',
     });
