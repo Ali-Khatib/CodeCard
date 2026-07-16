@@ -1,5 +1,5 @@
-import { DashboardAnalyticsView } from '@/components/dashboard/dashboard-analytics-view';
+import { PreviewAnalyticsView } from '@/components/dashboard/preview-analytics-view';
 
 export default function PreviewAnalyticsPage() {
-  return <DashboardAnalyticsView displayName="Alex Chen" />;
+  return <PreviewAnalyticsView displayName="Alex Chen" />;
 }
