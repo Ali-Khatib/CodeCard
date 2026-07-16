@@ -14,6 +14,7 @@ import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
+import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -180,6 +181,7 @@ export function DashboardShell({
   );
 
   return (
+    <MutationFeedbackProvider>
     <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref ? 'cc-app-root--route-pending' : ''}`}>
       {pendingHref && <div className="cc-app-route-progress" aria-hidden />}
       <button
@@ -367,5 +369,6 @@ export function DashboardShell({
         })}
       </nav>
     </div>
+    </MutationFeedbackProvider>
   );
 }

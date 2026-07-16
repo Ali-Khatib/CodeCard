@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Label } from '@codecard/ui';
 import type { Profile } from '@codecard/types';
@@ -14,6 +14,8 @@ import {
   updateProfileAction,
   type ProfileUpdateState,
 } from '@/lib/profile/update-profile-action';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -24,18 +26,31 @@ const initialState: ProfileUpdateState = {};
 
 export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
   const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const [form, setForm] = useState(() => profileToFormState(profile));
   const [clientError, setClientError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const notifiedErrorRef = useRef<string | null>(null);
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
 
   useEffect(() => {
     if (!state.success) return;
     setSaveSuccess(true);
+    notifySuccess(MUTATION_FEEDBACK.profile.saved);
     router.refresh();
-    const timeout = window.setTimeout(() => setSaveSuccess(false), 3000);
-    return () => window.clearTimeout(timeout);
-  }, [state.success, router]);
+  }, [state.success, router, notifySuccess]);
+
+  useEffect(() => {
+    if (!state.error && !state.fieldErrors) {
+      notifiedErrorRef.current = null;
+      return;
+    }
+    if (state.fieldErrors?.slug || state.fieldErrors?.display_name) return;
+    if (state.error && notifiedErrorRef.current !== state.error) {
+      notifiedErrorRef.current = state.error;
+      notifyError(state.error, MUTATION_FEEDBACK.profile.saveFailed);
+    }
+  }, [state.error, state.fieldErrors, notifyError]);
 
   useEffect(() => {
     if (!saveSuccess) return;
@@ -142,11 +157,6 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
       {displayError && !state.fieldErrors?.slug && (
         <p className="text-sm text-red-400" role="alert">
           {displayError}
-        </p>
-      )}
-      {saveSuccess && (
-        <p className="text-sm text-emerald-300" role="status" aria-live="polite">
-          Profile saved.
         </p>
       )}
       <Button type="submit" disabled={pending} aria-busy={pending}>
