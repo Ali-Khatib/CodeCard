@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { analyticsEventSchema } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { secureJsonRoute } from '@/lib/security/secure-route';
+import { isApprovedLinkCategory } from '@/lib/analytics/link-click';
 
 export async function POST(request: Request) {
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
@@ -18,6 +19,83 @@ export async function POST(request: Request) {
       source,
       session_id,
     } = data;
+
+    if (event_type === 'link_click' && profile_id) {
+      const linkKind = metadata?.link_kind === 'project' ? 'project' : 'profile';
+      const linkCategory = metadata?.link_category;
+      if (!isApprovedLinkCategory(linkKind, linkCategory)) {
+        return NextResponse.json({ error: 'Invalid link category' }, { status: 400 });
+      }
+
+      if (linkKind === 'project') {
+        if (!project_id) {
+          return NextResponse.json({ error: 'Project required' }, { status: 400 });
+        }
+        const { data: project } = await supabase
+          .from('projects')
+          .select('tenant_id, profile_id, is_published')
+          .eq('id', project_id)
+          .eq('profile_id', profile_id)
+          .eq('is_published', true)
+          .maybeSingle();
+
+        if (!project) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', project.profile_id)
+          .eq('is_public', true)
+          .maybeSingle();
+
+        if (!profile) {
+          return NextResponse.json({ ok: true, status: 'ignored' });
+        }
+
+        await supabase.from('analytics_events').insert({
+          tenant_id: project.tenant_id,
+          profile_id: project.profile_id,
+          target_type: 'project',
+          target_id: project_id,
+          event_type: 'link_click',
+          metadata: {
+            link_category: linkCategory,
+            link_kind: 'project',
+          },
+          session_id,
+        });
+
+        return NextResponse.json({ ok: true, status: 'recorded' });
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', profile_id)
+        .eq('is_public', true)
+        .maybeSingle();
+
+      if (!profile) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
+      }
+
+      await supabase.from('analytics_events').insert({
+        tenant_id: profile.tenant_id,
+        profile_id,
+        target_type: 'profile',
+        target_id: profile_id,
+        event_type: 'link_click',
+        metadata: {
+          link_category: linkCategory,
+          link_kind: 'profile',
+        },
+        session_id,
+      });
+
+      return NextResponse.json({ ok: true, status: 'recorded' });
+    }
 
     if (event_type === 'profile_view' && profile_id) {
       const { data: profile } = await supabase
