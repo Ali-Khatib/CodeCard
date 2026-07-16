@@ -11,7 +11,7 @@ export default async function ResearchPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, slug')
+    .select('id, slug, is_public')
     .eq('owner_user_id', user!.id)
     .single();
 
@@ -30,6 +30,8 @@ export default async function ResearchPage() {
       )}
       profileSlug={profile?.slug}
       profileId={profile?.id}
+      isProfilePublic={Boolean(profile?.is_public)}
+      basePath="/dashboard"
     />
   );
 }
