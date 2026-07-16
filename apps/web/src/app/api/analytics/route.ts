@@ -11,9 +11,15 @@ import {
   isDuplicateAnalyticsEvent,
   normalizeAnalyticsSessionId,
 } from '@/lib/analytics/dedupe';
+import { isObviousAnalyticsBot, sanitizeAnalyticsMetadata } from '@/lib/analytics/bot-filter';
 
 export async function POST(request: Request) {
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
+    // After rate-limit + schema validation: ignore obvious automated agents.
+    if (isObviousAnalyticsBot(request.headers.get('user-agent'))) {
+      return NextResponse.json({ ok: true, status: 'ignored' });
+    }
+
     const supabase = await createClient();
     const {
       event_type,
@@ -27,6 +33,7 @@ export async function POST(request: Request) {
       source,
     } = data;
     const session_id = normalizeAnalyticsSessionId(data.session_id);
+    const safeMetadata = sanitizeAnalyticsMetadata(metadata);
 
     const eventForDedupe = {
       event_type,
@@ -38,7 +45,7 @@ export async function POST(request: Request) {
       target_id,
       section_name,
       source,
-      metadata: metadata ?? null,
+      metadata: safeMetadata,
     };
 
     if (event_type === 'link_click' && profile_id) {
@@ -170,7 +177,7 @@ export async function POST(request: Request) {
         target_type: 'profile',
         target_id: profile_id,
         event_type,
-        metadata: metadata ?? {},
+        metadata: safeMetadata,
         session_id,
       });
 
@@ -214,7 +221,7 @@ export async function POST(request: Request) {
           target_type: 'profile',
           target_id: profile_id,
           event_type,
-          metadata: metadata ?? {},
+          metadata: safeMetadata,
           session_id,
         });
       }
@@ -253,7 +260,7 @@ export async function POST(request: Request) {
         target_id: project_id,
         event_type,
         section_name,
-        metadata: metadata ?? {},
+        metadata: safeMetadata,
         session_id,
       });
 
@@ -284,7 +291,7 @@ export async function POST(request: Request) {
           target_id: resolvedTargetId,
           event_type,
           section_name,
-          metadata: metadata ?? {},
+          metadata: safeMetadata,
           session_id,
         });
       }
@@ -314,7 +321,7 @@ export async function POST(request: Request) {
           target_id: resolvedTargetId,
           event_type,
           section_name,
-          metadata: metadata ?? {},
+          metadata: safeMetadata,
           session_id,
         });
       }
