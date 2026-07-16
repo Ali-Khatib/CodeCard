@@ -208,3 +208,135 @@ describe('WS08-T002 POST /api/analytics link_click', () => {
     expect(response.status).toBe(422);
   });
 });
+
+const OWNER_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const OTHER_USER_ID = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+
+describe('WS08-T003 POST /api/analytics owner self-view exclusion', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRateLimit.mockResolvedValue({ success: true });
+  });
+
+  it('records anonymous profile_view and ignores authenticated owner', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+    const publicEvents = chainable({ data: null });
+    const analyticsEvents = chainable({ data: null });
+    const profileQuery = chainable({ data: { tenant_id: TENANT_ID } });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return profileQuery;
+      if (table === 'public_profile_events') return publicEvents;
+      if (table === 'analytics_events') return analyticsEvents;
+      return chainable({ data: null });
+    });
+
+    const anon = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'anon-1',
+      }),
+    );
+    expect(anon.status).toBe(200);
+    expect(publicEvents.insert).toHaveBeenCalled();
+
+    vi.clearAllMocks();
+    mockRateLimit.mockResolvedValue({ success: true });
+    mockGetUser.mockResolvedValue({ data: { user: { id: OWNER_ID } } });
+    const ownerProfile = chainable({ data: { owner_user_id: OWNER_ID } });
+    const ownerInserts = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return ownerProfile;
+      return ownerInserts;
+    });
+
+    const owner = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'owner-1',
+        metadata: { isOwner: false, ownerUserId: OTHER_USER_ID },
+      }),
+    );
+    expect(owner.status).toBe(200);
+    const ownerBody = await owner.json();
+    expect(ownerBody).toEqual({ ok: true, status: 'ignored' });
+    expect(ownerInserts.insert).not.toHaveBeenCalled();
+    expect(JSON.stringify(ownerBody)).not.toContain(OWNER_ID);
+  });
+
+  it('counts authenticated non-owner profile_view', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: OTHER_USER_ID } } });
+    let profileCalls = 0;
+    const ownership = chainable({ data: { owner_user_id: OWNER_ID } });
+    const publicProfile = chainable({ data: { tenant_id: TENANT_ID } });
+    const publicEvents = chainable({ data: null });
+    const analyticsEvents = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') {
+        profileCalls += 1;
+        return profileCalls === 1 ? ownership : publicProfile;
+      }
+      if (table === 'public_profile_events') return publicEvents;
+      if (table === 'analytics_events') return analyticsEvents;
+      return chainable({ data: null });
+    });
+
+    const response = await POST(
+      makeRequest({
+        event_type: 'profile_view',
+        profile_id: PROFILE_ID,
+        session_id: 'visitor-1',
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(publicEvents.insert).toHaveBeenCalled();
+    expect(analyticsEvents.insert).toHaveBeenCalled();
+  });
+
+  it('ignores owner project_view and project_time_spent', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: OWNER_ID } } });
+    const projectOwnership = chainable({ data: { owner_user_id: OWNER_ID } });
+    const inserts = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'projects') return projectOwnership;
+      return inserts;
+    });
+
+    for (const event_type of ['project_view', 'project_time_spent'] as const) {
+      const response = await POST(
+        makeRequest({
+          event_type,
+          profile_id: PROFILE_ID,
+          project_id: PROJECT_ID,
+          target_type: 'project',
+          target_id: PROJECT_ID,
+          metadata: event_type === 'project_time_spent' ? { seconds: 12 } : undefined,
+        }),
+      );
+      expect(await response.json()).toEqual({ ok: true, status: 'ignored' });
+    }
+    expect(inserts.insert).not.toHaveBeenCalled();
+  });
+
+  it('still records owner link_click', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: OWNER_ID } } });
+    const profileQuery = chainable({ data: { tenant_id: TENANT_ID } });
+    const insertQuery = chainable({ data: null });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'profiles') return profileQuery;
+      if (table === 'analytics_events') return insertQuery;
+      return chainable({ data: null });
+    });
+
+    const response = await POST(
+      makeRequest({
+        event_type: 'link_click',
+        profile_id: PROFILE_ID,
+        metadata: { link_category: 'github', link_kind: 'profile' },
+      }),
+    );
+    expect(await response.json()).toEqual({ ok: true, status: 'recorded' });
+    expect(insertQuery.insert).toHaveBeenCalled();
+  });
+});
