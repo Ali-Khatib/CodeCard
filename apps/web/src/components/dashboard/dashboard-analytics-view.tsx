@@ -29,7 +29,7 @@ type DashboardAnalyticsViewProps = {
 
 /**
  * Authenticated analytics — real owner aggregates only.
- * Preview/demo charts live in `preview-analytics-view.tsx`.
+ * Sample preview charts are isolated to the preview analytics route.
  */
 export function DashboardAnalyticsView({
   summary,

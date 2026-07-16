@@ -1,5 +1,9 @@
 import type { TimeRange } from './analytics-data';
 
+/**
+ * Preview/demo chart fixtures only — not used by authenticated analytics.
+ */
+
 export type EngagementRow = { id: string; label: string; value: number };
 
 /** Real action counts — sorted by value when built */

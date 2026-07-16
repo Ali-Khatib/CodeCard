@@ -1,3 +1,9 @@
+/**
+ * Preview/demo sample analytics only.
+ * Do not import `buildAnalyticsData` into authenticated dashboard routes.
+ * Real owner aggregates live in `analytics-queries.ts` / `analytics-aggregate.ts`.
+ */
+
 export type TimeRange = 'today' | '7d' | '30d' | '90d' | '1y' | 'lifetime';
 
 export const TIME_RANGE_LABELS: Record<TimeRange, string> = {
