@@ -6,13 +6,14 @@ function read(rel: string) {
   return readFileSync(resolve(process.cwd(), rel), 'utf8');
 }
 
-describe('WS08-T008 authenticated dashboard home stats', () => {
-  it('uses owner analytics and never falls back to demo numbers', () => {
+describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
+  it('uses owner analytics and content summaries and never falls back to demo numbers', () => {
     const page = read('src/app/dashboard/(authenticated)/page.tsx');
     const view = read('src/components/dashboard/dashboard-overview-view.tsx');
     const preview = read('src/app/dashboard/preview/page.tsx');
 
     expect(page).toContain('loadOwnerAnalytics');
+    expect(page).toContain('loadOwnerOverviewContent');
     expect(page).not.toContain('DEMO_OVERVIEW_ACTIVITY');
     expect(page).not.toContain('1284');
     expect(page).not.toContain('128');
@@ -20,12 +21,18 @@ describe('WS08-T008 authenticated dashboard home stats', () => {
     expect(page).not.toContain('342');
     expect(page).toContain('activity={[]}');
     expect(page).toContain('statsError');
+    expect(page).toContain('contentError');
+    expect(page).toContain('projectsSummary');
+    expect(page).toContain('researchSummary');
 
     expect(view).not.toContain('saves');
     expect(view).not.toContain('qrScans');
     expect(view).toContain('linkClicks');
     expect(view).toContain('qrDownloads');
     expect(view).toContain('statsError');
+    expect(view).toContain('projectsSummary');
+    expect(view).toContain('Add project');
+    expect(view).toContain('Add paper');
     expect(view).toContain('Activity will appear here');
 
     // Preview keeps deterministic sample stats only on the preview route.

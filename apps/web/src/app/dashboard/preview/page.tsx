@@ -54,6 +54,48 @@ export default function PreviewOverviewPage() {
         linkClicks: 47,
         qrDownloads: 128,
       }}
+      projectsSummary={{
+        total: 3,
+        published: 2,
+        recent: [
+          {
+            id: 'demo-p1',
+            title: 'DevFlow',
+            isPublished: true,
+            href: '/dashboard/preview/projects',
+          },
+          {
+            id: 'demo-p2',
+            title: 'SchemaSync',
+            isPublished: true,
+            href: '/dashboard/preview/projects',
+          },
+          {
+            id: 'demo-p3',
+            title: 'Pulse',
+            isPublished: false,
+            href: '/dashboard/preview/projects',
+          },
+        ],
+      }}
+      researchSummary={{
+        total: 2,
+        published: 1,
+        recent: [
+          {
+            id: 'demo-r1',
+            title: 'Sample research paper',
+            isPublished: true,
+            href: '/dashboard/preview/research',
+          },
+          {
+            id: 'demo-r2',
+            title: 'Draft paper',
+            isPublished: false,
+            href: '/dashboard/preview/research',
+          },
+        ],
+      }}
       activity={DEMO_OVERVIEW_ACTIVITY}
       suggested={{
         ...DEMO_SUGGESTED_STEP,
