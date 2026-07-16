@@ -14,6 +14,13 @@ import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
 
+export type OverviewReachStats = {
+  profileViews: number;
+  projectOpens: number;
+  linkClicks: number;
+  qrDownloads: number;
+};
+
 export type OverviewProps = {
   greeting: string;
   displayName: string;
@@ -26,15 +33,20 @@ export type OverviewProps = {
   links?: ProfileLinkItem[];
   profile?: Profile | null;
   preview?: boolean;
-  stats: {
-    profileViews: number;
-    projectOpens: number;
-    saves: number;
-    qrScans: number;
-  };
+  /** Real owner aggregates, or null when the query failed. */
+  stats: OverviewReachStats | null;
+  /** True when reach stats could not be loaded (not the same as zero). */
+  statsError?: boolean;
   activity: WorkspaceActivity[];
   suggested: { title: string; detail: string; href: string } | null;
   basePath?: string;
+};
+
+const PREVIEW_SPARKS: Record<keyof OverviewReachStats, number[]> = {
+  profileViews: [8, 12, 10, 16, 14, 18],
+  projectOpens: [3, 6, 5, 9, 7, 11],
+  linkClicks: [1, 2, 2, 4, 3, 5],
+  qrDownloads: [2, 4, 3, 6, 5, 7],
 };
 
 export function DashboardOverviewView({
@@ -45,17 +57,26 @@ export function DashboardOverviewView({
   avatarUrl,
   headline,
   bio,
-  profileViews = 0,
+  profileViews,
   links = [],
   profile,
+  preview = false,
   stats,
+  statsError = false,
   activity,
   suggested,
   basePath = '/dashboard',
 }: OverviewProps) {
   const firstName = displayName.split(' ')[0];
-  const views = profileViews || stats.profileViews;
+  const views =
+    typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
   const visibleLinks = toSafeProfileLinkItems(links);
+  const reachCards: { key: keyof OverviewReachStats; label: string }[] = [
+    { key: 'profileViews', label: 'Profile views' },
+    { key: 'projectOpens', label: 'Project opens' },
+    { key: 'linkClicks', label: 'Link clicks' },
+    { key: 'qrDownloads', label: 'QR downloads' },
+  ];
 
   return (
     <div className="cc-profile-home">
@@ -72,9 +93,11 @@ export function DashboardOverviewView({
             <span className="cc-profile-home__stat-pill cc-profile-home__stat-pill--iris">
               Profile <CountUp value={completion.percentage} />% complete
             </span>
-            <span className="cc-profile-home__stat-pill">
-              <CountUp value={views} /> views
-            </span>
+            {!statsError && (
+              <span className="cc-profile-home__stat-pill">
+                <CountUp value={views} /> views
+              </span>
+            )}
           </div>
         </header>
       </FadeInView>
@@ -190,43 +213,60 @@ export function DashboardOverviewView({
 
       {/* ── Zone 6: Reach snapshot ── */}
       <FadeInView delay={0.2}>
-        <section className="cc-profile-home__zone">
+        <section className="cc-profile-home__zone" aria-label="Audience reach">
           <div className="cc-profile-home__zone-head">
             <div>
               <AppMono>Reach</AppMono>
-              <h2 className="cc-profile-home__zone-title">This week at a glance</h2>
+              <h2 className="cc-profile-home__zone-title">
+                {preview ? 'This week at a glance' : 'Audience at a glance'}
+              </h2>
             </div>
             <AppButton variant="ghost" href={`${basePath}/analytics`}>
               Full analytics →
             </AppButton>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {[
-              { label: 'Profile views', value: stats.profileViews, spark: [8, 12, 10, 16, 14, 18] },
-              { label: 'Project opens', value: stats.projectOpens, spark: [3, 6, 5, 9, 7, 11] },
-              { label: 'Saves', value: stats.saves, spark: [1, 2, 2, 4, 3, 5] },
-              { label: 'QR scans', value: stats.qrScans, spark: [2, 4, 3, 6, 5, 7] },
-            ].map((s) => (
-              <MetricCard key={s.label} label={s.label} value={<CountUp value={s.value} />}>
-                <Sparkline points={s.spark} className="mt-3 h-8 w-full opacity-60" />
-              </MetricCard>
-            ))}
-          </div>
+          {statsError || !stats ? (
+            <AppCard tone="rose" className="!p-5">
+              <p className="text-[15px] text-[var(--app-ink)]">
+                Reach stats could not be loaded. Try again shortly — profile editing and sharing still
+                work.
+              </p>
+            </AppCard>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {reachCards.map((s) => (
+                <MetricCard key={s.key} label={s.label} value={<CountUp value={stats[s.key]} />}>
+                  {preview ? (
+                    <Sparkline
+                      points={PREVIEW_SPARKS[s.key]}
+                      className="mt-3 h-8 w-full opacity-60"
+                    />
+                  ) : null}
+                </MetricCard>
+              ))}
+            </div>
+          )}
         </section>
       </FadeInView>
 
       {/* ── Zone 7: Activity ── */}
       <FadeInView delay={0.24}>
-        <section className="cc-profile-home__zone">
+        <section className="cc-profile-home__zone" aria-label="Recent activity">
           <AppMono>Recent activity</AppMono>
-          <ul className="cc-profile-activity-list mt-4">
-            {activity.slice(0, 5).map((item) => (
-              <li key={item.id} className="cc-profile-activity-list__item">
-                <span>{item.text}</span>
-                <time>{item.time}</time>
-              </li>
-            ))}
-          </ul>
+          {activity.length === 0 ? (
+            <p className="mt-4 text-[14px] text-[var(--app-smoke)]">
+              Activity will appear here as people engage with your public CodeCard.
+            </p>
+          ) : (
+            <ul className="cc-profile-activity-list mt-4">
+              {activity.slice(0, 5).map((item) => (
+                <li key={item.id} className="cc-profile-activity-list__item">
+                  <span>{item.text}</span>
+                  <time>{item.time}</time>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </FadeInView>
     </div>
