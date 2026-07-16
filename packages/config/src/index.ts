@@ -59,6 +59,8 @@ export const RATE_LIMITS = {
   moderation: { requests: 5, window: '1 h' as const },
   dmca: { requests: 3, window: '1 h' as const },
   billing: { requests: 20, window: '1 m' as const },
+  /** Authenticated account export downloads — intentionally strict. */
+  accountExport: { requests: 5, window: '1 h' as const },
 } as const;
 
 export const STORAGE_BUCKETS = {
