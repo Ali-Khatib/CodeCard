@@ -119,7 +119,7 @@ export function DashboardProjectsPortfolio({
           Add your first project to feature on your CodeCard.
         </p>
         <div className="text-center">
-          <AppButton variant="primary" href={`${basePath}/projects/new`}>
+          <AppButton variant="primary" href={`${basePath}/projects/new`} ariaLabel="Create project">
             Create project
           </AppButton>
         </div>
@@ -152,7 +152,7 @@ export function DashboardProjectsPortfolio({
               ))}
             </div>
           </div>
-          <AppButton variant="primary" href={`${basePath}/projects/new`}>
+          <AppButton variant="primary" href={`${basePath}/projects/new`} ariaLabel="Create project">
             Create project
           </AppButton>
         </div>

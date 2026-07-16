@@ -47,11 +47,11 @@ function ProjectRow({
         role="button"
         tabIndex={0}
         aria-label={`Open ${project.title}`}
-        onClick={() => router.push(project.href)}
+        onClick={() => router.push(project.editHref)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            router.push(project.href);
+            router.push(project.editHref);
           }
         }}
       >
@@ -86,13 +86,17 @@ function ProjectRow({
               </p>
             )}
 
-            <p className="cc-project-hover-card__stats mt-3 text-[13px] text-[var(--app-smoke)]">
-              {project.views ?? 0} views · {project.saves ?? 0} saves
-            </p>
+            {typeof project.views === 'number' || typeof project.saves === 'number' ? (
+              <p className="cc-project-hover-card__stats mt-3 text-[13px] text-[var(--app-smoke)]">
+                {typeof project.views === 'number' ? `${project.views} views` : null}
+                {typeof project.views === 'number' && typeof project.saves === 'number' ? ' · ' : null}
+                {typeof project.saves === 'number' ? `${project.saves} saves` : null}
+              </p>
+            ) : null}
 
             <div className="cc-project-hover-card__cta-slot">
-              <Link href={project.href} className="cc-project-hover-card__cta" tabIndex={-1}>
-                View Project →
+              <Link href={project.editHref} className="cc-project-hover-card__cta" tabIndex={-1}>
+                Edit project →
               </Link>
             </div>
 
@@ -122,14 +126,22 @@ function ProjectRow({
               <div className="flex flex-wrap gap-2">
               <PopIconButton
                 variant="primary"
-                href={`${basePath}/projects/${project.id}/edit`}
+                href={project.editHref}
                 icon={<HiOutlinePencil aria-hidden />}
+                ariaLabel={`Edit ${project.title}`}
               >
                 Edit
               </PopIconButton>
-              <PopIconButton href={project.href} icon={<HiOutlineEye aria-hidden />} popDelay={60}>
-                Preview
-              </PopIconButton>
+              {project.publicHref ? (
+                <PopIconButton
+                  href={project.publicHref}
+                  icon={<HiOutlineEye aria-hidden />}
+                  popDelay={60}
+                  ariaLabel={`View ${project.title} publicly`}
+                >
+                  View public
+                </PopIconButton>
+              ) : null}
               </div>
             </div>
           </div>
