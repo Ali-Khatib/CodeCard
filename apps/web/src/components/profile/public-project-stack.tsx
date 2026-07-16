@@ -7,6 +7,7 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import { HUME_EASE, HUME_MOTION, HUME_SPRING } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
+import { trackLinkClick } from '@/lib/analytics/link-click';
 
 function descriptionParts(description: string | null): { lead: string | null; rest: string[] } {
   if (!description) return { lead: null, rest: [] };
@@ -17,12 +18,14 @@ function descriptionParts(description: string | null): { lead: string | null; re
 type PublicProjectStackProps = {
   projects: FeaturedProject[];
   displayName: string;
+  profileId?: string;
   demoViews?: Record<string, { views: number; saves: number }>;
 };
 
 export function PublicProjectStack({
   projects,
   displayName,
+  profileId,
   demoViews,
 }: PublicProjectStackProps) {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -32,8 +35,10 @@ export function PublicProjectStack({
     <div className="flex flex-col gap-8">
       {projects.map((project, index) => {
         const isOpen = openId === project.id;
-        const liveUrl = firstSafeProjectLink(project.links ?? [], ['live', 'demo'])?.url;
-        const repoUrl = firstSafeProjectLink(project.links ?? [], ['repo'])?.url;
+        const liveLink = firstSafeProjectLink(project.links ?? [], ['live', 'demo']);
+        const repoLink = firstSafeProjectLink(project.links ?? [], ['repo']);
+        const liveUrl = liveLink?.url;
+        const repoUrl = repoLink?.url;
         const { lead, rest } = descriptionParts(project.description);
         const views = demoViews?.[project.id]?.views ?? 280 + index * 40;
         const saves = demoViews?.[project.id]?.saves ?? 24 + index * 8;
@@ -94,13 +99,39 @@ export function PublicProjectStack({
                   >
                     {isOpen ? 'Close project' : 'Open project'}
                   </button>
-                  {liveUrl && (
-                    <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost">
+                  {liveUrl && liveLink && (
+                    <a
+                      href={liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cc-app-btn cc-app-btn--ghost"
+                      onClick={() => {
+                        trackLinkClick({
+                          profileId,
+                          projectId: project.id,
+                          linkCategory: liveLink.type,
+                          kind: 'project',
+                        });
+                      }}
+                    >
                       Live demo
                     </a>
                   )}
-                  {repoUrl && (
-                    <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost">
+                  {repoUrl && repoLink && (
+                    <a
+                      href={repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cc-app-btn cc-app-btn--ghost"
+                      onClick={() => {
+                        trackLinkClick({
+                          profileId,
+                          projectId: project.id,
+                          linkCategory: repoLink.type,
+                          kind: 'project',
+                        });
+                      }}
+                    >
                       GitHub
                     </a>
                   )}

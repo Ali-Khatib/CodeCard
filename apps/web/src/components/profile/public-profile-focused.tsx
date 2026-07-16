@@ -15,6 +15,7 @@ import { PublicProjectStack } from './public-project-stack';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
+import { trackLinkClick } from '@/lib/analytics/link-click';
 
 export function PublicProfileFocused({
   profileSlug,
@@ -124,6 +125,13 @@ export function PublicProfileFocused({
                           rel="noopener noreferrer"
                           aria-label={getProfileLinkAria(link.type, link.label)}
                           className="cc-profile-identity-card__social"
+                          onClick={() => {
+                            trackLinkClick({
+                              profileId,
+                              linkCategory: link.type,
+                              kind: 'profile',
+                            });
+                          }}
                         >
                           <Icon className="text-sm" aria-hidden />
                         </a>
@@ -219,7 +227,11 @@ export function PublicProfileFocused({
 
           <div className="mt-8">
             {projects.length > 0 ? (
-              <PublicProjectStack projects={projects} displayName={displayName} />
+              <PublicProjectStack
+                projects={projects}
+                displayName={displayName}
+                profileId={profileId}
+              />
             ) : (
               <div className="cc-app-card text-center">
                 <p className="text-[15px] text-[var(--app-smoke)]">No published projects yet.</p>
