@@ -4,12 +4,25 @@ import Link from 'next/link';
 import type { AnalyticsTrendSeries } from '@/lib/dashboard/analytics-trends';
 import { AppCard, SectionLabel } from '../ui/dashboard-ui';
 
+function periodActivityTotal(trends: AnalyticsTrendSeries) {
+  return (
+    trends.totals.profileViews +
+    trends.totals.projectViews +
+    trends.totals.linkClicks +
+    trends.totals.profileShares +
+    trends.totals.qrDownloads
+  );
+}
+
 export function AnalyticsTrendChart({
   trends,
   activeRange,
+  hasLifetimeEvents,
 }: {
   trends: AnalyticsTrendSeries;
   activeRange: 7 | 30;
+  /** True when any lifetime audience events exist outside this chart. */
+  hasLifetimeEvents: boolean;
 }) {
   const max = Math.max(
     ...trends.buckets.map(
@@ -17,6 +30,8 @@ export function AnalyticsTrendChart({
     ),
     1,
   );
+  const periodTotal = periodActivityTotal(trends);
+  const rangeEmpty = periodTotal === 0;
 
   return (
     <AppCard className="!p-6">
@@ -29,7 +44,8 @@ export function AnalyticsTrendChart({
         </div>
         <div className="flex gap-2" role="tablist" aria-label="Trend range">
           {([7, 30] as const).map((days) => {
-            const href = days === 7 ? '/dashboard/analytics?range=7' : '/dashboard/analytics?range=30';
+            const href =
+              days === 7 ? '/dashboard/analytics?range=7' : '/dashboard/analytics?range=30';
             const selected = activeRange === days;
             return (
               <Link
@@ -49,6 +65,14 @@ export function AnalyticsTrendChart({
           })}
         </div>
       </div>
+
+      {rangeEmpty ? (
+        <p className="mt-6 text-[14px] text-[var(--app-smoke)]" role="status">
+          {hasLifetimeEvents
+            ? `No recorded activity in the last ${trends.range} UTC days. Lifetime totals above are unchanged.`
+            : `No activity in the last ${trends.range} UTC days yet.`}
+        </p>
+      ) : null}
 
       <ul className="mt-6 space-y-2" aria-label={`${trends.range}-day activity`}>
         {trends.buckets.map((bucket) => {
