@@ -1,16 +1,37 @@
 import { createClient } from '@/lib/supabase/server';
 import { DashboardAnalyticsView } from '@/components/dashboard/dashboard-analytics-view';
-import { loadOwnerAnalytics } from '@/lib/dashboard/analytics-queries';
+import {
+  loadOwnerAnalytics,
+  loadOwnerAnalyticsTrends,
+} from '@/lib/dashboard/analytics-queries';
+import { isAnalyticsTrendRange, type AnalyticsTrendRange } from '@/lib/dashboard/analytics-trends';
 import { AppCard, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 import Link from 'next/link';
 
-export default async function AnalyticsPage() {
+type SearchParams = Promise<{ range?: string }>;
+
+function parseRange(raw: string | undefined): AnalyticsTrendRange {
+  const n = raw ? Number(raw) : 30;
+  return isAnalyticsTrendRange(n) ? n : 30;
+}
+
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const range = parseRange(params.range);
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const result = await loadOwnerAnalytics(supabase, user?.id);
+  const [result, trendsResult] = await Promise.all([
+    loadOwnerAnalytics(supabase, user?.id),
+    loadOwnerAnalyticsTrends(supabase, user?.id, range),
+  ]);
 
   if (!result.ok) {
     if (result.reason === 'no_profile') {
@@ -50,9 +71,26 @@ export default async function AnalyticsPage() {
     );
   }
 
+  if (!trendsResult.ok) {
+    return (
+      <div className="cc-app-page cc-app-page--1040 space-y-6">
+        <PageHeader
+          title="Analytics"
+          description="We could not load your trend data right now."
+        />
+        <AppCard tone="rose" className="!p-6">
+          <p className="text-[15px] text-[var(--app-ink)]">
+            Trend queries failed. Lifetime totals were not shown to avoid mixing incomplete data.
+          </p>
+        </AppCard>
+      </div>
+    );
+  }
+
   return (
     <DashboardAnalyticsView
       summary={result.summary}
+      trends={trendsResult.trends}
       profileSlug={result.summary.profileSlug}
     />
   );
