@@ -12,7 +12,7 @@ function mockUser(overrides: Partial<User> = {}): User {
     email: 'owner-a@example.com',
     created_at: '2026-01-01T00:00:00.000Z',
     last_sign_in_at: '2026-07-01T00:00:00.000Z',
-    identities: [{ provider: 'email', id: '1' } as User['identities'] extends (infer I)[] | undefined ? I : never],
+    identities: [{ provider: 'email' }],
     app_metadata: {},
     user_metadata: {},
     aud: 'authenticated',
@@ -73,6 +73,9 @@ describe('WS10-T002 buildAccountExportDocument', () => {
           error: null,
         });
       }
+      if (table === 'subscriptions') {
+        return createChain({ data: null, error: null });
+      }
       return createChain({ data: [], error: null });
     });
 
@@ -86,7 +89,8 @@ describe('WS10-T002 buildAccountExportDocument', () => {
     expect(result.document.profile_links).toHaveLength(1);
     expect(result.document.projects).toEqual([]);
     expect(result.document.research).toEqual([]);
-    expect(result.document.analytics_summary).toBeNull();
+    expect(result.document.analytics_summary).not.toBeNull();
+    expect(result.document.analytics_summary?.has_any_events).toBe(false);
 
     const serialized = JSON.stringify(result.document);
     for (const forbidden of FORBIDDEN_EXPORT_FIELD_NAMES) {
@@ -112,5 +116,8 @@ describe('WS10-T002 buildAccountExportDocument', () => {
     if (!result.ok) return;
     expect(result.document.profile).toBeNull();
     expect(result.document.profile_links).toEqual([]);
+    expect(result.document.projects).toEqual([]);
+    expect(result.document.research).toEqual([]);
+    expect(result.document.analytics_summary).toBeNull();
   });
 });
