@@ -7,6 +7,13 @@ import {
   type OwnedResearchRow,
   type ProfileSourceRow,
 } from '@/lib/dashboard/analytics-aggregate';
+import {
+  buildTrendSeries,
+  buildUtcRangeWindow,
+  isAnalyticsTrendRange,
+  type AnalyticsTrendRange,
+  type AnalyticsTrendSeries,
+} from '@/lib/dashboard/analytics-trends';
 
 export type LoadOwnerAnalyticsResult =
   | { ok: true; summary: OwnerAnalyticsSummary }
@@ -92,4 +99,55 @@ export async function loadOwnerAnalytics(
   return { ok: true, summary };
 }
 
-export type { OwnerAnalyticsSummary };
+export async function loadOwnerAnalyticsTrends(
+  supabase: SupabaseClient,
+  userId: string | null | undefined,
+  range: AnalyticsTrendRange,
+  now: Date = new Date(),
+): Promise<
+  | { ok: true; trends: AnalyticsTrendSeries }
+  | { ok: false; reason: 'unauthenticated' | 'no_profile' | 'query_failed' | 'invalid_range' }
+> {
+  if (!isAnalyticsTrendRange(range)) {
+    return { ok: false, reason: 'invalid_range' };
+  }
+  if (!userId) {
+    return { ok: false, reason: 'unauthenticated' };
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('owner_user_id', userId)
+    .maybeSingle();
+
+  if (profileError) return { ok: false, reason: 'query_failed' };
+  if (!profile) return { ok: false, reason: 'no_profile' };
+
+  const window = buildUtcRangeWindow(range, now);
+  const { data, error } = await supabase
+    .from('analytics_events')
+    .select('event_type, created_at')
+    .eq('profile_id', profile.id)
+    .in('event_type', [
+      'profile_view',
+      'project_view',
+      'link_click',
+      'profile_share',
+      'qr_download',
+    ])
+    .gte('created_at', window.rangeStart)
+    .lt('created_at', window.rangeEndExclusive);
+
+  if (error) return { ok: false, reason: 'query_failed' };
+
+  const trends = buildTrendSeries({
+    range,
+    now,
+    events: (data ?? []) as { event_type: string; created_at: string }[],
+  });
+
+  return { ok: true, trends };
+}
+
+export type { OwnerAnalyticsSummary, AnalyticsTrendSeries, AnalyticsTrendRange };

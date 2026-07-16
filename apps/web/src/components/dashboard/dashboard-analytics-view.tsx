@@ -2,7 +2,9 @@
 
 import { CountUp } from '@/components/landing/count-up';
 import type { OwnerAnalyticsSummary } from '@/lib/dashboard/analytics-aggregate';
+import type { AnalyticsTrendSeries } from '@/lib/dashboard/analytics-trends';
 import { FadeInView } from './fade-in-view';
+import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
   AppCard,
   MetricCard,
@@ -20,6 +22,7 @@ function formatDuration(totalSec: number) {
 
 type DashboardAnalyticsViewProps = {
   summary: OwnerAnalyticsSummary;
+  trends: AnalyticsTrendSeries;
   profileSlug?: string;
 };
 
@@ -29,6 +32,7 @@ type DashboardAnalyticsViewProps = {
  */
 export function DashboardAnalyticsView({
   summary,
+  trends,
   profileSlug,
 }: DashboardAnalyticsViewProps) {
   const kpis = [
@@ -77,6 +81,10 @@ export function DashboardAnalyticsView({
             />
           ))}
         </div>
+      </FadeInView>
+
+      <FadeInView delay={0.06}>
+        <AnalyticsTrendChart trends={trends} activeRange={trends.range} />
       </FadeInView>
 
       <FadeInView delay={0.08}>
