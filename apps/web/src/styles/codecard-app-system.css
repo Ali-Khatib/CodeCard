@@ -1355,15 +1355,18 @@ html.dark .cc-project-nav-btn svg,
   .cc-app-mobile-nav__link {
     display: flex;
     min-width: 68px;
+    min-height: 44px;
     flex: 0 0 auto;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 2px;
     scroll-snap-align: center;
     border-radius: 14px;
-    padding: 4px 8px;
+    padding: 6px 8px;
     font-size: 10px;
     line-height: 1.1;
+    white-space: nowrap;
   }
 }
 
