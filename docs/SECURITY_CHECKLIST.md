@@ -23,6 +23,7 @@ Blocking CI policy: [`CI_SECURITY_AUDITING.md`](./CI_SECURITY_AUDITING.md) (WS11
 - [ ] RLS enabled on `public` tables
 - [ ] Service role only in approved server handlers
 - [ ] JWT expiry appropriate
+- [ ] Global platform admin uses `app_metadata.role === "admin"` only (see [`ADMIN_AUTHORIZATION.md`](./ADMIN_AUTHORIZATION.md); `/admin` gate is WS11-T002)
 
 ## Input validation
 
