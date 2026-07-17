@@ -124,7 +124,7 @@ Enable each provider in Supabase and supply client ID/secret there (server-side 
 | Topic | Implementation | Status |
 |-------|----------------|--------|
 | PKCE | `@supabase/ssr` browser + server clients use cookie-backed PKCE OAuth flow (Supabase SSR default) | Code-verified |
-| Session storage | HTTP-only cookies via `@supabase/ssr` (`middleware.ts`, `server.ts`, `client.ts`) | Code-verified |
+| Session storage | Browser-readable cookies via `@supabase/ssr` (`SameSite=Lax`, path `/`; production HTTPS → `Secure`). Not HttpOnly — the browser Supabase client must manage tokens. CSRF Origin checks complement SameSite. | Code-verified |
 | Token refresh | Automatic via Supabase client; dashboard `useDashboardSessionGuard` handles refresh/sign-out | Code-verified |
 | Open redirect protection | `sanitizeInternalRedirect()` in `lib/auth/redirect.ts` | Code-verified |
 
