@@ -230,8 +230,9 @@ export function buildPublishDedupeKey(
 export function buildUpdateDedupeKey(
   targetType: CircleActivityTargetType,
   targetId: string,
-  _contentFingerprint?: string,
+  contentFingerprint?: string,
 ): string {
+  void contentFingerprint;
   return `${targetType}_updated:${targetId}`;
 }
 

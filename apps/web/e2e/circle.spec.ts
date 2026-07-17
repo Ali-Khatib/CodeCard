@@ -43,6 +43,38 @@ test.describe('WS16 Circle feed (mocked browser)', () => {
     await expect(page.getByRole('link', { name: 'View project: PipelineX' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Like' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'React' })).toHaveCount(0);
+    await expect(page.getByLabel('New since your last visit').first()).toBeVisible();
+  });
+
+  test('filters and pagination work without duplicates', async ({ page }) => {
+    await openFixture(page);
+    await page.getByRole('button', { name: 'Paginated feed' }).click();
+    await expect(page.getByRole('list', { name: 'Circle activity' })).toBeVisible();
+    await expect(page.getByText('Graph Limits')).toBeVisible();
+    await page.getByRole('button', { name: 'Load more Circle activity' }).click();
+    await expect(page.getByText('Older Pipeline')).toBeVisible();
+    await expect(page.getByText('PipelineX')).toHaveCount(1);
+
+    await page.getByRole('tab', { name: 'Projects' }).click();
+    await expect(page.getByText('Graph Limits')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'PipelineX', exact: true }).first()).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Research' }).click();
+    await expect(page.getByRole('link', { name: 'Graph Limits', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'PipelineX', exact: true })).toHaveCount(0);
+
+    await page.getByRole('tab', { name: 'All' }).click();
+    await expect(page.getByRole('link', { name: 'Graph Limits', exact: true })).toBeVisible();
+  });
+
+  test('filtered empty state offers view all activity', async ({ page }) => {
+    await openFixture(page);
+    await page.getByRole('button', { name: 'Filtered empty' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'No Circle updates match this filter.' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'View all activity' }).click();
+    await expect(page.getByText('Graph Limits')).toBeVisible();
   });
 
   test('mobile layout has no horizontal overflow', async ({ page }) => {
@@ -60,5 +92,7 @@ test.describe('WS16 Circle feed (mocked browser)', () => {
     expect(await hasOverflow()).toBe(false);
     await page.setViewportSize({ width: 430, height: 932 });
     expect(await hasOverflow()).toBe(false);
+    await expect(page.getByRole('tab', { name: 'Projects' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Read paper: Graph Limits' })).toBeVisible();
   });
 });

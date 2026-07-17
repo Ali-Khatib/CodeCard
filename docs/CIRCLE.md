@@ -82,9 +82,34 @@ Forward-only (manual deploy — do **not** run `supabase db push` from agents):
 - `supabase/migrations/20260717034827_circle_activity.sql`
 - `supabase/migrations/20260717080001_circle_viewer_state.sql`
 
-## MVP limits
+## MVP limits / excluded features
 
-- No likes, reactions, comments, messaging
-- No manual social posts
-- No follower counts / engagement ranking / trending / recommendations
-- Private read state is viewer-only (never creator-facing)
+**Circle is a private latest-work feed, not a social engagement platform.**
+
+Excluded (do not implement):
+
+- likes, reactions, comments, replies
+- direct messages
+- follower counts / follow requests
+- public popularity metrics / engagement scores
+- reposts / manual social posts
+- trending / recommendations / sponsored activity
+- creator rankings
+- public read receipts / “X people saw this in Circle”
+- notifications that someone viewed work
+
+## Batch 2 completion checklist (T005–T008)
+
+| Area | Behavior |
+|---|---|
+| Pagination | Cursor keyset; page size 20; Load more; Connections revalidated every request |
+| Filters | All / Projects / Research / Updates; unknown → All |
+| Read state | Private `last_seen_at`; deliberate visible visit; nav badge bounded |
+| Quality | Meaningful updates only; per-target update upsert; feed collapse |
+| Security | Viewer session only; owner-only RLS; no demo fallback |
+| Demo | `DEMO_CIRCLE_FEED` on preview/Alex Chen only |
+| E2E | Mocked Playwright fixture (`e2e/circle.spec.ts`); live disposable users when infra available |
+
+## Next workstream
+
+WS11 — security hardening across the complete MVP, including Connections and Circle.
