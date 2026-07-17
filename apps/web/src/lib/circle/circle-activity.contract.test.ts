@@ -49,15 +49,12 @@ describe('WS16-T001 circle activity contract', () => {
     expect(CIRCLE_ACTIVITY_INVARIANTS).toContain('remove_connection_hides_actor_from_viewer_feed');
   });
 
-  it('builds idempotent publish and fingerprint-based update dedupe keys', () => {
+  it('builds idempotent publish and per-target update dedupe keys', () => {
     const id = '11111111-1111-4111-8111-111111111111';
     expect(buildPublishDedupeKey('project', id)).toBe(`project_published:${id}`);
     expect(buildPublishDedupeKey('research', id)).toBe(`research_published:${id}`);
-    expect(buildUpdateDedupeKey('project', id, 'abc')).toBe(`project_updated:${id}:abc`);
+    expect(buildUpdateDedupeKey('project', id, 'abc')).toBe(`project_updated:${id}`);
     expect(buildUpdateDedupeKey('project', id, 'abc')).toBe(
-      buildUpdateDedupeKey('project', id, 'abc'),
-    );
-    expect(buildUpdateDedupeKey('project', id, 'abc')).not.toBe(
       buildUpdateDedupeKey('project', id, 'def'),
     );
   });
