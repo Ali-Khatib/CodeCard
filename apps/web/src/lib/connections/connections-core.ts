@@ -441,6 +441,7 @@ export async function listOwnerConnections(
       connected_at,
       created_at,
       source,
+      context,
       saved_profile:saved_profile_id (
         ${TARGET_SELECT}
       )
@@ -457,6 +458,19 @@ export async function listOwnerConnections(
     };
   }
 
+  const connectionIds = (data ?? []).map((row) => row.id as string);
+  let notesMap: Record<string, string> = {};
+  if (connectionIds.length > 0) {
+    const { data: notes } = await supabase
+      .from('connection_notes')
+      .select('saved_connection_id, body')
+      .eq('owner_user_id', user.id)
+      .in('saved_connection_id', connectionIds);
+    for (const note of notes ?? []) {
+      notesMap[note.saved_connection_id] = note.body;
+    }
+  }
+
   const connections: OwnerConnectionListItem[] = (data ?? []).flatMap((row) => {
     const saved = row.saved_profile as TargetProfileRow | TargetProfileRow[] | null;
     const targetRow = Array.isArray(saved) ? saved[0] : saved;
@@ -470,6 +484,8 @@ export async function listOwnerConnections(
         connectedAt: (row.connected_at as string | null) ?? null,
         createdAt: row.created_at as string,
         source: row.source as string,
+        context: (row.context as string | null) ?? null,
+        privateNote: notesMap[row.id as string] ?? null,
         target: toSafeTarget(targetRow),
       },
     ];

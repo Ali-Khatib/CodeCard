@@ -37,6 +37,7 @@ function ConnectionExpandedBody({
   collections = [],
   membershipIds = [],
   onToggleMembership,
+  onOpenPrivateDetails,
 }: {
   connection: ViewConnection;
   variant: 'demo' | 'authenticated';
@@ -48,6 +49,7 @@ function ConnectionExpandedBody({
     collectionId: string,
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
+  onOpenPrivateDetails?: (connectionId: string) => void;
 }) {
   if (variant === 'authenticated') {
     const href =
@@ -131,6 +133,15 @@ function ConnectionExpandedBody({
             >
               Remove connection
             </AsyncActionButton>
+          ) : null}
+          {onOpenPrivateDetails ? (
+            <AppButton
+              variant="ghost"
+              onClick={() => onOpenPrivateDetails(connection.id)}
+              ariaLabel={`Edit private note for ${connection.name}`}
+            >
+              Private note
+            </AppButton>
           ) : null}
         </div>
       </div>
@@ -262,6 +273,7 @@ function ConnectionCard({
   collections,
   membershipIds,
   onToggleMembership,
+  onOpenPrivateDetails,
 }: {
   connection: ViewConnection;
   expanded: boolean;
@@ -275,6 +287,7 @@ function ConnectionCard({
     collectionId: string,
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
+  onOpenPrivateDetails?: (connectionId: string) => void;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -348,6 +361,7 @@ function ConnectionCard({
             collections={collections}
             membershipIds={membershipIds}
             onToggleMembership={onToggleMembership}
+            onOpenPrivateDetails={onOpenPrivateDetails}
           />
         </div>
       </div>
@@ -364,6 +378,7 @@ function ConnectionGridCard({
   collections,
   membershipIds,
   onToggleMembership,
+  onOpenPrivateDetails,
 }: {
   connection: ViewConnection;
   expanded: boolean;
@@ -377,6 +392,7 @@ function ConnectionGridCard({
     collectionId: string,
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
+  onOpenPrivateDetails?: (connectionId: string) => void;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -424,6 +440,7 @@ function ConnectionGridCard({
             collections={collections}
             membershipIds={membershipIds}
             onToggleMembership={onToggleMembership}
+            onOpenPrivateDetails={onOpenPrivateDetails}
           />
         </div>
       </div>
@@ -467,6 +484,7 @@ export function DashboardConnectionsView({
   collections = [],
   memberships = {},
   onToggleMembership,
+  onOpenPrivateDetails,
 }: {
   connections: ViewConnection[];
   basePath?: string;
@@ -479,6 +497,7 @@ export function DashboardConnectionsView({
     collectionId: string,
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
+  onOpenPrivateDetails?: (connectionId: string) => void;
 }) {
   const [query, setQuery] = useState('');
   const [source, setSource] = useState<(typeof SOURCES)[number]>('All');
@@ -600,6 +619,7 @@ export function DashboardConnectionsView({
                     collections={collections}
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
+                    onOpenPrivateDetails={onOpenPrivateDetails}
                   />
                 </li>
               ))}
@@ -620,6 +640,7 @@ export function DashboardConnectionsView({
                     collections={collections}
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
+                    onOpenPrivateDetails={onOpenPrivateDetails}
                   />
                 </li>
               ))}

@@ -196,6 +196,8 @@ export interface SavedConnection {
   connected_at: string | null;
   met_at: string | null;
   source: ConnectionSource;
+  /** Owner-private relationship context (WS15-T006). */
+  context?: string | null;
   created_at: string;
   updated_at: string;
 }

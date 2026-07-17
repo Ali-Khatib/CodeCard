@@ -218,6 +218,7 @@ const additionalAccountDataSchema = z
           connected_at: isoTimestamp.nullable(),
           met_at: isoTimestamp.nullable(),
           source: z.string(),
+          context: z.string().nullable().optional(),
           created_at: isoTimestamp,
           updated_at: isoTimestamp,
         })

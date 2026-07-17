@@ -483,6 +483,55 @@ export const connectionNoteSchema = z.object({
   body: z.string().min(1).max(5000).trim(),
 });
 
+/** WS15-T006 — update private note / context / dates for an owned Connection. */
+export const updateConnectionMetadataInputSchema = z.object({
+  connectionId: z.string().uuid(),
+  privateNote: z
+    .union([z.string(), z.null()])
+    .optional()
+    .superRefine((v, ctx) => {
+      if (typeof v === 'string' && v.replace(/^\s+|\s+$/g, '').length > 5000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Private note is too long',
+        });
+      }
+    })
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v == null) return null;
+      // Preserve intentional line breaks; trim only outer whitespace.
+      const trimmed = v.replace(/^\s+|\s+$/g, '');
+      return trimmed === '' ? null : trimmed;
+    }),
+  context: z
+    .union([z.string(), z.null()])
+    .optional()
+    .superRefine((v, ctx) => {
+      if (typeof v === 'string' && v.trim().length > 500) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Context is too long',
+        });
+      }
+    })
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v == null) return null;
+      const trimmed = v.trim();
+      return trimmed === '' ? null : trimmed;
+    }),
+  connectedAt: z
+    .union([z.string().datetime(), z.null()])
+    .optional(),
+  metAt: z.union([z.string().datetime(), z.null()]).optional(),
+  source: connectionSourceSchema.optional(),
+});
+
+export const connectionMetadataInputSchema = z.object({
+  connectionId: z.string().uuid(),
+});
+
 export const collectionSchema = z.object({
   name: z.string().min(1).max(80).trim(),
   description: z.string().max(500).trim().optional().nullable(),
@@ -637,6 +686,7 @@ export type ConnectionStatusInput = z.infer<typeof connectionStatusInputSchema>;
 export type CreateCollectionInput = z.infer<typeof createCollectionInputSchema>;
 export type UpdateCollectionInput = z.infer<typeof updateCollectionInputSchema>;
 export type CollectionMembershipInput = z.infer<typeof collectionMembershipInputSchema>;
+export type UpdateConnectionMetadataInput = z.infer<typeof updateConnectionMetadataInputSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;

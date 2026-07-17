@@ -464,7 +464,7 @@ async function loadAdditionalOwnerData(
     await Promise.all([
       supabase
         .from('saved_connections')
-        .select('id, saved_profile_id, connected_at, met_at, source, created_at, updated_at')
+        .select('id, saved_profile_id, connected_at, met_at, source, context, created_at, updated_at')
         .eq('owner_user_id', ownerUserId)
         .order('created_at', { ascending: true }),
       supabase
@@ -542,6 +542,7 @@ async function loadAdditionalOwnerData(
         connected_at: toUtcIso(row.connected_at),
         met_at: toUtcIso(row.met_at),
         source: row.source,
+        context: (row as { context?: string | null }).context ?? null,
         created_at: requireIso(row.created_at, generatedAt),
         updated_at: requireIso(row.updated_at, generatedAt),
       })),

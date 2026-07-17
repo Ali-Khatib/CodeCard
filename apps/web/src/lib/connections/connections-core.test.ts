@@ -166,6 +166,7 @@ function createMockSupabase(options: MockOptions = {}) {
                     connected_at: c.connected_at ?? null,
                     created_at: c.created_at ?? '2026-01-01T00:00:00.000Z',
                     source: c.source ?? 'manual',
+                    context: null,
                     saved_profile: c.saved_profile ?? publishedTarget,
                   })),
                   error: null,
@@ -241,6 +242,16 @@ function createMockSupabase(options: MockOptions = {}) {
               if (idx >= 0) connections.splice(idx, 1);
               return Promise.resolve({ error: null });
             }),
+          })),
+        })),
+      };
+    }
+
+    if (table === 'connection_notes') {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            in: vi.fn().mockResolvedValue({ data: [], error: null }),
           })),
         })),
       };
