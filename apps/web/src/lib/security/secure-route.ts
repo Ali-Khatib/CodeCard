@@ -21,6 +21,17 @@ interface SecureRouteOptions<T> {
   maxBodyBytes?: number;
   /** Stricter: fail if Redis unavailable in production */
   strictRateLimit?: boolean;
+  /**
+   * Reject non-JSON Content-Type when the header is present.
+   * Default true for ordinary JSON APIs.
+   */
+  requireJsonContentType?: boolean;
+}
+
+function hasJsonContentType(request: Request): boolean {
+  const contentType = request.headers.get('content-type');
+  if (!contentType) return true;
+  return contentType.toLowerCase().includes('application/json');
 }
 
 export async function secureJsonRoute<T, R>(
@@ -35,6 +46,10 @@ export async function secureJsonRoute<T, R>(
   if (!success) return rateLimited();
   if (options.strictRateLimit && isProduction() && !process.env.UPSTASH_REDIS_REST_URL) {
     return apiError('Service temporarily unavailable', 503);
+  }
+
+  if (options.requireJsonContentType !== false && !hasJsonContentType(request)) {
+    return apiError('Unsupported content type', 415);
   }
 
   let userId: string | null = null;

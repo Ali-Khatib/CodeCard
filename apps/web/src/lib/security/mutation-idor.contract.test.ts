@@ -242,6 +242,7 @@ describe('WS11-T003 mutation IDOR security', () => {
     const deleteRoute = readWeb('src/app/api/account/delete/route.ts');
     const exportBuild = readWeb('src/lib/account/export-build.ts');
     expect(exportRoute).toContain('requireAuth: true');
+    expect(exportRoute).toContain('isSameOriginMutation');
     expect(exportRoute).toContain('buildAccountExportDocument(supabase, user)');
     expect(exportRoute).toContain('user.id !== ctx.userId');
     expect(exportBuild).toContain('never client-supplied');
