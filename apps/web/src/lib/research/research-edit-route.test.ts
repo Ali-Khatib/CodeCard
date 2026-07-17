@@ -108,7 +108,7 @@ describe('dashboard research edit route', () => {
       'utf8',
     );
 
-    expect(view).toContain('/dashboard/research/${paper.id}/edit');
+    expect(view).toContain('${basePath}/research/${paper.id}/edit');
     expect(view).toContain('Edit');
   });
 

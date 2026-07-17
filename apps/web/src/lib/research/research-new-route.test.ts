@@ -66,7 +66,7 @@ describe('dashboard new research route', () => {
       'utf8',
     );
 
-    expect(view).toContain('/dashboard/research/new');
+    expect(view).toContain('${basePath}/research/new');
     expect(view).toContain('Add research');
     expect(view).toContain('Create paper');
     expect(view).not.toContain('Add from projects');
