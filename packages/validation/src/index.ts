@@ -488,6 +488,53 @@ export const collectionSchema = z.object({
   description: z.string().max(500).trim().optional().nullable(),
 });
 
+/** WS15-T005 — create collection (owner identity never accepted from client). */
+export const createCollectionInputSchema = z.object({
+  name: z
+    .string()
+    .transform((v) => v.trim())
+    .pipe(z.string().min(1, 'Collection name is required').max(80, 'Collection name is too long')),
+  description: z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => {
+      if (v == null) return null;
+      const trimmed = v.trim();
+      return trimmed === '' ? null : trimmed.slice(0, 500);
+    }),
+});
+
+export const updateCollectionInputSchema = z.object({
+  collectionId: z.string().uuid(),
+  name: z
+    .string()
+    .transform((v) => v.trim())
+    .pipe(z.string().min(1, 'Collection name is required').max(80, 'Collection name is too long'))
+    .optional(),
+  description: z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v == null) return null;
+      const trimmed = v.trim();
+      return trimmed === '' ? null : trimmed.slice(0, 500);
+    }),
+});
+
+export const collectionIdInputSchema = z.object({
+  collectionId: z.string().uuid(),
+});
+
+export const collectionMembershipInputSchema = z.object({
+  collectionId: z.string().uuid(),
+  connectionId: z.string().uuid(),
+});
+
+export const connectionCollectionsInputSchema = z.object({
+  connectionId: z.string().uuid(),
+});
+
 export const passwordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters')
@@ -587,6 +634,9 @@ export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
 export type AddConnectionInput = z.infer<typeof addConnectionInputSchema>;
 export type RemoveConnectionInput = z.infer<typeof removeConnectionInputSchema>;
 export type ConnectionStatusInput = z.infer<typeof connectionStatusInputSchema>;
+export type CreateCollectionInput = z.infer<typeof createCollectionInputSchema>;
+export type UpdateCollectionInput = z.infer<typeof updateCollectionInputSchema>;
+export type CollectionMembershipInput = z.infer<typeof collectionMembershipInputSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;

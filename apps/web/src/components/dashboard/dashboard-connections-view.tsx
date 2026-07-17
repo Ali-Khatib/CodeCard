@@ -34,10 +34,20 @@ function ConnectionExpandedBody({
   connection,
   variant,
   onRemove,
+  collections = [],
+  membershipIds = [],
+  onToggleMembership,
 }: {
   connection: ViewConnection;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
+  collections?: Array<{ id: string; name: string }>;
+  membershipIds?: string[];
+  onToggleMembership?: (
+    connectionId: string,
+    collectionId: string,
+    currentlyAssigned: boolean,
+  ) => void | Promise<void>;
 }) {
   if (variant === 'authenticated') {
     const href =
@@ -62,6 +72,42 @@ function ConnectionExpandedBody({
 
         <div className="cc-connection-notes">
           <p className="cc-connection-notes__text">{connection.note}</p>
+          {collections.length > 0 ? (
+            <fieldset className="mt-4 space-y-2">
+              <legend className="text-[13px] font-medium text-[var(--app-ink)]">
+                Add to collection
+              </legend>
+              <p className="text-[12px] text-[var(--app-smoke)]">Only you can see these folders.</p>
+              <ul className="space-y-1.5">
+                {collections.map((collection) => {
+                  const assigned = membershipIds.includes(collection.id);
+                  return (
+                    <li key={collection.id}>
+                      <label className="flex cursor-pointer items-center gap-2 text-[14px] text-[var(--app-ink)]">
+                        <input
+                          type="checkbox"
+                          checked={assigned}
+                          onChange={() => {
+                            void onToggleMembership?.(connection.id, collection.id, assigned);
+                          }}
+                          aria-label={
+                            assigned
+                              ? `Remove ${connection.name} from ${collection.name}`
+                              : `Add ${connection.name} to ${collection.name}`
+                          }
+                        />
+                        <span>{collection.name}</span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </fieldset>
+          ) : (
+            <p className="mt-3 text-[13px] text-[var(--app-smoke)]">
+              Create a collection above to organize this Connection.
+            </p>
+          )}
         </div>
 
         <div className="cc-connection-actions">
@@ -213,12 +259,22 @@ function ConnectionCard({
   onToggle,
   variant,
   onRemove,
+  collections,
+  membershipIds,
+  onToggleMembership,
 }: {
   connection: ViewConnection;
   expanded: boolean;
   onToggle: () => void;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
+  collections?: Array<{ id: string; name: string }>;
+  membershipIds?: string[];
+  onToggleMembership?: (
+    connectionId: string,
+    collectionId: string,
+    currentlyAssigned: boolean,
+  ) => void | Promise<void>;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -289,6 +345,9 @@ function ConnectionCard({
             connection={connection}
             variant={variant}
             onRemove={onRemove}
+            collections={collections}
+            membershipIds={membershipIds}
+            onToggleMembership={onToggleMembership}
           />
         </div>
       </div>
@@ -302,12 +361,22 @@ function ConnectionGridCard({
   onToggle,
   variant,
   onRemove,
+  collections,
+  membershipIds,
+  onToggleMembership,
 }: {
   connection: ViewConnection;
   expanded: boolean;
   onToggle: () => void;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
+  collections?: Array<{ id: string; name: string }>;
+  membershipIds?: string[];
+  onToggleMembership?: (
+    connectionId: string,
+    collectionId: string,
+    currentlyAssigned: boolean,
+  ) => void | Promise<void>;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -352,6 +421,9 @@ function ConnectionGridCard({
             connection={connection}
             variant={variant}
             onRemove={onRemove}
+            collections={collections}
+            membershipIds={membershipIds}
+            onToggleMembership={onToggleMembership}
           />
         </div>
       </div>
@@ -392,11 +464,21 @@ export function DashboardConnectionsView({
   basePath = '/dashboard',
   variant = 'demo',
   onRemoveConnection,
+  collections = [],
+  memberships = {},
+  onToggleMembership,
 }: {
   connections: ViewConnection[];
   basePath?: string;
   variant?: 'demo' | 'authenticated';
   onRemoveConnection?: (connectionId: string) => void | Promise<void>;
+  collections?: Array<{ id: string; name: string }>;
+  memberships?: Record<string, string[]>;
+  onToggleMembership?: (
+    connectionId: string,
+    collectionId: string,
+    currentlyAssigned: boolean,
+  ) => void | Promise<void>;
 }) {
   const [query, setQuery] = useState('');
   const [source, setSource] = useState<(typeof SOURCES)[number]>('All');
@@ -515,6 +597,9 @@ export function DashboardConnectionsView({
                     onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
+                    collections={collections}
+                    membershipIds={memberships[c.id] ?? []}
+                    onToggleMembership={onToggleMembership}
                   />
                 </li>
               ))}
@@ -532,6 +617,9 @@ export function DashboardConnectionsView({
                     onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
+                    collections={collections}
+                    membershipIds={memberships[c.id] ?? []}
+                    onToggleMembership={onToggleMembership}
                   />
                 </li>
               ))}
