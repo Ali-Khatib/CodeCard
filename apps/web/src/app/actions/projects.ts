@@ -53,6 +53,9 @@ export async function updateProjectAction(
       profileSlug: result.profileSlug,
       isPublished: result.isPublished,
     });
+    if (result.isPublished) {
+      revalidatePath('/dashboard/circle');
+    }
   }
 
   return result;
@@ -71,6 +74,7 @@ export async function publishProjectAction(
       isPublished: true,
       touchPublicRoutes: true,
     });
+    revalidatePath('/dashboard/circle');
   }
 
   return result;

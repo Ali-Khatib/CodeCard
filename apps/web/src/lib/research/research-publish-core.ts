@@ -5,6 +5,7 @@ import {
   type AuthUser,
   type OwnedResearchRecord,
 } from '@/lib/research/research-access-core';
+import { emitResearchPublishedActivity } from '@/lib/circle/circle-emit-core';
 
 export type ResearchPublishState = {
   success?: boolean;
@@ -99,6 +100,8 @@ export async function executeSetResearchPublished(
     }
   }
 
+  const wasPublished = paper.is_published;
+
   if (paper.is_published === input.isPublished) {
     return {
       success: true,
@@ -121,6 +124,14 @@ export async function executeSetResearchPublished(
       error: 'Could not update research visibility. Please try again.',
       errorCode: 'server',
     };
+  }
+
+  if (!wasPublished && input.isPublished) {
+    await emitResearchPublishedActivity(supabase, {
+      tenantId: paper.tenant_id,
+      actorProfileId: paper.profile_id,
+      researchPaperId: paper.id,
+    });
   }
 
   return {

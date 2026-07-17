@@ -4,6 +4,7 @@ import {
   resolveAuthenticatedUser,
   type AuthUser,
 } from '@/lib/projects/project-access-core';
+import { emitProjectPublishedActivity } from '@/lib/circle/circle-emit-core';
 
 export type ProjectPublishState = {
   success?: boolean;
@@ -34,6 +35,7 @@ export async function executeSetProjectPublished(
   }
 
   const { project, profile } = owned;
+  const wasPublished = project.is_published;
 
   if (project.is_published === input.isPublished) {
     return {
@@ -56,6 +58,15 @@ export async function executeSetProjectPublished(
       error: 'Could not update project visibility. Please try again.',
       errorCode: 'server',
     };
+  }
+
+  if (!wasPublished && input.isPublished) {
+    // Best-effort: publication already succeeded; unique dedupe prevents duplicates.
+    await emitProjectPublishedActivity(supabase, {
+      tenantId: project.tenant_id,
+      actorProfileId: project.profile_id,
+      projectId: project.id,
+    });
   }
 
   return {
