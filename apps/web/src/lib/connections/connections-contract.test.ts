@@ -117,8 +117,8 @@ describe('WS15-T001 connections data contract', () => {
       'utf8',
     );
     expect(demo).toContain('DEMO_CONNECTIONS');
-    // Pre-T004: authenticated page still imports demo data — contract flags that gap.
-    expect(authPage).toContain('DEMO_CONNECTIONS');
+    expect(authPage).not.toContain('DEMO_CONNECTIONS');
+    expect(authPage).toContain('listOwnerConnections');
     expect(previewPage).toContain('DEMO_CONNECTIONS');
     expect(CONNECTION_INVARIANTS).toContain('demo_data_isolated_from_authenticated');
   });

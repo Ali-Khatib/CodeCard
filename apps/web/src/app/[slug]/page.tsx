@@ -45,6 +45,54 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   if (!payload) notFound();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let connectionControl: {
+    isOwnProfile: boolean;
+    isAuthenticated: boolean;
+    initiallyConnected: boolean;
+    initialConnectionId: string | null;
+  } | null = null;
+
+  if (user) {
+    const { data: viewerProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('owner_user_id', user.id)
+      .maybeSingle();
+
+    const isOwnProfile = viewerProfile?.id === payload.profileId;
+    let initiallyConnected = false;
+    let initialConnectionId: string | null = null;
+
+    if (!isOwnProfile) {
+      const { data: existing } = await supabase
+        .from('saved_connections')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .eq('saved_profile_id', payload.profileId)
+        .maybeSingle();
+      initiallyConnected = Boolean(existing);
+      initialConnectionId = existing?.id ?? null;
+    }
+
+    connectionControl = {
+      isOwnProfile,
+      isAuthenticated: true,
+      initiallyConnected,
+      initialConnectionId,
+    };
+  } else {
+    connectionControl = {
+      isOwnProfile: false,
+      isAuthenticated: false,
+      initiallyConnected: false,
+      initialConnectionId: null,
+    };
+  }
+
   return (
     <>
       <ProfileAnalytics profileId={payload.profileId} />
@@ -59,6 +107,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         researchPapers={payload.researchPapers}
         profileId={payload.profileId}
         location={payload.location}
+        connectionControl={connectionControl}
       />
     </>
   );

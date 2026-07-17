@@ -20,7 +20,7 @@ Canonical authenticated/preview shell: `apps/web/src/components/dashboard/dashbo
 | `research` | `/dashboard/research` | Research | Partial (CRUD real; `#` public fallback; hard-coded `/dashboard` paths) | Keep / wire (T005) |
 | `circle` | `/dashboard/circle` | Circle | Out of MVP scope (demo feed) | Hide/remove from MVP nav (T002) |
 | `analytics` | `/dashboard/analytics` | Analytics | Real (WS08) | Keep / verify later (T006) |
-| `connections` | `/dashboard/connections` | Connections | Out of MVP scope (demo list) | Hide/remove from MVP nav (T002) |
+| `connections` | `/dashboard/connections` | Connections | Real (WS15) | Restored to MVP nav; demo preview retained |
 | `settings` | `/dashboard/settings` | Settings | Partial (email + sign-out + billing link; stub rows/`demoAction`) | Keep label; defer real account actions (T008 / WS10) |
 
 Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry (linked from Settings). Classification: real Stripe checkout/portal — verify later (T009).
@@ -99,10 +99,11 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 | Field | Detail |
 |---|---|
 | Route | `/dashboard/connections` |
-| Data | `DEMO_CONNECTIONS` from `workspace-demo.ts` |
-| Mutations | Fake follow-up async sleep |
-| MVP status | Out of scope / demo |
-| WS09 action | Hide from authenticated MVP nav (T002); preview route may remain |
+| Data | Owner `saved_connections` via `listOwnerConnections` (WS15) |
+| Mutations | Real add/remove from public profiles; authenticated remove on dashboard |
+| Demo | Preview `/dashboard/preview/connections` still uses `DEMO_CONNECTIONS` |
+| MVP status | Real foundation (WS15 Batch 1) |
+| WS09/WS15 action | Restored to authenticated MVP nav (WS15-T004); Circle remains hidden |
 
 ### Settings
 
@@ -169,7 +170,7 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 | Gap | Dependency |
 |---|---|
 | Real Circle / social graph | Future product; not MVP |
-| Real Connections CRM | Future product; not MVP |
+| Connections collections / notes / advanced search | WS15 Batch 2 (T005–T008) |
 | Account export / delete / full settings | WS10 + WS09-T008 |
 | Analytics tab verification | WS09-T006 |
 | Overview share verification | WS09-T007 |
@@ -182,7 +183,7 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 ## Batch 1 intended outcomes
 
 1. **T001** — This inventory (complete).
-2. **T002** — **Done:** Circle and Connections removed from authenticated MVP `NAV_ITEMS` (preferred). Preview routes and legacy `/dashboard/circle` / `/dashboard/connections` pages remain reachable by direct URL only; they are not advertised in MVP nav.
+2. **T002** — **Done:** Circle removed from authenticated MVP `NAV_ITEMS`. Connections later restored as real data in **WS15**.
 3. **T003** — Overview shows real project/research summaries without demo fill.
 4. **T004** — Projects tab CRUD navigation verified/fixed if gaps.
 5. **T005** — Research tab CRUD navigation verified/fixed (`#` fallback, consistent paths).
@@ -192,12 +193,16 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 | Item | Decision |
 |---|---|
 | Circle | **Removed** from active MVP navigation |
-| Connections | **Removed** from active MVP navigation |
+| Connections | **Removed** in WS09-T002; **Restored as real** in WS15-T004 |
 | Preview Circle/Connections | **Retained** under `/dashboard/preview/*` |
-| Auth Circle/Connections pages | **Retained** as non-nav legacy demo routes (not linked) |
+| Auth Circle page | **Retained** as non-nav legacy demo route (not linked) |
+
+### WS15 Connections update
+
+Authenticated `/dashboard/connections` loads owner `saved_connections` only. Zero Connections show the polished empty state — never Alex Chen / `DEMO_CONNECTIONS`. Preview and live demo keep populated example Connections.
 
 ---
 
 ## Honest statement
 
-Home reach analytics and authenticated analytics are already real (WS08). Circle and Connections remain demo-only behind enabled nav labels until T002. Overview still lacks real project/research inventory cards until T003. Project/research CRUD pages exist; Batch 1 focuses on truthful nav and list→CRUD reachability, not reimplementing editors.
+Home reach analytics and authenticated analytics are already real (WS08). Circle remains demo-only and hidden from authenticated nav. Connections are real as of WS15 Batch 1. Overview still lacks real project/research inventory cards until T003. Project/research CRUD pages exist; Batch 1 focuses on truthful nav and list→CRUD reachability, not reimplementing editors.
