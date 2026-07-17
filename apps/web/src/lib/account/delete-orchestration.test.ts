@@ -160,8 +160,10 @@ describe('WS10-T004 capability readiness fail-closed', () => {
     clearAccountDeletionCapabilitiesForTests();
   });
 
-  it('remains not ready when T005–T008 are missing even with T004 scaffolds', () => {
-    registerT004ScaffoldCapabilities();
+  it('remains not ready when T006–T008 are missing even with T004 scaffolds + T005', () => {
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:54321';
+    ensureT004CapabilityScaffoldsRegistered();
     const readiness = evaluateAccountDeletionReadiness();
     expect(readiness.ready).toBe(false);
     if (readiness.ready) return;
@@ -170,6 +172,7 @@ describe('WS10-T004 capability readiness fail-closed', () => {
     );
     expect(readiness.missing).not.toContain('local_content');
     expect(readiness.missing).not.toContain('storage_cleanup');
+    expect(readiness.missing).not.toContain('auth_user_deletion');
   });
 
   it('is ready only when every mandatory capability is registered and available', () => {
