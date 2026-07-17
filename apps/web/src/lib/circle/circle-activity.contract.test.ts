@@ -101,8 +101,9 @@ describe('WS16-T001 circle activity contract', () => {
       resolve(process.cwd(), 'src/app/dashboard/(authenticated)/circle/page.tsx'),
       'utf8',
     );
-    // T001 documents isolation; T004 replaces DEMO import on auth route.
-    expect(authPage).toContain('DEMO_CIRCLE_FEED');
+    // T004 replaces DEMO import on the authenticated Circle route.
+    expect(authPage).not.toContain('DEMO_CIRCLE_FEED');
+    expect(authPage).toContain('listCircleFeed');
   });
 
   it('relies on real Connections and published content foundations from WS15/WS05', () => {

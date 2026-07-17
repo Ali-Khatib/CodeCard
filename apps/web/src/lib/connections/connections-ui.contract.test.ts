@@ -76,8 +76,8 @@ describe('WS15-T004 real Connections save flow', () => {
     );
     expect(nav).toContain("label: 'Connections'");
     expect(nav).toContain("segment: 'connections'");
-    expect(nav).not.toContain("label: 'Circle'");
-    expect(nav).not.toContain("segment: 'circle'");
+    expect(nav).toContain("label: 'Circle'");
+    expect(nav).toContain("segment: 'circle'");
   });
 
   it('exposes Add connection on public profiles and never on own profile', () => {

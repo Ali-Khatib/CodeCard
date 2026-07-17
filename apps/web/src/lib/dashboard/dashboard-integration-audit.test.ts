@@ -67,10 +67,10 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
     expect(navBlock).toContain("label: 'Research'");
     expect(navBlock).toContain("label: 'Connections'");
     expect(navBlock).toContain("segment: 'connections'");
+    expect(navBlock).toContain("label: 'Circle'");
+    expect(navBlock).toContain("segment: 'circle'");
     expect(navBlock).toContain("label: 'Analytics'");
     expect(navBlock).toContain("label: 'Settings'");
-    expect(navBlock).not.toContain("label: 'Circle'");
-    expect(navBlock).not.toContain("segment: 'circle'");
 
     // Preview routes remain available intentionally.
     expect(existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/circle/page.tsx'))).toBe(
@@ -81,6 +81,6 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
     ).toBe(true);
 
     expect(audit).toContain('WS15');
-    expect(audit).toContain('Circle | **Removed** from active MVP navigation');
+    expect(audit).toContain('Circle');
   });
 });
