@@ -104,7 +104,9 @@ function ConnectionExpandedBody({
                         <input
                           type="checkbox"
                           checked={assigned}
-                          onChange={() => {
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
                             void onToggleMembership?.(connection.id, collection.id, assigned);
                           }}
                           aria-label={

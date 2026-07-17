@@ -11,6 +11,8 @@ describe('WS15-T004 real Connections save flow', () => {
       connectedAt: '2026-07-17T12:00:00.000Z',
       createdAt: '2026-07-17T12:00:00.000Z',
       source: 'manual',
+      context: null,
+      privateNote: null,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',
         slug: 'bob-smith',
@@ -34,6 +36,8 @@ describe('WS15-T004 real Connections save flow', () => {
       connectedAt: null,
       createdAt: '2026-07-17T12:00:00.000Z',
       source: 'manual',
+      context: null,
+      privateNote: null,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',
         slug: '',

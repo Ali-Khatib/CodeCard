@@ -459,7 +459,7 @@ export async function listOwnerConnections(
   }
 
   const connectionIds = (data ?? []).map((row) => row.id as string);
-  let notesMap: Record<string, string> = {};
+  const notesMap: Record<string, string> = {};
   if (connectionIds.length > 0) {
     const { data: notes } = await supabase
       .from('connection_notes')
