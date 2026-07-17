@@ -24,6 +24,9 @@ export type AuthenticatedConnectionCard = WorkspaceConnection & {
   profileSlug?: string;
   savedProfileId: string;
   isPublicTarget: boolean;
+  privateNote: string | null;
+  context: string | null;
+  connectedAtIso: string | null;
 };
 
 /** Map a safe owner list item into the existing Connections card shape. */
@@ -31,22 +34,27 @@ export function mapOwnerConnectionToCard(
   item: OwnerConnectionListItem,
 ): AuthenticatedConnectionCard {
   const target = item.target;
+  const publicPreview = target.isPublic
+    ? target.headline?.trim() || target.location?.trim() || 'Saved from their public CodeCard.'
+    : 'This CodeCard is no longer public. Your Connection is still saved privately.';
+
   return {
     id: item.connectionId,
     name: target.displayName,
     role: target.headline?.trim() || (target.isPublic ? 'CodeCard member' : 'Unavailable'),
     company: target.location?.trim() || '',
-    metAt: target.isPublic ? 'Connected' : 'Saved',
+    metAt: item.context?.trim() || (target.isPublic ? 'Connected' : 'Saved'),
     date: formatConnectedDate(item.connectedAt ?? item.createdAt),
     source: SOURCE_LABEL[item.source] ?? 'Manual',
-    note: target.isPublic
-      ? target.headline?.trim() || target.location?.trim() || 'Saved from their public CodeCard.'
-      : 'This CodeCard is no longer public. Your Connection is still saved privately.',
+    note: item.privateNote?.trim() || publicPreview,
     followUp: 'none',
     tags: [],
     avatarUrl: target.avatarPublicUrl ?? undefined,
     profileSlug: target.slug || undefined,
     savedProfileId: target.profileId,
     isPublicTarget: target.isPublic,
+    privateNote: item.privateNote,
+    context: item.context,
+    connectedAtIso: item.connectedAt ?? item.createdAt,
   };
 }

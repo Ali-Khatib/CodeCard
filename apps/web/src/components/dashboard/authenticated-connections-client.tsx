@@ -9,6 +9,7 @@ import {
 } from '@/app/actions/collections';
 import { DashboardConnectionsView } from '@/components/dashboard/dashboard-connections-view';
 import { ConnectionsCollectionsPanel } from '@/components/dashboard/connections-collections-panel';
+import { ConnectionPrivateDetails } from '@/components/dashboard/connection-private-details';
 import type { AuthenticatedConnectionCard } from '@/lib/connections/map-owner-connection';
 import type { OwnerCollection } from '@/lib/connections/collections-core';
 
@@ -26,6 +27,9 @@ export function AuthenticatedConnectionsClient({
   const [collections, setCollections] = useState(initialCollections);
   const [memberships, setMemberships] = useState(initialMemberships);
   const [error, setError] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+
+  const [detailsId, setDetailsId] = useState<string | null>(null);
 
   useEffect(() => {
     setConnections(initialConnections);
@@ -38,6 +42,10 @@ export function AuthenticatedConnectionsClient({
   useEffect(() => {
     setMemberships(initialMemberships);
   }, [initialMemberships]);
+
+  const detailsConnection = detailsId
+    ? connections.find((c) => c.id === detailsId) ?? null
+    : null;
 
   const onRemove = useCallback(
     async (connectionId: string) => {
@@ -146,7 +154,34 @@ export function AuthenticatedConnectionsClient({
         collections={collections}
         memberships={memberships}
         onToggleMembership={onToggleMembership}
+        onOpenPrivateDetails={setDetailsId}
       />
+      {detailsConnection ? (
+        <ConnectionPrivateDetails
+          connectionId={detailsConnection.id}
+          connectionName={detailsConnection.name}
+          initialNote={detailsConnection.privateNote}
+          initialContext={detailsConnection.context}
+          initialConnectedAt={detailsConnection.connectedAtIso}
+          open
+          onClose={() => setDetailsId(null)}
+          onSaved={({ privateNote, context }) => {
+            setConnections((prev) =>
+              prev.map((c) =>
+                c.id === detailsConnection.id
+                  ? {
+                      ...c,
+                      privateNote,
+                      context,
+                      note: privateNote?.trim() || c.note,
+                      metAt: context?.trim() || c.metAt,
+                    }
+                  : c,
+              ),
+            );
+          }}
+        />
+      ) : null}
     </div>
   );
 }
