@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffectEvent, useState, useTransition } from 'react';
+import { useEffect, useEffectEvent, useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -11,7 +11,8 @@ import {
   type CircleFeedItem,
   type CircleFeedState,
 } from '@/lib/circle/circle-activity-contract';
-import { listCircleFeedAction } from '@/app/actions/circle';
+import { listCircleFeedAction, markCircleSeenAction } from '@/app/actions/circle';
+import { isActivityNewSince } from '@/lib/circle/circle-read-state-core';
 import { DashFilterBar } from '@/components/dashboard/dash-filter-bar';
 import { FadeInView } from '@/components/dashboard/fade-in-view';
 import { AppButton, AppCard, AppMono, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
@@ -113,7 +114,15 @@ function CircleFilteredEmpty({ onReset }: { onReset: () => void }) {
   );
 }
 
-function CircleActivityCard({ item, index }: { item: CircleFeedItem; index: number }) {
+function CircleActivityCard({
+  item,
+  index,
+  isNew,
+}: {
+  item: CircleFeedItem;
+  index: number;
+  isNew?: boolean;
+}) {
   const href = targetHref(item);
   const profileHref = `/${item.actor.slug}`;
   const ctaLabel =
@@ -156,13 +165,20 @@ function CircleActivityCard({ item, index }: { item: CircleFeedItem; index: numb
               </p>
               <p className="text-[13px] text-[var(--app-smoke)]">{item.activitySentence}</p>
             </div>
-            <time
-              className="text-[13px] text-[var(--app-smoke)]"
-              dateTime={item.createdAt}
-              title={item.createdAt}
-            >
-              {formatActivityTimestamp(item.createdAt)}
-            </time>
+            <div className="flex flex-col items-end gap-1">
+              {isNew ? (
+                <span className="cc-app-badge cc-app-badge--mint inline-flex" aria-label="New since your last visit">
+                  New
+                </span>
+              ) : null}
+              <time
+                className="text-[13px] text-[var(--app-smoke)]"
+                dateTime={item.createdAt}
+                title={item.createdAt}
+              >
+                {formatActivityTimestamp(item.createdAt)}
+              </time>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-[minmax(200px,320px)_1fr]">
@@ -232,7 +248,13 @@ function labelToFilter(label: string): CircleFeedFilter {
   return entry?.[0] ?? 'all';
 }
 
-export function AuthenticatedCircleView({ initialFeed }: { initialFeed: CircleFeedState }) {
+export function AuthenticatedCircleView({
+  initialFeed,
+  initialLastSeenAt = null,
+}: {
+  initialFeed: CircleFeedState;
+  initialLastSeenAt?: string | null;
+}) {
   const [filter, setFilter] = useState<CircleFeedFilter>(
     initialFeed.status === 'feed' || initialFeed.status === 'filtered_empty'
       ? initialFeed.filter
@@ -251,6 +273,7 @@ export function AuthenticatedCircleView({ initialFeed }: { initialFeed: CircleFe
       ? initialFeed.connectionCount
       : 0,
   );
+  const [lastSeenAt] = useState<string | null>(initialLastSeenAt);
   const [pageStatus, setPageStatus] = useState<
     'ready' | 'filtered_empty' | 'no_activity' | 'no_connections' | 'error'
   >(
@@ -271,6 +294,27 @@ export function AuthenticatedCircleView({ initialFeed }: { initialFeed: CircleFe
   );
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [seenMarked, setSeenMarked] = useState(false);
+
+  // Deliberate visible Circle visit: mark seen only when document is visible and feed loaded.
+  useEffect(() => {
+    if (seenMarked) return;
+    if (pageStatus === 'error' || pageStatus === 'no_connections') return;
+    if (typeof document === 'undefined') return;
+    if (document.visibilityState !== 'visible') return;
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void markCircleSeenAction().then((result) => {
+        if (!cancelled && result.ok) setSeenMarked(true);
+      });
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [pageStatus, seenMarked]);
 
   const applyFeedResult = useEffectEvent((result: CircleFeedState, mode: 'replace' | 'append') => {
     if (result.status === 'unauthenticated') {
@@ -406,7 +450,12 @@ export function AuthenticatedCircleView({ initialFeed }: { initialFeed: CircleFe
           ) : null}
           <ul className="space-y-4" aria-label="Circle activity">
             {items.map((item, index) => (
-              <CircleActivityCard key={item.eventId} item={item} index={index} />
+              <CircleActivityCard
+                key={item.eventId}
+                item={item}
+                index={index}
+                isNew={isActivityNewSince(item.createdAt, lastSeenAt)}
+              />
             ))}
           </ul>
           {nextCursor ? (

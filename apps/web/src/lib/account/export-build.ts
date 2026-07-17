@@ -73,6 +73,7 @@ export async function buildAccountExportDocument(
     subscription: null,
     moderation_reports: [],
     circle_activity: [],
+    circle_viewer_state: null,
   };
 
   if (!profile) {
@@ -467,7 +468,7 @@ async function loadAdditionalOwnerData(
   | { ok: true; data: AccountExportDocument['additional_account_data'] }
   | { ok: false; error: 'query_failed' }
 > {
-  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes] =
+  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes, viewerStateRes] =
     await Promise.all([
       supabase
         .from('saved_connections')
@@ -503,6 +504,11 @@ async function loadAdditionalOwnerData(
         .select('id, event_type, target_type, target_id, dedupe_key, created_at')
         .eq('actor_profile_id', profileId)
         .order('created_at', { ascending: true }),
+      supabase
+        .from('circle_viewer_state')
+        .select('last_seen_at')
+        .eq('viewer_user_id', ownerUserId)
+        .maybeSingle(),
     ]);
 
   if (
@@ -511,7 +517,8 @@ async function loadAdditionalOwnerData(
     collectionsRes.error ||
     subscriptionRes.error ||
     reportsRes.error ||
-    circleRes.error
+    circleRes.error ||
+    viewerStateRes.error
   ) {
     return { ok: false, error: 'query_failed' };
   }
@@ -597,6 +604,10 @@ async function loadAdditionalOwnerData(
         dedupe_key: row.dedupe_key,
         created_at: requireIso(row.created_at, generatedAt),
       })),
+      circle_viewer_state:
+        viewerStateRes.data && !Array.isArray(viewerStateRes.data)
+          ? { last_seen_at: toUtcIso((viewerStateRes.data as { last_seen_at?: string | null }).last_seen_at) }
+          : null,
     },
   };
 }

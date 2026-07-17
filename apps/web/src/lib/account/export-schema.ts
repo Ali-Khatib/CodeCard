@@ -293,6 +293,12 @@ const additionalAccountDataSchema = z
         })
         .strict(),
     ),
+    circle_viewer_state: z
+      .object({
+        last_seen_at: isoTimestamp.nullable(),
+      })
+      .strict()
+      .nullable(),
   })
   .strict();
 

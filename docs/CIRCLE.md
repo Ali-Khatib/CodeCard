@@ -13,6 +13,13 @@ Circle is a **private feed projection**:
 - Target users cannot see who viewed them through Circle
 - Private Connection notes, collections, drafts, billing, and analytics never appear
 
+## Private read state (Batch 2)
+
+- Table: `circle_viewer_state` (`viewer_user_id`, `last_seen_at`)
+- Owner-only RLS; actors never see viewer reads
+- Deliberate visible Circle visit marks seen after successful load
+- Nav badge: real bounded unread count (`9+` cap); never demo values
+
 ## Pagination and filters (Batch 2)
 
 - Page size: 20 (max 20)
@@ -69,6 +76,7 @@ Not emitted: reorder-only, draft saves, analytics counters, private notes, colle
 Forward-only (manual deploy — do **not** run `supabase db push` from agents):
 
 - `supabase/migrations/20260717034827_circle_activity.sql`
+- `supabase/migrations/20260717080001_circle_viewer_state.sql`
 
 ## MVP limits (Batch 1)
 
