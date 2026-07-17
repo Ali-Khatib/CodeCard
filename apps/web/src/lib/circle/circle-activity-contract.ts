@@ -223,16 +223,49 @@ export function buildPublishDedupeKey(
 }
 
 /**
- * Update dedupe keys incorporate a content fingerprint so identical retries
- * remain idempotent while distinct meaningful edits create new events.
+ * Update events collapse to one row per target. Latest meaningful update
+ * refreshes `created_at` via upsert (grouping window = unbounded per target).
+ * Publication events remain separate and unique.
  */
 export function buildUpdateDedupeKey(
   targetType: CircleActivityTargetType,
   targetId: string,
-  contentFingerprint: string,
+  _contentFingerprint?: string,
 ): string {
-  return `${targetType}_updated:${targetId}:${contentFingerprint}`;
+  return `${targetType}_updated:${targetId}`;
 }
+
+/** Bounded display grouping window used by feed collapse helpers (ms). */
+export const CIRCLE_UPDATE_GROUPING_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Mutation → Circle activity classification (WS16-T007).
+ * Values: publish | update | none | hide
+ */
+export const CIRCLE_MUTATION_ACTIVITY_CLASSIFICATION = {
+  project_create: 'none',
+  project_draft_save: 'none',
+  project_publish: 'publish',
+  project_meaningful_update_while_published: 'update',
+  project_noop_update: 'none',
+  project_reorder: 'none',
+  project_unpublish: 'hide',
+  project_republish: 'publish_idempotent',
+  project_delete: 'hide',
+  research_create: 'none',
+  research_draft_save: 'none',
+  research_publish: 'publish',
+  research_meaningful_update_while_published: 'update',
+  research_noop_update: 'none',
+  research_figure_reorder: 'none',
+  research_unpublish: 'hide',
+  research_republish: 'publish_idempotent',
+  research_delete: 'hide',
+  connection_notes: 'none',
+  collections: 'none',
+  billing: 'none',
+  analytics: 'none',
+} as const;
 
 export function activitySentenceFor(
   eventType: CircleActivityEventType,

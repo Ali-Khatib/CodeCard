@@ -53,15 +53,19 @@ export async function emitCircleActivity(
     dedupeKey = buildUpdateDedupeKey(targetType, input.targetId, fingerprint);
   }
 
-  const { error } = await supabase.from(CIRCLE_ACTIVITY_TABLE).insert({
-    tenant_id: input.tenantId,
-    actor_profile_id: input.actorProfileId,
-    event_type: input.eventType,
-    target_type: targetType,
-    target_id: input.targetId,
-    dedupe_key: dedupeKey,
-    metadata: {},
-  });
+  const { error } = await supabase.from(CIRCLE_ACTIVITY_TABLE).upsert(
+    {
+      tenant_id: input.tenantId,
+      actor_profile_id: input.actorProfileId,
+      event_type: input.eventType,
+      target_type: targetType,
+      target_id: input.targetId,
+      dedupe_key: dedupeKey,
+      metadata: {},
+      created_at: new Date().toISOString(),
+    },
+    { onConflict: 'dedupe_key', ignoreDuplicates: isPublish },
+  );
 
   if (error) {
     if (error.code === '23505') {

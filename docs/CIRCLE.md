@@ -51,10 +51,14 @@ Demo `DEMO_CIRCLE_FEED` remains on preview/Alex Chen surfaces only.
 
 Not emitted: reorder-only, draft saves, analytics counters, private notes, collection/Connection changes, billing, autosave noise, profile_updated (deferred).
 
-## Deduplication
+## Deduplication and grouping (Batch 2)
 
-- Publish: `project_published:<id>` / `research_published:<id>` (unique)
-- Update: `project_updated:<id>:<fingerprint>` / `research_updated:<id>:<fingerprint>` (identical payload → idempotent)
+- Publish: unique `project_published:<id>` / `research_published:<id>` (idempotent)
+- Update: one row per target via `project_updated:<id>` upsert (latest meaningful update wins)
+- Feed also collapses duplicate update cards for the same actor+target
+- Reorder / no-op / draft / notes / collections → no activity
+- Republish after unpublish: same publish dedupe key (idempotent restore visibility)
+- Fingerprints still gate emit (meaningful change required); they are not part of the update dedupe key
 
 ## Privacy / deletion
 
@@ -64,12 +68,12 @@ Not emitted: reorder-only, draft saves, analytics counters, private notes, colle
 | Delete content | Cascade/remove related activity |
 | Remove Connection | Actor’s events disappear from that viewer’s feed |
 | Actor account deleted | Actor activity cascades with profile |
-| Viewer account deleted | Viewer Connections gone; no viewer-specific Circle state in Batch 1 |
+| Viewer account deleted | Viewer Connections gone; `circle_viewer_state` removed |
 
 ## Account controls (WS10)
 
-- **Export:** actor-owned `circle_activity` rows for the requesting owner
-- **Deletion:** actor-owned activity removed with profile/content cascade; viewer has no separate Circle state yet
+- **Export:** actor-owned `circle_activity` + viewer-owned `circle_viewer_state.last_seen_at`
+- **Deletion:** actor activity cascades; viewer read state deleted with account
 
 ## Migrations
 
@@ -78,10 +82,9 @@ Forward-only (manual deploy — do **not** run `supabase db push` from agents):
 - `supabase/migrations/20260717034827_circle_activity.sql`
 - `supabase/migrations/20260717080001_circle_viewer_state.sql`
 
-## MVP limits (Batch 1)
+## MVP limits
 
-- No reactions, comments, messaging
+- No likes, reactions, comments, messaging
 - No manual social posts
-- No Circle notifications / read state (Batch 2)
-- No trending / recommendations
-- Bounded page size with cursor-ready contract
+- No follower counts / engagement ranking / trending / recommendations
+- Private read state is viewer-only (never creator-facing)

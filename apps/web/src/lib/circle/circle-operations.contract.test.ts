@@ -16,6 +16,7 @@ function createInsertClient(result: { error: { code?: string; message?: string }
   return {
     from: vi.fn(() => ({
       insert: vi.fn(async () => result),
+      upsert: vi.fn(async () => result),
     })),
   };
 }

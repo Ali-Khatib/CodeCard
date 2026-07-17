@@ -16,6 +16,7 @@ import {
   type CircleActivityTargetType,
 } from '@/lib/circle/circle-activity-contract';
 import { resolveProjectMediaDisplayUrl } from '@/lib/projects/project-media-url';
+import { collapseCircleUpdateGroups } from '@/lib/circle/circle-group';
 
 type ActivityRow = {
   id: string;
@@ -297,9 +298,10 @@ export async function listCircleFeed(
       ? { createdAt: lastRaw.created_at, id: lastRaw.id, filter }
       : null;
 
-  if (items.length === 0) {
+  const groupedItems = collapseCircleUpdateGroups(items);
+
+  if (groupedItems.length === 0) {
     if (nextCursor) {
-      // Visible page empty but more raw rows exist — advance once more via client Load more.
       return {
         status: 'feed',
         connectionCount: connectionIds.length,
@@ -318,7 +320,7 @@ export async function listCircleFeed(
     status: 'feed',
     connectionCount: connectionIds.length,
     filter,
-    items,
+    items: groupedItems,
     nextCursor,
   };
 }
