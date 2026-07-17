@@ -74,10 +74,13 @@ describe('WS09-T012 mutation feedback wiring', () => {
     expect(figures).toContain('MUTATION_FEEDBACK.research.figureOrderSaved');
   });
 
-  it('does not introduce account export/delete or storage cleanup', () => {
+  it('wires Settings account export/delete outside the dashboard shell', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
+    const settings = read('src/components/dashboard/dashboard-settings-view.tsx');
     expect(shell).not.toContain('/api/account/export');
     expect(shell).not.toContain('/api/account/delete');
     expect(shell).not.toContain('cleanup-storage');
+    expect(settings).toContain('AccountExportAction');
+    expect(settings).toContain('AccountDeletionDialog');
   });
 });
