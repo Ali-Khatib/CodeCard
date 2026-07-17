@@ -17,7 +17,8 @@
     "db:migrate": "npx supabase db push",
     "db:reset": "npx supabase db reset",
     "db:seed": "tsx supabase/seed.ts",
-    "security:scan": "node scripts/check-secrets.js"
+    "security:scan": "node scripts/check-secrets.js",
+    "security:audit": "npm audit --audit-level=high --package-lock-only"
   },
   "devDependencies": {
     "prettier": "^3.4.2",

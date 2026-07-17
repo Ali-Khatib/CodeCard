@@ -10,11 +10,13 @@ Analytics retention (WS08-T012): raw analytics events are retained for **up to 9
 
 ## Secrets & configuration
 
-- [ ] No secrets in source, history, or fixtures
+- [x] No secrets in source, history, or fixtures (CI `secret-scan` + `scripts/check-secrets.js`)
 - [ ] Secrets only in env / deployment secret manager
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` is server-only (never `NEXT_PUBLIC_`)
 - [ ] Stripe / Upstash / other provider secrets are server-only
 - [ ] `.env.local` ignored and not committed
+
+Blocking CI policy: [`CI_SECURITY_AUDITING.md`](./CI_SECURITY_AUDITING.md) (WS11-T009).
 
 ## Database & auth
 
@@ -185,7 +187,9 @@ Full narrative assessment: [`WS04_T013_UPLOAD_SECURITY_DECISION.md`](./WS04_T013
 
 ## CI/CD & monitoring
 
-- [ ] Lint, typecheck, and tests blocking
+- [x] Lint, typecheck, and tests blocking
+- [x] Secret scanning blocking (`secret-scan` job)
+- [x] Dependency vulnerability audit blocking (`dependency-audit`, high/critical via `npm audit --audit-level=high --package-lock-only`)
 - [ ] Error monitoring configured
 - [ ] Audit logs for admin/billing/security actions where applicable
 
