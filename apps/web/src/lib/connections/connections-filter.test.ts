@@ -86,7 +86,7 @@ describe('WS15-T007 connections search filter sort', () => {
 
   it('wires authenticated filter UI and distinct empty states', () => {
     const view = readFileSync(
-      resolve(process.cwd(), 'src/components/dashboard/dashboard-connections-view.tsx'),
+      resolve(__dirname, '../../components/dashboard/dashboard-connections-view.tsx'),
       'utf8',
     );
     expect(view).toContain('filterAndSortConnections');

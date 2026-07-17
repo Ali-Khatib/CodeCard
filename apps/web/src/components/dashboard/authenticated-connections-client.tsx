@@ -29,8 +29,6 @@ export function AuthenticatedConnectionsClient({
   const [error, setError] = useState<string | null>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
 
-  const [detailsId, setDetailsId] = useState<string | null>(null);
-
   useEffect(() => {
     setConnections(initialConnections);
   }, [initialConnections]);
