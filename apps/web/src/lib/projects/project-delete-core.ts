@@ -4,6 +4,12 @@ import {
   resolveAuthenticatedUser,
   type AuthUser,
 } from '@/lib/projects/project-access-core';
+import { collectProjectStorageCleanupTargets } from '@/lib/jobs/collect-project-cleanup-targets';
+import {
+  cancelStorageCleanupJob,
+  enqueueStorageCleanupJob,
+  processStorageCleanupJobById,
+} from '@/lib/jobs/cleanup-storage';
 
 export type ProjectDeleteState = {
   success?: boolean;
@@ -13,12 +19,19 @@ export type ProjectDeleteState = {
   profileSlug?: string | null;
   wasPublished?: boolean;
   redirectTo?: string;
+  cleanupWarning?: boolean;
+};
+
+export type ProjectDeleteOptions = {
+  user?: AuthUser | null;
+  /** Server-only service client factory for durable cleanup jobs. */
+  createServiceClient?: () => Promise<SupabaseClient>;
 };
 
 export async function executeDeleteProject(
   supabase: SupabaseClient,
   projectId: string,
-  options?: { user?: AuthUser | null },
+  options?: ProjectDeleteOptions,
 ): Promise<ProjectDeleteState> {
   const auth = await resolveAuthenticatedUser(supabase, options);
   if ('error' in auth) {
@@ -35,6 +48,50 @@ export async function executeDeleteProject(
 
   const { project, profile } = owned;
 
+  const targets = await collectProjectStorageCleanupTargets(supabase, {
+    project,
+    userId: auth.user.id,
+  });
+  if (!targets.ok) {
+    return {
+      error: 'Could not delete this project. Please try again.',
+      errorCode: 'server',
+    };
+  }
+
+  let jobId: string | null = null;
+  let service: SupabaseClient | null = null;
+
+  if (targets.payload) {
+    if (!options?.createServiceClient) {
+      return {
+        error: 'Could not delete this project. Please try again.',
+        errorCode: 'server',
+      };
+    }
+
+    try {
+      service = await options.createServiceClient();
+    } catch {
+      return {
+        error: 'Could not delete this project. Please try again.',
+        errorCode: 'server',
+      };
+    }
+
+    const enqueued = await enqueueStorageCleanupJob(service, {
+      tenantId: project.tenant_id,
+      payload: targets.payload,
+    });
+    if (!enqueued.ok) {
+      return {
+        error: 'Could not delete this project. Please try again.',
+        errorCode: 'server',
+      };
+    }
+    jobId = enqueued.jobId;
+  }
+
   const { error } = await supabase
     .from('projects')
     .delete()
@@ -42,10 +99,21 @@ export async function executeDeleteProject(
     .eq('owner_user_id', auth.user.id);
 
   if (error) {
+    if (jobId && service) {
+      await cancelStorageCleanupJob(service, jobId, 'content_delete_failed');
+    }
     return {
       error: 'Could not delete this project. Please try again.',
       errorCode: 'server',
     };
+  }
+
+  let cleanupWarning = false;
+  if (jobId && service) {
+    const processed = await processStorageCleanupJobById(service, jobId);
+    if (!processed.ok) {
+      cleanupWarning = true;
+    }
   }
 
   return {
@@ -54,12 +122,12 @@ export async function executeDeleteProject(
     profileSlug: profile.slug,
     wasPublished: project.is_published,
     redirectTo: '/dashboard/projects',
+    cleanupWarning: cleanupWarning || undefined,
   };
 }
 
 /**
- * Database rows in project_domains, project_focus_areas, project_links,
- * project_media_assets, and project_orderings cascade on project delete.
- * Storage objects referenced by project_media_assets are not removed here (WS04-T010).
+ * Project deletion enqueues durable storage cleanup (WS04-T010) before cascade,
+ * then drains the job immediately. Residual failures remain retryable via jobs.
  */
-export const PROJECT_DELETE_STORAGE_DEFERRED = true;
+export const PROJECT_DELETE_STORAGE_DEFERRED = false;

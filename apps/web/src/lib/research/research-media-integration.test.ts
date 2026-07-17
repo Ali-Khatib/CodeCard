@@ -44,10 +44,17 @@ describe('WS05-T011 research media integration', () => {
       resolve(process.cwd(), 'src/lib/research/research-delete-core.ts'),
       'utf8',
     );
-    expect(del).toContain('listTrustedResearchFigureStoragePaths');
-    expect(del).toContain("resourceType: 'research-figure'");
+    expect(del).toContain('collectResearchStorageCleanupTargets');
+    expect(del).toContain('enqueueStorageCleanupJob');
     expect(del).toContain('external PDF URLs are never deleted remotely');
     expect(del).not.toContain("from('storage')");
+
+    const collect = readFileSync(
+      resolve(process.cwd(), 'src/lib/jobs/collect-research-cleanup-targets.ts'),
+      'utf8',
+    );
+    expect(collect).toContain('listTrustedResearchFigureStoragePaths');
+    expect(collect).toContain("'research-figure'");
   });
 
   it('keeps public PDF action external-only and figure alt text safe', () => {
@@ -57,7 +64,7 @@ describe('WS05-T011 research media integration', () => {
     );
     expect(detail).toContain('Open paper');
     expect(detail).toContain('CodeCard does not host or verify this file');
-    expect(detail).toContain("figure.caption?.trim() || 'Research figure'");
+    expect(detail).toContain("figure.caption?.trim() ? '' : 'Research figure'");
     expect(detail).not.toContain('Download paper');
     expect(detail).not.toContain('storage_path');
   });

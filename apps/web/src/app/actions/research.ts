@@ -75,7 +75,10 @@ export async function deleteResearchAction(
   researchPaperId: string,
 ): Promise<ResearchDeleteState> {
   const supabase = await createClient();
-  const result = await executeDeleteResearch(supabase, researchPaperId);
+  const { createServiceClient } = await import('@/lib/supabase/server');
+  const result = await executeDeleteResearch(supabase, researchPaperId, {
+    createServiceClient,
+  });
 
   if (result.success && result.researchPaperId && !result.alreadyDeleted) {
     revalidateDeletedResearchPaths({

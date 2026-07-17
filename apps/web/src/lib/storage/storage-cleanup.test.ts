@@ -79,4 +79,24 @@ describe('removeTrustedStorageObject', () => {
 
     expect(result.cleaned).toBe(false);
   });
+
+  it('treats not-found storage errors as successful cleanup', async () => {
+    const remove = vi.fn().mockResolvedValue({
+      error: { message: 'Object not found', statusCode: '404' },
+    });
+    const supabase = {
+      storage: {
+        from: vi.fn(() => ({ remove })),
+      },
+    };
+
+    const path =
+      '11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/project-media/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/file.png';
+    const result = await removeTrustedStorageObject(supabase as never, {
+      resourceType: 'project-media',
+      path,
+    });
+
+    expect(result).toEqual({ ok: true, removed: false });
+  });
 });

@@ -4,8 +4,12 @@ import {
   resolveAuthenticatedUser,
   type AuthUser,
 } from '@/lib/research/research-access-core';
-import { listTrustedResearchFigureStoragePaths } from '@/lib/research/research-figure-core';
-import { bestEffortRemoveTrustedStorageObject } from '@/lib/storage/storage-cleanup';
+import { collectResearchStorageCleanupTargets } from '@/lib/jobs/collect-research-cleanup-targets';
+import {
+  cancelStorageCleanupJob,
+  enqueueStorageCleanupJob,
+  processStorageCleanupJobById,
+} from '@/lib/jobs/cleanup-storage';
 
 export type ResearchDeleteState = {
   success?: boolean;
@@ -20,6 +24,11 @@ export type ResearchDeleteState = {
   cleanupWarning?: boolean;
 };
 
+export type ResearchDeleteOptions = {
+  user?: AuthUser | null;
+  createServiceClient?: () => Promise<SupabaseClient>;
+};
+
 /**
  * Deletes an owned research paper.
  *
@@ -27,13 +36,12 @@ export type ResearchDeleteState = {
  * return a safe already-removed success without revealing whether a foreign
  * paper exists. Related projects and external PDF URLs are never deleted remotely.
  * research_figures cascade via FK after the paper row is removed.
- * CodeCard-owned figure objects are cleaned up best-effort beforehand;
- * residual orphans remain WS04-T010.
+ * CodeCard-owned figure objects are cleaned via durable WS04-T010 jobs.
  */
 export async function executeDeleteResearch(
   supabase: SupabaseClient,
   researchPaperId: string,
-  options?: { user?: AuthUser | null },
+  options?: ResearchDeleteOptions,
 ): Promise<ResearchDeleteState> {
   const auth = await resolveAuthenticatedUser(supabase, options);
   if ('error' in auth) {
@@ -67,12 +75,49 @@ export async function executeDeleteResearch(
 
   const { paper, profile } = owned;
 
-  const figurePaths = await listTrustedResearchFigureStoragePaths(
-    supabase,
-    paper.id,
+  const targets = await collectResearchStorageCleanupTargets(supabase, {
     paper,
-    auth.user.id,
-  );
+    userId: auth.user.id,
+  });
+  if (!targets.ok) {
+    return {
+      error: 'Could not delete this research paper. Please try again.',
+      errorCode: 'server',
+    };
+  }
+
+  let jobId: string | null = null;
+  let service: SupabaseClient | null = null;
+
+  if (targets.payload) {
+    if (!options?.createServiceClient) {
+      return {
+        error: 'Could not delete this research paper. Please try again.',
+        errorCode: 'server',
+      };
+    }
+
+    try {
+      service = await options.createServiceClient();
+    } catch {
+      return {
+        error: 'Could not delete this research paper. Please try again.',
+        errorCode: 'server',
+      };
+    }
+
+    const enqueued = await enqueueStorageCleanupJob(service, {
+      tenantId: paper.tenant_id,
+      payload: targets.payload,
+    });
+    if (!enqueued.ok) {
+      return {
+        error: 'Could not delete this research paper. Please try again.',
+        errorCode: 'server',
+      };
+    }
+    jobId = enqueued.jobId;
+  }
 
   const { error } = await supabase
     .from('research_papers')
@@ -81,6 +126,9 @@ export async function executeDeleteResearch(
     .eq('owner_user_id', auth.user.id);
 
   if (error) {
+    if (jobId && service) {
+      await cancelStorageCleanupJob(service, jobId, 'content_delete_failed');
+    }
     return {
       error: 'Could not delete this research paper. Please try again.',
       errorCode: 'server',
@@ -88,12 +136,9 @@ export async function executeDeleteResearch(
   }
 
   let cleanupWarning = false;
-  for (const path of figurePaths) {
-    const cleanup = await bestEffortRemoveTrustedStorageObject(supabase, {
-      resourceType: 'research-figure',
-      path,
-    });
-    if (!cleanup.cleaned) {
+  if (jobId && service) {
+    const processed = await processStorageCleanupJobById(service, jobId);
+    if (!processed.ok) {
       cleanupWarning = true;
     }
   }
@@ -109,5 +154,5 @@ export async function executeDeleteResearch(
   };
 }
 
-/** Figure object cleanup is best-effort; orphans remain for WS04-T010. */
-export const RESEARCH_DELETE_STORAGE_DEFERRED = true;
+/** Figure cleanup uses durable WS04-T010 jobs with immediate drain after delete. */
+export const RESEARCH_DELETE_STORAGE_DEFERRED = false;

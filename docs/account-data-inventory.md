@@ -166,7 +166,7 @@ Required sections:
 | Storage objects | Delete owner-scoped targets | **WS04-T010** (next after export batch) |
 | `auth.users` | Delete last | WS10-T005 |
 
-**Schema note:** `jobs` has `type`/`status`/`payload` but **no `attempts` column**. WS04-T010 must audit whether a narrow migration is required.
+**Schema note:** WS04-T010 adds `jobs.attempts`, `jobs.available_at`, `jobs.claimed_at`, plus claim RPCs (`claim_storage_cleanup_jobs`, `claim_storage_cleanup_job_by_id`). Migration is local-only until ops deploy — see `supabase/migrations/20260716235701_storage_cleanup_jobs.sql`.
 
 ---
 
