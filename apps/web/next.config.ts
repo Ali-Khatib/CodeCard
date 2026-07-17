@@ -51,6 +51,11 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: [],
     },
+    /**
+     * WS11-T002: enables `forbidden()` so the `/admin` gate can return a
+     * real HTTP 403 (app/forbidden.tsx) instead of a 200 "access denied" page.
+     */
+    authInterrupts: true,
   },
   transpilePackages: [
     '@codecard/ui',

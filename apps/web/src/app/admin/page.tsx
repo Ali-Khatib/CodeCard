@@ -1,14 +1,13 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
 import { Card, CardContent, CardHeader, CardTitle } from '@codecard/ui';
 
 export default async function AdminPage() {
+  // WS11-T002: authorize (global admin only) before any rendering or data fetch.
+  await enforceGlobalAdminAccess();
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/sign-in');
 
   const { data: reports } = await supabase
     .from('moderation_reports')
