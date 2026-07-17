@@ -1,10 +1,11 @@
 # Admin authorization model (WS13-T001)
 
-**Status:** Accepted (model defined; enforcement deferred)  
+**Status:** Accepted (model defined; `/admin` page gate enforced by WS11-T002)  
 **Task:** WS13-T001 — Define the global admin authorization model  
-**Canonical resolver:** `apps/web/src/lib/security/admin-authorization.ts`
+**Canonical resolver:** `apps/web/src/lib/security/admin-authorization.ts`  
+**Route gate (WS11-T002):** `apps/web/src/lib/security/admin-route-gate.ts`
 
-> **Important:** This task does **not** secure `/admin`, enable admin data access, promote any user, or apply remote migrations. WS11-T002 and WS13-T002+ must enforce this model later.
+> **Important:** T001 itself does **not** secure `/admin`, enable admin data access, promote any user, or apply remote migrations. The `/admin` **page** gate is implemented by WS11-T002 (see §16a). Admin **data access** (RLS or gated service-role API) remains pending in WS13-T002+.
 
 ---
 
@@ -186,14 +187,41 @@ Path: `apps/web/src/lib/security/admin-authorization.ts`
 
 ## 16. Page authorization contract (`/admin`)
 
-| Caller | Later behavior (WS11-T002) |
-|--------|----------------------------|
+| Caller | Behavior (enforced by WS11-T002) |
+|--------|----------------------------------|
 | Authenticated global admin | Allowed |
-| Authenticated non-admin | Forbidden (not a soft redirect to dashboard as “success”) |
-| Anonymous visitor | Existing auth redirect to sign-in (middleware already requires a session for `/admin`) |
-| Demo identity | Forbidden |
+| Authenticated non-admin | Forbidden (real HTTP 403 via `forbidden()`, not a soft redirect) |
+| Anonymous visitor | Redirect to `/sign-in?redirect=%2Fadmin` (sanitized internal path; middleware also requires a session for `/admin`) |
+| Demo identity | Forbidden (demo mode has no verified Supabase session; the resolver additionally denies `isDemoIdentity`) |
 
-T001 does **not** implement this gate. Today any authenticated user can open `/admin` (reads still fail under RLS).
+T001 did **not** implement this gate; WS11-T002 did (§16a).
+
+## 16a. Enforcement (WS11-T002)
+
+**Gate module:** `apps/web/src/lib/security/admin-route-gate.ts` — `enforceGlobalAdminAccess()`, a server-only wrapper that:
+
+1. Verifies the user via the trusted server client (`supabase.auth.getUser()`).
+2. Passes only `{ userId, appMetadata }` from the verified user into the canonical `resolveGlobalAdminAuthorization` (no second role source, no request-derived roles).
+3. Enforces the decision: anonymous → sign-in redirect; everything else non-authorized → `forbidden()` (403); misconfiguration and identity-provider failure fail closed with bounded redacted logs (no tokens, metadata, or user IDs).
+
+**Enforcement points (server render, before any data fetch):**
+
+- `apps/web/src/app/admin/layout.tsx` — gates the entire `/admin` route tree (defense in depth for future nested routes).
+- `apps/web/src/app/admin/page.tsx` — awaits the gate **before** `createClient()` and the `moderation_reports` / `dmca_notices` queries, because Next.js renders layouts and pages in parallel. **Every future `/admin/*` page must do the same.**
+
+**403 mechanism:** `experimental.authInterrupts: true` in `apps/web/next.config.ts` enables Next 15's `forbidden()`, rendered by `apps/web/src/app/forbidden.tsx` (opaque copy, no admin details, keyboard-accessible links back to `/dashboard` and `/`).
+
+**401 vs 403:** Anonymous (no verifiable session) → sign-in redirect (the browser-page equivalent of 401). Authenticated but not a global admin → 403. Non-admins are never redirected to sign-in as if unauthenticated.
+
+**Middleware:** unchanged — coarse session-only routing for `/admin/*`. It decides authentication routing, never role authorization.
+
+**Session staleness:** unchanged from §11 — the gate trusts the verified current user; a revoked admin may retain access until token refresh/invalidation. Destructive admin mutations (later tasks) must re-check.
+
+**Page authorization is not API authorization.** The gate protects only browser rendering of `/admin`. Audit at WS11-T002 time: no `/api/admin/*` routes exist; `POST /api/moderation/report` and `POST /api/dmca` are public ingest (insert-only, validated, rate-limited) and are not admin surfaces. Every future admin API must independently call the canonical resolver server-side (WS13-T002).
+
+**Still pending:** WS13-T002 (admin data access — the page's moderation/DMCA reads still return nothing under current RLS), WS13-T003+ (admin UX). WS11-T002 does not make admin reads work.
+
+**Tests:** `admin-route-gate.test.ts` (behavior: anonymous redirect, open-redirect safety, non-admin/tenant-admin/user-metadata/forged-role/malformed-metadata/similar-role rejection, canonical admin allow, fail-closed provider failure, redacted logging) and `admin-route-gate.contract.test.ts` (gate wiring, pre-fetch authorization order, forbidden page opacity, `authInterrupts`, middleware role-free, docs accuracy). Browser E2E for authenticated admin/non-admin flows is **skipped** — the repo has no seeded staging auth users for Playwright; route-level integration tests above are the strongest available coverage.
 
 ## 17. API authorization contract
 
@@ -329,20 +357,20 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 
 ## 28. Deferred work
 
-- WS11-T002 — `/admin` role gate
+- WS11-T002 — `/admin` role gate — **done** (§16a)
 - WS13-T002 — admin RLS or gated service-role API
 - WS13-T003 — admin page data fetching
 - WS13-T004–T008 — actions, suspension, hide/unpublish, auditing
 - Public role-management UI/API — not planned for T001
 
-## 29. Mapping to WS11-T002
+## 29. Mapping to WS11-T002 (implemented)
 
-WS11-T002 must:
+WS11-T002 implemented this as specified:
 
-- Import `resolveGlobalAdminAuthorization` on the server `/admin` path (and layout if added)
-- Allow only `authorized: true`
-- Forbid non-admins; keep anonymous → sign-in behavior
-- Not trust client flags
+- `resolveGlobalAdminAuthorization` runs on the server `/admin` path and layout (via `enforceGlobalAdminAccess`)
+- Only `authorized: true` continues
+- Non-admins are forbidden (403); anonymous → sign-in behavior kept
+- No client flags trusted
 
 ## 30. Mapping to WS13-T002 through WS13-T008
 

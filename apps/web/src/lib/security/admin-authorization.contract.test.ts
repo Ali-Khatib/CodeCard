@@ -48,7 +48,8 @@ describe('WS13-T001 admin authorization contracts', () => {
     }
     expect(clientImporters).toEqual([]);
 
-    // T001 must not wire the resolver into /admin yet.
+    // Pages never call the resolver directly — enforcement goes through the
+    // single WS11-T002 gate wrapper (admin-route-gate).
     expect(adminPage).not.toContain('resolveGlobalAdminAuthorization');
     expect(adminPage).not.toContain('admin-authorization');
   });
