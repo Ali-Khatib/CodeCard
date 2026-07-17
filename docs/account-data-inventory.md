@@ -109,7 +109,7 @@ Project columns include foundation fields: `slug`, `user_role`, `started_at`, `e
 |---|---|---|---|---|---|---|
 | `subscription_customers` | Stripe customer map | `user_id` | **Do not export** Stripe customer id | Cancel Stripe then delete local (WS10-T006) | `stripe_customer_id` | WS10-T006 |
 | `subscriptions` | Local subscription state | `user_id` | **Safe/redacted**: status, period dates, `cancel_at_period_end`, timestamps; no Stripe ids | After cancel | `stripe_subscription_id`, `stripe_price_id` | WS10-T006 |
-| `billing_events` | Webhook audit | `tenant_id` nullable | **Do not export** | Retain operationally | Full `payload` jsonb | Internal |
+| `billing_events` | Webhook audit / idempotency ledger | `tenant_id` nullable | **Do not export** | Retain operationally | Object snapshot `payload` jsonb; `status` (`processing`/`completed`/`failed`); `failure_code`; `attempt_count`; `processed_at` only when completed | Internal (service role only; WS11-T011) |
 
 ### 3.8 Compliance and operations
 

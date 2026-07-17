@@ -181,9 +181,11 @@ Full narrative assessment: [`WS04_T013_UPLOAD_SECURITY_DECISION.md`](./WS04_T013
 
 ## Payments
 
-- [ ] Stripe webhook signature verification
-- [ ] Event ID deduplication
-- [ ] Subscription state from webhook, not client
+- [x] Stripe webhook signature verification
+- [x] Event ID deduplication (durable `billing_events` claim + processing status)
+- [x] Subscription state from webhook, not client
+
+See [`STRIPE_WEBHOOK_SECURITY.md`](./STRIPE_WEBHOOK_SECURITY.md) (WS11-T011).
 
 ## CI/CD & monitoring
 

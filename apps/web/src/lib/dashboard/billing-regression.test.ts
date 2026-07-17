@@ -33,12 +33,20 @@ describe('WS09-T009 billing regression verification', () => {
     expect(stripe).toContain("requireServerSecret('STRIPE_SECRET_KEY')");
     expect(stripe).not.toContain('NEXT_PUBLIC_STRIPE_SECRET');
 
-    expect(webhook).toContain("requireServerSecret('STRIPE_WEBHOOK_SECRET')");
-    expect(webhook).toContain('constructEvent');
-    expect(webhook).toContain('stripe-signature');
-    expect(webhook).toContain('billing_events');
-    expect(webhook).toContain('duplicate');
-    expect(webhook).toContain('Invalid signature');
+    expect(webhook).toContain('processStripeWebhookRequest');
+    expect(webhook).not.toContain('request.json()');
+
+    const core = read('src/lib/billing/stripe-webhook-core.ts');
+    expect(core).toContain("requireServerSecret('STRIPE_WEBHOOK_SECRET')");
+    expect(core).toContain('constructEvent');
+    expect(core).toContain('stripe-signature');
+    expect(core).toContain('billing_events');
+    expect(core).toContain('duplicate');
+    expect(core).toContain('Invalid signature');
+    expect(core).toContain("status: 'processing'");
+    expect(core).toContain("status: 'completed'");
+    expect(core).toContain("status: 'failed'");
+    expect(core).toContain('Webhook already processing');
   });
 
   it('does not expose Stripe secrets in client dashboard surfaces', () => {
