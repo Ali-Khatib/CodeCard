@@ -17,7 +17,8 @@ export function buildGeoMarkers(
       {
         id: `visit-city-${index}`,
         location,
-        value: Math.max(1, Math.round((city.visitors / maxVisitors) * 100)),
+        value: city.visitors,
+        barValue: Math.max(1, Math.round((city.visitors / maxVisitors) * 100)),
         label: city.name,
       },
     ];

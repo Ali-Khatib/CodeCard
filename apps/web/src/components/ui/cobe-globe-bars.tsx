@@ -14,6 +14,7 @@ export interface GlobeBarMarker {
   id: string;
   location: [number, number];
   value: number;
+  barValue?: number;
   label: string;
 }
 
@@ -21,6 +22,7 @@ interface GlobeBarsProps {
   markers?: GlobeBarMarker[];
   className?: string;
   speed?: number;
+  activeMarkerId?: string | null;
 }
 
 type AnchorStyle = CSSProperties & {
@@ -29,27 +31,32 @@ type AnchorStyle = CSSProperties & {
 };
 
 const defaultMarkers: GlobeBarMarker[] = [
-  { id: 'bar-nyc', location: [40.71, -74.01], value: 85, label: 'NYC' },
-  { id: 'bar-london', location: [51.51, -0.13], value: 62, label: 'London' },
-  { id: 'bar-tokyo', location: [35.68, 139.65], value: 94, label: 'Tokyo' },
-  { id: 'bar-singapore', location: [1.35, 103.82], value: 78, label: 'Singapore' },
+  { id: 'bar-nyc', location: [40.71, -74.01], value: 85, barValue: 85, label: 'NYC' },
+  { id: 'bar-london', location: [51.51, -0.13], value: 62, barValue: 62, label: 'London' },
+  { id: 'bar-tokyo', location: [35.68, 139.65], value: 94, barValue: 94, label: 'Tokyo' },
+  { id: 'bar-singapore', location: [1.35, 103.82], value: 78, barValue: 78, label: 'Singapore' },
 ];
 
 export function GlobeBars({
   markers = defaultMarkers,
   className = '',
   speed = 0.003,
+  activeMarkerId = null,
 }: GlobeBarsProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null);
   const dragOffset = useRef({ phi: 0, theta: 0 });
-  const phiOffsetRef = useRef(0);
-  const thetaOffsetRef = useRef(0);
+  const currentPhiRef = useRef(0);
+  const currentThetaRef = useRef(0.2);
+  const targetPhiRef = useRef<number | null>(null);
+  const targetThetaRef = useRef<number | null>(null);
   const isPausedRef = useRef(false);
   const reducedMotion = useReducedMotion();
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLCanvasElement>) => {
     pointerInteracting.current = { x: event.clientX, y: event.clientY };
+    targetPhiRef.current = null;
+    targetThetaRef.current = null;
     event.currentTarget.setPointerCapture(event.pointerId);
     event.currentTarget.style.cursor = 'grabbing';
     isPausedRef.current = true;
@@ -57,8 +64,8 @@ export function GlobeBars({
 
   const handlePointerUp = useCallback(() => {
     if (pointerInteracting.current) {
-      phiOffsetRef.current += dragOffset.current.phi;
-      thetaOffsetRef.current += dragOffset.current.theta;
+      currentPhiRef.current += dragOffset.current.phi;
+      currentThetaRef.current += dragOffset.current.theta;
       dragOffset.current = { phi: 0, theta: 0 };
     }
     pointerInteracting.current = null;
@@ -86,21 +93,47 @@ export function GlobeBars({
   }, [handlePointerUp]);
 
   useEffect(() => {
+    const activeMarker = markers.find((marker) => marker.id === activeMarkerId);
+    if (!activeMarker) {
+      targetPhiRef.current = null;
+      targetThetaRef.current = null;
+      return;
+    }
+
+    const [latitude, longitude] = activeMarker.location;
+    targetPhiRef.current =
+      Math.PI - ((longitude * Math.PI) / 180 - Math.PI / 2);
+    targetThetaRef.current = Math.max(-0.75, Math.min(0.75, (latitude * Math.PI) / 180));
+  }, [activeMarkerId, markers]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     let globe: ReturnType<typeof createGlobe> | null = null;
     let animationId = 0;
-    let phi = 0;
     let size = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const animate = () => {
       if (!globe) return;
-      if (!isPausedRef.current && !reducedMotion) phi += speed;
+      if (
+        targetPhiRef.current !== null &&
+        targetThetaRef.current !== null &&
+        !pointerInteracting.current
+      ) {
+        const phiDelta = Math.atan2(
+          Math.sin(targetPhiRef.current - currentPhiRef.current),
+          Math.cos(targetPhiRef.current - currentPhiRef.current),
+        );
+        currentPhiRef.current += phiDelta * 0.08;
+        currentThetaRef.current += (targetThetaRef.current - currentThetaRef.current) * 0.08;
+      } else if (!isPausedRef.current && !reducedMotion) {
+        currentPhiRef.current += speed;
+      }
       globe.update({
-        phi: phi + phiOffsetRef.current + dragOffset.current.phi,
-        theta: 0.2 + thetaOffsetRef.current + dragOffset.current.theta,
+        phi: currentPhiRef.current + dragOffset.current.phi,
+        theta: currentThetaRef.current + dragOffset.current.theta,
       });
       animationId = window.requestAnimationFrame(animate);
     };
@@ -180,36 +213,49 @@ export function GlobeBars({
         style={{ cursor: 'grab' }}
         aria-hidden="true"
       />
-      {markers.map((marker) => (
-        <div
-          key={marker.id}
-          className="pointer-events-none absolute flex min-w-[60px] -translate-x-1/2 flex-col items-center gap-1 rounded-md border border-[var(--app-border-strong)] bg-[var(--app-paper)] px-2 py-1.5 shadow-[0_2px_10px_rgba(34,34,34,0.12)] transition-[opacity,filter] duration-300"
-          style={
-            {
-              positionAnchor: `--cobe-${marker.id}`,
-              bottom: 'anchor(top)',
-              left: 'anchor(center)',
-              marginBottom: 8,
-              opacity: `var(--cobe-visible-${marker.id}, 0)`,
-              filter: `blur(calc((1 - var(--cobe-visible-${marker.id}, 0)) * 8px))`,
-              '--value': `${marker.value}%`,
-            } as AnchorStyle
-          }
-        >
-          <span className="font-eyebrow text-[9px] font-semibold uppercase tracking-[0.1em] text-[var(--app-smoke)]">
-            {marker.label}
-          </span>
-          <span className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--app-bone)]">
-            <span
-              className="block h-full rounded-full bg-[var(--app-iris)] motion-safe:animate-[cc-globe-bar-fill_1s_ease-out_forwards]"
-              style={{ width: `${marker.value}%` }}
-            />
-          </span>
-          <span className="font-eyebrow text-[11px] font-semibold tabular-nums text-[var(--app-ink)]">
-            {marker.value}%
-          </span>
-        </div>
-      ))}
+      {markers.map((marker) => {
+        const active = marker.id === activeMarkerId;
+        const barValue = marker.barValue ?? marker.value;
+        return (
+          <div
+            key={marker.id}
+            className={`pointer-events-none absolute flex min-w-[60px] -translate-x-1/2 flex-col items-center gap-1 rounded-md border bg-[var(--app-paper)] px-2 py-1.5 transition-[opacity,filter,margin,scale,box-shadow,border-color] duration-300 ${
+              active
+                ? 'border-[var(--app-iris)] shadow-[0_10px_28px_rgba(126,87,194,0.28)]'
+                : 'border-[var(--app-border-strong)] shadow-[0_2px_10px_rgba(34,34,34,0.12)]'
+            }`}
+            style={
+              {
+                positionAnchor: `--cobe-${marker.id}`,
+                bottom: 'anchor(top)',
+                left: 'anchor(center)',
+                marginBottom: active ? 38 : 8,
+                scale: active ? '1.12' : '1',
+                zIndex: active ? 20 : 1,
+                opacity:
+                  activeMarkerId && !active
+                    ? `calc(var(--cobe-visible-${marker.id}, 0) * 0.28)`
+                    : `var(--cobe-visible-${marker.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${marker.id}, 0)) * 8px))`,
+                '--value': `${barValue}%`,
+              } as AnchorStyle
+            }
+          >
+            <span className="font-eyebrow text-[9px] font-semibold uppercase tracking-[0.1em] text-[var(--app-smoke)]">
+              {marker.label}
+            </span>
+            <span className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--app-bone)]">
+              <span
+                className="block h-full rounded-full bg-[var(--app-iris)] motion-safe:animate-[cc-globe-bar-fill_1s_ease-out_forwards]"
+                style={{ width: `${barValue}%` }}
+              />
+            </span>
+            <span className="font-eyebrow text-[11px] font-semibold tabular-nums text-[var(--app-ink)]">
+              {marker.value.toLocaleString()} visitors
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
