@@ -14,7 +14,7 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(shell).toContain('cc-app-mobile-nav md:hidden');
     expect(shell).toContain('aria-label="Mobile"');
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Profile'");
+    expect(shell).not.toContain("label: 'Profile'");
     expect(shell).toContain("label: 'Projects'");
     expect(shell).toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");

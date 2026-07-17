@@ -36,7 +36,7 @@ describe('WS09-T010 optimistic dashboard navigation', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
 
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Profile'");
+    expect(shell).not.toContain("label: 'Profile'");
     expect(shell).toContain("label: 'Projects'");
     expect(shell).toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");

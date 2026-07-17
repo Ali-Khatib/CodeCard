@@ -18,7 +18,6 @@ import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedba
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
-  { segment: 'profile', label: 'Profile', icon: 'profile' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
   { segment: 'research', label: 'Research', icon: 'research' as const },
   { segment: 'connections', label: 'Connections', icon: 'connections' as const },
