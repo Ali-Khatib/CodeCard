@@ -527,7 +527,7 @@ describe('WS10-T006 Stripe cancellation', () => {
   });
 
   it('webhook skips recreating linkage when profile is gone', () => {
-    const webhook = read('src/app/api/webhooks/stripe/route.ts');
+    const webhook = read('src/lib/billing/stripe-webhook-core.ts');
     expect(webhook).toContain('subscription_customers');
     expect(webhook).toContain('no_profile');
     expect(webhook).toContain('owner_user_id');

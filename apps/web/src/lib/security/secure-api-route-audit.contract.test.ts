@@ -72,14 +72,17 @@ describe('WS11-T005 secure API route audit', () => {
   });
 
   it('documents and preserves binary/raw-body exceptions', () => {
-    const stripe = readWeb('src/app/api/webhooks/stripe/route.ts');
+    const stripeRoute = readWeb('src/app/api/webhooks/stripe/route.ts');
+    const stripeCore = readWeb('src/lib/billing/stripe-webhook-core.ts');
     const upload = readWeb('src/app/api/upload/route.ts');
     const pdf = readWeb('src/app/api/public/research/[paperId]/pdf/route.ts');
 
-    expect(stripe).toContain('readBodyWithLimit');
-    expect(stripe).toContain('stripe-signature');
-    expect(stripe).toContain('constructEvent');
-    expect(stripe).not.toContain('secureJsonRoute');
+    expect(stripeRoute).toContain('processStripeWebhookRequest');
+    expect(stripeCore).toContain('readBodyWithLimit');
+    expect(stripeCore).toContain('stripe-signature');
+    expect(stripeCore).toContain('constructEvent');
+    expect(stripeRoute).not.toContain('secureJsonRoute');
+    expect(stripeCore).not.toContain('secureJsonRoute');
 
     expect(upload).toContain('isSameOriginMutation');
     expect(upload).toContain('resolveUploadOwnership');
