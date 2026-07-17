@@ -58,7 +58,7 @@ Not emitted: reorder-only, draft saves, analytics counters, private notes, colle
 
 Forward-only (manual deploy — do **not** run `supabase db push` from agents):
 
-- `circle_activity` schema + RLS (WS16-T002)
+- `supabase/migrations/20260717034827_circle_activity.sql`
 
 ## MVP limits (Batch 1)
 

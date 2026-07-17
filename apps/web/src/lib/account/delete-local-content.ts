@@ -211,6 +211,13 @@ export async function executeLocalAccountContentDeletion(
     .eq('owner_user_id', ctx.ownerUserId);
   if (connectionsError) return { ok: false, reason: 'delete_failed' };
 
+  // Actor-owned Circle events (also cascade on profile/content delete).
+  const { error: circleError } = await supabase
+    .from('circle_activity')
+    .delete()
+    .eq('actor_profile_id', ctx.profileId);
+  if (circleError) return { ok: false, reason: 'delete_failed' };
+
   const { data: papers, error: papersListError } = await supabase
     .from('research_papers')
     .select('id')

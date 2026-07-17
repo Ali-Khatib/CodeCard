@@ -281,6 +281,18 @@ const additionalAccountDataSchema = z
         })
         .strict(),
     ),
+    circle_activity: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          event_type: z.string(),
+          target_type: z.string(),
+          target_id: z.string().uuid(),
+          dedupe_key: z.string(),
+          created_at: isoTimestamp,
+        })
+        .strict(),
+    ),
   })
   .strict();
 
