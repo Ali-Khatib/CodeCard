@@ -4,6 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { PLANS } from '@codecard/config';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
+import { AccountExportAction } from '@/components/dashboard/account-export-action';
+import {
+  AccountDeletionDialog,
+  type AccountDeletionAuthMode,
+} from '@/components/dashboard/account-deletion-dialog';
 import { FadeInView } from './fade-in-view';
 import { AppButton, AppCard, AppMono, PageHeader } from './ui/dashboard-ui';
 
@@ -13,7 +18,7 @@ type SettingRow = {
   value?: string;
   action?: string;
   href?: string;
-  control?: 'button' | 'toggle' | 'status';
+  control?: 'button' | 'toggle' | 'status' | 'account-export' | 'account-delete';
   enabled?: boolean;
 };
 
@@ -121,8 +126,16 @@ const SECTIONS: SettingSection[] = [
     rows: [
       { label: 'Active sessions', hint: 'Sign out remotely if needed', value: '2 devices', control: 'status' },
       { label: 'Two-factor authentication', hint: 'Authenticator app or SMS', action: 'Enable', control: 'button' },
-      { label: 'Export data', hint: 'JSON of profile & projects', action: 'Export data', control: 'button' },
-      { label: 'Delete account', hint: 'Permanent — cannot undo', action: 'Delete account', control: 'button' },
+      {
+        label: 'Export data',
+        hint: 'JSON download of approved account data (profile, projects, research, and related records)',
+        control: 'account-export',
+      },
+      {
+        label: 'Delete account',
+        hint: 'Requires recent reauthentication and exact confirmation — cannot be undone',
+        control: 'account-delete',
+      },
     ],
   },
 ];
@@ -130,11 +143,21 @@ const SECTIONS: SettingSection[] = [
 export function DashboardSettingsView({
   email,
   signOutAction,
+  accountControls = 'demo',
+  deletionAuth = { hasPassword: true, oauthProvider: null },
+  openDeletionOnMount = false,
 }: {
   email?: string;
   signOutAction?: () => Promise<void>;
+  /** Authenticated Settings use live account APIs; preview/demo stay isolated. */
+  accountControls?: 'live' | 'demo';
+  deletionAuth?: AccountDeletionAuthMode;
+  openDeletionOnMount?: boolean;
 }) {
-  const [openId, setOpenId] = useState<string>('account');
+  const [openId, setOpenId] = useState<string>(
+    openDeletionOnMount ? 'security' : 'account',
+  );
+  const live = accountControls === 'live';
 
   const sections = SECTIONS.map((s) => {
     if (s.id === 'account' && email) {
@@ -155,8 +178,6 @@ export function DashboardSettingsView({
     'Upload logo': 'Uploaded',
     'View history': 'Opened',
     Enable: 'Enabled',
-    'Export data': 'Started',
-    'Delete account': 'Requested',
   };
 
   return (
@@ -218,6 +239,15 @@ export function DashboardSettingsView({
                       }`}
                     />
                   </button>
+                )}
+                {row.control === 'account-export' && <AccountExportAction live={live} />}
+                {row.control === 'account-delete' && (
+                  <AccountDeletionDialog
+                    live={live}
+                    auth={deletionAuth}
+                    email={email}
+                    initiallyOpen={live && openDeletionOnMount}
+                  />
                 )}
                 {row.control === 'button' &&
                   (row.href ? (

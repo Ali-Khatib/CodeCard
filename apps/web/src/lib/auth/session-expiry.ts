@@ -1,8 +1,10 @@
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 
 export const SESSION_EXPIRED_MESSAGE = 'Your session expired. Please sign in again.';
+export const ACCOUNT_DELETED_MESSAGE =
+  'Your CodeCard account has been deleted. You can create a new account anytime.';
 
-export const SIGN_IN_REASONS = ['session_expired'] as const;
+export const SIGN_IN_REASONS = ['session_expired', 'account_deleted'] as const;
 export type SignInReason = (typeof SIGN_IN_REASONS)[number];
 
 let clientRedirectInFlight = false;
@@ -76,5 +78,6 @@ export async function handleUnauthorizedResponse(
 
 export function signInStatusMessage(reason: string | null | undefined): string | null {
   if (reason === 'session_expired') return SESSION_EXPIRED_MESSAGE;
+  if (reason === 'account_deleted') return ACCOUNT_DELETED_MESSAGE;
   return null;
 }

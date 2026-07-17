@@ -54,6 +54,14 @@ export const MUTATION_FEEDBACK = {
     deleteFailed: 'The research paper could not be deleted. Try again.',
     figureFailed: 'We couldn’t update that figure. Try again.',
   },
+  account: {
+    exportReady: 'Account export ready',
+    exportFailed: 'We couldn’t prepare your export. Your account was not changed.',
+    exportDemo: 'Demo export only — no account data was downloaded.',
+    deleted: 'Your CodeCard account has been deleted.',
+    deleteFailed: 'We couldn’t delete your account. Nothing was changed.',
+    deleteDemo: 'Demo only — no account was deleted.',
+  },
   sessionExpired: 'Your session expired. Sign in again.',
   genericFailure: 'Something went wrong. Try again.',
 } as const;
@@ -66,6 +74,7 @@ const KNOWN_SAFE_MESSAGES = new Set<string>([
   ...Object.values(MUTATION_FEEDBACK.profile),
   ...Object.values(MUTATION_FEEDBACK.project),
   ...Object.values(MUTATION_FEEDBACK.research),
+  ...Object.values(MUTATION_FEEDBACK.account),
   MUTATION_FEEDBACK.sessionExpired,
   MUTATION_FEEDBACK.genericFailure,
 ]);

@@ -38,8 +38,9 @@ describe('session expiry detection', () => {
     resetSessionExpiryRedirectLock();
   });
 
-  it('maps session_expired reason to a safe message', () => {
+  it('maps session_expired and account_deleted reasons to safe messages', () => {
     expect(signInStatusMessage('session_expired')).toBe(SESSION_EXPIRED_MESSAGE);
+    expect(signInStatusMessage('account_deleted')).toMatch(/account has been deleted/i);
     expect(signInStatusMessage('oauth_error')).toBeNull();
   });
 
