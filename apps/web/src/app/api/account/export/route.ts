@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { secureJsonRoute } from '@/lib/security/secure-route';
 import { createClient } from '@/lib/supabase/server';
 import { apiError } from '@/lib/api-utils';
+import { isSameOriginMutation } from '@/lib/security/same-origin';
 import {
   ACCOUNT_EXPORT_MAX_BYTES,
   accountExportRequestSchema,
@@ -12,6 +13,10 @@ import { buildAccountExportDocument } from '@/lib/account/export-build';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  if (!isSameOriginMutation(request)) {
+    return apiError('Forbidden', 403);
+  }
+
   return secureJsonRoute(
     request,
     {
