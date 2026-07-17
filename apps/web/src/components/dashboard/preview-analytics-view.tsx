@@ -89,6 +89,7 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
 
       <FadeInView delay={0.16}>
         <AnalyticsGeoPanel
+          geo={data.geo}
           topCountries={data.topCountries}
           topCities={data.topCities}
         />
