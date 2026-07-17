@@ -9,6 +9,8 @@
 
 Do not treat this document as a completed compliance or legal review.
 
+**WS10-T004 note:** `POST /api/account/delete` exists with confirmation + recent reauthentication + capability gate. Production deletion remains **fail closed** (`ACCOUNT_DELETION_NOT_READY`) until WS10-T005–T008 register real capabilities. Lock table migration: `20260717000001_account_deletion_operations.sql` (local only; not remotely applied).
+
 ---
 
 ## 1. Purpose
