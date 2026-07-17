@@ -3,6 +3,11 @@
 import { CountUp } from '@/components/landing/count-up';
 import type { OwnerAnalyticsSummary } from '@/lib/dashboard/analytics-aggregate';
 import type { AnalyticsTrendSeries } from '@/lib/dashboard/analytics-trends';
+import {
+  ANALYTICS_ACCURACY_DISCLOSURE_BODY,
+  ANALYTICS_ACCURACY_DISCLOSURE_DETAILS,
+  ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE,
+} from '@/lib/dashboard/analytics-accuracy-disclosure';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
@@ -298,6 +303,21 @@ export function DashboardAnalyticsView({
           </a>
         </p>
       )}
+
+      <footer
+        className="border-t border-[rgba(35,35,36,0.08)] pt-5"
+        aria-label="Analytics accuracy"
+      >
+        <p className="text-[14px] font-medium text-[var(--app-ink)]">
+          {ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE}
+        </p>
+        <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-[var(--app-smoke)]">
+          {ANALYTICS_ACCURACY_DISCLOSURE_BODY}
+        </p>
+        <p className="mt-2 max-w-3xl text-[12px] leading-relaxed text-[var(--app-smoke)]">
+          {ANALYTICS_ACCURACY_DISCLOSURE_DETAILS}
+        </p>
+      </footer>
     </div>
   );
 }
