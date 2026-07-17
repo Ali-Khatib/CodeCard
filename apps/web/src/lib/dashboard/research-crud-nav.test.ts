@@ -45,6 +45,9 @@ describe('WS09-T005 research CRUD navigation', () => {
     expect(view).toContain('/edit');
     expect(view).toContain('View public');
     expect(view).toContain('Add research paper');
+    expect(view).toContain('Research layout');
+    expect(view).toContain("label: 'Grid'");
+    expect(view).toContain('ResearchBubbleGrid');
     expect(view).not.toContain("href: '#'");
     expect(view).not.toContain('href="#"');
     expect(view).not.toContain('href={`#`}');
