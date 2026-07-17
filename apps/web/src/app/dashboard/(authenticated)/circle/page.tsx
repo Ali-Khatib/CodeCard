@@ -5,7 +5,7 @@ import { AppButton, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 
 export default async function CirclePage() {
   const supabase = await createClient();
-  const feed = await listCircleFeed(supabase);
+  const feed = await listCircleFeed(supabase, { filter: 'all' });
 
   if (feed.status === 'unauthenticated') {
     return (
@@ -23,5 +23,5 @@ export default async function CirclePage() {
     );
   }
 
-  return <AuthenticatedCircleView feed={feed} />;
+  return <AuthenticatedCircleView initialFeed={feed} />;
 }

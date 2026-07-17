@@ -13,13 +13,23 @@ Circle is a **private feed projection**:
 - Target users cannot see who viewed them through Circle
 - Private Connection notes, collections, drafts, billing, and analytics never appear
 
+## Pagination and filters (Batch 2)
+
+- Page size: 20 (max 20)
+- Cursor: `{ createdAt, id, filter }` — viewer always from session; Connections re-resolved each request
+- Filters: All / Projects / Research / Updates
+- Filtered empty: `No Circle updates match this filter.`
+
 ## Architecture
 
 **Persisted events + read-time visibility** (`circle_activity`):
 
 1. Trusted server operations emit events after successful publish / meaningful public updates.
 2. Feed queries resolve the viewer’s Connections, then return only events whose actor is still a Connection, actor profile is public, and target content is still published.
-3. Stable event IDs support future reactions/comments (WS16 Batch 2).
+3. Stable event IDs and chronological ordering (not popularity).
+
+**Circle is a private latest-work feed, not a social engagement platform.**
+No likes, reactions, comments, messaging, follower counts, or engagement ranking.
 
 Demo `DEMO_CIRCLE_FEED` remains on preview/Alex Chen surfaces only.
 

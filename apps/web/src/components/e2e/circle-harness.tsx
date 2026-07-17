@@ -66,6 +66,7 @@ export function CircleHarness() {
     feed = {
       status: 'feed',
       connectionCount: 1,
+      filter: 'all',
       items: [researchItem, sampleItem],
       nextCursor: null,
     };
@@ -105,7 +106,7 @@ export function CircleHarness() {
             Populated feed
           </button>
         </div>
-        <AuthenticatedCircleView feed={feed} />
+        <AuthenticatedCircleView initialFeed={feed} />
       </div>
     </main>
   );

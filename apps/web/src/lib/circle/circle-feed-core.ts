@@ -1,10 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   CIRCLE_ACTIVITY_TABLE,
+  CIRCLE_FEED_MAX_PAGE_SIZE,
   CIRCLE_FEED_PAGE_SIZE,
   activitySentenceFor,
+  eventTypesForFilter,
   isCircleActivityEventType,
+  normalizeCircleFeedFilter,
+  parseCircleFeedCursor,
   type CircleFeedCursor,
+  type CircleFeedFilter,
   type CircleFeedItem,
   type CircleFeedState,
   type CircleActivityEventType,
@@ -57,19 +62,21 @@ function circleFeedErrorMessage(): string {
   return 'Could not load Circle right now. Please try again.';
 }
 
-function encodeCursor(item: CircleFeedItem): CircleFeedCursor {
-  return { createdAt: item.createdAt, id: item.eventId };
+function invalidCursorMessage(): string {
+  return 'That page link is no longer valid. Showing the latest activity.';
 }
 
 /**
  * Trusted authenticated Circle feed query.
  * Enforces Connections membership, public actor, published target, and excludes self.
+ * Viewer identity always comes from the session — never from the cursor.
  */
 export async function listCircleFeed(
   supabase: SupabaseClient,
   options?: {
     limit?: number;
-    cursor?: CircleFeedCursor | null;
+    cursor?: CircleFeedCursor | string | null;
+    filter?: string | null;
   },
 ): Promise<CircleFeedState> {
   const {
@@ -81,10 +88,20 @@ export async function listCircleFeed(
     return { status: 'unauthenticated' };
   }
 
+  const filter = normalizeCircleFeedFilter(options?.filter);
   const limit = Math.min(
     Math.max(options?.limit ?? CIRCLE_FEED_PAGE_SIZE, 1),
-    CIRCLE_FEED_PAGE_SIZE,
+    CIRCLE_FEED_MAX_PAGE_SIZE,
   );
+
+  let cursor: CircleFeedCursor | null = null;
+  if (options?.cursor != null && options.cursor !== '') {
+    const parsed = parseCircleFeedCursor(options.cursor, filter);
+    if (!parsed.ok) {
+      return { status: 'invalid_cursor', error: invalidCursorMessage() };
+    }
+    cursor = parsed.cursor;
+  }
 
   const { data: viewerProfile, error: viewerProfileError } = await supabase
     .from('profiles')
@@ -98,6 +115,7 @@ export async function listCircleFeed(
 
   const viewerProfileId = viewerProfile?.id ?? null;
 
+  // Always re-resolve Connections for the authenticated viewer (cursor cannot override).
   const { data: connections, error: connectionsError } = await supabase
     .from('saved_connections')
     .select('saved_profile_id')
@@ -115,18 +133,21 @@ export async function listCircleFeed(
     return { status: 'no_connections' };
   }
 
+  const eventTypes = eventTypesForFilter(filter);
+
   let query = supabase
     .from(CIRCLE_ACTIVITY_TABLE)
     .select('id, actor_profile_id, event_type, target_type, target_id, created_at')
     .in('actor_profile_id', connectionIds)
+    .in('event_type', eventTypes)
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(limit + 1);
 
-  if (options?.cursor?.createdAt && options.cursor.id) {
+  if (cursor) {
     // Keyset: (created_at, id) < (cursor.createdAt, cursor.id)
     query = query.or(
-      `created_at.lt.${options.cursor.createdAt},and(created_at.eq.${options.cursor.createdAt},id.lt.${options.cursor.id})`,
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
     );
   }
 
@@ -137,12 +158,18 @@ export async function listCircleFeed(
 
   const rows = (activityRows ?? []) as ActivityRow[];
   if (rows.length === 0) {
+    if (filter !== 'all' && !cursor) {
+      return { status: 'filtered_empty', connectionCount: connectionIds.length, filter };
+    }
     return { status: 'no_activity', connectionCount: connectionIds.length };
   }
 
-  const actorIds = [...new Set(rows.map((r) => r.actor_profile_id))];
-  const projectIds = rows.filter((r) => r.target_type === 'project').map((r) => r.target_id);
-  const researchIds = rows.filter((r) => r.target_type === 'research').map((r) => r.target_id);
+  const hasMoreRaw = rows.length > limit;
+  const windowRows = hasMoreRaw ? rows.slice(0, limit) : rows;
+
+  const actorIds = [...new Set(windowRows.map((r) => r.actor_profile_id))];
+  const projectIds = windowRows.filter((r) => r.target_type === 'project').map((r) => r.target_id);
+  const researchIds = windowRows.filter((r) => r.target_type === 'research').map((r) => r.target_id);
 
   const [profilesRes, projectsRes, researchRes, mediaRes] = await Promise.all([
     supabase
@@ -172,7 +199,10 @@ export async function listCircleFeed(
           .select('project_id, storage_path, type')
           .in('project_id', projectIds)
           .eq('type', 'poster')
-      : Promise.resolve({ data: [] as Array<{ project_id: string; storage_path: string }>, error: null }),
+      : Promise.resolve({
+          data: [] as Array<{ project_id: string; storage_path: string }>,
+          error: null,
+        }),
   ]);
 
   if (profilesRes.error || projectsRes.error || researchRes.error || mediaRes.error) {
@@ -196,8 +226,9 @@ export async function listCircleFeed(
   }
 
   const items: CircleFeedItem[] = [];
-  for (const row of rows) {
+  for (const row of windowRows) {
     if (!isCircleActivityEventType(row.event_type)) continue;
+    if (!eventTypes.includes(row.event_type as CircleActivityEventType)) continue;
     const eventType = row.event_type as CircleActivityEventType;
     const actor = profiles.get(row.actor_profile_id);
     if (!actor || !actor.is_public || actor.owner_user_id === user.id) continue;
@@ -259,22 +290,35 @@ export async function listCircleFeed(
     }
   }
 
-  // After visibility filtering, we may have fewer than `limit` items even when
-  // more raw activity exists. Cursor is based on raw page window when more raw
-  // rows were fetched than `limit`.
-  const hasMoreRaw = rows.length > limit;
-  const pageItems = items.slice(0, limit);
-  if (pageItems.length === 0) {
+  // Cursor advances from the last raw window row so hidden items cannot cause skips/duplicates.
+  const lastRaw = windowRows[windowRows.length - 1];
+  const nextCursor: CircleFeedCursor | null =
+    hasMoreRaw && lastRaw
+      ? { createdAt: lastRaw.created_at, id: lastRaw.id, filter }
+      : null;
+
+  if (items.length === 0) {
+    if (nextCursor) {
+      // Visible page empty but more raw rows exist — advance once more via client Load more.
+      return {
+        status: 'feed',
+        connectionCount: connectionIds.length,
+        filter,
+        items: [],
+        nextCursor,
+      };
+    }
+    if (filter !== 'all' && !cursor) {
+      return { status: 'filtered_empty', connectionCount: connectionIds.length, filter };
+    }
     return { status: 'no_activity', connectionCount: connectionIds.length };
   }
-
-  const nextCursor =
-    hasMoreRaw && pageItems.length > 0 ? encodeCursor(pageItems[pageItems.length - 1]!) : null;
 
   return {
     status: 'feed',
     connectionCount: connectionIds.length,
-    items: pageItems,
+    filter,
+    items,
     nextCursor,
   };
 }

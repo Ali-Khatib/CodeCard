@@ -38,6 +38,7 @@ describe('WS16-T004 real circle feed experience', () => {
     expect(view).toContain('dateTime={item.createdAt}');
     expect(view).toContain('Read paper');
     expect(view).toContain('View project');
+    expect(view).toContain('Load more');
     expect(view).not.toMatch(/\bLike\b|\bReact\b|\bComment\b|\bReply\b/);
     expect(view).not.toContain('DEMO_CIRCLE_FEED');
   });

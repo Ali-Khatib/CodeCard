@@ -31,8 +31,39 @@ export const CIRCLE_ACTIVITY_TARGET_TYPES = ['project', 'research'] as const;
 
 export type CircleActivityTargetType = (typeof CIRCLE_ACTIVITY_TARGET_TYPES)[number];
 
-/** Default bounded page size for authenticated Circle feed queries. */
-export const CIRCLE_FEED_PAGE_SIZE = 30 as const;
+/** Default / max bounded page size for authenticated Circle feed queries. */
+export const CIRCLE_FEED_PAGE_SIZE = 20 as const;
+export const CIRCLE_FEED_MAX_PAGE_SIZE = 20 as const;
+
+/** Work-type filters — chronological latest-work only; never popularity. */
+export const CIRCLE_FEED_FILTERS = ['all', 'projects', 'research', 'updates'] as const;
+export type CircleFeedFilter = (typeof CIRCLE_FEED_FILTERS)[number];
+
+export const CIRCLE_FEED_FILTER_LABELS: Record<CircleFeedFilter, string> = {
+  all: 'All',
+  projects: 'Projects',
+  research: 'Research',
+  updates: 'Updates',
+};
+
+/** Product rule: Circle is not a social engagement platform. */
+export const CIRCLE_FORBIDDEN_SOCIAL_CONTROLS = [
+  'like',
+  'likes',
+  'reaction',
+  'reactions',
+  'comment',
+  'comments',
+  'reply',
+  'replies',
+  'repost',
+  'follower',
+  'followers',
+  'trending',
+  'popular',
+  'engagement',
+  'applause',
+] as const;
 
 export type CircleActivityIdentity = {
   actorProfileId: string;
@@ -43,10 +74,12 @@ export type CircleActivityIdentity = {
 };
 
 export type CircleFeedCursor = {
-  /** ISO created_at of the last item on the previous page. */
+  /** ISO created_at of the last raw activity row on the previous page. */
   createdAt: string;
   /** Event id tie-breaker (uuid). */
   id: string;
+  /** Filter active when the cursor was issued; must match the next request. */
+  filter: CircleFeedFilter;
 };
 
 export type SafeCircleActor = {
@@ -85,11 +118,18 @@ export type CircleFeedState =
   | { status: 'no_connections' }
   | { status: 'no_activity'; connectionCount: number }
   | {
+      status: 'filtered_empty';
+      connectionCount: number;
+      filter: CircleFeedFilter;
+    }
+  | {
       status: 'feed';
       connectionCount: number;
+      filter: CircleFeedFilter;
       items: CircleFeedItem[];
       nextCursor: CircleFeedCursor | null;
     }
+  | { status: 'invalid_cursor'; error: string }
   | { status: 'temporary_failure'; error: string };
 
 export type CircleActivityErrorCode =
@@ -219,4 +259,92 @@ export function targetTypeForEvent(eventType: CircleActivityEventType): CircleAc
     return 'project';
   }
   return 'research';
+}
+
+export function isCircleFeedFilter(value: string): value is CircleFeedFilter {
+  return (CIRCLE_FEED_FILTERS as readonly string[]).includes(value);
+}
+
+export function normalizeCircleFeedFilter(
+  value: string | null | undefined,
+): CircleFeedFilter {
+  if (!value) return 'all';
+  const normalized = value.trim().toLowerCase();
+  return isCircleFeedFilter(normalized) ? normalized : 'all';
+}
+
+export function eventTypesForFilter(filter: CircleFeedFilter): CircleActivityEventType[] {
+  switch (filter) {
+    case 'projects':
+      return ['project_published', 'project_updated'];
+    case 'research':
+      return ['research_published', 'research_updated'];
+    case 'updates':
+      return ['project_updated', 'research_updated'];
+    case 'all':
+    default:
+      return [...CIRCLE_ACTIVITY_EVENT_TYPES];
+  }
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Parse and validate a client-supplied cursor. Viewer identity is never taken
+ * from the cursor — the session always re-resolves Connections.
+ */
+export function parseCircleFeedCursor(
+  raw: unknown,
+  expectedFilter: CircleFeedFilter,
+):
+  | { ok: true; cursor: CircleFeedCursor }
+  | { ok: false; code: 'INVALID_CURSOR' } {
+  if (raw == null) {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+
+  let value: unknown = raw;
+  if (typeof raw === 'string') {
+    try {
+      const decoded = Buffer.from(raw, 'base64url').toString('utf8');
+      value = JSON.parse(decoded) as unknown;
+    } catch {
+      try {
+        value = JSON.parse(raw) as unknown;
+      } catch {
+        return { ok: false, code: 'INVALID_CURSOR' };
+      }
+    }
+  }
+
+  if (!value || typeof value !== 'object') {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+
+  const record = value as Record<string, unknown>;
+  const createdAt = typeof record.createdAt === 'string' ? record.createdAt : '';
+  const id = typeof record.id === 'string' ? record.id : '';
+  const filterRaw = typeof record.filter === 'string' ? record.filter : 'all';
+  const filter = normalizeCircleFeedFilter(filterRaw);
+
+  if (!createdAt || Number.isNaN(Date.parse(createdAt))) {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+  if (!UUID_RE.test(id)) {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+  if (filter !== expectedFilter) {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+  // Reject stray viewer/owner fields so clients cannot steer identity.
+  if ('viewerId' in record || 'ownerUserId' in record || 'userId' in record) {
+    return { ok: false, code: 'INVALID_CURSOR' };
+  }
+
+  return { ok: true, cursor: { createdAt, id, filter } };
+}
+
+export function encodeCircleFeedCursor(cursor: CircleFeedCursor): string {
+  return Buffer.from(JSON.stringify(cursor), 'utf8').toString('base64url');
 }
