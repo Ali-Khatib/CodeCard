@@ -36,15 +36,6 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
-      <div className="rounded-[16px] border border-[var(--app-border)] bg-[var(--app-bone)] px-4 py-3">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--app-iris)]">
-          Preview · Demo sample
-        </p>
-        <p className="mt-1 text-[14px] text-[var(--app-smoke)]">
-          These numbers are fictional layout samples — not your live analytics.
-        </p>
-      </div>
-
       <PageHeader
         title="How your work is performing"
         description="Sample reach, engagement, and audience layout for the preview workspace."
