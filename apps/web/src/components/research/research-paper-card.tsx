@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
-import { HiOutlineArrowTopRightOnSquare, HiOutlineDocumentText } from 'react-icons/hi2';
+import { HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
-import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
+import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
 import { trackResearchEvent } from './research-analytics';
 
 function formatReadTime(seconds?: number) {
@@ -116,24 +116,18 @@ export function ResearchPaperCard({
               Open research
             </Link>
             {paper.pdfUrl && (
-              <a
-                href={paper.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <ResearchPdfReadButton
+                paper={paper}
+                profileId={profileId}
                 className="cc-app-btn cc-app-btn--ghost"
-                aria-label="Open external paper"
-                title={describeExternalPdfSource(paper.pdfUrl) ?? 'Open external paper'}
-                onClick={() =>
+                onOpenTrack={() =>
                   trackResearchEvent({
                     eventType: 'paper_download',
                     profileId,
                     researchPaperId: paper.id,
                   })
                 }
-              >
-                <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
-                Open paper
-              </a>
+              />
             )}
             {paper.citationText && (
               <CitationCopyButton

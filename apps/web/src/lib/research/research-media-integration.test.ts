@@ -57,15 +57,16 @@ describe('WS05-T011 research media integration', () => {
     expect(collect).toContain("'research-figure'");
   });
 
-  it('keeps public PDF action external-only and figure alt text safe', () => {
+  it('keeps public PDF action in-app with external original fallback', () => {
     const detail = readFileSync(
       resolve(process.cwd(), 'src/components/research/research-paper-detail.tsx'),
       'utf8',
     );
-    expect(detail).toContain('Open paper');
+    expect(detail).toContain('ResearchPdfReadButton');
     expect(detail).toContain('CodeCard does not host or verify this file');
     expect(detail).toContain("figure.caption?.trim() ? '' : 'Research figure'");
     expect(detail).not.toContain('Download paper');
     expect(detail).not.toContain('storage_path');
+    expect(detail).not.toContain('iframe');
   });
 });
