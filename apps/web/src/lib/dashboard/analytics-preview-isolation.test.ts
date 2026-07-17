@@ -43,8 +43,9 @@ describe('WS08-T011 preview analytics isolation', () => {
     expect(previewPage).not.toContain('loadOwnerAnalyticsTrends');
 
     expect(previewView).toContain('buildAnalyticsData');
-    expect(previewView).toContain('Preview · Demo sample');
-    expect(previewView).toContain('not your live analytics');
+    expect(previewView).toContain('preview workspace');
+    expect(previewView).not.toContain('Preview · Demo sample');
+    expect(previewView).not.toContain('fictional layout samples');
     expect(previewView).not.toContain('loadOwnerAnalytics');
 
     expect(demoData).toContain('Preview/demo sample analytics only');
