@@ -63,6 +63,8 @@ export const RATE_LIMITS = {
   accountExport: { requests: 5, window: '1 h' as const },
   /** Account deletion attempts — intentionally strict. */
   accountDelete: { requests: 5, window: '1 h' as const },
+  /** Public research PDF proxy — published papers only. */
+  publicResearchPdf: { requests: 60, window: '1 m' as const },
 } as const;
 
 export const STORAGE_BUCKETS = {

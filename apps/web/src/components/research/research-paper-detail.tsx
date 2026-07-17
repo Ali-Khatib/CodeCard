@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   HiOutlineArrowLeft,
-  HiOutlineArrowTopRightOnSquare,
   HiOutlineDocumentText,
   HiOutlineLink,
 } from 'react-icons/hi2';
@@ -15,6 +14,7 @@ import { describeExternalPdfSource } from '@/lib/research/research-external-pdf'
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
+import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
 import { canTrackId, trackResearchEvent } from './research-analytics';
 import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 
@@ -87,24 +87,18 @@ export function ResearchPaperDetail({
 
             <div className="flex gap-2">
               {safePdfUrl && (
-                <a
-                  href={safePdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <ResearchPdfReadButton
+                  paper={paper}
+                  profileId={profileId}
                   className="cc-app-btn cc-app-btn--primary !h-10"
-                  aria-label="Open external paper (opens in a new tab)"
-                  title={externalPdfLabel ?? 'Open external paper'}
-                  onClick={() =>
+                  onOpenTrack={() =>
                     trackResearchEvent({
                       eventType: 'paper_download',
                       profileId,
                       researchPaperId: paper.id,
                     })
                   }
-                >
-                  <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
-                  Open paper
-                </a>
+                />
               )}
               {safeDoiUrl && (
                 <a href={safeDoiUrl} target="_blank" rel="noopener noreferrer" className="cc-app-btn cc-app-btn--ghost !h-10" aria-label="Open DOI (opens in a new tab)">
