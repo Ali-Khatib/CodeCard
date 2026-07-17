@@ -133,6 +133,12 @@ function createMockSupabase(options: {
       };
     }
 
+    if (table === 'circle_activity') {
+      return {
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      };
+    }
+
     throw new Error(`Unexpected table ${table}`);
   });
 

@@ -13,6 +13,8 @@ import {
   type OwnedProjectRecord,
 } from '@/lib/projects/project-access-core';
 import { mapProjectCreateDbError } from '@/lib/projects/project-create-core';
+import { emitProjectUpdatedActivity } from '@/lib/circle/circle-emit-core';
+import { projectHasMeaningfulChange } from '@/lib/circle/circle-fingerprint';
 
 export type ProjectUpdateFieldErrors = Partial<
   Record<
@@ -259,6 +261,33 @@ export async function executeUpdateProject(
       error: 'Could not save your project. Please try again.',
       errorCode: 'server',
     };
+  }
+
+  if (project.is_published) {
+    const before = {
+      title: project.title,
+      tagline: project.tagline,
+      description: project.description,
+      slug: project.slug,
+      technologies: project.technologies ?? [],
+      status: project.status,
+    };
+    const after = {
+      title: data.title,
+      tagline: data.tagline ?? null,
+      description: data.description ?? null,
+      slug: data.slug,
+      technologies: data.technologies,
+      status: data.status ?? 'draft',
+    };
+    if (projectHasMeaningfulChange(before, after)) {
+      await emitProjectUpdatedActivity(supabase, {
+        tenantId: project.tenant_id,
+        actorProfileId: project.profile_id,
+        projectId: project.id,
+        ...after,
+      });
+    }
   }
 
   return {

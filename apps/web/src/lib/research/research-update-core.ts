@@ -16,6 +16,8 @@ import {
   mapResearchCreateDbError,
   parseCreateResearchFormData,
 } from '@/lib/research/research-create-core';
+import { emitResearchUpdatedActivity } from '@/lib/circle/circle-emit-core';
+import { researchHasMeaningfulChange } from '@/lib/circle/circle-fingerprint';
 
 export type ResearchUpdateFieldErrors = Partial<
   Record<
@@ -188,6 +190,39 @@ export async function executeUpdateResearch(
 
   if (updateError) {
     return mapUpdateDbError(updateError);
+  }
+
+  if (paper.is_published) {
+    const before = {
+      title: paper.title,
+      abstract: paper.abstract,
+      slug: paper.slug,
+      authors: paper.authors ?? [],
+      venue: paper.venue,
+      publication_status: paper.publication_status,
+      pdf_url: paper.pdf_url,
+      cover_image_url: paper.cover_image_url,
+      year: paper.year,
+    };
+    const after = {
+      title: data.title,
+      abstract: data.abstract ?? null,
+      slug: data.slug,
+      authors: data.authors ?? [],
+      venue: data.venue ?? null,
+      publication_status: data.publication_status ?? null,
+      pdf_url: data.pdf_url ?? null,
+      cover_image_url: paper.cover_image_url,
+      year: data.year ?? null,
+    };
+    if (researchHasMeaningfulChange(before, after)) {
+      await emitResearchUpdatedActivity(supabase, {
+        tenantId: paper.tenant_id,
+        actorProfileId: paper.profile_id,
+        researchPaperId: paper.id,
+        ...after,
+      });
+    }
   }
 
   return {
