@@ -72,6 +72,7 @@ export async function buildAccountExportDocument(
     collections: [],
     subscription: null,
     moderation_reports: [],
+    circle_activity: [],
   };
 
   if (!profile) {
@@ -109,7 +110,12 @@ export async function buildAccountExportDocument(
     if (!analyticsResult.ok) return analyticsResult;
     analyticsSummary = analyticsResult.summary;
 
-    const additionalResult = await loadAdditionalOwnerData(supabase, user.id, generatedAt);
+    const additionalResult = await loadAdditionalOwnerData(
+      supabase,
+      user.id,
+      profile.id,
+      generatedAt,
+    );
     if (!additionalResult.ok) return additionalResult;
     additional = additionalResult.data;
   }
@@ -455,12 +461,13 @@ async function loadExportAnalytics(
 async function loadAdditionalOwnerData(
   supabase: SupabaseClient,
   ownerUserId: string,
+  profileId: string,
   generatedAt: string,
 ): Promise<
   | { ok: true; data: AccountExportDocument['additional_account_data'] }
   | { ok: false; error: 'query_failed' }
 > {
-  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes] =
+  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes] =
     await Promise.all([
       supabase
         .from('saved_connections')
@@ -491,6 +498,11 @@ async function loadAdditionalOwnerData(
         .select('id, target_type, target_id, reason, status, created_at, updated_at')
         .eq('reporter_user_id', ownerUserId)
         .order('created_at', { ascending: true }),
+      supabase
+        .from('circle_activity')
+        .select('id, event_type, target_type, target_id, dedupe_key, created_at')
+        .eq('actor_profile_id', profileId)
+        .order('created_at', { ascending: true }),
     ]);
 
   if (
@@ -498,7 +510,8 @@ async function loadAdditionalOwnerData(
     notesRes.error ||
     collectionsRes.error ||
     subscriptionRes.error ||
-    reportsRes.error
+    reportsRes.error ||
+    circleRes.error
   ) {
     return { ok: false, error: 'query_failed' };
   }
@@ -575,6 +588,14 @@ async function loadAdditionalOwnerData(
         status: row.status,
         created_at: requireIso(row.created_at, generatedAt),
         updated_at: requireIso(row.updated_at, generatedAt),
+      })),
+      circle_activity: (circleRes.data ?? []).map((row) => ({
+        id: row.id,
+        event_type: row.event_type,
+        target_type: row.target_type,
+        target_id: row.target_id,
+        dedupe_key: row.dedupe_key,
+        created_at: requireIso(row.created_at, generatedAt),
       })),
     },
   };

@@ -89,6 +89,7 @@ Project columns include foundation fields: `slug`, `user_role`, `started_at`, `e
 | `connection_notes` | Private notes | `owner_user_id` | May mention others in free text | **Export in full** (user-authored) | Delete | WS10-T004 |
 | `collections` | Private collections | `owner_user_id` | No | **Export in full** | Delete | WS10-T004 |
 | `collection_items` | Collection membership | via `collection_id` | May reference others’ public items | **Export metadata** of item refs owned via collection | Cascade delete | WS10-T004 |
+| `circle_activity` | Actor-owned Circle events | via `actor_profile_id` → owner | References public work of the actor; viewers never export others’ views | **Export actor-owned events only** (allowlisted fields; no private notes) | Cascade with profile/content; explicit delete for owner | WS16-T002 |
 
 ### 3.6 Analytics
 
