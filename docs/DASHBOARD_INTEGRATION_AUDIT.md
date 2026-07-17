@@ -192,17 +192,21 @@ Billing is reachable at `/dashboard/billing` but is **not** a `NAV_ITEMS` entry 
 
 | Item | Decision |
 |---|---|
-| Circle | **Removed** from active MVP navigation |
+| Circle | **Removed** in WS09-T002; **Restored as real feed** in WS16-T004 |
 | Connections | **Removed** in WS09-T002; **Restored as real** in WS15-T004 |
 | Preview Circle/Connections | **Retained** under `/dashboard/preview/*` |
-| Auth Circle page | **Retained** as non-nav legacy demo route (not linked) |
+| Auth Circle page | **Real** `listCircleFeed` (WS16-T004); demo remains preview-only |
 
 ### WS15 Connections update
 
 Authenticated `/dashboard/connections` loads owner `saved_connections` only. Zero Connections show the polished empty state — never Alex Chen / `DEMO_CONNECTIONS`. Preview and live demo keep populated example Connections.
 
+### WS16 Circle update
+
+Authenticated `/dashboard/circle` loads Connections-based `circle_activity` via `listCircleFeed`. Demo `DEMO_CIRCLE_FEED` remains on `/dashboard/preview/circle` only.
+
 ---
 
 ## Honest statement
 
-Home reach analytics and authenticated analytics are already real (WS08). Circle remains demo-only and hidden from authenticated nav. Connections are real as of WS15 Batch 1. Overview still lacks real project/research inventory cards until T003. Project/research CRUD pages exist; Batch 1 focuses on truthful nav and list→CRUD reachability, not reimplementing editors.
+Home reach analytics and authenticated analytics are already real (WS08). Circle is a real Connections-based feed as of WS16 Batch 1 (demo remains on preview). Connections are real as of WS15. Overview still lacks real project/research inventory cards until T003. Project/research CRUD pages exist; Batch 1 focuses on truthful nav and list→CRUD reachability, not reimplementing editors.

@@ -25,14 +25,14 @@ describe('WS15-T008 connections quality completion', () => {
     expect(doc).not.toMatch(/service_role|sk_live|eyJhbGci/i);
   });
 
-  it('keeps Circle out of authenticated nav while Connections remain real', () => {
+  it('keeps Connections real and restores Circle in authenticated nav', () => {
     const shell = readWeb('src/components/dashboard/dashboard-shell.tsx');
     const nav = shell.slice(
       shell.indexOf('const NAV_ITEMS'),
       shell.indexOf('] as const;') + '] as const;'.length,
     );
     expect(nav).toContain("label: 'Connections'");
-    expect(nav).not.toContain("label: 'Circle'");
+    expect(nav).toContain("label: 'Circle'");
   });
 
   it('isolates demo Connections from authenticated routes', () => {
