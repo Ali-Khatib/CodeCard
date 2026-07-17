@@ -1,12 +1,20 @@
 import { createClient } from '@/lib/supabase/server';
 import { AuthenticatedConnectionsClient } from '@/components/dashboard/authenticated-connections-client';
 import { listOwnerConnections } from '@/lib/connections/connections-core';
+import {
+  listOwnerCollections,
+  listOwnerMembershipMap,
+} from '@/lib/connections/collections-core';
 import { mapOwnerConnectionToCard } from '@/lib/connections/map-owner-connection';
 import { AppButton, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 
 export default async function ConnectionsPage() {
   const supabase = await createClient();
-  const result = await listOwnerConnections(supabase);
+  const [result, collectionsResult, membershipResult] = await Promise.all([
+    listOwnerConnections(supabase),
+    listOwnerCollections(supabase),
+    listOwnerMembershipMap(supabase),
+  ]);
 
   if (result.error && result.code === 'UNAUTHENTICATED') {
     return (
@@ -45,5 +53,11 @@ export default async function ConnectionsPage() {
 
   const cards = result.connections.map(mapOwnerConnectionToCard);
 
-  return <AuthenticatedConnectionsClient initialConnections={cards} />;
+  return (
+    <AuthenticatedConnectionsClient
+      initialConnections={cards}
+      initialCollections={collectionsResult.collections}
+      initialMemberships={membershipResult.memberships}
+    />
+  );
 }
