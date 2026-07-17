@@ -4,11 +4,32 @@ import {
   registerT004ScaffoldCapabilities,
   type AccountDeletionCapabilityId,
 } from '@/lib/account/delete-capabilities';
-import { registerAuthUserDeletionCapability } from '@/lib/account/delete-auth-user';
-import { registerStripeCancellationCapability } from '@/lib/account/delete-stripe';
-import { registerAnalyticsAnonymizationCapability } from '@/lib/account/delete-analytics';
+import {
+  deleteTrustedSupabaseAuthUser,
+  registerAuthUserDeletionCapability,
+} from '@/lib/account/delete-auth-user';
+import {
+  cancelTrustedAccountStripeSubscription,
+  registerStripeCancellationCapability,
+} from '@/lib/account/delete-stripe';
+import {
+  anonymizeTrustedAccountAnalytics,
+  registerAnalyticsAnonymizationCapability,
+} from '@/lib/account/delete-analytics';
+import {
+  insertTrustedDeletionAudit,
+  registerDeletionAuditCapability,
+} from '@/lib/account/delete-audit';
 import type { AccountDeletionErrorCode } from '@/lib/account/delete-schema';
-import { assertPersonalTenantSoleMember } from '@/lib/account/delete-local-content';
+import {
+  assertPersonalTenantSoleMember,
+  executeLocalAccountContentDeletion,
+} from '@/lib/account/delete-local-content';
+import {
+  acquireAccountDeletionLock,
+  releaseAccountDeletionLock,
+} from '@/lib/account/delete-lock';
+import { getStripe } from '@/lib/stripe';
 
 export const ACCOUNT_DELETION_INTENDED_ORDER = [
   'validate_auth_reauth_confirmation',
@@ -38,29 +59,37 @@ export type AccountDeletionOrchestratorResult =
       mutated: true;
     };
 
-export function ensureT004CapabilityScaffoldsRegistered(): void {
-  // Idempotent: registering twice overwrites the same ids safely.
+export type AccountDeletionOrchestratorDeps = {
+  createServiceClient: () => Promise<SupabaseClient>;
+  getStripeClient?: () => ReturnType<typeof getStripe>;
+};
+
+export function ensureAccountDeletionCapabilitiesRegistered(): void {
   registerT004ScaffoldCapabilities();
-  // WS10-T005–T007: real capabilities (still insufficient alone — T008 required).
   registerAuthUserDeletionCapability();
   registerStripeCancellationCapability();
   registerAnalyticsAnonymizationCapability();
+  registerDeletionAuditCapability();
+}
+
+/** @deprecated Use ensureAccountDeletionCapabilitiesRegistered */
+export function ensureT004CapabilityScaffoldsRegistered(): void {
+  ensureAccountDeletionCapabilitiesRegistered();
 }
 
 /**
- * Account deletion orchestrator (WS10-T004).
+ * Account deletion orchestrator (WS10-T004–T008).
  *
- * While T008 deletion_audit is unavailable, returns ACCOUNT_DELETION_NOT_READY
- * before any lock acquisition or mutation. T005–T007 register real capabilities but
- * are insufficient alone; Auth remains the final stage when the full pipeline runs.
+ * Runtime order (Auth last):
+ * readiness → resolve → lock → Stripe → storage/local → analytics → audit → Auth → success
  */
 export async function runAccountDeletionOrchestrator(input: {
   user: User;
   supabase: SupabaseClient;
-  /** Optional service client factory — unused while not ready. */
   createServiceClient?: () => Promise<SupabaseClient>;
+  getStripeClient?: () => ReturnType<typeof getStripe>;
 }): Promise<AccountDeletionOrchestratorResult> {
-  ensureT004CapabilityScaffoldsRegistered();
+  ensureAccountDeletionCapabilitiesRegistered();
 
   const readiness = evaluateAccountDeletionReadiness();
   if (!readiness.ready) {
@@ -72,8 +101,13 @@ export async function runAccountDeletionOrchestrator(input: {
     };
   }
 
-  // --- Paths below are unreachable until T008 registers deletion_audit. ---
-  // Kept for ordered future execution; must never run with placeholder successes.
+  if (!input.createServiceClient) {
+    return {
+      ok: false,
+      code: 'ACCOUNT_DELETION_NOT_READY',
+      mutated: false,
+    };
+  }
 
   const { data: profile, error: profileError } = await input.supabase
     .from('profiles')
@@ -85,6 +119,10 @@ export async function runAccountDeletionOrchestrator(input: {
     return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
   }
 
+  if (profile.owner_user_id !== input.user.id) {
+    return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+  }
+
   const tenantCheck = await assertPersonalTenantSoleMember(input.supabase, profile.tenant_id);
   if (!tenantCheck.ok) {
     if (tenantCheck.reason === 'shared_tenant') {
@@ -93,16 +131,101 @@ export async function runAccountDeletionOrchestrator(input: {
     return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
   }
 
-  // Future stages (lock → Stripe → storage → local → analytics → audit → Auth) are
-  // intentionally not invoked until T008 wires the remaining audit stage. Fail closed.
-  return {
-    ok: false,
-    code: 'ACCOUNT_DELETION_NOT_READY',
-    mutated: false,
-  };
+  let service: SupabaseClient;
+  try {
+    service = await input.createServiceClient();
+  } catch {
+    return {
+      ok: false,
+      code: 'ACCOUNT_DELETION_NOT_READY',
+      mutated: false,
+    };
+  }
+
+  const lock = await acquireAccountDeletionLock(service, input.user.id);
+  if (!lock.ok) {
+    if (lock.reason === 'in_progress') {
+      return { ok: false, code: 'ACCOUNT_DELETION_IN_PROGRESS', mutated: false };
+    }
+    return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+  }
+
+  const trustedOwnerUserId = input.user.id;
+  const tenantId = profile.tenant_id as string;
+  const profileId = profile.id as string;
+  const correlationId = lock.correlationId;
+
+  try {
+    let stripeClient: ReturnType<typeof getStripe>;
+    try {
+      stripeClient = (input.getStripeClient ?? getStripe)();
+    } catch {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'stripe_unavailable');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    const stripeResult = await cancelTrustedAccountStripeSubscription(service, stripeClient, {
+      authenticatedUserId: trustedOwnerUserId,
+      trustedOwnerUserId,
+      tenantId,
+      correlationId,
+    });
+    if (!stripeResult.ok) {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'stripe_cancellation');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    const localResult = await executeLocalAccountContentDeletion(input.supabase, service, {
+      ownerUserId: trustedOwnerUserId,
+      tenantId,
+      profileId,
+    });
+    if (!localResult.ok) {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'local_content');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    const analyticsResult = await anonymizeTrustedAccountAnalytics(service, {
+      authenticatedUserId: trustedOwnerUserId,
+      trustedOwnerUserId,
+      tenantId,
+      profileId,
+      correlationId,
+    });
+    if (!analyticsResult.ok) {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'analytics');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    const auditResult = await insertTrustedDeletionAudit(service, {
+      authenticatedUserId: trustedOwnerUserId,
+      trustedOwnerUserId,
+      correlationId,
+      completionState: 'pre_auth_deletion',
+    });
+    if (!auditResult.ok) {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'deletion_audit');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    const authResult = await deleteTrustedSupabaseAuthUser(service, {
+      authenticatedUserId: trustedOwnerUserId,
+      trustedOwnerUserId,
+      correlationId,
+      priorStagesCompleted: true,
+    });
+    if (!authResult.ok) {
+      await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'auth_user_deletion');
+      return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    await releaseAccountDeletionLock(service, lock.operationId, 'completed');
+    return { ok: true, mutated: true };
+  } catch {
+    await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'unexpected');
+    return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+  }
 }
 
-/** Exported for tests — capability still required after T005–T007 before mutation is allowed. */
-export const ACCOUNT_DELETION_DEFERRED_CAPABILITIES: AccountDeletionCapabilityId[] = [
-  'deletion_audit',
-];
+/** After T008 all mandatory capabilities are registered when env is configured. */
+export const ACCOUNT_DELETION_DEFERRED_CAPABILITIES: AccountDeletionCapabilityId[] = [];

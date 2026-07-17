@@ -65,7 +65,12 @@ export async function POST(request: Request) {
         );
       }
 
-      const result = await runAccountDeletionOrchestrator({ user, supabase });
+      const { createServiceClient } = await import('@/lib/supabase/server');
+      const result = await runAccountDeletionOrchestrator({
+        user,
+        supabase,
+        createServiceClient,
+      });
 
       if (!result.ok) {
         if (result.code === 'ACCOUNT_DELETION_NOT_READY') {
