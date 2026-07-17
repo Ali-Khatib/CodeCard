@@ -50,6 +50,8 @@ type DashboardShellProps = {
   basePath?: string;
   preview?: boolean;
   emailVerificationRequired?: boolean;
+  /** Private Circle freshness badge ("1"…"9" or "9+"); never demo values. */
+  circleUnreadBadge?: string | null;
 };
 
 function CopyProfileLinkButton({ slug }: { slug: string }) {
@@ -82,6 +84,7 @@ export function DashboardShell({
   basePath = '/dashboard',
   preview = false,
   emailVerificationRequired = false,
+  circleUnreadBadge = null,
 }: DashboardShellProps) {
   const pathname = usePathname();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -172,9 +175,24 @@ export function DashboardShell({
             className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''} ${pending ? 'cc-app-nav-link--pending' : ''}`}
             aria-current={active ? 'page' : undefined}
             aria-busy={pending}
+            aria-label={
+              item.segment === 'circle' && circleUnreadBadge
+                ? `Circle, ${circleUnreadBadge} new`
+                : undefined
+            }
           >
             <Icon />
-            {item.label}
+            <span className="inline-flex min-w-0 items-center gap-2">
+              {item.label}
+              {item.segment === 'circle' && circleUnreadBadge ? (
+                <span
+                  className="cc-app-badge cc-app-badge--mint inline-flex min-w-[1.25rem] justify-center px-1.5 text-[11px]"
+                  aria-hidden
+                >
+                  {circleUnreadBadge}
+                </span>
+              ) : null}
+            </span>
           </Link>
         );
       })}
@@ -362,9 +380,21 @@ export function DashboardShell({
               } ${pending ? 'cc-app-mobile-nav__link--pending' : ''}`}
               aria-current={active ? 'page' : undefined}
               aria-busy={pending}
+              aria-label={
+                item.segment === 'circle' && circleUnreadBadge
+                  ? `Circle, ${circleUnreadBadge} new`
+                  : undefined
+              }
             >
               <Icon />
-              {item.label}
+              <span className="inline-flex items-center gap-1">
+                {item.label}
+                {item.segment === 'circle' && circleUnreadBadge ? (
+                  <span className="cc-app-badge cc-app-badge--mint px-1 text-[10px]" aria-hidden>
+                    {circleUnreadBadge}
+                  </span>
+                ) : null}
+              </span>
             </Link>
           );
         })}

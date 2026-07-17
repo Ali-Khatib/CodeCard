@@ -218,6 +218,13 @@ export async function executeLocalAccountContentDeletion(
     .eq('actor_profile_id', ctx.profileId);
   if (circleError) return { ok: false, reason: 'delete_failed' };
 
+  // Viewer-owned Circle read state.
+  const { error: circleViewerError } = await supabase
+    .from('circle_viewer_state')
+    .delete()
+    .eq('viewer_user_id', ctx.ownerUserId);
+  if (circleViewerError) return { ok: false, reason: 'delete_failed' };
+
   const { data: papers, error: papersListError } = await supabase
     .from('research_papers')
     .select('id')

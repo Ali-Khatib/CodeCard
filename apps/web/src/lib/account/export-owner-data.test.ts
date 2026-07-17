@@ -513,6 +513,10 @@ function createScopedClient(ownerId: string) {
         });
       case 'moderation_reports':
         return createThenable({ data: ds.reports, error: null });
+      case 'circle_activity':
+        return createThenable({ data: [], error: null });
+      case 'circle_viewer_state':
+        return createThenable({ data: null, error: null });
       default:
         return createThenable({ data: [], error: null });
     }

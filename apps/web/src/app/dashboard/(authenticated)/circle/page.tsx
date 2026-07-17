@@ -1,11 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
 import { listCircleFeed } from '@/lib/circle/circle-feed-core';
+import { getCircleLastSeenAt } from '@/lib/circle/circle-read-state-core';
 import { AuthenticatedCircleView } from '@/components/dashboard/authenticated-circle-view';
 import { AppButton, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 
 export default async function CirclePage() {
   const supabase = await createClient();
-  const feed = await listCircleFeed(supabase, { filter: 'all' });
+  const [feed, lastSeen] = await Promise.all([
+    listCircleFeed(supabase, { filter: 'all' }),
+    getCircleLastSeenAt(supabase),
+  ]);
 
   if (feed.status === 'unauthenticated') {
     return (
@@ -23,5 +27,10 @@ export default async function CirclePage() {
     );
   }
 
-  return <AuthenticatedCircleView initialFeed={feed} />;
+  return (
+    <AuthenticatedCircleView
+      initialFeed={feed}
+      initialLastSeenAt={lastSeen.ok ? lastSeen.lastSeenAt : null}
+    />
+  );
 }

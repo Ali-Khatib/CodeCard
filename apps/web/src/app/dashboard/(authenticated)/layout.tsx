@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { userNeedsEmailVerification } from '@/lib/auth/email-verification';
 import { buildSignInHref } from '@/lib/auth/session-expiry';
+import { getCircleUnreadSummary } from '@/lib/circle/circle-read-state-core';
 
 export default async function AuthenticatedDashboardLayout({
   children,
@@ -20,11 +21,14 @@ export default async function AuthenticatedDashboardLayout({
     redirect(buildSignInHref(pathname));
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('slug, display_name, avatar_url')
-    .eq('owner_user_id', user.id)
-    .single();
+  const [{ data: profile }, circleUnread] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('slug, display_name, avatar_url')
+      .eq('owner_user_id', user.id)
+      .single(),
+    getCircleUnreadSummary(supabase),
+  ]);
 
   return (
     <DashboardShell
@@ -33,6 +37,7 @@ export default async function AuthenticatedDashboardLayout({
       email={user.email}
       avatarUrl={profile?.avatar_url}
       emailVerificationRequired={userNeedsEmailVerification(user)}
+      circleUnreadBadge={circleUnread.badgeLabel}
     >
       {children}
     </DashboardShell>
