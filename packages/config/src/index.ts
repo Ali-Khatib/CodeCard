@@ -65,6 +65,8 @@ export const RATE_LIMITS = {
   accountDelete: { requests: 5, window: '1 h' as const },
   /** Public research PDF proxy — published papers only. */
   publicResearchPdf: { requests: 60, window: '1 m' as const },
+  /** Authenticated Connections add/remove mutations. */
+  connections: { requests: 60, window: '1 m' as const },
 } as const;
 
 export const STORAGE_BUCKETS = {

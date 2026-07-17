@@ -433,6 +433,52 @@ export const saveConnectionSchema = z.object({
   met_at: z.string().datetime().optional().nullable(),
 });
 
+/** Public handle for Connections — normalize case before slug rules. */
+export const connectionTargetSlugSchema = z
+  .string()
+  .trim()
+  .min(3)
+  .max(63)
+  .transform((value) => value.toLowerCase())
+  .pipe(slugSchema);
+
+/**
+ * WS15-T003 — Add Connection input.
+ * Client may supply a target profile UUID and/or public slug.
+ * Owner identity is never accepted from the client.
+ */
+export const addConnectionInputSchema = z
+  .object({
+    targetProfileId: z.string().uuid().optional(),
+    targetSlug: connectionTargetSlugSchema.optional(),
+    source: connectionSourceSchema.default('manual'),
+  })
+  .refine((data) => Boolean(data.targetProfileId || data.targetSlug), {
+    message: 'A target profile id or slug is required',
+    path: ['targetProfileId'],
+  });
+
+/** Remove by connection row id and/or saved target profile id. */
+export const removeConnectionInputSchema = z
+  .object({
+    connectionId: z.string().uuid().optional(),
+    targetProfileId: z.string().uuid().optional(),
+  })
+  .refine((data) => Boolean(data.connectionId || data.targetProfileId), {
+    message: 'A connection id or target profile id is required',
+    path: ['connectionId'],
+  });
+
+export const connectionStatusInputSchema = z
+  .object({
+    targetProfileId: z.string().uuid().optional(),
+    targetSlug: connectionTargetSlugSchema.optional(),
+  })
+  .refine((data) => Boolean(data.targetProfileId || data.targetSlug), {
+    message: 'A target profile id or slug is required',
+    path: ['targetProfileId'],
+  });
+
 export const connectionNoteSchema = z.object({
   body: z.string().min(1).max(5000).trim(),
 });
@@ -538,6 +584,9 @@ export type CreateProjectInputPayload = z.infer<typeof createProjectInputSchema>
 export type UpdateProjectInputPayload = z.infer<typeof updateProjectInputSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SaveConnectionInput = z.infer<typeof saveConnectionSchema>;
+export type AddConnectionInput = z.infer<typeof addConnectionInputSchema>;
+export type RemoveConnectionInput = z.infer<typeof removeConnectionInputSchema>;
+export type ConnectionStatusInput = z.infer<typeof connectionStatusInputSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;
