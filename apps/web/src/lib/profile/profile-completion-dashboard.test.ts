@@ -52,6 +52,19 @@ describe('dashboard profile completion integration', () => {
     expect(completion).toContain("'/dashboard/projects/new'");
   });
 
+  it('keeps completion details collapsed until the top-right control expands them', () => {
+    const indicator = read('src/components/dashboard/profile-completion-indicator.tsx');
+
+    expect(indicator).toContain('useState(false)');
+    expect(indicator).toContain('aria-expanded={expanded}');
+    expect(indicator).toContain('aria-controls={detailsId}');
+    expect(indicator).toContain('View profile completion progress');
+    expect(indicator).toContain("grid-rows-[0fr]");
+    expect(indicator).toContain("grid-rows-[1fr]");
+    expect(indicator).toContain('tabIndex={expanded ? undefined : -1}');
+    expect(indicator).not.toMatch(/percentage\s*===\s*100/);
+  });
+
   it('uses a dashboard loading skeleton without fake percentages', () => {
     const loading = read('src/app/dashboard/(authenticated)/loading.tsx');
     const skeleton = read('src/components/loading/route-skeletons.tsx');
