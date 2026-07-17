@@ -41,6 +41,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  /**
+   * WS11-T007: Server Action CSRF.
+   * Next.js compares Origin to Host / X-Forwarded-Host (Vercel).
+   * `allowedOrigins` lists extra reverse-proxy hostnames that may bypass that check.
+   * Keep empty for direct Vercel deploys — never use wildcards.
+   */
+  experimental: {
+    serverActions: {
+      allowedOrigins: [],
+    },
+  },
   transpilePackages: [
     '@codecard/ui',
     '@codecard/types',
