@@ -1,10 +1,15 @@
 'use client';
 
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
+import {
+  filterAndSortConnections,
+  type ConnectionsCollectionFilter,
+  type ConnectionsSortId,
+} from '@/lib/connections/connections-filter';
 import { DashFilterBar } from './dash-filter-bar';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
@@ -22,7 +27,17 @@ type ConnectionsViewMode = 'list' | 'grid';
 type ViewConnection = WorkspaceConnection & {
   profileSlug?: string;
   isPublicTarget?: boolean;
+  context?: string | null;
+  privateNote?: string | null;
+  connectedAtIso?: string | null;
 };
+
+const SORT_OPTIONS: Array<{ id: ConnectionsSortId; label: string }> = [
+  { id: 'newest', label: 'Newest connected' },
+  { id: 'oldest', label: 'Oldest connected' },
+  { id: 'name_asc', label: 'Name A–Z' },
+  { id: 'name_desc', label: 'Name Z–A' },
+];
 
 function connectionEmail(connection: WorkspaceConnection) {
   const local = connection.name.toLowerCase().replace(/\s+/g, '.');
@@ -503,10 +518,33 @@ export function DashboardConnectionsView({
   const [source, setSource] = useState<(typeof SOURCES)[number]>('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
+  const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
+  const [sort, setSort] = useState<ConnectionsSortId>('newest');
+
+  const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
+
+  useEffect(() => {
+    if (
+      collectionFilter !== 'all' &&
+      collectionFilter !== 'uncategorized' &&
+      !collectionIds.has(collectionFilter)
+    ) {
+      setCollectionFilter('all');
+    }
+  }, [collectionFilter, collectionIds]);
 
   const filtered = useMemo(() => {
+    if (variant === 'authenticated') {
+      return filterAndSortConnections({
+        connections,
+        query,
+        collectionFilter,
+        memberships,
+        sort,
+      });
+    }
     return connections.filter((c) => {
-      if (variant === 'demo' && source !== 'All' && c.source !== source) return false;
+      if (source !== 'All' && c.source !== source) return false;
       if (!query.trim()) return true;
       const q = query.toLowerCase();
       return (
@@ -516,7 +554,17 @@ export function DashboardConnectionsView({
         c.role.toLowerCase().includes(q)
       );
     });
-  }, [connections, query, source, variant]);
+  }, [connections, query, source, variant, collectionFilter, memberships, sort]);
+
+  const filtersActive =
+    variant === 'authenticated' &&
+    (Boolean(query.trim()) || collectionFilter !== 'all' || sort !== 'newest');
+
+  const clearFilters = () => {
+    setQuery('');
+    setCollectionFilter('all');
+    setSort('newest');
+  };
 
   const upcomingFollowUps = useMemo(
     () => (variant === 'demo' ? getUpcomingFollowUps(connections) : []),
@@ -571,6 +619,45 @@ export function DashboardConnectionsView({
                   aria-label="Search connections"
                 />
               </div>
+
+              {variant === 'authenticated' ? (
+                <div className="flex flex-wrap gap-2">
+                  <label className="sr-only" htmlFor="connections-collection-filter">
+                    Filter by collection
+                  </label>
+                  <select
+                    id="connections-collection-filter"
+                    className="cc-app-input w-auto min-w-[10rem]"
+                    value={collectionFilter}
+                    onChange={(e) =>
+                      setCollectionFilter(e.target.value as ConnectionsCollectionFilter)
+                    }
+                  >
+                    <option value="all">All Connections</option>
+                    <option value="uncategorized">Uncategorized</option>
+                    {collections.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="sr-only" htmlFor="connections-sort">
+                    Sort Connections
+                  </label>
+                  <select
+                    id="connections-sort"
+                    className="cc-app-input w-auto min-w-[10rem]"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as ConnectionsSortId)}
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
 
               <div className="cc-projects-view-toggle" role="group" aria-label="Connections view">
                 {CONNECTION_VIEW_MODES.map(({ id, label, icon: Icon }) => (
@@ -648,9 +735,28 @@ export function DashboardConnectionsView({
           )}
 
           {filtered.length === 0 && (
-            <p className="py-16 text-center text-[15px] text-[var(--app-smoke)]">
-              No connections match this filter.
-            </p>
+            <div className="py-16 text-center">
+              {variant === 'authenticated' && connections.length > 0 ? (
+                <>
+                  <p className="text-[15px] text-[var(--app-smoke)]">
+                    No Connections match these filters.
+                  </p>
+                  {filtersActive ? (
+                    <button
+                      type="button"
+                      className="cc-app-btn cc-app-btn--ghost mt-4 !h-10"
+                      onClick={clearFilters}
+                    >
+                      Clear filters
+                    </button>
+                  ) : null}
+                </>
+              ) : (
+                <p className="text-[15px] text-[var(--app-smoke)]">
+                  No connections match this filter.
+                </p>
+              )}
+            </div>
           )}
         </FadeInView>
       </div>
