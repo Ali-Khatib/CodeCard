@@ -57,6 +57,17 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (customer) {
+      // WS10-T006: do not recreate billing linkage for deleted / mid-deletion accounts.
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('owner_user_id', customer.user_id)
+        .maybeSingle();
+
+      if (!profile) {
+        return NextResponse.json({ received: true, skipped: 'no_profile' });
+      }
+
       await supabase.from('subscriptions').upsert(
         {
           tenant_id: customer.tenant_id,
