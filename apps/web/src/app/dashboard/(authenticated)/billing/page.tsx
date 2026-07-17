@@ -33,47 +33,56 @@ export default async function BillingPage() {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const stripe = getStripe();
-    const { data: existingCustomer } = await supabase
-      .from('subscription_customers')
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    let checkoutUrl: string | null = null;
+    try {
+      const stripe = getStripe();
+      const { data: existingCustomer } = await supabase
+        .from('subscription_customers')
+        .select('stripe_customer_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    let stripeCustomerId = existingCustomer?.stripe_customer_id;
+      let stripeCustomerId = existingCustomer?.stripe_customer_id;
 
-    if (!stripeCustomerId) {
-      const stripeCustomer = await stripe.customers.create({
-        email: user.email,
-        metadata: { user_id: user.id },
+      if (!stripeCustomerId) {
+        const stripeCustomer = await stripe.customers.create({
+          email: user.email,
+          metadata: { user_id: user.id },
+        });
+        stripeCustomerId = stripeCustomer.id;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('tenant_id')
+          .eq('owner_user_id', user.id)
+          .single();
+
+        await supabase.from('subscription_customers').insert({
+          tenant_id: profile?.tenant_id,
+          user_id: user.id,
+          stripe_customer_id: stripeCustomerId,
+        });
+      }
+
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      if (!appUrl) return;
+
+      const session = await stripe.checkout.sessions.create({
+        customer: stripeCustomerId,
+        mode: 'subscription',
+        line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID!, quantity: 1 }],
+        success_url: `${appUrl}/dashboard/billing?success=true`,
+        cancel_url: `${appUrl}/dashboard/billing?canceled=true`,
       });
-      stripeCustomerId = stripeCustomer.id;
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('tenant_id')
-        .eq('owner_user_id', user.id)
-        .single();
-
-      await supabase.from('subscription_customers').insert({
-        tenant_id: profile?.tenant_id,
-        user_id: user.id,
-        stripe_customer_id: stripeCustomerId,
-      });
+      checkoutUrl = session.url;
+    } catch {
+      redirect('/dashboard/billing?error=billing');
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-    if (!appUrl) return;
-
-    const session = await stripe.checkout.sessions.create({
-      customer: stripeCustomerId,
-      mode: 'subscription',
-      line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID!, quantity: 1 }],
-      success_url: `${appUrl}/dashboard/billing?success=true`,
-      cancel_url: `${appUrl}/dashboard/billing?canceled=true`,
-    });
-
-    redirect(session.url!);
+    if (!checkoutUrl) {
+      redirect('/dashboard/billing?error=billing');
+    }
+    redirect(checkoutUrl);
   }
 
   async function openPortal() {
@@ -84,23 +93,33 @@ export default async function BillingPage() {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: ownedCustomer } = await supabase
-      .from('subscription_customers')
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    let portalUrl: string | null = null;
+    try {
+      const { data: ownedCustomer } = await supabase
+        .from('subscription_customers')
+        .select('stripe_customer_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    if (!ownedCustomer?.stripe_customer_id) return;
+      if (!ownedCustomer?.stripe_customer_id) return;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-    if (!appUrl) return;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      if (!appUrl) return;
 
-    const stripe = getStripe();
-    const session = await stripe.billingPortal.sessions.create({
-      customer: ownedCustomer.stripe_customer_id,
-      return_url: `${appUrl}/dashboard/billing`,
-    });
-    redirect(session.url);
+      const stripe = getStripe();
+      const session = await stripe.billingPortal.sessions.create({
+        customer: ownedCustomer.stripe_customer_id,
+        return_url: `${appUrl}/dashboard/billing`,
+      });
+      portalUrl = session.url;
+    } catch {
+      redirect('/dashboard/billing?error=billing');
+    }
+
+    if (!portalUrl) {
+      redirect('/dashboard/billing?error=billing');
+    }
+    redirect(portalUrl);
   }
 
   return (

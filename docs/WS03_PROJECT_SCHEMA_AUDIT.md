@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-13  
 **Scope:** Analysis and documentation only. No schema, UI, or application behavior changes in this task.  
-**Sources inspected:** `supabase/migrations/20250627000001_initial_schema.sql` through `20250627000008_storage_buckets_rls.sql`, `20250627000006_project_case_study_sections.sql`, `20250627000002_rls_policies.sql`, `20250627000003_force_rls.sql`, `packages/validation/src/index.ts`, `packages/types/src/index.ts`, `packages/config/src/index.ts`, `apps/web/src/lib/projects/featured.ts`, `apps/web/src/lib/dashboard/portfolio.ts`, `apps/web/src/lib/projects/demo-data.ts`, `apps/web/src/lib/projects/create-project-action.ts`, `apps/web/src/app/dashboard/(authenticated)/projects/page.tsx`, `apps/web/src/app/[slug]/page.tsx`, `apps/web/src/app/[slug]/projects/[id]/page.tsx`, `apps/web/src/components/dashboard/dashboard-projects-portfolio.tsx`, `apps/web/src/components/featured-work/project-detail-view.tsx`, `apps/web/src/components/profile/public-project-stack.tsx`, `supabase/seed.sql`.
+**Sources inspected:** `supabase/migrations/20250627000001_initial_schema.sql` through `20250627000008_storage_buckets_rls.sql`, `20250627000006_project_case_study_sections.sql`, `20250627000002_rls_policies.sql`, `20250627000003_force_rls.sql`, `packages/validation/src/index.ts`, `packages/types/src/index.ts`, `packages/config/src/index.ts`, `apps/web/src/lib/projects/featured.ts`, `apps/web/src/lib/dashboard/portfolio.ts`, `apps/web/src/lib/projects/demo-data.ts`, `apps/web/src/app/actions/projects.ts` (live create path; legacy `create-project-action.ts` removed in WS11-T008), `apps/web/src/app/dashboard/(authenticated)/projects/page.tsx`, `apps/web/src/app/[slug]/page.tsx`, `apps/web/src/app/[slug]/projects/[id]/page.tsx`, `apps/web/src/components/dashboard/dashboard-projects-portfolio.tsx`, `apps/web/src/components/featured-work/project-detail-view.tsx`, `apps/web/src/components/profile/public-project-stack.tsx`, `supabase/seed.sql`.
 
 ---
 
@@ -78,7 +78,7 @@ auth.users (owner_user_id)
                     └── project_orderings (table exists; app uses projects.sort_order)
 ```
 
-Provisioning: projects are inserted with `tenant_id`, `profile_id`, and `owner_user_id` from the authenticated owner's profile (`create-project-action.ts`).
+Provisioning: projects are inserted with `tenant_id`, `profile_id`, and `owner_user_id` from the authenticated owner's profile (`app/actions/projects.ts` / project-create-core).
 
 ### 6. RLS coverage
 
