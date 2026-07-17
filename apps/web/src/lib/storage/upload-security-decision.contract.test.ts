@@ -21,6 +21,7 @@ describe('WS04-T013 upload security decision contract', () => {
     expect(decision).toMatch(/SVG[\s\S]*Reject/i);
     expect(decision).toContain('PDF');
     expect(decision).toContain('NO-GO');
+    expect(decision).toContain('WS11-T010');
     expect(decision).not.toMatch(/ClamAV is integrated|VirusTotal is integrated|scanner is live/i);
   });
 

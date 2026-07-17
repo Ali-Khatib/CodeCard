@@ -7,6 +7,16 @@ import {
 import { researchFigureAltText, resolveResearchFigureDisplayUrl } from './research-figure-url';
 import { validateResearchFigureFile } from './research-figure-upload-client';
 
+vi.mock('@/lib/storage/finalize-raster-verification', () => ({
+  requireVerifiedRasterObjectForFinalize: vi.fn().mockResolvedValue({
+    ok: true,
+    detectedMime: 'image/png',
+    size: 1200,
+  }),
+  completeUploadIntentAfterFinalize: vi.fn().mockResolvedValue(undefined),
+  declaredMimeFromImagePath: () => 'image/png',
+}));
+
 const TENANT = '11111111-1111-4111-8111-111111111111';
 const OWNER = '22222222-2222-4222-8222-222222222222';
 const PAPER = '33333333-3333-4333-8333-333333333333';

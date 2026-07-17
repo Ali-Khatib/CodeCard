@@ -5,7 +5,7 @@
 **Branch basis:** `mvp` (controls verified against repository code; not a live pen test)  
 **Status:** Conditional go for private beta raster images only — **not** approval for wide public launch or research PDFs.
 
-This document does **not** claim that antivirus, magic-byte sniffing, or content-disarm infrastructure exists. Client-side compression (WS04-T012) is a performance aid only and is **not** a security control.
+This document does **not** claim that antivirus or content-disarm infrastructure exists. **Magic-byte sniffing for live raster finalize paths was added in WS11-T010** and complements MIME/extension allowlists; it is still not malware scanning. Client-side compression (WS04-T012) is a performance aid only and is **not** a security control.
 
 ---
 
@@ -105,7 +105,7 @@ Implemented in `apps/web/src/lib/storage/path.ts`.
 
 | Gap | Severity for private image beta | Notes |
 |-----|----------------------------------|-------|
-| No magic-byte / content sniffing | Residual | MIME is client-declared; buckets also enforce `allowed_mime_types` |
+| ~~No magic-byte / content sniffing~~ | Mitigated (WS11-T010) | Finalize downloads object and verifies JPEG/PNG/WebP magic; still not antivirus |
 | No malware scanner | Accepted for scoped deferral | Reassess for public / PDF |
 | No invite-only gate in app code | Operational | Must be enforced by ops (closed signup / limited invites) |
 | `private-doc` still a valid API `resourceType` | Residual | No research UI; keep PDF UI disabled; tighten before public PDF |
@@ -114,6 +114,7 @@ Implemented in `apps/web/src/lib/storage/path.ts`.
 | Admin UI not role-gated | Operational | Pending reports page exists; harden before public |
 | No formal incident-response runbook | Process | Expectations listed below; write a full IR playbook before public launch |
 | Bucket allows video MIME beyond live UI | Residual | Live finalize roles are image-only; do not enable video without a separate review |
+| Orphan reconciliation schedule | Residual | Executable reconciler exists (WS11-T010); production cron deferred |
 
 ---
 
@@ -121,7 +122,7 @@ Implemented in `apps/web/src/lib/storage/path.ts`.
 
 | Threat | Current mitigation | Residual | Blocks private beta? | Blocks public launch? | Future control |
 |--------|-------------------|----------|----------------------|------------------------|----------------|
-| Disguised executable as image | Allowlist + MIME/ext + bucket MIME | No magic bytes | No | Reassess | Content sniff / transcoder |
+| Disguised executable as image | Allowlist + MIME/ext + bucket MIME + **magic-byte finalize (WS11-T010)** | No full AV | No | Reassess | Antivirus / transcoder |
 | MIME/extension mismatch | Paired validation | — | No | No if kept | Keep tests |
 | Path traversal / directory influence | Strict filename rules; UUID paths | — | No | No | Keep tests |
 | Bucket/path forgery | Server-derived bucket/path; finalize asserts | — | No | No | Keep tests |

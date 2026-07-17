@@ -6,6 +6,21 @@ import {
   executeFinalizeAvatarUpload,
 } from './profile-avatar-core';
 
+vi.mock('@/lib/storage/finalize-raster-verification', () => ({
+  requireVerifiedRasterObjectForFinalize: vi.fn().mockResolvedValue({
+    ok: true,
+    detectedMime: 'image/png',
+    size: 128,
+  }),
+  completeUploadIntentAfterFinalize: vi.fn().mockResolvedValue(undefined),
+  declaredMimeFromImagePath: (path: string) =>
+    path.endsWith('.png') ? 'image/png' : path.endsWith('.jpg') || path.endsWith('.jpeg')
+      ? 'image/jpeg'
+      : path.endsWith('.webp')
+        ? 'image/webp'
+        : null,
+}));
+
 const tenantId = '11111111-1111-4111-8111-111111111111';
 const ownerUserId = '22222222-2222-4222-8222-222222222222';
 const profileId = '33333333-3333-4333-8333-333333333333';

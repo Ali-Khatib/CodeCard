@@ -11,6 +11,10 @@ import {
 } from '@/lib/storage/path';
 import { loadOwnedProject } from '@/lib/projects/project-access-core';
 import { bestEffortRemoveTrustedStorageObject } from '@/lib/storage/storage-cleanup';
+import {
+  completeUploadIntentAfterFinalize,
+  requireVerifiedRasterObjectForFinalize,
+} from '@/lib/storage/finalize-raster-verification';
 
 export type ProjectMediaAssetRecord = {
   id: string;
@@ -103,32 +107,6 @@ async function projectMediaObjectExists(
   }
 
   return (data ?? []).some((item) => item.name === filename);
-}
-
-async function readObjectMetadata(
-  supabase: SupabaseClient,
-  path: string,
-): Promise<{ mimeType: string; fileSize: number }> {
-  const slash = path.lastIndexOf('/');
-  const folder = slash >= 0 ? path.slice(0, slash) : '';
-  const filename = path.slice(slash + 1);
-  const { data: listed } = await supabase.storage
-    .from(STORAGE_BUCKETS.projectMedia)
-    .list(folder, { limit: 1, search: filename });
-
-  const objectMeta = (listed ?? []).find((item) => item.name === filename);
-  const mimeType =
-    typeof objectMeta?.metadata?.mimetype === 'string'
-      ? objectMeta.metadata.mimetype
-      : 'image/png';
-  const fileSize =
-    typeof objectMeta?.metadata?.size === 'number'
-      ? objectMeta.metadata.size
-      : typeof objectMeta?.metadata?.size === 'string'
-        ? Number.parseInt(objectMeta.metadata.size, 10) || 0
-        : 0;
-
-  return { mimeType, fileSize };
 }
 
 export async function countProjectMediaByRole(
@@ -285,6 +263,7 @@ export async function executeFinalizeProjectMediaUpload(
       .single();
 
     if (existing && existing.type === parsed.data.media_role) {
+      await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
       return {
         success: true,
         asset: existing as ProjectMediaAssetRecord,
@@ -303,7 +282,16 @@ export async function executeFinalizeProjectMediaUpload(
     return { error: GENERIC_ERROR };
   }
 
-  const { mimeType, fileSize } = await readObjectMetadata(supabase, parsed.data.path);
+  const verified = await requireVerifiedRasterObjectForFinalize(supabase, {
+    path: parsed.data.path,
+    resourceType: 'project-media',
+  });
+  if (!verified.ok) {
+    return { error: GENERIC_ERROR };
+  }
+
+  const mimeType = verified.detectedMime;
+  const fileSize = verified.size;
 
   if (parsed.data.media_role === 'poster') {
     const { data: existingCover } = await supabase
@@ -335,6 +323,8 @@ export async function executeFinalizeProjectMediaUpload(
         });
         return { error: GENERIC_ERROR };
       }
+
+      await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
 
       let cleanupWarning = false;
       if (previousPath && previousPath !== parsed.data.path) {
@@ -412,6 +402,8 @@ export async function executeFinalizeProjectMediaUpload(
     });
     return { error: GENERIC_ERROR };
   }
+
+  await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
 
   return {
     success: true,

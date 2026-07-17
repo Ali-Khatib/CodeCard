@@ -76,7 +76,8 @@ export async function removeTrustedStorageObject(
 
 /**
  * Best-effort owner-scoped cleanup after a successful DB reference change.
- * Never throws; orphan reconciliation remains WS04-T010.
+ * Never throws; abandoned signed-upload orphans are handled by WS11-T010
+ * `reconcileAbandonedUploadIntents` / `runAbandonedUploadReconciliation`.
  */
 export async function bestEffortRemoveTrustedStorageObject(
   supabase: SupabaseClient,

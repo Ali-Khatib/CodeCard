@@ -9,6 +9,16 @@ import {
   projectMediaPathAlreadyFinalized,
 } from './project-media-core';
 
+vi.mock('@/lib/storage/finalize-raster-verification', () => ({
+  requireVerifiedRasterObjectForFinalize: vi.fn().mockResolvedValue({
+    ok: true,
+    detectedMime: 'image/png',
+    size: 100,
+  }),
+  completeUploadIntentAfterFinalize: vi.fn().mockResolvedValue(undefined),
+  declaredMimeFromImagePath: () => 'image/png',
+}));
+
 const tenantId = '11111111-1111-4111-8111-111111111111';
 const userId = '22222222-2222-4222-8222-222222222222';
 const projectId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
