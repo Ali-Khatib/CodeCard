@@ -41,6 +41,7 @@ Live product uploads today:
 - Profile avatars
 - Project covers (`poster`)
 - Project screenshots
+- Research figures
 
 Scaffolding only (not approved live product features until separately gated):
 
@@ -54,6 +55,7 @@ Scaffolding only (not approved live product features until separately gated):
 | Avatar | `image/jpeg`, `image/png`, `image/webp` | `jpg`, `jpeg`, `png`, `webp` | 5 MB |
 | Project cover | same | same | 5 MB |
 | Screenshot | same | same | 5 MB |
+| Research figure | same | same | 5 MB |
 
 ### Rejected / not approved for MVP live uploads
 
@@ -108,22 +110,27 @@ Server validates declared size at signed-upload authorization; buckets enforce o
 ### Finalization checks
 
 - Re-authentication / session user
-- Owned profile or owned project
+- Owned profile, owned project, or owned research paper
 - Canonical path ownership (tenant/owner/resource)
 - Object present in expected bucket
+- **Magic-byte / content-signature verification** for live raster uploads (WS11-T010)
 - Persist DB reference only after checks succeed
+- Signed-upload intent marked finalized after successful attach
 - Replacement deletes previous object only after DB success (best-effort cleanup)
+- Abandoned intents reconcilable after grace period (`runAbandonedUploadReconciliation`)
 
 ### Malware / virus scanning decision (current)
 
 | Stage | Decision |
 |-------|----------|
-| Controlled private beta (images only) | **Conditional deferral** — see decision doc |
+| Controlled private beta (images only) | **Conditional deferral** — magic-byte sniffing **implemented**; full AV still deferred — see decision doc |
 | Wide public launch | **Reassess; scanning or equivalent hardening required before expansion** |
 | Research PDFs | Private uploads **not approved**; external HTTPS links supported for MVP | Separate gate required for private hosting |
 | SVG / archives / executables | **Reject** |
 
-Scanning is **not** implemented. Do not claim otherwise.
+Full malware scanning is **not** implemented. Magic-byte verification **is** implemented for live raster finalize paths (WS11-T010). Do not claim antivirus exists.
+
+See also: [`WS11_T010_UPLOAD_SECURITY.md`](./WS11_T010_UPLOAD_SECURITY.md).
 
 ### Private-beta conditions
 

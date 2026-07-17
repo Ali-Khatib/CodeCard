@@ -71,6 +71,20 @@ describe('POST /api/upload', () => {
       },
       error: null,
     });
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'storage_upload_intents') {
+        return {
+          insert: vi.fn().mockResolvedValue({ error: null }),
+        };
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn().mockResolvedValue({ data: profile, error: null }),
+          })),
+        })),
+      };
+    });
   });
 
   it('rejects unauthenticated requests', async () => {
@@ -172,6 +186,11 @@ describe('POST /api/upload', () => {
   it('authorizes owned project cover uploads and rejects unsupported MIME', async () => {
     const projectId = '44444444-4444-4444-8444-444444444444';
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'storage_upload_intents') {
+        return {
+          insert: vi.fn().mockResolvedValue({ error: null }),
+        };
+      }
       if (table === 'projects') {
         return {
           select: vi.fn(() => ({

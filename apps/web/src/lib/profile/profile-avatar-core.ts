@@ -7,6 +7,10 @@ import {
   bestEffortRemoveTrustedStorageObject,
   extractAvatarPathFromPublicUrl,
 } from '@/lib/storage/storage-cleanup';
+import {
+  completeUploadIntentAfterFinalize,
+  requireVerifiedRasterObjectForFinalize,
+} from '@/lib/storage/finalize-raster-verification';
 
 export type AvatarFinalizeState = {
   success?: boolean;
@@ -120,12 +124,21 @@ export async function executeFinalizeAvatarUpload(
 
   const previousPath = extractAvatarPathFromPublicUrl(currentProfile?.avatar_url ?? null);
   if (previousPath && previousPath === input.path) {
+    await completeUploadIntentAfterFinalize(supabase, input.path);
     return {
       success: true,
       avatarUrl: getPublicAvatarUrl(supabase, input.path),
       slug: profile.slug,
       isPublic: profile.is_public,
     };
+  }
+
+  const verified = await requireVerifiedRasterObjectForFinalize(supabase, {
+    path: input.path,
+    resourceType: 'avatar',
+  });
+  if (!verified.ok) {
+    return { error: GENERIC_ERROR };
   }
 
   const avatarUrl = getPublicAvatarUrl(supabase, input.path);
@@ -141,6 +154,8 @@ export async function executeFinalizeAvatarUpload(
     });
     return { error: GENERIC_ERROR };
   }
+
+  await completeUploadIntentAfterFinalize(supabase, input.path);
 
   let cleanupWarning = false;
   if (previousPath && previousPath !== input.path) {

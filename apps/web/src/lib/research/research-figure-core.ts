@@ -18,6 +18,10 @@ import {
   parseCanonicalStoragePath,
 } from '@/lib/storage/path';
 import { bestEffortRemoveTrustedStorageObject } from '@/lib/storage/storage-cleanup';
+import {
+  completeUploadIntentAfterFinalize,
+  requireVerifiedRasterObjectForFinalize,
+} from '@/lib/storage/finalize-raster-verification';
 
 export type ResearchFigureRecord = {
   id: string;
@@ -282,6 +286,7 @@ export async function executeFinalizeResearchFigureUpload(
     parsed.data.path,
   );
   if (already) {
+    await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
     return {
       success: true,
       figure: already,
@@ -295,6 +300,14 @@ export async function executeFinalizeResearchFigureUpload(
 
   const exists = await researchFigureObjectExists(supabase, parsed.data.path);
   if (!exists) {
+    return { error: GENERIC_ERROR };
+  }
+
+  const verified = await requireVerifiedRasterObjectForFinalize(supabase, {
+    path: parsed.data.path,
+    resourceType: 'research-figure',
+  });
+  if (!verified.ok) {
     return { error: GENERIC_ERROR };
   }
 
@@ -333,6 +346,8 @@ export async function executeFinalizeResearchFigureUpload(
       });
       return { error: GENERIC_ERROR };
     }
+
+    await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
 
     let cleanupWarning = false;
     if (previousPath && previousPath !== parsed.data.path) {
@@ -401,6 +416,8 @@ export async function executeFinalizeResearchFigureUpload(
     });
     return { error: GENERIC_ERROR };
   }
+
+  await completeUploadIntentAfterFinalize(supabase, parsed.data.path);
 
   return {
     success: true,

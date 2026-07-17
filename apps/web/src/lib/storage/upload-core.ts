@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { buildCanonicalStoragePath } from '@/lib/storage/path';
 import type { UploadOwnershipContext } from '@/lib/storage/upload-ownership';
 import type { UploadValidationResult } from '@/lib/storage/upload-validation';
+import { recordUploadIntent } from '@/lib/storage/upload-intents';
 
 export type SignedUploadIntent = {
   bucket: string;
@@ -34,6 +35,20 @@ export async function createSignedUploadIntent(
     .createSignedUploadUrl(location.path);
 
   if (error || !data?.signedUrl || !data.token) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Could not prepare upload. Please try again.',
+    };
+  }
+
+  const recorded = await recordUploadIntent(supabase, ownership, {
+    bucket: location.bucket,
+    path: location.path,
+    mimeType: validation.mimeType,
+    maxBytes: validation.maxBytes,
+  });
+  if (!recorded.ok) {
     return {
       ok: false,
       status: 500,
