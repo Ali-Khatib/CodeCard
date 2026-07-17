@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useEffectEvent, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -248,12 +248,22 @@ function labelToFilter(label: string): CircleFeedFilter {
   return entry?.[0] ?? 'all';
 }
 
+export type CircleFeedLoader = (input: {
+  filter: CircleFeedFilter;
+  cursor: CircleFeedCursor | null;
+}) => Promise<CircleFeedState>;
+
 export function AuthenticatedCircleView({
   initialFeed,
   initialLastSeenAt = null,
+  feedLoader,
+  markSeen,
 }: {
   initialFeed: CircleFeedState;
   initialLastSeenAt?: string | null;
+  /** Optional override for Playwright fixtures (no live Supabase). */
+  feedLoader?: CircleFeedLoader;
+  markSeen?: () => Promise<{ ok: true } | { ok: false; error: string }>;
 }) {
   const [filter, setFilter] = useState<CircleFeedFilter>(
     initialFeed.status === 'feed' || initialFeed.status === 'filtered_empty'
@@ -305,7 +315,8 @@ export function AuthenticatedCircleView({
 
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      void markCircleSeenAction().then((result) => {
+      const mark = markSeen ?? markCircleSeenAction;
+      void mark().then((result) => {
         if (!cancelled && result.ok) setSeenMarked(true);
       });
     }, 400);
@@ -316,7 +327,7 @@ export function AuthenticatedCircleView({
     };
   }, [pageStatus, seenMarked]);
 
-  const applyFeedResult = useEffectEvent((result: CircleFeedState, mode: 'replace' | 'append') => {
+  const applyFeedResult = (result: CircleFeedState, mode: 'replace' | 'append') => {
     if (result.status === 'unauthenticated') {
       setPageStatus('error');
       setErrorMessage('Sign in to view your Circle.');
@@ -370,14 +381,16 @@ export function AuthenticatedCircleView({
       }
       return merged;
     });
-  });
+  };
 
   const loadPage = (nextFilter: CircleFeedFilter, cursor: CircleFeedCursor | null, mode: 'replace' | 'append') => {
     startTransition(async () => {
-      const result = await listCircleFeedAction({
-        filter: nextFilter,
-        cursor,
-      });
+      const result = feedLoader
+        ? await feedLoader({ filter: nextFilter, cursor })
+        : await listCircleFeedAction({
+            filter: nextFilter,
+            cursor,
+          });
       applyFeedResult(result, mode);
     });
   };

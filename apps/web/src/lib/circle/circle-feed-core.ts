@@ -9,7 +9,6 @@ import {
   normalizeCircleFeedFilter,
   parseCircleFeedCursor,
   type CircleFeedCursor,
-  type CircleFeedFilter,
   type CircleFeedItem,
   type CircleFeedState,
   type CircleActivityEventType,

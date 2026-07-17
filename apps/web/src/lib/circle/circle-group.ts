@@ -13,8 +13,9 @@ function isUpdateEvent(eventType: CircleFeedItem['eventType']): boolean {
  */
 export function collapseCircleUpdateGroups(
   items: CircleFeedItem[],
-  _windowMs: number = CIRCLE_UPDATE_GROUPING_WINDOW_MS,
+  windowMs: number = CIRCLE_UPDATE_GROUPING_WINDOW_MS,
 ): CircleFeedItem[] {
+  void windowMs;
   const result: CircleFeedItem[] = [];
   const seenUpdateKeys = new Set<string>();
 
