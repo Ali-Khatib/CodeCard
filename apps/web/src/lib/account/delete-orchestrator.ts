@@ -4,6 +4,7 @@ import {
   registerT004ScaffoldCapabilities,
   type AccountDeletionCapabilityId,
 } from '@/lib/account/delete-capabilities';
+import { registerAuthUserDeletionCapability } from '@/lib/account/delete-auth-user';
 import type { AccountDeletionErrorCode } from '@/lib/account/delete-schema';
 import { assertPersonalTenantSoleMember } from '@/lib/account/delete-local-content';
 
@@ -38,13 +39,16 @@ export type AccountDeletionOrchestratorResult =
 export function ensureT004CapabilityScaffoldsRegistered(): void {
   // Idempotent: registering twice overwrites the same ids safely.
   registerT004ScaffoldCapabilities();
+  // WS10-T005: real Auth deletion capability (still insufficient alone — T006–T008 required).
+  registerAuthUserDeletionCapability();
 }
 
 /**
  * Account deletion orchestrator (WS10-T004).
  *
- * While T005–T008 capabilities are unavailable, returns ACCOUNT_DELETION_NOT_READY
- * before any lock acquisition or mutation.
+ * While T006–T008 capabilities are unavailable, returns ACCOUNT_DELETION_NOT_READY
+ * before any lock acquisition or mutation. T005 Auth deletion is registered but
+ * insufficient alone; Auth remains the final stage when the full pipeline runs.
  */
 export async function runAccountDeletionOrchestrator(input: {
   user: User;
@@ -64,7 +68,7 @@ export async function runAccountDeletionOrchestrator(input: {
     };
   }
 
-  // --- Paths below are unreachable until T005–T008 register real capabilities. ---
+  // --- Paths below are unreachable until T006–T008 register real capabilities. ---
   // Kept for ordered future execution; must never run with placeholder successes.
 
   const { data: profile, error: profileError } = await input.supabase
@@ -86,7 +90,7 @@ export async function runAccountDeletionOrchestrator(input: {
   }
 
   // Future stages (lock → Stripe → storage → local → analytics → audit → Auth) are
-  // intentionally not invoked in T004. Fail closed until T005–T008 wire real stages.
+  // intentionally not invoked until T006–T008 wire remaining stages. Fail closed.
   return {
     ok: false,
     code: 'ACCOUNT_DELETION_NOT_READY',
@@ -94,10 +98,9 @@ export async function runAccountDeletionOrchestrator(input: {
   };
 }
 
-/** Exported for tests — documents deferred stages that T005–T008 will fill. */
+/** Exported for tests — capabilities still required after T005 before mutation is allowed. */
 export const ACCOUNT_DELETION_DEFERRED_CAPABILITIES: AccountDeletionCapabilityId[] = [
   'stripe_cancellation',
   'analytics_anonymization',
   'deletion_audit',
-  'auth_user_deletion',
 ];
