@@ -21,5 +21,9 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     timeout: 90000,
+    env: {
+      ...process.env,
+      CODECARD_E2E_FIXTURES: '1',
+    },
   },
 });

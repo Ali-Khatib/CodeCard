@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { uploadFileToSignedUrlWithProgress } from './signed-upload-transport';
+import {
+  isAllowedSignedUploadUrl,
+  uploadFileToSignedUrlWithProgress,
+} from './signed-upload-transport';
 
 type FakeXhr = {
   status: number;
@@ -133,6 +136,27 @@ describe('uploadFileToSignedUrlWithProgress', () => {
       contentType: 'image/png',
     });
     expect(result.ok).toBe(false);
+  });
+
+  it('allows only same-origin HTTP loopback URLs for local browser E2E', () => {
+    expect(
+      isAllowedSignedUploadUrl(
+        'http://localhost:3000/e2e-fixtures/signed-upload',
+        'http://localhost:3000',
+      ),
+    ).toBe(true);
+    expect(
+      isAllowedSignedUploadUrl(
+        'http://localhost:3001/e2e-fixtures/signed-upload',
+        'http://localhost:3000',
+      ),
+    ).toBe(false);
+    expect(
+      isAllowedSignedUploadUrl(
+        'http://storage.example/upload',
+        'http://localhost:3000',
+      ),
+    ).toBe(false);
   });
 
   it('classifies expired authorization responses', async () => {

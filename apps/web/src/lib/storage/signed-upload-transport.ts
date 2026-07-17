@@ -22,6 +22,45 @@ export type SignedUploadTransportResult =
 
 const DEFAULT_CACHE_CONTROL = '3600';
 
+function isLoopbackHostname(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+}
+
+/**
+ * Production signed URLs must use HTTPS. A same-origin HTTP loopback URL is
+ * accepted only for local browser E2E, where Playwright intercepts the request.
+ */
+export function isAllowedSignedUploadUrl(
+  signedUrl: string,
+  currentOrigin = typeof window !== 'undefined' ? window.location.origin : undefined,
+): boolean {
+  let uploadUrl: URL;
+  try {
+    uploadUrl = new URL(signedUrl);
+  } catch {
+    return false;
+  }
+
+  if (uploadUrl.protocol === 'https:') {
+    return true;
+  }
+
+  if (uploadUrl.protocol !== 'http:' || !currentOrigin) {
+    return false;
+  }
+
+  try {
+    const current = new URL(currentOrigin);
+    return (
+      current.protocol === 'http:' &&
+      isLoopbackHostname(current.hostname) &&
+      uploadUrl.origin === current.origin
+    );
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Uploads a file to a Supabase signed-upload URL with truthful transfer progress.
  * Mirrors supabase-js Blob upload semantics (PUT FormData + x-upsert) without installing deps.
@@ -37,7 +76,7 @@ export function uploadFileToSignedUrlWithProgress(input: {
 }): Promise<SignedUploadTransportResult> {
   const { signedUrl, file, upsert = false, cacheControl = DEFAULT_CACHE_CONTROL } = input;
 
-  if (!signedUrl || !/^https:\/\//i.test(signedUrl)) {
+  if (!signedUrl || !isAllowedSignedUploadUrl(signedUrl)) {
     return Promise.resolve({
       ok: false,
       message: messageForUploadFailure('unknown'),

@@ -23,6 +23,13 @@ type AvatarUploadProps = {
   initialAvatarUrl: string | null;
   disabled?: boolean;
   onAvatarSaved?: (avatarUrl: string) => void;
+  finalizeUpload?: (path: string) => Promise<{
+    success: boolean;
+    avatarUrl?: string;
+    cleanupWarning?: boolean;
+    error?: string;
+  }>;
+  refreshAfterSave?: boolean;
 };
 
 function normalizeStage(phase: string): UploadStage {
@@ -49,6 +56,8 @@ export function AvatarUpload({
   initialAvatarUrl,
   disabled = false,
   onAvatarSaved,
+  finalizeUpload,
+  refreshAfterSave = true,
 }: AvatarUploadProps) {
   const router = useRouter();
   const { notifySuccess, notifyError } = useMutationFeedback();
@@ -178,7 +187,9 @@ export function AvatarUpload({
       uploadToStorage: (_init, uploadFile, options) =>
         uploadAvatarToSignedUrl(null, _init, uploadFile, options),
       finalizeUpload: async (path) => {
-        const finalized = await finalizeAvatarUploadAction({ path });
+        const finalized = finalizeUpload
+          ? await finalizeUpload(path)
+          : await finalizeAvatarUploadAction({ path });
         if (finalized.success && finalized.avatarUrl) {
           return {
             success: true as const,
@@ -219,14 +230,27 @@ export function AvatarUpload({
     setProgressPercent(null);
     notifySuccess(MUTATION_FEEDBACK.profile.photoUpdated);
     onAvatarSaved?.(result.avatarUrl);
-    router.refresh();
+    if (refreshAfterSave) {
+      router.refresh();
+    }
 
     window.setTimeout(() => {
       setSuccess(false);
       setOptimizationNote(null);
       setStage('idle');
     }, 2500);
-  }, [disabled, notifyError, notifySuccess, onAvatarSaved, pending, revokePreviewUrl, router, selectedFile]);
+  }, [
+    disabled,
+    finalizeUpload,
+    notifyError,
+    notifySuccess,
+    onAvatarSaved,
+    pending,
+    refreshAfterSave,
+    revokePreviewUrl,
+    router,
+    selectedFile,
+  ]);
 
   const statusMessage =
     error ||
