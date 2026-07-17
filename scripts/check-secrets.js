@@ -40,11 +40,17 @@ for (const file of walk(ROOT)) {
   const content = fs.readFileSync(file, 'utf8');
   const rel = path.relative(ROOT, file);
 
+  const relPosix = rel.replace(/\\/g, '/');
+  const isTestFile = /\.(test|spec|contract\.test)\.(ts|tsx|js|jsx)$/.test(relPosix);
+
   for (const { name, re } of PATTERNS) {
     if (re.test(content)) {
       if (name === 'Supabase service role JWT' && rel.includes('.example')) continue;
       if (name === 'Hardcoded password assignment' && rel.includes('test')) continue;
-      if (name === 'Forbidden NEXT_PUBLIC secret' && rel.replace(/\\/g, '/').includes('lib/security/env')) continue;
+      // False positive: env guard module documents forbidden NEXT_PUBLIC_ prefixes.
+      if (name === 'Forbidden NEXT_PUBLIC secret' && relPosix.includes('lib/security/env')) continue;
+      // False positive: security regression tests assert forbidden prefixes must not appear in app code.
+      if (name === 'Forbidden NEXT_PUBLIC secret' && isTestFile) continue;
       violations.push({ file: rel, name });
     }
   }

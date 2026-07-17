@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, mvp]
   pull_request:
-    branches: [main]
+    branches: [main, mvp]
+
+# Default least privilege; jobs that need more declare it explicitly (e.g. CodeQL).
+permissions:
+  contents: read
 
 jobs:
   lint-typecheck-test:
@@ -86,6 +90,8 @@ jobs:
 
   secret-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -94,4 +100,28 @@ jobs:
 
       - name: Check for hardcoded secrets patterns
         run: |
-          ! grep -rE "sk_live_[a-zA-Z0-9]{16,}|sk_test_[a-zA-Z0-9]{16,}" --include="*.ts" --include="*.tsx" --include="*.js" apps/ packages/ || (echo "Potential secret found in source" && exit 1)
+          set -euo pipefail
+          if grep -rE "sk_live_[a-zA-Z0-9]{16,}|sk_test_[a-zA-Z0-9]{16,}" --include="*.ts" --include="*.tsx" --include="*.js" apps/ packages/; then
+            echo "Potential secret found in source"
+            exit 1
+          fi
+
+  # WS11-T009: blocking dependency audit against the root monorepo lockfile.
+  # Threshold: fail on high and critical (see docs/CI_SECURITY_AUDITING.md).
+  dependency-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency vulnerability audit
+        run: npm run security:audit
