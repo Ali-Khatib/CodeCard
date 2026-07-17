@@ -52,6 +52,22 @@ export async function removeTrustedStorageObject(
 
   const { error } = await supabase.storage.from(bucket).remove([input.path]);
   if (error) {
+    const message = (error.message ?? '').toLowerCase();
+    const statusCode = String(
+      (error as { statusCode?: string; status?: number }).statusCode ??
+        (error as { status?: number }).status ??
+        '',
+    ).toLowerCase();
+    // Idempotent: already-missing objects are treated as cleaned.
+    if (
+      statusCode === '404' ||
+      message.includes('not found') ||
+      message.includes('not_found') ||
+      message.includes('object not found') ||
+      message.includes('no such file')
+    ) {
+      return { ok: true, removed: false };
+    }
     return { ok: false, reason: 'remove_failed' };
   }
 

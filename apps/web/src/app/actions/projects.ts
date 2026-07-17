@@ -98,7 +98,10 @@ export async function deleteProjectAction(
   projectId: string,
 ): Promise<ProjectDeleteState> {
   const supabase = await createClient();
-  const result = await executeDeleteProject(supabase, projectId);
+  const { createServiceClient } = await import('@/lib/supabase/server');
+  const result = await executeDeleteProject(supabase, projectId, {
+    createServiceClient,
+  });
 
   if (result.success && result.projectId) {
     revalidateDeletedProjectPaths({

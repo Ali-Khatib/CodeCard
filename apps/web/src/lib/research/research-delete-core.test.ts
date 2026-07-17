@@ -6,20 +6,22 @@ import {
 } from './research-delete-core';
 
 const PAPER_ID = '22222222-2222-4222-8222-222222222222';
+const TENANT_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const USER_ID = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 
 const ownedProfile = {
-  id: 'profile-1',
-  tenant_id: 'tenant-1',
-  owner_user_id: 'user-1',
+  id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+  tenant_id: TENANT_ID,
+  owner_user_id: USER_ID,
   slug: 'alex-chen',
   is_public: true,
 };
 
 const ownedPaper = {
   id: PAPER_ID,
-  tenant_id: 'tenant-1',
-  profile_id: 'profile-1',
-  owner_user_id: 'user-1',
+  tenant_id: TENANT_ID,
+  profile_id: ownedProfile.id,
+  owner_user_id: USER_ID,
   related_project_id: '33333333-3333-4333-8333-333333333333',
   slug: 'attention-is-all-you-need',
   title: 'Attention Is All You Need',
@@ -116,14 +118,14 @@ describe('executeDeleteResearch', () => {
     expect(result.success).toBeUndefined();
   });
 
-  it('deletes an owned paper and returns redirect target', async () => {
+  it('deletes an owned paper without figures and returns redirect target', async () => {
     const { supabase, paperDelete } = createMockSupabase({
-      user: { id: 'user-1' },
+      user: { id: USER_ID },
       profile: ownedProfile,
       paper: ownedPaper,
     });
 
-    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
+    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: USER_ID } });
 
     expect(result.success).toBe(true);
     expect(result.researchPaperId).toBe(PAPER_ID);
@@ -131,17 +133,17 @@ describe('executeDeleteResearch', () => {
     expect(result.paperSlug).toBe('attention-is-all-you-need');
     expect(result.redirectTo).toBe('/dashboard/research');
     expect(paperDelete).toHaveBeenCalled();
-    expect(RESEARCH_DELETE_STORAGE_DEFERRED).toBe(true);
+    expect(RESEARCH_DELETE_STORAGE_DEFERRED).toBe(false);
   });
 
   it('treats foreign or missing papers as already removed without leaking details', async () => {
     const { supabase, paperDelete } = createMockSupabase({
-      user: { id: 'user-1' },
+      user: { id: USER_ID },
       profile: ownedProfile,
       paper: null,
     });
 
-    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
+    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: USER_ID } });
 
     expect(result.success).toBe(true);
     expect(result.alreadyDeleted).toBe(true);
@@ -152,13 +154,13 @@ describe('executeDeleteResearch', () => {
 
   it('treats repeated delete as safe already-removed success', async () => {
     const { supabase } = createMockSupabase({
-      user: { id: 'user-1' },
+      user: { id: USER_ID },
       profile: ownedProfile,
       paper: null,
     });
 
-    const first = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
-    const second = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
+    const first = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: USER_ID } });
+    const second = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: USER_ID } });
 
     expect(first.success).toBe(true);
     expect(second.success).toBe(true);
@@ -167,13 +169,13 @@ describe('executeDeleteResearch', () => {
 
   it('hides raw delete errors', async () => {
     const { supabase } = createMockSupabase({
-      user: { id: 'user-1' },
+      user: { id: USER_ID },
       profile: ownedProfile,
       paper: ownedPaper,
       deleteError: { message: 'permission denied for table research_papers' },
     });
 
-    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
+    const result = await executeDeleteResearch(supabase, PAPER_ID, { user: { id: USER_ID } });
 
     expect(result.errorCode).toBe('server');
     expect(result.error).not.toMatch(/permission denied/i);
