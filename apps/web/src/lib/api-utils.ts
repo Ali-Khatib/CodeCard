@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
+export const INTERNAL_ERROR_MESSAGE = 'Something went wrong. Please try again.';
+
 export function apiError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
+}
+
+/** Opaque production 500 — never include stacks, SQL, or provider messages. */
+export function internalError() {
+  return apiError(INTERNAL_ERROR_MESSAGE, 500);
 }
 
 export function validationError(error: ZodError) {
