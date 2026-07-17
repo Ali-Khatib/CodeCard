@@ -19,13 +19,15 @@ describe('buildGeoMarkers', () => {
         id: 'visit-city-0',
         label: 'San Francisco',
         location: [37.77, -122.42],
-        value: 100,
+        value: 186,
+        barValue: 100,
       },
       {
         id: 'visit-city-1',
         label: 'Berlin',
         location: [52.52, 13.4],
-        value: 50,
+        value: 93,
+        barValue: 50,
       },
     ]);
   });
