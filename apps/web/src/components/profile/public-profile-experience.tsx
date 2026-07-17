@@ -17,6 +17,12 @@ interface PublicProfileExperienceProps {
   profileId?: string;
   accentColor?: string;
   location?: string | null;
+  connectionControl?: {
+    isOwnProfile: boolean;
+    isAuthenticated: boolean;
+    initiallyConnected: boolean;
+    initialConnectionId: string | null;
+  } | null;
 }
 
 export function PublicProfileExperience({
@@ -30,6 +36,7 @@ export function PublicProfileExperience({
   researchPapers = [],
   profileId,
   location,
+  connectionControl,
 }: PublicProfileExperienceProps) {
   return (
     <PublicProfileFocused
@@ -43,6 +50,7 @@ export function PublicProfileExperience({
       researchPapers={researchPapers}
       profileId={profileId}
       location={location}
+      connectionControl={connectionControl}
     />
   );
 }

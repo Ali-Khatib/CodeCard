@@ -19,8 +19,8 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(shell).toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");
     expect(shell).toContain("label: 'Settings'");
+    expect(shell).toContain("label: 'Connections'");
     expect(shell).not.toContain("label: 'Circle'");
-    expect(shell).not.toContain("label: 'Connections'");
     expect(shell).toContain("aria-current={active ? 'page' : undefined}");
     expect(shell).toContain("querySelector('.cc-app-mobile-nav a[aria-current=\"page\"]')");
     expect(shell).toContain('scrollIntoView');

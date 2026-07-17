@@ -53,7 +53,7 @@ describe('WS09-T001 dashboard demo inventory', () => {
 });
 
 describe('WS09-T002 truthful MVP dashboard navigation', () => {
-  it('removes Circle and Connections from active NAV_ITEMS', () => {
+  it('keeps Circle out of NAV_ITEMS and restores real Connections (WS15)', () => {
     const shell = readWeb('src/components/dashboard/dashboard-shell.tsx');
     const audit = readRepo('docs/DASHBOARD_INTEGRATION_AUDIT.md');
 
@@ -65,12 +65,12 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
     expect(navBlock).toContain("label: 'Profile'");
     expect(navBlock).toContain("label: 'Projects'");
     expect(navBlock).toContain("label: 'Research'");
+    expect(navBlock).toContain("label: 'Connections'");
+    expect(navBlock).toContain("segment: 'connections'");
     expect(navBlock).toContain("label: 'Analytics'");
     expect(navBlock).toContain("label: 'Settings'");
     expect(navBlock).not.toContain("label: 'Circle'");
-    expect(navBlock).not.toContain("label: 'Connections'");
     expect(navBlock).not.toContain("segment: 'circle'");
-    expect(navBlock).not.toContain("segment: 'connections'");
 
     // Preview routes remain available intentionally.
     expect(existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/circle/page.tsx'))).toBe(
@@ -80,6 +80,7 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
       existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/connections/page.tsx')),
     ).toBe(true);
 
-    expect(audit).toContain('Removed** from active MVP navigation');
+    expect(audit).toContain('WS15');
+    expect(audit).toContain('Circle | **Removed** from active MVP navigation');
   });
 });

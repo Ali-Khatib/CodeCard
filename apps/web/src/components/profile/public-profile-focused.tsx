@@ -16,6 +16,7 @@ import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 import { trackLinkClick } from '@/lib/analytics/link-click';
+import { PublicProfileConnectionControl } from './public-profile-connection-control';
 
 export function PublicProfileFocused({
   profileSlug,
@@ -28,6 +29,7 @@ export function PublicProfileFocused({
   researchPapers = [],
   profileId,
   location,
+  connectionControl,
 }: {
   profileSlug: string;
   displayName: string;
@@ -39,6 +41,12 @@ export function PublicProfileFocused({
   researchPapers?: ResearchPaper[];
   profileId?: string;
   location?: string | null;
+  connectionControl?: {
+    isOwnProfile: boolean;
+    isAuthenticated: boolean;
+    initiallyConnected: boolean;
+    initialConnectionId: string | null;
+  } | null;
 }) {
   const { role, company } = parseHeadline(headline);
   const reduced = useReducedMotion();
@@ -143,6 +151,27 @@ export function PublicProfileFocused({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              {profileId && connectionControl && !connectionControl.isOwnProfile ? (
+                <motion.div
+                  initial={reduced ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: 0.1,
+                    duration: HUME_MOTION.cardReveal,
+                    ease: HUME_EASE,
+                  }}
+                >
+                  <PublicProfileConnectionControl
+                    profileId={profileId}
+                    profileSlug={profileSlug}
+                    displayName={displayName}
+                    isOwnProfile={connectionControl.isOwnProfile}
+                    isAuthenticated={connectionControl.isAuthenticated}
+                    initiallyConnected={connectionControl.initiallyConnected}
+                    initialConnectionId={connectionControl.initialConnectionId}
+                  />
+                </motion.div>
+              ) : null}
               {actionPills.map((item, i) => {
                 if (item.type === 'copy') {
                   return (

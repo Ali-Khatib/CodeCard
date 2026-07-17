@@ -19,13 +19,78 @@ const CONNECTION_VIEW_MODES = [
 ];
 type ConnectionsViewMode = 'list' | 'grid';
 
+type ViewConnection = WorkspaceConnection & {
+  profileSlug?: string;
+  isPublicTarget?: boolean;
+};
+
 function connectionEmail(connection: WorkspaceConnection) {
   const local = connection.name.toLowerCase().replace(/\s+/g, '.');
   const domain = connection.company.toLowerCase().replace(/[^a-z0-9]/g, '') || 'mail';
   return `${local}@${domain}.com`;
 }
 
-function ConnectionExpandedBody({ connection }: { connection: WorkspaceConnection }) {
+function ConnectionExpandedBody({
+  connection,
+  variant,
+  onRemove,
+}: {
+  connection: ViewConnection;
+  variant: 'demo' | 'authenticated';
+  onRemove?: (connectionId: string) => void | Promise<void>;
+}) {
+  if (variant === 'authenticated') {
+    const href =
+      connection.profileSlug && connection.isPublicTarget !== false
+        ? `/${connection.profileSlug}`
+        : null;
+
+    return (
+      <div className="cc-connection-expand__grid">
+        <dl className="cc-connection-meta">
+          <div className="cc-connection-meta__item">
+            <dt className="cc-connection-meta__label">Connected</dt>
+            <dd className="cc-connection-meta__value">{connection.date}</dd>
+          </div>
+          {connection.company ? (
+            <div className="cc-connection-meta__item">
+              <dt className="cc-connection-meta__label">Location</dt>
+              <dd className="cc-connection-meta__value">{connection.company}</dd>
+            </div>
+          ) : null}
+        </dl>
+
+        <div className="cc-connection-notes">
+          <p className="cc-connection-notes__text">{connection.note}</p>
+        </div>
+
+        <div className="cc-connection-actions">
+          {href ? (
+            <AppButton variant="primary" href={href}>
+              Open CodeCard
+            </AppButton>
+          ) : (
+            <span className="cc-app-btn cc-app-btn--ghost opacity-60" aria-disabled="true">
+              CodeCard unavailable
+            </span>
+          )}
+          {onRemove ? (
+            <AsyncActionButton
+              variant="ghost"
+              successLabel="Removed"
+              ariaLabel={`Remove ${connection.name} from Connections`}
+              onAction={async () => {
+                await onRemove(connection.id);
+              }}
+            >
+              Remove connection
+            </AsyncActionButton>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   const followUp = `${connection.followUp.charAt(0).toUpperCase()}${connection.followUp.slice(1)}${
     connection.followUpDate ? ` · ${connection.followUpDate}` : ''
   }`;
@@ -146,10 +211,14 @@ function ConnectionCard({
   connection,
   expanded,
   onToggle,
+  variant,
+  onRemove,
 }: {
-  connection: WorkspaceConnection;
+  connection: ViewConnection;
   expanded: boolean;
   onToggle: () => void;
+  variant: 'demo' | 'authenticated';
+  onRemove?: (connectionId: string) => void | Promise<void>;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -190,7 +259,8 @@ function ConnectionCard({
             )}
           </div>
           <p className="cc-connection-blob__role">
-            {connection.role} · {connection.company}
+            {connection.role}
+            {connection.company ? ` · ${connection.company}` : ''}
           </p>
           {!expanded && (
             <p className="cc-connection-blob__preview">{connection.note}</p>
@@ -215,7 +285,11 @@ function ConnectionCard({
         aria-hidden={!expanded}
       >
         <div ref={bodyRef} className="cc-connection-expand__body">
-          <ConnectionExpandedBody connection={connection} />
+          <ConnectionExpandedBody
+            connection={connection}
+            variant={variant}
+            onRemove={onRemove}
+          />
         </div>
       </div>
     </ReactiveBorder>
@@ -226,10 +300,14 @@ function ConnectionGridCard({
   connection,
   expanded,
   onToggle,
+  variant,
+  onRemove,
 }: {
-  connection: WorkspaceConnection;
+  connection: ViewConnection;
   expanded: boolean;
   onToggle: () => void;
+  variant: 'demo' | 'authenticated';
+  onRemove?: (connectionId: string) => void | Promise<void>;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -270,19 +348,55 @@ function ConnectionGridCard({
         aria-hidden={!expanded}
       >
         <div ref={bodyRef} className="cc-connection-grid-card__expand-body">
-          <ConnectionExpandedBody connection={connection} />
+          <ConnectionExpandedBody
+            connection={connection}
+            variant={variant}
+            onRemove={onRemove}
+          />
         </div>
       </div>
     </ReactiveBorder>
   );
 }
 
+function ConnectionsEmptyState() {
+  return (
+    <div className="cc-app-page cc-app-page--1040 space-y-8">
+      <PageHeader
+        title="Build a network you can actually remember"
+        description="Save people whose work matters to you. Add Connections from their public CodeCard, then organize and follow their work from here."
+      />
+      <FadeInView delay={0}>
+        <div className="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] px-6 py-10 md:px-10 md:py-14">
+          <p className="max-w-xl text-[16px] leading-relaxed text-[var(--app-smoke)]">
+            Open a person&apos;s CodeCard and choose{' '}
+            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>. Your
+            list stays private — only you can see who you saved.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <AppButton variant="primary" href="/profiles">
+              Explore CodeCards
+            </AppButton>
+            <AppButton variant="ghost" href="/dashboard/profile">
+              Share your CodeCard
+            </AppButton>
+          </div>
+        </div>
+      </FadeInView>
+    </div>
+  );
+}
+
 export function DashboardConnectionsView({
   connections,
   basePath = '/dashboard',
+  variant = 'demo',
+  onRemoveConnection,
 }: {
-  connections: WorkspaceConnection[];
+  connections: ViewConnection[];
   basePath?: string;
+  variant?: 'demo' | 'authenticated';
+  onRemoveConnection?: (connectionId: string) => void | Promise<void>;
 }) {
   const [query, setQuery] = useState('');
   const [source, setSource] = useState<(typeof SOURCES)[number]>('All');
@@ -291,24 +405,36 @@ export function DashboardConnectionsView({
 
   const filtered = useMemo(() => {
     return connections.filter((c) => {
-      if (source !== 'All' && c.source !== source) return false;
+      if (variant === 'demo' && source !== 'All' && c.source !== source) return false;
       if (!query.trim()) return true;
       const q = query.toLowerCase();
       return (
         c.name.toLowerCase().includes(q) ||
         c.company.toLowerCase().includes(q) ||
-        c.note.toLowerCase().includes(q)
+        c.note.toLowerCase().includes(q) ||
+        c.role.toLowerCase().includes(q)
       );
     });
-  }, [connections, query, source]);
+  }, [connections, query, source, variant]);
 
-  const upcomingFollowUps = useMemo(() => getUpcomingFollowUps(connections), [connections]);
+  const upcomingFollowUps = useMemo(
+    () => (variant === 'demo' ? getUpcomingFollowUps(connections) : []),
+    [connections, variant],
+  );
+
+  if (variant === 'authenticated' && connections.length === 0) {
+    return <ConnectionsEmptyState />;
+  }
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader
-        title="People you saved"
-        description="Private context for everyone you meet."
+        title={variant === 'authenticated' ? 'Your Connections' : 'People you saved'}
+        description={
+          variant === 'authenticated'
+            ? 'People whose work you saved from their public CodeCard.'
+            : 'Private context for everyone you meet.'
+        }
         actions={
           <AppButton variant="primary" href={`${basePath}/profile`}>
             Share CodeCard
@@ -328,7 +454,12 @@ export function DashboardConnectionsView({
                   aria-hidden
                 >
                   <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
-                  <path d="M10.5 10.5 14 14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <path
+                    d="M10.5 10.5 14 14"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                  />
                 </svg>
                 <input
                   type="search"
@@ -358,16 +489,20 @@ export function DashboardConnectionsView({
                 ))}
               </div>
             </div>
-            <DashFilterBar options={SOURCES} value={source} onChange={setSource} />
+            {variant === 'demo' ? (
+              <DashFilterBar options={SOURCES} value={source} onChange={setSource} />
+            ) : null}
           </div>
         </FadeInView>
 
-        <FadeInView delay={0.08} className="cc-connections-followups-section">
-          <ConnectionsFollowUps
-            followUps={upcomingFollowUps}
-            onSelect={(id) => setSelectedId(id)}
-          />
-        </FadeInView>
+        {variant === 'demo' ? (
+          <FadeInView delay={0.08} className="cc-connections-followups-section">
+            <ConnectionsFollowUps
+              followUps={upcomingFollowUps}
+              onSelect={(id) => setSelectedId(id)}
+            />
+          </FadeInView>
+        ) : null}
 
         <FadeInView delay={0.06} className="cc-connections-results-section">
           {viewMode === 'list' ? (
@@ -378,6 +513,8 @@ export function DashboardConnectionsView({
                     connection={c}
                     expanded={selectedId === c.id}
                     onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                    variant={variant}
+                    onRemove={onRemoveConnection}
                   />
                 </li>
               ))}
@@ -393,6 +530,8 @@ export function DashboardConnectionsView({
                     connection={c}
                     expanded={selectedId === c.id}
                     onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                    variant={variant}
+                    onRemove={onRemoveConnection}
                   />
                 </li>
               ))}

@@ -41,8 +41,8 @@ describe('WS09-T010 optimistic dashboard navigation', () => {
     expect(shell).toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");
     expect(shell).toContain("label: 'Settings'");
+    expect(shell).toContain("label: 'Connections'");
     expect(shell).not.toContain("label: 'Circle'");
-    expect(shell).not.toContain("label: 'Connections'");
 
     const pendingClicks = shell.match(/onClick=\{\(\) => markPending\(href\)\}/g) ?? [];
     expect(pendingClicks.length).toBeGreaterThanOrEqual(2);
