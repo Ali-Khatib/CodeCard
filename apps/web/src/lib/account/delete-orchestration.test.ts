@@ -17,7 +17,6 @@ import {
   verifyAccountDeletionReauthentication,
 } from './delete-reauth';
 import {
-  ACCOUNT_DELETION_DEFERRED_CAPABILITIES,
   ACCOUNT_DELETION_INTENDED_ORDER,
   ensureT004CapabilityScaffoldsRegistered,
   runAccountDeletionOrchestrator,
@@ -160,25 +159,18 @@ describe('WS10-T004 capability readiness fail-closed', () => {
     clearAccountDeletionCapabilitiesForTests();
   });
 
-  it('remains not ready when T008 is missing even with T004 scaffolds + T005–T007', () => {
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:54321';
-    process.env.STRIPE_SECRET_KEY = 'sk_test_account_deletion_fixture';
+  it('remains not ready when required env or capabilities are missing', () => {
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.STRIPE_SECRET_KEY;
     ensureT004CapabilityScaffoldsRegistered();
     const readiness = evaluateAccountDeletionReadiness();
     expect(readiness.ready).toBe(false);
-    if (readiness.ready) return;
-    expect(readiness.missing).toEqual(
-      expect.arrayContaining(ACCOUNT_DELETION_DEFERRED_CAPABILITIES),
-    );
-    expect(readiness.missing).not.toContain('local_content');
-    expect(readiness.missing).not.toContain('storage_cleanup');
-    expect(readiness.missing).not.toContain('auth_user_deletion');
-    expect(readiness.missing).not.toContain('stripe_cancellation');
-    expect(readiness.missing).not.toContain('analytics_anonymization');
   });
 
   it('is ready only when every mandatory capability is registered and available', () => {
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:54321';
+    process.env.STRIPE_SECRET_KEY = 'sk_test_account_deletion_fixture';
     for (const id of ACCOUNT_DELETION_CAPABILITY_IDS) {
       registerAccountDeletionCapability({
         id,
@@ -190,8 +182,9 @@ describe('WS10-T004 capability readiness fail-closed', () => {
   });
 
   it('orchestrator returns NOT_READY without mutating when capabilities missing', async () => {
-    ensureT004CapabilityScaffoldsRegistered();
     clearAccountDeletionCapabilitiesForTests();
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.STRIPE_SECRET_KEY;
     registerT004ScaffoldCapabilities();
 
     const from = () => {
@@ -203,17 +196,16 @@ describe('WS10-T004 capability readiness fail-closed', () => {
       supabase: { from } as never,
     });
 
-    expect(result).toEqual({
-      ok: false,
-      code: 'ACCOUNT_DELETION_NOT_READY',
-      missingCapabilities: expect.any(Array),
-      mutated: false,
-    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe('ACCOUNT_DELETION_NOT_READY');
+    expect(result.mutated).toBe(false);
+    expect(result.missingCapabilities?.length).toBeGreaterThan(0);
   });
 });
 
 describe('WS10-T004 route and boundaries', () => {
-  it('wires POST delete route with same-origin, rate limit, and fail-closed orchestrator', () => {
+  it('wires POST delete route with same-origin, rate limit, and orchestrator', () => {
     const route = read('src/app/api/account/delete/route.ts');
     expect(route).toContain('isSameOriginMutation');
     expect(route).toContain("rateLimitType: 'accountDelete'");
@@ -222,9 +214,10 @@ describe('WS10-T004 route and boundaries', () => {
     expect(route).toContain('verifyAccountDeletionReauthentication');
     expect(route).toContain('runAccountDeletionOrchestrator');
     expect(route).toContain('ACCOUNT_DELETION_NOT_READY');
+    expect(route).toContain("import('@/lib/supabase/server')");
+    expect(route).toContain('createServiceClient');
     expect(route).not.toContain('deleteUser');
     expect(route).not.toContain('subscriptions.cancel');
-    expect(route).not.toContain('createServiceClient');
   });
 
   it('documents intended final deletion order with Auth last', () => {

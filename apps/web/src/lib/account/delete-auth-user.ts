@@ -68,7 +68,8 @@ function isUserNotFoundAdminError(error: { message?: string; status?: number } |
 /**
  * Sanitize Admin API failures for logs/tests — never return raw Admin payloads to routes.
  */
-export function sanitizeAuthAdminError(_error: unknown): string {
+export function sanitizeAuthAdminError(error: unknown): string {
+  void error;
   return 'auth_admin_error';
 }
 

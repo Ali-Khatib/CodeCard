@@ -76,7 +76,8 @@ function isStripeMissingError(error: unknown): boolean {
   return message.includes('no such subscription') || message.includes('no such customer');
 }
 
-export function sanitizeStripeDeletionError(_error: unknown): string {
+export function sanitizeStripeDeletionError(error: unknown): string {
+  void error;
   return 'stripe_cancellation_error';
 }
 
