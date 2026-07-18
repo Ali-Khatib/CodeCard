@@ -16,6 +16,12 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  NEXT_PUBLIC_CODECARD_IOS_APP_URL: z.string().url().startsWith('https://').optional(),
+  NEXT_PUBLIC_CODECARD_ANDROID_APP_URL: z
+    .string()
+    .url()
+    .startsWith('https://')
+    .optional(),
 });
 
 let cachedServer: z.infer<typeof serverEnvSchema> | null = null;
@@ -34,6 +40,9 @@ export function getPublicEnv() {
       NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      NEXT_PUBLIC_CODECARD_IOS_APP_URL: process.env.NEXT_PUBLIC_CODECARD_IOS_APP_URL,
+      NEXT_PUBLIC_CODECARD_ANDROID_APP_URL:
+        process.env.NEXT_PUBLIC_CODECARD_ANDROID_APP_URL,
     });
   }
   return cachedPublic;

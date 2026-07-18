@@ -24,7 +24,9 @@ const SETUP_MSG =
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = sanitizeInternalRedirect(searchParams.get('redirect'));
+  const redirectTo = sanitizeInternalRedirect(
+    searchParams.get('next') ?? searchParams.get('redirect'),
+  );
   const resetSuccess = searchParams.get('reset') === 'success';
   const statusMessage = signInStatusMessage(searchParams.get('reason'));
   const [email, setEmail] = useState('');

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -6,6 +7,7 @@ import { SkipToContentLink } from '@/components/a11y/skip-to-content';
 import { GlobalBackdrop } from '@/components/landing/global-backdrop';
 import { ProjectOpenProvider } from '@/components/featured-work/project-open-overlay';
 import { ThemeRoot } from '@/components/theme/theme-root';
+import { SitewideVisitorConversionPrompt } from '@/components/visitor-conversion/sitewide-visitor-conversion-prompt';
 import './globals.css';
 
 const inter = Inter({
@@ -79,6 +81,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SkipToContentLink />
           <GlobalBackdrop />
           <ProjectOpenProvider>{children}</ProjectOpenProvider>
+          <Suspense fallback={null}>
+            <SitewideVisitorConversionPrompt
+              iosAppUrl={process.env.NEXT_PUBLIC_CODECARD_IOS_APP_URL}
+              androidAppUrl={process.env.NEXT_PUBLIC_CODECARD_ANDROID_APP_URL}
+            />
+          </Suspense>
         </ThemeRoot>
         <Analytics />
         <SpeedInsights />

@@ -8,6 +8,7 @@ import {
 } from '@/lib/profile/public-profile';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { ProfileAnalytics } from '@/components/profile-analytics';
+import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -96,6 +97,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
   return (
     <>
       <ProfileAnalytics profileId={payload.profileId} />
+      <VisitorConversionMarker
+        context="public_profile"
+        referrer={payload.profileSlug}
+        profileId={payload.profileId}
+      />
       <PublicProfileExperience
         profileSlug={payload.profileSlug}
         displayName={payload.displayName}

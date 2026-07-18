@@ -1,4 +1,5 @@
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
+import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 import { DEMO_PROFILE_LINKS } from '@/lib/dashboard/workspace-demo';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -19,15 +20,18 @@ const links: ProfileLinkItem[] = DEMO_PROFILE.links.map((l) => ({
 
 export default function DemoCardPage() {
   return (
-    <PublicProfileExperience
-      profileSlug="demo"
-      displayName={DEMO_PROFILE.display_name}
-      headline={DEMO_PROFILE.headline}
-      avatarUrl={DEMO_PROFILE.avatar_url}
-      bio={DEMO_PROFILE.bio}
-      links={links.length ? links : DEMO_PROFILE_LINKS}
-      projects={projects}
-      location={DEMO_PROFILE.location}
-    />
+    <>
+      <VisitorConversionMarker context="live_demo" referrer="demo/card" />
+      <PublicProfileExperience
+        profileSlug="demo"
+        displayName={DEMO_PROFILE.display_name}
+        headline={DEMO_PROFILE.headline}
+        avatarUrl={DEMO_PROFILE.avatar_url}
+        bio={DEMO_PROFILE.bio}
+        links={links.length ? links : DEMO_PROFILE_LINKS}
+        projects={projects}
+        location={DEMO_PROFILE.location}
+      />
+    </>
   );
 }

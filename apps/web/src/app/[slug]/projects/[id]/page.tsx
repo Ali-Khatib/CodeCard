@@ -14,6 +14,7 @@ import {
 import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { ProfileAnalytics } from '@/components/profile-analytics';
+import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 
 interface PageProps {
   params: Promise<{ slug: string; id: string }>;
@@ -107,6 +108,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   return (
     <>
       <ProfileAnalytics profileId={profile.id} />
+      <VisitorConversionMarker
+        context="public_project"
+        referrer={`${slug}/projects/${id}`}
+        profileId={profile.id}
+      />
       <ProjectDetailView
         project={featured}
         profileSlug={slug}
