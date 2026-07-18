@@ -4,6 +4,7 @@ import { normalizeResearchSlug } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { ResearchPaperDetail } from '@/components/research/research-paper-detail';
 import { ProfileAnalytics } from '@/components/profile-analytics';
+import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 import { buildUnavailablePublicMetadata } from '@/lib/profile/public-metadata';
 import {
   buildPublicResearchMetadata,
@@ -99,6 +100,11 @@ export default async function ResearchDetailPage({ params }: PageProps) {
   return (
     <>
       <ProfileAnalytics profileId={profile.id} />
+      <VisitorConversionMarker
+        context="public_research"
+        referrer={`${slug}/research/${paperSlug}`}
+        profileId={profile.id}
+      />
       <ResearchPaperDetail
         paper={publicPaper}
         profileSlug={slug}
