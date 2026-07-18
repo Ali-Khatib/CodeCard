@@ -198,6 +198,8 @@ export function AdminModerationDashboard({
                     <ReportActions
                       reportId={report.id}
                       targetLabel={humanize(report.targetType).toLowerCase()}
+                      targetType={report.targetType}
+                      targetId={report.targetId}
                     />
                   )}
                 </li>

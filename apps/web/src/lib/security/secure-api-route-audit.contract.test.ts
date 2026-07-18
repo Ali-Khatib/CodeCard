@@ -33,6 +33,7 @@ describe('WS11-T005 secure API route audit', () => {
       [
         'account/delete/route.ts',
         'account/export/route.ts',
+        'admin/content/hide/route.ts',
         'admin/dmca/route.ts',
         'admin/reports/[id]/route.ts',
         'admin/reports/route.ts',
@@ -50,6 +51,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/moderation/report',
       '/api/account/export',
       '/api/account/delete',
+      '/api/admin/content/hide',
       '/api/admin/reports',
       '/api/admin/dmca',
       '/api/admin/reports/[id]',
@@ -113,13 +115,16 @@ describe('WS11-T005 secure API route audit', () => {
     const reports = readWeb('src/app/api/admin/reports/route.ts');
     const dmca = readWeb('src/app/api/admin/dmca/route.ts');
     const mutation = readWeb('src/app/api/admin/reports/[id]/route.ts');
+    const hide = readWeb('src/app/api/admin/content/hide/route.ts');
 
-    for (const source of [reports, dmca, mutation]) {
+    for (const source of [reports, dmca, mutation, hide]) {
       expect(source).toContain('requireGlobalAdminApiAccess');
       expect(source).toContain('no-store');
     }
     expect(mutation).toContain('isSameOriginMutation');
     expect(mutation).toContain('moderationReportActionSchema');
+    expect(hide).toContain('isSameOriginMutation');
+    expect(hide).toContain('hideReportedContentSchema');
   });
 
   it('rejects non-JSON content types in secureJsonRoute by default', async () => {

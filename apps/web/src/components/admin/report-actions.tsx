@@ -3,18 +3,24 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ModerationReportAction } from '@/lib/admin/moderation-actions';
+import type { AdminHideTargetType } from '@/lib/admin/content-hiding';
 
 type Feedback = { kind: 'success' | 'error'; message: string } | null;
+type PendingAction = ModerationReportAction | 'hide';
 
 export function ReportActions({
   reportId,
   targetLabel,
+  targetType,
+  targetId,
 }: {
   reportId: string;
   targetLabel: string;
+  targetType: string;
+  targetId: string;
 }) {
   const router = useRouter();
-  const [pendingAction, setPendingAction] = useState<ModerationReportAction | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
 
   async function run(action: ModerationReportAction) {
@@ -60,6 +66,49 @@ export function ReportActions({
     }
   }
 
+  async function hideContent() {
+    if (pendingAction || (targetType !== 'profile' && targetType !== 'project')) return;
+    if (
+      !window.confirm(
+        `Hide this ${targetLabel} from public view? The owner's record will be preserved, but a moderation hold will prevent republishing.`,
+      )
+    ) {
+      return;
+    }
+
+    setPendingAction('hide');
+    setFeedback(null);
+    try {
+      const response = await fetch('/api/admin/content/hide', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          reportId,
+          targetType: targetType as AdminHideTargetType,
+          targetId,
+        }),
+      });
+
+      if (!response.ok) {
+        setFeedback({
+          kind: 'error',
+          message:
+            response.status === 409
+              ? 'This report no longer matches an eligible pending action. Refresh and review it.'
+              : 'The content could not be hidden. Please try again.',
+        });
+        return;
+      }
+
+      setFeedback({ kind: 'success', message: 'Content hidden without deleting the owner record.' });
+      router.refresh();
+    } catch {
+      setFeedback({ kind: 'error', message: 'The content could not be hidden. Please try again.' });
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
   return (
     <div className="mt-5">
       <div className="flex flex-wrap gap-3">
@@ -81,6 +130,17 @@ export function ReportActions({
         >
           {pendingAction === 'dismiss' ? 'Dismissing…' : 'Dismiss report'}
         </button>
+        {(targetType === 'profile' || targetType === 'project') && (
+          <button
+            type="button"
+            className="cc-app-btn cc-app-btn--ghost min-h-11 border-red-600/40 text-red-700"
+            disabled={pendingAction !== null}
+            aria-busy={pendingAction === 'hide'}
+            onClick={() => void hideContent()}
+          >
+            {pendingAction === 'hide' ? 'Hiding…' : 'Hide public content'}
+          </button>
+        )}
       </div>
       {feedback && (
         <p
