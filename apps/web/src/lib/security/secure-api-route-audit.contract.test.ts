@@ -36,6 +36,7 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/content/hide/route.ts',
         'admin/dmca/route.ts',
         'admin/reports/[id]/route.ts',
+        'admin/reports/[id]/note/route.ts',
         'admin/reports/route.ts',
         'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
@@ -57,6 +58,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/admin/reports',
       '/api/admin/dmca',
       '/api/admin/reports/[id]',
+      '/api/admin/reports/[id]/note',
       '/api/upload',
       '/api/public/research/[paperId]/pdf',
       '/api/webhooks/stripe',
@@ -117,15 +119,18 @@ describe('WS11-T005 secure API route audit', () => {
     const reports = readWeb('src/app/api/admin/reports/route.ts');
     const dmca = readWeb('src/app/api/admin/dmca/route.ts');
     const mutation = readWeb('src/app/api/admin/reports/[id]/route.ts');
+    const note = readWeb('src/app/api/admin/reports/[id]/note/route.ts');
     const hide = readWeb('src/app/api/admin/content/hide/route.ts');
     const suspend = readWeb('src/app/api/admin/users/[id]/suspend/route.ts');
 
-    for (const source of [reports, dmca, mutation, hide, suspend]) {
+    for (const source of [reports, dmca, mutation, note, hide, suspend]) {
       expect(source).toContain('requireGlobalAdminApiAccess');
       expect(source).toContain('no-store');
     }
     expect(mutation).toContain('isSameOriginMutation');
     expect(mutation).toContain('moderationReportActionSchema');
+    expect(note).toContain('isSameOriginMutation');
+    expect(note).toContain('moderationNoteUpdateSchema');
     expect(hide).toContain('isSameOriginMutation');
     expect(hide).toContain('hideReportedContentSchema');
     expect(suspend).toContain('isSameOriginMutation');

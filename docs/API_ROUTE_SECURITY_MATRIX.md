@@ -18,6 +18,7 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/admin/reports` | GET | Canonical global admin | Allowlisted pagination/status/target filters | N/A (read-only) | None | Private no-store JSON | Authorization before T002 service-role reader |
 | `/api/admin/dmca` | GET | Canonical global admin | Allowlisted pagination/status filters | N/A (read-only) | None | Private no-store JSON | Privacy-minimized DMCA list DTO |
 | `/api/admin/reports/[id]` | PATCH | Canonical global admin | UUID + resolve/dismiss allowlist | **same-origin** | None | Private no-store JSON | Atomic status + audit RPC; conflict-safe |
+| `/api/admin/reports/[id]/note` | PUT | Canonical global admin | UUID + nullable plain-text note (max 4,000) + optimistic timestamp | **same-origin** | None | Private no-store JSON without note body | Atomic private note + audit metadata only; conflict-safe |
 | `/api/admin/content/hide` | POST | Canonical global admin | Strict report/target UUID + profile/project allowlist | **same-origin** | None | Private no-store JSON | Atomic hold + unpublish + audit; public cache invalidation |
 | `/api/admin/users/[id]/suspend` | POST | Canonical global admin | Path user UUID + optional report UUID | **same-origin** | None | Private no-store JSON | Durable suspension + Auth ban; partial-failure retryable; no Stripe changes |
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
