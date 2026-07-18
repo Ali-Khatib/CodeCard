@@ -281,6 +281,23 @@ Rejected for T002: direct administrator RLS. The canonical claim is server-verif
 - States: separate loading, empty, and opaque error states
 - Accessibility: one page heading, labelled sections/filters, semantic lists, textual status, keyboard-accessible pagination, and responsive cards
 
+## 18c. Report resolution actions (WS13-T004)
+
+Pending moderation reports expose Resolve and Dismiss actions only inside the authorized `/admin` dashboard. The mutation route is `PATCH /api/admin/reports/[id]` and independently performs API authentication, canonical global-admin authorization, same-origin CSRF enforcement, UUID/action validation, and safe response mapping.
+
+Status semantics:
+
+- `pending → resolved`: reviewed and handled; leaves the pending queue
+- `pending → dismissed`: reviewed with no moderation action required; leaves the pending queue
+- identical completed action: idempotent success
+- conflicting completed action: 409; never silently overwritten
+
+The forward-only migration `20260718012526_ws13_t004_report_resolution.sql` adds a service-role-only, `SECURITY INVOKER` function. It locks the report row and performs the conditional status transition plus narrow audit insertion in one database transaction. Audit actions are `moderation_report.resolved` and `moderation_report.dismissed`; metadata contains only previous/resulting status and a schema version—never report text or claimant details.
+
+The migration was created locally and was **not applied remotely**. It must be deployed through the normal reviewed migration process before the mutation route can work in an environment.
+
+T004 deliberately does not hide content, suspend accounts, or apply ordinary report actions to DMCA notices.
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -394,7 +411,8 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS11-T002 — `/admin` role gate — **done** (§16a)
 - WS13-T002 — gated service-role API — **done** (§18a)
 - WS13-T003 — real moderation and DMCA dashboard — **done** (§18b)
-- WS13-T004–T008 — actions, suspension, hide/unpublish, auditing
+- WS13-T004 — report resolve/dismiss — **done** (§18c)
+- WS13-T005–T008 — suspension, hide/unpublish, notes, generalized auditing
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)
