@@ -4,6 +4,13 @@ import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
 
+/** Metadata for the card → project expand transition (demo/public detail pages). */
+export type PortfolioOpenTransition = {
+  profileSlug: string;
+  displayName: string;
+  accentColor?: string;
+};
+
 export type PortfolioCreator = {
   displayName: string;
   headline: string | null;
@@ -36,6 +43,8 @@ export type PortfolioProject = {
   repoUrl?: string;
   screenshots?: string[];
   isPublished?: boolean;
+  /** Full featured payload when available — enables the card → page open transition. */
+  featured?: FeaturedProject;
 };
 
 type DbProfile = {
@@ -153,5 +162,6 @@ export function featuredToPortfolioProject(
     repoUrl: repo?.url,
     screenshots: project.screenshots,
     isPublished: true,
+    featured: project,
   };
 }

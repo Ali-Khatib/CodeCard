@@ -34,6 +34,11 @@ export default function PreviewProjectsPage() {
       creator={creator}
       projects={projects}
       basePath="/dashboard/preview"
+      openTransition={{
+        profileSlug: DEMO_WORKSPACE.profileSlug,
+        displayName: DEMO_PROFILE.display_name,
+        accentColor: DEMO_PROFILE.accentColor,
+      }}
     />
   );
 }
