@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteResearchAction } from '@/app/actions/research';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+import { useConfirmPanelA11y } from '@/lib/a11y/use-confirm-panel-a11y';
 
 type ResearchDeleteDialogProps = {
   researchPaperId: string;
@@ -20,6 +21,18 @@ export function ResearchDeleteDialog({
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState('');
+
+  const onClose = useCallback(() => {
+    setOpen(false);
+    setError('');
+  }, []);
+
+  const { panelRef, triggerRef, cancelRef, closePanel } = useConfirmPanelA11y({
+    open,
+    locked: pending,
+    initialFocus: 'cancel',
+    onClose,
+  });
 
   function handleDelete() {
     if (pending) return;
@@ -48,6 +61,7 @@ export function ResearchDeleteDialog({
 
       {!open ? (
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setOpen(true)}
           aria-label={`Delete research paper ${paperTitle}`}
@@ -57,14 +71,31 @@ export function ResearchDeleteDialog({
         </button>
       ) : (
         <div
+          ref={panelRef}
           className="mt-4 space-y-3"
           role="alertdialog"
+          aria-modal="true"
           aria-labelledby="delete-research-title"
+          aria-describedby="delete-research-desc"
         >
           <p id="delete-research-title" className="text-[13px] text-[var(--app-ink)]">
-            Delete <strong>{paperTitle}</strong>? This action cannot be undone.
+            Delete <strong>{paperTitle}</strong>?
+          </p>
+          <p id="delete-research-desc" className="text-[13px] text-[var(--app-smoke)]">
+            This action cannot be undone. The paper will be removed from your dashboard and public
+            profile. Related projects are not deleted.
           </p>
           <div className="flex flex-wrap gap-2">
+            <button
+              ref={cancelRef}
+              type="button"
+              data-confirm-cancel
+              disabled={pending}
+              onClick={closePanel}
+              className="cc-app-btn cc-app-btn--ghost inline-flex h-10 items-center px-4 text-[13px]"
+            >
+              Cancel
+            </button>
             <button
               type="button"
               disabled={pending}
@@ -74,17 +105,6 @@ export function ResearchDeleteDialog({
               className="inline-flex h-10 items-center rounded-full bg-red-600 px-4 text-[13px] text-white disabled:opacity-60"
             >
               {pending ? 'Deleting…' : 'Confirm delete'}
-            </button>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => {
-                setOpen(false);
-                setError('');
-              }}
-              className="cc-app-btn cc-app-btn--ghost inline-flex h-10 items-center px-4 text-[13px]"
-            >
-              Cancel
             </button>
           </div>
         </div>

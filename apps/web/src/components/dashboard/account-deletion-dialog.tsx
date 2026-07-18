@@ -109,10 +109,14 @@ export function AccountDeletionDialog({
     if (!open) return;
 
     const node = dialogRef.current;
-    const focusable = node?.querySelector<HTMLElement>(
-      'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
-    );
-    focusable?.focus();
+    // Prefer the confirmation field when present; otherwise the safe Cancel control.
+    const preferred =
+      confirmInputRef.current ??
+      node?.querySelector<HTMLElement>('[data-confirm-cancel]') ??
+      node?.querySelector<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+      );
+    preferred?.focus();
 
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape' && phase !== 'submitting') {
