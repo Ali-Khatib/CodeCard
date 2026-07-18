@@ -298,6 +298,22 @@ The migration was created locally and was **not applied remotely**. It must be d
 
 T004 deliberately does not hide content, suspend accounts, or apply ordinary report actions to DMCA notices.
 
+## 18d. Canonical immutable admin auditing (WS13-T008)
+
+All privileged WS13 mutations use the canonical audit mechanism:
+
+- Server validator/writer: `apps/web/src/lib/admin/admin-audit.ts`
+- Database writer: `public.insert_admin_audit_event`
+- Forward-only migration: `20260718014945_ws13_t008_admin_audit.sql`
+
+The database writer accepts only stable action/resource pairs, a server-derived actor UUID, a bounded idempotency key, an allowlisted result, and metadata capped at 4096 UTF-8 bytes. Sensitive keys including report, reason, note, token, cookie, authorization, email, provider error, signature, and statement are rejected.
+
+`audit_logs` rows are append-only: ordinary roles cannot insert/update/delete; service role can insert but cannot update/delete; and a database trigger rejects UPDATE/DELETE even if a product role later receives an overly broad grant. A partial unique index provides idempotency by action, resource, target, and key.
+
+WS13-T004 is redefined by the T008 migration to call the canonical database writer inside the same row-lock transaction. Resolve/dismiss retries reuse the same idempotency key and therefore cannot create duplicate action audits.
+
+Read-only admin page visits are not mutation audit events. The migration is local only and must be deployed through the reviewed migration workflow.
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -412,7 +428,8 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS13-T002 — gated service-role API — **done** (§18a)
 - WS13-T003 — real moderation and DMCA dashboard — **done** (§18b)
 - WS13-T004 — report resolve/dismiss — **done** (§18c)
-- WS13-T005–T008 — suspension, hide/unpublish, notes, generalized auditing
+- WS13-T008 — canonical immutable admin mutation auditing — **done** (§18d)
+- WS13-T005–T007 — hide/unpublish, suspension, moderation notes
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)
