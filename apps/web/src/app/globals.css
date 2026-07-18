@@ -3301,6 +3301,18 @@ select,
     color: #232324;
   }
 
+  /* Night mode flips the cream surfaces dark, so the locked ink must flip light
+     too — otherwise case-study/story text renders dark-on-dark and disappears. */
+  html.dark .cc-on-cream-surface {
+    --ink: #efedeb;
+    --text-primary: #efedeb;
+    color: #efedeb;
+  }
+
+  html.dark .cc-on-cream-surface :where(h1, h2, h3, h4) {
+    color: #efedeb;
+  }
+
   .cc-project-atmosphere__particles {
     position: absolute;
     inset: 0;
