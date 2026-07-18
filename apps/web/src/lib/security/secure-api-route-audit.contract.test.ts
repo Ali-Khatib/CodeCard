@@ -37,6 +37,7 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/dmca/route.ts',
         'admin/reports/[id]/route.ts',
         'admin/reports/route.ts',
+        'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
         'dmca/route.ts',
         'moderation/report/route.ts',
@@ -52,6 +53,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/account/export',
       '/api/account/delete',
       '/api/admin/content/hide',
+      '/api/admin/users/[id]/suspend',
       '/api/admin/reports',
       '/api/admin/dmca',
       '/api/admin/reports/[id]',
@@ -116,8 +118,9 @@ describe('WS11-T005 secure API route audit', () => {
     const dmca = readWeb('src/app/api/admin/dmca/route.ts');
     const mutation = readWeb('src/app/api/admin/reports/[id]/route.ts');
     const hide = readWeb('src/app/api/admin/content/hide/route.ts');
+    const suspend = readWeb('src/app/api/admin/users/[id]/suspend/route.ts');
 
-    for (const source of [reports, dmca, mutation, hide]) {
+    for (const source of [reports, dmca, mutation, hide, suspend]) {
       expect(source).toContain('requireGlobalAdminApiAccess');
       expect(source).toContain('no-store');
     }
@@ -125,6 +128,8 @@ describe('WS11-T005 secure API route audit', () => {
     expect(mutation).toContain('moderationReportActionSchema');
     expect(hide).toContain('isSameOriginMutation');
     expect(hide).toContain('hideReportedContentSchema');
+    expect(suspend).toContain('isSameOriginMutation');
+    expect(suspend).toContain('suspendAccountSchema');
   });
 
   it('rejects non-JSON content types in secureJsonRoute by default', async () => {

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { z } from 'zod';
+import { resolveReportOwnerUserId } from '@/lib/admin/account-suspension';
 import { createServiceClient } from '@/lib/supabase/server';
 
 export const MODERATION_STATUSES = [
@@ -41,6 +42,8 @@ export type AdminModerationReportDto = {
   id: string;
   targetType: (typeof MODERATION_TARGET_TYPES)[number];
   targetId: string;
+  /** Server-resolved content owner; never taken from the reporter client. */
+  ownerUserId: string | null;
   reasonPreview: string;
   status: (typeof MODERATION_STATUSES)[number];
   createdAt: string;
@@ -114,7 +117,7 @@ export async function listModerationReports(
     throw new Error('ADMIN_MODERATION_READ_FAILED');
   }
 
-  const items = (data ?? []).map((row) => ({
+  const baseItems = (data ?? []).map((row) => ({
     id: String(row.id),
     targetType: row.target_type as AdminModerationReportDto['targetType'],
     targetId: String(row.target_id),
@@ -123,6 +126,16 @@ export async function listModerationReports(
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   }));
+
+  const items: AdminModerationReportDto[] = await Promise.all(
+    baseItems.map(async (item) => ({
+      ...item,
+      ownerUserId: await resolveReportOwnerUserId(
+        { targetType: item.targetType, targetId: item.targetId },
+        deps,
+      ),
+    })),
+  );
   const total = count ?? items.length;
 
   return {

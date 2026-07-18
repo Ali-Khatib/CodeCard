@@ -328,6 +328,23 @@ The atomic `public.admin_hide_reported_content` function:
 
 The hold table is RLS-forced with no ordinary-client policy. Private-schema `SECURITY DEFINER` trigger functions block direct owner attempts to set held content public, including direct Data API updates. The underlying owner record and media remain intact and owner-readable; removing a hold is deliberately deferred to a future reviewed workflow. Public profile/project cache paths are invalidated after success, and Circle/public loaders continue to exclude content through the existing visibility predicates.
 
+## 18f. Account suspension (WS13-T006)
+
+`POST /api/admin/users/[id]/suspend` suspends a reported account without deleting it.
+
+Sequence (Auth Admin and Postgres are not one transaction):
+
+1. authenticate and require the canonical global admin;
+2. enforce same-origin CSRF for browser mutations;
+3. load the target Auth user by path UUID (never by client email);
+4. reject self-suspension, demo identities, service identities, and last-active-global-admin suspension;
+5. verify optional report ownership matches the path user;
+6. prepare durable `account_suspensions` state and unpublish owned public profile/project/research content;
+7. apply Supabase Auth Admin `updateUserById(..., { ban_duration: '876000h' })`;
+8. write `user.suspended`, or `user.suspension_partial` / `user.suspension_failed` for retryable reconciliation.
+
+Stripe subscriptions are intentionally unchanged by suspension. Active JWTs are not claimed to be revoked immediately; durable publish blocking uses `is_current_account_suspended()` plus database triggers on profile/project/research publication fields. Account deletion remains a separate WS10 flow.
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -444,7 +461,8 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS13-T004 — report resolve/dismiss — **done** (§18c)
 - WS13-T008 — canonical immutable admin mutation auditing — **done** (§18d)
 - WS13-T005 — reported profile/project hiding with durable holds — **done** (§18e)
-- WS13-T006–T007 — suspension and moderation notes
+- WS13-T006 — account suspension with Auth ban + durable publish blocks — **done** (§18f)
+- WS13-T007 — moderation notes
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)

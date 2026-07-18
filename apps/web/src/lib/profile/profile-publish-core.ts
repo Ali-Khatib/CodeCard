@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isCurrentAccountSuspended } from '@/lib/account/suspension-guard';
 
 export type ProfilePublishState = {
   success?: boolean;
@@ -47,6 +48,10 @@ export async function executePublishProfile(
   const { profile } = resolved;
   if (profile.is_public) {
     return { success: true, is_public: true, slug: profile.slug };
+  }
+
+  if (await isCurrentAccountSuspended(supabase)) {
+    return { error: 'Your account is suspended and cannot publish content.' };
   }
 
   const { error: updateError } = await supabase

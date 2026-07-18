@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isCurrentAccountSuspended } from '@/lib/account/suspension-guard';
 import {
   loadOwnedProject,
   resolveAuthenticatedUser,
@@ -44,6 +45,13 @@ export async function executeSetProjectPublished(
       is_published: project.is_published,
       profileSlug: profile.slug,
       profileIsPublic: profile.is_public,
+    };
+  }
+
+  if (input.isPublished && (await isCurrentAccountSuspended(supabase))) {
+    return {
+      error: 'Your account is suspended and cannot publish content.',
+      errorCode: 'server',
     };
   }
 
