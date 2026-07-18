@@ -1,6 +1,14 @@
 -- CodeCard MVP Schema
 -- Multi-tenant from day one with RLS on every table
 
+-- Defer function-body validation for this migration. public.user_tenant_ids()
+-- (defined below) reads tenant_memberships, which is created a few statements
+-- later, so a fresh apply with the default check_function_bodies = on would abort
+-- at CREATE FUNCTION (relation "tenant_memberships" does not exist). This is the
+-- same idiom pg_dump emits at the top of every dump so forward references restore
+-- cleanly; it applies only to this migration's transaction and changes no schema.
+SET check_function_bodies = off;
+
 -- Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

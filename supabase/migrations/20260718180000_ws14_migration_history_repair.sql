@@ -1,28 +1,26 @@
--- WS14 migration-history repair (forward-only).
+-- WS14 idempotent compatibility migration.
 --
--- Commit 37b5f78 (WS14 E2E bootstrap) edited two already-shipped migrations in
--- place, breaking forward-only discipline:
---   * 20250627000007_profile_location_skills.sql
---   * 20250627000008_storage_buckets_rls.sql
--- Those files have been restored to their original authored content. The required
--- corrections are carried here instead, as a new forward-only migration.
+-- History:
+--   * Commit 37b5f78 (WS14 E2E bootstrap) edited migrations 007 and 008 in place.
+--   * A later remediation restored 007/008 to their original authored content and
+--     carried the corrections here, but that left the chain un-replayable from a
+--     fresh database: 007's original inline subquery CHECK aborts at SQLSTATE 0A000
+--     before this migration is ever reached.
+--   * Migrations 007 and 008 are now corrected in place (they were never deployed
+--     to production and never successfully applied anywhere, so the forward-only
+--     "never edit shipped migrations" rule does not apply to them). See:
+--       - 20250627000007_profile_location_skills.sql (IMMUTABLE helper + CHECK)
+--       - 20250627000008_storage_buckets_rls.sql (guarded, verified RLS enable)
 --
--- Root causes corrected:
---   1. profiles_skills_item_length_chk originally embedded a subquery directly in a
---      CHECK constraint, which PostgreSQL rejects (SQLSTATE 0A000: "cannot use
---      subquery in check constraint"). The per-item rule is re-expressed through an
---      IMMUTABLE helper that depends only on its argument array -- it reads no
---      tables and no mutable state, so IMMUTABLE is accurate.
---   2. storage.objects RLS was enabled with a bare ALTER that fails on hosted
---      Supabase, where the table is owned by supabase_storage_admin (SQLSTATE
---      42501: "must be owner of table objects") and RLS is already enabled by the
---      platform. Enablement is guarded so it only runs where RLS is genuinely off,
---      and the owner-scoped policies are re-asserted so a skipped ALTER can never
---      silently leave required policies absent.
+-- Purpose now: a purely idempotent compatibility pass for any environment that
+-- applied the intermediate (bootstrap-era) schema before 007/008 were corrected.
+-- On a fresh replay it re-asserts the exact same helper, constraint, RLS state and
+-- storage policies that corrected 007/008 already established, so it is a safe
+-- no-op that never conflicts with them. It is retained (not deleted) so migration
+-- history is not rewritten to hide the intermediate state.
 --
--- This migration is idempotent and safe for both fresh and already-provisioned
--- databases. It depends on the storage helper functions created in
--- 20250627000008_storage_buckets_rls.sql.
+-- Idempotent and safe for both fresh and already-provisioned databases. Depends on
+-- the storage helper functions created in 20250627000008_storage_buckets_rls.sql.
 
 -- 1. Skills per-item length rule -------------------------------------------------
 
