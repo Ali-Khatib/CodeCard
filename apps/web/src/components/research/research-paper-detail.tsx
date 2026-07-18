@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   HiOutlineArrowLeft,
   HiOutlineDocumentText,
@@ -39,6 +40,7 @@ export function ResearchPaperDetail({
   displayName: string;
 }) {
   const [abstractExpanded, setAbstractExpanded] = useState(false);
+  const reduced = useReducedMotion();
   const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
@@ -70,7 +72,12 @@ export function ResearchPaperDetail({
   const externalPdfLabel = describeExternalPdfSource(safePdfUrl);
 
   return (
-    <div className="relative min-h-[100dvh] text-text-primary">
+    <motion.div
+      className="relative min-h-[100dvh] text-text-primary"
+      initial={reduced ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       <ProjectWorkAtmosphere variant="page" />
 
       <main className="relative z-[1]">
@@ -278,6 +285,6 @@ export function ResearchPaperDetail({
           )}
         </article>
       </main>
-    </div>
+    </motion.div>
   );
 }

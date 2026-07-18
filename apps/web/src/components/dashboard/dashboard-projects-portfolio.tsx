@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { HiSquares2X2, HiBars3BottomLeft } from 'react-icons/hi2';
-import type { PortfolioCreator, PortfolioProject } from '@/lib/dashboard/portfolio';
+import type {
+  PortfolioCreator,
+  PortfolioOpenTransition,
+  PortfolioProject,
+} from '@/lib/dashboard/portfolio';
 import { ProjectsProfileStrip } from './projects-profile-strip';
 import { FadeInView } from './fade-in-view';
 import { ProjectsVerticalStack } from './projects-vertical-stack';
@@ -96,11 +100,14 @@ export function DashboardProjectsPortfolio({
   projects,
   emptyState = false,
   basePath = '/dashboard',
+  openTransition,
 }: {
   creator: PortfolioCreator;
   projects: PortfolioProject[];
   emptyState?: boolean;
   basePath?: string;
+  /** When set, cards open via the smooth expand overlay (demo/public detail). */
+  openTransition?: PortfolioOpenTransition;
 }) {
   const [filter, setFilter] = useState<string>(ALL_PROJECTS_FILTER);
   const [sort, setSort] = useState<ProjectSort>('Visitor order');
@@ -160,13 +167,18 @@ export function DashboardProjectsPortfolio({
 
       {filteredProjects.length > 0 ? (
         viewMode === 'grid' ? (
-          <ProjectsBubbleGrid projects={filteredProjects} basePath={basePath} />
+          <ProjectsBubbleGrid
+            projects={filteredProjects}
+            basePath={basePath}
+            openTransition={openTransition}
+          />
         ) : (
           <ProjectsVerticalStack
             projects={filteredProjects}
             basePath={basePath}
             orderedProjectIds={projects.map((project) => project.id)}
             canReorder={sort === 'Visitor order'}
+            openTransition={openTransition}
           />
         )
       ) : (        <FadeInView>

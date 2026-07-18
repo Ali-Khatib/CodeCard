@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { RevealProjectImages } from '@/components/ui/reveal-images';
+import { useProjectOpenOptional } from '@/components/featured-work/project-open-overlay';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import type { PortfolioProject } from '@/lib/dashboard/portfolio';
+import type { PortfolioOpenTransition, PortfolioProject } from '@/lib/dashboard/portfolio';
+import type { FeaturedProject } from '@/lib/projects/featured';
 import { FadeInView } from './fade-in-view';
 import { ProjectHoverCard } from './project-hover-card';
 import { PopIconButton } from './ui/dashboard-ui';
@@ -22,16 +24,37 @@ function ProjectRow({
   basePath,
   orderedProjectIds,
   canReorder,
+  openTransition,
+  featuredSiblings,
 }: {
   project: PortfolioProject;
   index: number;
   basePath: string;
   orderedProjectIds: string[];
   canReorder: boolean;
+  openTransition?: PortfolioOpenTransition;
+  featuredSiblings?: FeaturedProject[];
 }) {
   const isPublished = project.isPublished !== false;
   const reduced = useReducedMotion();
   const router = useRouter();
+  const openCtx = useProjectOpenOptional();
+
+  const openProject = (element: HTMLElement | null) => {
+    // Smooth card → page expand (same overlay as the public profile) when
+    // the full featured payload is available; plain navigation otherwise.
+    if (!reduced && openCtx && openTransition && project.featured && element) {
+      openCtx.open(project.featured, element, project.editHref, {
+        profileSlug: openTransition.profileSlug,
+        displayName: openTransition.displayName,
+        accentColor: openTransition.accentColor,
+        projects: featuredSiblings,
+      });
+      return;
+    }
+    router.push(project.editHref);
+  };
+
   const revealImages = [
     ...(project.screenshots ?? []),
     ...(project.posterUrl ? [project.posterUrl] : []),
@@ -47,11 +70,11 @@ function ProjectRow({
         role="button"
         tabIndex={0}
         aria-label={`Open ${project.title}`}
-        onClick={() => router.push(project.editHref)}
+        onClick={(event) => openProject(event.currentTarget)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            router.push(project.editHref);
+            openProject(event.currentTarget);
           }
         }}
       >
@@ -156,13 +179,18 @@ export function ProjectsVerticalStack({
   basePath = '/dashboard',
   orderedProjectIds,
   canReorder = false,
+  openTransition,
 }: {
   projects: PortfolioProject[];
   basePath?: string;
   orderedProjectIds?: string[];
   canReorder?: boolean;
+  openTransition?: PortfolioOpenTransition;
 }) {
   const ids = orderedProjectIds ?? projects.map((project) => project.id);
+  const featuredSiblings = projects
+    .map((project) => project.featured)
+    .filter((featured): featured is FeaturedProject => Boolean(featured));
 
   return (
     <div className="cc-project-stack">
@@ -174,6 +202,8 @@ export function ProjectsVerticalStack({
           basePath={basePath}
           orderedProjectIds={ids}
           canReorder={canReorder}
+          openTransition={openTransition}
+          featuredSiblings={featuredSiblings}
         />
       ))}
     </div>
