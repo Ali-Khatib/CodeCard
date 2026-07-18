@@ -30,9 +30,22 @@ const REQUIRED_DOCUMENTED = [
   'UPSTASH_REDIS_REST_URL',
   'UPSTASH_REDIS_REST_TOKEN',
   'SENTRY_DSN',
-  // Test-only
+  // Test-only (UI fixtures)
   'CODECARD_E2E_FIXTURES',
   'PLAYWRIGHT_PORT',
+  // Isolated real-E2E backend (WS14 bootstrap) — placeholders only
+  'CODECARD_E2E',
+  'CODECARD_E2E_ALLOW_DESTRUCTIVE',
+  'CODECARD_E2E_SUPABASE_URL',
+  'CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY',
+  'CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY',
+  'CODECARD_E2E_SUPABASE_PROJECT_REF',
+  'CODECARD_E2E_TEST_PASSWORD',
+  'CODECARD_E2E_BASE_URL',
+  'CODECARD_E2E_EMAIL_DOMAIN',
+  'CODECARD_E2E_STRIPE_SECRET_KEY',
+  'CODECARD_E2E_STRIPE_WEBHOOK_SECRET',
+  'CODECARD_E2E_STRIPE_PRICE_ID',
 ] as const;
 
 /**
@@ -60,6 +73,11 @@ const SERVER_ONLY_SECRETS = [
   'UPSTASH_REDIS_REST_URL',
   'UPSTASH_REDIS_REST_TOKEN',
   'SENTRY_DSN',
+  // E2E-only service-role credential (still server-only)
+  'CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY',
+  'CODECARD_E2E_TEST_PASSWORD',
+  'CODECARD_E2E_STRIPE_SECRET_KEY',
+  'CODECARD_E2E_STRIPE_WEBHOOK_SECRET',
 ] as const;
 
 function readExample(): string {
@@ -146,5 +164,19 @@ describe('.env.example contract (WS14-T001)', () => {
     const keys = parseKeys(readExample());
     // Test-mode Stripe placeholder must not be an empty or live value.
     expect(keys.get('STRIPE_SECRET_KEY')).toMatch(/^sk_test_/);
+    expect(keys.get('CODECARD_E2E_STRIPE_SECRET_KEY')).toMatch(/^sk_test_/);
+  });
+
+  it('25/26. documents all E2E variables with placeholders only', () => {
+    const contents = readExample();
+    expect(contents).toMatch(/ISOLATED REAL E2E BACKEND/i);
+    expect(contents).toMatch(/\.env\.e2e\.local/);
+    expect(contents).toMatch(/WS14-T012/);
+    expect(contents).toMatch(/NOT equivalent to[\s#]+real E2E/i);
+    expect(contents).toContain('gclteunkzorwaliwhatp');
+    // Placeholders only — no concrete 20-char project host in values.
+    const keys = parseKeys(contents);
+    expect(keys.get('CODECARD_E2E_SUPABASE_URL')).toMatch(/your-e2e-project/);
+    expect(keys.get('CODECARD_E2E_SUPABASE_PROJECT_REF')).toBe('your-e2e-project-ref');
   });
 });
