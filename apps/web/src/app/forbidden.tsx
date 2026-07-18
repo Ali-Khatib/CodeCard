@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 /**
  * WS11-T002 — Rendered with HTTP 403 when `forbidden()` is thrown
@@ -7,7 +8,11 @@ import Link from 'next/link';
  */
 export default function Forbidden() {
   return (
-    <main className="relative flex min-h-[100dvh] max-w-[100vw] items-center justify-center px-6 py-16 text-[var(--app-ink)]">
+    <main
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
+      className="relative flex min-h-[100dvh] max-w-[100vw] items-center justify-center px-6 py-16 text-[var(--app-ink)]"
+    >
       <div className="mx-auto w-full max-w-lg text-center">
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
           CodeCard

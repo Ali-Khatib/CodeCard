@@ -23,6 +23,7 @@ import { hasShowcaseExtras } from '@/lib/projects/case-study-sections';
 import { trackProjectEngagementEvent, canTrackId } from '@/components/research/research-analytics';
 import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
@@ -150,7 +151,7 @@ export function ProjectDetailView({
     >
       <ProjectWorkAtmosphere variant="page" />
 
-      <main className="relative z-[1]">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
           <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link

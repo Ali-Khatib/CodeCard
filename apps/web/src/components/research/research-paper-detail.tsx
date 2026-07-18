@@ -18,6 +18,7 @@ import { CitationCopyButton } from '@/components/research/citation-copy-button';
 import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
 import { canTrackId, trackResearchEvent } from './research-analytics';
 import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 function metadataLine(paper: ResearchPaper) {
   return [paper.venue, paper.publicationStatus, paper.year].filter(Boolean).join(' · ');
@@ -80,7 +81,7 @@ export function ResearchPaperDetail({
     >
       <ProjectWorkAtmosphere variant="page" />
 
-      <main className="relative z-[1]">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
           <div className="flex items-center justify-between rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
             <Link

@@ -10,7 +10,7 @@ export const metadata = {
 export default function ResearchReferencesPage() {
   return (
     <div className="pb-16">
-      <main className="cc-container py-8 pt-[96px] md:py-12">
+      <div className="cc-container py-8 pt-[96px] md:py-12">
         <p className="text-[13px] font-semibold uppercase tracking-[0.16em] text-text-secondary">Bibliography</p>
         <h1 className="mt-3 text-[40px] font-extrabold tracking-tight md:text-[56px]">Research references</h1>
         <p className="mt-6 max-w-[720px] text-[18px] leading-relaxed text-text-secondary">
@@ -64,7 +64,7 @@ export default function ResearchReferencesPage() {
             Back to evidence overview
           </Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

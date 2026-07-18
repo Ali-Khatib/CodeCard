@@ -18,6 +18,7 @@ import { AppReveal } from '@/components/ui/app-reveal';
 import { trackLinkClick } from '@/lib/analytics/link-click';
 import { PublicProfileConnectionControl } from './public-profile-connection-control';
 import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 export function PublicProfileFocused({
   profileSlug,
@@ -76,7 +77,11 @@ export function PublicProfileFocused({
 
   return (
     <div className="cc-public-profile">
-      <main className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16">
+      <main
+        id={MAIN_CONTENT_ID}
+        tabIndex={-1}
+        className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
+      >
         <motion.header
           className="cc-app-profile-preview cc-app-profile-preview--hero"
           initial={reduced ? false : { opacity: 0, y: 16 }}

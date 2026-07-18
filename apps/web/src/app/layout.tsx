@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SkipToContentLink } from '@/components/a11y/skip-to-content';
 import { GlobalBackdrop } from '@/components/landing/global-backdrop';
 import { ProjectOpenProvider } from '@/components/featured-work/project-open-overlay';
 import { ThemeRoot } from '@/components/theme/theme-root';
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         } as Record<string, string>}
       >
         <ThemeRoot>
+          <SkipToContentLink />
           <GlobalBackdrop />
           <ProjectOpenProvider>{children}</ProjectOpenProvider>
         </ThemeRoot>

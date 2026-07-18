@@ -1,6 +1,10 @@
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+
 export default function AdminLoading() {
   return (
     <main
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
       className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
       aria-busy="true"
       aria-live="polite"

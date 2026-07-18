@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { AuthShowcaseStage } from '@/components/auth/auth-collage';
 import { AuthWordmark } from '@/components/auth/auth-wordmark';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 export type AuthShellMode = 'sign-in' | 'sign-up' | 'other';
 
@@ -48,7 +49,7 @@ export function AuthShell({
         data-testid="auth-shell"
         data-auth-mode={mode}
       >
-        <div className="w-full max-w-[440px]">
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="w-full max-w-[440px]">
           <div className="mb-6 text-center">
             <AuthWordmark />
           </div>
@@ -62,7 +63,7 @@ export function AuthShell({
             ) : null}
             <div className="mt-6">{children}</div>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -90,7 +91,7 @@ export function AuthShell({
           className="relative z-[3] flex w-full flex-1 flex-col justify-center overflow-y-auto rounded-t-[28px] border border-[rgba(34,34,34,0.08)] bg-white px-6 py-8 shadow-[-12px_0_40px_rgba(35,35,36,0.08)] sm:px-8 lg:min-h-screen lg:w-[40%] lg:max-w-[40%] lg:rounded-t-none lg:rounded-l-[28px] lg:rounded-r-none lg:border-y-0 lg:border-r-0 lg:px-10 lg:py-12"
           data-testid="auth-side-panel"
         >
-          <div className="mx-auto w-full max-w-[420px]">
+          <main id={MAIN_CONTENT_ID} tabIndex={-1} className="mx-auto w-full max-w-[420px]">
             <div className="relative min-h-[64px]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -119,7 +120,7 @@ export function AuthShell({
             >
               {children}
             </motion.div>
-          </div>
+          </main>
         </motion.aside>
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   moderationReportListQuerySchema,
 } from '@/lib/admin/moderation-data';
 import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -40,7 +41,7 @@ export default async function AdminPage({
 
   if (!reportsQuery.success || !dmcaQuery.success) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-3xl font-semibold">Moderation</h1>
         <div role="alert" className="mt-6 rounded-xl border border-red-500/30 p-5">
           These filters are invalid. Return to the default moderation view.

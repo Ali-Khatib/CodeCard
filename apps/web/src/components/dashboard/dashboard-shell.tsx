@@ -15,6 +15,7 @@ import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -350,7 +351,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <div className="cc-app-content">
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="cc-app-content">
           {pendingHref && (
             <div className="cc-app-route-pending" role="status" aria-live="polite">
               <span className="cc-app-route-pending__pulse" aria-hidden />
@@ -361,7 +362,7 @@ export function DashboardShell({
             <EmailVerificationBanner email={email} />
           )}
           <DashboardPageTransition>{children}</DashboardPageTransition>
-        </div>
+        </main>
       </div>
 
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">

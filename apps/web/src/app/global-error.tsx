@@ -26,7 +26,7 @@ export default function GlobalError({
           padding: '24px',
         }}
       >
-        <main style={{ maxWidth: 420, textAlign: 'center' }}>
+        <main id="main-content" tabIndex={-1} style={{ maxWidth: 420, textAlign: 'center' }}>
           <h1 style={{ fontSize: 22, fontWeight: 600, margin: '0 0 12px' }}>Something went wrong</h1>
           <p style={{ fontSize: 15, lineHeight: 1.5, color: '#9aa7b5', margin: '0 0 20px' }}>
             An unexpected error occurred. Please try again. If the problem continues, return to the
