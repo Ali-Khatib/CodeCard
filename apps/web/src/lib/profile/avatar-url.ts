@@ -31,3 +31,8 @@ export function profileAvatarAltText(displayName: string): string {
   const trimmed = displayName.trim();
   return trimmed ? `${trimmed} avatar` : 'Profile avatar';
 }
+
+/** When the display name is already announced beside the avatar. */
+export function profileAvatarAltTextRedundant(): string {
+  return '';
+}

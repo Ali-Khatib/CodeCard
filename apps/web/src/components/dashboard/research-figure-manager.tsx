@@ -423,11 +423,16 @@ export function ResearchFigureManager({
                 <label className="block text-[13px] font-medium text-[var(--app-ink)]" htmlFor={`caption-${figure.id}`}>
                   Caption
                 </label>
+                <p id={`caption-help-${figure.id}`} className="text-[12px] text-[var(--app-smoke)]">
+                  Describe the meaningful conclusion of this figure for readers who cannot see the
+                  image. Do not paste filenames.
+                </p>
                 <textarea
                   id={`caption-${figure.id}`}
                   defaultValue={figure.caption ?? ''}
                   maxLength={RESEARCH_FIGURE_CAPTION_MAX_LENGTH}
                   rows={2}
+                  aria-describedby={`caption-help-${figure.id}`}
                   className="w-full rounded-xl border border-[var(--app-border)] px-3 py-2 text-[14px]"
                   onBlur={(event) => {
                     const next = event.target.value;

@@ -43,5 +43,6 @@ export function createResearchFigureUrlResolver(supabase: SupabaseClient) {
 export function researchFigureAltText(caption: string | null | undefined): string {
   const trimmed = caption?.trim();
   if (trimmed) return trimmed;
+  // Legacy figures without captions: non-filename fallback (known a11y debt).
   return 'Research figure';
 }
