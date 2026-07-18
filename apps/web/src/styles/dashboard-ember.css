@@ -327,8 +327,15 @@
 
 .cc-dash-input:focus {
   border-color: var(--border-strong) !important;
-  outline: none;
+  outline: 3px solid var(--iris, #c094e4);
+  outline-offset: 2px;
   box-shadow: none !important;
+}
+
+.cc-dash-input:focus-visible {
+  border-color: var(--border-strong) !important;
+  outline: 3px solid var(--iris, #c094e4);
+  outline-offset: 2px;
 }
 
 .cc-dash-label {

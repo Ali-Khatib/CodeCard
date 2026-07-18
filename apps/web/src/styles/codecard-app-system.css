@@ -495,6 +495,33 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   width: 100%;
 }
 
+/* WS12-T004 — Keyboard focus for shared app controls */
+.cc-app-btn:focus {
+  outline: none;
+}
+
+.cc-app-btn:focus-visible {
+  outline: 3px solid var(--app-iris, #c094e4);
+  outline-offset: 3px;
+}
+
+.cc-app-btn--primary:focus-visible {
+  outline-color: var(--app-iris, #c094e4);
+  box-shadow: 0 0 0 1px var(--app-paper, #fff);
+}
+
+.cc-settings-nav-link:focus-visible,
+.cc-app-mobile-nav__link:focus-visible {
+  outline: 3px solid var(--app-iris, #c094e4);
+  outline-offset: 2px;
+}
+
+a.cc-app-nav-link:focus-visible,
+button.cc-app-nav-link:focus-visible {
+  outline: 3px solid var(--app-iris, #c094e4);
+  outline-offset: 2px;
+}
+
 /* Async action button — loading pulse + check morph */
 .cc-async-action-btn {
   position: relative;
@@ -789,6 +816,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-color: transparent;
 }
 
+.cc-app-input:focus-visible {
+  outline: 3px solid var(--app-iris);
+  outline-offset: 2px;
+}
+
 /* ── Filters ── */
 .cc-app-filter-bar {
   display: inline-flex;
@@ -819,6 +851,16 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   transition: color 0.28s ease, background 0.28s ease;
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+.cc-app-filter-pill:focus {
+  outline: none;
+}
+
+.cc-app-filter-pill:focus-visible {
+  outline: 3px solid var(--app-iris, #c094e4);
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 .cc-app-filter-pill:hover {

@@ -54,6 +54,31 @@ html {
   outline-offset: 4px;
 }
 
+/* WS12-T004 — Shared focus-visible contract (keyboard only). */
+:root {
+  --cc-focus-ring: var(--iris, #c094e4);
+  --cc-focus-ring-width: 3px;
+  --cc-focus-ring-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible,
+[role='switch']:focus-visible,
+[role='menuitem']:focus-visible,
+[role='option']:focus-visible {
+  outline: var(--cc-focus-ring-width) solid var(--cc-focus-ring);
+  outline-offset: var(--cc-focus-ring-offset);
+}
+
+/* Sticky header / fixed mobile nav: keep focused targets clear of chrome. */
+:where(a, button, input, select, textarea, [role='button'], [role='tab']):focus-visible {
+  scroll-margin-top: calc(72px + env(safe-area-inset-top, 0px));
+  scroll-margin-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+}
+
 img,
 video,
 canvas,
@@ -2737,6 +2762,13 @@ select,
     background: #333333;
   }
 
+  .cc-btn-pill-primary:focus-visible,
+  .cc-btn-pill-ghost:focus-visible,
+  .cc-btn-pill-demo:focus-visible {
+    outline: 3px solid var(--iris, #c094e4);
+    outline-offset: 3px;
+  }
+
   .cc-btn-pill-ghost {
     display: inline-flex;
     align-items: center;
@@ -4147,6 +4179,11 @@ select,
   .cc-input:focus {
     border-color: var(--reactor);
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+  }
+
+  .cc-input:focus-visible {
+    outline: 3px solid var(--iris, #c094e4);
+    outline-offset: 2px;
   }
 
   .cc-expand-form {
