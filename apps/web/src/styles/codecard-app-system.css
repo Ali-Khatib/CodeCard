@@ -8,9 +8,10 @@
   --app-ink: #232324;
   --app-paper: #ffffff;
   --app-bone: #fcf1e7;
-  --app-smoke: #767073;
+  --app-smoke: #5c5856;
   --app-carbon: #000000;
   --app-iris: #c094e4;
+  --app-error: #b91c1c;
   --app-blush: #fce0ee;
   --app-rose-mist: #fdebf7;
   --app-meringue: #ffe9cf;
@@ -18,7 +19,8 @@
   --app-seafoam: #cef1e1;
   --app-slate-plum: #574853;
   --app-border: rgba(34, 34, 34, 0.08);
-  --app-border-strong: rgba(34, 34, 34, 0.14);
+  /* Meaningful control borders — ≥3:1 vs paper/bone after composite. */
+  --app-border-strong: rgba(34, 34, 34, 0.52);
   --app-radius-input: 8px;
   --app-radius-card: 16px;
   --app-radius-large: 24px;
@@ -48,7 +50,8 @@ html.dark .cc-app-root {
   --app-ink: #efedeb;
   --app-paper: #1a191c;
   --app-bone: #121114;
-  --app-smoke: #9a969c;
+  --app-smoke: #b5b1b6;
+  --app-error: #f87171;
   --app-blush: #2a1f2e;
   --app-rose-mist: #261d28;
   --app-meringue: #2a2218;
@@ -56,7 +59,7 @@ html.dark .cc-app-root {
   --app-seafoam: #182822;
   --app-slate-plum: #b0a8ae;
   --app-border: rgba(255, 255, 255, 0.08);
-  --app-border-strong: rgba(255, 255, 255, 0.14);
+  --app-border-strong: rgba(255, 255, 255, 0.48);
   color-scheme: dark;
 }
 
@@ -495,31 +498,36 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   width: 100%;
 }
 
-/* WS12-T004 — Keyboard focus for shared app controls */
+/* WS12-T004 / T005 — Keyboard focus for shared app controls */
 .cc-app-btn:focus {
   outline: none;
 }
 
 .cc-app-btn:focus-visible {
-  outline: 3px solid var(--app-iris, #c094e4);
-  outline-offset: 3px;
+  outline: 2px solid var(--app-ink, #232324);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
 }
 
 .cc-app-btn--primary:focus-visible {
-  outline-color: var(--app-iris, #c094e4);
-  box-shadow: 0 0 0 1px var(--app-paper, #fff);
+  outline-color: var(--app-paper, #fff);
+  box-shadow:
+    0 0 0 2px var(--app-ink, #232324),
+    0 0 0 5px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
 }
 
 .cc-settings-nav-link:focus-visible,
 .cc-app-mobile-nav__link:focus-visible {
-  outline: 3px solid var(--app-iris, #c094e4);
+  outline: 2px solid var(--app-ink, #232324);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
 }
 
 a.cc-app-nav-link:focus-visible,
 button.cc-app-nav-link:focus-visible {
-  outline: 3px solid var(--app-iris, #c094e4);
+  outline: 2px solid var(--app-ink, #232324);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
 }
 
 /* Async action button — loading pulse + check morph */

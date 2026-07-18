@@ -35,8 +35,9 @@ html {
 
 .cc-skip-link:focus,
 .cc-skip-link:focus-visible {
-  outline: 3px solid var(--iris, #c094e4);
+  outline: 2px solid var(--ink, #232324);
   outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--iris, #c094e4) 42%, transparent);
   left: 1rem;
   top: 1rem;
 }
@@ -54,11 +55,18 @@ html {
   outline-offset: 4px;
 }
 
-/* WS12-T004 — Shared focus-visible contract (keyboard only). */
+/* WS12-T004 / T005 — Shared focus-visible contract (keyboard only).
+   Ink outline guarantees ≥3:1 non-text contrast on light surfaces;
+   iris glow preserves brand accent without relying on iris alone. */
 :root {
-  --cc-focus-ring: var(--iris, #c094e4);
-  --cc-focus-ring-width: 3px;
+  --cc-focus-ring: #232324;
+  --cc-focus-ring-accent: var(--iris, #c094e4);
+  --cc-focus-ring-width: 2px;
   --cc-focus-ring-offset: 2px;
+}
+
+html.dark {
+  --cc-focus-ring: #c094e4;
 }
 
 a:focus-visible,
@@ -71,6 +79,7 @@ summary:focus-visible,
 [role='option']:focus-visible {
   outline: var(--cc-focus-ring-width) solid var(--cc-focus-ring);
   outline-offset: var(--cc-focus-ring-offset);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--cc-focus-ring-accent) 42%, transparent);
 }
 
 /* Sticky header / fixed mobile nav: keep focused targets clear of chrome. */
@@ -109,8 +118,8 @@ svg {
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
   --ink: #232324;
-  --smoke: #767073;
-  --muted: #767073;
+  --smoke: #5c5856;
+  --muted: #5c5856;
   --line-soft: #c2bcbb;
   --surface-dark: #202020;
   --chart-hume: #edc4f1;
@@ -120,14 +129,14 @@ svg {
   --char: #ffffff;
   --midnight: #232324;
   --iron: #f5f0ea;
-  --slate: #767073;
+  --slate: #5c5856;
   --mist: #fcf1e7;
-  --pewter: #767073;
+  --pewter: #5c5856;
   --ember: #c094e4;
   --pine: #daf7ee;
   --tide: #574853;
-  --driftwood: #767073;
-  --cedar: #767073;
+  --driftwood: #5c5856;
+  --cedar: #5c5856;
   --coral: #f7bbe6;
   --primary-action-fill: #232324;
   --blush: #fce0ee;
@@ -152,10 +161,10 @@ svg {
   --vellum: #232324;
   --phosphor: #232324;
   --pearl: #ffffff;
-  --ash: #767073;
-  --lichen: #767073;
-  --graphite: #767073;
-  --smoke-legacy: #767073;
+  --ash: #5c5856;
+  --lichen: #5c5856;
+  --graphite: #5c5856;
+  --smoke-legacy: #5c5856;
   --fern: #fcf1e7;
   --bronze-field: #fcf1e7;
   --void-canvas: #fcf1e7;
@@ -165,11 +174,11 @@ svg {
   --midnight-legacy: #232324;
   --deep-indigo: #574853;
   --lilac-white: #ffffff;
-  --fog: #767073;
+  --fog: #5c5856;
   --steel: #fcf1e7;
-  --twilight: #767073;
-  --gunmetal: #767073;
-  --slate-veil: #767073;
+  --twilight: #5c5856;
+  --gunmetal: #5c5856;
+  --slate-veil: #5c5856;
   --bone: #fcf1e7;
   --abyss: #fcf1e7;
   --vault: #ffffff;
@@ -200,7 +209,7 @@ svg {
   --canvas: #fcf1e7;
   --surface: #ffffff;
   --text-primary: #232324;
-  --text-secondary: #767073;
+  --text-secondary: #5c5856;
   --text-on-light: #232324;
   --border: rgba(35, 35, 36, 0.08);
   --border-subtle: rgba(35, 35, 36, 0.05);
@@ -219,14 +228,16 @@ svg {
   --panel: #ffffff;
   --panel-2: #fff9f3;
   --panel-3: #fce0ee;
-  --border-strong: rgba(34, 34, 34, 0.14);
+  --border-strong: rgba(34, 34, 34, 0.52);
   --text: #222222;
-  --text-soft: #7a7876;
-  --text-muted: #7a7876;
-  --text-faint: #7a7876;
+  --text-soft: #5c5856;
+  --text-muted: #5c5856;
+  --text-faint: #5c5856;
   --accent-soft: rgba(192, 148, 228, 0.14);
   --success: #daf7ee;
   --success-text: #574853;
+  --error: #b91c1c;
+  --error-text: #b91c1c;
   --radius-card: 16px;
   --radius-button: 9999px;
 
@@ -239,7 +250,7 @@ svg {
   --secondary: #fff9f3;
   --secondary-foreground: #222222;
   --muted: #fff9f3;
-  --muted-foreground: #7a7876;
+  --muted-foreground: #5c5856;
   --accent-foreground: #222222;
   --success-foreground: #574853;
   --input: rgba(34, 34, 34, 0.08);
@@ -256,18 +267,22 @@ html.dark {
   --lichen: #b5b1b6;
   --graphite: #9a969c;
   --ash: #9a969c;
-  --smoke: #9a969c;
-  --fog: #9a969c;
-  --twilight: #9a969c;
+  --smoke: #b5b1b6;
+  --fog: #b5b1b6;
+  --twilight: #b5b1b6;
   --background: #121114;
   --foreground: #efedeb;
   --canvas: #121114;
   --surface: #1a191c;
   --text-primary: #efedeb;
-  --text-secondary: #9a969c;
+  --text-secondary: #b5b1b6;
   --text-on-mist: #efedeb;
   --border: rgba(255, 255, 255, 0.1);
   --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.48);
+  --muted-foreground: #b5b1b6;
+  --error: #f87171;
+  --error-text: #f87171;
   --obsidian: #121114;
   --void-canvas: #121114;
   --charcoal: #121114;
@@ -301,6 +316,19 @@ select,
   caret-color: auto;
 }
 
+/* WS12-T005 — Placeholders inherit AA secondary text, never lighter-only opacity. */
+::placeholder {
+  color: var(--smoke, #5c5856);
+  opacity: 1;
+}
+
+/* Guaranteed readable text over photography / cover imagery. */
+.cc-media-text-backed {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
 .cc-marketing-shell {
   color-scheme: light;
   --hume-page: #fafafa;
@@ -310,20 +338,20 @@ select,
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
   --ink: #232324;
-  --smoke: #767073;
+  --smoke: #5c5856;
   --line-soft: #c2bcbb;
   --paper: #ffffff;
   --char: #ffffff;
   --midnight: #232324;
   --iron: #f5f0ea;
-  --slate: #767073;
+  --slate: #5c5856;
   --mist: #fcf1e7;
-  --pewter: #767073;
+  --pewter: #5c5856;
   --ember: #c094e4;
   --pine: #daf7ee;
   --tide: #574853;
-  --driftwood: #767073;
-  --cedar: #767073;
+  --driftwood: #5c5856;
+  --cedar: #5c5856;
   --coral: #f7bbe6;
   --primary-action-fill: #232324;
   --blush: #fce0ee;
@@ -340,10 +368,10 @@ select,
   --vellum: #232324;
   --phosphor: #232324;
   --pearl: #ffffff;
-  --ash: #767073;
-  --lichen: #767073;
-  --graphite: #767073;
-  --smoke-legacy: #767073;
+  --ash: #5c5856;
+  --lichen: #5c5856;
+  --graphite: #5c5856;
+  --smoke-legacy: #5c5856;
   --fern: #fcf1e7;
   --bronze-field: #fcf1e7;
   --void-canvas: #fcf1e7;
@@ -353,11 +381,11 @@ select,
   --midnight-legacy: #232324;
   --deep-indigo: #574853;
   --lilac-white: #ffffff;
-  --fog: #767073;
+  --fog: #5c5856;
   --steel: #fcf1e7;
-  --twilight: #767073;
-  --gunmetal: #767073;
-  --slate-veil: #767073;
+  --twilight: #5c5856;
+  --gunmetal: #5c5856;
+  --slate-veil: #5c5856;
   --bone: #fcf1e7;
   --abyss: #fcf1e7;
   --vault: #ffffff;
@@ -385,7 +413,7 @@ select,
   --canvas: #fcf1e7;
   --surface: #ffffff;
   --text-primary: #232324;
-  --text-secondary: #767073;
+  --text-secondary: #5c5856;
   --text-on-light: #232324;
   --border: rgba(35, 35, 36, 0.08);
   --border-subtle: rgba(35, 35, 36, 0.05);
@@ -1930,7 +1958,7 @@ select,
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #767073;
+    color: #5c5856;
   }
 
   .cc-hero-preview__media {
@@ -2765,8 +2793,9 @@ select,
   .cc-btn-pill-primary:focus-visible,
   .cc-btn-pill-ghost:focus-visible,
   .cc-btn-pill-demo:focus-visible {
-    outline: 3px solid var(--iris, #c094e4);
+    outline: 2px solid var(--ink, #232324);
     outline-offset: 3px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--iris, #c094e4) 42%, transparent);
   }
 
   .cc-btn-pill-ghost {
@@ -3769,7 +3798,7 @@ select,
     font-size: 10px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #767073;
+    color: #5c5856;
   }
 
   .cc-how-it-works-preview__header {
@@ -3922,7 +3951,7 @@ select,
     padding: 0.25rem 0.5rem;
     font-size: 10px;
     font-weight: 600;
-    color: #767073;
+    color: #5c5856;
   }
 
   .cc-how-it-works-preview__filter-pill.cc-app-filter-pill {
@@ -3931,7 +3960,7 @@ select,
     font-size: 10px;
     font-weight: 500;
     border-radius: 9999px;
-    color: #767073;
+    color: #5c5856;
     pointer-events: none;
     transition: color 0.2s ease, background 0.2s ease;
   }
@@ -4182,8 +4211,9 @@ select,
   }
 
   .cc-input:focus-visible {
-    outline: 3px solid var(--iris, #c094e4);
+    outline: 2px solid var(--ink, #232324);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--iris, #c094e4) 42%, transparent);
   }
 
   .cc-expand-form {
@@ -4672,12 +4702,12 @@ select,
   --phosphor: #232324;
   --text-primary: #232324;
   --foreground: #232324;
-  --ash: #767073;
-  --lichen: #767073;
-  --text-secondary: #767073;
-  --graphite: #767073;
-  --smoke: #767073;
-  --fog: #767073;
+  --ash: #5c5856;
+  --lichen: #5c5856;
+  --text-secondary: #5c5856;
+  --graphite: #5c5856;
+  --smoke: #5c5856;
+  --fog: #5c5856;
   --background: #fcf1e7;
   --chart-hume: #edc4f1;
   --chart-compare: #fee6c5;
@@ -4890,8 +4920,8 @@ select,
 }
 
 .cc-auth-input--error {
-  border-color: rgba(223, 106, 107, 0.7);
-  box-shadow: 0 0 0 1px rgba(223, 106, 107, 0.12);
+  border-color: color-mix(in srgb, var(--error-text, #b91c1c) 72%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--error-text, #b91c1c) 18%, transparent);
 }
 
 .cc-auth-input:disabled {

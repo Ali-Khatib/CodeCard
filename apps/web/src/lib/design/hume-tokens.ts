@@ -11,7 +11,8 @@ export const HUME_COLORS = {
   peach: '#FADAC1',
   pink: '#F1C9DD',
   ink: '#232324',
-  muted: '#767073',
+  /** Secondary body text — WCAG AA ≥4.5:1 on cream/white (was #767073). */
+  muted: '#5c5856',
   lineSoft: '#C2BCBB',
   paper: '#FFFFFF',
   /** Charts / demo panels only — not site-wide body */
