@@ -7,6 +7,7 @@ import type {
 import { MODERATION_STATUSES, MODERATION_TARGET_TYPES } from '@/lib/admin/moderation-data';
 import { toSafeHttpHref } from '@/lib/security/safe-href';
 import { ReportActions } from '@/components/admin/report-actions';
+import { ModerationNoteEditor } from '@/components/admin/moderation-note-editor';
 
 type ListState<T> =
   | { status: 'ready'; data: AdminPaginatedResult<T> }
@@ -194,6 +195,11 @@ export function AdminModerationDashboard({
                   >
                     Submitted {formatTimestamp(report.createdAt)} UTC
                   </time>
+                  <ModerationNoteEditor
+                    reportId={report.id}
+                    initialNote={report.moderationNotes}
+                    initialUpdatedAt={report.updatedAt}
+                  />
                   {report.status === 'pending' && (
                     <ReportActions
                       reportId={report.id}

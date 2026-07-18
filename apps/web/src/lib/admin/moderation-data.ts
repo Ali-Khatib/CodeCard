@@ -44,6 +44,7 @@ export type AdminModerationReportDto = {
   targetId: string;
   /** Server-resolved content owner; never taken from the reporter client. */
   ownerUserId: string | null;
+  moderationNotes: string | null;
   reasonPreview: string;
   status: (typeof MODERATION_STATUSES)[number];
   createdAt: string;
@@ -74,7 +75,8 @@ export type AdminModerationDataDependencies = {
   createPrivilegedClient?: () => Promise<PrivilegedClient>;
 };
 
-const REPORT_COLUMNS = 'id, target_type, target_id, reason, status, created_at, updated_at';
+const REPORT_COLUMNS =
+  'id, target_type, target_id, reason, moderation_notes, status, created_at, updated_at';
 const DMCA_COLUMNS =
   'id, claimant_name, copyrighted_work, infringing_url, status, created_at, updated_at';
 
@@ -121,6 +123,8 @@ export async function listModerationReports(
     id: String(row.id),
     targetType: row.target_type as AdminModerationReportDto['targetType'],
     targetId: String(row.target_id),
+    moderationNotes:
+      typeof row.moderation_notes === 'string' ? row.moderation_notes : null,
     reasonPreview: boundedText(row.reason, 500),
     status: row.status as AdminModerationReportDto['status'],
     createdAt: String(row.created_at),

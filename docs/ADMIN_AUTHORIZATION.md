@@ -345,6 +345,24 @@ Sequence (Auth Admin and Postgres are not one transaction):
 
 Stripe subscriptions are intentionally unchanged by suspension. Active JWTs are not claimed to be revoked immediately; durable publish blocking uses `is_current_account_suspended()` plus database triggers on profile/project/research publication fields. Account deletion remains a separate WS10 flow.
 
+## 18g. Private moderation notes (WS13-T007)
+
+`moderation_reports.moderation_notes` is nullable plain text bounded to 4,000
+characters. Column-level grants exclude it from ordinary authenticated reporter
+reads; only the server-side service-role moderation reader selects it explicitly.
+It is absent from report submission responses, public content queries, demo data,
+analytics, Circle, Connections, and owner account exports.
+
+`PUT /api/admin/reports/[id]/note` requires the canonical global-admin gate and
+same-origin CSRF check. The client submits the last observed `updated_at`; the
+database locks the report and returns a conflict rather than silently merging a
+concurrent edit. Empty/whitespace input deliberately clears the note.
+
+The note update and `moderation_note.updated` audit event share one database
+transaction. Audit metadata contains only presence/length state and never note
+text. An identical retry is an idempotent no-op and creates no duplicate audit
+event.
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -462,7 +480,7 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS13-T008 — canonical immutable admin mutation auditing — **done** (§18d)
 - WS13-T005 — reported profile/project hiding with durable holds — **done** (§18e)
 - WS13-T006 — account suspension with Auth ban + durable publish blocks — **done** (§18f)
-- WS13-T007 — moderation notes
+- WS13-T007 — private moderation notes — **done** (§18g)
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)
