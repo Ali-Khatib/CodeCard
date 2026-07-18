@@ -6,6 +6,7 @@ function createMockSupabase(options: {
   user?: { id: string } | null;
   profile?: { id: string; slug: string; is_public: boolean; owner_user_id: string } | null;
   updateError?: { message?: string } | null;
+  suspended?: boolean;
 }) {
   const update = vi.fn().mockResolvedValue({ error: options.updateError ?? null });
 
@@ -13,6 +14,10 @@ function createMockSupabase(options: {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: options.user ?? null } }),
     },
+    rpc: vi.fn().mockResolvedValue({
+      data: options.suspended === true,
+      error: null,
+    }),
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
@@ -68,6 +73,18 @@ describe('executePublishProfile', () => {
 
     const result = await executePublishProfile(supabase);
     expect(result.success).toBe(true);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('blocks publish when the account is suspended', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      suspended: true,
+    });
+
+    const result = await executePublishProfile(supabase);
+    expect(result.error).toMatch(/suspended/i);
     expect(update).not.toHaveBeenCalled();
   });
 });

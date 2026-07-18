@@ -38,6 +38,7 @@ function createMockSupabase(options: {
   profile?: typeof ownedProfile | null;
   project?: typeof ownedProject | null;
   updateError?: { message: string } | null;
+  suspended?: boolean;
 }) {
   let updatedPayload: unknown;
 
@@ -85,6 +86,7 @@ function createMockSupabase(options: {
     if (table === 'circle_activity') {
       return {
         insert: vi.fn().mockResolvedValue({ error: null }),
+        upsert: vi.fn().mockResolvedValue({ error: null }),
       };
     }
 
@@ -96,6 +98,10 @@ function createMockSupabase(options: {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: options.user ?? null } }),
       },
+      rpc: vi.fn().mockResolvedValue({
+        data: options.suspended === true,
+        error: null,
+      }),
       from,
     } as unknown as SupabaseClient,
     updatedPayload: () => updatedPayload,
@@ -131,6 +137,19 @@ describe('executePublishProject', () => {
     });
     const result = await executePublishProject(supabase, PROJECT_ID, { user: { id: 'user-2' } });
     expect(result.errorCode).toBe('auth');
+  });
+
+  it('blocks publish when the account is suspended', async () => {
+    const { supabase, updatedPayload } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      project: ownedProject,
+      suspended: true,
+    });
+
+    const result = await executePublishProject(supabase, PROJECT_ID, { user: { id: 'user-1' } });
+    expect(result.error).toMatch(/suspended/i);
+    expect(updatedPayload()).toBeUndefined();
   });
 });
 

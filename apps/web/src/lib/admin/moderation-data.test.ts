@@ -64,6 +64,7 @@ describe('privileged moderation data DTOs', () => {
       id: '11111111-1111-4111-8111-111111111111',
       targetType: 'project',
       targetId: '22222222-2222-4222-8222-222222222222',
+      ownerUserId: null,
       reasonPreview: 'Spam',
       status: 'pending',
       createdAt: '2026-07-18T00:00:00.000Z',

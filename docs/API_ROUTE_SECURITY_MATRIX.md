@@ -19,6 +19,7 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/admin/dmca` | GET | Canonical global admin | Allowlisted pagination/status filters | N/A (read-only) | None | Private no-store JSON | Privacy-minimized DMCA list DTO |
 | `/api/admin/reports/[id]` | PATCH | Canonical global admin | UUID + resolve/dismiss allowlist | **same-origin** | None | Private no-store JSON | Atomic status + audit RPC; conflict-safe |
 | `/api/admin/content/hide` | POST | Canonical global admin | Strict report/target UUID + profile/project allowlist | **same-origin** | None | Private no-store JSON | Atomic hold + unpublish + audit; public cache invalidation |
+| `/api/admin/users/[id]/suspend` | POST | Canonical global admin | Path user UUID + optional report UUID | **same-origin** | None | Private no-store JSON | Durable suspension + Auth ban; partial-failure retryable; no Stripe changes |
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |

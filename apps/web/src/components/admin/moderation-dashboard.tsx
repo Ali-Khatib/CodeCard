@@ -200,6 +200,7 @@ export function AdminModerationDashboard({
                       targetLabel={humanize(report.targetType).toLowerCase()}
                       targetType={report.targetType}
                       targetId={report.targetId}
+                      ownerUserId={report.ownerUserId}
                     />
                   )}
                 </li>

@@ -43,6 +43,7 @@ function createMockSupabase(options: {
   profile?: typeof ownedProfile | null;
   paper?: typeof ownedPaper | null;
   updateError?: { message: string } | null;
+  suspended?: boolean;
 }) {
   let updatedPayload: unknown;
   const updateEq = vi.fn().mockResolvedValue({ error: options.updateError ?? null });
@@ -91,6 +92,7 @@ function createMockSupabase(options: {
     if (table === 'circle_activity') {
       return {
         insert: vi.fn().mockResolvedValue({ error: null }),
+        upsert: vi.fn().mockResolvedValue({ error: null }),
       };
     }
 
@@ -102,6 +104,10 @@ function createMockSupabase(options: {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: options.user ?? null } }),
       },
+      rpc: vi.fn().mockResolvedValue({
+        data: options.suspended === true,
+        error: null,
+      }),
       from,
     } as unknown as SupabaseClient,
     getUpdatedPayload: () => updatedPayload,
@@ -173,6 +179,19 @@ describe('executePublishResearch', () => {
     expect(result.success).toBe(true);
     expect(result.is_published).toBe(true);
     expect(getUpdatedPayload()).toEqual({ is_published: true });
+  });
+
+  it('blocks publish when the account is suspended', async () => {
+    const { supabase, updateEq } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+      paper: ownedPaper,
+      suspended: true,
+    });
+
+    const result = await executePublishResearch(supabase, PAPER_ID, { user: { id: 'user-1' } });
+    expect(result.error).toMatch(/suspended/i);
+    expect(updateEq).not.toHaveBeenCalled();
   });
 
   it('is idempotent when already published', async () => {
