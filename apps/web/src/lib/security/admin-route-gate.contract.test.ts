@@ -82,7 +82,11 @@ describe('WS11-T002 admin route gate contracts', () => {
     expect(docs).toContain('WS13-T002');
   });
 
-  it('no admin API routes exist yet (nothing bypasses the page gate)', () => {
-    expect(existsSync(resolve(WEB, 'src/app/api/admin'))).toBe(false);
+  it('admin APIs have their own canonical server-side authorization boundary', () => {
+    expect(existsSync(resolve(WEB, 'src/app/api/admin'))).toBe(true);
+    const apiAuthorization = readWeb('src/lib/security/admin-api-authorization.ts');
+    expect(apiAuthorization).toContain('resolveGlobalAdminAuthorization');
+    expect(apiAuthorization).toContain('createClient');
+    expect(apiAuthorization).not.toContain('createServiceClient');
   });
 });
