@@ -1,79 +1,81 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { AdminModerationDashboard } from '@/components/admin/moderation-dashboard';
+import {
+  dmcaNoticeListQuerySchema,
+  listDmcaNotices,
+  listModerationReports,
+  moderationReportListQuerySchema,
+} from '@/lib/admin/moderation-data';
 import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
-import { Card, CardContent, CardHeader, CardTitle } from '@codecard/ui';
 
-export default async function AdminPage() {
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+type AdminSearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function first(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: AdminSearchParams;
+}) {
   // WS11-T002: authorize (global admin only) before any rendering or data fetch.
   await enforceGlobalAdminAccess();
 
-  const supabase = await createClient();
+  const query = await searchParams;
+  const reportsQuery = moderationReportListQuerySchema.safeParse({
+    page: first(query.reportsPage),
+    pageSize: 20,
+    status: first(query.reportStatus),
+    targetType: first(query.targetType) || undefined,
+  });
+  const dmcaQuery = dmcaNoticeListQuerySchema.safeParse({
+    page: first(query.dmcaPage),
+    pageSize: 20,
+    status: first(query.dmcaStatus),
+  });
 
-  const { data: reports } = await supabase
-    .from('moderation_reports')
-    .select('*')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  if (!reportsQuery.success || !dmcaQuery.success) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-16">
+        <h1 className="text-3xl font-semibold">Moderation</h1>
+        <div role="alert" className="mt-6 rounded-xl border border-red-500/30 p-5">
+          These filters are invalid. Return to the default moderation view.
+        </div>
+        <Link className="cc-app-btn cc-app-btn--primary mt-5 min-h-11" href="/admin">
+          Reset filters
+        </Link>
+      </main>
+    );
+  }
 
-  const { data: dmcaNotices } = await supabase
-    .from('dmca_notices')
-    .select('*')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  const [reportsResult, dmcaResult] = await Promise.allSettled([
+    listModerationReports(reportsQuery.data),
+    listDmcaNotices(dmcaQuery.data),
+  ]);
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-zinc-800 px-6 py-4">
-        <Link href="/dashboard" className="font-semibold">
-          ← Dashboard
-        </Link>
-      </header>
-      <main className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="text-2xl font-bold">Moderation</h1>
-        <p className="mt-1 text-zinc-400">Review reports and DMCA notices</p>
-
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">Pending reports</h2>
-          <div className="mt-4 space-y-4">
-            {reports?.length === 0 && (
-              <p className="text-sm text-zinc-500">No pending reports.</p>
-            )}
-            {reports?.map((report) => (
-              <Card key={report.id}>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    {report.target_type}: {report.target_id}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-zinc-400">{report.reason}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">DMCA notices</h2>
-          <div className="mt-4 space-y-4">
-            {dmcaNotices?.length === 0 && (
-              <p className="text-sm text-zinc-500">No pending DMCA notices.</p>
-            )}
-            {dmcaNotices?.map((notice) => (
-              <Card key={notice.id}>
-                <CardHeader>
-                  <CardTitle className="text-base">{notice.claimant_name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-zinc-400">{notice.infringing_url}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </main>
-    </div>
+    <AdminModerationDashboard
+      reports={
+        reportsResult.status === 'fulfilled'
+          ? { status: 'ready', data: reportsResult.value }
+          : { status: 'error' }
+      }
+      dmca={
+        dmcaResult.status === 'fulfilled'
+          ? { status: 'ready', data: dmcaResult.value }
+          : { status: 'error' }
+      }
+      filters={{
+        reportStatus: reportsQuery.data.status,
+        targetType: reportsQuery.data.targetType,
+        reportsPage: reportsQuery.data.page,
+        dmcaStatus: dmcaQuery.data.status,
+        dmcaPage: dmcaQuery.data.page,
+      }}
+    />
   );
 }

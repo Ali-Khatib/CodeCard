@@ -43,13 +43,14 @@ describe('WS11-T002 admin route gate contracts', () => {
     );
   });
 
-  it('admin page authorizes before creating a client or fetching data', () => {
+  it('admin page authorizes before invoking privileged T002 readers', () => {
     expect(page).toContain('enforceGlobalAdminAccess');
     const gateIndex = page.indexOf('await enforceGlobalAdminAccess()');
     expect(gateIndex).toBeGreaterThan(-1);
-    expect(gateIndex).toBeLessThan(page.indexOf('createClient()'));
-    expect(gateIndex).toBeLessThan(page.indexOf('moderation_reports'));
-    expect(gateIndex).toBeLessThan(page.indexOf('dmca_notices'));
+    expect(gateIndex).toBeLessThan(page.indexOf('listModerationReports(reportsQuery.data)'));
+    expect(gateIndex).toBeLessThan(page.indexOf('listDmcaNotices(dmcaQuery.data)'));
+    expect(page).not.toContain('createClient()');
+    expect(page).not.toMatch(/\.from\(['"](?:moderation_reports|dmca_notices)['"]\)/);
     // The page no longer performs its own weaker auth-only redirect.
     expect(page).not.toMatch(/redirect\(['"]\/sign-in['"]\)/);
   });
