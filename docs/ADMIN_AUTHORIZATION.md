@@ -268,6 +268,19 @@ No migration is required. Existing RLS remains the browser boundary: reporters m
 
 Rejected for T002: direct administrator RLS. The canonical claim is server-verified and moderation list DTOs intentionally omit private source/claimant fields; keeping global reads behind the server reduces accidental browser exposure and avoids JWT-policy duplication.
 
+## 18b. Moderation dashboard (WS13-T003)
+
+`/admin` now loads real moderation reports and DMCA notices exclusively through the T002 server-only readers after awaiting the page gate. It does not query Supabase directly, use demo fixtures, or fall back to synthetic data.
+
+- Default status: `pending`
+- Ordering: `created_at DESC`, then `id DESC`
+- Pagination: independent report and DMCA pages, 20 rows per page
+- Filters: allowlisted report status/target type and DMCA status
+- Privacy: list DTOs omit reporter identity, claimant email, legal statement, and signature
+- Caching: dynamic server rendering with revalidation disabled; APIs use private no-store headers
+- States: separate loading, empty, and opaque error states
+- Accessibility: one page heading, labelled sections/filters, semantic lists, textual status, keyboard-accessible pagination, and responsive cards
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -380,7 +393,7 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 
 - WS11-T002 — `/admin` role gate — **done** (§16a)
 - WS13-T002 — gated service-role API — **done** (§18a)
-- WS13-T003 — admin page data fetching
+- WS13-T003 — real moderation and DMCA dashboard — **done** (§18b)
 - WS13-T004–T008 — actions, suspension, hide/unpublish, auditing
 - Public role-management UI/API — not planned for T001
 
