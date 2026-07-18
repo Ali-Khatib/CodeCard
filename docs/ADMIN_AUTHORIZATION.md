@@ -314,6 +314,20 @@ WS13-T004 is redefined by the T008 migration to call the canonical database writ
 
 Read-only admin page visits are not mutation audit events. The migration is local only and must be deployed through the reviewed migration workflow.
 
+## 18e. Reported content hiding (WS13-T005)
+
+`POST /api/admin/content/hide` supports report-linked `profile` and `project` targets. Research is not accepted because the current moderation-report schema does not support it; media has no safe independent publication-state model.
+
+The atomic `public.admin_hide_reported_content` function:
+
+1. locks and verifies the source report and exact target;
+2. inserts a private `moderation_content_holds` row;
+3. sets `profiles.is_public = false` or `projects.is_published = false`;
+4. marks a pending/reviewing source report resolved;
+5. writes one idempotent `content.hidden` event through the T008 writer.
+
+The hold table is RLS-forced with no ordinary-client policy. Private-schema `SECURITY DEFINER` trigger functions block direct owner attempts to set held content public, including direct Data API updates. The underlying owner record and media remain intact and owner-readable; removing a hold is deliberately deferred to a future reviewed workflow. Public profile/project cache paths are invalidated after success, and Circle/public loaders continue to exclude content through the existing visibility predicates.
+
 ## 19. Admin RLS versus service-role decision boundary
 
 | Concern | Owner |
@@ -429,7 +443,8 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS13-T003 — real moderation and DMCA dashboard — **done** (§18b)
 - WS13-T004 — report resolve/dismiss — **done** (§18c)
 - WS13-T008 — canonical immutable admin mutation auditing — **done** (§18d)
-- WS13-T005–T007 — hide/unpublish, suspension, moderation notes
+- WS13-T005 — reported profile/project hiding with durable holds — **done** (§18e)
+- WS13-T006–T007 — suspension and moderation notes
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)
