@@ -130,8 +130,9 @@ export function featuredToPortfolioProject(
 ): PortfolioProject {
   const live = firstSafeProjectLink(project.links, ['live', 'demo']);
   const repo = firstSafeProjectLink(project.links, ['repo']);
-  const editHref = `/dashboard/preview/projects`;
-  const resolvedHref = href ?? editHref;
+  // Demo/preview has no editor; cards and "Edit" CTAs open the demo detail page
+  // (dashboard cards navigate via editHref since WS09-T004).
+  const resolvedHref = href ?? `/dashboard/preview/projects`;
 
   return {
     id: project.id,
@@ -139,7 +140,7 @@ export function featuredToPortfolioProject(
     tagline: project.tagline ?? undefined,
     description: project.description ?? undefined,
     href: resolvedHref,
-    editHref,
+    editHref: resolvedHref,
     publicHref: resolvedHref.startsWith('/demo') || resolvedHref.startsWith('/')
       ? resolvedHref
       : undefined,
