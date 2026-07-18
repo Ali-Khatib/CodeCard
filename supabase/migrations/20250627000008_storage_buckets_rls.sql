@@ -160,7 +160,17 @@ AS $$
     AND public.storage_path_tenant_id(object_path) IN (SELECT public.user_tenant_ids());
 $$;
 
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Hosted Supabase enables RLS on storage.objects by default and reserves table
+-- ownership for supabase_storage_admin, so only run the ALTER when RLS is
+-- actually disabled (e.g. bare local Postgres). Semantics are unchanged.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class WHERE oid = 'storage.objects'::regclass AND relrowsecurity
+  ) THEN
+    EXECUTE 'ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY';
+  END IF;
+END $$;
 
 DROP POLICY IF EXISTS storage_objects_owner_insert ON storage.objects;
 DROP POLICY IF EXISTS storage_objects_owner_update ON storage.objects;

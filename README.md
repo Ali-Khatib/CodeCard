@@ -144,11 +144,24 @@ Test-only variables (never set in production):
 * `CODECARD_E2E_FIXTURES=1` enables the `/e2e-fixtures/*` harness routes used by
   the local Playwright specs; the Playwright config sets it automatically.
 * `PLAYWRIGHT_PORT` overrides the local E2E server port (default `3000`).
-* Full authenticated Playwright E2E (auth, CRUD, sharing, account lifecycle)
-  additionally needs a dedicated **disposable** Supabase test backend isolated
-  from production, plus disposable test-user and test-mode Stripe configuration.
-  Those variables are intentionally not defined until that backend is
-  provisioned.
+* Local UI fixture mode (`CODECARD_E2E_FIXTURES=1`) is **not** equivalent to
+  real E2E mode. Real authenticated Playwright E2E requires a dedicated
+  disposable Supabase project or persistent branch, configured via
+  `apps/web/.env.e2e.local` (git-ignored; never commit it).
+* Real-E2E variables (documented as placeholders in `apps/web/.env.example`):
+  `CODECARD_E2E`, `CODECARD_E2E_ALLOW_DESTRUCTIVE`,
+  `CODECARD_E2E_SUPABASE_URL`, `CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY`,
+  `CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY` (server-only),
+  `CODECARD_E2E_SUPABASE_PROJECT_REF`, `CODECARD_E2E_TEST_PASSWORD`,
+  `CODECARD_E2E_BASE_URL`, optional `CODECARD_E2E_EMAIL_DOMAIN`, and optional
+  Stripe test-mode keys (`CODECARD_E2E_STRIPE_*`).
+* Production values are forbidden. The live project reference
+  `gclteunkzorwaliwhatp` must never be used for E2E.
+* GitHub Actions secrets for these variables are configured later during
+  WS14-T012.
+* Readiness / smoke (headless, non-interactive):
+  `npm run test:e2e:env --workspace=web` and
+  `npm run test:e2e:smoke --workspace=web`.
 
 ---
 

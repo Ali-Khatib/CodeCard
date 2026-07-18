@@ -4,7 +4,15 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'node',
-    exclude: ['**/node_modules/**', '**/e2e/**'],
+    // Playwright specs live under apps/web/e2e/. Live backend readiness/smoke
+    // runs use vitest.e2e.config.ts (*.livetest.ts) and must never run under
+    // `npm test`. Do NOT exclude src/lib/e2e — that holds unit/contract tests.
+    exclude: [
+      '**/node_modules/**',
+      'e2e/**',
+      '**/apps/web/e2e/**',
+      '**/*.livetest.ts',
+    ],
   },
   resolve: {
     alias: {
