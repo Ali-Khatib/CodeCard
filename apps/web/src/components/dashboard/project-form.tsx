@@ -20,6 +20,10 @@ import {
 } from '@/lib/projects/project-form';
 import { CASE_STUDY_SECTIONS } from '@/lib/projects/case-study-sections';
 import type { CaseStudySectionId } from '@/lib/projects/case-study-sections.shared';
+import {
+  CASE_STUDY_IMAGE_ACCEPT,
+  compressCaseStudyImage,
+} from '@/lib/projects/case-study-image';
 import { cn } from '@/lib/cn';
 import { joinDescribedBy } from '@/lib/a11y/described-by';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
@@ -116,6 +120,12 @@ export function ProjectForm({
   );
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [techInput, setTechInput] = useState('');
+  const [sectionImageErrors, setSectionImageErrors] = useState<
+    Partial<Record<CaseStudySectionId, string>>
+  >({});
+  const [sectionImageBusy, setSectionImageBusy] = useState<
+    Partial<Record<CaseStudySectionId, boolean>>
+  >({});
   const [clientError, setClientError] = useState('');
   const [clientFieldError, setClientFieldError] = useState<{
     field?: string;
@@ -602,8 +612,9 @@ export function ProjectForm({
             Showcase story (optional)
           </h2>
           <p id="project-showcase-help" className="mt-1 text-[13px] leading-relaxed text-ash">
-            Add up to five short written tabs on your project page. Each one is text-only — write
-            what a visitor should read when they tap that tab. Skip any you do not need.
+            Add up to five short written tabs on your project page. Write what a visitor should
+            read when they tap that tab, and optionally add a background image behind the text —
+            the text always stays readable on top. Skip any you do not need.
           </p>
         </div>
         <div className="space-y-4">
@@ -615,6 +626,11 @@ export function ProjectForm({
             const fieldId = `case_study_${section.id}`;
             const helpId = `${fieldId}-help`;
             const promptId = `${fieldId}-prompt`;
+            const imageInputId = `${fieldId}-image`;
+            const imageHelpId = `${fieldId}-image-help`;
+            const sectionImage = form.case_study_sections[section.id]?.mediaUrl ?? '';
+            const imageError = sectionImageErrors[section.id] ?? '';
+            const imageBusy = Boolean(sectionImageBusy[section.id]);
             return (
               <div
                 key={section.id}
@@ -642,6 +658,7 @@ export function ProjectForm({
                         }
                         return { ...prev, case_study_sections: next };
                       });
+                      setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
                     }}
                   >
                     {enabled ? 'Remove' : 'Add'}
@@ -667,7 +684,10 @@ export function ProjectForm({
                           ...prev,
                           case_study_sections: {
                             ...prev.case_study_sections,
-                            [section.id as CaseStudySectionId]: { text },
+                            [section.id as CaseStudySectionId]: {
+                              ...prev.case_study_sections[section.id],
+                              text,
+                            },
                           },
                         }));
                       }}
@@ -678,6 +698,92 @@ export function ProjectForm({
                     <p id={helpId} className="text-[12px] text-ash">
                       Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
                     </p>
+
+                    <div className="mt-3 space-y-2 border-t border-charcoal/60 pt-3">
+                      <label
+                        htmlFor={imageInputId}
+                        className="text-[13px] font-medium text-graphite"
+                      >
+                        Background image <span className="text-ash">(optional)</span>
+                      </label>
+                      <p id={imageHelpId} className="text-[12px] leading-relaxed text-ash">
+                        Shown behind this tab&apos;s text with a dark overlay so the words stay
+                        readable. JPEG, PNG, or WebP — it is compressed automatically.
+                      </p>
+                      {sectionImage ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          {/* Bounded data-URL preview generated client-side. */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={sectionImage}
+                            alt={`${section.label} background preview`}
+                            className="h-16 w-28 rounded-[10px] border border-charcoal/70 object-cover"
+                          />
+                          <button
+                            type="button"
+                            className="cc-app-btn cc-app-btn--ghost min-h-11 px-4 text-[13px]"
+                            onClick={() => {
+                              setForm((prev) => {
+                                const current = prev.case_study_sections[section.id];
+                                const next = { ...current };
+                                delete next.mediaUrl;
+                                return {
+                                  ...prev,
+                                  case_study_sections: {
+                                    ...prev.case_study_sections,
+                                    [section.id as CaseStudySectionId]: next,
+                                  },
+                                };
+                              });
+                              setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
+                            }}
+                          >
+                            Remove image
+                          </button>
+                        </div>
+                      ) : (
+                        <input
+                          id={imageInputId}
+                          type="file"
+                          accept={CASE_STUDY_IMAGE_ACCEPT}
+                          disabled={imageBusy}
+                          aria-describedby={imageHelpId}
+                          className="block w-full text-[13px] text-ash file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-[10px] file:border file:border-charcoal/70 file:bg-charcoal/40 file:px-4 file:py-2 file:text-[13px] file:text-vellum"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = '';
+                            if (!file) return;
+                            setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
+                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: true }));
+                            const result = await compressCaseStudyImage(file);
+                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: false }));
+                            if (!result.ok) {
+                              setSectionImageErrors((prev) => ({
+                                ...prev,
+                                [section.id]: result.message,
+                              }));
+                              return;
+                            }
+                            setForm((prev) => ({
+                              ...prev,
+                              case_study_sections: {
+                                ...prev.case_study_sections,
+                                [section.id as CaseStudySectionId]: {
+                                  ...prev.case_study_sections[section.id],
+                                  mediaUrl: result.dataUrl,
+                                },
+                              },
+                            }));
+                          }}
+                        />
+                      )}
+                      {imageBusy ? (
+                        <p className="text-[12px] text-ash" role="status">
+                          Preparing image…
+                        </p>
+                      ) : null}
+                      <FieldError id={`${imageInputId}-error`} message={imageError || undefined} />
+                    </div>
                   </div>
                 ) : null}
               </div>

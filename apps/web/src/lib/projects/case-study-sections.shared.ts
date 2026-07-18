@@ -90,9 +90,14 @@ export function caseStudyTextForSection(
   return text || null;
 }
 
+/** Only inline images and http(s) URLs may render (blocks javascript: etc.). */
+export function isSafeCaseStudyMediaUrl(value: string): boolean {
+  return value.startsWith('data:image/') || /^https?:\/\//i.test(value);
+}
+
 /**
- * Optional custom media for a section. Text sections are preferred in the UI;
- * screenshot/video fallbacks are not used so empty text does not look like a missing image.
+ * Optional background image for a section. Rendered behind the section text
+ * with a scrim so the story stays readable; never shown as a bare media panel.
  */
 export function caseStudyMediaForSection(
   project: {
@@ -101,7 +106,8 @@ export function caseStudyMediaForSection(
   sectionId: CaseStudySectionId,
 ): string | null {
   const custom = project.caseStudySections?.[sectionId]?.mediaUrl?.trim();
-  return custom || null;
+  if (!custom || !isSafeCaseStudyMediaUrl(custom)) return null;
+  return custom;
 }
 
 export function visibleCaseStudySections(
@@ -127,6 +133,24 @@ export function buildCaseStudySectionsFromTexts(
   for (const id of CASE_STUDY_SECTION_IDS) {
     const text = texts[id]?.trim();
     if (text) out[id] = { text };
+  }
+  return out;
+}
+
+/** Build a storable object from per-section text and optional background image. */
+export function buildCaseStudySectionsFromEntries(
+  entries: Partial<Record<CaseStudySectionId, { text?: string; mediaUrl?: string }>>,
+): CaseStudySections {
+  const out: CaseStudySections = {};
+  for (const id of CASE_STUDY_SECTION_IDS) {
+    const text = entries[id]?.text?.trim();
+    const mediaUrl = entries[id]?.mediaUrl?.trim();
+    const safeMedia = mediaUrl && isSafeCaseStudyMediaUrl(mediaUrl) ? mediaUrl : undefined;
+    if (!text && !safeMedia) continue;
+    out[id] = {
+      ...(text ? { text } : {}),
+      ...(safeMedia ? { mediaUrl: safeMedia } : {}),
+    };
   }
   return out;
 }

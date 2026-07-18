@@ -17,26 +17,68 @@ import { cn } from '@/lib/cn';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-function TextCaseStudyPanel({
+function CaseStudyPanel({
   section,
   body,
+  mediaUrl,
 }: {
   section: CaseStudySectionConfig;
   body: string;
+  mediaUrl: string | null;
 }) {
+  const hasImage = Boolean(mediaUrl);
+
   return (
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(192,148,228,0.28),transparent_36%),linear-gradient(155deg,#0b0614,#1a1230_52%,#07040f)]">
+    <div
+      className={cn(
+        'absolute inset-0',
+        // Site-palette backdrop (cream → lavender mist) when no image is set.
+        !hasImage &&
+          'bg-[radial-gradient(circle_at_16%_14%,rgba(192,148,228,0.22),transparent_46%),linear-gradient(150deg,var(--paper),var(--hume-lavender-mist)_58%,var(--hume-cream))]',
+      )}
+    >
+      {hasImage && mediaUrl ? (
+        <>
+          <ProjectMedia
+            src={mediaUrl}
+            alt=""
+            sizes="(max-width: 1024px) 100vw, 720px"
+            className="object-cover"
+          />
+          {/* Scrim guarantees the story text stays readable over any image. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(23,21,26,0.42),rgba(23,21,26,0.58)_48%,rgba(23,21,26,0.8))]"
+          />
+        </>
+      ) : null}
+
       <div
         className="absolute inset-0 flex flex-col justify-center gap-4 overflow-y-auto p-5 sm:p-7 md:gap-5 md:p-10"
         role="presentation"
       >
-        <p className="font-eyebrow text-[10px] uppercase tracking-[0.2em] text-lavender/85 md:text-[11px]">
+        <p
+          className={cn(
+            'font-eyebrow text-[10px] uppercase tracking-[0.2em] md:text-[11px]',
+            hasImage ? 'text-[#e9ddf5] [text-shadow:0_1px_10px_rgba(0,0,0,0.55)]' : 'text-smoke',
+          )}
+        >
           {section.eyebrow}
         </p>
-        <h2 className="max-w-[14ch] text-[clamp(2rem,7vw,3.75rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-lilac-white">
+        <h2
+          className={cn(
+            'max-w-[14ch] text-[clamp(2rem,7vw,3.75rem)] font-semibold leading-[0.92] tracking-[-0.07em]',
+            hasImage ? 'text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.55)]' : 'text-ink',
+          )}
+        >
           {section.label}
         </h2>
-        <p className="max-w-[34ch] text-[clamp(1.15rem,3.2vw,1.85rem)] font-medium leading-[1.25] tracking-[-0.03em] text-lilac-white/92 md:max-w-[38ch]">
+        <p
+          className={cn(
+            'max-w-[34ch] text-[clamp(1.15rem,3.2vw,1.85rem)] font-medium leading-[1.25] tracking-[-0.03em] md:max-w-[38ch]',
+            hasImage ? 'text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.6)]' : 'text-ink',
+          )}
+        >
           {body}
         </p>
       </div>
@@ -69,9 +111,7 @@ export function ProjectCaseStudyTabs({
   const activePart = visibleSections.find((part) => part.id === activePartId) ?? visibleSections[0]!;
   const activeText = caseStudyTextForSection(project, activePart.id);
   const activeMedia = caseStudyMediaForSection(project, activePart.id);
-  // Showcase tabs are text-first; media only when the section stores an explicit mediaUrl.
-  const showTextPanel = Boolean(activeText);
-  const showMediaPanel = Boolean(activeMedia) && !showTextPanel;
+  const activeBody = activeText ?? activePart.summary;
 
   const setActive = (id: CaseStudySectionId, label: string) => {
     setActivePartId(id);
@@ -79,56 +119,33 @@ export function ProjectCaseStudyTabs({
   };
 
   return (
-    <section className="mb-8 mt-6 overflow-hidden rounded-[20px] border border-white/10 bg-[#07040f] shadow-[0_20px_60px_rgba(0,0,0,0.32)] md:mb-14 md:mt-14 md:rounded-[30px] md:shadow-[0_28px_90px_rgba(0,0,0,0.38)]">
+    <section className="mb-8 mt-6 overflow-hidden rounded-[20px] border border-[color:var(--line-soft)] bg-paper shadow-[0_18px_50px_rgba(35,35,36,0.1)] md:mb-14 md:mt-14 md:rounded-[30px] md:shadow-[0_24px_70px_rgba(35,35,36,0.12)]">
       <div className="grid overflow-hidden md:rounded-[30px] lg:grid-cols-[minmax(0,1.12fr)_minmax(280px,0.88fr)]">
         <div className="relative min-h-[220px] overflow-hidden sm:min-h-[280px] md:min-h-[520px]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={`${project.id}-${activePart.id}-${activeText ?? activeMedia ?? 'empty'}`}
+              key={`${project.id}-${activePart.id}-${activeBody}-${activeMedia ?? 'no-media'}`}
               initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.02, y: 8 }}
               animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.99, y: -6 }}
               transition={{ duration: reduced ? 0.18 : 0.4, ease: EASE }}
               className="absolute inset-0"
             >
-              {showTextPanel ? (
-                <TextCaseStudyPanel section={activePart} body={activeText!} />
-              ) : showMediaPanel && activeMedia ? (
-                <ProjectMedia src={activeMedia} sizes="(max-width: 1024px) 100vw, 720px" className="object-cover object-top" />
-              ) : (
-                <TextCaseStudyPanel
-                  section={activePart}
-                  body={activePart.summary}
-                />
-              )}
+              <CaseStudyPanel section={activePart} body={activeBody} mediaUrl={activeMedia} />
             </motion.div>
           </AnimatePresence>
-
-          {showMediaPanel && (
-            <>
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(3,0,12,0.88),rgba(3,0,12,0.1)_45%,rgba(3,0,12,0.12))]" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-                <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-lavender/80 md:text-[10px]">
-                  {activePart.eyebrow}
-                </p>
-                <h2 className="mt-2 max-w-[12ch] text-[clamp(1.5rem,5vw,4rem)] font-semibold leading-[0.9] tracking-[-0.08em] text-lilac-white">
-                  {activePart.label}
-                </h2>
-              </div>
-            </>
-          )}
         </div>
 
-        <div className="flex flex-col justify-between border-t border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-3 backdrop-blur-xl sm:p-4 md:p-8 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-[color:var(--line-soft)] bg-[color:var(--hume-cream)] p-3 sm:p-4 md:p-8 lg:border-l lg:border-t-0">
           <div>
-            <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-lavender/80 md:text-[10px]">
+            <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-smoke md:text-[10px]">
               Extra showcase
             </p>
-            <p className="mt-2 text-[12px] leading-relaxed text-ash md:text-[13px]">
+            <p className="mt-2 text-[12px] leading-relaxed text-smoke md:text-[13px]">
               Optional story beats — each tab is a short written section visitors can tap through.
             </p>
             {project.tagline && (
-              <h3 className="mt-3 text-[16px] font-medium leading-snug tracking-[-0.03em] text-lilac-white sm:text-[18px] md:mt-5 md:text-[24px]">
+              <h3 className="mt-3 text-[16px] font-medium leading-snug tracking-[-0.03em] text-ink sm:text-[18px] md:mt-5 md:text-[24px]">
                 {project.tagline}
               </h3>
             )}
@@ -180,11 +197,14 @@ export function ProjectCaseStudyTabs({
                     className={cn(
                       'flex min-h-11 min-w-0 items-center gap-1.5 rounded-[12px] border px-2 py-1.5 text-left transition-all duration-200 lg:gap-3 lg:rounded-[20px] lg:px-4 lg:py-3',
                       active
-                        ? 'border-lavender/35 bg-lavender/15 text-lilac-white shadow-[0_10px_30px_rgba(192,148,228,0.12)]'
-                        : 'border-white/8 bg-white/[0.035] text-ash opacity-70 hover:opacity-100',
+                        ? 'border-[#c094e4] bg-paper text-ink shadow-[0_10px_26px_rgba(192,148,228,0.28)]'
+                        : 'border-[color:var(--border)] bg-paper text-smoke hover:border-[#c094e4] hover:text-ink',
                     )}
                   >
-                    <Icon className={cn('h-3.5 w-3.5 shrink-0 lg:h-5 lg:w-5', active && 'text-lavender')} aria-hidden />
+                    <Icon
+                      className={cn('h-3.5 w-3.5 shrink-0 lg:h-5 lg:w-5', active ? 'text-[#a86ed6]' : 'text-smoke')}
+                      aria-hidden
+                    />
                     <span className="truncate text-[11px] font-medium leading-tight lg:text-[15px]">{label}</span>
                   </button>
                 );
@@ -201,7 +221,7 @@ export function ProjectCaseStudyTabs({
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6 }}
                 transition={{ duration: reduced ? 0.12 : 0.2 }}
-                className="mt-3 min-h-[36px] text-[12px] leading-relaxed text-ash md:mt-4 md:text-[14px]"
+                className="mt-3 min-h-[36px] text-[12px] leading-relaxed text-smoke md:mt-4 md:text-[14px]"
               >
                 {activeText ?? activePart.summary}
               </motion.div>

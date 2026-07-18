@@ -258,7 +258,7 @@ export const caseStudySectionContentSchema = z
     mediaUrl: caseStudyMediaUrlSchema.optional(),
   })
   .refine((value) => Boolean(value.text?.trim() || value.mediaUrl?.trim()), {
-    message: 'Each showcase section needs text',
+    message: 'Each showcase section needs text or a background image',
   });
 
 export const caseStudySectionsSchema = z
