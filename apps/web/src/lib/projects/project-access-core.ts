@@ -28,6 +28,7 @@ export type OwnedProjectRecord = {
   status: string | null;
   is_published: boolean;
   sort_order: number;
+  case_study_sections: unknown;
 };
 
 type AccessError = {
@@ -93,7 +94,7 @@ export async function loadOwnedProject(
   const { data: project, error } = await supabase
     .from('projects')
     .select(
-      'id, tenant_id, profile_id, owner_user_id, slug, title, tagline, description, technologies, user_role, started_at, ended_at, status, is_published, sort_order',
+      'id, tenant_id, profile_id, owner_user_id, slug, title, tagline, description, technologies, user_role, started_at, ended_at, status, is_published, sort_order, case_study_sections',
     )
     .eq('id', input.projectId)
     .eq('owner_user_id', input.userId)

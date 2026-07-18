@@ -39,6 +39,46 @@ describe('profileLinkInputSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('rejects GitHub type with a non-GitHub host', () => {
+    const result = profileLinkInputSchema.safeParse({
+      type: 'github',
+      label: 'GitHub',
+      url: 'https://gitlab.com/alex',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects LinkedIn type with a non-LinkedIn host', () => {
+    const result = profileLinkInputSchema.safeParse({
+      type: 'linkedin',
+      url: 'https://github.com/alex',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts X links on x.com and twitter.com', () => {
+    expect(
+      profileLinkInputSchema.safeParse({
+        type: 'twitter',
+        url: 'https://x.com/alex',
+      }).success,
+    ).toBe(true);
+    expect(
+      profileLinkInputSchema.safeParse({
+        type: 'twitter',
+        url: 'https://twitter.com/alex',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('allows any https host for personal website', () => {
+    const result = profileLinkInputSchema.safeParse({
+      type: 'website',
+      url: 'https://alex.dev',
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('normalizes email links to mailto', () => {
     const result = profileLinkInputSchema.safeParse({
       type: 'email',

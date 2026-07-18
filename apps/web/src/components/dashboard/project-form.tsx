@@ -18,6 +18,8 @@ import {
   type ProjectFormMode,
   type ProjectFormValues,
 } from '@/lib/projects/project-form';
+import { CASE_STUDY_SECTIONS } from '@/lib/projects/case-study-sections';
+import type { CaseStudySectionId } from '@/lib/projects/case-study-sections.shared';
 import { cn } from '@/lib/cn';
 import { joinDescribedBy } from '@/lib/a11y/described-by';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
@@ -592,6 +594,97 @@ export function ProjectForm({
           />
           <FieldError id="project-ended-at-error" message={fieldErrors.ended_at} />
         </div>
+      </section>
+
+      <section className="space-y-4" aria-labelledby="project-showcase-heading">
+        <div>
+          <h2 id="project-showcase-heading" className="text-[15px] font-semibold text-graphite">
+            Showcase story (optional)
+          </h2>
+          <p id="project-showcase-help" className="mt-1 text-[13px] leading-relaxed text-ash">
+            Add up to five short written tabs on your project page. Each one is text-only — write
+            what a visitor should read when they tap that tab. Skip any you do not need.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {CASE_STUDY_SECTIONS.map((section) => {
+            const enabled = Object.prototype.hasOwnProperty.call(
+              form.case_study_sections,
+              section.id,
+            );
+            const fieldId = `case_study_${section.id}`;
+            const helpId = `${fieldId}-help`;
+            const promptId = `${fieldId}-prompt`;
+            return (
+              <div
+                key={section.id}
+                className="rounded-[16px] border border-charcoal/70 bg-charcoal/20 p-4"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium text-vellum">{section.label}</p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.addHint}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={cn(
+                      'cc-app-btn min-h-11 shrink-0 px-4 text-[13px]',
+                      enabled ? 'cc-app-btn--ghost' : 'cc-app-btn--primary',
+                    )}
+                    aria-pressed={enabled}
+                    onClick={() => {
+                      setForm((prev) => {
+                        const next = { ...prev.case_study_sections };
+                        if (enabled) {
+                          delete next[section.id];
+                        } else {
+                          next[section.id] = { text: '' };
+                        }
+                        return { ...prev, case_study_sections: next };
+                      });
+                    }}
+                  >
+                    {enabled ? 'Remove' : 'Add'}
+                  </button>
+                </div>
+                {enabled ? (
+                  <div className="mt-4 space-y-2">
+                    <label htmlFor={fieldId} className="text-[13px] font-medium text-graphite">
+                      {section.label} text
+                    </label>
+                    <p id={promptId} className="text-[12px] leading-relaxed text-lichen">
+                      {section.prompt}
+                    </p>
+                    <textarea
+                      id={fieldId}
+                      name={fieldId}
+                      rows={4}
+                      maxLength={PROJECT_FORM_LIMITS.caseStudySection}
+                      value={form.case_study_sections[section.id]?.text ?? ''}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        setForm((prev) => ({
+                          ...prev,
+                          case_study_sections: {
+                            ...prev.case_study_sections,
+                            [section.id as CaseStudySectionId]: { text },
+                          },
+                        }));
+                      }}
+                      className="cc-input w-full resize-y"
+                      placeholder={section.placeholder}
+                      aria-describedby={joinDescribedBy(promptId, helpId)}
+                    />
+                    <p id={helpId} className="text-[12px] text-ash">
+                      Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        <FieldError id="project-case-study-error" message={fieldErrors.case_study_sections} />
       </section>
 
       {recoverableError && (

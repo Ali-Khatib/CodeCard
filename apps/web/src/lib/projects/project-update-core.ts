@@ -15,6 +15,7 @@ import {
 import { mapProjectCreateDbError } from '@/lib/projects/project-create-core';
 import { emitProjectUpdatedActivity } from '@/lib/circle/circle-emit-core';
 import { projectHasMeaningfulChange } from '@/lib/circle/circle-fingerprint';
+import { parseCaseStudySectionsFromFormData } from '@/lib/projects/project-form';
 
 export type ProjectUpdateFieldErrors = Partial<
   Record<
@@ -28,7 +29,8 @@ export type ProjectUpdateFieldErrors = Partial<
     | 'user_role'
     | 'started_at'
     | 'ended_at'
-    | 'status',
+    | 'status'
+    | 'case_study_sections',
     string
   >
 >;
@@ -67,6 +69,7 @@ export function parseUpdateProjectFormData(formData: FormData) {
     started_at: String(formData.get('started_at') ?? '') || null,
     ended_at: String(formData.get('ended_at') ?? '') || null,
     status: String(formData.get('status') ?? '') || undefined,
+    case_study_sections: parseCaseStudySectionsFromFormData(formData),
   };
 }
 
@@ -236,6 +239,7 @@ export async function executeUpdateProject(
       started_at: data.started_at ?? null,
       ended_at: data.ended_at ?? null,
       status: data.status ?? 'draft',
+      case_study_sections: data.case_study_sections ?? {},
     })
     .eq('id', project.id)
     .eq('owner_user_id', auth.user.id);

@@ -3,7 +3,6 @@
 export const CASE_STUDY_SECTION_IDS = [
   'problem',
   'approach',
-  'impact',
   'results',
   'product',
   'architecture',
@@ -34,10 +33,12 @@ export type CaseStudySectionConfig = {
   Icon: import('react-icons').IconType;
 };
 
+/** Map retired / alternate keys onto the five current section ids. */
 const LEGACY_SECTION_MAP: Record<string, CaseStudySectionId> = {
-  takeaway: 'impact',
-  overview: 'impact',
-  github: 'impact',
+  impact: 'results',
+  takeaway: 'results',
+  overview: 'results',
+  github: 'results',
   demo: 'product',
   build: 'architecture',
   model: 'architecture',
@@ -89,21 +90,18 @@ export function caseStudyTextForSection(
   return text || null;
 }
 
+/**
+ * Optional custom media for a section. Text sections are preferred in the UI;
+ * screenshot/video fallbacks are not used so empty text does not look like a missing image.
+ */
 export function caseStudyMediaForSection(
   project: {
     caseStudySections?: CaseStudySections;
-    posterUrl?: string | null;
-    screenshots?: string[];
-    videoUrl?: string | null;
   },
   sectionId: CaseStudySectionId,
 ): string | null {
   const custom = project.caseStudySections?.[sectionId]?.mediaUrl?.trim();
-  if (custom) return custom;
-  if (sectionId === 'product') return project.videoUrl ?? project.posterUrl ?? project.screenshots?.[0] ?? null;
-  if (sectionId === 'results') return project.screenshots?.[3] ?? project.screenshots?.[1] ?? null;
-  if (sectionId === 'architecture') return project.screenshots?.[2] ?? project.screenshots?.[1] ?? null;
-  return null;
+  return custom || null;
 }
 
 export function visibleCaseStudySections(
@@ -119,4 +117,16 @@ export function hasShowcaseExtras(
   sections: CaseStudySectionConfig[],
 ): boolean {
   return visibleCaseStudySections(project, sections).length > 0;
+}
+
+/** Build a storable object from optional per-section text (empty → omitted). */
+export function buildCaseStudySectionsFromTexts(
+  texts: Partial<Record<CaseStudySectionId, string>>,
+): CaseStudySections {
+  const out: CaseStudySections = {};
+  for (const id of CASE_STUDY_SECTION_IDS) {
+    const text = texts[id]?.trim();
+    if (text) out[id] = { text };
+  }
+  return out;
 }
