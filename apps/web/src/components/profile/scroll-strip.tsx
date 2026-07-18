@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { ProjectMedia } from './project-media';
+import { scrollBehaviorForPreference } from '@/hooks/use-reduced-motion';
 
 interface ScrollStripProps {
   projects: FeaturedProject[];
@@ -35,7 +36,7 @@ export function ScrollStrip({ projects, activeId, accentColor, onSelect }: Scrol
     if (activeEl) {
       const target =
         activeEl.offsetLeft - track.clientWidth / 2 + activeEl.clientWidth / 2;
-      track.scrollTo({ left: target, behavior: 'smooth' });
+      track.scrollTo({ left: target, behavior: scrollBehaviorForPreference() });
     }
   }, [activeId]);
 

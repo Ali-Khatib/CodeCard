@@ -587,3 +587,11 @@
     opacity: 0;
   }
 }
+
+/* WS12-T006 — Analytics pulse is decorative; disable under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .cc-analytics-live-dot,
+  [data-analytics-pulse] {
+    animation: none !important;
+  }
+}

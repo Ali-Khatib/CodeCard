@@ -4322,8 +4322,17 @@ select,
     scroll-behavior: auto !important;
   }
 
-  .cc-skeleton {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .cc-skeleton,
+  .animate-pulse,
+  .animate-spin:not([data-essential-loading='true']) {
     animation: none !important;
+  }
+
+  .cc-skeleton {
     background: #08080c !important;
   }
 
@@ -4341,6 +4350,12 @@ select,
 
   .cc-logo-loop__track {
     animation: none !important;
+    transform: none !important;
+  }
+
+  /* Decorative hover transforms become static. */
+  .cc-hero-points__item:hover,
+  .cc-instant-press:active {
     transform: none !important;
   }
 }
