@@ -15,11 +15,16 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/moderation/report` | POST | Public (optional user) | Zod | N/A | `moderation` | JSON | `reporter_user_id` from session when present |
 | `/api/account/export` | POST (GET→405) | Required | Strict Zod | **same-origin** | `accountExport` strict | JSON download | Session identity only; no-store |
 | `/api/account/delete` | POST (GET→405) | Required | Zod + confirmation | **same-origin** | `accountDelete` strict | JSON | Reauth required |
+| `/api/admin/reports` | GET | Canonical global admin | Allowlisted pagination/status/target filters | N/A (read-only) | None | Private no-store JSON | Authorization before T002 service-role reader |
+| `/api/admin/dmca` | GET | Canonical global admin | Allowlisted pagination/status filters | N/A (read-only) | None | Private no-store JSON | Privacy-minimized DMCA list DTO |
+| `/api/admin/reports/[id]` | PATCH | Canonical global admin | UUID + resolve/dismiss allowlist | **same-origin** | None | Private no-store JSON | Atomic status + audit RPC; conflict-safe |
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |
 
-No Connections/Circle/admin JSON API routes exist — those use server actions with session ownership.
+No Connections/Circle JSON API routes exist — those use server actions with session ownership.
+
+Admin routes deliberately do not use the generic `secureJsonRoute`: they use the canonical WS13 global-admin resolver, explicit filter/body schemas, private no-store responses, and create the privileged client only after authorization. The report mutation additionally enforces same-origin CSRF.
 
 No QR API route — QR is generated client/server-side locally; downloads recorded via analytics.
 
@@ -31,6 +36,7 @@ No QR API route — QR is generated client/server-side locally; downloads record
 2. **Upload** — custom JSON controls with same-origin, ownership, MIME.
 3. **Public research PDF** — binary stream + SSRF controls.
 4. **Account export** — uses `secureJsonRoute` for auth/validation then returns attachment bytes.
+5. **Admin routes** — canonical global-admin authorization followed by narrowly scoped T002 readers/actions; mutation uses same-origin CSRF.
 
 ---
 
