@@ -652,12 +652,22 @@ export const analyticsEventSchema = z.object({
   session_id: z.string().max(64).optional().nullable(),
 });
 
-export const moderationReportSchema = z.object({
-  target_type: z.enum(['profile', 'project', 'media']),
-  target_id: z.string().uuid(),
-  reason: z.string().min(10).max(2000).trim(),
-  reporter_email: z.string().email().max(255).optional(),
-});
+export const MODERATION_REPORT_REASON_CATEGORIES = [
+  'spam',
+  'harassment',
+  'impersonation',
+  'copyright',
+  'other',
+] as const;
+
+export const moderationReportSchema = z
+  .object({
+    target_type: z.enum(['profile', 'project']),
+    target_id: z.string().uuid(),
+    reason_category: z.enum(MODERATION_REPORT_REASON_CATEGORIES),
+    description: z.string().max(1500).trim().optional(),
+  })
+  .strict();
 
 export const dmcaNoticeSchema = z.object({
   claimant_name: z.string().min(1).max(200).trim(),

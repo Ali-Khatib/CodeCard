@@ -481,6 +481,7 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 - WS13-T005 — reported profile/project hiding with durable holds — **done** (§18e)
 - WS13-T006 — account suspension with Auth ban + durable publish blocks — **done** (§18f)
 - WS13-T007 — private moderation notes — **done** (§18g)
+- WS13-T009 — public profile/project reporting — **done** (`MODERATION.md`)
 - Public role-management UI/API — not planned for T001
 
 ## 29. Mapping to WS11-T002 (implemented)

@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PLAYWRIGHT_PORT ?? '3000');
+const baseURL = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -8,7 +11,7 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -17,8 +20,8 @@ export default defineConfig({
     { name: 'mobile-390', use: { ...devices['Pixel 5'], viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
+    command: `npm run start -- -p ${port}`,
+    url: baseURL,
     reuseExistingServer: true,
     timeout: 90000,
     env: {
