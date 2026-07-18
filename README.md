@@ -130,6 +130,25 @@ Important security rules:
 * Keep the Stripe secret key server-only
 * Keep the Stripe webhook secret server-only
 * Keep Upstash tokens server-only
+* Never commit `apps/web/.env.local` — only `.env.example` is tracked
+
+Which values are optional for basic local development:
+
+* Stripe, Upstash, and Sentry variables are optional unless you exercise
+  billing, rate limiting, or error monitoring locally.
+* The Supabase service role key is required for account export/deletion and
+  webhook flows.
+
+Test-only variables (never set in production):
+
+* `CODECARD_E2E_FIXTURES=1` enables the `/e2e-fixtures/*` harness routes used by
+  the local Playwright specs; the Playwright config sets it automatically.
+* `PLAYWRIGHT_PORT` overrides the local E2E server port (default `3000`).
+* Full authenticated Playwright E2E (auth, CRUD, sharing, account lifecycle)
+  additionally needs a dedicated **disposable** Supabase test backend isolated
+  from production, plus disposable test-user and test-mode Stripe configuration.
+  Those variables are intentionally not defined until that backend is
+  provisioned.
 
 ---
 
