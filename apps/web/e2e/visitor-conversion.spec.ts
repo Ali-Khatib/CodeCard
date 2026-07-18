@@ -2,13 +2,16 @@ import { expect, test, type Page } from '@playwright/test';
 
 const PROMPT = '[data-testid="sitewide-visitor-conversion-prompt"]';
 const DELAY_MS = 8_000;
+const SHOWN_KEY = 'codecard:visitor-conversion:shown';
+const REFUSAL_LABEL = 'No, I’ll keep my work scattered';
+const REFUSAL_SUPPORT =
+  'I’d rather keep sending people five different links and explaining everything manually.';
 
 async function prepareAnonymousPrompt(page: Page) {
   await page.addInitScript(() => {
     window.__CODECARD_E2E_ALLOW_VISITOR_PROMPT__ = true;
     if (window.sessionStorage.getItem('__codecard_prompt_test_initialized') !== '1') {
       window.sessionStorage.clear();
-      window.localStorage.removeItem('codecard:visitor-conversion:dismissed-at');
       window.sessionStorage.setItem('__codecard_prompt_test_initialized', '1');
     }
   });
@@ -29,7 +32,7 @@ async function advanceToReadyPrompt(page: Page, pathname: string) {
 }
 
 test.describe('site-wide anonymous visitor conversion prompt', () => {
-  test('waits eight visible seconds, stays non-modal, and suppresses the session', async ({
+  test('landing waits eight seconds, sets session key only when visible, and refuses without insult', async ({
     page,
   }) => {
     await prepareAnonymousPrompt(page);
@@ -44,14 +47,26 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
       'ready',
     );
     await expect(page.locator(PROMPT)).toHaveCount(0, { timeout: 1 });
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBeNull();
+
     await page.clock.runFor(DELAY_MS);
 
     const prompt = page.locator(PROMPT);
     await expect(prompt).toBeVisible();
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBe('true');
     await expect(prompt).toHaveAttribute('role', 'region');
     await expect(focusTarget).toBeFocused();
     await expect(page.locator('main')).not.toHaveAttribute('inert', /.*/);
     await expect(prompt.getByRole('heading', { name: 'Build your own CodeCard' })).toBeVisible();
+    await expect(
+      prompt.getByText(
+        'Give people one place to explore your projects, research, and technical work through a link or QR code.',
+      ),
+    ).toBeVisible();
     await expect(prompt.getByRole('link', { name: 'Create your CodeCard' })).toHaveAttribute(
       'href',
       /^\/sign-up\?source=marketing/,
@@ -61,23 +76,77 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
       /^\/sign-in\?source=marketing/,
     );
     await expect(prompt.getByText(/Get the .*app|iOS app|Android app/i)).toHaveCount(0);
+    await expect(prompt.getByRole('button', { name: REFUSAL_LABEL })).toBeVisible();
+    await expect(prompt.getByText(REFUSAL_SUPPORT)).toBeVisible();
 
-    await prompt.getByRole('button', { name: 'Dismiss CodeCard account prompt' }).click();
+    await prompt.getByRole('button', { name: REFUSAL_LABEL }).click();
     await expect(prompt).toHaveCount(0);
     expect(
-      await page.evaluate(() =>
-        window.localStorage.getItem('codecard:visitor-conversion:dismissed-at'),
-      ),
-    ).toMatch(/^\d+$/);
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBe('true');
 
-    await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
+    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
     await page.clock.fastForward(20_000);
     await expect(page.locator(PROMPT)).toHaveCount(0);
   });
 
-  test('pauses while hidden', async ({ page }) => {
+  test('leaving landing before eight seconds does not set the session key', async ({ page }) => {
     await prepareAnonymousPrompt(page);
+    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.clock.runFor(100);
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-visitor-conversion-timer',
+      'ready',
+    );
+    await page.clock.runFor(3_000);
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBeNull();
+
     await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
+    await page.clock.fastForward(20_000);
+    await expect(page.locator(PROMPT)).toHaveCount(0);
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBeNull();
+  });
+
+  test('live demo waits eight seconds and suppresses later landing shows', async ({ page }) => {
+    await advanceToReadyPrompt(page, '/dashboard/preview');
+    const prompt = page.locator(PROMPT);
+    await expect(prompt.getByText('CodeCard Demo')).toBeVisible();
+    await expect(prompt.getByRole('heading', { name: 'Like what you’re exploring?' })).toBeVisible();
+    await expect(
+      prompt.getByText(
+        'Build your own CodeCard and give people one place to explore your projects, research, and technical work.',
+      ),
+    ).toBeVisible();
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBe('true');
+
+    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.clock.fastForward(20_000);
+    await expect(page.locator(PROMPT)).toHaveCount(0);
+  });
+
+  test('Escape dismisses and keeps the session key set', async ({ page }) => {
+    await advanceToReadyPrompt(page, '/landing');
+    const prompt = page.locator(PROMPT);
+    await expect(prompt).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(prompt).toHaveCount(0);
+    expect(
+      await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
+    ).toBe('true');
+    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
+    await page.clock.fastForward(20_000);
+    await expect(page.locator(PROMPT)).toHaveCount(0);
+  });
+
+  test('pauses while hidden on landing', async ({ page }) => {
+    await prepareAnonymousPrompt(page);
+    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
     await page.clock.runFor(100);
     await expect(page.locator('html')).toHaveAttribute(
       'data-visitor-conversion-timer',
@@ -104,22 +173,15 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     await expect(page.locator(PROMPT)).toBeVisible();
   });
 
-  test('uses demo copy and keeps demo navigation interactive', async ({ page }) => {
-    await advanceToReadyPrompt(page, '/demo/card');
-    const prompt = page.locator(PROMPT);
-    await expect(prompt.getByText('CodeCard Demo')).toBeVisible();
-    await expect(prompt.getByRole('heading', { name: 'Like what you’re exploring?' })).toBeVisible();
-    await expect(prompt.getByRole('button', { name: 'Keep exploring' })).toBeVisible();
-    await expect(page.locator('main#main-content')).toBeVisible();
-    await expect(page.getByText('DevFlow').first()).toBeVisible();
-  });
-
   for (const pathname of [
     '/sign-in',
     '/sign-up',
     '/forgot-password',
     '/legal/privacy',
     '/admin',
+    '/pricing',
+    '/demo/card',
+    '/dashboard/preview/projects',
   ]) {
     test(`never appears on excluded route ${pathname}`, async ({ page }) => {
       await prepareAnonymousPrompt(page);
@@ -133,7 +195,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     test(`fits ${width}px with practical touch targets`, async ({ page }) => {
       test.slow();
       await page.setViewportSize({ width, height: 844 });
-      await advanceToReadyPrompt(page, '/pricing');
+      await advanceToReadyPrompt(page, '/landing');
       const prompt = page.locator(PROMPT);
       const box = await prompt.boundingBox();
       expect(box).not.toBeNull();
@@ -167,7 +229,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
 
   test('reduced motion uses opacity without translation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await advanceToReadyPrompt(page, '/pricing');
+    await advanceToReadyPrompt(page, '/landing');
     const style = await page.locator(PROMPT).evaluate((element) => {
       const computed = getComputedStyle(element);
       return {

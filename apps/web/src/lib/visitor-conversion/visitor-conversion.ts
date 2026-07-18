@@ -1,22 +1,27 @@
 import { isObviousAnalyticsBot } from '@/lib/analytics/bot-filter';
+import {
+  LIVE_DEMO_ENTRY_HREF,
+  MARKETING_HOME_HREF,
+} from '@/lib/marketing/site-routes';
 
 export const VISITOR_CONVERSION_DELAY_MS = 8_000;
-export const VISITOR_CONVERSION_DISMISSAL_MS = 7 * 24 * 60 * 60 * 1_000;
 export const VISITOR_CONVERSION_SHOWN_KEY = 'codecard:visitor-conversion:shown';
-export const VISITOR_CONVERSION_DISMISSED_AT_KEY =
-  'codecard:visitor-conversion:dismissed-at';
+export const VISITOR_CONVERSION_SHOWN_VALUE = 'true';
 
-export const VISITOR_CONVERSION_CONTEXTS = [
-  'landing',
-  'pricing',
+export const VISITOR_CONVERSION_CONTEXTS = ['landing', 'live_demo'] as const;
+
+export type VisitorConversionContext = (typeof VISITOR_CONVERSION_CONTEXTS)[number];
+
+/** Marker contexts on published pages. Markers no longer drive prompt eligibility. */
+export const VISITOR_CONVERSION_MARKER_CONTEXTS = [
   'live_demo',
   'public_profile',
   'public_project',
   'public_research',
-  'qr_profile',
 ] as const;
 
-export type VisitorConversionContext = (typeof VISITOR_CONVERSION_CONTEXTS)[number];
+export type VisitorConversionMarkerContext =
+  (typeof VISITOR_CONVERSION_MARKER_CONTEXTS)[number];
 
 export type VisitorConversionRoute = {
   context: VisitorConversionContext;
@@ -35,14 +40,11 @@ export type VisitorStorage = {
   setItem(key: string, value: string): void;
 };
 
-const MARKETING_PATH_CONTEXTS = new Map<string, VisitorConversionContext>([
-  ['/landing', 'landing'],
-  ['/how-it-works', 'landing'],
-  ['/profiles', 'landing'],
-  ['/research', 'landing'],
-  ['/research/references', 'landing'],
-  ['/pricing', 'pricing'],
-]);
+/** Public landing page — marketing home (mvp: `/landing`). */
+export const VISITOR_CONVERSION_LANDING_PATH = MARKETING_HOME_HREF;
+
+/** Live demo entry page — signed-out workspace preview. Nested preview routes are excluded. */
+export const VISITOR_CONVERSION_LIVE_DEMO_ENTRY_PATH = LIVE_DEMO_ENTRY_HREF;
 
 const EXCLUDED_PATH_PREFIXES = [
   '/sign-in',
@@ -58,12 +60,7 @@ const EXCLUDED_PATH_PREFIXES = [
 
 const SIGNUP_SOURCE_BY_CONTEXT: Record<VisitorConversionContext, string> = {
   landing: 'marketing',
-  pricing: 'pricing',
   live_demo: 'demo',
-  public_profile: 'public_profile',
-  public_project: 'public_project',
-  public_research: 'public_research',
-  qr_profile: 'qr',
 };
 
 const REFERRER_RE = /^[A-Za-z0-9][A-Za-z0-9/_-]*$/;
@@ -83,7 +80,9 @@ export function isExcludedVisitorConversionPath(pathname: string): boolean {
   if (!pathname.startsWith('/')) return true;
   if (
     pathname === '/dashboard' ||
-    (pathname.startsWith('/dashboard/') && !pathname.startsWith('/dashboard/preview'))
+    (pathname.startsWith('/dashboard/') &&
+      pathname !== VISITOR_CONVERSION_LIVE_DEMO_ENTRY_PATH &&
+      !pathname.startsWith(`${VISITOR_CONVERSION_LIVE_DEMO_ENTRY_PATH}/`))
   ) {
     return true;
   }
@@ -133,40 +132,28 @@ export function sanitizeInternalNextPath(raw: string | null | undefined): string
   return raw;
 }
 
+/**
+ * Eligible only on the public landing page and the live-demo entry page.
+ * Nested preview routes, marketing subpages, public profiles, and marker-backed
+ * detail routes are intentionally excluded.
+ */
 export function resolveVisitorConversionRoute(input: {
   pathname: string;
   searchParams?: URLSearchParams | null;
   marker?: VisitorConversionMarkerData | null;
 }): VisitorConversionRoute | null {
-  const { pathname, marker } = input;
+  const { pathname } = input;
   if (isExcludedVisitorConversionPath(pathname)) return null;
 
-  if (pathname === '/dashboard/preview' || pathname.startsWith('/dashboard/preview/')) {
+  if (pathname === VISITOR_CONVERSION_LANDING_PATH) {
+    return { context: 'landing', referrer: 'landing', profileId: null };
+  }
+
+  if (pathname === VISITOR_CONVERSION_LIVE_DEMO_ENTRY_PATH) {
     return { context: 'live_demo', referrer: 'demo', profileId: null };
   }
 
-  const marketingContext = MARKETING_PATH_CONTEXTS.get(pathname);
-  if (marketingContext) {
-    return {
-      context: marketingContext,
-      referrer: marketingContext === 'pricing' ? 'pricing' : 'landing',
-      profileId: null,
-    };
-  }
-
-  if (!marker || !isVisitorConversionContext(marker.context)) return null;
-  const markerContext = marker.context;
-  const isQrProfile =
-    markerContext === 'public_profile' && input.searchParams?.get('source') === 'qr';
-
-  return {
-    context: isQrProfile ? 'qr_profile' : markerContext,
-    referrer: sanitizeVisitorReferrer(marker.referrer),
-    profileId:
-      typeof marker.profileId === 'string' && marker.profileId.length <= 64
-        ? marker.profileId
-        : null,
-  };
+  return null;
 }
 
 export function buildVisitorConversionCtaHrefs(input: {
@@ -185,13 +172,6 @@ export function buildVisitorConversionCtaHrefs(input: {
     signupHref: `/sign-up?${signup.toString()}`,
     signinHref: `/sign-in?${signin.toString()}`,
   };
-}
-
-export function parseDismissedAt(raw: string | null, now = Date.now()): number | null {
-  if (!raw || !/^\d{10,16}$/.test(raw)) return null;
-  const timestamp = Number(raw);
-  if (!Number.isFinite(timestamp) || timestamp <= 0 || timestamp > now) return null;
-  return timestamp;
 }
 
 export function readVisitorStorage(storage: VisitorStorage, key: string): string | null {
@@ -215,12 +195,24 @@ export function writeVisitorStorage(
   }
 }
 
-export function isVisitorConversionDismissed(
-  raw: string | null,
-  now = Date.now(),
-): boolean {
-  const dismissedAt = parseDismissedAt(raw, now);
-  return dismissedAt !== null && now - dismissedAt < VISITOR_CONVERSION_DISMISSAL_MS;
+/** True when this browser-tab session has already shown the prompt. */
+export function hasVisitorConversionBeenShown(storage: VisitorStorage): boolean {
+  return (
+    readVisitorStorage(storage, VISITOR_CONVERSION_SHOWN_KEY) ===
+    VISITOR_CONVERSION_SHOWN_VALUE
+  );
+}
+
+/**
+ * Mark the prompt as shown for this browser-tab session.
+ * Call only when the box actually becomes visible — never when the timer starts.
+ */
+export function markVisitorConversionShown(storage: VisitorStorage): boolean {
+  return writeVisitorStorage(
+    storage,
+    VISITOR_CONVERSION_SHOWN_KEY,
+    VISITOR_CONVERSION_SHOWN_VALUE,
+  );
 }
 
 export function isValidStoreUrl(raw: string | null | undefined): raw is string {

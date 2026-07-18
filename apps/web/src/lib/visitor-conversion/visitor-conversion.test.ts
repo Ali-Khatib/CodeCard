@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   VISITOR_CONVERSION_DELAY_MS,
-  VISITOR_CONVERSION_DISMISSAL_MS,
+  VISITOR_CONVERSION_SHOWN_KEY,
+  VISITOR_CONVERSION_SHOWN_VALUE,
   buildVisitorConversionCtaHrefs,
+  hasVisitorConversionBeenShown,
   isAutomatedVisitor,
   isValidStoreUrl,
-  isVisitorConversionDismissed,
+  markVisitorConversionShown,
   readVisitorStorage,
   resolveStoreLinks,
   resolveVisitorConversionRoute,
@@ -33,54 +35,51 @@ class FakeVisibleDocument {
   }
 }
 
+class MemoryStorage {
+  private data = new Map<string, string>();
+  getItem(key: string) {
+    return this.data.has(key) ? this.data.get(key)! : null;
+  }
+  setItem(key: string, value: string) {
+    this.data.set(key, value);
+  }
+  clear() {
+    this.data.clear();
+  }
+}
+
 afterEach(() => {
   vi.useRealTimers();
 });
 
 describe('visitor conversion route eligibility', () => {
-  it.each([
-    ['/landing', 'landing'],
-    ['/how-it-works', 'landing'],
-    ['/profiles', 'landing'],
-    ['/research', 'landing'],
-    ['/pricing', 'pricing'],
-    ['/dashboard/preview', 'live_demo'],
-    ['/dashboard/preview/projects', 'live_demo'],
-  ])('allows public exploration route %s', (pathname, context) => {
-    expect(resolveVisitorConversionRoute({ pathname })?.context).toBe(context);
+  it('allows only the public landing page and live-demo entry page', () => {
+    expect(resolveVisitorConversionRoute({ pathname: '/landing' })?.context).toBe('landing');
+    expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })?.context).toBe(
+      'live_demo',
+    );
   });
 
   it.each([
-    ['/alex', 'public_profile'],
-    ['/alex/projects/11111111-1111-4111-8111-111111111111', 'public_project'],
-    ['/alex/research/paper', 'public_research'],
-    ['/demo/card', 'live_demo'],
-  ])('requires a successful public marker for %s', (pathname, context) => {
+    '/how-it-works',
+    '/profiles',
+    '/research',
+    '/research/references',
+    '/pricing',
+    '/dashboard/preview/projects',
+    '/dashboard/preview/research',
+    '/demo/card',
+    '/alex',
+    '/alex/projects/11111111-1111-4111-8111-111111111111',
+    '/alex/research/paper',
+  ])('never shows on non-entry route %s', (pathname) => {
     expect(resolveVisitorConversionRoute({ pathname })).toBeNull();
     expect(
       resolveVisitorConversionRoute({
         pathname,
-        marker: { context, referrer: pathname.slice(1) },
-      })?.context,
-    ).toBe(context);
-  });
-
-  it('recognizes only the fixed QR source on a public profile', () => {
-    const marker = { context: 'public_profile', referrer: 'alex' };
-    expect(
-      resolveVisitorConversionRoute({
-        pathname: '/alex',
-        marker,
-        searchParams: new URLSearchParams('source=qr'),
-      })?.context,
-    ).toBe('qr_profile');
-    expect(
-      resolveVisitorConversionRoute({
-        pathname: '/alex',
-        marker,
-        searchParams: new URLSearchParams('source=anything'),
-      })?.context,
-    ).toBe('public_profile');
+        marker: { context: 'live_demo', referrer: 'demo' },
+      }),
+    ).toBeNull();
   });
 
   it.each([
@@ -153,28 +152,50 @@ describe('visitor conversion timing', () => {
   });
 });
 
-describe('visitor conversion suppression and safety', () => {
-  it('suppresses for seven days and returns at the boundary', () => {
-    const now = 2_000_000_000_000;
-    expect(isVisitorConversionDismissed(String(now - 1), now)).toBe(true);
-    expect(
-      isVisitorConversionDismissed(
-        String(now - VISITOR_CONVERSION_DISMISSAL_MS + 1),
-        now,
-      ),
-    ).toBe(true);
-    expect(
-      isVisitorConversionDismissed(String(now - VISITOR_CONVERSION_DISMISSAL_MS), now),
-    ).toBe(false);
+describe('visitor conversion sessionStorage once-per-tab-session', () => {
+  it('uses exactly one shared sessionStorage key with value true', () => {
+    expect(VISITOR_CONVERSION_SHOWN_KEY).toBe('codecard:visitor-conversion:shown');
+    expect(VISITOR_CONVERSION_SHOWN_VALUE).toBe('true');
   });
 
-  it.each(['', 'nope', '-1', 'NaN', '9999999999999999'])(
-    'fails open for malformed dismissal value %s',
-    (value) => {
-      expect(isVisitorConversionDismissed(value, 2_000_000_000_000)).toBe(false);
-    },
-  );
+  it('sets the key only when markVisitorConversionShown runs (visibility moment)', () => {
+    const storage = new MemoryStorage();
+    expect(hasVisitorConversionBeenShown(storage)).toBe(false);
+    expect(storage.getItem(VISITOR_CONVERSION_SHOWN_KEY)).toBeNull();
 
+    markVisitorConversionShown(storage);
+    expect(hasVisitorConversionBeenShown(storage)).toBe(true);
+    expect(storage.getItem(VISITOR_CONVERSION_SHOWN_KEY)).toBe('true');
+  });
+
+  it('landing and live demo share the same suppression key', () => {
+    const storage = new MemoryStorage();
+    markVisitorConversionShown(storage);
+    // Same key suppresses both routes — route resolver remains eligible, storage blocks show.
+    expect(resolveVisitorConversionRoute({ pathname: '/landing' })?.context).toBe('landing');
+    expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })?.context).toBe(
+      'live_demo',
+    );
+    expect(hasVisitorConversionBeenShown(storage)).toBe(true);
+  });
+
+  it('a fresh storage (new mocked tab session) is eligible again', () => {
+    const firstTab = new MemoryStorage();
+    markVisitorConversionShown(firstTab);
+    expect(hasVisitorConversionBeenShown(firstTab)).toBe(true);
+
+    const secondTab = new MemoryStorage();
+    expect(hasVisitorConversionBeenShown(secondTab)).toBe(false);
+  });
+
+  it('does not treat other values as shown', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(VISITOR_CONVERSION_SHOWN_KEY, '1');
+    expect(hasVisitorConversionBeenShown(storage)).toBe(false);
+  });
+});
+
+describe('visitor conversion CTA and safety', () => {
   it('rejects external, protocol-relative, encoded external, and malformed next paths', () => {
     expect(sanitizeInternalNextPath('/alex/projects/one')).toBe('/alex/projects/one');
     expect(sanitizeInternalNextPath('https://evil.test')).toBeNull();
@@ -187,18 +208,14 @@ describe('visitor conversion suppression and safety', () => {
   it('builds allowlisted internal signup and sign-in destinations', () => {
     const hrefs = buildVisitorConversionCtaHrefs({
       route: {
-        context: 'public_project',
-        referrer: 'alex/projects/project-one',
+        context: 'live_demo',
+        referrer: 'demo',
         profileId: null,
       },
-      pathname: '/alex/projects/project-one',
+      pathname: '/dashboard/preview',
     });
-    expect(hrefs.signupHref).toBe(
-      '/sign-up?source=public_project&referrer=alex%2Fprojects%2Fproject-one',
-    );
-    expect(hrefs.signinHref).toBe(
-      '/sign-in?source=public_project&next=%2Falex%2Fprojects%2Fproject-one',
-    );
+    expect(hrefs.signupHref).toBe('/sign-up?source=demo&referrer=demo');
+    expect(hrefs.signinHref).toBe('/sign-in?source=demo&next=%2Fdashboard%2Fpreview');
   });
 
   it('accepts only real HTTPS store links and hides missing links', () => {
@@ -229,9 +246,7 @@ describe('visitor conversion suppression and safety', () => {
   it('excludes automated traffic unless the test override is explicit', () => {
     expect(isAutomatedVisitor({ webdriver: true })).toBe(true);
     expect(isAutomatedVisitor({ userAgent: 'Googlebot/2.1' })).toBe(true);
-    expect(
-      isAutomatedVisitor({ webdriver: true, allowTestOverride: true }),
-    ).toBe(false);
+    expect(isAutomatedVisitor({ webdriver: true, allowTestOverride: true })).toBe(false);
   });
 
   it('remains usable when browser storage is blocked', () => {
@@ -245,5 +260,7 @@ describe('visitor conversion suppression and safety', () => {
     };
     expect(readVisitorStorage(blocked, 'key')).toBeNull();
     expect(writeVisitorStorage(blocked, 'key', 'value')).toBe(false);
+    expect(hasVisitorConversionBeenShown(blocked)).toBe(false);
+    expect(markVisitorConversionShown(blocked)).toBe(false);
   });
 });
