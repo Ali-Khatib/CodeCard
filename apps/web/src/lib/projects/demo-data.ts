@@ -80,6 +80,7 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
       },
       product: {
         text: 'A pipeline canvas where each node is a GitHub Action step, with live logs and one-click preview links.',
+        mediaUrl: unsplash('1551288049-bebda4e38f71'),
       },
       architecture: {
         text: 'Next.js app talks to API routes and Postgres for state, while workers watch GitHub webhooks to spin previews.',

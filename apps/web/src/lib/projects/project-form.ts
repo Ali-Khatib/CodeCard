@@ -11,7 +11,7 @@ import {
   type ProjectLifecycleStatus,
 } from '@codecard/validation';
 import {
-  buildCaseStudySectionsFromTexts,
+  buildCaseStudySectionsFromEntries,
   CASE_STUDY_SECTION_IDS,
   parseCaseStudySections,
   type CaseStudySectionId,
@@ -59,19 +59,29 @@ export function suggestProjectSlugFromTitle(title: string): string {
 function appendCaseStudySections(fd: FormData, sections: CaseStudySections) {
   for (const id of CASE_STUDY_SECTION_IDS) {
     const text = sections[id]?.text?.trim();
+    const mediaUrl = sections[id]?.mediaUrl?.trim();
     if (text) {
       fd.set(`case_study_${id}`, text);
+    }
+    if (mediaUrl) {
+      fd.set(`case_study_${id}_image`, mediaUrl);
     }
   }
 }
 
 export function parseCaseStudySectionsFromFormData(formData: FormData): CaseStudySections {
-  const texts: Partial<Record<CaseStudySectionId, string>> = {};
+  const entries: Partial<Record<CaseStudySectionId, { text?: string; mediaUrl?: string }>> = {};
   for (const id of CASE_STUDY_SECTION_IDS) {
     const text = String(formData.get(`case_study_${id}`) ?? '');
-    if (text.trim()) texts[id] = text;
+    const mediaUrl = String(formData.get(`case_study_${id}_image`) ?? '');
+    if (text.trim() || mediaUrl.trim()) {
+      entries[id] = {
+        ...(text.trim() ? { text } : {}),
+        ...(mediaUrl.trim() ? { mediaUrl } : {}),
+      };
+    }
   }
-  return buildCaseStudySectionsFromTexts(texts);
+  return buildCaseStudySectionsFromEntries(entries);
 }
 
 export function buildCreateProjectFormData(values: ProjectFormValues): FormData {

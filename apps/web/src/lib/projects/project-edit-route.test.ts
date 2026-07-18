@@ -66,8 +66,14 @@ describe('dashboard project edit route', () => {
   });
 
   it('points dashboard edit controls at the edit route', () => {
+    // Since the card-to-page transition work, the stack navigates via the
+    // editHref built in lib/dashboard/portfolio.ts.
     const stack = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/projects-vertical-stack.tsx'),
+      'utf8',
+    );
+    const portfolio = readFileSync(
+      resolve(process.cwd(), 'src/lib/dashboard/portfolio.ts'),
       'utf8',
     );
     const hero = readFileSync(
@@ -75,7 +81,8 @@ describe('dashboard project edit route', () => {
       'utf8',
     );
 
-    expect(stack).toContain('/projects/${project.id}/edit');
+    expect(stack).toContain('project.editHref');
+    expect(portfolio).toContain('/projects/${project.id}/edit');
     expect(hero).toContain('/projects/${project.id}/edit');
   });
 
