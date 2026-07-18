@@ -1,11 +1,11 @@
 # Admin authorization model (WS13-T001)
 
-**Status:** Accepted (model defined; `/admin` page gate enforced by WS11-T002)  
-**Task:** WS13-T001 — Define the global admin authorization model  
-**Canonical resolver:** `apps/web/src/lib/security/admin-authorization.ts`  
+**Status:** Accepted (model, page gate, and privileged read boundary implemented)
+**Task:** WS13-T001 / WS11-T002 / WS13-T002
+**Canonical resolver:** `apps/web/src/lib/security/admin-authorization.ts`
 **Route gate (WS11-T002):** `apps/web/src/lib/security/admin-route-gate.ts`
 
-> **Important:** T001 itself does **not** secure `/admin`, enable admin data access, promote any user, or apply remote migrations. The `/admin` **page** gate is implemented by WS11-T002 (see §16a). Admin **data access** (RLS or gated service-role API) remains pending in WS13-T002+.
+> **Important:** T001 itself did **not** secure `/admin`, enable admin data access, promote any user, or apply remote migrations. The `/admin` **page** gate is implemented by WS11-T002 (see §16a), and the privileged read boundary is implemented by WS13-T002 (see §18a).
 
 ---
 
@@ -245,7 +245,28 @@ Every admin API must re-check via the canonical resolver server-side.
 - Mutations must be audited (WS13-T008).
 - Ordinary users cannot select arbitrary service-role operations.
 
-**WS13-T002** decides admin RLS vs gated service-role API for data access. T001 only defines identity authorization.
+**WS13-T002 decision:** use an authorization-gated, server-only service-role reader. Browser clients keep the existing RLS posture and receive no global moderation SELECT policy.
+
+## 18a. Privileged read architecture (WS13-T002)
+
+The selected architecture is a **gated service-role API**, not administrator RLS:
+
+1. `requireGlobalAdminApiAccess()` verifies the current Auth user through `getUser()`.
+2. It passes only the verified `{ userId, appMetadata }` to the canonical `resolveGlobalAdminAuthorization`.
+3. Anonymous API requests receive 401 JSON; authenticated denied identities receive 403 JSON.
+4. Only after authorization do `listModerationReports()` / `listDmcaNotices()` create a service-role client.
+5. The readers use explicit column lists, bounded pagination, allowlisted filters, stable newest-first ordering, and safe DTOs.
+6. Routes are dynamic and return `private, no-store` cache controls.
+
+Paths:
+
+- API authorization: `apps/web/src/lib/security/admin-api-authorization.ts`
+- Privileged readers and DTOs: `apps/web/src/lib/admin/moderation-data.ts`
+- Routes: `GET /api/admin/reports`, `GET /api/admin/dmca`
+
+No migration is required. Existing RLS remains the browser boundary: reporters may read only their own reports, ordinary users have no DMCA SELECT policy, and no browser receives service-role credentials.
+
+Rejected for T002: direct administrator RLS. The canonical claim is server-verified and moderation list DTOs intentionally omit private source/claimant fields; keeping global reads behind the server reduces accidental browser exposure and avoids JWT-policy duplication.
 
 ## 19. Admin RLS versus service-role decision boundary
 
@@ -358,7 +379,7 @@ Covered by `admin-authorization.test.ts` and `admin-authorization.contract.test.
 ## 28. Deferred work
 
 - WS11-T002 — `/admin` role gate — **done** (§16a)
-- WS13-T002 — admin RLS or gated service-role API
+- WS13-T002 — gated service-role API — **done** (§18a)
 - WS13-T003 — admin page data fetching
 - WS13-T004–T008 — actions, suspension, hide/unpublish, auditing
 - Public role-management UI/API — not planned for T001

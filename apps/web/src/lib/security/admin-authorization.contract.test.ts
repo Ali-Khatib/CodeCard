@@ -59,7 +59,7 @@ describe('WS13-T001 admin authorization contracts', () => {
     expect(docs).toMatch(/user_metadata/i);
     expect(docs).toContain("app_metadata.role === \"admin\"");
     expect(docs).toMatch(/tenant_role/i);
-    expect(docs).toContain('does **not** secure `/admin`');
+    expect(docs).toContain('T001 itself did **not** secure `/admin`');
     expect(docs).toContain('WS11-T002');
     expect(docs).toContain('WS13-T002');
 
