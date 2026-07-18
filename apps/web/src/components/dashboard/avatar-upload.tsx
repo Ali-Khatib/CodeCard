@@ -296,6 +296,7 @@ export function AvatarUpload({
             className="sr-only"
             disabled={disabled || pending}
             onChange={handleFileChange}
+            aria-describedby={`${inputId}-constraints`}
           />
           <div className="flex flex-wrap gap-2">
             <AppButton
@@ -337,7 +338,9 @@ export function AvatarUpload({
               </AppButton>
             )}
           </div>
-          <p className="text-[13px] text-[var(--app-smoke)]">JPEG, PNG, or WebP up to 5 MB.</p>
+          <p id={`${inputId}-constraints`} className="text-[13px] text-[var(--app-smoke)]">
+            JPEG, PNG, or WebP up to 5 MB.
+          </p>
           {savedAvatarUrl && selectedFile ? (
             <p className="text-[13px] text-[var(--app-smoke)]">
               Replacement occurs only after upload succeeds. The current photo stays until then.

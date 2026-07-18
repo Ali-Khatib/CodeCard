@@ -513,7 +513,7 @@ export function ProjectMediaUpload({
         >
           Project media
         </h2>
-        <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+        <p id="project-media-constraints" className="mt-2 text-[14px] text-[var(--app-smoke)]">
           Add a cover image and screenshots for this project. JPEG, PNG, or WebP up to 5 MB each.
         </p>
       </div>
@@ -550,6 +550,7 @@ export function ProjectMediaUpload({
               className="sr-only"
               disabled={disabled || coverPending}
               onChange={handleCoverFileChange}
+              aria-describedby="project-media-constraints"
             />
             <div className="flex flex-wrap gap-2">
               <AppButton
@@ -727,6 +728,7 @@ export function ProjectMediaUpload({
               className="sr-only"
               disabled={disabled}
               onChange={handleScreenshotFileChange}
+              aria-describedby="project-media-constraints"
             />
             <AppButton
               type="button"

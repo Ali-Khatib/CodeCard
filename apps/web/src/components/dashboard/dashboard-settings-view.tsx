@@ -229,6 +229,7 @@ export function DashboardSettingsView({
                     type="button"
                     role="switch"
                     aria-checked={row.enabled}
+                    aria-label={row.label}
                     className={`h-6 w-11 rounded-full p-0.5 transition-colors ${
                       row.enabled ? 'bg-[var(--app-iris)]' : 'bg-[var(--app-border-strong)]'
                     }`}

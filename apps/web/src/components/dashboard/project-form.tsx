@@ -375,18 +375,22 @@ export function ProjectForm({
 
       <section className="space-y-3">
         <div>
-          <p className="text-[13px] font-medium text-graphite">Technologies</p>
-          <p className="text-[12px] text-ash">Add tools and languages, then press Enter.</p>
+          <label htmlFor="project-technologies" className="text-[13px] font-medium text-graphite">
+            Technologies
+          </label>
+          <p id="project-technologies-hint" className="text-[12px] text-ash">
+            Add tools and languages, then press Enter.
+          </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="list" aria-label="Selected technologies">
           {form.technologies.map((tech) => (
-            <span key={tech} className="cc-dash-tech-chip inline-flex items-center gap-2">
+            <span key={tech} className="cc-dash-tech-chip inline-flex items-center gap-2" role="listitem">
               {tech}
               <button
                 type="button"
                 className="text-ash hover:text-vellum"
                 onClick={() => removeTechnology(tech)}
-                aria-label={`Remove ${tech}`}
+                aria-label={`Remove technology ${tech}`}
               >
                 ×
               </button>
@@ -394,6 +398,7 @@ export function ProjectForm({
           ))}
         </div>
         <input
+          id="project-technologies"
           value={techInput}
           onChange={(e) => setTechInput(e.target.value)}
           onKeyDown={(e) => {
@@ -404,13 +409,13 @@ export function ProjectForm({
           }}
           className="cc-input w-full"
           placeholder="TypeScript, Next.js, C++"
-          aria-label="Add technology"
+          aria-describedby="project-technologies-hint"
         />
         <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
       </section>
 
-      <section className="space-y-3">
-        <p className="text-[13px] font-medium text-graphite">Domains</p>
+      <fieldset className="space-y-3 border-0 p-0">
+        <legend className="text-[13px] font-medium text-graphite">Domains</legend>
         <div className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
             <ToggleChip
@@ -422,10 +427,10 @@ export function ProjectForm({
           ))}
         </div>
         <FieldError id="project-domains-error" message={fieldErrors.domains} />
-      </section>
+      </fieldset>
 
-      <section className="space-y-3">
-        <p className="text-[13px] font-medium text-graphite">Focus areas</p>
+      <fieldset className="space-y-3 border-0 p-0">
+        <legend className="text-[13px] font-medium text-graphite">Focus areas</legend>
         <div className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
             <ToggleChip
@@ -437,7 +442,7 @@ export function ProjectForm({
           ))}
         </div>
         <FieldError id="project-focus-areas-error" message={fieldErrors.focus_areas} />
-      </section>
+      </fieldset>
 
       <section className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">

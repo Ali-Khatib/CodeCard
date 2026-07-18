@@ -253,7 +253,7 @@ export function ResearchFigureManager({
         <h2 id={`${inputId}-heading`} className="text-[16px] font-semibold text-[var(--app-ink)]">
           Research figures
         </h2>
-        <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+        <p className="mt-1 text-[13px] text-[var(--app-smoke)]" id={`${inputId}-constraints`}>
           JPEG, PNG, or WebP · up to 5 MB each · {remaining} of {RESEARCH_FIGURE_MAX_COUNT} remaining.
           Add figures to show results, diagrams or visual evidence.
         </p>
@@ -275,6 +275,7 @@ export function ResearchFigureManager({
           className="sr-only"
           disabled={remaining === 0 || pending}
           onChange={(event) => onFilesSelected(event.target.files)}
+          aria-describedby={`${inputId}-constraints`}
         />
       </div>
 
