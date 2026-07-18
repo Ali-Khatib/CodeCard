@@ -160,7 +160,28 @@ AS $$
     AND public.storage_path_tenant_id(object_path) IN (SELECT public.user_tenant_ids());
 $$;
 
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Hosted Supabase reserves ownership of storage.objects for supabase_storage_admin
+-- and enables RLS by default, so an unconditional ALTER by the migration role fails
+-- (SQLSTATE 42501). Enable RLS only when it is genuinely disabled (e.g. bare local
+-- Postgres), then verify it is on and fail loudly rather than silently leaving the
+-- table open. The policy statements below are never skipped, so enforcement can
+-- never be left partially applied.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class
+    WHERE oid = 'storage.objects'::regclass AND relrowsecurity
+  ) THEN
+    EXECUTE 'ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_class
+    WHERE oid = 'storage.objects'::regclass AND relrowsecurity
+  ) THEN
+    RAISE EXCEPTION 'storage.objects RLS is not enabled and role % cannot enable it', current_user;
+  END IF;
+END $$;
 
 DROP POLICY IF EXISTS storage_objects_owner_insert ON storage.objects;
 DROP POLICY IF EXISTS storage_objects_owner_update ON storage.objects;
