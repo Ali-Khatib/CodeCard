@@ -7,6 +7,7 @@ import {
 } from '@codecard/validation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { evaluateProjectCreationQuota } from '@/lib/projects/project-plan-core';
+import { parseCaseStudySectionsFromFormData } from '@/lib/projects/project-form';
 
 export type ProjectCreateFieldErrors = Partial<
   Record<
@@ -20,7 +21,8 @@ export type ProjectCreateFieldErrors = Partial<
     | 'user_role'
     | 'started_at'
     | 'ended_at'
-    | 'status',
+    | 'status'
+    | 'case_study_sections',
     string
   >
 >;
@@ -66,6 +68,7 @@ export function parseCreateProjectFormData(formData: FormData) {
     started_at: String(formData.get('started_at') ?? '') || null,
     ended_at: String(formData.get('ended_at') ?? '') || null,
     status: String(formData.get('status') ?? '') || undefined,
+    case_study_sections: parseCaseStudySectionsFromFormData(formData),
   };
 }
 
@@ -224,7 +227,7 @@ export async function executeCreateProject(
       ended_at: data.ended_at ?? null,
       status: data.status ?? 'draft',
       is_published: false,
-      case_study_sections: {},
+      case_study_sections: data.case_study_sections ?? {},
       sort_order: sortOrder,
     })
     .select('id')

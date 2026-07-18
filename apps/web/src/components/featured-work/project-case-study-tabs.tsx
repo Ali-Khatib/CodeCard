@@ -25,16 +25,18 @@ function TextCaseStudyPanel({
   body: string;
 }) {
   return (
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(192,148,228,0.22),transparent_32%),linear-gradient(160deg,#07040f,#17112b_58%,#05030a)]">
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(3,0,12,0.94),rgba(3,0,12,0.2)_42%,rgba(3,0,12,0.12))]" />
-      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8">
-        <p className="font-eyebrow text-[8px] uppercase tracking-[0.18em] text-lavender/80 md:text-[10px]">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(192,148,228,0.28),transparent_36%),linear-gradient(155deg,#0b0614,#1a1230_52%,#07040f)]">
+      <div
+        className="absolute inset-0 flex flex-col justify-center gap-4 overflow-y-auto p-5 sm:p-7 md:gap-5 md:p-10"
+        role="presentation"
+      >
+        <p className="font-eyebrow text-[10px] uppercase tracking-[0.2em] text-lavender/85 md:text-[11px]">
           {section.eyebrow}
         </p>
-        <h2 className="mt-2 text-[clamp(1.35rem,5vw,2.5rem)] font-semibold leading-[0.92] tracking-[-0.06em] text-lilac-white md:mt-3">
+        <h2 className="max-w-[14ch] text-[clamp(2rem,7vw,3.75rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-lilac-white">
           {section.label}
         </h2>
-        <p className="mt-3 max-w-prose text-[12px] leading-relaxed text-ash md:mt-4 md:text-[15px]">
+        <p className="max-w-[34ch] text-[clamp(1.15rem,3.2vw,1.85rem)] font-medium leading-[1.25] tracking-[-0.03em] text-lilac-white/92 md:max-w-[38ch]">
           {body}
         </p>
       </div>
@@ -67,8 +69,9 @@ export function ProjectCaseStudyTabs({
   const activePart = visibleSections.find((part) => part.id === activePartId) ?? visibleSections[0]!;
   const activeText = caseStudyTextForSection(project, activePart.id);
   const activeMedia = caseStudyMediaForSection(project, activePart.id);
-  const showProductVideo = activePart.id === 'product' && project.videoUrl && !activeMedia && !reduced;
-  const showTextPanel = Boolean(activeText) && !showProductVideo && !activeMedia;
+  // Showcase tabs are text-first; media only when the section stores an explicit mediaUrl.
+  const showTextPanel = Boolean(activeText);
+  const showMediaPanel = Boolean(activeMedia) && !showTextPanel;
 
   const setActive = (id: CaseStudySectionId, label: string) => {
     setActivePartId(id);
@@ -88,27 +91,20 @@ export function ProjectCaseStudyTabs({
               transition={{ duration: reduced ? 0.18 : 0.4, ease: EASE }}
               className="absolute inset-0"
             >
-              {showProductVideo ? (
-                <video
-                  src={project.videoUrl ?? undefined}
-                  poster={project.posterUrl ?? undefined}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="h-full w-full object-cover object-top"
-                />
-              ) : activeMedia ? (
-                <ProjectMedia src={activeMedia} sizes="(max-width: 1024px) 100vw, 720px" className="object-cover object-top" />
-              ) : showTextPanel ? (
+              {showTextPanel ? (
                 <TextCaseStudyPanel section={activePart} body={activeText!} />
+              ) : showMediaPanel && activeMedia ? (
+                <ProjectMedia src={activeMedia} sizes="(max-width: 1024px) 100vw, 720px" className="object-cover object-top" />
               ) : (
-                <div className="absolute inset-0 bg-[linear-gradient(135deg,#07040f,#241936_58%,#06030c)]" />
+                <TextCaseStudyPanel
+                  section={activePart}
+                  body={activePart.summary}
+                />
               )}
             </motion.div>
           </AnimatePresence>
 
-          {!showTextPanel && (
+          {showMediaPanel && (
             <>
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(3,0,12,0.88),rgba(3,0,12,0.1)_45%,rgba(3,0,12,0.12))]" />
               <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
@@ -129,7 +125,7 @@ export function ProjectCaseStudyTabs({
               Extra showcase
             </p>
             <p className="mt-2 text-[12px] leading-relaxed text-ash md:text-[13px]">
-              Optional story beats — tap a tab to read or view what was added.
+              Optional story beats — each tab is a short written section visitors can tap through.
             </p>
             {project.tagline && (
               <h3 className="mt-3 text-[16px] font-medium leading-snug tracking-[-0.03em] text-lilac-white sm:text-[18px] md:mt-5 md:text-[24px]">

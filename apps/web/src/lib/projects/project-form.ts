@@ -10,6 +10,13 @@ import {
   PROJECT_USER_ROLE_MAX_LENGTH,
   type ProjectLifecycleStatus,
 } from '@codecard/validation';
+import {
+  buildCaseStudySectionsFromTexts,
+  CASE_STUDY_SECTION_IDS,
+  parseCaseStudySections,
+  type CaseStudySectionId,
+  type CaseStudySections,
+} from '@/lib/projects/case-study-sections.shared';
 
 export type ProjectFormMode = 'create' | 'edit';
 
@@ -25,6 +32,7 @@ export type ProjectFormValues = {
   started_at: string;
   ended_at: string;
   status: ProjectLifecycleStatus;
+  case_study_sections: CaseStudySections;
 };
 
 export function createEmptyProjectFormValues(): ProjectFormValues {
@@ -40,11 +48,30 @@ export function createEmptyProjectFormValues(): ProjectFormValues {
     started_at: '',
     ended_at: '',
     status: 'draft',
+    case_study_sections: {},
   };
 }
 
 export function suggestProjectSlugFromTitle(title: string): string {
   return normalizeProjectSlug(title);
+}
+
+function appendCaseStudySections(fd: FormData, sections: CaseStudySections) {
+  for (const id of CASE_STUDY_SECTION_IDS) {
+    const text = sections[id]?.text?.trim();
+    if (text) {
+      fd.set(`case_study_${id}`, text);
+    }
+  }
+}
+
+export function parseCaseStudySectionsFromFormData(formData: FormData): CaseStudySections {
+  const texts: Partial<Record<CaseStudySectionId, string>> = {};
+  for (const id of CASE_STUDY_SECTION_IDS) {
+    const text = String(formData.get(`case_study_${id}`) ?? '');
+    if (text.trim()) texts[id] = text;
+  }
+  return buildCaseStudySectionsFromTexts(texts);
 }
 
 export function buildCreateProjectFormData(values: ProjectFormValues): FormData {
@@ -66,6 +93,7 @@ export function buildCreateProjectFormData(values: ProjectFormValues): FormData 
   fd.set('started_at', values.started_at);
   fd.set('ended_at', values.ended_at);
   fd.set('status', values.status);
+  appendCaseStudySections(fd, values.case_study_sections);
   return fd;
 }
 
@@ -94,6 +122,7 @@ export function projectRecordToFormValues(
     started_at?: string | null;
     ended_at?: string | null;
     status?: string | null;
+    case_study_sections?: unknown;
   },
   relations: { domains: string[]; focus_areas: string[] },
 ): ProjectFormValues {
@@ -115,6 +144,7 @@ export function projectRecordToFormValues(
     started_at: formatProjectDateForInput(project.started_at),
     ended_at: formatProjectDateForInput(project.ended_at),
     status,
+    case_study_sections: parseCaseStudySections(project.case_study_sections),
   };
 }
 
@@ -137,6 +167,7 @@ export function validateProjectFormClient(
     started_at: values.started_at || null,
     ended_at: values.ended_at || null,
     status: values.status,
+    case_study_sections: values.case_study_sections,
   });
 
   if (!parsed.success) {
@@ -160,4 +191,5 @@ export const PROJECT_FORM_LIMITS = {
   tagline: PROJECT_TAGLINE_MAX_LENGTH,
   description: PROJECT_DESCRIPTION_MAX_LENGTH,
   userRole: PROJECT_USER_ROLE_MAX_LENGTH,
+  caseStudySection: 2000,
 };

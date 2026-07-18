@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Label } from '@codecard/ui';
-import { PROFILE_LINK_TYPES } from '@codecard/validation';
+import { PROFILE_LINK_TYPES, profileLinkUrlHelp, profileLinkUrlPlaceholder } from '@codecard/validation';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import {
   createProfileLinkAction,
@@ -146,7 +146,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
         <div>
           <h3 className="text-sm font-medium text-zinc-100">Profile links</h3>
           <p className="mt-1 text-sm text-zinc-400">
-            Add social and contact links visitors can open from your card.
+            GitHub, LinkedIn, and X must use the matching site URL. A personal website is optional.
           </p>
         </div>
         {mode.kind === 'idle' && (
@@ -228,13 +228,17 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               className="flex h-10 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
+              aria-describedby="profile-link-type-help"
             >
               {PROFILE_LINK_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {type}
+                  {type === 'twitter' ? 'X (Twitter)' : type}
                 </option>
               ))}
             </select>
+            <p id="profile-link-type-help" className="text-xs text-zinc-400">
+              Pick the network first so we can check the URL matches. Website and X are optional.
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="profile-link-label">Label (optional)</Label>
@@ -243,9 +247,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.label)}
+              aria-describedby={fieldErrors?.label ? 'profile-link-label-error' : undefined}
             />
             {fieldErrors?.label && (
-              <p className="text-sm text-red-400" role="alert">
+              <p id="profile-link-label-error" className="text-sm text-red-400" role="alert">
                 {fieldErrors.label}
               </p>
             )}
@@ -257,10 +262,16 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.url)}
-              placeholder={form.type === 'email' ? 'you@example.com' : 'https://example.com'}
+              aria-describedby={
+                fieldErrors?.url ? 'profile-link-url-error' : 'profile-link-url-help'
+              }
+              placeholder={profileLinkUrlPlaceholder(form.type)}
             />
+            <p id="profile-link-url-help" className="text-xs text-zinc-400">
+              {profileLinkUrlHelp(form.type)}
+            </p>
             {fieldErrors?.url && (
-              <p className="text-sm text-red-400" role="alert">
+              <p id="profile-link-url-error" className="text-sm text-red-400" role="alert">
                 {fieldErrors.url}
               </p>
             )}

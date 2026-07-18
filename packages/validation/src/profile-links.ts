@@ -18,6 +18,81 @@ export const PROFILE_LINK_TYPES = profileLinkTypeSchema.options;
 
 const BLOCKED_URL_PROTOCOLS = new Set(['javascript:', 'data:', 'vbscript:', 'file:']);
 
+/** Host expectations for typed profile links. Website/other/resume stay open https. */
+const PROFILE_LINK_HOST_RULES: Partial<
+  Record<(typeof PROFILE_LINK_TYPES)[number], { hosts: string[]; message: string }>
+> = {
+  github: {
+    hosts: ['github.com'],
+    message: 'GitHub links must use github.com (example: https://github.com/yourname)',
+  },
+  linkedin: {
+    hosts: ['linkedin.com'],
+    message: 'LinkedIn links must use linkedin.com (example: https://www.linkedin.com/in/yourname)',
+  },
+  twitter: {
+    hosts: ['x.com', 'twitter.com'],
+    message: 'X / Twitter links must use x.com or twitter.com (example: https://x.com/yourname)',
+  },
+};
+
+export function profileLinkUrlHelp(type: string): string {
+  switch (type) {
+    case 'github':
+      return 'Paste your GitHub profile URL (github.com/…).';
+    case 'linkedin':
+      return 'Paste your LinkedIn profile URL (linkedin.com/in/…).';
+    case 'twitter':
+      return 'Paste your X profile URL (x.com/… or twitter.com/…). Optional.';
+    case 'website':
+      return 'Add your personal website if you have one (optional). Any https:// URL works.';
+    case 'email':
+      return 'Your public contact email.';
+    case 'resume':
+      return 'Link to a public resume or CV (https://…).';
+    default:
+      return 'Paste a full https:// URL.';
+  }
+}
+
+export function profileLinkUrlPlaceholder(type: string): string {
+  switch (type) {
+    case 'github':
+      return 'https://github.com/yourname';
+    case 'linkedin':
+      return 'https://www.linkedin.com/in/yourname';
+    case 'twitter':
+      return 'https://x.com/yourname';
+    case 'website':
+      return 'https://yourname.dev';
+    case 'email':
+      return 'you@example.com';
+    case 'resume':
+      return 'https://…';
+    default:
+      return 'https://example.com';
+  }
+}
+
+function hostMatches(hostname: string, allowed: string[]): boolean {
+  const host = hostname.toLowerCase().replace(/^www\./, '');
+  return allowed.some((rule) => host === rule || host.endsWith(`.${rule}`));
+}
+
+export function profileLinkHostError(type: string, url: string): string | null {
+  const rule = PROFILE_LINK_HOST_RULES[type as keyof typeof PROFILE_LINK_HOST_RULES];
+  if (!rule) return null;
+  try {
+    const parsed = new URL(url);
+    if (!hostMatches(parsed.hostname, rule.hosts)) {
+      return rule.message;
+    }
+  } catch {
+    return rule.message;
+  }
+  return null;
+}
+
 export function normalizeProfileLinkLabel(label: string | null | undefined): string | null {
   if (label == null) return null;
   const trimmed = label.trim();
@@ -92,6 +167,15 @@ export const profileLinkInputSchema = z
           path: ['url'],
         });
       }
+      return;
+    }
+    const hostError = profileLinkHostError(value.type, normalizedUrl);
+    if (hostError) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: hostError,
+        path: ['url'],
+      });
     }
   })
   .transform((value) => ({

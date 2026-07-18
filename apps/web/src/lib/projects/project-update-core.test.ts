@@ -153,6 +153,7 @@ function createMockSupabase(options: {
     if (table === 'circle_activity') {
       return {
         insert: vi.fn().mockResolvedValue({ error: null }),
+        upsert: vi.fn().mockResolvedValue({ error: null }),
       };
     }
 
@@ -218,6 +219,7 @@ describe('executeUpdateProject persistence', () => {
       title: 'DevFlow',
       slug: 'dev-flow',
       status: 'draft',
+      case_study_sections: {},
     });
     expect(updatedPayload()).not.toHaveProperty('is_published');
     expect(updatedPayload()).not.toHaveProperty('owner_user_id');

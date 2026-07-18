@@ -233,6 +233,39 @@ export function findForbiddenCreateProjectFormData(formData: FormData): string |
   return null;
 }
 
+export const CASE_STUDY_SECTION_ID_VALUES = [
+  'problem',
+  'approach',
+  'results',
+  'product',
+  'architecture',
+] as const;
+
+export const caseStudySectionBodySchema = z.string().max(2000).trim();
+
+const caseStudyMediaUrlSchema = z
+  .string()
+  .trim()
+  .max(600_000, 'Image is too large')
+  .refine(
+    (value) => value.startsWith('data:image/') || /^https?:\/\//i.test(value),
+    'Image must be a valid URL or uploaded photo',
+  );
+
+export const caseStudySectionContentSchema = z
+  .object({
+    text: caseStudySectionBodySchema.optional(),
+    mediaUrl: caseStudyMediaUrlSchema.optional(),
+  })
+  .refine((value) => Boolean(value.text?.trim() || value.mediaUrl?.trim()), {
+    message: 'Each showcase section needs text',
+  });
+
+export const caseStudySectionsSchema = z
+  .record(z.union([caseStudySectionBodySchema, caseStudySectionContentSchema]))
+  .optional()
+  .default({});
+
 export const projectCoreInputSchema = z.object({
   title: z
     .string()
@@ -261,6 +294,7 @@ export const projectCoreInputSchema = z.object({
   started_at: projectDateSchema,
   ended_at: projectDateSchema,
   status: projectLifecycleStatusSchema.default('draft'),
+  case_study_sections: caseStudySectionsSchema,
 });
 
 function applyProjectDateRangeRefine<T extends z.ZodTypeAny>(schema: T) {
@@ -375,31 +409,6 @@ export const profileLinkSchema = z.object({
   url: urlSchema,
   sort_order: z.number().int().min(0).max(100).default(0),
 });
-
-export const caseStudySectionBodySchema = z.string().max(2000).trim();
-
-const caseStudyMediaUrlSchema = z
-  .string()
-  .trim()
-  .max(600_000, 'Image is too large')
-  .refine(
-    (value) => value.startsWith('data:image/') || /^https?:\/\//i.test(value),
-    'Image must be a valid URL or uploaded photo',
-  );
-
-export const caseStudySectionContentSchema = z
-  .object({
-    text: caseStudySectionBodySchema.optional(),
-    mediaUrl: caseStudyMediaUrlSchema.optional(),
-  })
-  .refine((value) => Boolean(value.text?.trim() || value.mediaUrl?.trim()), {
-    message: 'Each showcase section needs text or an image',
-  });
-
-export const caseStudySectionsSchema = z
-  .record(z.union([caseStudySectionBodySchema, caseStudySectionContentSchema]))
-  .optional()
-  .default({});
 
 export const createProjectSchema = z.object({
   title: z.string().min(1).max(120).trim(),
