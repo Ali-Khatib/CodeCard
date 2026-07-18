@@ -22,6 +22,22 @@ interface ProfileEditorProps {
   links?: ProfileLinkRow[];
 }
 
+const PROFILE_FIELD_IDS: Record<string, string> = {
+  display_name: 'display_name',
+  slug: 'slug',
+  headline: 'headline',
+  bio: 'bio',
+  location: 'location',
+  skills: 'skills',
+};
+
+function focusProfileField(field?: string) {
+  if (!field) return;
+  const id = PROFILE_FIELD_IDS[field] ?? field;
+  const el = document.getElementById(id);
+  if (el instanceof HTMLElement) el.focus();
+}
+
 const initialState: ProfileUpdateState = {};
 
 export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
@@ -29,6 +45,10 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [form, setForm] = useState(() => profileToFormState(profile));
   const [clientError, setClientError] = useState('');
+  const [clientFieldError, setClientFieldError] = useState<{
+    field?: string;
+    message: string;
+  } | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const notifiedErrorRef = useRef<string | null>(null);
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
@@ -57,17 +77,35 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
     setForm(profileToFormState(profile));
   }, [profile, saveSuccess]);
 
+  useEffect(() => {
+    const errors = state.fieldErrors ?? {};
+    const firstKey = Object.keys(errors)[0];
+    if (firstKey) focusProfileField(firstKey);
+  }, [state.fieldErrors]);
+
+  const fieldErrors = {
+    ...(state.fieldErrors ?? {}),
+    ...(clientFieldError?.field
+      ? { [clientFieldError.field]: clientFieldError.message }
+      : {}),
+  };
+
   const displayError =
-    clientError || state.fieldErrors?.slug || state.fieldErrors?.display_name || state.error || '';
+    clientError ||
+    (!fieldErrors.slug && !fieldErrors.display_name ? state.error : undefined) ||
+    '';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (pending) return;
     setClientError('');
+    setClientFieldError(null);
 
     const parsed = parseProfileUpdate(form);
     if (!parsed.success) {
       setClientError(parsed.message);
+      setClientFieldError({ field: parsed.field, message: parsed.message });
+      focusProfileField(parsed.field);
       return;
     }
 
@@ -82,7 +120,14 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           id="display_name"
           value={form.display_name}
           onChange={(e) => setForm({ ...form, display_name: e.target.value })}
+          aria-invalid={Boolean(fieldErrors.display_name)}
+          aria-describedby={fieldErrors.display_name ? 'display_name-error' : undefined}
         />
+        {fieldErrors.display_name ? (
+          <p id="display_name-error" className="text-sm text-red-400" role="alert">
+            {fieldErrors.display_name}
+          </p>
+        ) : null}
       </div>
       <div className="space-y-2">
         <Label htmlFor="headline">Headline</Label>
@@ -99,13 +144,14 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           id="slug"
           value={form.slug}
           onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase() })}
-          aria-invalid={Boolean(state.fieldErrors?.slug)}
+          aria-invalid={Boolean(fieldErrors.slug)}
+          aria-describedby={fieldErrors.slug ? 'slug-error' : undefined}
         />
-        {state.fieldErrors?.slug && (
-          <p className="text-sm text-red-400" role="alert">
-            {state.fieldErrors.slug}
+        {fieldErrors.slug ? (
+          <p id="slug-error" className="text-sm text-red-400" role="alert">
+            {fieldErrors.slug}
           </p>
-        )}
+        ) : null}
       </div>
       <div className="space-y-2">
         <Label htmlFor="bio">Bio (shown later on profile)</Label>
@@ -154,11 +200,11 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           )}
         </p>
       )}
-      {displayError && !state.fieldErrors?.slug && (
+      {displayError && !fieldErrors.slug && !fieldErrors.display_name ? (
         <p className="text-sm text-red-400" role="alert">
           {displayError}
         </p>
-      )}
+      ) : null}
       <Button type="submit" disabled={pending} aria-busy={pending}>
         {pending ? 'Saving…' : 'Save changes'}
       </Button>

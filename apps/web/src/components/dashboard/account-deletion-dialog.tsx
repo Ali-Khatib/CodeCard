@@ -57,8 +57,11 @@ export function AccountDeletionDialog({
   const descId = useId();
   const confirmInputId = useId();
   const passwordInputId = useId();
+  const errorId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const confirmInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const inFlightRef = useRef(false);
 
   const [open, setOpen] = useState(initiallyOpen);
@@ -69,6 +72,7 @@ export function AccountDeletionDialog({
   const [passwordVerified, setPasswordVerified] = useState(false);
   const [oauthRecent, setOauthRecent] = useState(initiallyOpen);
   const [error, setError] = useState('');
+  const [invalidField, setInvalidField] = useState<'confirmation' | 'password' | null>(null);
   const [oauthPending, setOauthPending] = useState(false);
 
   useEffect(() => {
@@ -87,6 +91,7 @@ export function AccountDeletionDialog({
     setPassword('');
     setPasswordVerified(false);
     setError('');
+    setInvalidField(null);
     setOauthPending(false);
     setPhase('idle');
     inFlightRef.current = false;
@@ -146,6 +151,7 @@ export function AccountDeletionDialog({
     setPassword('');
     setPasswordVerified(false);
     setError('');
+    setInvalidField(null);
     setOauthPending(false);
     setPhase('idle');
     inFlightRef.current = false;
@@ -154,12 +160,15 @@ export function AccountDeletionDialog({
 
   const verifyPassword = async () => {
     setError('');
+    setInvalidField(null);
     if (!auth.hasPassword || !email) {
       setError('Password reauthentication is not available for this account.');
       return;
     }
     if (!password) {
       setError('Enter your current password to continue.');
+      setInvalidField('password');
+      passwordInputRef.current?.focus();
       return;
     }
 
@@ -182,6 +191,8 @@ export function AccountDeletionDialog({
     if (!ok) {
       setPasswordVerified(false);
       setError('That password is incorrect. Your account was not deleted.');
+      setInvalidField('password');
+      passwordInputRef.current?.focus();
       return;
     }
 
@@ -219,16 +230,21 @@ export function AccountDeletionDialog({
     if (!submitEnabled) return;
     if (!confirmationValid) {
       setError('Type DELETE exactly to confirm. Your account was not deleted.');
+      setInvalidField('confirmation');
+      confirmInputRef.current?.focus();
       return;
     }
     if (!reauthSatisfied) {
       setError('Reauthenticate before deleting. Your account was not deleted.');
+      setInvalidField(auth.hasPassword ? 'password' : null);
+      if (auth.hasPassword) passwordInputRef.current?.focus();
       return;
     }
 
     inFlightRef.current = true;
     setPhase('submitting');
     setError('');
+    setInvalidField(null);
 
     const result = await requestAccountDeletion({
       confirmation: ACCOUNT_DELETION_CONFIRMATION,
@@ -345,14 +361,22 @@ export function AccountDeletionDialog({
                       Type {ACCOUNT_DELETION_CONFIRMATION} to confirm
                     </label>
                     <input
+                      ref={confirmInputRef}
                       id={confirmInputId}
                       name="account-deletion-confirmation"
                       autoComplete="off"
                       spellCheck={false}
                       value={confirmation}
                       disabled={phase === 'submitting'}
-                      onChange={(event) => setConfirmation(event.target.value)}
+                      onChange={(event) => {
+                        setConfirmation(event.target.value);
+                        if (invalidField === 'confirmation') setInvalidField(null);
+                      }}
                       onKeyDown={onConfirmKeyDown}
+                      aria-invalid={invalidField === 'confirmation' || undefined}
+                      aria-describedby={
+                        invalidField === 'confirmation' && error ? errorId : undefined
+                      }
                       className="mt-1.5 w-full rounded-[12px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-3 py-2.5 text-[14px] text-[var(--app-ink)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-ink)]"
                       placeholder={ACCOUNT_DELETION_CONFIRMATION}
                       data-testid="account-deletion-confirmation"
@@ -368,6 +392,7 @@ export function AccountDeletionDialog({
                         Current password
                       </label>
                       <input
+                        ref={passwordInputRef}
                         id={passwordInputId}
                         name="account-deletion-password"
                         type="password"
@@ -377,7 +402,12 @@ export function AccountDeletionDialog({
                         onChange={(event) => {
                           setPassword(event.target.value);
                           setPasswordVerified(false);
+                          if (invalidField === 'password') setInvalidField(null);
                         }}
+                        aria-invalid={invalidField === 'password' || undefined}
+                        aria-describedby={
+                          invalidField === 'password' && error ? errorId : undefined
+                        }
                         className="mt-1.5 w-full rounded-[12px] border border-[var(--app-border)] bg-[var(--app-canvas)] px-3 py-2.5 text-[14px] text-[var(--app-ink)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-ink)]"
                         data-testid="account-deletion-password"
                       />
@@ -432,7 +462,7 @@ export function AccountDeletionDialog({
                 </div>
 
                 {error ? (
-                  <p className="mt-4 text-[13px] text-red-600" role="alert">
+                  <p id={errorId} className="mt-4 text-[13px] text-red-600" role="alert">
                     {error}
                   </p>
                 ) : null}

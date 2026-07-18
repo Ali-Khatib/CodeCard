@@ -206,13 +206,15 @@ export function ProjectLinksEditor({ projectId, links }: ProjectLinksEditorProps
           <label className="block space-y-2">
             <span className="text-[12px] uppercase tracking-[0.08em] text-graphite">Label (optional)</span>
             <input
+              id="project-link-label"
               className="cc-app-input w-full"
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.label)}
+              aria-describedby={fieldErrors?.label ? 'project-link-label-error' : undefined}
             />
             {fieldErrors?.label && (
-              <p className="text-[13px] text-red-400" role="alert">
+              <p id="project-link-label-error" className="text-[13px] text-red-400" role="alert">
                 {fieldErrors.label}
               </p>
             )}
@@ -220,14 +222,16 @@ export function ProjectLinksEditor({ projectId, links }: ProjectLinksEditorProps
           <label className="block space-y-2">
             <span className="text-[12px] uppercase tracking-[0.08em] text-graphite">URL</span>
             <input
+              id="project-link-url"
               className="cc-app-input w-full"
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.url)}
+              aria-describedby={fieldErrors?.url ? 'project-link-url-error' : undefined}
               placeholder="https://example.com"
             />
             {fieldErrors?.url && (
-              <p className="text-[13px] text-red-400" role="alert">
+              <p id="project-link-url-error" className="text-[13px] text-red-400" role="alert">
                 {fieldErrors.url}
               </p>
             )}

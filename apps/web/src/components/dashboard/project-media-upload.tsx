@@ -613,7 +613,7 @@ export function ProjectMediaUpload({
         ) : null}
         {(coverError || coverSuccess || coverCleanupWarning) && !coverPending && (
           <p
-            role="status"
+            role={coverError ? 'alert' : 'status'}
             className={`text-[14px] ${coverError ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
             aria-live="polite"
           >
@@ -703,13 +703,13 @@ export function ProjectMediaUpload({
         )}
 
         {deleteError ? (
-          <p role="status" className="text-[14px] text-red-600" aria-live="polite">
+          <p role="alert" className="text-[14px] text-red-600" aria-live="polite">
             {deleteError}
           </p>
         ) : null}
 
         {selectionError ? (
-          <p role="status" className="text-[14px] text-red-600" aria-live="polite">
+          <p role="alert" className="text-[14px] text-red-600" aria-live="polite">
             {selectionError}
           </p>
         ) : null}
@@ -770,7 +770,7 @@ export function ProjectMediaUpload({
                         {selection.file.name}
                       </p>
                       {selection.error ? (
-                        <p className="text-[13px] text-red-600" role="status">
+                        <p className="text-[13px] text-red-600" role="alert">
                           {selection.error}
                         </p>
                       ) : active ? (

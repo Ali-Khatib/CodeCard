@@ -124,7 +124,13 @@ export function researchRecordToFormValues(paper: OwnedResearchRecord): Research
   };
 }
 
-export function validateResearchFormClient(values: ResearchFormValues): string | null {
+export type ResearchFormClientValidationResult =
+  | { success: true }
+  | { success: false; message: string; field?: string };
+
+export function validateResearchFormClient(
+  values: ResearchFormValues,
+): ResearchFormClientValidationResult {
   const authors = values.authors.map((item) => item.trim()).filter(Boolean);
   const related = values.related_project_id.trim();
   const parsed = createResearchSchema.safeParse({
@@ -143,8 +149,14 @@ export function validateResearchFormClient(values: ResearchFormValues): string |
   });
 
   if (!parsed.success) {
-    return parsed.error.errors[0]?.message ?? 'Check the highlighted fields.';
+    const first = parsed.error.errors[0];
+    const field = first?.path[0];
+    return {
+      success: false,
+      message: first?.message ?? 'Check the highlighted fields.',
+      field: typeof field === 'string' ? field : undefined,
+    };
   }
 
-  return null;
+  return { success: true };
 }

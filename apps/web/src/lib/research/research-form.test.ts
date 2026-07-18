@@ -19,7 +19,7 @@ describe('validateResearchFormClient', () => {
       title: 'Graph Neural Nets',
       slug: 'graph-neural-nets',
     };
-    expect(validateResearchFormClient(values)).toBeNull();
+    expect(validateResearchFormClient(values)).toEqual({ success: true });
   });
 
   it('rejects missing title', () => {
@@ -27,7 +27,12 @@ describe('validateResearchFormClient', () => {
       ...createEmptyResearchFormValues(),
       slug: 'graph-neural-nets',
     };
-    expect(validateResearchFormClient(values)).toMatch(/title/i);
+    const result = validateResearchFormClient(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.message).toMatch(/title/i);
+      expect(result.field).toBe('title');
+    }
   });
 
   it('rejects invalid DOI', () => {
@@ -37,7 +42,12 @@ describe('validateResearchFormClient', () => {
       slug: 'paper',
       doi_url: 'not-a-doi',
     };
-    expect(validateResearchFormClient(values)).toMatch(/doi/i);
+    const result = validateResearchFormClient(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.message).toMatch(/doi/i);
+      expect(result.field).toBe('doi_url');
+    }
   });
 
   it('rejects javascript URLs', () => {
@@ -47,7 +57,12 @@ describe('validateResearchFormClient', () => {
       slug: 'paper',
       pdf_url: 'javascript:alert(1)',
     };
-    expect(validateResearchFormClient(values)).toMatch(/url/i);
+    const result = validateResearchFormClient(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.message).toMatch(/url/i);
+      expect(result.field).toBe('pdf_url');
+    }
   });
 });
 

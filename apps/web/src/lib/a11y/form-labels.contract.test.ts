@@ -40,7 +40,8 @@ describe('WS12-T002 accessible form labels', () => {
     const source = read('components/dashboard/project-form.tsx');
     expect(source).toContain('htmlFor="project-technologies"');
     expect(source).toContain('id="project-technologies"');
-    expect(source).toContain('aria-describedby="project-technologies-hint"');
+    expect(source).toContain("'project-technologies-hint'");
+    expect(source).toContain('joinDescribedBy');
     expect(source).not.toContain('aria-label="Add technology"');
     expect(source).toContain('<legend className="text-[13px] font-medium text-graphite">Domains</legend>');
     expect(source).toContain(

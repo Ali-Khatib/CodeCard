@@ -243,9 +243,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.label)}
+              aria-describedby={fieldErrors?.label ? 'profile-link-label-error' : undefined}
             />
             {fieldErrors?.label && (
-              <p className="text-sm text-red-400" role="alert">
+              <p id="profile-link-label-error" className="text-sm text-red-400" role="alert">
                 {fieldErrors.label}
               </p>
             )}
@@ -257,10 +258,11 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.url)}
+              aria-describedby={fieldErrors?.url ? 'profile-link-url-error' : undefined}
               placeholder={form.type === 'email' ? 'you@example.com' : 'https://example.com'}
             />
             {fieldErrors?.url && (
-              <p className="text-sm text-red-400" role="alert">
+              <p id="profile-link-url-error" className="text-sm text-red-400" role="alert">
                 {fieldErrors.url}
               </p>
             )}

@@ -19,8 +19,31 @@ import {
   type ProjectFormValues,
 } from '@/lib/projects/project-form';
 import { cn } from '@/lib/cn';
+import { joinDescribedBy } from '@/lib/a11y/described-by';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+
+const PROJECT_FIELD_IDS: Record<string, string> = {
+  title: 'project-title',
+  slug: 'project-slug',
+  tagline: 'project-tagline',
+  description: 'project-description',
+  technologies: 'project-technologies',
+  domains: 'project-domains',
+  focus_areas: 'project-focus-areas',
+  user_role: 'project-user-role',
+  status: 'project-status',
+  started_at: 'project-started-at',
+  ended_at: 'project-ended-at',
+};
+
+function focusProjectField(field?: string) {
+  if (!field) return;
+  const id = PROJECT_FIELD_IDS[field];
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (el instanceof HTMLElement) el.focus();
+}
 
 const initialCreateState: ProjectCreateState = {};
 const initialUpdateState: ProjectUpdateState = {};
@@ -92,6 +115,10 @@ export function ProjectForm({
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [techInput, setTechInput] = useState('');
   const [clientError, setClientError] = useState('');
+  const [clientFieldError, setClientFieldError] = useState<{
+    field?: string;
+    message: string;
+  } | null>(null);
   const [recoverableError, setRecoverableError] = useState('');
   const [createState, createAction, createPending] = useActionState(
     createProjectAction,
@@ -138,10 +165,16 @@ export function ProjectForm({
   }, [state.errorCode, editPath, notifyError]);
 
   useEffect(() => {
-    if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
+    const errors = state.fieldErrors ?? {};
+    const firstKey = Object.keys(errors)[0];
+    if (state.errorCode === 'slug_taken') {
       slugInputRef.current?.focus();
+      return;
     }
-  }, [state.errorCode, state.fieldErrors?.slug]);
+    if (firstKey) {
+      focusProjectField(firstKey);
+    }
+  }, [state.errorCode, state.fieldErrors]);
 
   useEffect(() => {
     if (isRecoverableProjectFailure(state)) {
@@ -231,12 +264,15 @@ export function ProjectForm({
 
     submitLockRef.current = true;
     setClientError('');
+    setClientFieldError(null);
     setRecoverableError('');
 
     const validation = validateProjectFormClient(form);
     if (!validation.success) {
       setClientError(validation.message);
+      setClientFieldError({ field: validation.field, message: validation.message });
       submitLockRef.current = false;
+      focusProjectField(validation.field);
       return;
     }
 
@@ -268,13 +304,19 @@ export function ProjectForm({
     await submitProject();
   }
 
-  const fieldErrors = state.fieldErrors ?? {};
+  const fieldErrors = {
+    ...(state.fieldErrors ?? {}),
+    ...(clientFieldError?.field
+      ? { [clientFieldError.field]: clientFieldError.message }
+      : {}),
+  };
   const globalError =
     clientError ||
     (mode === 'create' && state.errorCode === 'limit' ? state.error : '') ||
     state.error ||
     (state.errorCode === 'auth' ? state.error : '') ||
     '';
+  const formErrorId = 'project-form-error';
 
   return (
     <form
@@ -331,7 +373,10 @@ export function ProjectForm({
             className="cc-input w-full"
             placeholder="dev-flow"
             aria-invalid={Boolean(fieldErrors.slug)}
-            aria-describedby={fieldErrors.slug ? 'project-slug-error' : 'project-slug-hint'}
+            aria-describedby={joinDescribedBy(
+              'project-slug-hint',
+              fieldErrors.slug && 'project-slug-error',
+            )}
           />
           <p id="project-slug-hint" className="text-[12px] text-ash">
             Lowercase letters, numbers, and hyphens only.
@@ -351,6 +396,10 @@ export function ProjectForm({
             maxLength={PROJECT_FORM_LIMITS.tagline}
             className="cc-input w-full"
             placeholder="Ship faster with better workflows"
+            aria-invalid={Boolean(fieldErrors.tagline)}
+            aria-describedby={
+              fieldErrors.tagline ? 'project-tagline-error' : undefined
+            }
           />
           <FieldError id="project-tagline-error" message={fieldErrors.tagline} />
         </div>
@@ -368,6 +417,10 @@ export function ProjectForm({
             rows={5}
             className="cc-input w-full resize-y"
             placeholder="What you built, why it matters, and what you learned."
+            aria-invalid={Boolean(fieldErrors.description)}
+            aria-describedby={
+              fieldErrors.description ? 'project-description-error' : undefined
+            }
           />
           <FieldError id="project-description-error" message={fieldErrors.description} />
         </div>
@@ -409,14 +462,22 @@ export function ProjectForm({
           }}
           className="cc-input w-full"
           placeholder="TypeScript, Next.js, C++"
-          aria-describedby="project-technologies-hint"
+          aria-invalid={Boolean(fieldErrors.technologies)}
+          aria-describedby={joinDescribedBy(
+            'project-technologies-hint',
+            fieldErrors.technologies && 'project-technologies-error',
+          )}
         />
         <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
       </section>
 
-      <fieldset className="space-y-3 border-0 p-0">
+      <fieldset
+        className="space-y-3 border-0 p-0"
+        aria-invalid={fieldErrors.domains ? true : undefined}
+        aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
+      >
         <legend className="text-[13px] font-medium text-graphite">Domains</legend>
-        <div className="flex flex-wrap gap-2">
+        <div id="project-domains" className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
             <ToggleChip
               key={domain}
@@ -429,9 +490,13 @@ export function ProjectForm({
         <FieldError id="project-domains-error" message={fieldErrors.domains} />
       </fieldset>
 
-      <fieldset className="space-y-3 border-0 p-0">
+      <fieldset
+        className="space-y-3 border-0 p-0"
+        aria-invalid={fieldErrors.focus_areas ? true : undefined}
+        aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
+      >
         <legend className="text-[13px] font-medium text-graphite">Focus areas</legend>
-        <div className="flex flex-wrap gap-2">
+        <div id="project-focus-areas" className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
             <ToggleChip
               key={area}
@@ -457,6 +522,10 @@ export function ProjectForm({
             maxLength={PROJECT_FORM_LIMITS.userRole}
             className="cc-input w-full"
             placeholder="Lead Engineer"
+            aria-invalid={Boolean(fieldErrors.user_role)}
+            aria-describedby={
+              fieldErrors.user_role ? 'project-user-role-error' : undefined
+            }
           />
           <FieldError id="project-user-role-error" message={fieldErrors.user_role} />
         </div>
@@ -476,6 +545,8 @@ export function ProjectForm({
               }))
             }
             className="cc-input w-full"
+            aria-invalid={Boolean(fieldErrors.status)}
+            aria-describedby={fieldErrors.status ? 'project-status-error' : undefined}
           >
             {PROJECT_FORM_STATUS_OPTIONS.map((status) => (
               <option key={status} value={status}>
@@ -497,6 +568,10 @@ export function ProjectForm({
             value={form.started_at}
             onChange={(e) => setForm((prev) => ({ ...prev, started_at: e.target.value }))}
             className="cc-input w-full"
+            aria-invalid={Boolean(fieldErrors.started_at)}
+            aria-describedby={
+              fieldErrors.started_at ? 'project-started-at-error' : undefined
+            }
           />
           <FieldError id="project-started-at-error" message={fieldErrors.started_at} />
         </div>
@@ -537,9 +612,23 @@ export function ProjectForm({
         </div>
       )}
 
-      {globalError && !fieldErrors.slug && !fieldErrors.title && state.errorCode !== 'limit' && !recoverableError && (
-        <p className="text-[13px] text-red-400" role="alert" aria-live="polite">
+      {globalError &&
+        !fieldErrors.slug &&
+        !fieldErrors.title &&
+        state.errorCode !== 'limit' &&
+        !recoverableError && (
+        <p
+          id={formErrorId}
+          className="text-[13px] text-red-400"
+          role="alert"
+          aria-live="assertive"
+        >
           {globalError}
+        </p>
+      )}
+      {clientError && (fieldErrors.slug || fieldErrors.title) && !recoverableError && (
+        <p id={formErrorId} className="sr-only" role="alert">
+          {clientError}
         </p>
       )}
 

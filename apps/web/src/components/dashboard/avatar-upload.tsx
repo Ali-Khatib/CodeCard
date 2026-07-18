@@ -360,7 +360,7 @@ export function AvatarUpload({
 
       {statusMessage && !pending ? (
         <p
-          role="status"
+          role={error ? 'alert' : 'status'}
           className={`text-[14px] ${error ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
           aria-live="polite"
         >
