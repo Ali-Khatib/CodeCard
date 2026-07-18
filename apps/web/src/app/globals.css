@@ -2276,6 +2276,21 @@ select,
         background 0.24s ease;
     }
 
+    .cc-nav-veil__inner {
+      min-height: 52px;
+      height: auto;
+      padding-block: 6px;
+    }
+
+    .cc-nav-veil__inner > button[aria-label='Open menu'],
+    .cc-nav-veil__inner > button[aria-label='Close menu'],
+    .cc-nav-mobile-trigger {
+      min-height: 44px !important;
+      min-width: 44px !important;
+      height: 44px !important;
+      width: 44px !important;
+    }
+
     .cc-nav-veil--mobile-open {
       border-radius: 28px;
       background:
@@ -2774,6 +2789,7 @@ select,
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
     border-radius: 100px;
     padding: 12px 28px;
     font-size: 14px;
@@ -2802,6 +2818,7 @@ select,
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
     border-radius: 100px;
     padding: 12px 28px;
     font-size: 14px;
@@ -2824,6 +2841,7 @@ select,
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
+    min-height: 44px;
     border-radius: 100px;
     padding: 12px 22px;
     font-size: 14px;

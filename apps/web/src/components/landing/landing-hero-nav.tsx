@@ -146,7 +146,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
 
         <button
           type="button"
-          className="ml-auto flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
+          className="cc-nav-mobile-trigger ml-auto flex items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
           aria-expanded={mobileOpen}
           aria-label="Open menu"
           onClick={() => setMobileOpen((o) => !o)}

@@ -1,6 +1,6 @@
-/* ═══════════════════════════════════════════════════════════════
-   CodeCard App — Hume-inspired scientific workspace (scoped)
-   ═══════════════════════════════════════════════════════════════ */
+/* ???????????????????????????????????????????????????????????????
+   CodeCard App ? Hume-inspired scientific workspace (scoped)
+   ??????????????????????????????????????????????????????????????? */
 
 .cc-app-root {
   position: relative;
@@ -19,7 +19,7 @@
   --app-seafoam: #cef1e1;
   --app-slate-plum: #574853;
   --app-border: rgba(34, 34, 34, 0.08);
-  /* Meaningful control borders — ≥3:1 vs paper/bone after composite. */
+  /* Meaningful control borders ? ?3:1 vs paper/bone after composite. */
   --app-border-strong: rgba(34, 34, 34, 0.52);
   --app-radius-input: 8px;
   --app-radius-card: 16px;
@@ -45,7 +45,7 @@
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* ── Dark appearance (Settings › Branding toggle) ── */
+/* ?? Dark appearance (Settings ? Branding toggle) ?? */
 html.dark .cc-app-root {
   --app-ink: #efedeb;
   --app-paper: #1a191c;
@@ -89,7 +89,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   box-shadow: inset 0 4px 0 rgba(192, 148, 228, 0.28);
 }
 
-/* ── Layout ── */
+/* ?? Layout ?? */
 .cc-app-sidebar {
   position: fixed;
   left: 0;
@@ -166,8 +166,10 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 14px;
   border: 1px solid var(--app-border-strong);
   border-left: none;
@@ -304,7 +306,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   max-width: var(--app-page-public);
 }
 
-/* ── Typography ── */
+/* ?? Typography ?? */
 .cc-app-mono {
   font-family: var(--app-mono);
   font-size: 12px;
@@ -382,7 +384,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   color: var(--app-ink);
 }
 
-/* ── Cards ── */
+/* ?? Cards ?? */
 .cc-app-card {
   border-radius: var(--app-radius-large);
   padding: var(--app-card-pad);
@@ -449,13 +451,14 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-color: transparent;
 }
 
-/* ── Buttons ── */
+/* ?? Buttons ?? */
 .cc-app-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 40px;
+  min-height: 44px;
+  height: 44px;
   border-radius: var(--app-radius-pill);
   padding: 0 18px;
   font-size: 14px;
@@ -498,7 +501,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   width: 100%;
 }
 
-/* WS12-T004 / T005 — Keyboard focus for shared app controls */
+/* WS12-T004 / T005 ? Keyboard focus for shared app controls */
 .cc-app-btn:focus {
   outline: none;
 }
@@ -530,7 +533,7 @@ button.cc-app-nav-link:focus-visible {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
 }
 
-/* Async action button — loading pulse + check morph */
+/* Async action button ? loading pulse + check morph */
 .cc-async-action-btn {
   position: relative;
   overflow: hidden;
@@ -689,7 +692,7 @@ button.cc-app-nav-link:focus-visible {
   }
 }
 
-/* ── Nav ── */
+/* ?? Nav ?? */
 .cc-app-nav-link {
   display: flex;
   height: 40px;
@@ -743,7 +746,7 @@ button.cc-app-nav-link:focus-visible {
   pointer-events: none;
 }
 
-/* ── Settings nav (two-line) ── */
+/* ?? Settings nav (two-line) ?? */
 .cc-settings-nav-link {
   display: flex;
   flex-direction: column;
@@ -799,7 +802,7 @@ button.cc-app-nav-link:focus-visible {
   color: color-mix(in srgb, var(--app-smoke) 75%, var(--app-iris));
 }
 
-/* ── User card ── */
+/* ?? User card ?? */
 .cc-app-user-card {
   border-radius: var(--app-radius-card);
   border: 1px solid var(--app-border);
@@ -807,7 +810,7 @@ button.cc-app-nav-link:focus-visible {
   padding: 12px;
 }
 
-/* ── Inputs ── */
+/* ?? Inputs ?? */
 .cc-app-input {
   width: 100%;
   border-radius: var(--app-radius-input);
@@ -829,7 +832,7 @@ button.cc-app-nav-link:focus-visible {
   outline-offset: 2px;
 }
 
-/* ── Filters ── */
+/* ?? Filters ?? */
 .cc-app-filter-bar {
   display: inline-flex;
   flex-wrap: nowrap;
@@ -850,7 +853,8 @@ button.cc-app-nav-link:focus-visible {
 }
 
 .cc-app-filter-pill {
-  height: 32px;
+  min-height: 44px;
+  height: 44px;
   border-radius: var(--app-radius-pill);
   padding: 0 16px;
   font-size: 14px;
@@ -882,7 +886,7 @@ button.cc-app-nav-link:focus-visible {
   color: var(--app-paper);
 }
 
-/* ── Animated dock surfaces ── */
+/* ?? Animated dock surfaces ?? */
 .cc-animated-dock {
   width: fit-content;
   max-width: 100%;
@@ -946,7 +950,7 @@ button.cc-app-nav-link:focus-visible {
   letter-spacing: -0.035em;
 }
 
-/* Fixed prev/next on project detail — always dark icon on solid white (immune to theme/dark mode) */
+/* Fixed prev/next on project detail ? always dark icon on solid white (immune to theme/dark mode) */
 .cc-project-nav-btn {
   pointer-events: auto;
   display: flex;
@@ -1042,7 +1046,7 @@ html.dark .cc-project-nav-btn svg,
   color: var(--app-paper);
 }
 
-/* ── Metric ── */
+/* ?? Metric ?? */
 .cc-app-metric.cc-reactive-border {
   border-radius: var(--app-radius-card);
   padding: 20px;
@@ -1103,7 +1107,7 @@ html.dark .cc-project-nav-btn svg,
   color: var(--app-iris);
 }
 
-/* ── Badge ── */
+/* ?? Badge ?? */
 .cc-app-badge {
   display: inline-flex;
   align-items: center;
@@ -1123,7 +1127,7 @@ html.dark .cc-project-nav-btn svg,
   color: var(--app-slate-plum);
 }
 
-/* ── Page transition ── */
+/* ?? Page transition ?? */
 .cc-app-route-progress {
   position: fixed;
   left: 0;
@@ -1231,7 +1235,7 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
-/* ── Mutation feedback toasts (WS09-T012) ── */
+/* ?? Mutation feedback toasts (WS09-T012) ?? */
 .cc-mutation-toast-region {
   position: fixed;
   z-index: 80;
@@ -1326,7 +1330,7 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
-/* ── Mobile ── */
+/* ?? Mobile ?? */
 @media (max-width: 767px) {
   .cc-app-sidebar {
     display: none;
@@ -1419,11 +1423,12 @@ html.dark .cc-project-nav-btn svg,
   }
 
   .cc-app-filter-pill {
-    flex: 0 1 auto;
-    min-width: 0;
-    height: clamp(28px, 7.2vw, 34px);
-    padding-inline: clamp(6px, 1.15vw, 10px);
-    font-size: clamp(11px, 2.85vw, 12px);
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px !important;
+    height: 44px !important;
+    padding-inline: clamp(10px, 1.15vw, 14px);
+    font-size: clamp(12px, 2.85vw, 13px);
     font-weight: 700;
     letter-spacing: -0.02em;
     color: color-mix(in srgb, var(--app-ink) 82%, transparent);
@@ -1521,7 +1526,7 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
-/* ── Connection rows — reactive blob expand ── */
+/* ?? Connection rows ? reactive blob expand ?? */
 .cc-connections-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -2276,7 +2281,7 @@ html.dark .cc-project-nav-btn svg,
   box-shadow: inset 0 1px 0 var(--app-border);
 }
 
-/* ── Icon button + notifications ── */
+/* ?? Icon button + notifications ?? */
 .cc-app-icon-btn {
   display: flex;
   height: 40px;
@@ -2307,7 +2312,7 @@ html.dark .cc-project-nav-btn svg,
   max-height: min(70vh, 420px);
 }
 
-/* ── Compact profile preview ── */
+/* ?? Compact profile preview ?? */
 .cc-app-profile-preview {
   border-radius: var(--app-radius-large);
   border: 1px solid var(--app-border);
@@ -2321,7 +2326,7 @@ html.dark .cc-project-nav-btn svg,
   padding: 0;
 }
 
-/* ── Project stack cards ── */
+/* ?? Project stack cards ?? */
 .cc-app-project-card {
   overflow: hidden;
   border-radius: var(--app-radius-large);
@@ -2425,7 +2430,7 @@ html.dark .cc-project-nav-btn svg,
   color: var(--app-ink);
 }
 
-/* ── Reactive border (pointer-tracking glow) ── */
+/* ?? Reactive border (pointer-tracking glow) ?? */
 .cc-reactive-border {
   --rx: 50%;
   --ry: 50%;
@@ -2442,7 +2447,7 @@ html.dark .cc-project-nav-btn svg,
   transform-origin: center center;
 }
 
-/* Shine sweep removed — it bled across cards and flashed on dark mode */
+/* Shine sweep removed ? it bled across cards and flashed on dark mode */
 .cc-reactive-border__shine {
   display: none;
 }
@@ -2517,7 +2522,7 @@ html.dark .cc-reactive-border:hover {
   }
 }
 
-/* ── Simple analytics bar chart ── */
+/* ?? Simple analytics bar chart ?? */
 .cc-metric-chart {
   display: flex;
   flex-direction: column;
@@ -2593,7 +2598,7 @@ html.dark .cc-reactive-border:hover {
   }
 }
 
-/* ── Analytics panels ── */
+/* ?? Analytics panels ?? */
 .cc-analytics-stat-block {
   padding: 12px 14px;
   border-radius: 10px;
@@ -2662,7 +2667,7 @@ html.dark .cc-reactive-border:hover {
   border-bottom: none;
 }
 
-/* legacy hume chart (unused) — kept for reference */
+/* legacy hume chart (unused) ? kept for reference */
 .cc-hume-chart {
   display: flex;
   flex-direction: column;
@@ -2675,7 +2680,7 @@ html.dark .cc-reactive-border:hover {
   gap: 4px;
 }
 
-/* Hume spotlight fade — shared pattern also in globals.css */
+/* Hume spotlight fade ? shared pattern also in globals.css */
 .cc-hume-fade-group {
   display: flex;
   align-items: center;
@@ -2850,7 +2855,7 @@ html.dark .cc-reactive-border:hover {
   }
 }
 
-/* ── Profile share hero (copy link + QR) ── */
+/* ?? Profile share hero (copy link + QR) ?? */
 .cc-profile-share-hero {
   display: flex;
   flex-direction: column;
@@ -3150,7 +3155,7 @@ html.dark .cc-reactive-border:hover {
   }
 }
 
-/* ── Profile home layout ── */
+/* ?? Profile home layout ?? */
 .cc-profile-home {
   display: flex;
   flex-direction: column;
@@ -3288,7 +3293,7 @@ html.dark .cc-reactive-border:hover {
   color: var(--app-smoke);
 }
 
-/* ── Projects page — profile ribbon + stack ── */
+/* ?? Projects page ? profile ribbon + stack ?? */
 .cc-projects-profile-strip {
   position: relative;
   display: flex;
@@ -3714,7 +3719,7 @@ html.dark .cc-share-qr-pattern__scan {
   box-shadow: 0 0 12px rgba(192, 148, 228, 0.55);
 }
 
-/* ── Project card — premium hover ── */
+/* ?? Project card ? premium hover ?? */
 .cc-project-hover-card {
   --mx: 50%;
   --my: 50%;
@@ -4085,7 +4090,7 @@ html.dark [class*='uppercase'][class*='tracking'] {
   }
 }
 
-/* ── Public profile canvas ── */
+/* ?? Public profile canvas ?? */
 .cc-public-profile {
   --app-ink: #222222;
   --app-paper: #ffffff;
@@ -4144,5 +4149,28 @@ html.dark [class*='uppercase'][class*='tracking'] {
 
   .cc-public-profile .cc-app-btn {
     min-height: 44px;
+  }
+}
+
+/* WS12-T007 ? Mobile primary controls: at least 44x44 CSS px hit area. */
+@media (max-width: 767px) {
+  .cc-app-btn,
+  .cc-app-btn.cc-app-btn--ghost,
+  .cc-app-btn.cc-app-btn--primary,
+  .cc-app-btn.cc-app-btn--soft {
+    min-height: 44px !important;
+    min-width: 44px;
+    height: auto !important;
+  }
+
+  .cc-app-topbar-cta {
+    min-height: 44px;
+  }
+
+  .cc-app-filter-pill {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding-inline: 12px !important;
+    font-size: 13px !important;
   }
 }

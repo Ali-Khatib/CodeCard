@@ -58,7 +58,7 @@ export function ResearchReorderToolbar({
         </span>
         <button
           type="button"
-          className="cc-app-btn cc-app-btn--ghost h-8 px-3 text-[12px] disabled:opacity-50"
+          className="cc-app-btn cc-app-btn--ghost min-h-11 px-3 text-[12px] disabled:opacity-50"
           disabled={pending || disabled || index === 0}
           aria-label={`Move research paper ${paperTitle} up from position ${index + 1}`}
           onClick={() => move('up')}
@@ -67,7 +67,7 @@ export function ResearchReorderToolbar({
         </button>
         <button
           type="button"
-          className="cc-app-btn cc-app-btn--ghost h-8 px-3 text-[12px] disabled:opacity-50"
+          className="cc-app-btn cc-app-btn--ghost min-h-11 px-3 text-[12px] disabled:opacity-50"
           disabled={pending || disabled || index === total - 1}
           aria-label={`Move research paper ${paperTitle} down from position ${index + 1}`}
           onClick={() => move('down')}

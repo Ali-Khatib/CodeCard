@@ -290,7 +290,7 @@ export function DashboardShell({
             <button
               type="button"
               onClick={() => setUserMenuOpen((o) => !o)}
-              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]"
+              className="flex h-11 w-11 min-h-11 min-w-11 items-center justify-center overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]"
               aria-expanded={userMenuOpen}
               aria-label="User menu"
             >
