@@ -139,23 +139,54 @@ export function ProjectCaseStudyTabs({
           </div>
 
           <div className="mt-4 md:mt-8">
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-1 lg:gap-2">
+            <div
+              className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-1 lg:gap-2"
+              role="tablist"
+              aria-label="Project showcase sections"
+            >
               {visibleSections.map(({ id, label, Icon }) => {
                 const active = id === activePart.id;
                 return (
                   <button
                     key={id}
                     type="button"
-                    onMouseEnter={() => setActive(id, label)}
+                    role="tab"
+                    id={`case-study-tab-${id}`}
+                    aria-selected={active}
+                    aria-controls={`case-study-panel-${id}`}
+                    tabIndex={active ? 0 : -1}
+                    onMouseEnter={() => {
+                      if (
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(hover: hover) and (pointer: fine)').matches
+                      ) {
+                        setActive(id, label);
+                      }
+                    }}
                     onFocus={() => setActive(id, label)}
                     onClick={() => setActive(id, label)}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft' && event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+                        return;
+                      }
+                      event.preventDefault();
+                      const index = visibleSections.findIndex((section) => section.id === id);
+                      const delta =
+                        event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1;
+                      const next =
+                        visibleSections[(index + delta + visibleSections.length) % visibleSections.length];
+                      if (!next) return;
+                      setActive(next.id, next.label);
+                      window.requestAnimationFrame(() => {
+                        document.getElementById(`case-study-tab-${next.id}`)?.focus();
+                      });
+                    }}
                     className={cn(
-                      'flex min-w-0 items-center gap-1.5 rounded-[12px] border px-2 py-1.5 text-left transition-all duration-200 lg:gap-3 lg:rounded-[20px] lg:px-4 lg:py-3',
+                      'flex min-h-11 min-w-0 items-center gap-1.5 rounded-[12px] border px-2 py-1.5 text-left transition-all duration-200 lg:gap-3 lg:rounded-[20px] lg:px-4 lg:py-3',
                       active
                         ? 'border-lavender/35 bg-lavender/15 text-lilac-white shadow-[0_10px_30px_rgba(192,148,228,0.12)]'
                         : 'border-white/8 bg-white/[0.035] text-ash opacity-70 hover:opacity-100',
                     )}
-                    aria-pressed={active}
                   >
                     <Icon className={cn('h-3.5 w-3.5 shrink-0 lg:h-5 lg:w-5', active && 'text-lavender')} aria-hidden />
                     <span className="truncate text-[11px] font-medium leading-tight lg:text-[15px]">{label}</span>
@@ -165,16 +196,19 @@ export function ProjectCaseStudyTabs({
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
-              <motion.p
+              <motion.div
                 key={activePart.id}
-                initial={{ opacity: 0, y: 6 }}
+                id={`case-study-panel-${activePart.id}`}
+                role="tabpanel"
+                aria-labelledby={`case-study-tab-${activePart.id}`}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.2 }}
+                exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6 }}
+                transition={{ duration: reduced ? 0.12 : 0.2 }}
                 className="mt-3 min-h-[36px] text-[12px] leading-relaxed text-ash md:mt-4 md:text-[14px]"
               >
                 {activeText ?? activePart.summary}
-              </motion.p>
+              </motion.div>
             </AnimatePresence>
           </div>
         </div>

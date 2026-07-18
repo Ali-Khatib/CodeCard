@@ -36,6 +36,12 @@ export function DashboardProjectManageCard({
       aria-label={`Open ${project.title}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setHovered(false);
+        }
+      }}
       onClick={() => router.push(project.href)}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {

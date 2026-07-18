@@ -46,13 +46,14 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
           )}
           {card.videoUrl && !reduced && (
             <video
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100"
               src={card.videoUrl}
               muted
               loop
               playsInline
               preload="none"
               onMouseEnter={(e) => void e.currentTarget.play().catch(() => {})}
+              onFocus={(e) => void e.currentTarget.play().catch(() => {})}
               onMouseLeave={(e) => {
                 e.currentTarget.pause();
                 e.currentTarget.currentTime = 0;
@@ -60,7 +61,7 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-void-canvas via-void-canvas/20 to-transparent opacity-80" />
-          <div className="absolute inset-0 bg-reactor/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <div className="absolute inset-0 bg-reactor/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100" />
 
           <div className="absolute left-3 top-3 flex gap-2">
             <span className="cc-dash-chip cc-dash-chip--status">{card.subtitle}</span>
@@ -69,7 +70,7 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
             )}
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 translate-y-3 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="absolute bottom-0 left-0 right-0 translate-y-3 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
             <div className="flex flex-wrap gap-2">
               {card.liveUrl && (
                 <span className="cc-dash-chip cc-dash-chip--action">Live demo</span>

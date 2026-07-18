@@ -26,10 +26,20 @@ function AccordionPanel({ item, isActive, onActivate, index }: AccordionPanelPro
   return (
     <button
       type="button"
+      role="tab"
+      aria-selected={isActive}
       aria-expanded={isActive}
       aria-label={item.title}
-      onMouseEnter={onActivate}
+      onMouseEnter={() => {
+        if (
+          typeof window !== 'undefined' &&
+          window.matchMedia('(hover: hover) and (pointer: fine)').matches
+        ) {
+          onActivate();
+        }
+      }}
       onFocus={onActivate}
+      onClick={onActivate}
       className={cn(
         'cc-accordion-panel relative h-[min(450px,52vh)] shrink-0 overflow-hidden rounded-[24px] border-2',
         'transition-[width,box-shadow,transform] duration-[520ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
