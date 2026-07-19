@@ -201,9 +201,14 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     await expect(page.locator(NO_VISITOR_PROMPT)).toHaveCount(0);
   });
 
-  test('wrong password fails safely; correct works; session survives reload', async ({ page }) => {
+  test('wrong password fails safely; correct works; session survives reload', async ({
+    page,
+    env,
+  }) => {
     await page.context().clearCookies();
-    await signInViaUI(page, { email: primary.email, password: 'WrongPassword123!' });
+    // Intentionally wrong — derived from the E2E env password, never a hardcoded literal.
+    const wrongPassword = `${env.testPassword}-not-the-account-password`;
+    await signInViaUI(page, { email: primary.email, password: wrongPassword });
     const alert = page.getByRole('alert').first();
     await expect(alert).toBeVisible();
     await expect(alert).not.toContainText(/access_token|refresh_token|code=|supabase|400|401/i);
@@ -343,12 +348,18 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
   test('full password reset: real UI request → Mailtrap email → recovery link → new password', async ({
     page,
     run,
+    env,
   }) => {
     const mailtrap = loadMailtrapConfig();
     test.skip(!mailtrap, 'Mailtrap sandbox credentials not configured in .env.e2e.local');
     if (!mailtrap) return;
 
-    const NEW_PASSWORD = 'Rotated-E2E-Password-NotForProduction-7b2c';
+    // Rotated password must come from CODECARD_E2E_TEST_PASSWORD (via env fixture),
+    // never a hardcoded literal (secret-scan / Hardcoded password assignment).
+    if (!env.testPassword || env.testPassword.trim().length === 0) {
+      throw new Error('CODECARD_E2E_TEST_PASSWORD is required for password-reset E2E');
+    }
+    const NEW_PASSWORD = `${env.testPassword}-Rotated9`;
 
     // Start clean: drop any earlier captured messages for this run's recipient
     // so the next captured message is unambiguously the one we request now.
