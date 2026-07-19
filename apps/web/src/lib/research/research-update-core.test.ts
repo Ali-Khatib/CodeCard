@@ -136,6 +136,8 @@ function createMockSupabase(options: {
     if (table === 'circle_activity') {
       return {
         insert: vi.fn().mockResolvedValue({ error: null }),
+        // Production emit path uses upsert (onConflict: dedupe_key).
+        upsert: vi.fn().mockResolvedValue({ error: null }),
       };
     }
 

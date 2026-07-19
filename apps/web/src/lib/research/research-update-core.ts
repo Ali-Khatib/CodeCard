@@ -216,12 +216,17 @@ export async function executeUpdateResearch(
       year: data.year ?? null,
     };
     if (researchHasMeaningfulChange(before, after)) {
-      await emitResearchUpdatedActivity(supabase, {
-        tenantId: paper.tenant_id,
-        actorProfileId: paper.profile_id,
-        researchPaperId: paper.id,
-        ...after,
-      });
+      // Best-effort: a Circle emit failure must never roll back a successful update.
+      try {
+        await emitResearchUpdatedActivity(supabase, {
+          tenantId: paper.tenant_id,
+          actorProfileId: paper.profile_id,
+          researchPaperId: paper.id,
+          ...after,
+        });
+      } catch {
+        // Intentionally ignored — mutation already succeeded.
+      }
     }
   }
 
