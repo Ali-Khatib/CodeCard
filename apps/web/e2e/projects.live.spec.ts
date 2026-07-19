@@ -37,15 +37,23 @@ async function fillStable(locator: Locator, value: string): Promise<void> {
 }
 
 /**
- * Click a trigger until its confirmation dialog opens. On slow CI runners a
- * click can land before React hydration attaches the onClick handler, so the
- * dialog never opens; retrying after hydration settles is the reliable fix.
+ * Open an inline confirmation panel and return once its Confirm button is
+ * visible. On slow CI runners a click can land before React hydration attaches
+ * the onClick handler (so the panel never opens); retrying after hydration
+ * settles is the reliable fix. We assert on the Confirm button rather than the
+ * alertdialog role because CI's Linux Chromium exposes the inline
+ * role="alertdialog" panel as an "alert" node, which getByRole('alertdialog')
+ * does not match.
  */
-async function clickUntilAlertDialog(page: Page, name: RegExp): Promise<void> {
+async function openConfirmPanel(
+  page: Page,
+  trigger: RegExp,
+  confirm: RegExp,
+): Promise<void> {
   await page.waitForLoadState('networkidle');
   await expect(async () => {
-    await page.getByRole('button', { name }).click();
-    await expect(page.getByRole('alertdialog')).toBeVisible({ timeout: 2_000 });
+    await page.getByRole('button', { name: trigger }).click();
+    await expect(page.getByRole('button', { name: confirm })).toBeVisible({ timeout: 2_000 });
   }).toPass({ timeout: 30_000 });
 }
 
@@ -214,7 +222,7 @@ test.describe('WS14-T004 project CRUD E2E (isolated real backend)', () => {
   test('unpublish removes public access again', async ({ page, admin, browser }) => {
     await openDashboard(page);
     await page.goto(`/dashboard/projects/${projectId}/edit`, { waitUntil: 'domcontentloaded' });
-    await clickUntilAlertDialog(page, /^Unpublish project$/);
+    await openConfirmPanel(page, /^Unpublish project$/, /^Confirm unpublish$/);
     await page.getByRole('button', { name: /^Confirm unpublish$/ }).click();
     await expect(page.getByText('Draft', { exact: true })).toBeVisible({ timeout: 30_000 });
 
@@ -239,7 +247,7 @@ test.describe('WS14-T004 project CRUD E2E (isolated real backend)', () => {
   test('hard-delete removes the project row and cascades children', async ({ page, admin }) => {
     await openDashboard(page);
     await page.goto(`/dashboard/projects/${projectId}/edit`, { waitUntil: 'domcontentloaded' });
-    await clickUntilAlertDialog(page, /^Delete project$/);
+    await openConfirmPanel(page, /^Delete project$/, /^Confirm delete$/);
     await page.getByRole('button', { name: /^Confirm delete$/ }).click();
     await expect(
       page.getByRole('status').filter({ hasText: 'Project deleted' }).first(),

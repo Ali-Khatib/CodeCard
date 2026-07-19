@@ -126,10 +126,14 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
     await openProfileEditor(page);
 
     // The slug input lowercases on change; spaces and punctuation still fail validation.
-    await fillStable(page.getByLabel('Profile URL'), 'invalid slug!!');
-    // Retry the submit on slow CI runners: a click that lands before hydration
-    // finishes never runs the client-side validation that renders #slug-error.
+    // On slow CI runners a submit click can land before hydration wires the
+    // onSubmit handler, triggering a native form submit that reloads the page and
+    // discards the typed value. Re-fill inside the retry so the invalid slug is
+    // present when the client-side validation (which renders #slug-error) runs.
+    await page.waitForLoadState('networkidle');
+    const slugInput = page.getByLabel('Profile URL');
     await expect(async () => {
+      await fillStable(slugInput, 'invalid slug!!');
       await page.locator('button[type="submit"]').filter({ hasText: 'Save changes' }).click();
       await expect(page.locator('#slug-error')).toBeVisible({ timeout: 5_000 });
     }).toPass({ timeout: 30_000 });
