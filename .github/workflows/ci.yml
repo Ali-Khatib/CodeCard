@@ -69,6 +69,103 @@ jobs:
         working-directory: apps/web
         run: npx playwright test e2e/auth.spec.ts --project=desktop-1440
 
+  # WS14-T010: real RLS integration against the isolated E2E Supabase project.
+  # Uses only CODECARD_E2E_* repository secrets — never production credentials.
+  # When secrets are missing the job fails closed (no production env fallback).
+  rls-integration:
+    runs-on: ubuntu-latest
+    needs: lint-typecheck-test
+    # Serialize destructive cleanup against the shared isolated project.
+    concurrency:
+      group: codecard-e2e-isolated
+      cancel-in-progress: false
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Require isolated E2E repository secrets
+        env:
+          CODECARD_E2E_SUPABASE_URL: ${{ secrets.CODECARD_E2E_SUPABASE_URL }}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY }}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY }}
+          CODECARD_E2E_SUPABASE_PROJECT_REF: ${{ secrets.CODECARD_E2E_SUPABASE_PROJECT_REF }}
+          CODECARD_E2E_TEST_PASSWORD: ${{ secrets.CODECARD_E2E_TEST_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in \
+            CODECARD_E2E_SUPABASE_URL \
+            CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY \
+            CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY \
+            CODECARD_E2E_SUPABASE_PROJECT_REF \
+            CODECARD_E2E_TEST_PASSWORD
+          do
+            if [ -z "${!name}" ]; then
+              echo "Missing repository secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "RLS integration cannot run without isolated E2E secrets."
+            echo "Configure the CODECARD_E2E_* repository secrets listed above."
+            echo "Never paste secret values into the workflow YAML or chat."
+            exit 1
+          fi
+          case "$CODECARD_E2E_SUPABASE_PROJECT_REF" in
+            gclteunkzorwaliwhatp)
+              echo "Refusing production Supabase project reference."
+              exit 1
+              ;;
+            zbum*)
+              echo "Isolated E2E project reference accepted."
+              ;;
+            *)
+              echo "Unexpected project reference prefix — expected zbum*."
+              exit 1
+              ;;
+          esac
+
+      - name: Write isolated E2E env file
+        env:
+          CODECARD_E2E_SUPABASE_URL: ${{ secrets.CODECARD_E2E_SUPABASE_URL }}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY }}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY }}
+          CODECARD_E2E_SUPABASE_PROJECT_REF: ${{ secrets.CODECARD_E2E_SUPABASE_PROJECT_REF }}
+          CODECARD_E2E_TEST_PASSWORD: ${{ secrets.CODECARD_E2E_TEST_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cat > apps/web/.env.e2e.local <<EOF
+          CODECARD_E2E=1
+          CODECARD_E2E_ALLOW_DESTRUCTIVE=1
+          CODECARD_E2E_SUPABASE_URL=${CODECARD_E2E_SUPABASE_URL}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY=${CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY=${CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY}
+          CODECARD_E2E_SUPABASE_PROJECT_REF=${CODECARD_E2E_SUPABASE_PROJECT_REF}
+          CODECARD_E2E_TEST_PASSWORD=${CODECARD_E2E_TEST_PASSWORD}
+          CODECARD_E2E_BASE_URL=http://localhost:3100
+          EOF
+
+      - name: Environment guard and schema readiness
+        run: npm run test:e2e:env --workspace=web
+
+      - name: Disposable-user smoke
+        run: npm run test:e2e:smoke --workspace=web
+
+      - name: RLS integration suite
+        run: npm run test:e2e:rls --workspace=web
+
+      - name: Scrub E2E env file
+        if: always()
+        run: rm -f apps/web/.env.e2e.local
+
   codeql:
     runs-on: ubuntu-latest
     permissions:
