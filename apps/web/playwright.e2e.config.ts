@@ -32,9 +32,12 @@ export default defineConfig({
   globalSetup: './e2e/support/global-setup.ts',
   use: {
     baseURL: E2E_BASE_URL,
-    // Never retain secrets (recovery links, cookies, tokens) in artifacts.
+    // Never retain secrets (recovery links, cookies, tokens) in artifacts by
+    // default. CI may opt into screenshots-only-on-failure via env — still no
+    // traces/videos that could capture recovery URLs or auth cookies.
     trace: 'off',
-    screenshot: 'off',
+    screenshot:
+      process.env.PLAYWRIGHT_E2E_SCREENSHOT === 'only-on-failure' ? 'only-on-failure' : 'off',
     video: 'off',
   },
   // Single project: the serial suite shares one primary user across tests and

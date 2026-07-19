@@ -19,6 +19,8 @@ describe('WS14-T010 RLS CI workflow contract', () => {
     expect(workflow).toContain('npm run test:e2e:env');
     expect(workflow).toContain('npm run test:e2e:smoke');
     expect(workflow).toContain('npm run test:e2e:rls');
+    expect(workflow).toContain('playwright-live-e2e:');
+    expect(workflow).toContain('CODECARD_E2E_MAILTRAP_API_TOKEN');
 
     for (const secret of [
       'CODECARD_E2E_SUPABASE_URL',
