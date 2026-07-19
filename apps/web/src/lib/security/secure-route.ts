@@ -46,7 +46,16 @@ export async function secureJsonRoute<T, R>(
 
     const { success } = await rateLimit(rlKey, options.rateLimitType);
     if (!success) return rateLimited();
-    if (options.strictRateLimit && isProduction() && !process.env.UPSTASH_REDIS_REST_URL) {
+    // Strict Redis requirement applies in production, except in the isolated
+    // E2E backend mode (CODECARD_E2E=1, server-only) where the app is a
+    // production build served locally without Upstash.
+    const isolatedE2E = process.env.CODECARD_E2E === '1';
+    if (
+      options.strictRateLimit &&
+      isProduction() &&
+      !isolatedE2E &&
+      !process.env.UPSTASH_REDIS_REST_URL
+    ) {
       return apiError('Service temporarily unavailable', 503);
     }
 
