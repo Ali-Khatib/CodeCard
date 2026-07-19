@@ -127,8 +127,12 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
 
     // The slug input lowercases on change; spaces and punctuation still fail validation.
     await fillStable(page.getByLabel('Profile URL'), 'invalid slug!!');
-    await page.locator('button[type="submit"]').filter({ hasText: 'Save changes' }).click();
-    await expect(page.locator('#slug-error')).toBeVisible();
+    // Retry the submit on slow CI runners: a click that lands before hydration
+    // finishes never runs the client-side validation that renders #slug-error.
+    await expect(async () => {
+      await page.locator('button[type="submit"]').filter({ hasText: 'Save changes' }).click();
+      await expect(page.locator('#slug-error')).toBeVisible({ timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
 
     const { data: row } = await admin
       .from('profiles')
