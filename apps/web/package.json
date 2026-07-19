@@ -20,6 +20,7 @@
     "test:e2e:public": "playwright test --config playwright.e2e.config.ts public.live.spec.ts",
     "test:e2e:account": "playwright test --config playwright.e2e.config.ts account.live.spec.ts",
     "test:e2e:analytics": "playwright test --config playwright.e2e.config.ts analytics.live.spec.ts",
+    "test:e2e:uploads": "playwright test --config playwright.e2e.config.ts uploads.live.spec.ts",
     "test:e2e:live": "playwright test --config playwright.e2e.config.ts",
     "test:e2e:env": "vitest run --config vitest.e2e.config.ts src/lib/e2e/schema-readiness.livetest.ts",
     "test:e2e:smoke": "vitest run --config vitest.e2e.config.ts src/lib/e2e/smoke.livetest.ts",
