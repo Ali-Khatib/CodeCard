@@ -22,7 +22,7 @@ for (const [key, value] of Object.entries(process.env)) {
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: /auth\.live\.spec\.ts$/,
+  testMatch: /\.live\.spec\.ts$/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,

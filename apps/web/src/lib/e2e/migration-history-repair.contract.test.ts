@@ -84,13 +84,31 @@ describe('WS14 fresh-replayable migration contract', () => {
   });
 
   describe('repair migration is a retained idempotent compatibility pass', () => {
-    it('is still present and is the newest timestamp in the directory', () => {
+    it('is still present, with only strictly newer forward-only migrations after it', () => {
       const versions = readdirSync(migrationsDir)
         .filter((f) => f.endsWith('.sql'))
         .map((f) => f.slice(0, 14))
         .filter((v) => /^\d{14}$/.test(v));
       const repairVersion = REPAIR_MIGRATION.slice(0, 14);
-      expect(versions.reduce((a, b) => (a > b ? a : b))).toBe(repairVersion);
+      expect(versions).toContain(repairVersion);
+      // Forward-only discipline: timestamps stay unique and everything after
+      // the history repair is a known, strictly newer forward-only migration.
+      expect(new Set(versions).size).toBe(versions.length);
+      const newer = readdirSync(migrationsDir)
+        .filter((f) => f.endsWith('.sql') && f.slice(0, 14) > repairVersion)
+        .sort();
+      expect(newer).toEqual(['20260719010000_ws14_upload_intent_grants.sql']);
+    });
+
+    it('WS14-T003 upload-intent grants migration matches the owner policies', () => {
+      const grantsSql = read('20260719010000_ws14_upload_intent_grants.sql');
+      // Exactly the operations the owner-scoped policies were written for —
+      // never DELETE (service-role-only) and never anon.
+      expect(grantsSql).toContain(
+        'GRANT SELECT, INSERT, UPDATE ON TABLE public.storage_upload_intents TO authenticated;',
+      );
+      expect(grantsSql).not.toMatch(/^GRANT[^;]*\bDELETE\b[^;]*TO authenticated/im);
+      expect(grantsSql).not.toMatch(/^GRANT[^;]*TO anon\b/im);
     });
 
     it('documents its idempotent compatibility purpose', () => {

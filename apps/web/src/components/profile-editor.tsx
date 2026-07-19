@@ -75,7 +75,11 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl space-y-6">
+    <div className="max-w-xl space-y-6">
+      {/* The links editor renders its own <form>; nesting forms is invalid
+          HTML (the browser drops the inner tag during SSR), so the profile
+          form must close before it. */}
+      <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="display_name">Display name</Label>
         <Input
@@ -135,6 +139,20 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           placeholder="TypeScript, Next.js, C++"
         />
       </div>
+        {/* Success feedback is announced once via the mutation toast
+            (MUTATION_FEEDBACK.profile.saved); this region only announces the
+            in-flight state accessibly. */}
+        <div aria-live="polite">
+          {pending ? (
+            <p className="text-sm text-zinc-400" role="status">
+              Saving your profile…
+            </p>
+          ) : null}
+        </div>
+        <Button type="submit" disabled={pending} aria-busy={pending}>
+          {pending ? 'Saving…' : 'Save changes'}
+        </Button>
+      </form>
       <ProfileLinksEditor links={links} />
       <ProfilePublishControls isPublic={profile.is_public} />
       {profile.slug && (
@@ -159,9 +177,6 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
           {displayError}
         </p>
       )}
-      <Button type="submit" disabled={pending} aria-busy={pending}>
-        {pending ? 'Saving…' : 'Save changes'}
-      </Button>
-    </form>
+    </div>
   );
 }

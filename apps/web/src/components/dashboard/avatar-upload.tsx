@@ -356,13 +356,15 @@ export function AvatarUpload({
       ) : null}
 
       {statusMessage && !pending ? (
-        <p
-          role="status"
-          className={`text-[14px] ${error ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
-          aria-live="polite"
-        >
-          {statusMessage}
-        </p>
+        error ? (
+          <p role="alert" className="text-[14px] text-red-600" aria-live="polite">
+            {statusMessage}
+          </p>
+        ) : (
+          <p role="status" className="text-[14px] text-[var(--app-smoke)]" aria-live="polite">
+            {statusMessage}
+          </p>
+        )
       ) : null}
     </div>
   );
