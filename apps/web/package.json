@@ -24,7 +24,8 @@
     "test:e2e:live": "playwright test --config playwright.e2e.config.ts",
     "test:e2e:env": "vitest run --config vitest.e2e.config.ts src/lib/e2e/schema-readiness.livetest.ts",
     "test:e2e:smoke": "vitest run --config vitest.e2e.config.ts src/lib/e2e/smoke.livetest.ts",
-    "test:e2e:reset": "vitest run --config vitest.e2e.config.ts src/lib/e2e/auth-reset.livetest.ts"
+    "test:e2e:reset": "vitest run --config vitest.e2e.config.ts src/lib/e2e/auth-reset.livetest.ts",
+    "test:e2e:rls-repair": "vitest run --config vitest.e2e.config.ts src/lib/e2e/tenant-ownership-rls-repair.livetest.ts"
   },
   "dependencies": {
     "@codecard/analytics": "*",
