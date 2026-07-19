@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { analyticsEventSchema } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { secureJsonRoute } from '@/lib/security/secure-route';
-import { isApprovedLinkCategory } from '@/lib/analytics/link-click';
+// Server-safe import: never import through the 'use client' link-click module
+// (client-reference proxies throw when called inside a route handler).
+import { isApprovedLinkCategory } from '@/lib/analytics/link-click.shared';
 import {
   isAuthenticatedContentOwner,
   isOwnerExcludedAudienceEvent,

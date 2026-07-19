@@ -38,6 +38,15 @@ type AuthTestFixtures = {
  */
 function makeDeleters(admin: SupabaseClient): Partial<Record<FixtureKind, FixtureDeleter>> {
   return {
+    analytics_event: async (f) => {
+      const { data, error } = await admin
+        .from('analytics_events')
+        .delete()
+        .eq('id', f.id)
+        .select('id');
+      if (error) throw new Error(`analytics event cleanup failed: ${error.code}`);
+      return data && data.length > 0 ? 'deleted' : 'already_gone';
+    },
     storage_object: async (f) => {
       const [bucket, ...rest] = f.id.split('/');
       const { data, error } = await admin.storage.from(bucket).remove([rest.join('/')]);

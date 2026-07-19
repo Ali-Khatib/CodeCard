@@ -40,6 +40,20 @@ describe('WS08-T002 public link click wiring', () => {
     expect(helper).toContain('Never blocks navigation');
   });
 
+  it('route handler never imports link_click helpers through the client module (WS14-T008)', () => {
+    // Importing via the 'use client' module hands the server route
+    // client-reference proxies; invoking one throws and every real
+    // link_click returns 500 (found by WS14-T008 real integration testing).
+    const route = read('src/app/api/analytics/route.ts');
+    const shared = read('src/lib/analytics/link-click.shared.ts');
+
+    expect(route).toContain("from '@/lib/analytics/link-click.shared'");
+    expect(route).not.toContain("from '@/lib/analytics/link-click'");
+    // The directive only counts at the top of the file (comments may mention it).
+    expect(shared).not.toMatch(/^\s*['"]use client['"]/);
+    expect(shared).toContain('export function isApprovedLinkCategory');
+  });
+
   it('does not treat internal open-project toggles as link_click', () => {
     const stack = read('src/components/profile/public-project-stack.tsx');
     expect(stack).toContain("setOpenId(isOpen ? null : project.id)");
