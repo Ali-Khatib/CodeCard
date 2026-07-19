@@ -85,6 +85,9 @@ export function webServerEnv(env: ValidatedE2EEnv): Record<string, string> {
     NEXT_PUBLIC_APP_URL: E2E_BASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: env.serviceRoleKey,
     // Real backend mode — NOT the local UI fixture mode (CODECARD_E2E_FIXTURES).
+    // Marks the server runtime as isolated E2E so Redis-less strict rate
+    // limits don't fail closed against the production build served locally.
+    CODECARD_E2E: '1',
     NODE_ENV: 'production',
   };
 }

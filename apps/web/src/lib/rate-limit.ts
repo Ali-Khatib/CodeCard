@@ -17,7 +17,11 @@ export async function rateLimit(
   const redis = getRedis();
 
   if (!redis) {
-    if (isProduction() && (type === 'ai' || type === 'upload' || type === 'auth')) {
+    // Strict endpoints fail closed without Redis in production, except in the
+    // isolated E2E backend mode (CODECARD_E2E=1, server-only, never set in
+    // production) where the app is a production build served locally.
+    const isolatedE2E = process.env.CODECARD_E2E === '1';
+    if (isProduction() && !isolatedE2E && (type === 'ai' || type === 'upload' || type === 'auth')) {
       console.error(`[rate-limit] Redis unavailable for strict endpoint: ${type}`);
       return { success: false };
     }

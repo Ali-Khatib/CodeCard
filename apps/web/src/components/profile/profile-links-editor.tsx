@@ -156,6 +156,14 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
         )}
       </div>
 
+      <div aria-live="polite">
+        {isPending ? (
+          <p className="text-sm text-zinc-400" role="status">
+            Updating links…
+          </p>
+        ) : null}
+      </div>
+
       {sortedLinks.length === 0 && mode.kind === 'idle' ? (
         <p className="text-sm text-zinc-400">
           No links yet. Add GitHub, LinkedIn, your website, or email so people can reach you faster.

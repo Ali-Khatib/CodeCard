@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:hero": "playwright test e2e/hero.spec.ts",
-    "test:e2e:auth": "playwright test --config playwright.e2e.config.ts",
+    "test:e2e:auth": "playwright test --config playwright.e2e.config.ts auth.live.spec.ts",
+    "test:e2e:profile": "playwright test --config playwright.e2e.config.ts profile.live.spec.ts",
+    "test:e2e:live": "playwright test --config playwright.e2e.config.ts",
     "test:e2e:env": "vitest run --config vitest.e2e.config.ts src/lib/e2e/schema-readiness.livetest.ts",
     "test:e2e:smoke": "vitest run --config vitest.e2e.config.ts src/lib/e2e/smoke.livetest.ts",
     "test:e2e:reset": "vitest run --config vitest.e2e.config.ts src/lib/e2e/auth-reset.livetest.ts"
