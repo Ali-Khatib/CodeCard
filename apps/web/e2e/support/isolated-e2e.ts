@@ -79,11 +79,20 @@ export function assertNotProductionUrl(url: string): void {
  * key (server-only, never in the client bundle) are exported here.
  */
 export function webServerEnv(env: ValidatedE2EEnv): Record<string, string> {
+  // Account deletion readiness requires STRIPE_SECRET_KEY to start with sk_.
+  // On the no-subscription path the Stripe API is never called (outcome
+  // `no_customer`), so a clearly-fake test-mode placeholder is sufficient
+  // unless the operator supplies a real CODECARD_E2E_STRIPE_SECRET_KEY.
+  const stripeSecret =
+    env.stripe?.secretKey?.trim() ||
+    'sk_test_codecard_e2e_no_subscription_placeholder';
+
   return {
     NEXT_PUBLIC_SUPABASE_URL: env.supabaseUrl,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: env.publishableKey,
     NEXT_PUBLIC_APP_URL: E2E_BASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: env.serviceRoleKey,
+    STRIPE_SECRET_KEY: stripeSecret,
     // Real backend mode — NOT the local UI fixture mode (CODECARD_E2E_FIXTURES).
     // Marks the server runtime as isolated E2E so Redis-less strict rate
     // limits don't fail closed against the production build served locally.
