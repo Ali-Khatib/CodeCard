@@ -1,10 +1,16 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import Stripe from 'stripe';
 import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/webhooks/stripe/route';
 import { processStripeWebhookRequest } from '@/lib/billing/stripe-webhook-core';
+
+const getStripeMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@/lib/stripe', () => ({
+  getStripe: getStripeMock,
+}));
 
 const WEBHOOK_SECRET = 'whsec_test_ws11_t011_codecard_secret';
 const stripe = new Stripe('sk_test_ws11t011fixture', {
@@ -536,5 +542,95 @@ describe('WS11-T011 Stripe webhook hardening', () => {
     expect(second.status).toBe(200);
     expect(db.cancelCount).toBe(1);
     expect(db.subscriptions[0]?.status).toBe('canceled');
+  });
+});
+
+describe('WS14-T011 Stripe webhook unit coverage gaps', () => {
+  beforeEach(() => {
+    getStripeMock.mockReset();
+  });
+
+  it('skips subscription upsert when no customer mapping exists (no_customer)', async () => {
+    const db = createMemoryDb({ profiles: [baseProfile] });
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_no_customer',
+      subscriptionObject(),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ received: true, skipped: 'no_customer' });
+    expect(db.upsertCount).toBe(0);
+    expect(db.events.get('evt_no_customer')?.status).toBe('completed');
+  });
+
+  it('skips subscription upsert when the mapped profile is gone (no_profile)', async () => {
+    const db = createMemoryDb({ customers: [baseCustomer] });
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_no_profile',
+      subscriptionObject(),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ received: true, skipped: 'no_profile' });
+    expect(db.upsertCount).toBe(0);
+    expect(db.events.get('evt_no_profile')?.status).toBe('completed');
+  });
+
+  it('returns opaque 500 when the service client cannot be created', async () => {
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_svc_fail',
+      subscriptionObject(),
+    );
+    const res = await processStripeWebhookRequest(signedRequest(payload), {
+      getWebhookSecret: () => WEBHOOK_SECRET,
+      constructEvent: (body, signature, secret) =>
+        stripe.webhooks.constructEvent(body, signature, secret),
+      getServiceClient: async () => {
+        throw new Error('db down — must never leak');
+      },
+    });
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toEqual({ error: 'Webhook processing failed' });
+    expect(JSON.stringify(json)).not.toContain('db down');
+    expect(JSON.stringify(json)).not.toContain(WEBHOOK_SECRET);
+  });
+
+  it('never calls the live Stripe SDK when constructEvent is injected', async () => {
+    const db = createMemoryDb({ customers: [baseCustomer], profiles: [baseProfile] });
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_no_live',
+      subscriptionObject(),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(200);
+    expect(getStripeMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps logs free of webhook secrets and full payment payloads', async () => {
+    const core = read('src/lib/billing/stripe-webhook-core.ts');
+    expect(core).not.toContain('console.log');
+    expect(core).not.toContain('console.info');
+    expect(core).toMatch(/never include the webhook secret|Logs must never include/i);
+
+    const db = createMemoryDb({ customers: [baseCustomer], profiles: [baseProfile] });
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_redact',
+      subscriptionObject({
+        // Sensitive-looking fields that must never appear in API error responses.
+        default_payment_method: 'pm_card_visa_4242',
+      }),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(JSON.stringify(json)).not.toContain(WEBHOOK_SECRET);
+    expect(JSON.stringify(json)).not.toContain('pm_card_visa_4242');
+    expect(JSON.stringify(json)).not.toContain('4242');
   });
 });
