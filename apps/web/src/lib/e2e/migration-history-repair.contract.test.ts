@@ -97,7 +97,10 @@ describe('WS14 fresh-replayable migration contract', () => {
       const newer = readdirSync(migrationsDir)
         .filter((f) => f.endsWith('.sql') && f.slice(0, 14) > repairVersion)
         .sort();
-      expect(newer).toEqual(['20260719010000_ws14_upload_intent_grants.sql']);
+      expect(newer).toEqual([
+        '20260719010000_ws14_upload_intent_grants.sql',
+        '20260719153000_repair_project_research_tenant_ownership_rls.sql',
+      ]);
     });
 
     it('WS14-T003 upload-intent grants migration matches the owner policies', () => {
