@@ -44,6 +44,20 @@ function makeDeleters(admin: SupabaseClient): Partial<Record<FixtureKind, Fixtur
       if (error) throw new Error(`storage cleanup failed: ${error.message}`);
       return data && data.length > 0 ? 'deleted' : 'already_gone';
     },
+    project: async (f) => {
+      const { data, error } = await admin.from('projects').delete().eq('id', f.id).select('id');
+      if (error) throw new Error(`project cleanup failed: ${error.code}`);
+      return data && data.length > 0 ? 'deleted' : 'already_gone';
+    },
+    research_paper: async (f) => {
+      const { data, error } = await admin
+        .from('research_papers')
+        .delete()
+        .eq('id', f.id)
+        .select('id');
+      if (error) throw new Error(`research cleanup failed: ${error.code}`);
+      return data && data.length > 0 ? 'deleted' : 'already_gone';
+    },
     profile: async (f) => {
       const { data, error } = await admin.from('profiles').delete().eq('id', f.id).select('id');
       if (error) throw new Error(`profile cleanup failed: ${error.code}`);
