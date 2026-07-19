@@ -166,6 +166,145 @@ jobs:
         if: always()
         run: rm -f apps/web/.env.e2e.local
 
+  # WS14-T012: Playwright live E2E (T002–T007) against the isolated backend.
+  # Shares the codecard-e2e-isolated concurrency group with RLS so destructive
+  # disposable-user / Mailtrap / storage cleanup never races itself.
+  playwright-live-e2e:
+    runs-on: ubuntu-latest
+    needs: lint-typecheck-test
+    concurrency:
+      group: codecard-e2e-isolated
+      cancel-in-progress: false
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Require isolated E2E and Mailtrap repository secrets
+        env:
+          CODECARD_E2E_SUPABASE_URL: ${{ secrets.CODECARD_E2E_SUPABASE_URL }}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY }}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY }}
+          CODECARD_E2E_SUPABASE_PROJECT_REF: ${{ secrets.CODECARD_E2E_SUPABASE_PROJECT_REF }}
+          CODECARD_E2E_TEST_PASSWORD: ${{ secrets.CODECARD_E2E_TEST_PASSWORD }}
+          CODECARD_E2E_MAILTRAP_API_TOKEN: ${{ secrets.CODECARD_E2E_MAILTRAP_API_TOKEN }}
+          CODECARD_E2E_MAILTRAP_ACCOUNT_ID: ${{ secrets.CODECARD_E2E_MAILTRAP_ACCOUNT_ID }}
+          CODECARD_E2E_MAILTRAP_INBOX_ID: ${{ secrets.CODECARD_E2E_MAILTRAP_INBOX_ID }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in \
+            CODECARD_E2E_SUPABASE_URL \
+            CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY \
+            CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY \
+            CODECARD_E2E_SUPABASE_PROJECT_REF \
+            CODECARD_E2E_TEST_PASSWORD \
+            CODECARD_E2E_MAILTRAP_API_TOKEN \
+            CODECARD_E2E_MAILTRAP_ACCOUNT_ID \
+            CODECARD_E2E_MAILTRAP_INBOX_ID
+          do
+            if [ -z "${!name}" ]; then
+              echo "Missing repository secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Playwright live E2E cannot run without isolated E2E + Mailtrap secrets."
+            echo "Configure the CODECARD_E2E_* repository secrets listed above (names only)."
+            echo "Never paste secret values into the workflow YAML or chat."
+            exit 1
+          fi
+          case "$CODECARD_E2E_SUPABASE_PROJECT_REF" in
+            gclteunkzorwaliwhatp)
+              echo "Refusing production Supabase project reference."
+              exit 1
+              ;;
+            zbum*)
+              echo "Isolated E2E project reference accepted."
+              ;;
+            *)
+              echo "Unexpected project reference prefix — expected zbum*."
+              exit 1
+              ;;
+          esac
+
+      - name: Write isolated E2E env file
+        env:
+          CODECARD_E2E_SUPABASE_URL: ${{ secrets.CODECARD_E2E_SUPABASE_URL }}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY }}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY }}
+          CODECARD_E2E_SUPABASE_PROJECT_REF: ${{ secrets.CODECARD_E2E_SUPABASE_PROJECT_REF }}
+          CODECARD_E2E_TEST_PASSWORD: ${{ secrets.CODECARD_E2E_TEST_PASSWORD }}
+          CODECARD_E2E_MAILTRAP_API_TOKEN: ${{ secrets.CODECARD_E2E_MAILTRAP_API_TOKEN }}
+          CODECARD_E2E_MAILTRAP_ACCOUNT_ID: ${{ secrets.CODECARD_E2E_MAILTRAP_ACCOUNT_ID }}
+          CODECARD_E2E_MAILTRAP_INBOX_ID: ${{ secrets.CODECARD_E2E_MAILTRAP_INBOX_ID }}
+        run: |
+          set -euo pipefail
+          cat > apps/web/.env.e2e.local <<EOF
+          CODECARD_E2E=1
+          CODECARD_E2E_ALLOW_DESTRUCTIVE=1
+          CODECARD_E2E_SUPABASE_URL=${CODECARD_E2E_SUPABASE_URL}
+          CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY=${CODECARD_E2E_SUPABASE_PUBLISHABLE_KEY}
+          CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY=${CODECARD_E2E_SUPABASE_SERVICE_ROLE_KEY}
+          CODECARD_E2E_SUPABASE_PROJECT_REF=${CODECARD_E2E_SUPABASE_PROJECT_REF}
+          CODECARD_E2E_TEST_PASSWORD=${CODECARD_E2E_TEST_PASSWORD}
+          CODECARD_E2E_BASE_URL=http://localhost:3100
+          CODECARD_E2E_MAILTRAP_API_TOKEN=${CODECARD_E2E_MAILTRAP_API_TOKEN}
+          CODECARD_E2E_MAILTRAP_ACCOUNT_ID=${CODECARD_E2E_MAILTRAP_ACCOUNT_ID}
+          CODECARD_E2E_MAILTRAP_INBOX_ID=${CODECARD_E2E_MAILTRAP_INBOX_ID}
+          EOF
+
+      - name: Environment guard and schema readiness
+        run: npm run test:e2e:env --workspace=web
+
+      - name: Disposable-user smoke
+        run: npm run test:e2e:smoke --workspace=web
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright live E2E (auth, profile, projects, research, public, account)
+        working-directory: apps/web
+        env:
+          CI: '1'
+          # Failure screenshots only — traces/videos stay off so recovery
+          # links, cookies, and tokens are never retained in artifacts.
+          PLAYWRIGHT_E2E_SCREENSHOT: only-on-failure
+        run: |
+          set -euo pipefail
+          npx playwright test --config playwright.e2e.config.ts \
+            auth.live.spec.ts \
+            profile.live.spec.ts \
+            projects.live.spec.ts \
+            research.live.spec.ts \
+            public.live.spec.ts \
+            account.live.spec.ts
+
+      - name: Upload safe Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-live-e2e-failure
+          path: |
+            apps/web/test-results/**
+            !apps/web/test-results/**/*.zip
+            !apps/web/.env*
+            !apps/web/**/.env*
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Scrub E2E env file
+        if: always()
+        run: rm -f apps/web/.env.e2e.local
+
   codeql:
     runs-on: ubuntu-latest
     permissions:
