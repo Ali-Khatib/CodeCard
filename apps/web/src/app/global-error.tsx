@@ -1,17 +1,27 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 /**
- * Root App Router error boundary (WS11-T008).
+ * Root App Router error boundary (WS11-T008 / WS14-T015).
  * Must render its own html/body. Never displays exception text or stacks to users.
+ * Reports to Sentry when client DSN is configured; never includes error.message in UI.
  */
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error, {
+      tags: { surface: 'global-error' },
+    });
+  }, [error]);
+
   return (
     <html lang="en">
       <body
