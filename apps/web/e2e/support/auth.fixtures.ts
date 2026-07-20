@@ -2,7 +2,7 @@ import { test as base, type Page, expect } from '@playwright/test';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { loadIsolatedE2EEnv, assertNotProductionUrl } from './isolated-e2e';
 import { loadMailtrapConfig, cleanupRunMessages } from './mailtrap';
-import { createE2ERunIdentity, disposableFixtureEmail, type E2ERunIdentity } from '../../src/lib/e2e/run-id';
+import { createE2ERunIdentity, disposableFixtureEmail, assertAllowedFixtureProfileSlug } from '../../src/lib/e2e/run-id';
 import {
   E2EFixtureRegistry,
   type FixtureDeleter,
@@ -256,6 +256,7 @@ export async function createAdminUser(
   registry: E2EFixtureRegistry,
   opts: { slug: string; displayName: string; workerIndex?: number },
 ): Promise<ProvisionedUser> {
+  assertAllowedFixtureProfileSlug(opts.slug);
   const email = disposableFixtureEmail({
     runId: registry.runId,
     workerIndex: opts.workerIndex ?? 1,

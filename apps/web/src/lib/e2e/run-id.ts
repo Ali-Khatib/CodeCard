@@ -17,9 +17,14 @@ export type E2ERunIdentity = {
   runUuid: string;
 };
 
-/** Identities that must never become fixtures (demo persona, real people). */
-export const FORBIDDEN_FIXTURE_EMAILS = ['alex.chen@stripe.com'] as const;
-export const FORBIDDEN_FIXTURE_USERNAMES = ['alexchen'] as const;
+/** Identities that must never become fixtures (demo persona, real people, staging showcase). */
+export const FORBIDDEN_FIXTURE_EMAILS = [
+  'alex.chen@stripe.com',
+  'showcase.alex-chen@codecard-staging.test',
+] as const;
+export const FORBIDDEN_FIXTURE_USERNAMES = ['alexchen', 'alex-chen'] as const;
+/** Persistent staging showcase slug — never register for E2E cleanup. */
+export const FORBIDDEN_FIXTURE_PROFILE_SLUGS = ['alex-chen'] as const;
 
 export function createE2ERunIdentity(now: Date = new Date()): E2ERunIdentity {
   const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -50,8 +55,8 @@ export function disposableFixtureEmail(options: {
 
 /**
  * A fixture identity is allowed only when it is a disposable run-scoped
- * address. The demo persona and anything without the current run ID is
- * rejected so cleanup can never touch data outside the run.
+ * address. The demo persona, staging showcase, and anything without the
+ * current run ID is rejected so cleanup can never touch data outside the run.
  */
 export function assertAllowedFixtureIdentity(email: string, runId: string): void {
   const normalized = email.trim().toLowerCase();
@@ -63,6 +68,17 @@ export function assertAllowedFixtureIdentity(email: string, runId: string): void
   }
   if (!normalized.includes(runId.toLowerCase())) {
     throw new Error('E2E fixture identity rejected: email does not carry the current run ID.');
+  }
+}
+
+/** Refuse staging showcase / demo profile slugs as disposable fixture targets. */
+export function assertAllowedFixtureProfileSlug(slug: string): void {
+  const normalized = slug.trim().toLowerCase();
+  if ((FORBIDDEN_FIXTURE_PROFILE_SLUGS as readonly string[]).includes(normalized)) {
+    throw new Error('E2E fixture identity rejected: persistent showcase slug is forbidden.');
+  }
+  if ((FORBIDDEN_FIXTURE_USERNAMES as readonly string[]).includes(normalized)) {
+    throw new Error('E2E fixture identity rejected: demo persona username is forbidden.');
   }
 }
 
