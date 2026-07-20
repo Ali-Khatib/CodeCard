@@ -39,6 +39,7 @@ coverage/
 apps/web/.screenshots/
 apps/web/test-results/
 apps/web/playwright-report/
+apps/web/.lighthouse-public-profile.json
 
 # Supabase
 supabase/.branches
