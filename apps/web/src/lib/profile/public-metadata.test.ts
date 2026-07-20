@@ -159,7 +159,8 @@ describe('public route metadata contracts', () => {
     );
 
     expect(profile).toContain('generateMetadata');
-    expect(profile).toContain("eq('is_public', true)");
+    expect(profile).toContain('loadPublicProfileBySlug');
+    expect(profile).toContain('createPublicClient');
     expect(project).toContain('generateMetadata');
     expect(project).toContain("eq('is_published', true)");
     expect(project).toContain('buildPublicProjectMetadata');

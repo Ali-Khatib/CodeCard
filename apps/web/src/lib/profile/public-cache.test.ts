@@ -169,6 +169,7 @@ describe('public cache wiring contracts', () => {
     expect(loader).toContain("eq('is_public', true)");
     expect(loader).not.toContain('createServiceClient');
     expect(cache).not.toContain('createServiceClient');
-    expect(cache).not.toContain('unstable_cache');
+    // Page loaders may use tagged data cache; this module must not wrap private payloads.
+    expect(cache).not.toMatch(/\bunstable_cache\s*\(/);
   });
 });

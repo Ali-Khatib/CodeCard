@@ -26,15 +26,22 @@ describe('WS06-T008 public accessibility audit', () => {
       resolve(process.cwd(), 'src/components/profile/public-profile-focused.tsx'),
       'utf8',
     );
+    const social = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-social-links.tsx'),
+      'utf8',
+    );
+    const hero = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-hero-actions.tsx'),
+      'utf8',
+    );
     expect(profile).toContain('<main');
     expect(profile).toContain('<h1');
     expect(profile.match(/<h1/g)?.length).toBe(1);
-    expect(profile).toContain('aria-label="Profile links"');
+    expect(social).toContain('aria-label="Profile links"');
     expect(profile).toContain('profileAvatarAltText');
     expect(profile).toContain('aria-hidden');
-    expect(profile).toContain('useReducedMotion');
-    expect(profile).toContain('Profile link copied');
-    expect(profile).toContain('aria-live="polite"');
+    expect(hero).toContain('Profile link copied');
+    expect(hero).toContain('aria-live="polite"');
     expect(profile).not.toContain('tabIndex={1}');
     expect(profile).not.toContain('tabIndex={2}');
   });

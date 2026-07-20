@@ -9,15 +9,16 @@ function read(rel: string) {
 describe('WS08-T002 public link click wiring', () => {
   it('tracks profile and project external links without replacing anchors', () => {
     const profile = read('src/components/profile/public-profile-focused.tsx');
+    const social = read('src/components/profile/public-profile-social-links.tsx');
     const stack = read('src/components/profile/public-project-stack.tsx');
     const route = read('src/app/api/analytics/route.ts');
     const helper = read('src/lib/analytics/link-click.ts');
 
-    expect(profile).toContain('trackLinkClick');
-    expect(profile).toContain("kind: 'profile'");
-    expect(profile).toContain('href={link.url}');
-    expect(profile).toContain('rel="noopener noreferrer"');
-    expect(profile).not.toContain('preventDefault');
+    expect(social).toContain('trackLinkClick');
+    expect(social).toContain("kind: 'profile'");
+    expect(social).toContain('href={link.url}');
+    expect(social).toContain('rel="noopener noreferrer"');
+    expect(social).not.toContain('preventDefault');
     expect(profile).toContain('profileId={profileId}');
     expect(profile).toContain('<PublicProjectStack');
 

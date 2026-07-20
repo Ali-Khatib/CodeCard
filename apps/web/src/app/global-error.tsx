@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 /**
  * Root App Router error boundary (WS11-T008 / WS14-T015).
  * Must render its own html/body. Never displays exception text or stacks to users.
- * Reports to Sentry when client DSN is configured; never includes error.message in UI.
+ * Reports to Sentry when client DSN is configured; never surfaces exception text in the UI.
  */
 export default function GlobalError({
   error,

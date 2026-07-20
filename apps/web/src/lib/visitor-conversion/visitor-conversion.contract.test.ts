@@ -6,14 +6,19 @@ const WEB = resolve(process.cwd());
 const read = (path: string) => readFileSync(resolve(WEB, path), 'utf8');
 
 describe('site-wide visitor conversion prompt contract', () => {
-  it('uses one shared root integration and the shared eight-second constant', () => {
-    const layout = read('src/app/layout.tsx');
+  it('uses shared marketing/dashboard integration and the shared eight-second constant', () => {
+    const marketing = read('src/app/(marketing)/layout.tsx');
+    const dashboard = read('src/app/dashboard/layout.tsx');
+    const root = read('src/app/layout.tsx');
     const component = read(
       'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
     );
     const core = read('src/lib/visitor-conversion/visitor-conversion.ts');
 
-    expect(layout).toContain('SitewideVisitorConversionPrompt');
+    // Public `/[slug]` must not inherit this client island (WS14-T019).
+    expect(root).not.toContain('SitewideVisitorConversionPrompt');
+    expect(marketing).toContain('SitewideVisitorConversionPrompt');
+    expect(dashboard).toContain('SitewideVisitorConversionPrompt');
     expect(component).toContain('startVisibleDelay');
     expect(component).not.toContain('8000');
     expect(core).toContain('VISITOR_CONVERSION_DELAY_MS = 8_000');
@@ -77,10 +82,13 @@ describe('site-wide visitor conversion prompt contract', () => {
   });
 
   it('uses safe optional app environment variables and no placeholder links', () => {
-    const layout = read('src/app/layout.tsx');
+    const marketing = read('src/app/(marketing)/layout.tsx');
+    const dashboard = read('src/app/dashboard/layout.tsx');
     const env = read('src/lib/security/env.ts');
-    expect(layout).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
-    expect(layout).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
+    expect(marketing).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
+    expect(marketing).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
+    expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
+    expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
   });

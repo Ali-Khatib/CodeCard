@@ -28,15 +28,24 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+const DEFAULT_VALUE: ThemeContextValue = {
+  themeId: DEFAULT_THEME_ID,
+  theme: getTheme(DEFAULT_THEME_ID),
+  setTheme: () => undefined,
+};
+
+/**
+ * Theme context without wrapping children in a pending/ready DOM gate.
+ * Ambience is a sibling so above-fold SSR HTML can paint without a theme shell
+ * (WS14-T019).
+ */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [themeId, setThemeId] = useState<CodecardThemeId>(DEFAULT_THEME_ID);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const stored = readStoredTheme();
     setThemeId(stored);
     applyThemeVars(stored);
-    setReady(true);
   }, []);
 
   const setTheme = useCallback((_id: CodecardThemeId) => {
@@ -56,10 +65,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <div className={ready ? 'cc-theme-ready' : 'cc-theme-pending'}>
-        <ThemeAmbience />
-        {children}
-      </div>
+      {children}
+      <ThemeAmbience />
     </ThemeContext.Provider>
   );
 }
@@ -67,7 +74,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function useCodecardTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    throw new Error('useCodecardTheme must be used within ThemeProvider');
+    // Public profiles may render without a provider after layout isolation.
+    return DEFAULT_VALUE;
   }
   return ctx;
 }

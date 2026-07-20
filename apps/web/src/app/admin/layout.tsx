@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
+import { ThemeRoot } from '@/components/theme/theme-root';
 
 /**
  * WS11-T002 — Server-side global-admin gate for the whole `/admin` tree.
@@ -10,5 +11,5 @@ import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
  */
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   await enforceGlobalAdminAccess();
-  return <>{children}</>;
+  return <ThemeRoot>{children}</ThemeRoot>;
 }

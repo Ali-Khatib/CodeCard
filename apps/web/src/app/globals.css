@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WS12-T001 — Skip link: visually hidden until keyboard focus. */
+.cc-skip-link {
+  position: absolute;
+  z-index: 10000;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0.65rem 1.1rem;
+  border: 2px solid var(--ink, #232324);
+  border-radius: 999px;
+  background: var(--paper, #ffffff);
+  color: var(--ink, #232324);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  /* Classic off-screen pattern — no transform (overflow/sticky safe). */
+  left: -10000px;
+  top: auto;
+}
+
+.cc-skip-link:focus,
+.cc-skip-link:focus-visible {
+  outline: 2px solid var(--ink, #232324);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--iris, #c094e4) 42%, transparent);
+  left: 1rem;
+  top: 1rem;
+}
+
+#main-content {
+  scroll-margin-top: calc(72px + env(safe-area-inset-top, 0px));
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+#main-content:focus-visible {
+  outline: 3px solid var(--iris, #c094e4);
+  outline-offset: 4px;
+}
+
 html,
 body {
   max-width: 100%;

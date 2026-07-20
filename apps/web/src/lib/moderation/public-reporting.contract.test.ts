@@ -12,7 +12,7 @@ const dialog = read(
   'apps/web/src/components/moderation/public-report-dialog.tsx',
 );
 const profile = read(
-  'apps/web/src/components/profile/public-profile-focused.tsx',
+  'apps/web/src/components/profile/public-profile-viewer-chrome.tsx',
 );
 const project = read(
   'apps/web/src/components/featured-work/project-detail-view.tsx',
@@ -80,9 +80,8 @@ describe('WS13-T009 public reporting contracts', () => {
   });
 
   it('keeps demo and owner-preview surfaces isolated by absent real target props', () => {
-    expect(profile).toContain(
-      'profileId && connectionControl && !connectionControl.isOwnProfile',
-    );
+    expect(profile).toContain('if (viewer.isOwnProfile) return null');
+    expect(profile).toContain('PublicReportDialog');
     expect(project).toContain("profileId && profileSlug !== 'demo'");
     expect(read('apps/web/src/app/demo/card/page.tsx')).not.toContain('profileId=');
     expect(read('apps/web/src/app/demo/projects/[id]/page.tsx')).not.toContain(

@@ -96,9 +96,19 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(control).toContain('Sign in to add connection');
     expect(control).toContain('if (isOwnProfile)');
     expect(control).toContain('return null');
-    expect(focused).toContain('PublicProfileConnectionControl');
+    const viewer = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-viewer-chrome.tsx'),
+      'utf8',
+    );
+    const hero = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-hero-actions.tsx'),
+      'utf8',
+    );
+    expect(viewer).toContain('PublicProfileConnectionControl');
+    expect(focused).toContain('PublicProfileHeroActions');
+    expect(hero).toContain('PublicProfileViewerChrome');
     expect(page).toContain('connectionControl');
-    expect(page).toContain('isOwnProfile');
+    expect(viewer).toContain('isOwnProfile');
   });
 
   it('keeps preview and live-demo Connections populated separately', () => {
