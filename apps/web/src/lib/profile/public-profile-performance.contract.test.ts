@@ -18,14 +18,9 @@ describe('WS14-T019 public profile performance contract', () => {
     const doc = readRepo('docs/PUBLIC_PROFILE_PERFORMANCE.md');
     expect(doc).toMatch(/LCP.*2\.5/i);
     expect(doc).toContain('lighthouse-public-profile.mjs');
-    expect(doc).toContain('createPublicClient');
   });
 
-  it('keeps public profile on cookie-free data path with priority LCP image', () => {
-    const page = readWeb('src/app/[slug]/page.tsx');
-    expect(page).toContain('createPublicClient');
-    expect(page).not.toMatch(/await createClient\(\)/);
-
+  it('prioritizes above-fold LCP image and avoids opacity gates on hero', () => {
     const stack = readWeb('src/components/profile/public-project-stack.tsx');
     expect(stack).toContain('priority={index === 0}');
     expect(stack).toContain('eager={index === 0}');
@@ -33,5 +28,6 @@ describe('WS14-T019 public profile performance contract', () => {
     const focused = readWeb('src/components/profile/public-profile-focused.tsx');
     expect(focused).toContain('priority');
     expect(focused).toContain("from '@/lib/profile/parse-headline'");
+    expect(focused).toContain('<header className="cc-app-profile-preview cc-app-profile-preview--hero">');
   });
 });

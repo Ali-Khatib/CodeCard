@@ -15,10 +15,12 @@ Script exits non-zero if LCP ≥ 2500ms.
 
 - Hero / avatar render without `opacity: 0` motion gates
 - First project poster: `AppReveal eager` + `Image priority`
-- Cookie-free `createPublicClient()` for public profile data so `revalidate = 60` can cache
-- Connection/auth control hydrates on the client
 - Cyber theme fonts: `preload: false`
 - `parseHeadline` extracted to avoid pulling canvas badge code into the profile client chunk
+
+Note: anonymous ISR via a cookie-free Supabase client was attempted but regressed public
+profile reads in production; the page keeps the session-aware server client until a
+verified anon path exists.
 
 ## Evidence
 
