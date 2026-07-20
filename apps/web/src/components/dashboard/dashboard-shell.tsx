@@ -19,7 +19,6 @@ import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
-  { segment: 'profile', label: 'My profile', icon: 'profile' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
   { segment: 'research', label: 'Research', icon: 'research' as const },
   { segment: 'connections', label: 'Connections', icon: 'connections' as const },

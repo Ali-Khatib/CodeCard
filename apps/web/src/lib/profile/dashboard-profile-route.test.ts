@@ -16,7 +16,7 @@ describe('canonical dashboard profile route', () => {
     expect(src).not.toContain('notFound()');
   });
 
-  it('points dashboard navigation to the canonical profile editor', () => {
+  it('keeps the profile editor off primary nav; Home CTA is the entry', () => {
     const shell = readFileSync(resolve(process.cwd(), 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
     const nav = readFileSync(resolve(process.cwd(), 'src/components/dashboard/dashboard-nav.tsx'), 'utf8');
     const overview = readFileSync(
@@ -24,9 +24,14 @@ describe('canonical dashboard profile route', () => {
       'utf8',
     );
 
-    expect(shell).toContain("segment: 'profile'");
-    expect(nav).toContain("href: '/dashboard/profile'");
+    const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
+    expect(navMatch).toBeTruthy();
+    const navBlock = navMatch![1];
+    expect(navBlock).not.toContain("segment: 'profile'");
+    expect(navBlock).not.toMatch(/label:\s*'My profile'|label:\s*'Profile'/);
+    expect(nav).not.toContain("href: '/dashboard/profile'");
     expect(overview).toContain('href="/dashboard/profile"');
+    expect(overview).toContain('Edit profile');
   });
 
   it('does not keep a second full profile editor on the dashboard overview', () => {
