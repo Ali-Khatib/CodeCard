@@ -292,9 +292,14 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
 
   test('unpublish removes public access again', async ({ page, admin, browser }) => {
     await openProfileEditor(page);
-    await page.getByRole('button', { name: /^Unpublish profile$/ }).click();
-    // Confirmation dialog explains consequences before unpublishing.
-    await expect(page.getByRole('alertdialog')).toBeVisible();
+    // Assert on Confirm unpublish rather than alertdialog: CI's Linux Chromium
+    // exposes the inline role="alertdialog" panel as a status/alert node.
+    await expect(async () => {
+      await page.getByRole('button', { name: /^Unpublish profile$/ }).click();
+      await expect(page.getByRole('button', { name: /^Confirm unpublish$/ })).toBeVisible({
+        timeout: 2_000,
+      });
+    }).toPass({ timeout: 30_000 });
     await page.getByRole('button', { name: /^Confirm unpublish$/ }).click();
     await expect(page.getByText('Unpublished', { exact: true })).toBeVisible({
       timeout: 30_000,
