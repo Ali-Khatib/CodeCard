@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createPublicClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import {
   loadPublicProfileBySlug,
   mapPublicProfileMetadata,
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return mapPublicProfileMetadata(null);
   }
 
-  const supabase = createPublicClient();
+  const supabase = await createClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('slug, display_name, headline, bio')
@@ -39,16 +39,60 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 /** Must be a literal for Next.js segment config; keep equal to PUBLIC_CACHE_SECONDS. */
 export const revalidate = 60;
 
-/**
- * Public profile (WS14-T019): cookie-free data load so `revalidate` can cache
- * anonymous HTML. Connection/auth UI hydrates on the client.
- */
 export default async function PublicProfilePage({ params }: PageProps) {
   const { slug: rawSlug } = await params;
-  const supabase = createPublicClient();
+  const supabase = await createClient();
   const payload = await loadPublicProfileBySlug(supabase, rawSlug);
 
   if (!payload) notFound();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let connectionControl: {
+    isOwnProfile: boolean;
+    isAuthenticated: boolean;
+    initiallyConnected: boolean;
+    initialConnectionId: string | null;
+  } | null = null;
+
+  if (user) {
+    const { data: viewerProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('owner_user_id', user.id)
+      .maybeSingle();
+
+    const isOwnProfile = viewerProfile?.id === payload.profileId;
+    let initiallyConnected = false;
+    let initialConnectionId: string | null = null;
+
+    if (!isOwnProfile) {
+      const { data: existing } = await supabase
+        .from('saved_connections')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .eq('saved_profile_id', payload.profileId)
+        .maybeSingle();
+      initiallyConnected = Boolean(existing);
+      initialConnectionId = existing?.id ?? null;
+    }
+
+    connectionControl = {
+      isOwnProfile,
+      isAuthenticated: true,
+      initiallyConnected,
+      initialConnectionId,
+    };
+  } else {
+    connectionControl = {
+      isOwnProfile: false,
+      isAuthenticated: false,
+      initiallyConnected: false,
+      initialConnectionId: null,
+    };
+  }
 
   return (
     <>
@@ -69,12 +113,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         researchPapers={payload.researchPapers}
         profileId={payload.profileId}
         location={payload.location}
-        connectionControl={{
-          isOwnProfile: false,
-          isAuthenticated: false,
-          initiallyConnected: false,
-          initialConnectionId: null,
-        }}
+        connectionControl={connectionControl}
       />
     </>
   );

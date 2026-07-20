@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import {
   addConnectionAction,
   removeConnectionAction,
 } from '@/app/actions/connections';
-import { createClient } from '@/lib/supabase/client';
 
 type PublicProfileConnectionControlProps = {
   profileId: string;
@@ -23,68 +22,17 @@ export function PublicProfileConnectionControl({
   profileId,
   profileSlug,
   displayName,
-  isOwnProfile: isOwnProfileProp,
-  isAuthenticated: isAuthenticatedProp,
+  isOwnProfile,
+  isAuthenticated,
   initiallyConnected,
   initialConnectionId,
 }: PublicProfileConnectionControlProps) {
   const router = useRouter();
-  const [ready, setReady] = useState(isAuthenticatedProp || isOwnProfileProp);
-  const [isOwnProfile, setIsOwnProfile] = useState(isOwnProfileProp);
-  const [isAuthenticated, setIsAuthenticated] = useState(isAuthenticatedProp);
   const [connected, setConnected] = useState(initiallyConnected);
   const [connectionId, setConnectionId] = useState<string | null>(initialConnectionId);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (cancelled) return;
-        if (!user) {
-          setIsAuthenticated(false);
-          setIsOwnProfile(false);
-          setReady(true);
-          return;
-        }
-
-        const { data: viewerProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('owner_user_id', user.id)
-          .maybeSingle();
-        if (cancelled) return;
-
-        const own = viewerProfile?.id === profileId;
-        setIsOwnProfile(own);
-        setIsAuthenticated(true);
-
-        if (!own) {
-          const { data: existing } = await supabase
-            .from('saved_connections')
-            .select('id')
-            .eq('owner_user_id', user.id)
-            .eq('saved_profile_id', profileId)
-            .maybeSingle();
-          if (cancelled) return;
-          setConnected(Boolean(existing));
-          setConnectionId(existing?.id ?? null);
-        }
-        setReady(true);
-      } catch {
-        if (!cancelled) setReady(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [profileId]);
 
   const signInHref = `/sign-in?redirect=${encodeURIComponent(`/${profileSlug}`)}`;
 
@@ -140,16 +88,6 @@ export function PublicProfileConnectionControl({
       router.refresh();
     });
   }, [pending, connectionId, profileId, profileSlug, displayName, router]);
-
-  if (!ready) {
-    return (
-      <div className="flex flex-col gap-2" aria-busy="true">
-        <span className="cc-app-btn cc-app-btn--ghost !h-10 inline-flex items-center justify-center opacity-60">
-          Checking connection…
-        </span>
-      </div>
-    );
-  }
 
   if (isOwnProfile) {
     return null;
