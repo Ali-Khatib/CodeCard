@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   FORBIDDEN_FIXTURE_EMAILS,
   assertAllowedFixtureIdentity,
+  assertAllowedFixtureProfileSlug,
   createE2ERunIdentity,
   disposableFixtureEmail,
   storageFixturePath,
@@ -64,11 +65,15 @@ describe('WS14 E2E run identity', () => {
       assertAllowedFixtureIdentity(FORBIDDEN_FIXTURE_EMAILS[0], run.runId),
     ).toThrow(/demo persona/);
     expect(() =>
+      assertAllowedFixtureIdentity(FORBIDDEN_FIXTURE_EMAILS[1], run.runId),
+    ).toThrow(/demo persona/);
+    expect(() =>
       assertAllowedFixtureIdentity('someone@example.com', run.runId),
     ).toThrow(/disposable/);
     expect(() =>
       assertAllowedFixtureIdentity(`codecard-e2e+other-run@example.com`, run.runId),
     ).toThrow(/current run ID/);
+    expect(() => assertAllowedFixtureProfileSlug('alex-chen')).toThrow(/showcase slug/);
   });
 });
 
