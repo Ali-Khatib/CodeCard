@@ -41,6 +41,8 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
         'dmca/route.ts',
+        'internal/rate-limit-verify/route.ts',
+        'internal/sentry-verify/route.ts',
         'moderation/report/route.ts',
         'public/research/[paperId]/pdf/route.ts',
         'upload/route.ts',
@@ -62,6 +64,8 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/upload',
       '/api/public/research/[paperId]/pdf',
       '/api/webhooks/stripe',
+      '/api/internal/rate-limit-verify',
+      '/api/internal/sentry-verify',
     ]) {
       expect(matrix).toContain(route);
     }

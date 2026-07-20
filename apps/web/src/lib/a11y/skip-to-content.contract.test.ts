@@ -50,10 +50,11 @@ describe('WS12-T001 skip-to-content contracts', () => {
     expect(layout).toContain("import { SkipToContentLink } from '@/components/a11y/skip-to-content'");
     const bodyOpen = layout.indexOf('<body');
     const skipUse = layout.indexOf('<SkipToContentLink');
-    const backdrop = layout.indexOf('<GlobalBackdrop');
+    const children = layout.indexOf('{children}');
     expect(bodyOpen).toBeGreaterThanOrEqual(0);
     expect(skipUse).toBeGreaterThan(bodyOpen);
-    expect(backdrop).toBeGreaterThan(skipUse);
+    // Skip link must precede page content (GlobalBackdrop lives in themed shells, not root).
+    expect(children).toBeGreaterThan(skipUse);
   });
 
   it('keeps skip-link styles visually hidden until focused', () => {

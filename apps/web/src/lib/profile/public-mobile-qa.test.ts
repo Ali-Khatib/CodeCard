@@ -47,8 +47,12 @@ describe('WS06-T007 mobile public page QA contracts', () => {
     expect(css).not.toMatch(/\.cc-public-profile[^{]*\{[^}]*overflow-x:\s*hidden/);
 
     expect(profile).toContain('break-words');
-    expect(profile).toContain('break-all');
     expect(profile).toContain('min-w-0');
+    const hero = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-hero-actions.tsx'),
+      'utf8',
+    );
+    expect(hero).toContain('break-all');
     expect(projects).toContain('break-words');
     expect(research).toContain('break-words');
     expect(projectDetail).toContain('break-words');

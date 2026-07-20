@@ -30,13 +30,25 @@ export async function createClient() {
 
 /**
  * Cookie-free anon client for public ISR routes (WS14-T019).
- * Does not call `cookies()`, so `revalidate` can cache anonymous HTML.
+ * Does not call `cookies()`, and tags fetches with `revalidate` so Next can
+ * cache anonymous public reads (Next 15 defaults fetch to no-store).
  */
 export function createPublicClient() {
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     getSupabasePublicKey()!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+          const nextInit = {
+            ...init,
+            next: { revalidate: 60 },
+          } as RequestInit & { next: { revalidate: number } };
+          return fetch(input, nextInit);
+        },
+      },
+    },
   );
 }
 

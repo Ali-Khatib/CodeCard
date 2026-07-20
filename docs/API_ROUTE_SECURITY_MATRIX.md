@@ -24,6 +24,8 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |
+| `/api/internal/rate-limit-verify` | POST | Internal verify token | Zod | N/A | None | JSON | Staging/ops verification only |
+| `/api/internal/sentry-verify` | POST | Internal verify token | Zod | N/A | None | JSON | Staging/ops verification only |
 
 No Connections/Circle JSON API routes exist — those use server actions with session ownership.
 

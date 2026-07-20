@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import {
   PUBLIC_CACHE_SECONDS,
   PUBLIC_STALE_WHILE_REVALIDATE,
@@ -91,8 +91,23 @@ function revalidatePublicPath(path: string | null) {
   }
 }
 
+function revalidatePublicProfileDataTag(profileSlug: string) {
+  const tag = publicProfileCacheTag(profileSlug);
+  if (!tag) return;
+  try {
+    // Bust tagged public profile data-cache entries (WS14-T019).
+    revalidateTag(tag);
+  } catch (error) {
+    console.error('[public-cache] tag revalidation failed', {
+      tag,
+      message: error instanceof Error ? error.message : 'unknown',
+    });
+  }
+}
+
 /** Invalidate a public profile page, lists on it, and its social image. */
 export function revalidatePublicProfile(profileSlug: string) {
+  revalidatePublicProfileDataTag(profileSlug);
   revalidatePublicPath(buildPublicProfilePath(profileSlug));
 }
 

@@ -1,25 +1,33 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import dynamic from 'next/dynamic';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
-import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
-import { PublicProjectStack } from './public-project-stack';
-import { ResearchPaperCard } from '@/components/research/research-paper-card';
-import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
-import { AppReveal } from '@/components/ui/app-reveal';
-import { trackLinkClick } from '@/lib/analytics/link-click';
-import { PublicProfileConnectionControl } from './public-profile-connection-control';
-import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import { PublicProfileHeroActions } from './public-profile-hero-actions';
+import { PublicProfileSocialLinks } from './public-profile-social-links';
 
+/** Below-fold client islands — keep ATF bio free of their hydration cost. */
+const PublicProjectStack = dynamic(
+  () => import('./public-project-stack').then((m) => m.PublicProjectStack),
+  { ssr: true },
+);
+const PublicResearchSection = dynamic(
+  () => import('./public-research-section').then((m) => m.PublicResearchSection),
+  { ssr: true },
+);
+const PublicProfileSaveCard = dynamic(
+  () => import('./public-profile-save-card').then((m) => m.PublicProfileSaveCard),
+  { ssr: true },
+);
+/**
+ * Public profile view — Server Component shell so the above-fold bio (LCP)
+ * is in the initial HTML without waiting on the motion/client chunk.
+ */
 export function PublicProfileFocused({
   profileSlug,
   displayName,
@@ -51,29 +59,11 @@ export function PublicProfileFocused({
   } | null;
 }) {
   const { role, company } = parseHeadline(headline);
-  const reduced = useReducedMotion();
-  const [copied, setCopied] = useState(false);
-  const [qrOpen, setQrOpen] = useState(false);
-
-  const copyLink = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/${profileSlug}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* ignore */
-    }
-  }, [profileSlug]);
-
   const safeLinks = toSafeProfileLinkItems(links);
   const intro =
     bio ??
     'I build developer tools that make complex workflows feel simple.';
-
-  const actionPills = [
-    { type: 'copy' as const, key: 'copy' },
-    { type: 'qr' as const, key: 'qr' },
-  ];
+  const firstName = displayName.split(' ')[0];
 
   return (
     <div className="cc-public-profile">
@@ -82,7 +72,7 @@ export function PublicProfileFocused({
         tabIndex={-1}
         className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
       >
-        <header className="cc-app-profile-preview cc-app-profile-preview--hero">
+        <header className="cc-app-profile-preview cc-app-profile-preview--hero pb-[min(36vh,18rem)]">
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <div className="relative h-[96px] w-[96px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
@@ -92,11 +82,15 @@ export function PublicProfileFocused({
                     alt={profileAvatarAltText(displayName)}
                     fill
                     priority
+                    fetchPriority="high"
                     className="object-cover"
                     sizes="96px"
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-3xl font-medium" aria-hidden>
+                  <span
+                    className="flex h-full w-full items-center justify-center text-3xl font-medium"
+                    aria-hidden
+                  >
                     {displayName[0]}
                   </span>
                 )}
@@ -106,153 +100,39 @@ export function PublicProfileFocused({
                 <h1 className="break-words text-[clamp(1.75rem,7vw,2.25rem)] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
                   {displayName}
                 </h1>
-                {role && (
+                {role ? (
                   <p className="mt-1 break-words text-[16px] text-[var(--app-smoke)]">{role}</p>
-                )}
-                {company && (
+                ) : null}
+                {company ? (
                   <p className="mt-0.5 break-words text-[16px] text-[var(--app-smoke)]">{company}</p>
-                )}
-                {location && (
+                ) : null}
+                {location ? (
                   <p className="mt-1 break-words text-[15px] text-[var(--app-smoke)]">{location}</p>
-                )}
+                ) : null}
                 <p className="mt-4 max-w-lg break-words text-[16px] leading-relaxed text-[var(--app-ink)]">
                   {intro}
                 </p>
-                {safeLinks.length > 0 && (
-                  <nav className="mt-4 flex flex-wrap gap-2" aria-label="Profile links">
-                    {safeLinks.map((link) => {
-                      const Icon = resolveProfileLinkIcon(link.type);
-                      return (
-                        <a
-                          key={link.url + link.type}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={getProfileLinkAria(link.type, link.label)}
-                          className="cc-profile-identity-card__social"
-                          onClick={() => {
-                            trackLinkClick({
-                              profileId,
-                              linkCategory: link.type,
-                              kind: 'profile',
-                            });
-                          }}
-                        >
-                          <Icon className="text-sm" aria-hidden />
-                        </a>
-                      );
-                    })}
-                  </nav>
-                )}
+                <PublicProfileSocialLinks links={safeLinks} profileId={profileId} />
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              {profileId && connectionControl && !connectionControl.isOwnProfile ? (
-                <>
-                  <motion.div
-                    initial={reduced ? false : { opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.1,
-                      duration: HUME_MOTION.cardReveal,
-                      ease: HUME_EASE,
-                    }}
-                  >
-                    <PublicProfileConnectionControl
-                      profileId={profileId}
-                      profileSlug={profileSlug}
-                      displayName={displayName}
-                      isOwnProfile={connectionControl.isOwnProfile}
-                      isAuthenticated={connectionControl.isAuthenticated}
-                      initiallyConnected={connectionControl.initiallyConnected}
-                      initialConnectionId={connectionControl.initialConnectionId}
-                    />
-                  </motion.div>
-                  <PublicReportDialog targetType="profile" targetId={profileId} />
-                </>
-              ) : null}
-              {actionPills.map((item, i) => {
-                if (item.type === 'copy') {
-                  return (
-                    <motion.div
-                      key={item.key}
-                      initial={reduced ? false : { opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: 0.12 + i * HUME_MOTION.pillStagger,
-                        duration: HUME_MOTION.cardReveal,
-                        ease: HUME_EASE,
-                      }}
-                    >
-                      <button
-                        type="button"
-                        className="cc-app-btn cc-app-btn--primary !h-10"
-                        onClick={copyLink}
-                        aria-live="polite"
-                      >
-                        {copied ? 'Profile link copied' : 'Copy link'}
-                      </button>
-                    </motion.div>
-                  );
-                }
-                return (
-                  <motion.div
-                    key={item.key}
-                    initial={reduced ? false : { opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.12 + i * HUME_MOTION.pillStagger,
-                      duration: HUME_MOTION.cardReveal,
-                      ease: HUME_EASE,
-                    }}
-                  >
-                    <button
-                      type="button"
-                      className="cc-app-btn cc-app-btn--ghost !h-10"
-                      onClick={() => setQrOpen((o) => !o)}
-                      aria-expanded={qrOpen}
-                    >
-                      QR code
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {qrOpen && (
-              <motion.div
-                initial={reduced ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex max-w-full flex-col items-start rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
-              >
-                <p className="cc-app-mono mb-3">Scan to open</p>
-                <div className="grid h-40 w-40 max-w-full grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
-                  {Array.from({ length: 25 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={i % 2 === 0 ? 'bg-[var(--app-ink)]' : 'bg-transparent'}
-                    />
-                  ))}
-                </div>
-                <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-smoke)]">
-                  codecard.app/{profileSlug}
-                </p>
-              </motion.div>
-            )}
+            <PublicProfileHeroActions
+              profileId={profileId}
+              profileSlug={profileSlug}
+              displayName={displayName}
+              connectionControl={connectionControl}
+            />
           </div>
         </header>
 
         <section className="mt-16">
-          <AppReveal>
-            <p className="cc-app-mono">Featured work</p>
-            <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
-              What {displayName.split(' ')[0]} built
-            </h2>
-            <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-              Projects, demos, research, and outcomes — shown before credentials.
-            </p>
-          </AppReveal>
+          <p className="cc-app-mono">Featured work</p>
+          <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+            What {firstName} built
+          </h2>
+          <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
+            Projects, demos, research, and outcomes — shown before credentials.
+          </p>
 
           <div className="mt-8">
             {projects.length > 0 ? (
@@ -269,58 +149,22 @@ export function PublicProfileFocused({
           </div>
         </section>
 
-        {researchPapers.length > 0 && (
-          <section id="research" className="mt-16 scroll-mt-24">
-            <AppReveal>
-              <p className="cc-app-mono">Research</p>
-              <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
-                Papers &amp; publications
-              </h2>
-              <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-                Abstracts, citations, PDFs, and related technical work in the same CodeCard.
-              </p>
-            </AppReveal>
+        {researchPapers.length > 0 ? (
+          <PublicResearchSection
+            profileSlug={profileSlug}
+            profileId={profileId}
+            researchPapers={researchPapers}
+          />
+        ) : null}
 
-            <div className="mt-8 flex flex-col gap-8">
-              {researchPapers.map((paper, index) => (
-                <ResearchPaperCard
-                  key={paper.id}
-                  paper={paper}
-                  href={`/${profileSlug}/research/${paper.slug}`}
-                  profileId={profileId}
-                  delay={index * HUME_MOTION.stagger}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <AppReveal className="mt-16">
-          <div className="cc-app-card cc-app-card--rose !p-8 text-center">
-            <p className="cc-app-mono">Save this CodeCard</p>
-            <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
-              Keep {displayName.split(' ')[0]}&apos;s work handy
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-[15px] text-[var(--app-smoke)]">
-              Copy the link, scan the QR, or save the contact for your next conversation.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <button type="button" className="cc-app-btn cc-app-btn--primary" onClick={copyLink} aria-live="polite">
-                {copied ? 'Profile link copied' : 'Copy link'}
-              </button>
-              <button
-                type="button"
-                className="cc-app-btn cc-app-btn--ghost"
-                onClick={() => setQrOpen(true)}
-              >
-                Show QR code
-              </button>
-            </div>
-          </div>
-        </AppReveal>
-
+        <div className="mt-16">
+          <PublicProfileSaveCard profileSlug={profileSlug} displayName={displayName} />
+        </div>
         <footer className="mt-16 border-t border-[var(--app-border)] pt-8 text-center">
-          <Link href="/" className="text-[14px] text-[var(--app-smoke)] hover:text-[var(--app-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)]">
+          <Link
+            href="/"
+            className="text-[14px] text-[var(--app-smoke)] hover:text-[var(--app-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)]"
+          >
             CodeCard home
           </Link>
         </footer>

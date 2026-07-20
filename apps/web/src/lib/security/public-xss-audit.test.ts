@@ -197,7 +197,11 @@ describe('public rendering XSS contracts', () => {
     expect(stack).toContain('rel="noopener noreferrer"');
     expect(detail).toContain('rel="noopener noreferrer"');
     expect(focused).toContain('toSafeProfileLinkItems');
-    expect(focused).toContain('rel="noopener noreferrer"');
+    const social = readFileSync(
+      resolve(process.cwd(), 'src/components/profile/public-profile-social-links.tsx'),
+      'utf8',
+    );
+    expect(social).toContain('rel="noopener noreferrer"');
   });
 
   it('documents trusted non-UGC dangerouslySetInnerHTML exceptions', () => {

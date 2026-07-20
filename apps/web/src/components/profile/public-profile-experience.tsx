@@ -1,5 +1,3 @@
-'use client';
-
 import { PublicProfileFocused } from './public-profile-focused';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
@@ -25,6 +23,7 @@ interface PublicProfileExperienceProps {
   } | null;
 }
 
+/** Server Component entry — keeps above-fold profile HTML out of the client bundle. */
 export function PublicProfileExperience({
   profileSlug,
   displayName,
