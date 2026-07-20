@@ -78,8 +78,9 @@ Visibility:
 | `SENTRY_ORG` | for source maps | P (, Pr) | build-only | Sentry | Org slug | optional |
 | `SENTRY_PROJECT` | for source maps | P (, Pr) | build-only | Sentry | Project slug | optional |
 | `CODECARD_SENTRY_VERIFY` | never steady-state | temporary | server | App | One-shot verify probe; unset after | unset |
-| `UPSTASH_REDIS_REST_URL` | optional until T016 | P, Pr | server | Upstash | Configure in T016 | unset |
-| `UPSTASH_REDIS_REST_TOKEN` | optional until T016 | P, Pr | server | Upstash | Configure in T016 | unset |
+| `UPSTASH_REDIS_REST_URL` | for rate limits | P, Pr | server | Upstash | See [`UPSTASH.md`](./UPSTASH.md) | set P+Pr on `codecard-mvp` |
+| `UPSTASH_REDIS_REST_TOKEN` | for rate limits | P, Pr | server | Upstash | See [`UPSTASH.md`](./UPSTASH.md) | set P+Pr on `codecard-mvp` |
+| `CODECARD_RATE_LIMIT_VERIFY` | never steady-state | temporary | server | App | Bounded 429 probe; unset after | unset |
 
 ### 2.4 Optional public
 
@@ -189,7 +190,7 @@ All `CODECARD_E2E_*`, `CODECARD_E2E_FIXTURES`, `PLAYWRIGHT_PORT`, Mailtrap sandb
 | Task | Variables |
 |------|-----------|
 | WS14-T015 | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` (+ optional build-only source-map trio). See [`SENTRY.md`](./SENTRY.md) |
-| WS14-T016 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| WS14-T016 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. See [`UPSTASH.md`](./UPSTASH.md) |
 
 ---
 
