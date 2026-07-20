@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { parseHeadline } from '@/lib/profile/lanyard-badge-images';
+import { parseHeadline } from '@/lib/profile/parse-headline';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -18,6 +18,7 @@ import { AppReveal } from '@/components/ui/app-reveal';
 import { trackLinkClick } from '@/lib/analytics/link-click';
 import { PublicProfileConnectionControl } from './public-profile-connection-control';
 import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 export function PublicProfileFocused({
   profileSlug,
@@ -76,26 +77,21 @@ export function PublicProfileFocused({
 
   return (
     <div className="cc-public-profile">
-      <main className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16">
-        <motion.header
-          className="cc-app-profile-preview cc-app-profile-preview--hero"
-          initial={reduced ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: HUME_MOTION.sectionReveal, ease: HUME_EASE }}
-        >
+      <main
+        id={MAIN_CONTENT_ID}
+        tabIndex={-1}
+        className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
+      >
+        <header className="cc-app-profile-preview cc-app-profile-preview--hero">
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-              <motion.div
-                className="relative h-[96px] w-[96px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]"
-                initial={reduced ? false : { scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: HUME_MOTION.cardReveal, ease: HUME_EASE }}
-              >
+              <div className="relative h-[96px] w-[96px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
                 {avatarUrl ? (
                   <Image
                     src={avatarUrl}
                     alt={profileAvatarAltText(displayName)}
                     fill
+                    priority
                     className="object-cover"
                     sizes="96px"
                   />
@@ -104,7 +100,7 @@ export function PublicProfileFocused({
                     {displayName[0]}
                   </span>
                 )}
-              </motion.div>
+              </div>
 
               <div className="min-w-0 flex-1">
                 <h1 className="break-words text-[clamp(1.75rem,7vw,2.25rem)] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
@@ -245,7 +241,7 @@ export function PublicProfileFocused({
               </motion.div>
             )}
           </div>
-        </motion.header>
+        </header>
 
         <section className="mt-16">
           <AppReveal>

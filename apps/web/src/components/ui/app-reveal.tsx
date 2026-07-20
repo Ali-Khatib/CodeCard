@@ -10,6 +10,8 @@ type AppRevealProps = {
   delay?: number;
   y?: number;
   duration?: number;
+  /** Skip opacity gate (above-fold LCP candidates). */
+  eager?: boolean;
 };
 
 export function AppReveal({
@@ -18,10 +20,11 @@ export function AppReveal({
   delay = 0,
   y = 12,
   duration = HUME_MOTION.cardReveal,
+  eager = false,
 }: AppRevealProps) {
   const reduced = useReducedMotion();
 
-  if (reduced) {
+  if (reduced || eager) {
     return <div className={className}>{children}</div>;
   }
 

@@ -25,18 +25,21 @@ const spaceMono = Space_Mono({
   variable: '--font-space-mono',
   subsets: ['latin'],
   weight: ['400'],
+  preload: false,
 });
 
 const orbitron = Orbitron({
   variable: '--font-cyber-display',
   subsets: ['latin'],
   weight: ['500', '700'],
+  preload: false,
 });
 
 const shareTechMono = Share_Tech_Mono({
   variable: '--font-cyber-sans',
   subsets: ['latin'],
   weight: ['400'],
+  preload: false,
 });
 
 export const metadata: Metadata = {

@@ -1,3 +1,4 @@
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
@@ -27,8 +28,19 @@ export async function createClient() {
   );
 }
 
+/**
+ * Cookie-free anon client for public ISR routes (WS14-T019).
+ * Does not call `cookies()`, so `revalidate` can cache anonymous HTML.
+ */
+export function createPublicClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabasePublicKey()!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  );
+}
+
 export async function createServiceClient() {
-  const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
   const { requireServerSecret } = await import('@/lib/security/env');
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

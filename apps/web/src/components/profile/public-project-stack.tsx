@@ -44,7 +44,7 @@ export function PublicProjectStack({
         const saves = demoViews?.[project.id]?.saves ?? 24 + index * 8;
 
         return (
-          <AppReveal key={project.id} delay={index * HUME_MOTION.stagger}>
+          <AppReveal key={project.id} delay={index * HUME_MOTION.stagger} eager={index === 0}>
             <motion.article
               layout
               className={`cc-app-project-card ${isOpen ? 'cc-app-project-card--open' : ''}`}
@@ -57,6 +57,7 @@ export function PublicProjectStack({
                     src={project.posterUrl}
                     alt=""
                     fill
+                    priority={index === 0}
                     className="cc-app-project-card__media-inner"
                     sizes="(max-width: 920px) 100vw, 920px"
                   />
