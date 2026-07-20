@@ -72,7 +72,12 @@ Visibility:
 
 | Variable | Required | Scopes | Visibility | Owner | Notes | Status |
 |----------|----------|--------|------------|-------|-------|--------|
-| `SENTRY_DSN` | optional until T015 | P, Pr | server | Sentry | Configure in T015 | unset |
+| `SENTRY_DSN` | for monitoring | P, Pr | server | Sentry | Server/edge init. See [`SENTRY.md`](./SENTRY.md) | configure in T015 |
+| `NEXT_PUBLIC_SENTRY_DSN` | for browser capture | P, Pr | public | Sentry | Same DSN value (public by Sentry design) | configure in T015 |
+| `SENTRY_AUTH_TOKEN` | for source maps | P (, Pr) | build-only | Sentry | Never `NEXT_PUBLIC_` | optional |
+| `SENTRY_ORG` | for source maps | P (, Pr) | build-only | Sentry | Org slug | optional |
+| `SENTRY_PROJECT` | for source maps | P (, Pr) | build-only | Sentry | Project slug | optional |
+| `CODECARD_SENTRY_VERIFY` | never steady-state | temporary | server | App | One-shot verify probe; unset after | unset |
 | `UPSTASH_REDIS_REST_URL` | optional until T016 | P, Pr | server | Upstash | Configure in T016 | unset |
 | `UPSTASH_REDIS_REST_TOKEN` | optional until T016 | P, Pr | server | Upstash | Configure in T016 | unset |
 
@@ -179,11 +184,11 @@ Rotate any secret that was shared outside Vercel, then update the matching Verce
 
 All `CODECARD_E2E_*`, `CODECARD_E2E_FIXTURES`, `PLAYWRIGHT_PORT`, Mailtrap sandbox tokens, and disposable test passwords.
 
-### 5.4 Deferred to later tasks
+### 5.4 Deferred / follow-on
 
 | Task | Variables |
 |------|-----------|
-| WS14-T015 | `SENTRY_DSN` |
+| WS14-T015 | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` (+ optional build-only source-map trio). See [`SENTRY.md`](./SENTRY.md) |
 | WS14-T016 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 
 ---
