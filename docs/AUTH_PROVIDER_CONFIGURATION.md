@@ -132,7 +132,10 @@ Enable each provider in Supabase and supply client ID/secret there (server-side 
 
 ## 6. Vercel environment variables
 
-Set the same keys as local for each Vercel environment (Production, Preview, Development):
+Full inventory (both Vercel projects, Preview/Production scopes, E2E exclusions):
+[`VERCEL_ENVIRONMENT.md`](./VERCEL_ENVIRONMENT.md) (WS14-T013).
+
+Minimum auth-related keys per environment (Production, Preview, Development):
 
 | Variable | Production | Preview | Development |
 |----------|------------|---------|-------------|
