@@ -1,8 +1,8 @@
 # WS14-T014 — Production migration deployment evidence
 
-**Status:** Schema deployed to new production Supabase project.  
-**Vercel cutover:** NOT done (separate gate).  
-**T018:** NOT started.
+**Status:** Schema deployed to new production Supabase project.
+**Vercel cutover:** Complete (see [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) §30).
+**T018:** Launch checklist recorded in [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md).
 
 ## Target
 
@@ -116,12 +116,6 @@ All **29** repository timestamps present on remote (local == remote for each ver
 - No Vercel / Stripe / Sentry / Upstash / Auth URL / DNS changes
 - No secrets recorded in this file
 
-## Next cutover gate (user approval required)
+## Cutover outcome
 
-Point Vercel (`codecard-mvp` and/or `code-card-web`) at:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-
-for project `amneeddkxfbednqwzhao`, then configure Auth Site URL / redirects. **Do not** begin T018 until that cutover is approved and verified.
+Vercel `codecard-mvp` Production points at `amneeddkxfbednqwzhao`; Preview remains on staging `zbumnudyvclkmynpqjsr`. Auth Site URL / callback configured. Evidence and GO/NO-GO recorded in [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md).

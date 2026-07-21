@@ -38,4 +38,4 @@ Script exits non-zero if LCP ≥ 2500ms. Do **not** weaken this budget.
 
 ## Evidence
 
-Record operator, URL, LCP ms, and commit SHA in the launch checklist when verifying a deployment.
+Record operator, URL, LCP ms, and commit SHA in [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) when verifying a deployment.

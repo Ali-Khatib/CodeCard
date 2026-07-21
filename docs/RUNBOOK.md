@@ -205,8 +205,8 @@ Verification evidence: (links to deploy, checklist ticks)
 
 ## 10. Ops drill record (non-production tabletop)
 
-**Date:** 2026-07-20  
-**Type:** Tabletop (documentation + procedure walkthrough — **no** production restore, **no** destructive SQL)  
+**Date:** 2026-07-20
+**Type:** Tabletop (documentation + procedure walkthrough — **no** production restore, **no** destructive SQL)
 **Scenario:** “Migration `repair_project_research_tenant_ownership_rls` fails halfway on production.”
 
 Walked:
@@ -257,5 +257,5 @@ Summary:
 - [`UPSTASH.md`](./UPSTASH.md)
 - [`ANALYTICS_RETENTION.md`](./ANALYTICS_RETENTION.md)
 - [`RLS_ACCESS_MATRIX.md`](./RLS_ACCESS_MATRIX.md)
-- [`../LAUNCH_CHECKLIST.md`](../LAUNCH_CHECKLIST.md) (gitignored local ops checklist)
+- [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) (WS14-T018 canonical launch checklist)
 - Privacy Policy (web): `/legal/privacy`
