@@ -214,7 +214,7 @@ Run tests.
 * [PRODUCT.md](./PRODUCT.md) — Canonical product vision and MVP roadmap
 * [DESIGN.md](./DESIGN.md) — Design system contract
 * [docs/SECURITY_CHECKLIST.md](./docs/SECURITY_CHECKLIST.md) — Pre-launch security checklist (includes WS04-T013 upload scanning decision)
-* [LAUNCH_CHECKLIST.md](./LAUNCH_CHECKLIST.md) — Launch readiness checklist
+* [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md) — Launch readiness checklist (WS14-T018)
 
 ---
 
