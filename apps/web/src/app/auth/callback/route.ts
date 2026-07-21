@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { isAuthConfigured } from '@/lib/auth/configured';
 import {
   buildAuthErrorUrl,
+  classifyCodeExchangeError,
   logOAuthCallbackFailure,
   resolveOAuthCallback,
 } from '@/lib/auth/oauth-callback';
@@ -24,9 +25,10 @@ export async function GET(request: Request) {
   const { error } = await supabase.auth.exchangeCodeForSession(resolution.code);
 
   if (error) {
-    logOAuthCallbackFailure('exchange_failed');
+    const reason = classifyCodeExchangeError(error.message);
+    logOAuthCallbackFailure(reason);
     return NextResponse.redirect(
-      buildAuthErrorUrl(origin, 'exchange_failed', resolution.redirectPath),
+      buildAuthErrorUrl(origin, reason, resolution.redirectPath),
     );
   }
 

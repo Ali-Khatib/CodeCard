@@ -40,7 +40,10 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
   }
 
   if (lower.includes('session') && lower.includes('expired')) {
-    return 'Your session expired. Please sign in again.';
+    // Sign-up must never surface session-expiry copy for a null post-signUp session.
+    return context === 'sign-in'
+      ? 'Your session expired. Please sign in again.'
+      : 'Could not create your account. Please try again.';
   }
 
   if (

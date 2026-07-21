@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   buildAuthErrorUrl,
   buildSignInRetryUrl,
+  classifyCodeExchangeError,
   oauthErrorMessage,
+  OAUTH_LINK_EXPIRED_MESSAGE,
   resolveOAuthCallback,
 } from '@/lib/auth/oauth-callback';
 
@@ -58,11 +60,26 @@ describe('resolveOAuthCallback', () => {
   });
 });
 
+describe('classifyCodeExchangeError', () => {
+  it('maps expired or invalid PKCE codes to link_expired', () => {
+    expect(classifyCodeExchangeError('otp_expired')).toBe('link_expired');
+    expect(classifyCodeExchangeError('invalid flow state')).toBe('link_expired');
+    expect(classifyCodeExchangeError('PKCE code verifier not found')).toBe('link_expired');
+  });
+
+  it('maps other exchange failures to exchange_failed', () => {
+    expect(classifyCodeExchangeError('unexpected provider failure')).toBe('exchange_failed');
+    expect(classifyCodeExchangeError(null)).toBe('exchange_failed');
+  });
+});
+
 describe('oauth error UX helpers', () => {
   it('uses safe user-facing messages', () => {
     expect(oauthErrorMessage('exchange_failed')).toBe("We couldn't complete sign-in. Please try again.");
     expect(oauthErrorMessage('exchange_failed')).not.toMatch(/supabase|token|code|access_denied/i);
     expect(oauthErrorMessage('misconfigured')).toContain('temporarily unavailable');
+    expect(oauthErrorMessage('link_expired')).toBe(OAUTH_LINK_EXPIRED_MESSAGE);
+    expect(oauthErrorMessage('link_expired')).not.toMatch(/supabase|jwt|stack/i);
   });
 
   it('builds auth error URLs without leaking provider details', () => {
