@@ -4,6 +4,7 @@ export const OAUTH_ERROR_REASONS = [
   'provider_denied',
   'missing_code',
   'exchange_failed',
+  'link_expired',
   'misconfigured',
   'malformed_state',
 ] as const;
@@ -12,6 +13,9 @@ export type OAuthErrorReason = (typeof OAUTH_ERROR_REASONS)[number];
 
 export const OAUTH_USER_MESSAGE =
   "We couldn't complete sign-in. Please try again.";
+
+export const OAUTH_LINK_EXPIRED_MESSAGE =
+  'This confirmation or sign-in link is invalid or has expired. Request a new email, or sign in if you already confirmed.';
 
 export const OAUTH_MISCONFIGURED_MESSAGE =
   'Sign-in is temporarily unavailable. Please try again later.';
@@ -55,7 +59,26 @@ export function resolveOAuthCallback(
 
 export function oauthErrorMessage(reason: OAuthErrorReason): string {
   if (reason === 'misconfigured') return OAUTH_MISCONFIGURED_MESSAGE;
+  if (reason === 'link_expired') return OAUTH_LINK_EXPIRED_MESSAGE;
   return OAUTH_USER_MESSAGE;
+}
+
+/** Map code-exchange failures to accurate recovery copy without leaking vendor details. */
+export function classifyCodeExchangeError(message: string | null | undefined): OAuthErrorReason {
+  const lower = (message ?? '').toLowerCase();
+  if (
+    lower.includes('expired') ||
+    lower.includes('otp_expired') ||
+    lower.includes('invalid flow state') ||
+    lower.includes('flow state') ||
+    lower.includes('pkce') ||
+    lower.includes('code verifier') ||
+    lower.includes('auth code') ||
+    lower.includes('invalid request')
+  ) {
+    return 'link_expired';
+  }
+  return 'exchange_failed';
 }
 
 export function buildAuthErrorUrl(

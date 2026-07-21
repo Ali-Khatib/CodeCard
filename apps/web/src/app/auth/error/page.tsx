@@ -16,6 +16,7 @@ const KNOWN_REASONS = new Set<OAuthErrorReason>([
   'provider_denied',
   'missing_code',
   'exchange_failed',
+  'link_expired',
   'misconfigured',
   'malformed_state',
 ]);

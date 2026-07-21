@@ -13,6 +13,11 @@ import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
 import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
+import {
+  SIGNUP_CONFIRMATION_TITLE,
+  resolveSignUpOutcome,
+  signupConfirmationBody,
+} from '@/lib/auth/signup-result';
 
 const SETUP_MSG =
   'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
@@ -30,6 +35,7 @@ function SignUpForm() {
   const [fieldError, setFieldError] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
   const submitLock = useRef(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +67,7 @@ function SignUpForm() {
     setError('');
     setFieldError({});
 
-    if (submitLock.current || loading) return;
+    if (submitLock.current || loading || pendingConfirmationEmail) return;
 
     if (!authConfigured) {
       setError(SETUP_MSG);
@@ -91,7 +97,7 @@ function SignUpForm() {
       }
 
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signUp({
+      const { data, error: authError } = await supabase.auth.signUp({
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
@@ -103,9 +109,20 @@ function SignUpForm() {
         },
       });
 
-      if (authError) {
-        setError(mapAuthFormError(authError.message, 'sign-up'));
+      const outcome = resolveSignUpOutcome({
+        data: { user: data.user, session: data.session },
+        error: authError,
+        email: parsed.data.email,
+      });
+
+      if (outcome.kind === 'error') {
+        setError(outcome.message);
         requestAnimationFrame(() => errorRef.current?.focus());
+        return;
+      }
+
+      if (outcome.kind === 'needs_email_confirmation') {
+        setPendingConfirmationEmail(outcome.email);
         return;
       }
 
@@ -118,6 +135,31 @@ function SignUpForm() {
       submitLock.current = false;
       setLoading(false);
     }
+  }
+
+  if (pendingConfirmationEmail) {
+    return (
+      <AuthShell
+        mode="sign-up"
+        showCollage
+        title={SIGNUP_CONFIRMATION_TITLE}
+        subtitle={signupConfirmationBody(pendingConfirmationEmail)}
+      >
+        <div className="space-y-4" role="status" aria-live="polite" data-testid="signup-email-confirmation">
+          <p className="text-[14px] leading-relaxed text-smoke">
+            Open the confirmation link in that email to activate your account. Until then you cannot
+            open the dashboard.
+          </p>
+          <Link
+            href="/sign-in"
+            className="cc-btn-pill-primary flex w-full justify-center py-2.5 text-[15px]"
+            prefetch
+          >
+            Back to sign in
+          </Link>
+        </div>
+      </AuthShell>
+    );
   }
 
   return (
