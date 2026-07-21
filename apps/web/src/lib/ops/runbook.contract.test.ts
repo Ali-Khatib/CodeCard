@@ -16,6 +16,7 @@ describe('WS14-T017 RUNBOOK backup and rollback contract', () => {
   it('covers inventory, backup, migrate, rollback, incidents, and evidence', () => {
     const doc = readRepo('docs/RUNBOOK.md');
     expect(doc).toContain('gclteunkzorwaliwhatp');
+    expect(doc).toContain('amneeddkxfbednqwzhao');
     expect(doc).toMatch(/zbum/i);
     expect(doc).toContain('codecard-mvp');
     expect(doc).toContain('System inventory');
