@@ -11,7 +11,8 @@ Primary owners: engineering + whoever holds Supabase / Vercel / Stripe org admin
 
 | System | Identifier / notes | Role |
 |--------|-------------------|------|
-| Production Supabase | Project ref `gclteunkzorwaliwhatp` | Authoritative prod DB, Auth, Storage |
+| Production Supabase (MVP schema) | Project ref `amneeddkxfbednqwzhao` (`codecard-production`) | Authoritative MVP prod DB — see [`WS14_T014_PRODUCTION_MIGRATION.md`](./WS14_T014_PRODUCTION_MIGRATION.md) |
+| Legacy Supabase (paused) | Project ref `gclteunkzorwaliwhatp` (`CodeCard`) | Pre-MVP schema; **INACTIVE**; do not migrate or seed |
 | Isolated E2E Supabase | Ref prefix `zbum…` (never production) | Disposable Playwright / CI backend |
 | Vercel MVP | Project `codecard-mvp` (`prj_ZTosasXt5TxnUQf4WTfcTbN8k1UN`), branch `mvp` | Staging / MVP app — `https://codecard-mvp.vercel.app` |
 | Vercel marketing | Project `code-card-web` (`prj_E5wdwC2T4SYTZsRS6xh20p56LJZn`), branch `main` | Marketing / future production |
@@ -103,19 +104,20 @@ Primary-table analytics cleanup does **not** erase backup copies. Define backup 
 
 State explicitly:
 
-- System: Supabase production `gclteunkzorwaliwhatp`
+- System: Supabase production `amneeddkxfbednqwzhao` (`codecard-production`)
+  - Legacy paused project `gclteunkzorwaliwhatp` must not receive MVP migrations
 - Effect: apply pending SQL migrations from `supabase/migrations/`
-- Backup status: (filled from §4)
+- Backup status: (filled from §4 — Free plan may have **NONE**; confirm in Dashboard)
 - Rollback method: (§6)
-- Manual vs automated: **manual human only**
+- Manual vs automated: **manual human only** unless an explicit automation gate is opened
 - Production write: **yes**
 
 Wait for **explicit** user confirmation. Prior batch approval is not enough.
 
 ### Steps
 
-1. Link locally only for the operator session: `npx supabase link --project-ref gclteunkzorwaliwhatp` (password from Dashboard — not logged).
-2. Prefer Dashboard **SQL / Migrations** review of pending files, or operator-run `npm run db:migrate` (**human**, not agent).
+1. Link locally only for the operator session: `npx supabase link --project-ref amneeddkxfbednqwzhao` (password from Dashboard — not logged). Do **not** overwrite a staging link in the main checkout; use a temporary workdir when needed.
+2. Prefer Dashboard **SQL / Migrations** review of pending files, or operator-run `npx supabase migration up --linked` (**human**, not agent) after identity verification.
 3. **Do not** use `supabase db push` from Cursor agents or CI against production.
 4. Stop if: migration errors, RLS lockout symptoms, unexpected drop, or checksum/history mismatch.
 5. Verify:
@@ -123,6 +125,7 @@ Wait for **explicit** user confirmation. Prior batch approval is not enough.
    - Spot-check tables/policies named in the migration
    - Read-only app smoke: `/`, `/sign-in`, one public slug if known, webhook route responds (signature still required)
 
+Evidence for the initial MVP schema cutover: [`WS14_T014_PRODUCTION_MIGRATION.md`](./WS14_T014_PRODUCTION_MIGRATION.md).
 ---
 
 ## 6. Rollback procedure
