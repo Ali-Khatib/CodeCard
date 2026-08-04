@@ -7,6 +7,7 @@ import { HowItWorksSection } from './how-it-works-page';
 import { ProductHero } from './product-hero';
 import { HumeStatStrip } from './hume-stat-strip';
 import { ScrollReveal } from './scroll-reveal';
+import { MotionSectionRevealProof } from '@/components/motion/section-reveal-proof';
 import { AuroraDivider } from './aurora-divider';
 import { AudienceBounceCards } from '@/components/landing/audience-bounce-cards';
 import { BuildYoursSection } from '@/components/landing/build-yours-section';
@@ -29,7 +30,7 @@ export function ProductPage() {
 
         <section id="research-support" className="scroll-mt-28 py-16 md:py-24">
           <div className="cc-container">
-            <ScrollReveal>
+            <MotionSectionRevealProof>
               <SectionCounter label="Research support" index="" />
               <h2 className={`mt-4 ${TYPE.sectionHeading} text-ink`}>
                 Showcase your research, not just your projects.
@@ -38,7 +39,7 @@ export function ProductPage() {
                 Add papers, abstracts, citations, PDFs, publication status, and related technical
                 work directly to your CodeCard.
               </p>
-            </ScrollReveal>
+            </MotionSectionRevealProof>
 
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {[
