@@ -72,23 +72,27 @@ describe('site-wide visitor conversion prompt contract', () => {
       'src/app/[slug]/page.tsx',
       'src/app/[slug]/projects/[id]/page.tsx',
       'src/app/[slug]/research/[paperSlug]/page.tsx',
-      'src/app/demo/card/page.tsx',
+      'src/app/demo/page.tsx',
       'src/app/demo/projects/[id]/page.tsx',
       'src/app/demo/research/[paperSlug]/page.tsx',
       'src/app/dashboard/preview/layout.tsx',
     ]) {
       expect(read(path), path).toContain('VisitorConversionMarker');
     }
+    expect(read('src/app/demo/layout.tsx')).toContain('SitewideVisitorConversionPrompt');
   });
 
   it('uses safe optional app environment variables and no placeholder links', () => {
     const marketing = read('src/app/(marketing)/layout.tsx');
     const dashboard = read('src/app/dashboard/layout.tsx');
+    const demo = read('src/app/demo/layout.tsx');
     const env = read('src/lib/security/env.ts');
     expect(marketing).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(marketing).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
+    expect(demo).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
+    expect(demo).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
   });

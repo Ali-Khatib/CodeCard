@@ -1,5 +1,10 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF, LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
+import {
+  LIVE_DEMO_HREF,
+  LIVE_DEMO_PROFILE_HREF,
+  LIVE_DEMO_PROFILE_LEGACY_HREF,
+  LIVE_DEMO_WORKSPACE_HREF,
+} from '@/lib/marketing/demo-url';
 import { cn } from '@/lib/utils';
 
 type LiveDemoLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
@@ -20,8 +25,9 @@ export function isLiveDemoHref(href: string): boolean {
     href === LIVE_DEMO_HREF ||
     href === LIVE_DEMO_WORKSPACE_HREF ||
     href === LIVE_DEMO_PROFILE_HREF ||
-    href === '/demo/card' ||
+    href === LIVE_DEMO_PROFILE_LEGACY_HREF ||
     href === '/dashboard/preview' ||
-    href.startsWith('/dashboard/preview/')
+    href.startsWith('/dashboard/preview/') ||
+    href.startsWith('/demo/')
   );
 }

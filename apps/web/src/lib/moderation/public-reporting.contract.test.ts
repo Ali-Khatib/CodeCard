@@ -83,6 +83,7 @@ describe('WS13-T009 public reporting contracts', () => {
     expect(profile).toContain('if (viewer.isOwnProfile) return null');
     expect(profile).toContain('PublicReportDialog');
     expect(project).toContain("profileId && profileSlug !== 'demo'");
+    expect(read('apps/web/src/app/demo/page.tsx')).not.toContain('profileId=');
     expect(read('apps/web/src/app/demo/card/page.tsx')).not.toContain('profileId=');
     expect(read('apps/web/src/app/demo/projects/[id]/page.tsx')).not.toContain(
       'profileId=',

@@ -142,7 +142,11 @@ export function resolveVisitorConversionRoute(input: {
   const { pathname, marker } = input;
   if (isExcludedVisitorConversionPath(pathname)) return null;
 
-  if (pathname === '/dashboard/preview' || pathname.startsWith('/dashboard/preview/')) {
+  if (
+    pathname === '/demo' ||
+    pathname === '/dashboard/preview' ||
+    pathname.startsWith('/dashboard/preview/')
+  ) {
     return { context: 'live_demo', referrer: 'demo', profileId: null };
   }
 
