@@ -18,11 +18,11 @@ const instrumentSerif = Instrument_Serif({
   variable: '--font-instrument',
   subsets: ['latin'],
   weight: '400',
-  display: 'swap',
-  // Not required for public-profile ATF bio text.
-  preload: false,
+  // Landing `/` LCP is this face. optional avoids a late webfont swap updating LCP.
+  display: 'optional',
+  preload: true,
+  adjustFontFallback: true,
 });
-
 const spaceMono = Space_Mono({
   variable: '--font-space-mono',
   subsets: ['latin'],

@@ -1,9 +1,54 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionCounter } from './section-counter';
 import { TYPE } from '@/lib/design/tokens';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+
+/**
+ * Workspace preview iframe — mount only when near viewport so `/` LCP is not
+ * competed with by a full dashboard document fetch (Phase 0C evidence).
+ */
+function DeferredDashboardPreview() {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setShow(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShow(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={hostRef} className="cc-workspace-showcase-embed">
+      {show ? (
+        <iframe
+          src="/dashboard/preview"
+          title="CodeCard dashboard preview"
+          className="cc-workspace-showcase-embed__frame"
+          loading="lazy"
+        />
+      ) : (
+        <div className="cc-workspace-showcase-embed__frame" aria-hidden />
+      )}
+    </div>
+  );
+}
 
 export function WorkspaceShowcase() {
   return (
@@ -23,14 +68,7 @@ export function WorkspaceShowcase() {
         </ScrollReveal>
 
         <ScrollReveal delay={0.08} scale={0.99} className="mt-8">
-          <div className="cc-workspace-showcase-embed">
-            <iframe
-              src="/dashboard/preview"
-              title="CodeCard dashboard preview"
-              className="cc-workspace-showcase-embed__frame"
-              loading="eager"
-            />
-          </div>
+          <DeferredDashboardPreview />
         </ScrollReveal>
       </div>
     </section>

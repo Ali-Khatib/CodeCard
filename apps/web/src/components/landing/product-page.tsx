@@ -1,19 +1,54 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ResearchProvider } from '@/components/research/research-provider';
-import { ResearchAlternatingRows } from '@/components/research/research-alternating-rows';
-import { ResearchThesisCard } from '@/components/research/research-thesis-card';
-import { ResearchWhyCodecard } from '@/components/research/research-why-codecard';
-import { HowItWorksSection } from './how-it-works-page';
 import { ProductHero } from './product-hero';
 import { HumeStatStrip } from './hume-stat-strip';
-import { ScrollReveal } from './scroll-reveal';
-import { MotionSectionRevealProof } from '@/components/motion/section-reveal-proof';
 import { AuroraDivider } from './aurora-divider';
-import { AudienceBounceCards } from '@/components/landing/audience-bounce-cards';
-import { BuildYoursSection } from '@/components/landing/build-yours-section';
-import { WorkspaceShowcase } from '@/components/landing/workspace-showcase';
 import { SectionCounter } from './section-counter';
 import { TYPE } from '@/lib/design/tokens';
+
+/** Below-fold islands — keep initial `/` JS free of their client graphs until needed. */
+const WorkspaceShowcase = dynamic(
+  () => import('./workspace-showcase').then((m) => m.WorkspaceShowcase),
+  { ssr: true, loading: () => <section className="scroll-mt-28 py-20 md:py-[100px]" aria-hidden /> },
+);
+const HowItWorksSection = dynamic(
+  () => import('./how-it-works-page').then((m) => m.HowItWorksSection),
+  { ssr: true },
+);
+const AudienceBounceCards = dynamic(
+  () =>
+    import('@/components/landing/audience-bounce-cards').then((m) => m.AudienceBounceCards),
+  { ssr: true },
+);
+const BuildYoursSection = dynamic(
+  () => import('@/components/landing/build-yours-section').then((m) => m.BuildYoursSection),
+  { ssr: true },
+);
+const ResearchAlternatingRows = dynamic(
+  () =>
+    import('@/components/research/research-alternating-rows').then(
+      (m) => m.ResearchAlternatingRows,
+    ),
+  { ssr: true },
+);
+const ResearchThesisCard = dynamic(
+  () => import('@/components/research/research-thesis-card').then((m) => m.ResearchThesisCard),
+  { ssr: true },
+);
+const ResearchWhyCodecard = dynamic(
+  () => import('@/components/research/research-why-codecard').then((m) => m.ResearchWhyCodecard),
+  { ssr: true },
+);
+const ScrollReveal = dynamic(
+  () => import('./scroll-reveal').then((m) => m.ScrollReveal),
+  { ssr: true },
+);
+const MotionSectionRevealProof = dynamic(
+  () =>
+    import('@/components/motion/section-reveal-proof').then((m) => m.MotionSectionRevealProof),
+  { ssr: true },
+);
 
 export function ProductPage() {
   return (

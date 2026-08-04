@@ -1,6 +1,5 @@
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
-import { DEMO_PROFILE_LINKS } from '@/lib/dashboard/workspace-demo';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
@@ -28,7 +27,7 @@ export default function DemoPage() {
         headline={DEMO_PROFILE.headline}
         avatarUrl={DEMO_PROFILE.avatar_url}
         bio={DEMO_PROFILE.bio}
-        links={links.length ? links : DEMO_PROFILE_LINKS}
+        links={links}
         projects={projects}
         location={DEMO_PROFILE.location}
       />

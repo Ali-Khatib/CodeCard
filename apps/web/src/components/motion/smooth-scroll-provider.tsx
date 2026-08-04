@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from 'react';
 import { ReactLenis, type LenisRef } from 'lenis/react';
@@ -64,7 +65,34 @@ export function SmoothScrollProvider({
   const lenisRef = useRef<LenisRef>(null);
   const pauseCountRef = useRef(0);
   const tickerAttachedRef = useRef(false);
-  const active = enabled && canEnhanceMotion;
+  // Defer Lenis until after first paint so LCP text is not blocked by smooth-scroll boot.
+  const [lenisBooted, setLenisBooted] = useState(false);
+  const active = enabled && canEnhanceMotion && lenisBooted;
+
+  useEffect(() => {
+    if (!(enabled && canEnhanceMotion)) {
+      setLenisBooted(false);
+      return;
+    }
+    let cancelled = false;
+    const boot = () => {
+      if (!cancelled) setLenisBooted(true);
+    };
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(boot, { timeout: 1800 });
+    } else {
+      timeoutId = setTimeout(boot, 200);
+    }
+    return () => {
+      cancelled = true;
+      if (idleId != null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId != null) clearTimeout(timeoutId);
+    };
+  }, [enabled, canEnhanceMotion]);
 
   const pause = useCallback(() => {
     pauseCountRef.current += 1;
