@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'motion/react';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 export type RichProjectCard = {
@@ -31,7 +31,12 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
       transition={{ delay: index * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="cc-dash-project-card group"
     >
-      <Link href={card.href} className="block overflow-hidden rounded-[14px]">
+      <ContentOpeningLink
+        href={card.href}
+        kind="project"
+        itemTitle={card.title}
+        className="block overflow-hidden rounded-[14px]"
+      >
         <div className="cc-dash-project-card__media relative aspect-[16/10] overflow-hidden">
           {card.posterUrl ? (
             <Image
@@ -64,19 +69,13 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
 
           <div className="absolute left-3 top-3 flex gap-2">
             <span className="cc-dash-chip cc-dash-chip--status">{card.subtitle}</span>
-            {card.updatedAt && (
-              <span className="cc-dash-chip">{card.updatedAt}</span>
-            )}
+            {card.updatedAt && <span className="cc-dash-chip">{card.updatedAt}</span>}
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 translate-y-3 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <div className="flex flex-wrap gap-2">
-              {card.liveUrl && (
-                <span className="cc-dash-chip cc-dash-chip--action">Live demo</span>
-              )}
-              {card.repoUrl && (
-                <span className="cc-dash-chip cc-dash-chip--action">GitHub</span>
-              )}
+              {card.liveUrl && <span className="cc-dash-chip cc-dash-chip--action">Live demo</span>}
+              {card.repoUrl && <span className="cc-dash-chip cc-dash-chip--action">GitHub</span>}
               <span className="cc-dash-chip cc-dash-chip--action">Edit</span>
             </div>
           </div>
@@ -105,7 +104,7 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
             {card.stars != null && <span>★ {card.stars}</span>}
           </div>
         </div>
-      </Link>
+      </ContentOpeningLink>
     </motion.article>
   );
 }

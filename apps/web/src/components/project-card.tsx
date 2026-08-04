@@ -1,6 +1,8 @@
-import Link from 'next/link';
+'use client';
+
 import Image from 'next/image';
 import { Badge } from '@codecard/ui';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 
 interface ProjectCardProps {
   project: {
@@ -16,10 +18,13 @@ interface ProjectCardProps {
 export function ProjectCard({ project, profileSlug }: ProjectCardProps) {
   const poster = project.project_media_assets?.find((a) => a.type === 'poster');
   const heroVideo = project.project_media_assets?.find((a) => a.type === 'hero_video');
+  const href = `/${profileSlug}/projects/${project.id}`;
 
   return (
-    <Link
-      href={`/${profileSlug}/projects/${project.id}`}
+    <ContentOpeningLink
+      href={href}
+      kind="project"
+      itemTitle={project.title}
       className="group block animate-slide-up overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 transition-all duration-300 hover:border-zinc-600 hover:shadow-lg hover:shadow-violet-500/5"
     >
       {(poster || heroVideo) && (
@@ -39,9 +44,7 @@ export function ProjectCard({ project, profileSlug }: ProjectCardProps) {
         <h3 className="text-xl font-semibold transition-colors group-hover:text-violet-300">
           {project.title}
         </h3>
-        {project.tagline && (
-          <p className="mt-2 text-sm text-zinc-400">{project.tagline}</p>
-        )}
+        {project.tagline && <p className="mt-2 text-sm text-zinc-400">{project.tagline}</p>}
         {project.technologies.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {project.technologies.slice(0, 6).map((tech) => (
@@ -50,6 +53,6 @@ export function ProjectCard({ project, profileSlug }: ProjectCardProps) {
           </div>
         )}
       </div>
-    </Link>
+    </ContentOpeningLink>
   );
 }

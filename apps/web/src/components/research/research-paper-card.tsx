@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
 import { HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
@@ -10,6 +9,7 @@ import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
 import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { trackResearchEvent } from './research-analytics';
 
 function formatReadTime(seconds?: number) {
@@ -45,8 +45,10 @@ export function ResearchPaperCard({
         whileTap={reduced ? undefined : { scale: 0.985 }}
         transition={{ duration: HUME_MOTION.press, ease: HUME_EASE }}
       >
-        <Link
+        <ContentOpeningLink
           href={href}
+          kind="research"
+          itemTitle={paper.title}
           className="cc-app-project-card__media cc-app-project-card__media--public group block outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
           aria-label={`Open research paper: ${paper.title}`}
         >
@@ -65,16 +67,21 @@ export function ResearchPaperCard({
             <HiOutlineDocumentText className="h-4 w-4" aria-hidden />
             Research
           </div>
-        </Link>
+        </ContentOpeningLink>
 
         <div className="cc-app-project-card__body">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <Link href={href} className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]">
+              <ContentOpeningLink
+                href={href}
+                kind="research"
+                itemTitle={paper.title}
+                className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+              >
                 <h3 className="cc-fit-title cc-work-title cc-work-title--compact">
                   {paper.title}
                 </h3>
-              </Link>
+              </ContentOpeningLink>
               <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
                 {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
               </p>
@@ -112,9 +119,14 @@ export function ResearchPaperCard({
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link href={href} className="cc-app-btn cc-app-btn--primary">
+            <ContentOpeningLink
+              href={href}
+              kind="research"
+              itemTitle={paper.title}
+              className="cc-app-btn cc-app-btn--primary"
+            >
               Open research
-            </Link>
+            </ContentOpeningLink>
             {paper.pdfUrl && (
               <ResearchPdfReadButton
                 paper={paper}
@@ -143,8 +155,9 @@ export function ResearchPaperCard({
               />
             )}
             {paper.relatedProjectHref && (
-              <Link
+              <ContentOpeningLink
                 href={paper.relatedProjectHref}
+                kind="project"
                 className="cc-app-btn cc-app-btn--ghost"
                 onClick={() =>
                   trackResearchEvent({
@@ -155,7 +168,7 @@ export function ResearchPaperCard({
                 }
               >
                 Related project
-              </Link>
+              </ContentOpeningLink>
             )}
           </div>
         </div>

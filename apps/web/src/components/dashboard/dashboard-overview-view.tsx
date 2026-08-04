@@ -14,6 +14,7 @@ import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 
 export type OverviewReachStats = {
   profileViews: number;
@@ -265,19 +266,26 @@ export function DashboardOverviewView({
                   </div>
                 ) : (
                   <ul className="mt-4 space-y-2">
-                    {projectsSummary.recent.map((item) => (
+                    {projectsSummary.recent.map((item) => {
+                      const href = item.href.startsWith('/')
+                        ? item.href
+                        : `${basePath}/projects/${item.id}/edit`;
+                      return (
                       <li key={item.id}>
-                        <a
-                          href={item.href.startsWith('/') ? item.href : `${basePath}/projects/${item.id}/edit`}
+                        <ContentOpeningLink
+                          href={href}
+                          kind="project"
+                          itemTitle={item.title}
                           className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
                         >
                           <span className="min-w-0 truncate font-medium">{item.title}</span>
                           <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
                             {item.isPublished ? 'Published' : 'Draft'}
                           </span>
-                        </a>
+                        </ContentOpeningLink>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 )}
               </AppCard>
@@ -308,23 +316,26 @@ export function DashboardOverviewView({
                   </div>
                 ) : (
                   <ul className="mt-4 space-y-2">
-                    {researchSummary.recent.map((item) => (
+                    {researchSummary.recent.map((item) => {
+                      const href = item.href.startsWith('/')
+                        ? item.href
+                        : `${basePath}/research/${item.id}/edit`;
+                      return (
                       <li key={item.id}>
-                        <a
-                          href={
-                            item.href.startsWith('/')
-                              ? item.href
-                              : `${basePath}/research/${item.id}/edit`
-                          }
+                        <ContentOpeningLink
+                          href={href}
+                          kind="research"
+                          itemTitle={item.title}
                           className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
                         >
                           <span className="min-w-0 truncate font-medium">{item.title}</span>
                           <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
                             {item.isPublished ? 'Published' : 'Draft'}
                           </span>
-                        </a>
+                        </ContentOpeningLink>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 )}
               </AppCard>

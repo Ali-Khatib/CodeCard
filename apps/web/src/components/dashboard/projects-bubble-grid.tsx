@@ -1,11 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import type { PortfolioOpenTransition, PortfolioProject } from '@/lib/dashboard/portfolio';
-import type { FeaturedProject } from '@/lib/projects/featured';
 import { motion } from 'motion/react';
-import { useProjectOpenOptional } from '@/components/featured-work/project-open-overlay';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 const FALLBACK =
@@ -13,18 +11,13 @@ const FALLBACK =
 
 export function ProjectsBubbleGrid({
   projects,
-  basePath = '/dashboard',
-  openTransition,
+  openTransition: _openTransition,
 }: {
   projects: PortfolioProject[];
   basePath?: string;
   openTransition?: PortfolioOpenTransition;
 }) {
   const reduced = useReducedMotion();
-  const openCtx = useProjectOpenOptional();
-  const featuredSiblings = projects
-    .map((project) => project.featured)
-    .filter((featured): featured is FeaturedProject => Boolean(featured));
   const count = projects.length;
   const colMin = count <= 2 ? 'minmax(200px, 1fr)' : count === 3 ? 'minmax(160px, 1fr)' : 'minmax(140px, 1fr)';
 
@@ -49,22 +42,13 @@ export function ProjectsBubbleGrid({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Link
+            <ContentOpeningLink
               href={project.editHref}
+              kind="project"
+              itemTitle={project.title}
               className="cc-projects-bubble group"
               title={project.title}
-              aria-label={`Edit ${project.title}`}
-              onClick={(event) => {
-                // Smooth card → page expand when the demo/public payload exists.
-                if (reduced || !openCtx || !openTransition || !project.featured) return;
-                event.preventDefault();
-                openCtx.open(project.featured, event.currentTarget, project.editHref, {
-                  profileSlug: openTransition.profileSlug,
-                  displayName: openTransition.displayName,
-                  accentColor: openTransition.accentColor,
-                  projects: featuredSiblings,
-                });
-              }}
+              aria-label={`Open ${project.title}`}
             >
               <div className="cc-projects-bubble__thumb">
                 <Image
@@ -92,7 +76,7 @@ export function ProjectsBubbleGrid({
                   ))}
                 </div>
               )}
-            </Link>
+            </ContentOpeningLink>
           </motion.div>
         );
       })}

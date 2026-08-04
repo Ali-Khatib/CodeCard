@@ -1170,13 +1170,77 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
+/* ?? Project / research opening transition ?? */
+.cc-content-opening {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--app-iris, #c094e4) 18%, transparent), transparent 42%),
+    color-mix(in srgb, var(--app-bone, #fcf1e7) 88%, transparent);
+  backdrop-filter: blur(10px);
+  pointer-events: all;
+}
+
+.cc-content-opening__panel {
+  display: flex;
+  max-width: min(420px, 100%);
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.cc-content-opening__spinner {
+  height: 28px;
+  width: 28px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--app-iris, #c094e4) 28%, transparent);
+  border-top-color: var(--app-iris, #c094e4);
+  animation: cc-content-opening-spin 0.8s linear infinite;
+}
+
+.cc-content-opening__dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 999px;
+  background: var(--app-iris, #c094e4);
+}
+
+.cc-content-opening__headline {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--app-ink, #232324);
+}
+
+.cc-content-opening__title {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--app-smoke, #767073);
+  overflow-wrap: anywhere;
+}
+
+@keyframes cc-content-opening-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cc-app-page-enter,
   .cc-app-route-progress::after,
   .cc-app-route-pending,
   .cc-app-route-pending__pulse,
   .cc-app-nav-link--pending::after,
-  .cc-app-mobile-nav__link--pending::after {
+  .cc-app-mobile-nav__link--pending::after,
+  .cc-content-opening__spinner {
     animation: none;
   }
 }

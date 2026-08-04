@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
+import {
+  ContentOpeningLink,
+  useContentOpeningOptional,
+} from '@/components/navigation/content-opening-transition';
 import { AppButton } from './ui/dashboard-ui';
 
 function firstSentence(text?: string): string | null {
@@ -22,11 +26,24 @@ export function DashboardProjectManageCard({
   project: PortfolioProject;
   editHref?: string;
 }) {
+  const opening = useContentOpeningOptional();
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
   const impact = firstSentence(project.description);
   const githubClicks = Math.round((project.views ?? 0) * 0.28);
   const editLink = editHref ?? `${project.href}/edit`;
+
+  const openProject = () => {
+    if (opening) {
+      opening.navigateWithOpening({
+        kind: 'project',
+        title: project.title,
+        href: project.href,
+      });
+      return;
+    }
+    router.push(project.href);
+  };
 
   return (
     <article
@@ -36,11 +53,17 @@ export function DashboardProjectManageCard({
       aria-label={`Open ${project.title}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => router.push(project.href)}
+      onFocus={() => setHovered(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setHovered(false);
+        }
+      }}
+      onClick={() => openProject()}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          router.push(project.href);
+          openProject();
         }
       }}
     >
@@ -82,9 +105,7 @@ export function DashboardProjectManageCard({
           </span>
         </div>
 
-        <h3 className="cc-fit-title cc-work-title mt-4">
-          {project.title}
-        </h3>
+        <h3 className="cc-fit-title cc-work-title mt-4">{project.title}</h3>
 
         {project.tagline && (
           <p className="mt-2 text-[16px] text-[var(--app-ink)]">{project.tagline}</p>
@@ -124,9 +145,9 @@ export function DashboardProjectManageCard({
           <Link href={editLink}>
             <AppButton variant="primary">Edit</AppButton>
           </Link>
-          <Link href={project.href}>
+          <ContentOpeningLink href={project.href} kind="project" itemTitle={project.title}>
             <AppButton variant="ghost">Preview</AppButton>
-          </Link>
+          </ContentOpeningLink>
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noreferrer">
               <AppButton variant="ghost">Live demo</AppButton>
