@@ -8,7 +8,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { REDUCED_MOTION_QUERY } from '@/hooks/use-reduced-motion';
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 type MotionPreferences = {
   /** True when prefers-reduced-motion: reduce is active (hydrated). */
