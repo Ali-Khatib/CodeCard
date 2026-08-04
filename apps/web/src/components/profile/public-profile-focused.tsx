@@ -81,8 +81,8 @@ export function PublicProfileFocused({
                     src={avatarUrl}
                     alt={profileAvatarAltText(displayName)}
                     fill
-                    priority
-                    fetchPriority="high"
+                    // LCP on `/demo` is the bio text, not the avatar — avoid high-priority
+                    // image decode competing with text paint (Phase 0C).
                     className="object-cover"
                     sizes="96px"
                   />
