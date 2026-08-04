@@ -9,6 +9,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { ScrollProjectCard } from './scroll-project-card';
 import { MorphFilterSurface } from '@/components/profile/morph-filter-surface';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
+import { useContentOpeningOptional } from '@/components/navigation/content-opening-transition';
 import { useProjectOpen } from './project-open-overlay';
 import { TYPE, COLORS } from '@/lib/design/tokens';
 
@@ -38,6 +39,7 @@ export function FeaturedWorkStack({
   const isLight = variant === 'light';
   const reducedMotion = useReducedMotion();
   const { opening, open } = useProjectOpen();
+  const contentOpening = useContentOpeningOptional();
   const [domain, setDomain] = useState<string | null>(null);
   const [focusArea, setFocusArea] = useState<string | null>(null);
   const [proximities, setProximities] = useState<Record<string, number>>({});
@@ -161,7 +163,19 @@ export function FeaturedWorkStack({
                   onProximityChange={onProximityChange}
                   onOpen={
                     reducedMotion
-                      ? undefined
+                      ? (element) => {
+                          void element;
+                          const href = `${projectBase}/projects/${project.id}`;
+                          if (contentOpening) {
+                            contentOpening.navigateWithOpening({
+                              kind: 'project',
+                              title: project.title,
+                              href,
+                            });
+                            return;
+                          }
+                          router.push(href);
+                        }
                       : (element) =>
                           open(project, element, `${projectBase}/projects/${project.id}`, {
                             profileSlug,

@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'motion/react';
 import { HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 export function ResearchBubbleGrid({
@@ -41,11 +41,13 @@ export function ResearchBubbleGrid({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Link
+            <ContentOpeningLink
               href={editHref}
+              kind="research"
+              itemTitle={paper.title}
               className="cc-projects-bubble group"
               title={paper.title}
-              aria-label={`Edit ${paper.title}`}
+              aria-label={`Open ${paper.title}`}
             >
               <div className="cc-projects-bubble__thumb">
                 {paper.coverImageUrl ? (
@@ -78,7 +80,7 @@ export function ResearchBubbleGrid({
                   <span className="cc-projects-bubble__tech-chip">{paper.venue}</span>
                 ) : null}
               </div>
-            </Link>
+            </ContentOpeningLink>
           </motion.div>
         );
       })}
