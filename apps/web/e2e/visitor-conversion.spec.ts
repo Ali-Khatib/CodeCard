@@ -36,7 +36,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     page,
   }) => {
     await prepareAnonymousPrompt(page);
-    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     const focusTarget = page.locator('main a, main button').first();
     await expect(focusTarget).toBeVisible();
     await focusTarget.focus();
@@ -85,14 +85,14 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
       await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
     ).toBe('true');
 
-    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await page.clock.fastForward(20_000);
     await expect(page.locator(PROMPT)).toHaveCount(0);
   });
 
   test('leaving landing before eight seconds does not set the session key', async ({ page }) => {
     await prepareAnonymousPrompt(page);
-    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.clock.runFor(100);
     await expect(page.locator('html')).toHaveAttribute(
       'data-visitor-conversion-timer',
@@ -112,7 +112,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
   });
 
   test('live demo waits eight seconds and suppresses later landing shows', async ({ page }) => {
-    await advanceToReadyPrompt(page, '/dashboard/preview');
+    await advanceToReadyPrompt(page, '/demo');
     const prompt = page.locator(PROMPT);
     await expect(prompt.getByText('CodeCard Demo')).toBeVisible();
     await expect(prompt.getByRole('heading', { name: 'Like what you’re exploring?' })).toBeVisible();
@@ -125,13 +125,13 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
       await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
     ).toBe('true');
 
-    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.clock.fastForward(20_000);
     await expect(page.locator(PROMPT)).toHaveCount(0);
   });
 
   test('Escape dismisses and keeps the session key set', async ({ page }) => {
-    await advanceToReadyPrompt(page, '/landing');
+    await advanceToReadyPrompt(page, '/');
     const prompt = page.locator(PROMPT);
     await expect(prompt).toBeVisible();
     await page.keyboard.press('Escape');
@@ -139,14 +139,14 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     expect(
       await page.evaluate((key) => window.sessionStorage.getItem(key), SHOWN_KEY),
     ).toBe('true');
-    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await page.clock.fastForward(20_000);
     await expect(page.locator(PROMPT)).toHaveCount(0);
   });
 
   test('pauses while hidden on landing', async ({ page }) => {
     await prepareAnonymousPrompt(page);
-    await page.goto('/landing', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.clock.runFor(100);
     await expect(page.locator('html')).toHaveAttribute(
       'data-visitor-conversion-timer',
@@ -180,7 +180,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     '/legal/privacy',
     '/admin',
     '/pricing',
-    '/demo/card',
+    '/dashboard/preview',
     '/dashboard/preview/projects',
   ]) {
     test(`never appears on excluded route ${pathname}`, async ({ page }) => {
@@ -195,7 +195,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
     test(`fits ${width}px with practical touch targets`, async ({ page }) => {
       test.slow();
       await page.setViewportSize({ width, height: 844 });
-      await advanceToReadyPrompt(page, '/landing');
+      await advanceToReadyPrompt(page, '/');
       const prompt = page.locator(PROMPT);
       const box = await prompt.boundingBox();
       expect(box).not.toBeNull();
@@ -229,7 +229,7 @@ test.describe('site-wide anonymous visitor conversion prompt', () => {
 
   test('reduced motion uses opacity without translation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await advanceToReadyPrompt(page, '/landing');
+    await advanceToReadyPrompt(page, '/');
     const style = await page.locator(PROMPT).evaluate((element) => {
       const computed = getComputedStyle(element);
       return {

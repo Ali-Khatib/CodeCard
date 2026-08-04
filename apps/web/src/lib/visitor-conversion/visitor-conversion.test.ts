@@ -54,21 +54,22 @@ afterEach(() => {
 
 describe('visitor conversion route eligibility', () => {
   it('allows only the public landing page and live-demo entry page', () => {
-    expect(resolveVisitorConversionRoute({ pathname: '/landing' })?.context).toBe('landing');
-    expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })?.context).toBe(
-      'live_demo',
-    );
+    expect(resolveVisitorConversionRoute({ pathname: '/' })?.context).toBe('landing');
+    expect(resolveVisitorConversionRoute({ pathname: '/demo' })?.context).toBe('live_demo');
   });
 
   it.each([
+    '/landing',
     '/how-it-works',
     '/profiles',
     '/research',
     '/research/references',
     '/pricing',
+    '/dashboard/preview',
     '/dashboard/preview/projects',
     '/dashboard/preview/research',
     '/demo/card',
+    '/demo/projects/11111111-1111-4111-8111-111111111111',
     '/alex',
     '/alex/projects/11111111-1111-4111-8111-111111111111',
     '/alex/research/paper',
@@ -172,10 +173,8 @@ describe('visitor conversion sessionStorage once-per-tab-session', () => {
     const storage = new MemoryStorage();
     markVisitorConversionShown(storage);
     // Same key suppresses both routes — route resolver remains eligible, storage blocks show.
-    expect(resolveVisitorConversionRoute({ pathname: '/landing' })?.context).toBe('landing');
-    expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })?.context).toBe(
-      'live_demo',
-    );
+    expect(resolveVisitorConversionRoute({ pathname: '/' })?.context).toBe('landing');
+    expect(resolveVisitorConversionRoute({ pathname: '/demo' })?.context).toBe('live_demo');
     expect(hasVisitorConversionBeenShown(storage)).toBe(true);
   });
 
@@ -212,10 +211,10 @@ describe('visitor conversion CTA and safety', () => {
         referrer: 'demo',
         profileId: null,
       },
-      pathname: '/dashboard/preview',
+      pathname: '/demo',
     });
     expect(hrefs.signupHref).toBe('/sign-up?source=demo&referrer=demo');
-    expect(hrefs.signinHref).toBe('/sign-in?source=demo&next=%2Fdashboard%2Fpreview');
+    expect(hrefs.signinHref).toBe('/sign-in?source=demo&next=%2Fdemo');
   });
 
   it('accepts only real HTTPS store links and hides missing links', () => {

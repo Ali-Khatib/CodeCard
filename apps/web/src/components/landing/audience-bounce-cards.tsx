@@ -23,7 +23,7 @@ const AUDIENCE_CARDS = [
     body: 'Share a link with your repos, demos, and case studies — the first thing they see, not the footnote.',
     detail: 'A showcase where your proof is the headline, not buried below schools and titles.',
     highlights: ['Featured work stack', 'Stack tags & outcomes', 'One link for every channel'],
-    cta: { href: '/demo/card', label: 'See a showcase' },
+    cta: { href: '/demo', label: 'See a showcase' },
   },
   {
     eyebrow: 'For recruiters',
@@ -31,7 +31,7 @@ const AUDIENCE_CARDS = [
     body: 'Identity, role, and demonstrated work in one glance.',
     detail: 'Skip the PDF chase. Open one living page with role, proof, and project depth.',
     highlights: ['Name + role up top', 'Scrollable project stories', 'Shareable in one tap'],
-    cta: { href: '/demo/card', label: 'See a live profile' },
+    cta: { href: '/demo', label: 'See a live profile' },
   },
   {
     eyebrow: 'For events',
@@ -48,7 +48,7 @@ const AUDIENCE_CARDS = [
     body: 'Ship projects before the degree line. Show skill, not just school.',
     detail: 'Lead with what you built in class, clubs, and side projects, not just your major.',
     highlights: ['Project-first layout', 'Internship-ready proof', 'Easy to share with mentors'],
-    cta: { href: '/demo/card', label: 'See a student profile' },
+    cta: { href: '/demo', label: 'See a student profile' },
   },
   {
     eyebrow: 'For freelancers',

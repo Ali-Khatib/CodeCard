@@ -9,6 +9,7 @@ describe('site-wide visitor conversion prompt contract', () => {
   it('uses shared marketing/dashboard integration and the shared eight-second constant', () => {
     const marketing = read('src/app/(marketing)/layout.tsx');
     const dashboard = read('src/app/dashboard/layout.tsx');
+    const demo = read('src/app/demo/layout.tsx');
     const root = read('src/app/layout.tsx');
     const component = read(
       'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
@@ -19,6 +20,7 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(root).not.toContain('SitewideVisitorConversionPrompt');
     expect(marketing).toContain('SitewideVisitorConversionPrompt');
     expect(dashboard).toContain('SitewideVisitorConversionPrompt');
+    expect(demo).toContain('SitewideVisitorConversionPrompt');
     expect(component).toContain('startVisibleDelay');
     expect(component).not.toContain('8000');
     expect(core).toContain('VISITOR_CONVERSION_DELAY_MS = 8_000');
@@ -108,6 +110,8 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(marketing).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
+    expect(read('src/app/demo/layout.tsx')).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
+    expect(read('src/app/demo/layout.tsx')).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
   });

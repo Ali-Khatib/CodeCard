@@ -40,10 +40,10 @@ export type VisitorStorage = {
   setItem(key: string, value: string): void;
 };
 
-/** Public landing page — marketing home (mvp: `/landing`). */
+/** Public landing page — marketing home (`/`). */
 export const VISITOR_CONVERSION_LANDING_PATH = MARKETING_HOME_HREF;
 
-/** Live demo entry page — signed-out workspace preview. Nested preview routes are excluded. */
+/** Live demo entry page — public-profile demo (`/demo`). Nested demo/project routes are excluded. */
 export const VISITOR_CONVERSION_LIVE_DEMO_ENTRY_PATH = LIVE_DEMO_ENTRY_HREF;
 
 const EXCLUDED_PATH_PREFIXES = [

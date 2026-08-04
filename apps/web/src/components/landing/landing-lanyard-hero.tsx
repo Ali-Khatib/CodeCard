@@ -47,7 +47,7 @@ export function LandingLanyardHero({
         accentColor: ACCENT,
       });
       const back = await createLanyardBackImage({
-        profileUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/demo/card`,
+        profileUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/demo`,
         linkCount: DEMO_PROFILE.links.length,
         accentColor: ACCENT,
       });
