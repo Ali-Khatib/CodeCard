@@ -13,7 +13,6 @@ import { ReactLenis, type LenisRef } from 'lenis/react';
 import type Lenis from 'lenis';
 import {
   ensureGsapPlugins,
-  killAllScrollTriggers,
   refreshScrollTrigger,
   ScrollTrigger,
   gsap,
@@ -52,6 +51,10 @@ type SmoothScrollProviderProps = {
  * Marketing-scoped Lenis + GSAP ScrollTrigger sync.
  * Disabled under prefers-reduced-motion (native scroll).
  * Not mounted on dashboard routes in Phase 0.
+ *
+ * Cleanup is scoped to this provider: Lenis scroll listener, GSAP ticker callback,
+ * and visibility handlers only. It never kills ScrollTriggers owned by child
+ * components (those revert via their own useGSAP / gsap.context cleanup).
  */
 export function SmoothScrollProvider({
   children,
@@ -60,6 +63,7 @@ export function SmoothScrollProvider({
   const { canEnhanceMotion } = useMotionPreferences();
   const lenisRef = useRef<LenisRef>(null);
   const pauseCountRef = useRef(0);
+  const tickerAttachedRef = useRef(false);
   const active = enabled && canEnhanceMotion;
 
   const pause = useCallback(() => {
@@ -78,12 +82,6 @@ export function SmoothScrollProvider({
     () => ({ pause, resume, enabled: active }),
     [pause, resume, active],
   );
-
-  useEffect(() => {
-    return () => {
-      killAllScrollTriggers();
-    };
-  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -120,9 +118,15 @@ export function SmoothScrollProvider({
         }
         return;
       }
+      // Guard against duplicate attach if effect remount races.
+      if (tickerAttachedRef.current && attachedLenis === lenis) return;
+
       attachedLenis = lenis;
       lenis.on('scroll', onScroll);
-      gsap.ticker.add(tick);
+      if (!tickerAttachedRef.current) {
+        gsap.ticker.add(tick);
+        tickerAttachedRef.current = true;
+      }
       gsap.ticker.lagSmoothing(0);
       document.addEventListener('visibilitychange', onVisibility);
       refreshScrollTrigger({ safe: true });
@@ -134,7 +138,11 @@ export function SmoothScrollProvider({
       cancelled = true;
       document.removeEventListener('visibilitychange', onVisibility);
       attachedLenis?.off('scroll', onScroll);
-      gsap.ticker.remove(tick);
+      if (tickerAttachedRef.current) {
+        gsap.ticker.remove(tick);
+        tickerAttachedRef.current = false;
+      }
+      // Do NOT globally kill ScrollTriggers — child useGSAP contexts own their triggers.
     };
   }, [active]);
 

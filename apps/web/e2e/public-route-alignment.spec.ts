@@ -56,4 +56,26 @@ test.describe('Phase 0A public route alignment', () => {
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('main')).toBeVisible();
   });
+
+  test('browser forward returns to demo after back', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+    await page.goForward();
+    await expect(page).toHaveURL(/\/demo\/?$/);
+    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+  });
+
+  test('repeated / → /demo → / navigation stays stable', async ({ page }) => {
+    for (let i = 0; i < 3; i += 1) {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await expect(page).toHaveURL(/\/$/);
+      await expect(page.getByText('Alex Chen')).toHaveCount(0);
+      await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    }
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
+  });
 });

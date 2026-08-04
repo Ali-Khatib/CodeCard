@@ -41,8 +41,17 @@ describe('Phase 0B motion foundation', () => {
     expect(provider).toContain('ReactLenis');
     expect(provider).toContain('ScrollTrigger.update');
     expect(provider).toContain('visibilitychange');
-    expect(provider).toContain('killAllScrollTriggers');
+    expect(provider).toContain('gsap.ticker.remove');
+    expect(provider).not.toContain('killAllScrollTriggers');
+    expect(provider).not.toMatch(/ScrollTrigger\.getAll\s*\(\s*\)/);
     expect(provider).not.toContain('ScrollSmoother');
+  });
+
+  it('keeps killAllScrollTriggers as a deprecated diagnostic helper only', () => {
+    const runtime = read('src/components/motion/gsap-runtime.ts');
+    expect(runtime).toContain('@deprecated');
+    expect(runtime).toContain('killAllScrollTriggers');
+    expect(runtime).toContain('getScrollTriggerCount');
   });
 
   it('uses @gsap/react for the integration proof with transform/opacity only', () => {
