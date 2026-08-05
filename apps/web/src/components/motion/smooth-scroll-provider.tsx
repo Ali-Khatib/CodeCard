@@ -8,16 +8,12 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
   type ReactNode,
+  type RefObject,
 } from 'react';
-import { ReactLenis, type LenisRef } from 'lenis/react';
+import type { LenisRef } from 'lenis/react';
 import type Lenis from 'lenis';
-import {
-  ensureGsapPlugins,
-  refreshScrollTrigger,
-  ScrollTrigger,
-  gsap,
-} from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
 type SmoothScrollApi = {
@@ -48,9 +44,23 @@ type SmoothScrollProviderProps = {
   enabled?: boolean;
 };
 
+type LenisRootProps = {
+  root?: boolean;
+  ref?: RefObject<LenisRef | null>;
+  options?: {
+    autoRaf?: boolean;
+    lerp?: number;
+    smoothWheel?: boolean;
+  };
+  children?: ReactNode;
+};
+
+type GsapRuntimeModule = typeof import('@/components/motion/gsap-runtime');
+
 /**
  * Marketing-scoped Lenis + GSAP ScrollTrigger sync.
- * Disabled under prefers-reduced-motion (native scroll).
+ * Native scroll first; Lenis/GSAP load only after idle paint when motion is allowed.
+ * Disabled under prefers-reduced-motion (never downloads the runtime when practical).
  * Not mounted on dashboard routes in Phase 0.
  *
  * Cleanup is scoped to this provider: Lenis scroll listener, GSAP ticker callback,
@@ -65,26 +75,50 @@ export function SmoothScrollProvider({
   const lenisRef = useRef<LenisRef>(null);
   const pauseCountRef = useRef(0);
   const tickerAttachedRef = useRef(false);
-  // Defer Lenis until after first paint so LCP text is not blocked by smooth-scroll boot.
-  const [lenisBooted, setLenisBooted] = useState(false);
-  const active = enabled && canEnhanceMotion && lenisBooted;
+  const gsapRef = useRef<GsapRuntimeModule | null>(null);
+  const [ReactLenis, setReactLenis] = useState<ComponentType<LenisRootProps> | null>(null);
+  const [runtimeFailed, setRuntimeFailed] = useState(false);
+
+  const wantsEnhancement = enabled && canEnhanceMotion && !runtimeFailed;
+  const active = Boolean(wantsEnhancement && ReactLenis);
 
   useEffect(() => {
-    if (!(enabled && canEnhanceMotion)) {
-      setLenisBooted(false);
+    if (!wantsEnhancement) {
+      setReactLenis(null);
+      gsapRef.current = null;
       return;
     }
+
     let cancelled = false;
-    const boot = () => {
-      if (!cancelled) setLenisBooted(true);
-    };
     let idleId: number | undefined;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const boot = () => {
+      void (async () => {
+        try {
+          const [{ ReactLenis: LenisRoot }, gsapMod] = await Promise.all([
+            import('lenis/react'),
+            import('@/components/motion/gsap-runtime'),
+          ]);
+          if (cancelled) return;
+          gsapRef.current = gsapMod;
+          setReactLenis(() => LenisRoot as ComponentType<LenisRootProps>);
+        } catch {
+          if (!cancelled) {
+            setRuntimeFailed(true);
+            setReactLenis(null);
+            gsapRef.current = null;
+          }
+        }
+      })();
+    };
+
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       idleId = window.requestIdleCallback(boot, { timeout: 1800 });
     } else {
       timeoutId = setTimeout(boot, 200);
     }
+
     return () => {
       cancelled = true;
       if (idleId != null && 'cancelIdleCallback' in window) {
@@ -92,7 +126,7 @@ export function SmoothScrollProvider({
       }
       if (timeoutId != null) clearTimeout(timeoutId);
     };
-  }, [enabled, canEnhanceMotion]);
+  }, [wantsEnhancement]);
 
   const pause = useCallback(() => {
     pauseCountRef.current += 1;
@@ -113,7 +147,10 @@ export function SmoothScrollProvider({
 
   useEffect(() => {
     if (!active) return;
+    const runtime = gsapRef.current;
+    if (!runtime) return;
 
+    const { ensureGsapPlugins, refreshScrollTrigger, ScrollTrigger, gsap } = runtime;
     ensureGsapPlugins();
 
     let cancelled = false;
@@ -176,12 +213,14 @@ export function SmoothScrollProvider({
 
   useEffect(() => {
     if (!active) return;
-    const onPageShow = () => refreshScrollTrigger({ safe: true });
+    const runtime = gsapRef.current;
+    if (!runtime) return;
+    const onPageShow = () => runtime.refreshScrollTrigger({ safe: true });
     window.addEventListener('pageshow', onPageShow);
     return () => window.removeEventListener('pageshow', onPageShow);
   }, [active]);
 
-  if (!active) {
+  if (!active || !ReactLenis) {
     return (
       <SmoothScrollContext.Provider value={api}>{children}</SmoothScrollContext.Provider>
     );

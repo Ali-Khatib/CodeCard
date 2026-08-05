@@ -1,9 +1,9 @@
-import { Suspense } from 'react';
 import { GlobalBackdrop } from '@/components/landing/global-backdrop';
 import { ProjectOpenProvider } from '@/components/featured-work/project-open-overlay';
 import { ContentOpeningProvider } from '@/components/navigation/content-opening-transition';
 import { ThemeRoot } from '@/components/theme/theme-root';
-import { SitewideVisitorConversionPrompt } from '@/components/visitor-conversion/sitewide-visitor-conversion-prompt';
+import { DeferredVisitorConversionPrompt } from '@/components/visitor-conversion/deferred-visitor-conversion-prompt';
+import '@/styles/codecard-app-system.css';
 
 export default function DashboardLayout({
   children,
@@ -16,12 +16,10 @@ export default function DashboardLayout({
         <ProjectOpenProvider>
           <GlobalBackdrop />
           {children}
-          <Suspense fallback={null}>
-            <SitewideVisitorConversionPrompt
-              iosAppUrl={process.env.NEXT_PUBLIC_CODECARD_IOS_APP_URL}
-              androidAppUrl={process.env.NEXT_PUBLIC_CODECARD_ANDROID_APP_URL}
-            />
-          </Suspense>
+          <DeferredVisitorConversionPrompt
+            iosAppUrl={process.env.NEXT_PUBLIC_CODECARD_IOS_APP_URL}
+            androidAppUrl={process.env.NEXT_PUBLIC_CODECARD_ANDROID_APP_URL}
+          />
         </ProjectOpenProvider>
       </ContentOpeningProvider>
     </ThemeRoot>

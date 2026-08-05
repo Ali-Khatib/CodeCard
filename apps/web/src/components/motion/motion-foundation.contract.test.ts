@@ -38,6 +38,8 @@ describe('Phase 0B motion foundation', () => {
     expect(marketing).toContain('MotionPreferencesProvider');
     expect(dashboard).not.toContain('SmoothScrollProvider');
     expect(provider).toContain('canEnhanceMotion');
+    expect(provider).toContain("import('lenis/react')");
+    expect(provider).toContain("import('@/components/motion/gsap-runtime')");
     expect(provider).toContain('ReactLenis');
     expect(provider).toContain('ScrollTrigger.update');
     expect(provider).toContain('visibilitychange');
@@ -45,6 +47,9 @@ describe('Phase 0B motion foundation', () => {
     expect(provider).not.toContain('killAllScrollTriggers');
     expect(provider).not.toMatch(/ScrollTrigger\.getAll\s*\(\s*\)/);
     expect(provider).not.toContain('ScrollSmoother');
+    // No static top-level Lenis/GSAP runtime imports in the critical chunk.
+    expect(provider).not.toMatch(/^import \{[^}]*ReactLenis/m);
+    expect(provider).not.toMatch(/^import \{[^}]*ensureGsapPlugins/m);
   });
 
   it('keeps killAllScrollTriggers as a deprecated diagnostic helper only', () => {

@@ -9,6 +9,7 @@ describe('site-wide visitor conversion prompt contract', () => {
   it('uses shared marketing/dashboard integration and the shared eight-second constant', () => {
     const marketing = read('src/app/(marketing)/layout.tsx');
     const dashboard = read('src/app/dashboard/layout.tsx');
+    const demo = read('src/app/demo/layout.tsx');
     const root = read('src/app/layout.tsx');
     const component = read(
       'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
@@ -17,8 +18,14 @@ describe('site-wide visitor conversion prompt contract', () => {
 
     // Public `/[slug]` must not inherit this client island (WS14-T019).
     expect(root).not.toContain('SitewideVisitorConversionPrompt');
-    expect(marketing).toContain('SitewideVisitorConversionPrompt');
-    expect(dashboard).toContain('SitewideVisitorConversionPrompt');
+    expect(root).not.toContain('DeferredVisitorConversionPrompt');
+    // Layouts mount the idle-deferred shell; the prompt itself loads after paint.
+    expect(marketing).toContain('DeferredVisitorConversionPrompt');
+    expect(dashboard).toContain('DeferredVisitorConversionPrompt');
+    expect(demo).toContain('DeferredVisitorConversionPrompt');
+    expect(marketing).not.toContain('SitewideVisitorConversionPrompt');
+    expect(dashboard).not.toContain('SitewideVisitorConversionPrompt');
+    expect(demo).not.toContain('SitewideVisitorConversionPrompt');
     expect(component).toContain('startVisibleDelay');
     expect(component).not.toContain('8000');
     expect(core).toContain('VISITOR_CONVERSION_DELAY_MS = 8_000');
@@ -79,7 +86,7 @@ describe('site-wide visitor conversion prompt contract', () => {
     ]) {
       expect(read(path), path).toContain('VisitorConversionMarker');
     }
-    expect(read('src/app/demo/layout.tsx')).toContain('SitewideVisitorConversionPrompt');
+    expect(read('src/app/demo/layout.tsx')).toContain('DeferredVisitorConversionPrompt');
   });
 
   it('uses safe optional app environment variables and no placeholder links', () => {

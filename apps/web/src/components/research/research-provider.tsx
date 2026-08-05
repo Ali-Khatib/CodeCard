@@ -1,9 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import type { ResearchSource } from '@/lib/research/sources';
 import { RESEARCH_SOURCES } from '@/lib/research/sources';
-import { SourceDrawer } from './source-drawer';
+
+const SourceDrawer = dynamic(
+  () => import('./source-drawer').then((m) => ({ default: m.SourceDrawer })),
+  { ssr: false },
+);
 
 interface ResearchContextValue {
   openSource: (sourceId: string) => void;
@@ -31,7 +36,9 @@ export function ResearchProvider({ children }: { children: React.ReactNode }) {
   return (
     <ResearchContext.Provider value={{ openSource, closeSource }}>
       {children}
-      <SourceDrawer source={activeSource} onClose={closeSource} />
+      {activeSource ? (
+        <SourceDrawer source={activeSource} onClose={closeSource} />
+      ) : null}
     </ResearchContext.Provider>
   );
 }

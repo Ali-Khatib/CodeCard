@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Phase 0D measurement artifacts
+.lighthouse-phase0d/
+.lighthouse-*/
+.phase0-*/

@@ -103,7 +103,7 @@ test.describe('Phase 0B motion foundation', () => {
   }) => {
     await enableMotionDebug(page);
     await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
     expect(await isLenisActive(page)).toBe(false);
   });
 
@@ -112,7 +112,12 @@ test.describe('Phase 0B motion foundation', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page).catch(() => undefined);
-    await page.waitForTimeout(500);
+    // Lenis boots after idle (up to ~1.8s); wait for the class, not a fixed short sleep.
+    await page.waitForFunction(
+      () => document.documentElement.classList.contains('lenis'),
+      undefined,
+      { timeout: 8000 },
+    );
 
     expect(await isLenisActive(page)).toBe(true);
     const debugLenis = await page.evaluate(
@@ -198,7 +203,7 @@ test.describe('Phase 0B motion foundation', () => {
     await page.evaluate(() => {
       (window as Window & { __ccSoftNavMark?: number }).__ccSoftNavMark = 1;
     });
-    const demoLink = page.locator('a[href="/demo"]').first();
+    const demoLink = page.getByRole('link', { name: /Live demo/i }).first();
     await expect(demoLink).toBeVisible();
     await Promise.all([page.waitForURL(/\/demo\/?$/), demoLink.click()]);
     await page.waitForTimeout(500);
