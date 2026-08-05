@@ -101,6 +101,19 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   padding: 20px 16px 20px 20px;
   transition: transform var(--app-slide-duration) var(--app-slide-ease);
   will-change: transform;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--app-iris) 35%, transparent) transparent;
+}
+
+.cc-app-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cc-app-sidebar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-iris) 32%, transparent);
 }
 
 .cc-app-sidebar__head {
@@ -198,6 +211,10 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   background: var(--app-paper);
   border-color: var(--app-iris);
   transform: translateX(2px);
+}
+
+.cc-app-sidebar-toggle:active {
+  transform: scale(0.96);
 }
 
 .cc-app-sidebar-toggle__card {
@@ -655,7 +672,29 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 /* ── Nav ── */
+.cc-app-nav {
+  position: relative;
+}
+
+.cc-app-nav__active-pill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  border-radius: var(--app-radius-pill);
+  background: var(--app-rose-mist);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(0);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.18s ease;
+  z-index: 0;
+}
+
 .cc-app-nav-link {
+  position: relative;
+  z-index: 1;
   display: flex;
   height: 40px;
   align-items: center;
@@ -665,7 +704,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   font-size: 14px;
   font-weight: 500;
   color: var(--app-ink);
-  transition: background 0.28s ease, color 0.28s ease;
+  transition: background 0.28s ease, color 0.28s ease, transform 0.16s ease;
 }
 
 .cc-app-nav-link:hover {
@@ -673,8 +712,18 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   color: var(--app-ink);
 }
 
+.cc-app-nav-link:hover svg,
+.cc-app-nav-link:focus-visible svg {
+  transform: translateX(1px) scale(1.04);
+}
+
+.cc-app-nav-link svg {
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
 .cc-app-nav-link--active {
-  background: var(--app-rose-mist);
+  background: transparent;
   color: var(--app-ink);
 }
 
@@ -685,6 +734,10 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-radius: 50%;
   background: var(--app-iris);
   flex-shrink: 0;
+}
+
+.cc-app-nav-link:active:not(.cc-app-nav-link--pending) {
+  transform: scale(0.985);
 }
 
 .cc-app-nav-link--pending,
@@ -1192,6 +1245,7 @@ html.dark .cc-project-nav-btn svg,
   align-items: center;
   gap: 10px;
   text-align: center;
+  animation: cc-content-opening-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .cc-content-opening__spinner {
@@ -1201,6 +1255,21 @@ html.dark .cc-project-nav-btn svg,
   border: 2px solid color-mix(in srgb, var(--app-iris, #c094e4) 28%, transparent);
   border-top-color: var(--app-iris, #c094e4);
   animation: cc-content-opening-spin 0.8s linear infinite;
+}
+
+.cc-content-opening__brand {
+  display: flex;
+  height: 36px;
+  width: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--app-iris, #c094e4) 35%, transparent);
+  background: color-mix(in srgb, var(--app-iris, #c094e4) 12%, transparent);
+  color: var(--app-iris, #c094e4);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 .cc-content-opening__dot {
@@ -1233,6 +1302,17 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
+@keyframes cc-content-opening-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cc-app-page-enter,
   .cc-app-route-progress::after,
@@ -1240,8 +1320,11 @@ html.dark .cc-project-nav-btn svg,
   .cc-app-route-pending__pulse,
   .cc-app-nav-link--pending::after,
   .cc-app-mobile-nav__link--pending::after,
-  .cc-content-opening__spinner {
+  .cc-content-opening__spinner,
+  .cc-content-opening__panel,
+  .cc-app-nav__active-pill {
     animation: none;
+    transition: none;
   }
 }
 

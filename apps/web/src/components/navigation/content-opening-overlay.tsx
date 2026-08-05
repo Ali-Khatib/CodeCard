@@ -25,16 +25,22 @@ export function ContentOpeningOverlayLazy({
       role="status"
       aria-live="polite"
       aria-busy="true"
+      data-testid="content-opening-overlay"
       initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
-      transition={{ duration: reducedMotion ? 0.12 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reducedMotion ? 0.12 : 0.2, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="cc-content-opening__panel">
-        {!reducedMotion ? (
-          <span className="cc-content-opening__spinner" aria-hidden />
-        ) : (
+        {reducedMotion ? (
           <span className="cc-content-opening__dot" aria-hidden />
+        ) : (
+          <>
+            <span className="cc-content-opening__brand" aria-hidden>
+              Cc
+            </span>
+            <span className="cc-content-opening__spinner" aria-hidden />
+          </>
         )}
         <p className="cc-content-opening__headline">{headline}</p>
         <p className="cc-content-opening__title">{title}</p>

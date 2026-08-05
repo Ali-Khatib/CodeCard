@@ -166,7 +166,16 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
             data-testid="content-opening-fallback"
           >
             <div className="cc-content-opening__panel">
-              <span className="cc-content-opening__dot" aria-hidden />
+              {reducedMotion ? (
+                <span className="cc-content-opening__dot" aria-hidden />
+              ) : (
+                <>
+                  <span className="cc-content-opening__brand" aria-hidden>
+                    Cc
+                  </span>
+                  <span className="cc-content-opening__spinner" aria-hidden />
+                </>
+              )}
               <p className="cc-content-opening__headline">
                 {opening.kind === 'project' ? 'Opening project' : 'Opening research'}
               </p>

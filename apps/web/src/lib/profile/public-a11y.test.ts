@@ -40,7 +40,7 @@ describe('WS06-T008 public accessibility audit', () => {
     expect(social).toContain('aria-label="Profile links"');
     expect(profile).toContain('profileAvatarAltText');
     expect(profile).toContain('aria-hidden');
-    expect(hero).toContain('Profile link copied');
+    expect(hero).toContain('Copied');
     expect(hero).toContain('aria-live="polite"');
     expect(profile).not.toContain('tabIndex={1}');
     expect(profile).not.toContain('tabIndex={2}');

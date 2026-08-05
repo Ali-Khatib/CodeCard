@@ -31,8 +31,8 @@ test.describe('Phase 0D public critical rendering path', () => {
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     const html = await page.content();
     expect(html).toMatch(/Alex Chen/);
-    // Bio is server-rendered profile copy.
-    expect(html).toMatch(/<p[^>]*class="[^"]*mt-4/);
+    // Bio is server-rendered profile copy (class utilities may shift; assert content).
+    expect(html).toMatch(/I ship tools that help teams move faster/);
 
     await expect(page.getByText('Alex Chen').first()).toBeVisible();
     expect(errors.filter((e) => /hydration/i.test(e))).toEqual([]);

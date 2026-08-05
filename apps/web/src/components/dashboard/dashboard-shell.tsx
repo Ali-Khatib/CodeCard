@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { DASH_NAV_ICONS } from './dashboard-nav-icons';
 import { EmailVerificationBanner } from './email-verification-banner';
 import { DashboardPageTransition } from './dashboard-page-transition';
@@ -89,6 +89,8 @@ export function DashboardShell({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const activePillRef = useRef<HTMLSpanElement>(null);
 
   useDashboardSessionGuard();
 
@@ -125,6 +127,29 @@ export function DashboardShell({
     return () => window.clearTimeout(timeout);
   }, [pendingHref]);
 
+  const syncActivePill = useCallback(() => {
+    const nav = navRef.current;
+    const pill = activePillRef.current;
+    if (!nav || !pill) return;
+    const active = nav.querySelector<HTMLElement>('a[aria-current="page"]');
+    if (!active) {
+      pill.style.opacity = '0';
+      return;
+    }
+    pill.style.opacity = '1';
+    pill.style.transform = `translateY(${active.offsetTop}px)`;
+  }, []);
+
+  useLayoutEffect(() => {
+    syncActivePill();
+  }, [pathname, sidebarOpen, syncActivePill]);
+
+  useEffect(() => {
+    const onResize = () => syncActivePill();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [syncActivePill]);
+
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((open) => {
       const next = !open;
@@ -160,7 +185,8 @@ export function DashboardShell({
     .toUpperCase();
 
   const navLinks = (
-    <nav className="flex flex-col gap-1" aria-label="Main">
+    <nav ref={navRef} className="cc-app-nav flex flex-col gap-1" aria-label="Main">
+      <span ref={activePillRef} className="cc-app-nav__active-pill" aria-hidden data-testid="sidebar-active-indicator" />
       {NAV_ITEMS.map((item) => {
         const href = hrefFor(item.segment);
         const active = isActive(item.segment);
@@ -174,6 +200,7 @@ export function DashboardShell({
             className={`cc-app-nav-link ${active ? 'cc-app-nav-link--active' : ''} ${pending ? 'cc-app-nav-link--pending' : ''}`}
             aria-current={active ? 'page' : undefined}
             aria-busy={pending}
+            data-nav-segment={item.segment || 'home'}
             aria-label={
               item.segment === 'circle' && circleUnreadBadge
                 ? `Circle, ${circleUnreadBadge} new`
