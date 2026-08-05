@@ -1,3 +1,5 @@
+import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
+
 export type AdjacentProjects<T> = {
   previous: T | null;
   next: T | null;
@@ -27,6 +29,5 @@ export function getAdjacentProjects<T extends { id: string }>(
 }
 
 export function buildPublicProjectDetailHref(profileSlug: string, projectId: string): string {
-  const base = profileSlug === 'demo' ? '/demo' : `/${encodeURIComponent(profileSlug)}`;
-  return `${base}/projects/${encodeURIComponent(projectId)}`;
+  return publicDemoProjectHref(profileSlug, projectId);
 }

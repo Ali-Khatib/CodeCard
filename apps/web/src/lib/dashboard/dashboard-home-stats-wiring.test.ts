@@ -10,7 +10,7 @@ describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
   it('uses owner analytics and content summaries and never falls back to demo numbers', () => {
     const page = read('src/app/dashboard/(authenticated)/page.tsx');
     const view = read('src/components/dashboard/dashboard-overview-view.tsx');
-    const preview = read('src/app/dashboard/preview/page.tsx');
+    const preview = read('src/app/demo/(workspace)/page.tsx');
 
     expect(page).toContain('loadOwnerAnalytics');
     expect(page).toContain('loadOwnerOverviewContent');
@@ -35,7 +35,7 @@ describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
     expect(view).toContain('Add paper');
     expect(view).toContain('Activity will appear here');
 
-    // Preview keeps deterministic sample stats only on the preview route.
+    // Workspace demo keeps deterministic sample stats only on the live-demo route.
     expect(preview).toContain('DEMO_OVERVIEW_ACTIVITY');
     expect(preview).toContain('1284');
     expect(preview).toContain('preview');

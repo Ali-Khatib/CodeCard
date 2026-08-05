@@ -1,5 +1,7 @@
 'use client';
 
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+
 import dynamic from 'next/dynamic';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { FeaturedProject } from '@/lib/projects/featured';
@@ -61,7 +63,7 @@ export function ProfileIdentityScene({
 
   const profileUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}${profileSlug === 'demo' ? '/demo' : `/${profileSlug}`}`
+      ? `${window.location.origin}${publicDemoProfileBasePath(profileSlug)}`
       : '';
 
   useEffect(() => {

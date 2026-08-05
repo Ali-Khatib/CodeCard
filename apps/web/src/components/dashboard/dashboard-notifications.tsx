@@ -63,10 +63,14 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
 
   const resolveHref = (href?: string) => {
     if (!href) return basePath;
-    if (basePath === '/dashboard/preview') {
-      return href.replace('/dashboard', '/dashboard/preview');
+    if (href === basePath || href.startsWith(`${basePath}/`)) return href;
+    if (basePath === '/demo' || basePath === '/dashboard/preview') {
+      return href
+        .replace(/^\/dashboard\/preview/, basePath)
+        .replace(/^\/dashboard/, basePath)
+        .replace(/^\/demo/, basePath);
     }
-    return href.replace('/dashboard/preview', '/dashboard');
+    return href.replace(/^\/dashboard\/preview/, '/dashboard').replace(/^\/demo/, '/dashboard');
   };
 
   return (

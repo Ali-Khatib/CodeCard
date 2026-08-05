@@ -141,7 +141,7 @@ export function featuredToPortfolioProject(
   const repo = firstSafeProjectLink(project.links, ['repo']);
   // Demo/preview has no editor; cards and "Edit" CTAs open the demo detail page
   // (dashboard cards navigate via editHref since WS09-T004).
-  const resolvedHref = href ?? `/dashboard/preview/projects`;
+  const resolvedHref = href ?? `/demo/projects`;
 
   return {
     id: project.id,

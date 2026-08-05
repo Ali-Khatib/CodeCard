@@ -14,7 +14,7 @@ export default async function DemoProjectPage({ params }: PageProps) {
 
   return (
     <>
-      <VisitorConversionMarker context="live_demo" referrer={`demo/projects/${id}`} />
+      <VisitorConversionMarker context="live_demo" referrer={`demo/card/projects/${id}`} />
       <ProjectDetailView
         project={project}
         profileSlug="demo"

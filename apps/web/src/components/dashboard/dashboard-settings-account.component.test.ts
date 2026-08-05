@@ -18,7 +18,7 @@ describe('WS09-T008 Settings account controls wiring', () => {
   });
 
   it('preview Settings stays on demo account controls', () => {
-    const preview = read('src/app/dashboard/preview/settings/page.tsx');
+    const preview = read('src/app/demo/(workspace)/settings/page.tsx');
     expect(preview).toContain('accountControls="demo"');
     expect(preview).not.toContain('/api/account/delete');
     expect(preview).not.toContain('/api/account/export');

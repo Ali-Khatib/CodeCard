@@ -75,11 +75,11 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
     expect(navBlock).toContain("label: 'Settings'");
 
     // Preview routes remain available intentionally.
-    expect(existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/circle/page.tsx'))).toBe(
+    expect(existsSync(resolve(process.cwd(), 'src/app/demo/(workspace)/circle/page.tsx'))).toBe(
       true,
     );
     expect(
-      existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/connections/page.tsx')),
+      existsSync(resolve(process.cwd(), 'src/app/demo/(workspace)/connections/page.tsx')),
     ).toBe(true);
 
     expect(audit).toContain('WS15');

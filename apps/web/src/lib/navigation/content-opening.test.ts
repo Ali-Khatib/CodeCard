@@ -28,6 +28,8 @@ describe('content opening helpers', () => {
     expect(resolveContentOpeningKind('/alex-chen/projects/abc')).toBe('project');
     expect(resolveContentOpeningKind('/dashboard/projects/abc/edit')).toBe('project');
     expect(resolveContentOpeningKind('/demo/research/paper-slug')).toBe('research');
+    expect(resolveContentOpeningKind('/demo/card/research/paper-slug')).toBe('research');
+    expect(resolveContentOpeningKind('/demo/card/projects/abc')).toBe('project');
     expect(resolveContentOpeningKind('/dashboard/research/abc/edit')).toBe('research');
     expect(resolveContentOpeningKind('/dashboard/projects')).toBeNull();
     expect(resolveContentOpeningKind('/dashboard/projects/new')).toBeNull();

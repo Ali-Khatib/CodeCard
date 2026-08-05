@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
+import Link from 'next/link';
+import { TYPE } from '@/lib/design/tokens';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionCounter } from './section-counter';
-import { TYPE } from '@/lib/design/tokens';
-import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Workspace preview iframe — mount only when near viewport so `/` LCP is not
@@ -38,8 +40,8 @@ function DeferredDashboardPreview() {
     <div ref={hostRef} className="cc-workspace-showcase-embed">
       {show ? (
         <iframe
-          src="/dashboard/preview"
-          title="CodeCard dashboard preview"
+          src="/demo"
+          title="CodeCard live demo workspace"
           className="cc-workspace-showcase-embed__frame"
           loading="lazy"
         />
@@ -62,9 +64,17 @@ export function WorkspaceShowcase() {
           <p className={`mt-4 max-w-[600px] ${TYPE.subheading}`}>
             This is the real dashboard — same UI as the live demo. Click a tab or explore inside.
           </p>
-          <LiveDemoLink className="cc-btn-pill-demo cc-instant-press mt-8 inline-flex h-11 px-8 text-[15px]">
-            Open live demo workspace →
-          </LiveDemoLink>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <LiveDemoLink className="cc-btn-pill-demo cc-instant-press inline-flex h-11 px-8 text-[15px]">
+              Open live demo workspace →
+            </LiveDemoLink>
+            <Link
+              href={LIVE_DEMO_PROFILE_HREF}
+              className="text-[15px] font-medium text-ink underline-offset-4 transition-opacity hover:opacity-70 hover:underline"
+            >
+              View public profile
+            </Link>
+          </div>
         </ScrollReveal>
 
         <ScrollReveal delay={0.08} scale={0.99} className="mt-8">

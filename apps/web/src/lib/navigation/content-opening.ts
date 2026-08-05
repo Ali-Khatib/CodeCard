@@ -66,12 +66,12 @@ export function resolveContentOpeningKind(href: string): ContentOpeningKind | nu
   if (!path) return null;
 
   const project = path.match(
-    /^\/(?:dashboard(?:\/preview)?|demo|[^/]+)\/projects\/(?!new(?:\/|$))[^/]+(?:\/edit)?\/?(?:\?.*)?$/i,
+    /^\/(?:dashboard(?:\/preview)?|demo(?:\/card)?|[^/]+)\/projects\/(?!new(?:\/|$))[^/]+(?:\/edit)?\/?(?:\?.*)?$/i,
   );
   if (project) return 'project';
 
   const research = path.match(
-    /^\/(?:dashboard(?:\/preview)?|demo|[^/]+)\/research\/(?!new(?:\/|$))[^/]+(?:\/edit)?\/?(?:\?.*)?$/i,
+    /^\/(?:dashboard(?:\/preview)?|demo(?:\/card)?|[^/]+)\/research\/(?!new(?:\/|$))[^/]+(?:\/edit)?\/?(?:\?.*)?$/i,
   );
   if (research) return 'research';
 

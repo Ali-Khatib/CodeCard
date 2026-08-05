@@ -1,5 +1,7 @@
 'use client';
 
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRef } from 'react';
@@ -51,7 +53,7 @@ export function ProfileMagicBento({
   const openProject = () => {
     if (!featuredProject) return;
     saveScrollForProfile(profileSlug);
-    const base = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+    const base = publicDemoProfileBasePath(profileSlug);
     navigate(`${base}/projects/${featuredProject.id}`);
   };
 

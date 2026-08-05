@@ -15,9 +15,10 @@ describe('Phase 0D public critical-path isolation', () => {
     expect(marketing).toContain('ProjectOpenProvider');
   });
 
-  it('hosts ContentOpening on /demo via DemoInteractionsHost for project/research openings', () => {
+  it('hosts ContentOpening on /demo/card via DemoInteractionsHost for project/research openings', () => {
+    const card = read('src/app/demo/card/layout.tsx');
     const demo = read('src/app/demo/layout.tsx');
-    expect(demo).toContain('DemoInteractionsHost');
+    expect(card).toContain('DemoInteractionsHost');
     expect(demo).toContain('DeferredVisitorConversionPrompt');
     expect(demo).toContain('codecard-app-system.css');
   });

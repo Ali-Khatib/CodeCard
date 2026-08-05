@@ -37,7 +37,7 @@ describe('WS15-T008 connections quality completion', () => {
 
   it('isolates demo Connections from authenticated routes', () => {
     const auth = readWeb('src/app/dashboard/(authenticated)/connections/page.tsx');
-    const preview = readWeb('src/app/dashboard/preview/connections/page.tsx');
+    const preview = readWeb('src/app/demo/(workspace)/connections/page.tsx');
     const demo = readWeb('src/lib/dashboard/workspace-demo.ts');
     expect(auth).toContain('listOwnerConnections');
     expect(auth).not.toContain('DEMO_CONNECTIONS');

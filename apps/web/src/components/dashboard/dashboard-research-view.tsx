@@ -7,6 +7,7 @@ import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { ResearchBubbleGrid } from '@/components/dashboard/research-bubble-grid';
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
 const VIEW_MODES = [
@@ -24,10 +25,7 @@ function paperPublicHref(
   if (!paper.isPublished || !isProfilePublic || !profileSlug || !paper.slug) {
     return null;
   }
-  if (profileSlug === 'demo') {
-    return `/demo/research/${paper.slug}`;
-  }
-  return `/${profileSlug}/research/${paper.slug}`;
+  return `${publicDemoProfileBasePath(profileSlug)}/research/${paper.slug}`;
 }
 
 export function DashboardResearchView({

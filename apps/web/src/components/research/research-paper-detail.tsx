@@ -12,6 +12,7 @@ import {
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
@@ -42,7 +43,7 @@ export function ResearchPaperDetail({
 }) {
   const [abstractExpanded, setAbstractExpanded] = useState(false);
   const reduced = useReducedMotion();
-  const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const backHref = publicDemoProfileBasePath(profileSlug);
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
   useEffect(() => {

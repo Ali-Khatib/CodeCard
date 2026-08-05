@@ -1,3 +1,4 @@
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 import { isAbsoluteMediaUrl } from '@/lib/projects/project-media-url';
 import {
   toSafeDoiHref,
@@ -98,7 +99,7 @@ export function normalizeResearchPaper(
     relatedProjectTitle: relatedIsPublic ? (related?.title ?? null) : null,
     relatedProjectHref:
       relatedProjectId && profileSlug
-        ? `${profileSlug === 'demo' ? '/demo' : `/${profileSlug}`}/projects/${relatedProjectId}`
+        ? `${publicDemoProfileBasePath(profileSlug)}/projects/${relatedProjectId}`
         : null,
     isPublished: Boolean(paper.is_published),
     figures: (paper.research_figures ?? [])

@@ -10,7 +10,7 @@ describe('WS08-T006/T007 authenticated analytics wiring', () => {
   it('uses owner query aggregates and not synthetic builders', () => {
     const page = read('src/app/dashboard/(authenticated)/analytics/page.tsx');
     const view = read('src/components/dashboard/dashboard-analytics-view.tsx');
-    const previewPage = read('src/app/dashboard/preview/analytics/page.tsx');
+    const previewPage = read('src/app/demo/(workspace)/analytics/page.tsx');
 
     expect(page).toContain('loadOwnerAnalytics');
     expect(page).toContain('loadOwnerAnalyticsTrends');

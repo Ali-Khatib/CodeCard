@@ -34,7 +34,7 @@ describe('WS10-T010 analytics accuracy disclosure', () => {
     const view = read('src/components/dashboard/dashboard-analytics-view.tsx');
     const page = read('src/app/dashboard/(authenticated)/analytics/page.tsx');
     const queries = read('src/lib/dashboard/analytics-queries.ts');
-    const preview = read('src/app/dashboard/preview/analytics/page.tsx');
+    const preview = read('src/app/demo/(workspace)/analytics/page.tsx');
 
     expect(view).toContain('ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE');
     expect(view).toContain('ANALYTICS_ACCURACY_DISCLOSURE_BODY');

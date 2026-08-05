@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('WS12-T008 touch interaction fallbacks', () => {
   test('demo project case-study tabs switch by click', async ({ page }) => {
-    await page.goto('/demo/projects/demo-1', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo/card/projects/demo-1', { waitUntil: 'domcontentloaded' });
     const tabs = page.locator('[role="tablist"][aria-label="Project showcase sections"] [role="tab"]');
     const count = await tabs.count();
     test.skip(count < 2, 'Demo project has fewer than two showcase tabs');
@@ -15,7 +15,7 @@ test.describe('WS12-T008 touch interaction fallbacks', () => {
   });
 
   test('demo project case-study tabs switch by keyboard', async ({ page }) => {
-    await page.goto('/demo/projects/demo-1', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo/card/projects/demo-1', { waitUntil: 'domcontentloaded' });
     const tabs = page.locator('[role="tablist"][aria-label="Project showcase sections"] [role="tab"]');
     const count = await tabs.count();
     test.skip(count < 2, 'Demo project has fewer than two showcase tabs');
@@ -27,7 +27,7 @@ test.describe('WS12-T008 touch interaction fallbacks', () => {
 
   test('coarse pointer still activates tabs by tap/click', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/demo/projects/demo-1', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo/card/projects/demo-1', { waitUntil: 'domcontentloaded' });
     const tabs = page.locator('[role="tablist"][aria-label="Project showcase sections"] [role="tab"]');
     const count = await tabs.count();
     test.skip(count < 2, 'Demo project has fewer than two showcase tabs');

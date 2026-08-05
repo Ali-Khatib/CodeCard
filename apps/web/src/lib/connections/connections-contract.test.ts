@@ -109,7 +109,7 @@ describe('WS15-T001 connections data contract', () => {
       'utf8',
     );
     const previewPage = readFileSync(
-      resolve(process.cwd(), 'src/app/dashboard/preview/connections/page.tsx'),
+      resolve(process.cwd(), 'src/app/demo/(workspace)/connections/page.tsx'),
       'utf8',
     );
     const demo = readFileSync(

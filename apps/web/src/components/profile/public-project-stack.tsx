@@ -7,6 +7,7 @@ import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import { trackLinkClick } from '@/lib/analytics/link-click';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 
 function descriptionParts(description: string | null): { lead: string | null; rest: string[] } {
   if (!description) return { lead: null, rest: [] };
@@ -31,7 +32,7 @@ export function PublicProjectStack({
   demoViews,
 }: PublicProjectStackProps) {
   const [openId, setOpenId] = useState<string | null>(null);
-  const base = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const base = publicDemoProfileBasePath(profileSlug);
 
   return (
     <div className="flex flex-col gap-8">

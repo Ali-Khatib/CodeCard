@@ -1,5 +1,5 @@
 /** Public marketing homepage. */
 export const MARKETING_HOME_HREF = '/';
 
-/** Public-profile live demo (Alex Chen). Workspace preview stays at `/dashboard/preview`. */
+/** Live demo entry — full Alex Chen workspace (sidebar). Public profile is `/demo/card`. */
 export const LIVE_DEMO_ENTRY_HREF = '/demo';

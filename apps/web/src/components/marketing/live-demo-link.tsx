@@ -1,6 +1,7 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import {
   LIVE_DEMO_HREF,
+  LIVE_DEMO_PREVIEW_ALIAS_HREF,
   LIVE_DEMO_PROFILE_HREF,
   LIVE_DEMO_PROFILE_LEGACY_HREF,
   LIVE_DEMO_WORKSPACE_HREF,
@@ -26,8 +27,8 @@ export function isLiveDemoHref(href: string): boolean {
     href === LIVE_DEMO_WORKSPACE_HREF ||
     href === LIVE_DEMO_PROFILE_HREF ||
     href === LIVE_DEMO_PROFILE_LEGACY_HREF ||
-    href === '/dashboard/preview' ||
-    href.startsWith('/dashboard/preview/') ||
+    href === LIVE_DEMO_PREVIEW_ALIAS_HREF ||
+    href.startsWith(`${LIVE_DEMO_PREVIEW_ALIAS_HREF}/`) ||
     href.startsWith('/demo/')
   );
 }

@@ -1,13 +1,6 @@
-import { PreviewAnalyticsView } from '@/components/dashboard/preview-analytics-view';
+import { permanentRedirect } from 'next/navigation';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
-/**
- * Preview-only sample analytics route.
- * Authenticated owners use `/dashboard/analytics` with real aggregates.
- */
-export default function PreviewAnalyticsPage() {
-  return (
-    <div aria-label="Preview demo sample analytics">
-      <PreviewAnalyticsView displayName="Alex Chen" />
-    </div>
-  );
+export default function PreviewAnalyticsAliasPage() {
+  permanentRedirect(`${LIVE_DEMO_WORKSPACE_HREF}/analytics`);
 }

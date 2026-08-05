@@ -44,7 +44,7 @@ test.describe('Phase 1A premium interactions', () => {
   });
 
   test('internal project navigation shows Opening project with title', async ({ page }) => {
-    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo/card', { waitUntil: 'domcontentloaded' });
     const projectLink = page.getByRole('link', { name: /Open project:|View project/i }).first();
     await expect(projectLink).toBeVisible();
     const title =
@@ -58,17 +58,17 @@ test.describe('Phase 1A premium interactions', () => {
     if (title.trim()) {
       await expect(overlay.getByText(title.trim().slice(0, 12), { exact: false })).toBeVisible();
     }
-    await page.waitForURL(/\/demo\/projects\//);
+    await page.waitForURL(/\/demo\/card\/projects\//);
     await expect(overlay).toBeHidden({ timeout: 8000 });
   });
 
   test('internal research navigation shows Opening research with title', async ({ page }) => {
-    await page.goto('/demo', { waitUntil: 'networkidle' });
+    await page.goto('/demo/card', { waitUntil: 'networkidle' });
     await page.locator('#research').scrollIntoViewIfNeeded();
     const researchLink = page.getByRole('link', { name: /Open research paper:/i }).first();
     await expect(researchLink).toBeVisible();
     await Promise.all([
-      page.waitForURL(/\/demo\/research\//),
+      page.waitForURL(/\/demo\/card\/research\//),
       researchLink.click(),
     ]);
     // Overlay may be brief; assert destination and that it does not stick.
@@ -77,17 +77,17 @@ test.describe('Phase 1A premium interactions', () => {
   });
 
   test('failed navigation clears the opening overlay', async ({ page }) => {
-    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
-    await page.route('**/demo/projects/**', (route) => route.abort());
+    await page.goto('/demo/card', { waitUntil: 'domcontentloaded' });
+    await page.route('**/demo/card/projects/**', (route) => route.abort());
     const projectLink = page.getByRole('link', { name: /Open project:/i }).first();
     await projectLink.click();
     // Failsafe or aborted nav should not leave a stuck overlay forever.
     await expect(page.locator('.cc-content-opening')).toBeHidden({ timeout: 10000 });
   });
 
-  test('Ctrl/Cmd-click and external links stay native', async ({ page, context, browserName }) => {
-    test.skip(browserName === 'webkit', 'Modifier new-tab flaky on webkit');
-    await page.goto('/demo', { waitUntil: 'networkidle' });
+  test('Ctrl/Cmd-click and external links stay native', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', 'modifier new-tab flaky on webkit');
+    await page.goto('/demo/card', { waitUntil: 'networkidle' });
     const projectLink = page.getByRole('link', { name: /Open project:/i }).first();
     await expect(projectLink).toBeVisible();
 
@@ -95,8 +95,8 @@ test.describe('Phase 1A premium interactions', () => {
     await projectLink.click({ modifiers: ['ControlOrMeta'], force: true });
     await page.waitForTimeout(400);
     await expect(page.locator('.cc-content-opening')).toHaveCount(0);
-    // Stay on demo (new tab handled by browser; primary page unchanged).
-    await expect(page).toHaveURL(/\/demo/);
+    // Stay on public profile demo (new tab handled by browser; primary page unchanged).
+    await expect(page).toHaveURL(/\/demo\/card/);
 
     const external = page.locator('a[target="_blank"][rel*="noopener"]').first();
     if (await external.count()) {
@@ -106,17 +106,17 @@ test.describe('Phase 1A premium interactions', () => {
   });
 
   test('browser back/forward after project open remains functional', async ({ page }) => {
-    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+    await page.goto('/demo/card', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /Open project:/i }).first().click();
-    await page.waitForURL(/\/demo\/projects\//);
+    await page.waitForURL(/\/demo\/card\/projects\//);
     await page.goBack();
-    await expect(page).toHaveURL(/\/demo\/?$/);
+    await expect(page).toHaveURL(/\/demo\/card\/?$/);
     await page.goForward();
-    await expect(page).toHaveURL(/\/demo\/projects\//);
+    await expect(page).toHaveURL(/\/demo\/card\/projects\//);
   });
 
-  test('dashboard preview does not get Lenis marketing runtime', async ({ page }) => {
-    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
+  test('workspace demo does not get Lenis marketing runtime', async ({ page }) => {
+    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
     const lenis = await page.evaluate(() =>
       document.documentElement.classList.contains('lenis'),
@@ -124,7 +124,17 @@ test.describe('Phase 1A premium interactions', () => {
     expect(lenis).toBe(false);
   });
 
-  test('demo remains readable with JavaScript disabled', async ({ browser }) => {
+  test('/dashboard/preview alias reaches workspace without Lenis', async ({ page }) => {
+    await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/\/demo\/?$/);
+    await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
+    const lenis = await page.evaluate(() =>
+      document.documentElement.classList.contains('lenis'),
+    );
+    expect(lenis).toBe(false);
+  });
+
+  test('demo workspace remains readable with JavaScript disabled', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });

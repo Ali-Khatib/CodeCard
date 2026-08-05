@@ -113,7 +113,7 @@ describe('WS15-T004 real Connections save flow', () => {
 
   it('keeps preview and live-demo Connections populated separately', () => {
     const preview = readFileSync(
-      resolve(process.cwd(), 'src/app/dashboard/preview/connections/page.tsx'),
+      resolve(process.cwd(), 'src/app/demo/(workspace)/connections/page.tsx'),
       'utf8',
     );
     const demo = readFileSync(
