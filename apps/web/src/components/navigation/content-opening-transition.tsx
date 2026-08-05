@@ -154,8 +154,26 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
   return (
     <ContentOpeningContext.Provider value={value}>
       {children}
-      {opening && Overlay ? (
-        <Overlay opening={opening} reducedMotion={reducedMotion} />
+      {opening ? (
+        Overlay ? (
+          <Overlay opening={opening} reducedMotion={reducedMotion} />
+        ) : (
+          <div
+            className="cc-content-opening"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            data-testid="content-opening-fallback"
+          >
+            <div className="cc-content-opening__panel">
+              <span className="cc-content-opening__dot" aria-hidden />
+              <p className="cc-content-opening__headline">
+                {opening.kind === 'project' ? 'Opening project' : 'Opening research'}
+              </p>
+              <p className="cc-content-opening__title">{opening.title}</p>
+            </div>
+          </div>
+        )
       ) : null}
     </ContentOpeningContext.Provider>
   );

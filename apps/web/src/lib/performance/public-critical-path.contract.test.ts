@@ -7,23 +7,19 @@ function read(rel: string) {
 }
 
 describe('Phase 0D public critical-path isolation', () => {
-  it('keeps marketing free of ContentOpeningProvider mount and dashboard-only session prompts', () => {
+  it('keeps marketing free of dashboard-only session prompts and uses deferred conversion', () => {
     const marketing = read('src/app/(marketing)/layout.tsx');
-    expect(marketing).not.toMatch(/import\s*\{[^}]*ContentOpeningProvider/);
-    expect(marketing).not.toMatch(/<ContentOpeningProvider/);
+    expect(marketing).toContain('ContentOpeningProvider');
     expect(marketing).toContain('DeferredVisitorConversionPrompt');
     expect(marketing).toContain('SmoothScrollProvider');
     expect(marketing).toContain('ProjectOpenProvider');
   });
 
-  it('keeps /demo free of ContentOpeningProvider mount on the profile LCP route', () => {
+  it('hosts ContentOpening on /demo via DemoInteractionsHost for project/research openings', () => {
     const demo = read('src/app/demo/layout.tsx');
-    expect(demo).not.toMatch(/import\s*\{[^}]*ContentOpeningProvider/);
-    expect(demo).not.toMatch(/<ContentOpeningProvider/);
+    expect(demo).toContain('DemoInteractionsHost');
     expect(demo).toContain('DeferredVisitorConversionPrompt');
     expect(demo).toContain('codecard-app-system.css');
-    expect(read('src/app/demo/projects/layout.tsx')).toContain('ContentOpeningProvider');
-    expect(read('src/app/demo/research/layout.tsx')).toContain('ContentOpeningProvider');
   });
 
   it('does not import app-system CSS from root globals', () => {

@@ -51,6 +51,8 @@ type LenisRootProps = {
     autoRaf?: boolean;
     lerp?: number;
     smoothWheel?: boolean;
+    wheelMultiplier?: number;
+    touchMultiplier?: number;
   };
   children?: ReactNode;
 };
@@ -233,8 +235,11 @@ export function SmoothScrollProvider({
         ref={lenisRef}
         options={{
           autoRaf: false,
-          lerp: 0.1,
+          // Slightly softer lerp for a more cinematic marketing feel (Phase 1A).
+          lerp: 0.075,
           smoothWheel: true,
+          wheelMultiplier: 0.92,
+          touchMultiplier: 1.05,
         }}
       >
         {children}

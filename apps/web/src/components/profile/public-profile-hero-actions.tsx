@@ -86,9 +86,10 @@ export function PublicProfileHeroActions({
         ) : null}
         <button
           type="button"
-          className="cc-app-btn cc-app-btn--primary !h-10"
+          className="cc-app-btn cc-app-btn--primary cc-copy-feedback !h-10"
           onClick={copyLink}
           aria-live="polite"
+          data-testid="profile-copy-link"
         >
           {copied ? 'Profile link copied' : 'Copy link'}
         </button>
@@ -97,13 +98,19 @@ export function PublicProfileHeroActions({
           className="cc-app-btn cc-app-btn--ghost !h-10"
           onClick={() => setQrOpen((o) => !o)}
           aria-expanded={qrOpen}
+          data-testid="profile-qr-toggle"
         >
           QR code
         </button>
       </div>
 
       {qrOpen ? (
-        <div className="flex max-w-full flex-col items-start rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5">
+        <div
+          className="cc-qr-modal mt-4 flex max-w-full flex-col items-start rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
+          role="dialog"
+          aria-label="Profile QR code"
+          data-testid="profile-qr-modal"
+        >
           <p className="cc-app-mono mb-3">Scan to open</p>
           <div className="grid h-40 w-40 max-w-full grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
             {Array.from({ length: 25 }).map((_, i) => (
