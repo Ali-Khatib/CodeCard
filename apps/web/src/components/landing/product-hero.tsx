@@ -1,7 +1,16 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
-import { ProductHeroDecorations } from './product-hero-decorations';
+
+/** Decorative island — keep float-icon client JS out of the LCP text chunk. */
+const ProductHeroDecorations = dynamic(
+  () =>
+    import('./product-hero-decorations').then((m) => ({
+      default: m.ProductHeroDecorations,
+    })),
+  { ssr: true, loading: () => null },
+);
 
 /**
  * Landing hero — Server Component so the LCP headline is in the initial HTML

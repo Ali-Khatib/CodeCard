@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { enforceGlobalAdminAccess } from '@/lib/security/admin-route-gate';
 import { ThemeRoot } from '@/components/theme/theme-root';
+import '@/styles/codecard-app-system.css';
 
 /**
  * WS11-T002 — Server-side global-admin gate for the whole `/admin` tree.

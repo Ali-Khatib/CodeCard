@@ -18,9 +18,14 @@ describe('site-wide visitor conversion prompt contract', () => {
 
     // Public `/[slug]` must not inherit this client island (WS14-T019).
     expect(root).not.toContain('SitewideVisitorConversionPrompt');
-    expect(marketing).toContain('SitewideVisitorConversionPrompt');
-    expect(dashboard).toContain('SitewideVisitorConversionPrompt');
-    expect(demo).toContain('SitewideVisitorConversionPrompt');
+    expect(root).not.toContain('DeferredVisitorConversionPrompt');
+    // Layouts mount the idle-deferred shell; the prompt itself loads after paint.
+    expect(marketing).toContain('DeferredVisitorConversionPrompt');
+    expect(dashboard).toContain('DeferredVisitorConversionPrompt');
+    expect(demo).toContain('DeferredVisitorConversionPrompt');
+    expect(marketing).not.toContain('SitewideVisitorConversionPrompt');
+    expect(dashboard).not.toContain('SitewideVisitorConversionPrompt');
+    expect(demo).not.toContain('SitewideVisitorConversionPrompt');
     expect(component).toContain('startVisibleDelay');
     expect(component).not.toContain('8000');
     expect(core).toContain('VISITOR_CONVERSION_DELAY_MS = 8_000');

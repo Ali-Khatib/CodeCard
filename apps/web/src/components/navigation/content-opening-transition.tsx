@@ -9,17 +9,16 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type ComponentType,
   type MouseEvent,
   type ReactNode,
 } from 'react';
-import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import {
   CONTENT_OPENING_FAILSAFE_MS,
   CONTENT_OPENING_MIN_MS,
-  contentOpeningHeadline,
   contentOpeningMatchesPath,
   contentOpeningTitle,
   resolveContentOpeningKind,
@@ -45,53 +44,17 @@ type ContentOpeningContextValue = {
 
 const ContentOpeningContext = createContext<ContentOpeningContextValue | null>(null);
 
-function ContentOpeningOverlay({
-  opening,
-  reducedMotion,
-}: {
+type OverlayProps = {
   opening: ContentOpeningState;
   reducedMotion: boolean | null;
-}) {
-  const headline = contentOpeningHeadline(opening.kind);
-  const title = contentOpeningTitle(opening.kind, opening.title);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return createPortal(
-    <motion.div
-      className="cc-content-opening"
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-      initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
-      transition={{ duration: reducedMotion ? 0.12 : 0.22, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="cc-content-opening__panel">
-        {!reducedMotion ? (
-          <span className="cc-content-opening__spinner" aria-hidden />
-        ) : (
-          <span className="cc-content-opening__dot" aria-hidden />
-        )}
-        <p className="cc-content-opening__headline">{headline}</p>
-        <p className="cc-content-opening__title">{title}</p>
-      </div>
-    </motion.div>,
-    document.body,
-  );
-}
+};
 
 export function ContentOpeningProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const reducedMotion = useReducedMotion();
   const [opening, setOpening] = useState<ContentOpeningState | null>(null);
+  const [Overlay, setOverlay] = useState<ComponentType<OverlayProps> | null>(null);
   const startedAtRef = useRef(0);
   const pendingHrefRef = useRef<string | null>(null);
   const clearTimerRef = useRef<number | null>(null);
@@ -167,6 +130,17 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!opening || Overlay) return;
+    let cancelled = false;
+    void import('./content-opening-overlay').then((mod) => {
+      if (!cancelled) setOverlay(() => mod.ContentOpeningOverlayLazy);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [opening, Overlay]);
+
   const value = useMemo(
     () => ({
       opening,
@@ -180,8 +154,8 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
   return (
     <ContentOpeningContext.Provider value={value}>
       {children}
-      {opening ? (
-        <ContentOpeningOverlay opening={opening} reducedMotion={reducedMotion} />
+      {opening && Overlay ? (
+        <Overlay opening={opening} reducedMotion={reducedMotion} />
       ) : null}
     </ContentOpeningContext.Provider>
   );

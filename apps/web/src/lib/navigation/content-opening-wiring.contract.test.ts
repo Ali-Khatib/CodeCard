@@ -20,10 +20,12 @@ describe('content opening wiring', () => {
     expect(helpers).toContain("'Opening research'");
 
     const transition = read('src/components/navigation/content-opening-transition.tsx');
-    expect(transition).toContain('aria-live="polite"');
+    const overlay = read('src/components/navigation/content-opening-overlay.tsx');
+    expect(overlay).toContain('aria-live="polite"');
     expect(transition).toContain('useReducedMotion');
     expect(transition).toContain('CONTENT_OPENING_FAILSAFE_MS');
     expect(transition).toContain('shouldInterceptContentOpeningClick');
+    expect(transition).toContain("import('./content-opening-overlay')");
 
     expect(read('src/components/research/research-paper-card.tsx')).toContain('ContentOpeningLink');
     expect(read('src/components/dashboard/projects-bubble-grid.tsx')).toContain('ContentOpeningLink');

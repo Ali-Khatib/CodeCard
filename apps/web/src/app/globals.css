@@ -5293,4 +5293,4 @@ select,
   }
 }
 
-@import '../styles/codecard-app-system.css';
+/* codecard-app-system.css is route-split: imported by demo, [slug], dashboard, and admin layouts. */

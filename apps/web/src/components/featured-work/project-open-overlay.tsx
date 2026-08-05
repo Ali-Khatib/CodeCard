@@ -7,22 +7,16 @@ import {
   useEffect,
   useRef,
   useState,
+  type ComponentType,
   type ReactNode,
 } from 'react';
-import { createPortal } from 'react-dom';
-import { motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import {
   normalizeProjectPath,
   setOptimisticProject,
 } from '@/lib/navigation/optimistic-project';
-import { ProjectMedia } from '@/components/profile/project-media';
-import { ProjectDetailView } from './project-detail-view';
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-const EXPAND_MS = 520;
-const CROSSFADE_MS = 320;
 const REVEAL_FALLBACK_MS = 480;
 
 interface OpenBounds {
@@ -59,112 +53,14 @@ interface ProjectOpenContextValue {
 
 const ProjectOpenContext = createContext<ProjectOpenContextValue | null>(null);
 
-function ProjectOpenOverlay({
-  project,
-  bounds,
-  phase,
-  onExpandComplete,
-  onRevealComplete,
-}: {
+type UnderlayProps = {
   project: FeaturedProject;
   bounds: OpenBounds;
   phase: 'expanding' | 'revealing';
+  meta: ProjectOpenMeta;
   onExpandComplete: () => void;
   onRevealComplete: () => void;
-}) {
-  const phaseRef = useRef(phase);
-  const expandDoneRef = useRef(false);
-  const revealDoneRef = useRef(false);
-  phaseRef.current = phase;
-
-  const target = {
-    top: 0,
-    left: 0,
-    width: typeof window !== 'undefined' ? window.innerWidth : bounds.width,
-    height: typeof window !== 'undefined' ? window.innerHeight : bounds.height,
-  };
-
-  const isRevealing = phase === 'revealing';
-
-  return createPortal(
-    <>
-      <motion.div
-        className="fixed inset-0 z-[201] bg-void-canvas/70 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isRevealing ? 0 : 1 }}
-        transition={{ duration: isRevealing ? CROSSFADE_MS / 1000 : 0.22, ease: EASE }}
-        aria-hidden
-      />
-      <motion.div
-        className="fixed z-[202] overflow-hidden bg-canvas"
-        initial={{
-          top: bounds.top,
-          left: bounds.left,
-          width: bounds.width,
-          height: bounds.height,
-          borderRadius: 12,
-          opacity: 1,
-        }}
-        animate={{
-          top: isRevealing ? target.top : target.top,
-          left: isRevealing ? target.left : target.left,
-          width: target.width,
-          height: target.height,
-          borderRadius: isRevealing ? 0 : 0,
-          opacity: isRevealing ? 0 : 1,
-        }}
-        transition={{
-          duration: isRevealing ? CROSSFADE_MS / 1000 : EXPAND_MS / 1000,
-          ease: EASE,
-        }}
-        onAnimationComplete={() => {
-          if (phaseRef.current === 'expanding' && !expandDoneRef.current) {
-            expandDoneRef.current = true;
-            onExpandComplete();
-          }
-          if (phaseRef.current === 'revealing' && !revealDoneRef.current) {
-            revealDoneRef.current = true;
-            onRevealComplete();
-          }
-        }}
-        role="presentation"
-        aria-hidden
-        style={{ pointerEvents: isRevealing ? 'none' : 'auto' }}
-      >
-        {project.posterUrl && (
-          <ProjectMedia
-            src={project.posterUrl}
-            priority
-            className="absolute inset-0 h-full w-full object-cover object-top"
-          />
-        )}
-        {project.videoUrl && (
-          <video
-            src={project.videoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover object-top"
-          />
-        )}
-        <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.88)_0%,rgba(5,3,15,0.58)_54%,transparent_100%)] p-8 md:p-12">
-          <div className="max-w-[680px] rounded-[24px] border border-white/22 bg-black/48 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.38)] backdrop-blur-md">
-            <h2 className="cc-fit-title font-display text-[clamp(1.75rem,6vw,2.75rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)]">
-              {project.title}
-            </h2>
-            {project.tagline && (
-              <p className="mt-2 text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
-                {project.tagline}
-              </p>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </>,
-    document.body,
-  );
-}
+};
 
 function useProjectOpenState() {
   const router = useRouter();
@@ -256,34 +152,38 @@ function useProjectOpenState() {
   };
 }
 
+/**
+ * Thin provider shell — motion + ProjectDetailView load only when a project opens.
+ */
 export function ProjectOpenProvider({ children }: { children: ReactNode }) {
   const { opening, phase, open, close, handleExpandComplete, showUnderlay } =
     useProjectOpenState();
+  const [Underlay, setUnderlay] = useState<ComponentType<UnderlayProps> | null>(null);
+
+  useEffect(() => {
+    if (!opening || Underlay) return;
+    let cancelled = false;
+    void import('./project-open-underlay').then((mod) => {
+      if (!cancelled) setUnderlay(() => mod.ProjectOpenUnderlay);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [opening, Underlay]);
 
   return (
     <ProjectOpenContext.Provider value={{ opening, open, close }}>
       {children}
-      {opening && showUnderlay && (
-        <div className="fixed inset-0 z-[200] overflow-y-auto bg-void-canvas">
-          <ProjectDetailView
-            project={opening.project}
-            profileSlug={opening.meta.profileSlug}
-            displayName={opening.meta.displayName}
-            accentColor={opening.meta.accentColor}
-            projects={opening.meta.projects}
-            transitionHandoff
-          />
-        </div>
-      )}
-      {opening && (
-        <ProjectOpenOverlay
+      {opening && showUnderlay && Underlay ? (
+        <Underlay
           project={opening.project}
           bounds={opening.bounds}
           phase={phase}
+          meta={opening.meta}
           onExpandComplete={handleExpandComplete}
           onRevealComplete={close}
         />
-      )}
+      ) : null}
     </ProjectOpenContext.Provider>
   );
 }

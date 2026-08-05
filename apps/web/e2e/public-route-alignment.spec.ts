@@ -19,7 +19,7 @@ test.describe('Phase 0A public route alignment', () => {
   test('/dashboard/preview remains the workspace preview', async ({ page }) => {
     await page.goto('/dashboard/preview', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard\/preview\/?$/);
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
     await expect(page.getByRole('navigation').or(page.locator('[data-testid*="sidebar"]')).first()).toBeVisible();
   });
 
