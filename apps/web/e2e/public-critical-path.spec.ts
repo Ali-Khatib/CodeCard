@@ -34,7 +34,8 @@ test.describe('Phase 0D public critical rendering path', () => {
     // Bio is server-rendered profile copy (class utilities may shift; assert content).
     expect(html).toMatch(/I ship tools that help teams move faster/);
 
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    // Greeting heading is visible at every viewport; the sidebar summary collapses on mobile.
+    await expect(page.locator('h1.cc-profile-home__title')).toBeVisible();
     expect(errors.filter((e) => /hydration/i.test(e))).toEqual([]);
   });
 
