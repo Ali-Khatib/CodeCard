@@ -1,7 +1,9 @@
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
+import { MagneticCta } from '@/components/interactions/magnetic-cta';
+import { CtaArrow } from '@/components/interactions/glow-press';
+import { ProductHeroInteractions } from './product-hero-interactions';
 
 /** Decorative island — keep float-icon client JS out of the LCP text chunk. */
 const ProductHeroDecorations = dynamic(
@@ -15,6 +17,7 @@ const ProductHeroDecorations = dynamic(
 /**
  * Landing hero — Server Component so the LCP headline is in the initial HTML
  * without a client boundary wrapping the text (Phase 0C).
+ * Interactions are client islands; headline never starts hidden.
  */
 export function ProductHero() {
   return (
@@ -23,6 +26,7 @@ export function ProductHero() {
       data-testid="hero-section"
     >
       <div className="cc-hume-hero__blobs pointer-events-none" aria-hidden />
+      <ProductHeroInteractions />
 
       <ProductHeroDecorations />
 
@@ -43,10 +47,14 @@ export function ProductHero() {
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3" data-hero-cta>
-          <Link href="/sign-up" className="cc-btn-pill-primary cc-instant-press h-11 px-8 text-[15px]">
-            Start free →
-          </Link>
-          <LiveDemoLink className="cc-btn-pill-ghost cc-instant-press h-11 px-8 text-[15px]">
+          <MagneticCta
+            href="/sign-up"
+            className="cc-btn-pill-primary h-11 px-8 text-[15px]"
+            data-testid="hero-primary-cta"
+          >
+            Start free <CtaArrow />
+          </MagneticCta>
+          <LiveDemoLink className="cc-btn-pill-ghost cc-btn-glow cc-instant-press h-11 px-8 text-[15px]">
             Live demo
           </LiveDemoLink>
         </div>

@@ -5196,4 +5196,287 @@ select,
   }
 }
 
+/* ── Phase 1A premium interactions (CSS-owned hover/press/ambient) ── */
+.cc-btn-glow,
+.cc-btn-glow-shell {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.cc-btn-glow::after,
+.cc-btn-glow-shell::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    120px circle at var(--glow-x) var(--glow-y),
+    color-mix(in srgb, var(--iris, #c094e4) 55%, transparent),
+    transparent 70%
+  );
+  transition: opacity 0.25s ease;
+  z-index: 0;
+}
+
+.cc-btn-glow:hover::after,
+.cc-btn-glow[data-glow-active='true']::after,
+.cc-btn-glow-shell:hover::after,
+.cc-btn-glow-shell[data-glow-active='true']::after {
+  opacity: 0.85;
+}
+
+.cc-btn-glow > *,
+.cc-btn-glow-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cc-cta-arrow {
+  display: inline-block;
+  transition: transform 0.22s ease;
+}
+
+.cc-magnetic-cta:hover .cc-cta-arrow,
+.cc-btn-pill-primary:hover .cc-cta-arrow,
+.cc-btn-pill-demo:hover .cc-cta-arrow,
+a:hover > .cc-cta-arrow {
+  transform: translateX(3px);
+}
+
+.cc-instant-press:active {
+  transform: scale(0.97);
+}
+
+.cc-hero-ambient-light {
+  --hero-light-x: 50%;
+  --hero-light-y: 40%;
+  background: radial-gradient(
+    42% 36% at var(--hero-light-x) var(--hero-light-y),
+    color-mix(in srgb, var(--iris, #c094e4) 22%, transparent),
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.cc-hero-ambient-light[data-active='true'] {
+  opacity: 1;
+}
+
+.cc-interactive-card {
+  --spot-x: 50%;
+  --spot-y: 40%;
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.cc-interactive-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  background: radial-gradient(
+    280px circle at var(--spot-x) var(--spot-y),
+    color-mix(in srgb, var(--iris, #c094e4) 16%, transparent),
+    transparent 65%
+  );
+  transition: opacity 0.25s ease;
+}
+
+.cc-interactive-card[data-spot-active='true']::before {
+  opacity: 1;
+}
+
+.cc-interactive-card--lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(35, 35, 36, 0.08);
+}
+
+.cc-interactive-card [data-card-media] {
+  transition: transform 0.35s ease-out;
+  will-change: transform;
+}
+
+.cc-chip-react {
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.cc-chip-react:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--iris, #c094e4) 40%, var(--app-border, #e5e0d8));
+}
+
+.cc-app-project-card .cc-app-tech-tag.cc-chip-react {
+  cursor: default;
+}
+
+
+.cc-nav-ghost-link {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.12s ease;
+}
+
+.cc-nav-ghost-link:hover {
+  transform: translateY(-1px);
+}
+
+.cc-landing-closing--ambient {
+  position: relative;
+}
+
+.cc-landing-closing--ambient::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  border-radius: 40px;
+  background: radial-gradient(
+    55% 50% at 50% 40%,
+    color-mix(in srgb, var(--iris, #c094e4) 14%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: cc-closing-ambient 7s ease-in-out infinite alternate;
+}
+
+@keyframes cc-closing-ambient {
+  from {
+    opacity: 0.55;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.cc-copy-feedback.cc-copy-success,
+.cc-copy-feedback:has(:is([aria-live] )) {
+  /* success state driven by text swap + brief scale */
+}
+
+.cc-copy-feedback {
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+button.cc-copy-feedback:active {
+  transform: scale(0.97);
+}
+
+.cc-qr-modal {
+  animation: cc-qr-enter 0.28s ease-out;
+  transform-origin: top left;
+}
+
+@keyframes cc-qr-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cc-demo-hero-enter {
+  animation: cc-demo-hero-enter 0.55s ease-out;
+}
+
+@keyframes cc-demo-hero-enter {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.cc-demo-progress {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateY(-50%);
+}
+
+.cc-demo-progress__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-ink, #232324) 22%, transparent);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    height 0.2s ease;
+}
+
+.cc-demo-progress__dot--active {
+  background: var(--app-iris, #c094e4);
+  height: 18px;
+}
+
+@media (max-width: 900px) {
+  .cc-demo-progress {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-hero-ambient-light,
+  .cc-landing-closing--ambient::before,
+  .cc-interactive-card--lift:hover,
+  .cc-cta-arrow,
+  .cc-demo-hero-enter,
+  .cc-qr-modal,
+  .cc-closing-ambient {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .cc-interactive-card::before,
+  .cc-btn-glow::after,
+  .cc-btn-glow-shell::after {
+    display: none;
+  }
+
+  .cc-interactive-card [data-card-media] {
+    transform: none !important;
+  }
+
+  .cc-demo-progress--static .cc-demo-progress__dot--active {
+    height: 8px;
+  }
+
+  .cc-visitor-prompt {
+    animation: none !important;
+  }
+
+  .cc-visitor-prompt-fade {
+    animation: none !important;
+  }
+}
+
 /* codecard-app-system.css is route-split: imported by demo, [slug], dashboard, and admin layouts. */

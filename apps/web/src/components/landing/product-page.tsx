@@ -6,6 +6,7 @@ import { HumeStatStrip } from './hume-stat-strip';
 import { AuroraDivider } from './aurora-divider';
 import { SectionCounter } from './section-counter';
 import { TYPE } from '@/lib/design/tokens';
+import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
 
 /** Below-fold islands — keep initial `/` JS free of their client graphs until needed. */
 const WorkspaceShowcase = dynamic(
@@ -92,10 +93,12 @@ export function ProductPage() {
                 },
               ].map((card) => (
                 <ScrollReveal key={card.title}>
-                  <article className="cc-surface-card h-full p-6">
-                    <h3 className="font-display text-[24px] tracking-[-0.03em] text-ink">{card.title}</h3>
+                  <InteractiveSurfaceCard className="cc-surface-card h-full p-6" parallax={false}>
+                    <h3 className="font-display text-[24px] tracking-[-0.03em] text-ink" data-enter-item>
+                      {card.title}
+                    </h3>
                     <p className="mt-3 text-[15px] leading-relaxed text-lichen">{card.body}</p>
-                  </article>
+                  </InteractiveSurfaceCard>
                 </ScrollReveal>
               ))}
             </div>

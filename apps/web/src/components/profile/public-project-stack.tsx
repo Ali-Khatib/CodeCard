@@ -5,6 +5,8 @@ import { useState } from 'react';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import { trackLinkClick } from '@/lib/analytics/link-click';
+import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
 
 function descriptionParts(description: string | null): { lead: string | null; rest: string[] } {
   if (!description) return { lead: null, rest: [] };
@@ -16,17 +18,20 @@ type PublicProjectStackProps = {
   projects: FeaturedProject[];
   displayName: string;
   profileId?: string;
+  profileSlug?: string;
   demoViews?: Record<string, { views: number; saves: number }>;
 };
 
-/** Public project cards without motion/framer — keeps LCP render-delay low (WS14-T019). */
+/** Public project cards with restrained interactions (Phase 1A). */
 export function PublicProjectStack({
   projects,
   displayName,
   profileId,
+  profileSlug = 'demo',
   demoViews,
 }: PublicProjectStackProps) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const base = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
 
   return (
     <div className="flex flex-col gap-8">
@@ -39,27 +44,44 @@ export function PublicProjectStack({
         const { lead, rest } = descriptionParts(project.description);
         const views = demoViews?.[project.id]?.views ?? 280 + index * 40;
         const saves = demoViews?.[project.id]?.saves ?? 24 + index * 8;
+        const detailHref = `${base}/projects/${project.id}`;
 
         return (
-          <article
+          <InteractiveSurfaceCard
             key={project.id}
             className={`cc-app-project-card ${isOpen ? 'cc-app-project-card--open' : ''}`}
+            parallax
+            lift
           >
-            <div className="cc-app-project-card__media cc-app-project-card__media--public">
+            <ContentOpeningLink
+              href={detailHref}
+              kind="project"
+              itemTitle={project.title}
+              className="cc-app-project-card__media cc-app-project-card__media--public group relative block outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+              aria-label={`Open project: ${project.title}`}
+            >
               {project.posterUrl ? (
                 <Image
                   src={project.posterUrl}
                   alt=""
                   fill
                   loading="lazy"
+                  data-card-media
                   className="cc-app-project-card__media-inner"
                   sizes="(max-width: 920px) 100vw, 920px"
                 />
               ) : null}
-            </div>
+            </ContentOpeningLink>
 
             <div className="cc-app-project-card__body">
-              <h3 className="cc-fit-title cc-work-title break-words">{project.title}</h3>
+              <ContentOpeningLink
+                href={detailHref}
+                kind="project"
+                itemTitle={project.title}
+                className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+              >
+                <h3 className="cc-fit-title cc-work-title break-words">{project.title}</h3>
+              </ContentOpeningLink>
               {project.tagline ? (
                 <p className="mt-2 break-words text-[16px] text-[var(--app-ink)]">{project.tagline}</p>
               ) : null}
@@ -72,7 +94,7 @@ export function PublicProjectStack({
               {project.technologies.length > 0 ? (
                 <div className="mt-5 flex flex-wrap gap-2">
                   {project.technologies.slice(0, 6).map((tech) => (
-                    <span key={tech} className="cc-app-tech-tag">
+                    <span key={tech} className="cc-app-tech-tag cc-chip-react">
                       {tech}
                     </span>
                   ))}
@@ -85,12 +107,20 @@ export function PublicProjectStack({
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
+                <ContentOpeningLink
+                  href={detailHref}
+                  kind="project"
+                  itemTitle={project.title}
+                  className="cc-app-btn cc-app-btn--primary"
+                >
+                  View project
+                </ContentOpeningLink>
                 <button
                   type="button"
-                  className="cc-app-btn cc-app-btn--primary"
+                  className="cc-app-btn cc-app-btn--ghost"
                   onClick={() => setOpenId(isOpen ? null : project.id)}
                 >
-                  {isOpen ? 'Close project' : 'Open project'}
+                  {isOpen ? 'Hide details' : 'Quick details'}
                 </button>
                 {liveUrl && liveLink ? (
                   <a
@@ -165,7 +195,7 @@ export function PublicProjectStack({
                 </div>
               ) : null}
             </div>
-          </article>
+          </InteractiveSurfaceCard>
         );
       })}
     </div>

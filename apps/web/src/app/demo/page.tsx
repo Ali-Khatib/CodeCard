@@ -1,6 +1,7 @@
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
 import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
+import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 export const dynamic = 'force-static';
@@ -29,6 +30,7 @@ export default function DemoPage() {
         bio={DEMO_PROFILE.bio}
         links={links}
         projects={projects}
+        researchPapers={DEMO_RESEARCH_PAPERS}
         location={DEMO_PROFILE.location}
       />
     </>

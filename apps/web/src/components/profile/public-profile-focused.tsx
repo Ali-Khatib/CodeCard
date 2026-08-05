@@ -72,7 +72,10 @@ export function PublicProfileFocused({
         tabIndex={-1}
         className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
       >
-        <header className="cc-app-profile-preview cc-app-profile-preview--hero pb-[min(36vh,18rem)]">
+        <header
+          id="profile-hero"
+          className="cc-app-profile-preview cc-app-profile-preview--hero cc-demo-hero-enter pb-[min(36vh,18rem)]"
+        >
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <div className="relative h-[96px] w-[96px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
@@ -125,7 +128,7 @@ export function PublicProfileFocused({
           </div>
         </header>
 
-        <section className="mt-16">
+        <section id="projects" className="mt-16">
           <p className="cc-app-mono">Featured work</p>
           <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
             What {firstName} built
@@ -140,6 +143,7 @@ export function PublicProfileFocused({
                 projects={projects}
                 displayName={displayName}
                 profileId={profileId}
+                profileSlug={profileSlug}
               />
             ) : (
               <div className="cc-app-card text-center">

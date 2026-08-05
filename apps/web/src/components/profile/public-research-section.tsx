@@ -27,7 +27,11 @@ export function PublicResearchSection({
           <ResearchPaperCard
             key={paper.id}
             paper={paper}
-            href={`/${profileSlug}/research/${paper.slug}`}
+            href={
+              profileSlug === 'demo'
+                ? `/demo/research/${paper.slug}`
+                : `/${profileSlug}/research/${paper.slug}`
+            }
             profileId={profileId}
             delay={index * HUME_MOTION.stagger}
           />
