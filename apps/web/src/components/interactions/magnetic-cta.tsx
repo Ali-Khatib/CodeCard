@@ -2,14 +2,16 @@
 
 import {
   useCallback,
+  useEffect,
   useRef,
-  useState,
   type ComponentPropsWithoutRef,
+  type CSSProperties,
+  type MouseEvent,
   type ReactNode,
 } from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'motion/react';
-import { MOTION_LIMITS, MOTION_SPRING } from '@/components/motion/motion-tokens';
+import { useReducedMotion } from 'motion/react';
+import { MOTION_LIMITS } from '@/components/motion/motion-tokens';
 
 type MagneticCtaProps = {
   href: string;
@@ -21,48 +23,80 @@ type MagneticCtaProps = {
 } & Omit<ComponentPropsWithoutRef<typeof Link>, 'href' | 'children' | 'className'>;
 
 /**
- * Primary CTA with Motion-owned magnetic pull on fine pointers.
- * Keyboard / touch: no offset — native link behavior.
+ * Primary CTA with magnetic pull on fine pointers.
+ * Offset updates through rAF + CSS vars; keyboard / touch keep native link behavior.
  */
 export function MagneticCta({
   href,
   children,
   className = '',
-  strength = 14,
+  strength = 12,
   ...rest
 }: MagneticCtaProps) {
   const reduced = useReducedMotion();
-  const ref = useRef<HTMLAnchorElement>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef(0);
+  const targetRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const flush = useCallback(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const { x, y } = targetRef.current;
+    shell.style.setProperty('--mag-x', `${x}px`);
+    shell.style.setProperty('--mag-y', `${y}px`);
+  }, []);
 
   const onMove = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
+    (e: MouseEvent<HTMLAnchorElement>) => {
       if (reduced) return;
       if (typeof window === 'undefined' || !window.matchMedia('(pointer: fine)').matches) return;
-      const el = ref.current;
+      const el = linkRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * strength;
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * strength;
-      setOffset({ x, y });
+      targetRef.current = {
+        x: ((e.clientX - rect.left) / rect.width - 0.5) * strength,
+        y: ((e.clientY - rect.top) / rect.height - 0.5) * strength,
+      };
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(flush);
     },
-    [reduced, strength],
+    [flush, reduced, strength],
   );
 
-  const onLeave = useCallback(() => setOffset({ x: 0, y: 0 }), []);
+  const onLeave = useCallback(() => {
+    targetRef.current = { x: 0, y: 0 };
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(flush);
+  }, [flush]);
 
   return (
-    <motion.div
-      className="inline-flex"
-      animate={reduced ? undefined : { x: offset.x, y: offset.y }}
-      transition={MOTION_SPRING.snappy}
-      style={{ willChange: reduced ? undefined : 'transform' }}
+    <div
+      ref={shellRef}
+      className="cc-magnetic-shell inline-flex"
+      style={
+        reduced
+          ? undefined
+          : ({
+              '--mag-x': '0px',
+              '--mag-y': '0px',
+              transform: 'translate3d(var(--mag-x), var(--mag-y), 0)',
+              transition: 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)',
+              willChange: 'transform',
+            } as CSSProperties)
+      }
+      data-motion-pattern="button-magnetic"
     >
       <Link
-        ref={ref}
+        ref={linkRef}
         href={href}
         className={`cc-magnetic-cta cc-btn-glow cc-instant-press ${className}`.trim()}
-        data-motion-pattern="button-magnetic"
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         {...rest}
@@ -71,28 +105,40 @@ export function MagneticCta({
           {children}
         </span>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
 /** Apply pointer-reactive border glow via CSS variables (fine pointer only). */
 export function usePointerGlow(disabled?: boolean) {
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   const onMove = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
+    (e: MouseEvent<HTMLElement>) => {
       if (disabled) return;
       if (typeof window === 'undefined' || !window.matchMedia('(pointer: fine)').matches) return;
       const el = e.currentTarget;
       const rect = el.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
-      el.style.setProperty('--glow-x', `${x}%`);
-      el.style.setProperty('--glow-y', `${y}%`);
-      el.dataset.glowActive = 'true';
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        el.style.setProperty('--glow-x', `${x}%`);
+        el.style.setProperty('--glow-y', `${y}%`);
+        el.dataset.glowActive = 'true';
+      });
     },
     [disabled],
   );
 
-  const onLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  const onLeave = useCallback((e: MouseEvent<HTMLElement>) => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     e.currentTarget.dataset.glowActive = 'false';
   }, []);
 

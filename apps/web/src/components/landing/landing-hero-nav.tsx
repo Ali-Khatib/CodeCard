@@ -23,11 +23,12 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuTrackRef = useRef<HTMLDivElement>(null);
   const hoverLineRef = useRef<HTMLDivElement>(null);
+  const activeLineRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [hovered, setHovered] = useState<number | null>(null);
 
   const isActive = useCallback(
-    (href: string, label: string) => {
+    (href: string, _label: string) => {
       if (href === MARKETING_HOME_HREF) {
         return (
           pathname === MARKETING_HOME_HREF ||
@@ -69,15 +70,39 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     [activeIndex],
   );
 
+  const moveActiveLine = useCallback(() => {
+    const line = activeLineRef.current;
+    const track = menuTrackRef.current;
+    if (!line || !track) return;
+    if (activeIndex < 0) {
+      line.style.opacity = '0';
+      return;
+    }
+    const el = itemRefs.current[activeIndex];
+    if (!el) return;
+    const trackRect = track.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    line.style.opacity = '1';
+    line.style.left = `${rect.left - trackRect.left}px`;
+    line.style.width = `${rect.width}px`;
+  }, [activeIndex]);
+
   useEffect(() => {
     moveHoverLine(hovered);
   }, [hovered, moveHoverLine]);
 
   useEffect(() => {
-    const onResize = () => moveHoverLine(hovered);
+    moveActiveLine();
+  }, [moveActiveLine]);
+
+  useEffect(() => {
+    const onResize = () => {
+      moveHoverLine(hovered);
+      moveActiveLine();
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [hovered, moveHoverLine]);
+  }, [hovered, moveHoverLine, moveActiveLine]);
 
   return (
     <nav className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
@@ -93,6 +118,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         </Link>
 
         <div ref={menuTrackRef} className="relative hidden md:flex">
+          <div ref={activeLineRef} className="cc-nav-active-underline" aria-hidden />
           <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
           <ul className="cc-hume-fade-group flex items-center gap-1">
             {items.map((item, i) => {

@@ -38,8 +38,8 @@ export const MOTION_SCROLL = {
 } as const;
 
 export const MOTION_LIMITS = {
-  parallaxMaxPx: 24,
-  cardTiltMaxDeg: 6,
+  parallaxMaxPx: 18,
+  cardTiltMaxDeg: 4,
   hoverScaleMax: 1.02,
   pressScale: 0.98,
   revealY: 28,
@@ -47,6 +47,13 @@ export const MOTION_LIMITS = {
   opacityMin: 0,
   opacityMax: 1,
   mobileReduction: 0.6,
+} as const;
+
+/** Shared feedback durations (Motion-owned success / loading). */
+export const MOTION_FEEDBACK = {
+  successMs: 1600,
+  loadingPulse: 1.1,
+  pressMs: 120,
 } as const;
 
 export const MOTION_OVERLAY = {

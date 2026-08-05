@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { cn } from '@/lib/utils';
+import { MOTION_FEEDBACK } from '@/components/motion/motion-tokens';
 
 interface ThemeToggleProps {
   className?: string;
@@ -11,17 +12,25 @@ interface ThemeToggleProps {
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const [isDark, setIsDark] = useState(false);
+  const [justChanged, setJustChanged] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const dark = readDarkPreference();
     applyDarkMode(dark);
     setIsDark(dark);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const toggle = () => {
     const next = !isDark;
     setIsDark(next);
     applyDarkMode(next);
+    setJustChanged(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setJustChanged(false), MOTION_FEEDBACK.successMs);
   };
 
   return (
@@ -31,6 +40,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         isDark
           ? 'border border-zinc-800 bg-zinc-950'
           : 'border border-[var(--app-border)] bg-[var(--app-paper)]',
+        justChanged && 'ring-2 ring-[var(--app-iris)]',
         className,
       )}
       onClick={toggle}
@@ -43,6 +53,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       role="button"
       tabIndex={0}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-live="polite"
+      data-theme-success={justChanged ? 'true' : 'false'}
+      data-testid="theme-toggle"
     >
       <div className="flex w-full items-center justify-between">
         <div
@@ -70,6 +83,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
           )}
         </div>
       </div>
+      <span className="sr-only">{justChanged ? (isDark ? 'Dark mode on' : 'Light mode on') : null}</span>
     </div>
   );
 }
