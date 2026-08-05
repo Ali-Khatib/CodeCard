@@ -76,7 +76,7 @@ describe('WS15-T005 collections schema hardening', () => {
       'utf8',
     );
     const preview = readFileSync(
-      resolve(process.cwd(), 'src/app/dashboard/preview/connections/page.tsx'),
+      resolve(process.cwd(), 'src/app/demo/(workspace)/connections/page.tsx'),
       'utf8',
     );
 

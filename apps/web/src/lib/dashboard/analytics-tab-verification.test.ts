@@ -46,10 +46,10 @@ describe('WS09-T006 real analytics tab', () => {
     expect(buildUtcRangeWindow(7, now).dayKeys).toHaveLength(7);
     expect(buildUtcRangeWindow(30, now).dayKeys).toHaveLength(30);
 
-    expect(existsSync(resolve(process.cwd(), 'src/app/dashboard/preview/analytics/page.tsx'))).toBe(
+    expect(existsSync(resolve(process.cwd(), 'src/app/demo/(workspace)/analytics/page.tsx'))).toBe(
       true,
     );
-    const preview = read('src/app/dashboard/preview/analytics/page.tsx');
+    const preview = read('src/app/demo/(workspace)/analytics/page.tsx');
     expect(preview).toContain('PreviewAnalyticsView');
     expect(preview).not.toContain('loadOwnerAnalytics');
   });

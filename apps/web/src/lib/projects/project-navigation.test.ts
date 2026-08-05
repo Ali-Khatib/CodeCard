@@ -145,7 +145,7 @@ describe('getAdjacentProjects', () => {
       `/alex-chen/projects/${PROJECT_A.id}`,
     );
     expect(buildPublicProjectDetailHref('demo', PROJECT_A.id)).toBe(
-      `/demo/projects/${PROJECT_A.id}`,
+      `/demo/card/projects/${PROJECT_A.id}`,
     );
   });
 });

@@ -1,13 +1,31 @@
 import { LIVE_DEMO_ENTRY_HREF } from '@/lib/marketing/site-routes';
 
-/** Signed-out workspace demo — dashboard preview with sidebar */
-export const LIVE_DEMO_WORKSPACE_HREF = '/dashboard/preview';
+/** Signed-out workspace demo — full dashboard preview with sidebar (canonical live demo). */
+export const LIVE_DEMO_WORKSPACE_HREF = LIVE_DEMO_ENTRY_HREF;
 
-/** Public profile demo — visitor-facing CodeCard page */
-export const LIVE_DEMO_PROFILE_HREF = LIVE_DEMO_ENTRY_HREF;
+/** Public profile demo — visitor-facing Alex Chen CodeCard page. */
+export const LIVE_DEMO_PROFILE_HREF = '/demo/card';
 
-/** Default live demo entry (public profile) */
-export const LIVE_DEMO_HREF = LIVE_DEMO_PROFILE_HREF;
+/** Default live demo entry (workspace). */
+export const LIVE_DEMO_HREF = LIVE_DEMO_WORKSPACE_HREF;
 
-/** Legacy path kept for redirects and link recognition. */
-export const LIVE_DEMO_PROFILE_LEGACY_HREF = '/demo/card';
+/** Compatible alias kept for redirects and embed links. */
+export const LIVE_DEMO_PREVIEW_ALIAS_HREF = '/dashboard/preview';
+
+/**
+ * @deprecated Prefer LIVE_DEMO_PROFILE_HREF — same path after workspace-first routing.
+ */
+export const LIVE_DEMO_PROFILE_LEGACY_HREF = LIVE_DEMO_PROFILE_HREF;
+
+/** Public profile path for a slug (`/demo/card` for the Alex Chen demo). */
+export function publicDemoProfileBasePath(profileSlug: string): string {
+  return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
+}
+
+export function publicDemoProjectHref(profileSlug: string, projectId: string): string {
+  return `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
+}
+
+export function publicDemoResearchHref(profileSlug: string, paperSlug: string): string {
+  return `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
+}

@@ -1,7 +1,34 @@
-import { permanentRedirect } from 'next/navigation';
-import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
+import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
+import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
+import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
+import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
-/** Backward-compatible alias for the public-profile demo. */
-export default function DemoCardAliasPage() {
-  permanentRedirect(LIVE_DEMO_PROFILE_HREF);
+export const dynamic = 'force-static';
+
+const DEMO_NAMES = ['DevFlow', 'SchemaSync', 'Pulse'] as const;
+
+const projects = DEMO_FEATURED_PROJECTS.filter((p) =>
+  DEMO_NAMES.includes(p.title as (typeof DEMO_NAMES)[number]),
+);
+
+const links: ProfileLinkItem[] = DEMO_PROFILE.links.map((l) => ({
+  type: l.type,
+  label: l.label,
+  url: l.url,
+}));
+
+export default function DemoCardPage() {
+  return (
+    <PublicProfileExperience
+      profileSlug="demo"
+      displayName={DEMO_PROFILE.display_name}
+      headline={DEMO_PROFILE.headline}
+      avatarUrl={DEMO_PROFILE.avatar_url}
+      bio={DEMO_PROFILE.bio}
+      links={links}
+      projects={projects}
+      researchPapers={DEMO_RESEARCH_PAPERS}
+      location={DEMO_PROFILE.location}
+    />
+  );
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import { publicDemoProfileBasePath, publicDemoProjectHref } from '@/lib/marketing/demo-url';
 
 const prefetched = new Set<string>();
 
@@ -34,11 +35,9 @@ export function prefetchProjectRoute(
   projectId: string,
   router?: { prefetch: (url: string) => void },
 ) {
-  const base = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
-  prefetchHref(`${base}/projects/${projectId}`, router);
+  prefetchHref(publicDemoProjectHref(profileSlug, projectId), router);
 }
 
 export function prefetchProfileRoute(profileSlug: string, router?: { prefetch: (url: string) => void }) {
-  const href = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
-  prefetchHref(href, router);
+  prefetchHref(publicDemoProfileBasePath(profileSlug), router);
 }

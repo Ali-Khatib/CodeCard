@@ -1,6 +1,6 @@
-import { DashboardConnectionsView } from '@/components/dashboard/dashboard-connections-view';
-import { DEMO_CONNECTIONS } from '@/lib/dashboard/workspace-demo';
+import { permanentRedirect } from 'next/navigation';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
-export default function PreviewConnectionsPage() {
-  return <DashboardConnectionsView connections={DEMO_CONNECTIONS} basePath="/dashboard/preview" />;
+export default function PreviewConnectionsAliasPage() {
+  permanentRedirect(`${LIVE_DEMO_WORKSPACE_HREF}/connections`);
 }

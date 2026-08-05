@@ -13,6 +13,7 @@ import {
   buildPublicProjectDetailHref,
   getAdjacentProjects,
 } from '@/lib/projects/project-navigation';
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
 import { COLORS, TYPE } from '@/lib/design/tokens';
@@ -127,7 +128,7 @@ export function ProjectDetailView({
     transitionHandoff,
   ]);
 
-  const backHref = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const backHref = publicDemoProfileBasePath(profileSlug);
   const projectList = projects?.length ? projects : [project];
   const { previous: previousProject, next: nextProject } = getAdjacentProjects(
     projectList,

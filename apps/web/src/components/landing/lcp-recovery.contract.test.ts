@@ -32,7 +32,7 @@ describe('Phase 0C LCP recovery contracts', () => {
     expect(product).toContain('WorkspaceShowcase');
     expect(product).toContain('HowItWorksSection');
     expect(showcase).toContain('IntersectionObserver');
-    expect(showcase).toContain('/dashboard/preview');
+    expect(showcase).toContain('/demo');
   });
 
   it('does not high-priority the demo avatar when bio text is LCP', () => {

@@ -10,7 +10,7 @@ const AUTH_ANALYTICS_PAGE = 'src/app/dashboard/(authenticated)/analytics/page.ts
 const AUTH_HOME_PAGE = 'src/app/dashboard/(authenticated)/page.tsx';
 const AUTH_VIEW = 'src/components/dashboard/dashboard-analytics-view.tsx';
 const AUTH_QUERIES = 'src/lib/dashboard/analytics-queries.ts';
-const PREVIEW_PAGE = 'src/app/dashboard/preview/analytics/page.tsx';
+const PREVIEW_PAGE = 'src/app/demo/(workspace)/analytics/page.tsx';
 const PREVIEW_VIEW = 'src/components/dashboard/preview-analytics-view.tsx';
 const DEMO_DATA = 'src/lib/dashboard/analytics-data.ts';
 

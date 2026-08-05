@@ -94,8 +94,36 @@ const nextConfig: NextConfig = {
     ];
     return [
       { source: '/(.*)', headers: securityHeaders },
+      { source: '/demo', headers: previewEmbedHeaders },
+      { source: '/demo/projects', headers: previewEmbedHeaders },
+      { source: '/demo/projects/:path*', headers: previewEmbedHeaders },
+      { source: '/demo/research', headers: previewEmbedHeaders },
+      { source: '/demo/research/:path*', headers: previewEmbedHeaders },
+      { source: '/demo/analytics', headers: previewEmbedHeaders },
+      { source: '/demo/analytics/:path*', headers: previewEmbedHeaders },
+      { source: '/demo/connections', headers: previewEmbedHeaders },
+      { source: '/demo/connections/:path*', headers: previewEmbedHeaders },
+      { source: '/demo/circle', headers: previewEmbedHeaders },
+      { source: '/demo/circle/:path*', headers: previewEmbedHeaders },
+      { source: '/demo/settings', headers: previewEmbedHeaders },
+      { source: '/demo/settings/:path*', headers: previewEmbedHeaders },
       { source: '/dashboard/preview', headers: previewEmbedHeaders },
       { source: '/dashboard/preview/:path*', headers: previewEmbedHeaders },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        // Legacy public project detail URLs (exclude workspace /projects/new).
+        source: '/demo/projects/:id((?!new$)[^/]+)',
+        destination: '/demo/card/projects/:id',
+        permanent: true,
+      },
+      {
+        source: '/demo/research/:slug((?!new$)[^/]+)',
+        destination: '/demo/card/research/:slug',
+        permanent: true,
+      },
     ];
   },
 };

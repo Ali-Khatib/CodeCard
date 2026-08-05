@@ -83,7 +83,7 @@ describe('WS16-T008 circle quality completion', () => {
     const exportBuild = readWeb('src/lib/account/export-build.ts');
     const deletion = readWeb('src/lib/account/delete-local-content.ts');
     const authPage = readWeb('src/app/dashboard/(authenticated)/circle/page.tsx');
-    const preview = readWeb('src/app/dashboard/preview/circle/page.tsx');
+    const preview = readWeb('src/app/demo/(workspace)/circle/page.tsx');
     const demo = readWeb('src/lib/dashboard/circle-demo.ts');
     const layout = readWeb('src/app/dashboard/(authenticated)/layout.tsx');
 

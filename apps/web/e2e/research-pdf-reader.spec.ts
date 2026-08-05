@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-const DEMO_RESEARCH = '/demo/research/retrieval-evaluation-for-dev-tools';
+const DEMO_RESEARCH = '/demo/card/research/retrieval-evaluation-for-dev-tools';
 
 async function assertNoHorizontalOverflow(page: Page) {
   const metrics = await page.evaluate(() => {

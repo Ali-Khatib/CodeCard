@@ -16,7 +16,7 @@ export const DEMO_NOTIFICATIONS: DashboardNotification[] = [
     body: 'PipelineX — deploy previews that never block the main branch.',
     time: '2h ago',
     unread: true,
-    href: '/dashboard/preview/circle',
+    href: '/demo/circle',
   },
   {
     id: 'n2',
@@ -25,7 +25,7 @@ export const DEMO_NOTIFICATIONS: DashboardNotification[] = [
     body: 'Most came from GitHub and QR scans at DevConf.',
     time: '5h ago',
     unread: true,
-    href: '/dashboard/preview/analytics',
+    href: '/demo/analytics',
   },
   {
     id: 'n3',
@@ -34,7 +34,7 @@ export const DEMO_NOTIFICATIONS: DashboardNotification[] = [
     body: 'New demo video on her featured project.',
     time: 'Yesterday',
     unread: true,
-    href: '/dashboard/preview/circle',
+    href: '/demo/circle',
   },
   {
     id: 'n4',
@@ -43,7 +43,7 @@ export const DEMO_NOTIFICATIONS: DashboardNotification[] = [
     body: '1,284 profile views · +18% · DevFlow led project opens.',
     time: 'Mon',
     unread: false,
-    href: '/dashboard/preview/analytics',
+    href: '/demo/analytics',
   },
   {
     id: 'n5',
@@ -52,6 +52,6 @@ export const DEMO_NOTIFICATIONS: DashboardNotification[] = [
     body: 'Someone opened DevFlow from your card.',
     time: '3 days ago',
     unread: false,
-    href: '/dashboard/preview',
+    href: '/demo',
   },
 ];

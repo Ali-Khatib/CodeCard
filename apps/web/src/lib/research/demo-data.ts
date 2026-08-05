@@ -35,7 +35,7 @@ export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
     coverImageUrl: figure('Retrieval Evaluation', 'Benchmark flow for developer tooling agents'),
     relatedProjectId: 'demo-1',
     relatedProjectTitle: 'DevFlow',
-    relatedProjectHref: '/demo/projects/demo-1',
+    relatedProjectHref: '/demo/card/projects/demo-1',
     figures: [
       {
         imageUrl: figure('Context Recall', 'Comparing retrieval depth against fix accuracy', '#7dd3fc'),
@@ -67,7 +67,7 @@ export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
     coverImageUrl: figure('Trace Summaries', 'Incident context without dashboard overload', '#34d399'),
     relatedProjectId: 'demo-3',
     relatedProjectTitle: 'Pulse',
-    relatedProjectHref: '/demo/projects/demo-3',
+    relatedProjectHref: '/demo/card/projects/demo-3',
     figures: [
       {
         imageUrl: figure('Alert Routing', 'Noise reduction across service owners', '#34d399'),

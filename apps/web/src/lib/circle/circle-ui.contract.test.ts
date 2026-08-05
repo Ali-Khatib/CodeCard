@@ -21,7 +21,7 @@ describe('WS16-T004 real circle feed experience', () => {
 
   it('wires authenticated Circle page to listCircleFeed without demo data', () => {
     const page = readWeb('src/app/dashboard/(authenticated)/circle/page.tsx');
-    const preview = readWeb('src/app/dashboard/preview/circle/page.tsx');
+    const preview = readWeb('src/app/demo/(workspace)/circle/page.tsx');
     expect(page).toContain('listCircleFeed');
     expect(page).toContain('AuthenticatedCircleView');
     expect(page).not.toContain('DEMO_CIRCLE_FEED');

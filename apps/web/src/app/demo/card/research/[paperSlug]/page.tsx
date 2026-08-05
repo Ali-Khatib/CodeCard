@@ -17,7 +17,7 @@ export default async function DemoResearchDetailPage({ params }: PageProps) {
     <>
       <VisitorConversionMarker
         context="live_demo"
-        referrer={`demo/research/${paperSlug}`}
+        referrer={`demo/card/research/${paperSlug}`}
       />
       <ResearchPaperDetail
         paper={paper}

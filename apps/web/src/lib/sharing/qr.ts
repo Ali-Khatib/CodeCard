@@ -1,5 +1,6 @@
 import { SLUG_REGEX } from '@codecard/validation';
 import QRCode from 'qrcode';
+import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
 import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 
 export const PROFILE_QR_ERROR_CORRECTION = 'M' as const;
@@ -84,11 +85,13 @@ export function buildCanonicalPublicProfileUrl(
     };
   }
 
+  const path = slug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${slug}`;
+
   return {
     ok: true,
     origin,
     slug,
-    url: `${origin}/${slug}`,
+    url: `${origin}${path}`,
   };
 }
 

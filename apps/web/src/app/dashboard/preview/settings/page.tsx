@@ -1,6 +1,6 @@
-import { DashboardSettingsView } from '@/components/dashboard/dashboard-settings-view';
-import { DEMO_WORKSPACE } from '@/lib/dashboard/workspace-demo';
+import { permanentRedirect } from 'next/navigation';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
-export default function PreviewSettingsPage() {
-  return <DashboardSettingsView email={DEMO_WORKSPACE.email} accountControls="demo" />;
+export default function PreviewSettingsAliasPage() {
+  permanentRedirect(`${LIVE_DEMO_WORKSPACE_HREF}/settings`);
 }

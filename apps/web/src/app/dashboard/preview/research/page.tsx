@@ -1,16 +1,6 @@
-import { DashboardResearchView } from '@/components/dashboard/dashboard-research-view';
-import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
-import { DEMO_WORKSPACE } from '@/lib/dashboard/workspace-demo';
+import { permanentRedirect } from 'next/navigation';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
-export const dynamic = 'force-static';
-
-export default function PreviewResearchPage() {
-  return (
-    <DashboardResearchView
-      papers={DEMO_RESEARCH_PAPERS.map((paper) => ({ ...paper, isPublished: true }))}
-      profileSlug={DEMO_WORKSPACE.profileSlug}
-      isProfilePublic
-      basePath="/dashboard/preview"
-    />
-  );
+export default function PreviewResearchAliasPage() {
+  permanentRedirect(`${LIVE_DEMO_WORKSPACE_HREF}/research`);
 }

@@ -6,6 +6,7 @@ import { LayoutGroup, motion, AnimatePresence } from 'motion/react';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { collectFilterOptions, filterProjects } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
 import { ScrollProjectCard } from './scroll-project-card';
 import { MorphFilterSurface } from '@/components/profile/morph-filter-surface';
 import { ProjectWorkAtmosphere } from './project-work-atmosphere';
@@ -80,7 +81,7 @@ export function FeaturedWorkStack({
     (p) => p.id === activeId && (proximities[p.id] ?? 0) >= ACTIVE_THRESHOLD && !!p.videoUrl,
   );
 
-  const projectBase = profileSlug === 'demo' ? '/demo' : `/${profileSlug}`;
+  const projectBase = publicDemoProfileBasePath(profileSlug);
   const router = useRouter();
 
   useEffect(() => {
