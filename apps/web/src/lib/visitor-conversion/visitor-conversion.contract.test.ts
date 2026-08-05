@@ -79,10 +79,11 @@ describe('site-wide visitor conversion prompt contract', () => {
       'src/app/[slug]/page.tsx',
       'src/app/[slug]/projects/[id]/page.tsx',
       'src/app/[slug]/research/[paperSlug]/page.tsx',
-      'src/app/demo/page.tsx',
-      'src/app/demo/projects/[id]/page.tsx',
-      'src/app/demo/research/[paperSlug]/page.tsx',
-      'src/app/dashboard/preview/layout.tsx',
+      // Workspace-first routing: the workspace lives at `/demo`, the public
+      // profile at `/demo/card`, and `/dashboard/preview/*` only redirects.
+      'src/app/demo/(workspace)/layout.tsx',
+      'src/app/demo/card/projects/[id]/page.tsx',
+      'src/app/demo/card/research/[paperSlug]/page.tsx',
     ]) {
       expect(read(path), path).toContain('VisitorConversionMarker');
     }
