@@ -2,25 +2,16 @@
 
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-<<<<<<< HEAD
-=======
 import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
-import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
->>>>>>> bb7b388 (Restore workspace as the primary live demo)
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
 const FOOTER_COLUMNS = [
   {
     title: 'Product',
     links: [
-<<<<<<< HEAD
       { label: 'Overview', href: '/' },
-      { label: 'Live demo', href: '/dashboard/preview/projects' },
-=======
-      { label: 'Overview', href: MARKETING_HOME_HREF },
       { label: 'Live demo', href: LIVE_DEMO_HREF },
       { label: 'View public profile', href: LIVE_DEMO_PROFILE_HREF },
->>>>>>> bb7b388 (Restore workspace as the primary live demo)
       { label: 'Pricing', href: '/pricing' },
     ],
   },
