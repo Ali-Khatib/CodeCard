@@ -66,8 +66,8 @@ test.describe('Phase 1B premium interaction polish', () => {
     expect(transform === 'none' || transform.includes('matrix(1, 0, 0, 1, 0, 0)')).toBe(true);
   });
 
-  test('workspace sidebar active indicator and navigation', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
+  test('workspace sidebar active indicator and navigation', async ({ page, isMobile }) => {
+    test.skip(!!isMobile, 'Sidebar is a desktop affordance; mobile uses the bottom nav.');
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
     const indicator = page.getByTestId('sidebar-active-indicator');
@@ -90,12 +90,17 @@ test.describe('Phase 1B premium interaction polish', () => {
     await expect(page.locator('.cc-app-sidebar').getByText('My Profile')).toHaveCount(0);
   });
 
-  test('workspace project and research actions remain available', async ({ page }) => {
+  test('workspace project and research actions remain available', async ({ page, isMobile }) => {
+    // Desktop uses the sidebar; mobile uses the bottom nav. Exercise the real affordance.
+    const navName = isMobile ? 'Mobile' : 'Main';
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Projects$/i }).click();
+    const nav = page.getByRole('navigation', { name: navName });
+
+    await nav.getByRole('link', { name: /^Projects$/i }).click();
     await expect(page).toHaveURL(/\/demo\/projects/);
     await expect(page.locator('main')).toBeVisible();
-    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Research$/i }).click();
+
+    await nav.getByRole('link', { name: /^Research$/i }).click();
     await expect(page).toHaveURL(/\/demo\/research/);
     await expect(page.locator('main')).toBeVisible();
   });

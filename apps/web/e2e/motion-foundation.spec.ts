@@ -34,6 +34,11 @@ async function isLenisActive(page: Page) {
   return page.evaluate(() => document.documentElement.classList.contains('lenis'));
 }
 
+/** Workspace greeting renders at every viewport; the sidebar summary collapses on mobile. */
+function workspaceGreeting(page: Page) {
+  return page.locator('h1.cc-profile-home__title');
+}
+
 test.describe('Phase 0B motion foundation', () => {
   test('landing keeps research-support content visible before/with motion', async ({
     page,
@@ -145,7 +150,7 @@ test.describe('Phase 0B motion foundation', () => {
 
     for (let i = 0; i < 3; i += 1) {
       await page.goto('/demo', { waitUntil: 'domcontentloaded' });
-      await expect(page.getByText('Alex Chen').first()).toBeVisible();
+      await expect(workspaceGreeting(page)).toBeVisible();
       await page.goto('/', { waitUntil: 'networkidle' });
       await waitForMotionDebug(page);
       await page.waitForTimeout(500);
@@ -286,19 +291,20 @@ test.describe('Phase 0B motion foundation', () => {
 
     await page.goForward();
     await expect(page).toHaveURL(/\/demo\/?$/);
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    await expect(workspaceGreeting(page)).toBeVisible();
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    await expect(workspaceGreeting(page)).toBeVisible();
   });
 
   test('route alignment remains correct after motion foundation', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByText('Alex Chen')).toHaveCount(0);
+    // Landing previews the demo name in its mobile mockup; only a profile heading is disqualifying.
+    await expect(page.getByRole('heading', { name: 'Alex Chen' })).toHaveCount(0);
 
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Alex Chen').first()).toBeVisible();
+    await expect(workspaceGreeting(page)).toBeVisible();
   });
 
   test('JS-disabled landing content remains readable', async ({ browser }) => {

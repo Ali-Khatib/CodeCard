@@ -59,7 +59,7 @@ test.describe('Workspace-first public route alignment', () => {
   test('public-profile CTA reaches /demo/card', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const profileCta = page.getByRole('link', { name: /View public profile/i }).first();
-    await profileCta.scrollIntoViewIfNeeded();
+    // Attribute assertion needs no scrolling; scrolling here races Lenis + section entrances.
     await expect(profileCta).toHaveAttribute('href', '/demo/card');
   });
 
@@ -106,7 +106,9 @@ test.describe('Workspace-first public route alignment', () => {
     for (let i = 0; i < 3; i += 1) {
       await page.goto('/', { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveURL(/\/$/);
-      await expect(page.getByText('Alex Chen')).toHaveCount(0);
+      // The landing legitimately previews the demo name in its mobile mockup, so assert
+      // only that `/` is not a profile page (no Alex Chen heading).
+      await expect(page.getByRole('heading', { name: 'Alex Chen' })).toHaveCount(0);
       await page.goto('/demo', { waitUntil: 'domcontentloaded' });
       await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
     }
