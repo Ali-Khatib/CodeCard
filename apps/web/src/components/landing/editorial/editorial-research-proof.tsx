@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
@@ -134,6 +135,12 @@ export function EditorialResearchProof() {
           );
         })}
       </div>
+
+      <p className="cc-ed-proof__more">
+        <Link href="/research" className="cc-ed__link">
+          See all research papers →
+        </Link>
+      </p>
     </section>
   );
 }
