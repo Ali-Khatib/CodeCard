@@ -4242,8 +4242,6 @@ html.dark [class*='uppercase'][class*='tracking'] {
     min-height: 44px;
   }
 }
-<<<<<<< HEAD
-=======
 
 /* WS12-T007 ? Mobile primary controls: at least 44x44 CSS px hit area. */
 @media (max-width: 767px) {
@@ -4335,4 +4333,3 @@ html.dark [class*='uppercase'][class*='tracking'] {
     transform: none;
   }
 }
->>>>>>> 3a3fbe7 (Finish Phase 1B polish gaps and skip-link focus)
