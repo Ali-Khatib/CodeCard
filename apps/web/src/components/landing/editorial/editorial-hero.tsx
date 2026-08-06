@@ -1,8 +1,13 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
+/** Warm full-bleed editorial photo — Parloa-scale first impression. */
+const HERO_IMAGE =
+  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2400&q=80';
+
 /**
- * Dark editorial hero — full-size display lines, clean breaks.
+ * Full-bleed photo hero: big picture first, then oversized type + CTAs.
  */
 export function EditorialHero() {
   return (
@@ -13,8 +18,20 @@ export function EditorialHero() {
       data-testid="editorial-hero"
       aria-labelledby="editorial-hero-heading"
     >
-      <div className="cc-ed-hero__solo" data-testid="hero-section">
-        <div className="cc-ed-hero__mark" aria-hidden />
+      <div className="cc-ed-hero__media" aria-hidden>
+        <Image
+          src={HERO_IMAGE}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="cc-ed-hero__img"
+        />
+        <div className="cc-ed-hero__veil" />
+        <div className="cc-ed-hero__flare" />
+      </div>
+
+      <div className="cc-ed-hero__content" data-testid="hero-section">
         <p className="cc-ed__eyebrow">CodeCard</p>
         <h1
           id="editorial-hero-heading"
@@ -22,7 +39,7 @@ export function EditorialHero() {
           data-hero-statement
         >
           <span className="cc-ed__lead">YOUR WORK.</span>
-          <span className="cc-ed__sub cc-ed__sub--accent">ONE IDENTITY.</span>
+          <span className="cc-ed__sub">ONE IDENTITY.</span>
         </h1>
         <p className="cc-ed__lede mt-6">
           Projects, research, Circle, and connections, presented through one
