@@ -902,6 +902,11 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   color: var(--ed-mute);
 }
 
+.cc-ed-proof__more {
+  margin-top: clamp(1.75rem, 4vh, 2.5rem);
+  text-align: center;
+}
+
 /* —— Finale —— */
 .cc-ed-finale {
   padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3.5rem) clamp(5rem, 14vh, 9rem);
