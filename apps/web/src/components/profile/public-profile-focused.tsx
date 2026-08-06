@@ -10,6 +10,7 @@ import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
+import { ProfileSectionHashScroll } from './profile-section-hash-scroll';
 
 /** Below-fold client islands — keep ATF bio free of their hydration cost. */
 const PublicProjectStack = dynamic(
@@ -67,6 +68,7 @@ export function PublicProfileFocused({
 
   return (
     <div className="cc-public-profile">
+      <ProfileSectionHashScroll />
       <main
         id={MAIN_CONTENT_ID}
         tabIndex={-1}
@@ -128,7 +130,7 @@ export function PublicProfileFocused({
           </div>
         </header>
 
-        <section id="projects" className="mt-16">
+        <section id="projects" className="mt-16 scroll-mt-24">
           <p className="cc-app-mono">Featured work</p>
           <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
             What {firstName} built

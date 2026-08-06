@@ -153,6 +153,15 @@ test.describe('Phase 1B premium interaction polish', () => {
     await expect(overlay).toBeHidden({ timeout: 8000 });
   });
 
+  test('project back returns to featured work section', async ({ page }) => {
+    await page.goto('/demo/card', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('link', { name: /Open project:/i }).first().click();
+    await page.waitForURL(/\/demo\/card\/projects\//);
+    await page.getByRole('link', { name: /Back to projects/i }).click();
+    await page.waitForURL(/\/demo\/card#projects$/);
+    await expect(page.locator('#projects')).toBeInViewport();
+  });
+
   test('research opening title shows on navigation', async ({ page }) => {
     await page.goto('/demo/card', { waitUntil: 'networkidle' });
     await page.locator('#research').scrollIntoViewIfNeeded();

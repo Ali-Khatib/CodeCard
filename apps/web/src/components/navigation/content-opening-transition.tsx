@@ -13,12 +13,14 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import {
   CONTENT_OPENING_FAILSAFE_MS,
   CONTENT_OPENING_MIN_MS,
+  contentOpeningHeadline,
   contentOpeningMatchesPath,
   contentOpeningTitle,
   resolveContentOpeningKind,
@@ -48,6 +50,41 @@ type OverlayProps = {
   opening: ContentOpeningState;
   reducedMotion: boolean | null;
 };
+
+function ContentOpeningFallback({
+  opening,
+  reducedMotion,
+}: {
+  opening: ContentOpeningState;
+  reducedMotion: boolean | null;
+}) {
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div
+      className="cc-content-opening"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      data-testid="content-opening-fallback"
+    >
+      <div className="cc-content-opening__panel">
+        {reducedMotion ? (
+          <span className="cc-content-opening__dot" aria-hidden />
+        ) : (
+          <>
+            <span className="cc-content-opening__brand" aria-hidden>
+              Cc
+            </span>
+            <span className="cc-content-opening__spinner" aria-hidden />
+          </>
+        )}
+        <p className="cc-content-opening__headline">{contentOpeningHeadline(opening.kind)}</p>
+        <p className="cc-content-opening__title">{opening.title}</p>
+      </div>
+    </div>,
+    document.body,
+  );
+}
 
 export function ContentOpeningProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -130,8 +167,8 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Preload overlay so the spinner is ready on first click.
   useEffect(() => {
-    if (!opening || Overlay) return;
     let cancelled = false;
     void import('./content-opening-overlay').then((mod) => {
       if (!cancelled) setOverlay(() => mod.ContentOpeningOverlayLazy);
@@ -139,7 +176,7 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [opening, Overlay]);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -158,30 +195,7 @@ export function ContentOpeningProvider({ children }: { children: ReactNode }) {
         Overlay ? (
           <Overlay opening={opening} reducedMotion={reducedMotion} />
         ) : (
-          <div
-            className="cc-content-opening"
-            role="status"
-            aria-live="polite"
-            aria-busy="true"
-            data-testid="content-opening-fallback"
-          >
-            <div className="cc-content-opening__panel">
-              {reducedMotion ? (
-                <span className="cc-content-opening__dot" aria-hidden />
-              ) : (
-                <>
-                  <span className="cc-content-opening__brand" aria-hidden>
-                    Cc
-                  </span>
-                  <span className="cc-content-opening__spinner" aria-hidden />
-                </>
-              )}
-              <p className="cc-content-opening__headline">
-                {opening.kind === 'project' ? 'Opening project' : 'Opening research'}
-              </p>
-              <p className="cc-content-opening__title">{opening.title}</p>
-            </div>
-          </div>
+          <ContentOpeningFallback opening={opening} reducedMotion={reducedMotion} />
         )
       ) : null}
     </ContentOpeningContext.Provider>
