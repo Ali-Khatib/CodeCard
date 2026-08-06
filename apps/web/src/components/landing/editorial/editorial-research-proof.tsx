@@ -58,6 +58,27 @@ function GrowingStat({
   return <span className="cc-ed-proof__stat-num">{text}</span>;
 }
 
+  const LANDING_PROOF = [
+    {
+      id: 'attention',
+      title: 'First passes are short',
+      finding:
+        'Eye-tracking research found early résumé scans often lasted about six seconds—name, title, and school drew the first look before deeper project detail.',
+    },
+    {
+      id: 'pedigree',
+      title: 'Context shapes outcomes',
+      finding:
+        'In an audit study with identical qualifications, school and firm signals shifted callbacks by nearly 15 points. Clearer proof helps skill compete on equal footing.',
+    },
+    {
+      id: 'proof',
+      title: 'Visible skills travel farther',
+      finding:
+        'LinkedIn’s 2025 skills-based hiring research: pools can widen up to 6.1× when skills are easy to see up front—not buried below the fold.',
+    },
+  ] as const;
+
 /**
  * Research importance — animated growing stats that argue for CodeCard.
  */
@@ -93,18 +114,18 @@ export function EditorialResearchProof() {
       <div className="cc-ed-proof__intro">
         <p className="cc-ed__eyebrow">The research</p>
         <h2 id="editorial-research-proof-heading" className="cc-ed__display mt-3">
-          ATTENTION IS SHORT.
+          FIRST LOOKS ARE FAST.
           <br />
-          <span className="cc-ed__accent">PROOF HAS TO LAND FAST.</span>
+          <span className="cc-ed__accent">MAKE THE WORK EASY TO SEE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          CodeCard exists because résumés hide the work. The studies keep saying
-          the same thing.
+          Studies on how people scan profiles and résumés point to the same
+          opportunity: put your proof where it’s easy to find.
         </p>
       </div>
 
       <div className="cc-ed-proof__grid">
-        {RESEARCH_INSIGHTS.map((insight) => {
+        {LANDING_PROOF.map((insight) => {
           const grow = GROWS[insight.id] ?? { end: 0 };
           return (
             <article key={insight.id} className="cc-ed-proof__card">
