@@ -5257,6 +5257,22 @@ select,
   outline-offset: 3px;
 }
 
+/* Keep conversion prompt clear of pinned cinematic product frame (right side). */
+@media (min-width: 768px) {
+  body:has([data-cinematic-runtime='landing']) .cc-visitor-prompt {
+    right: auto;
+    left: max(20px, env(safe-area-inset-left));
+    bottom: max(20px, env(safe-area-inset-bottom));
+    width: min(340px, calc(42vw - 32px));
+    z-index: 45;
+  }
+
+  body:has([data-cinematic-runtime='landing']) .cc-visitor-prompt[data-avoid-focus='true'] {
+    top: max(88px, env(safe-area-inset-top));
+    bottom: auto;
+  }
+}
+
 /* Large / TV-ish viewports — keep type readable at distance */
 @media (min-width: 1280px) {
   .cc-visitor-prompt {

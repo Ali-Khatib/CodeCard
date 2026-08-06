@@ -119,6 +119,50 @@
   will-change: transform, opacity;
 }
 
+/* Pre-GSAP scatter so chips do not pile at center before the timeline runs. */
+@media (min-width: 768px) {
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap,
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap {
+    opacity: 0;
+  }
+
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(1),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(1) {
+    transform: translate(-38%, -28%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(2),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(2) {
+    transform: translate(36%, -32%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(3),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(3) {
+    transform: translate(-42%, 8%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(4),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(4) {
+    transform: translate(40%, 4%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(5),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(5) {
+    transform: translate(-28%, 34%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(6),
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__chip-wrap:nth-child(6) {
+    transform: translate(30%, 36%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(7) {
+    transform: translate(-8%, -40%);
+  }
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__chip-wrap:nth-child(8) {
+    transform: translate(6%, 42%);
+  }
+
+  .cc-cinematic-scattered[data-scene-mode='desktop'] .cc-cinematic-scattered__card-wrap,
+  .cc-cinematic-scattered[data-scene-mode='tablet'] .cc-cinematic-scattered__card-wrap {
+    opacity: 0;
+  }
+}
+
 .cc-cinematic-fragment {
   display: inline-flex;
   align-items: center;

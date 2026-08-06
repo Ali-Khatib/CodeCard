@@ -45,6 +45,9 @@ describe('Phase 2 cinematic landing contract', () => {
     expect(showcase).toContain('useGSAP');
     expect(scattered).toContain('cinematic-scattered-pin');
     expect(showcase).toContain('cinematic-showcase-pin');
+    expect(scattered).toContain("start: PIN_START");
+    expect(showcase).toContain("start: PIN_START");
+    expect(showcase).toContain('resolveStage');
     expect(scattered).toContain('invalidateOnRefresh');
     expect(showcase).toContain('invalidateOnRefresh');
     expect(scattered).not.toContain('killAllScrollTriggers');

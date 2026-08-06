@@ -14,6 +14,13 @@ import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
 import { CinematicProgress } from './cinematic-progress';
 import { PRODUCT_SHOWCASE_STAGES } from './cinematic-previews';
 
+/** Desktop/tablet pin distance — trimmed from 220/160 after dead Profile stretch. */
+const PIN_VH = { desktop: 185, tablet: 140 } as const;
+const PIN_START = 'top 88px'; // clear sticky marketing nav
+/** Enter/exit hysteresis so scrub edges do not flicker active stage. */
+const STAGE_ENTER_SLACK = 0.02;
+const STAGE_EXIT_SLACK = 0.03;
+
 const STAGE_COPY = [
   {
     title: 'Profile',
@@ -131,13 +138,19 @@ export function ProductShowcaseScene() {
         if (!pinShell || !track || !frame) return;
 
         const stageCount = PRODUCT_SHOWCASE_STAGES.length;
-        const pinVh = window.matchMedia('(min-width: 1024px)').matches ? 220 : 160;
+        const pinVh = window.matchMedia('(min-width: 1024px)').matches
+          ? PIN_VH.desktop
+          : PIN_VH.tablet;
 
         gsap.set(track, { yPercent: 0 });
         if (chartPath) gsap.set(chartPath, { strokeDasharray: 1, strokeDashoffset: 1 });
 
+        let activeStage = -1;
+
         const setActive = (index: number) => {
           const i = Math.max(0, Math.min(stageCount - 1, index));
+          if (i === activeStage) return;
+          activeStage = i;
           steps.forEach((step, idx) => {
             step.dataset.active = idx === i ? 'true' : undefined;
           });
@@ -154,12 +167,28 @@ export function ProductShowcaseScene() {
 
         setActive(0);
 
+        const resolveStage = (progress: number) => {
+          const span = 1 / stageCount;
+          // Ideal index from continuous progress (settle last stage before unpin)
+          const ideal = Math.min(
+            stageCount - 1,
+            Math.floor(Math.min(progress, 0.999) / span),
+          );
+          if (ideal === activeStage) return activeStage;
+          if (ideal > activeStage) {
+            const enterAt = (activeStage + 1) * span + STAGE_ENTER_SLACK * span;
+            return progress >= enterAt ? ideal : activeStage;
+          }
+          const exitAt = activeStage * span - STAGE_EXIT_SLACK * span;
+          return progress <= exitAt ? ideal : activeStage;
+        };
+
         const tl = gsap.timeline({
           defaults: { ease: MOTION_EASE.inOut },
           scrollTrigger: {
             id: 'cinematic-showcase-pin',
             trigger: pinShell,
-            start: 'top top',
+            start: PIN_START,
             end: `+=${pinVh}%`,
             pin: true,
             scrub: 0.7,
@@ -167,11 +196,7 @@ export function ProductShowcaseScene() {
             invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
-              const idx = Math.min(
-                stageCount - 1,
-                Math.floor(self.progress * stageCount * 0.999),
-              );
-              setActive(idx);
+              setActive(resolveStage(self.progress));
             },
           },
         });

@@ -7,7 +7,7 @@ test.describe('Phase 2 cinematic landing', () => {
     const html = await page.content();
     expect(html).toContain('cc-hume-hero__headline');
     expect(html).toContain('Your best work');
-    await expect(page.getByTestId('hero-section').locator('[data-hero-statement]')).toBeVisible();
+    await expect(page.getByTestId('hero-section').locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toBeVisible();
   });
 
