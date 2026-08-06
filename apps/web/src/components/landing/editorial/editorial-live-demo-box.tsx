@@ -64,8 +64,8 @@ export function EditorialLiveDemoBox() {
           <span className="cc-ed__sub">REAL THING.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Explore {DEMO_PROFILE.display_name}’s full CodeCard inside the page—same
-          workspace as the live demo.
+          Explore {DEMO_PROFILE.display_name}’s full CodeCard inside the page, the
+          same workspace as the live demo.
         </p>
         <p className="mt-5">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>

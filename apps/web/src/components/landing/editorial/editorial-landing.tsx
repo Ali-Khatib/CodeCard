@@ -34,11 +34,11 @@ export function EditorialLanding() {
         eyebrow="Projects"
         title={
           <>
-            <span className="cc-ed__lead">SHOW WHAT</span>
-            <span className="cc-ed__sub">YOU BUILT.</span>
+            <span className="cc-ed__lead">YOUR CODING</span>
+            <span className="cc-ed__sub">PROJECTS. FAST.</span>
           </>
         }
-        body="Present the problem, process, technologies, media, links, and results in one clear project record."
+        body="Repos, demos, tech, and results in one project record. People see what you built in seconds."
         state="projects"
         size="lg"
         linkHref={`${LIVE_DEMO_HREF}/projects`}
@@ -50,11 +50,11 @@ export function EditorialLanding() {
         eyebrow="Research"
         title={
           <>
-            <span className="cc-ed__lead">RESEARCH DESERVES</span>
-            <span className="cc-ed__sub">MORE THAN A PDF LINK.</span>
+            <span className="cc-ed__lead">YOUR RESEARCH</span>
+            <span className="cc-ed__sub">PAPERS. FAST.</span>
           </>
         }
-        body="Give papers, methods, diagrams, collaborators, and findings a professional home."
+        body="Abstracts, methods, figures, collaborators, and PDFs in one place. Open a paper and skim it in seconds."
         state="research"
         flip
         researchBoard
@@ -95,7 +95,7 @@ export function EditorialLanding() {
               <span className="cc-ed__sub">YOU ACTUALLY MET.</span>
             </>
           }
-          body="Capture people from events, intros, and QR opens—with notes and follow-ups that stay useful."
+          body="Capture people from events, intros, and QR opens, with notes and follow ups that stay useful."
           state="connections"
           flip
           size="lg"

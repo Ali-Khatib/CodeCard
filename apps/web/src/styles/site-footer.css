@@ -1,0 +1,181 @@
+/* New Form–inspired marketing footer (AppShell + legal pages). */
+
+.cc-site-footer {
+  --sf-cream: #fcf1e7;
+  --sf-ink: #232324;
+  --sf-mute: #5c5856;
+  --sf-dark: #151515;
+  --sf-paper: #efedeb;
+  --sf-iris: #c094e4;
+}
+
+.cc-site-footer__statement {
+  background: var(--sf-cream);
+  color: var(--sf-ink);
+  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 5vw, 4rem)
+    clamp(3.5rem, 8vh, 5.5rem);
+}
+
+.cc-site-footer__statement-inner {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+
+.cc-site-footer__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sf-ink) 45%, transparent);
+}
+
+.cc-site-footer__display {
+  margin: 1rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3.5rem, 10vw + 1rem, 8.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.cc-site-footer__display span:last-child {
+  color: color-mix(in srgb, var(--sf-iris) 55%, var(--sf-ink));
+}
+
+.cc-site-footer__lede {
+  margin: 1.5rem 0 0;
+  max-width: 32rem;
+  font-size: clamp(1rem, 0.4vw + 0.95rem, 1.125rem);
+  line-height: 1.55;
+  color: var(--sf-mute);
+}
+
+.cc-site-footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 2rem;
+}
+
+.cc-site-footer__actions .cc-ed__btn-primary {
+  background: var(--sf-ink);
+  color: var(--sf-paper);
+}
+
+.cc-site-footer__actions .cc-ed__btn-ghost {
+  border-color: color-mix(in srgb, var(--sf-ink) 22%, transparent);
+  color: var(--sf-ink);
+}
+
+.cc-site-footer__bar {
+  position: relative;
+  overflow: hidden;
+  background: var(--sf-dark);
+  color: var(--sf-paper);
+  padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 4rem)
+    clamp(1.5rem, 4vh, 2.25rem);
+}
+
+.cc-site-footer__bar-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 3rem;
+}
+
+.cc-site-footer__email {
+  display: inline-block;
+  font-size: clamp(1.75rem, 4vw + 0.5rem, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--sf-paper);
+  text-decoration: none;
+}
+
+.cc-site-footer__email:hover {
+  opacity: 0.85;
+}
+
+.cc-site-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 1.5rem 3.5rem;
+  margin-top: 1.75rem;
+}
+
+.cc-site-footer__cols ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cc-site-footer__cols a {
+  color: var(--sf-paper);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cc-site-footer__cols a:hover {
+  opacity: 0.7;
+}
+
+.cc-site-footer__ghost {
+  position: absolute;
+  right: clamp(-1rem, -2vw, 0);
+  bottom: 18%;
+  margin: 0;
+  max-width: 55%;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(4rem, 14vw, 11rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--sf-paper) 8%, transparent);
+  pointer-events: none;
+  user-select: none;
+  text-align: right;
+}
+
+.cc-site-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in srgb, var(--sf-paper) 12%, transparent);
+}
+
+.cc-site-footer__meta p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--sf-paper) 55%, transparent);
+}
+
+.cc-site-footer__top {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--sf-paper) 70%, transparent);
+  cursor: pointer;
+}
+
+.cc-site-footer__top:hover {
+  color: var(--sf-paper);
+}
+
+@media (max-width: 720px) {
+  .cc-site-footer__ghost {
+    display: none;
+  }
+}

@@ -185,8 +185,10 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   color: var(--ed-fg);
   display: flex;
   flex-direction: column;
-  gap: 0.1em;
-  text-wrap: balance;
+  align-items: flex-start;
+  gap: 0.08em;
+  text-wrap: pretty;
+  text-align: left;
 }
 
 .cc-ed__display--xl {
@@ -197,6 +199,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed__lead {
   display: block;
   color: var(--ed-fg);
+  text-align: inherit;
 }
 
 /* Same size as lead — all-caps twin line, not a quiet caption */
@@ -209,6 +212,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   letter-spacing: inherit;
   font-weight: inherit;
   text-transform: uppercase;
+  text-align: inherit;
   color: var(--ed-iris);
 }
 
@@ -424,6 +428,30 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   border-radius: 12px;
   overflow: hidden;
   background: var(--ed-page);
+}
+
+.cc-ed__frame-media--research {
+  aspect-ratio: 16 / 9;
+  min-height: 14rem;
+}
+
+.cc-ed__frame-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-ed__frame-tags li {
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ed-ink) 12%, transparent);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ed-mute);
 }
 
 /* Scheduling-style research numerals */
@@ -667,19 +695,19 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed-story__grid {
   display: grid;
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
-  max-width: 72rem;
+  align-items: start;
+  max-width: 78rem;
   margin: 0 auto;
 }
 
 @media (min-width: 960px) {
   .cc-ed-story__grid {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.35fr);
     gap: clamp(2rem, 4vw, 3.5rem);
   }
 
   .cc-ed-story--flip .cc-ed-story__grid {
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.95fr);
   }
 
   .cc-ed-story--flip .cc-ed-story__copy {
@@ -691,13 +719,54 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   }
 }
 
+.cc-ed-story__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cc-ed-story__copy .cc-ed__display {
+  width: 100%;
+  max-width: 18ch;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cc-ed-story__copy .cc-ed__lede {
+  max-width: 28rem;
+  text-align: left;
+}
+
+.cc-ed-story__copy .cc-ed__stat-board {
+  width: 100%;
+  max-width: 28rem;
+}
+
 .cc-ed-story__visual {
   display: flex;
   justify-content: center;
 }
 
 .cc-ed-story__visual .cc-ed__frame {
-  max-width: min(62rem, 100%);
+  max-width: min(64rem, 100%);
+}
+
+.cc-ed-story--research .cc-ed-story__visual .cc-ed__frame,
+.cc-ed-story--research .cc-ed__frame-body {
+  min-height: 0;
+}
+
+.cc-ed-story--research .cc-ed__frame {
+  max-width: min(68rem, 100%);
+}
+
+.cc-ed-story--research .cc-ed__frame-title {
+  font-size: clamp(1.5rem, 2.2vw + 0.85rem, 2.15rem);
+}
+
+.cc-ed-story--research .cc-ed__frame-body {
+  padding: 1.35rem 1.4rem 1.6rem;
 }
 
 /* —— Network bridge + tight Circle/Connections pair —— */

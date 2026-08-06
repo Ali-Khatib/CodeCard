@@ -63,7 +63,7 @@ const LANDING_PROOF = [
     id: 'attention',
     title: 'First passes are short',
     finding:
-      'Eye-tracking research found early résumé scans often lasted about six seconds—name, title, and school drew the first look before deeper project detail.',
+      'Eye tracking research found early résumé scans often lasted about six seconds. Name, title, and school drew the first look before deeper project detail.',
   },
   {
     id: 'pedigree',
@@ -75,7 +75,7 @@ const LANDING_PROOF = [
     id: 'proof',
     title: 'Visible skills travel farther',
     finding:
-      'LinkedIn’s 2025 skills-based hiring research: pools can widen up to 6.1× when skills are easy to see up front—not buried below the fold.',
+      'LinkedIn’s 2025 skills based hiring research: pools can widen up to 6.1× when skills are easy to see up front, not buried below the fold.',
   },
 ] as const;
 

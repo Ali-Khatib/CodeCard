@@ -112,10 +112,11 @@ describe('WS12-T002 accessible form labels', () => {
     expect(note).toContain('Private internal moderation note');
   });
 
-  it('footer newsletter is not placeholder-only', () => {
+  it('footer keeps labeled contact without placeholder-only fields', () => {
     const source = read('components/landing/hume-footer-cluster.tsx');
-    expect(source).toContain('htmlFor="footer-email"');
-    expect(source).toContain('Email');
+    expect(source).toContain('Get in touch');
+    expect(source).toContain('/sign-up');
+    expect(source).not.toMatch(/placeholder=/);
   });
 
   it('representative forms do not rely on placeholder as the only name source', () => {

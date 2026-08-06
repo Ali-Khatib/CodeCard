@@ -25,7 +25,7 @@ export function EditorialHero() {
           <span className="cc-ed__sub cc-ed__sub--accent">ONE IDENTITY.</span>
         </h1>
         <p className="cc-ed__lede mt-6">
-          Projects, research, Circle, and connections—presented through one
+          Projects, research, Circle, and connections, presented through one
           living technical profile.
         </p>
         <div className="cc-ed__actions mt-8">

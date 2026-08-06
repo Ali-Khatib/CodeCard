@@ -11,17 +11,17 @@ export function EditorialNetworkBridge() {
       aria-labelledby="editorial-network-bridge-heading"
     >
       <div className="cc-ed-network-bridge__inner">
-        <p className="cc-ed__eyebrow">More than a showcase</p>
+        <p className="cc-ed__eyebrow">Also a card holder</p>
         <h2
           id="editorial-network-bridge-heading"
           className="cc-ed__display mt-4"
         >
-          <span className="cc-ed__lead">CODECARD ISN’T JUST</span>
-          <span className="cc-ed__sub">FOR SHOWING WORK.</span>
+          <span className="cc-ed__lead">CODECARD IS ALSO</span>
+          <span className="cc-ed__sub">YOUR CARD HOLDER.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          It’s the easiest way to save connections and exchange cards—your
-          technical identity, and a card holder for the people you meet.
+          Showcase your work, then save the people you meet. Exchange cards,
+          keep notes, and carry your technical identity like a wallet.
         </p>
       </div>
     </section>

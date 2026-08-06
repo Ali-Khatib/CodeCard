@@ -108,9 +108,29 @@ export function EditorialProductFrame({
 
         {state === 'research' ? (
           <>
-            <p className="cc-ed__frame-kicker">Research</p>
+            <p className="cc-ed__frame-kicker">Research paper</p>
             <p className="cc-ed__frame-title">{DEMO_PAPER.title}</p>
-            <p className="cc-ed__frame-text line-clamp-3">{DEMO_PAPER.abstract}</p>
+            <p className="cc-ed__frame-text">
+              {DEMO_PAPER.authors.join(', ')}
+            </p>
+            {DEMO_PAPER.coverImageUrl ? (
+              <div className="cc-ed__frame-media cc-ed__frame-media--research">
+                <Image
+                  src={DEMO_PAPER.coverImageUrl}
+                  alt=""
+                  fill
+                  unoptimized={DEMO_PAPER.coverImageUrl.startsWith('data:')}
+                  sizes="(max-width: 768px) 100vw, 720px"
+                  className="object-cover object-top"
+                />
+              </div>
+            ) : null}
+            <p className="cc-ed__frame-text line-clamp-2">{DEMO_PAPER.abstract}</p>
+            <ul className="cc-ed__frame-tags" aria-label="Paper topics">
+              {DEMO_PAPER.tags.slice(0, 4).map((tag) => (
+                <li key={tag}>{tag}</li>
+              ))}
+            </ul>
             <p className="cc-ed__frame-text mt-3">
               {DEMO_PAPER.venue} · {DEMO_PAPER.publicationStatus} · {DEMO_PAPER.year}
             </p>

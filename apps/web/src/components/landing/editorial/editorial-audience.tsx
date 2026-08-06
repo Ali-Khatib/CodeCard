@@ -4,7 +4,7 @@ const AUDIENCE = [
   {
     eyebrow: 'Builders',
     title: 'Lead with proof.',
-    body: 'Repos, demos, and case studies first—not buried under schools and titles.',
+    body: 'Repos, demos, and case studies first, not buried under schools and titles.',
   },
   {
     eyebrow: 'Recruiters',
@@ -14,7 +14,7 @@ const AUDIENCE = [
   {
     eyebrow: 'Events',
     title: 'Show it live.',
-    body: 'QR or your screen at a meetup—they scan and scroll your work while you talk.',
+    body: 'QR or your screen at a meetup. They scan and scroll your work while you talk.',
   },
   {
     eyebrow: 'Students',
@@ -49,7 +49,7 @@ export function EditorialAudience() {
           <span className="cc-ed__sub">USE CODECARD.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Same living profile—whether you’re pitching, recruiting, networking,
+          Same living profile, whether you’re pitching, recruiting, networking,
           learning, or freelancing.
         </p>
       </div>
