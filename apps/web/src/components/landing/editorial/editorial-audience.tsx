@@ -28,12 +28,27 @@ const AUDIENCE = [
   },
 ] as const;
 
+function AudienceCards({ suffix }: { suffix: string }) {
+  return (
+    <div className="cc-ed-audience__group" aria-hidden={suffix !== 'a'}>
+      {AUDIENCE.map((card) => (
+        <article
+          key={`${card.eyebrow}-${suffix}`}
+          className="cc-ed-audience__card"
+        >
+          <p className="cc-ed-audience__eyebrow">{card.eyebrow}</p>
+          <h3 className="cc-ed-audience__title">{card.title}</h3>
+          <p className="cc-ed-audience__body">{card.body}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 /**
- * Who it’s for — horizontal drifting audience cards (marquee).
+ * Who it’s for — seamless infinite horizontal marquee.
  */
 export function EditorialAudience() {
-  const loop = [...AUDIENCE, ...AUDIENCE];
-
   return (
     <section
       id="audience"
@@ -59,16 +74,8 @@ export function EditorialAudience() {
           className="cc-ed-audience__track"
           data-testid="editorial-audience-track"
         >
-          {loop.map((card, index) => (
-            <article
-              key={`${card.eyebrow}-${index}`}
-              className="cc-ed-audience__card"
-            >
-              <p className="cc-ed-audience__eyebrow">{card.eyebrow}</p>
-              <h3 className="cc-ed-audience__title">{card.title}</h3>
-              <p className="cc-ed-audience__body">{card.body}</p>
-            </article>
-          ))}
+          <AudienceCards suffix="a" />
+          <AudienceCards suffix="b" />
         </div>
       </div>
     </section>

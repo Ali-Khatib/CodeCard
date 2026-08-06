@@ -988,14 +988,21 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-audience__viewport {
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
 .cc-ed-audience__track {
   display: flex;
-  gap: 1rem;
   width: max-content;
-  animation: cc-ed-audience-marquee 38s linear infinite;
+  animation: cc-ed-audience-marquee 45s linear infinite;
+  will-change: transform;
+}
+
+.cc-ed-audience__group {
+  display: flex;
+  gap: 1rem;
+  /* Trailing gap so set A → set B looks identical to card → card */
+  padding-inline-end: 1rem;
 }
 
 .cc-ed-audience__card {
@@ -1031,15 +1038,21 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--ed-mute);
+  text-wrap: pretty;
 }
 
 @keyframes cc-ed-audience-marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    /* Exactly one group width (group + its trailing padding) */
+    transform: translate3d(-50%, 0, 0);
   }
+}
+
+.cc-ed-audience__viewport:hover .cc-ed-audience__track {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1051,6 +1064,17 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
     margin: 0 auto;
     padding: 0 clamp(1.25rem, 4vw, 3.5rem);
     justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .cc-ed-audience__group {
+    flex-wrap: wrap;
+    padding-inline-end: 0;
+    gap: 1rem;
+  }
+
+  .cc-ed-audience__group[aria-hidden='true'] {
+    display: none;
   }
 
   .cc-ed-audience__viewport {
