@@ -68,7 +68,7 @@ describe('Phase 0B motion foundation', () => {
     expect(proof).toContain("data-motion-pattern=\"reveal-soft\"");
     expect(proof).not.toContain('pin:');
     expect(proof).not.toContain('scrub:');
-    expect(product).toContain('IdentityLanding');
+    expect(product).toContain('EditorialLanding');
     expect(product).not.toContain('MotionSectionRevealProof');
   });
 

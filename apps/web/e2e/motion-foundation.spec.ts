@@ -50,7 +50,7 @@ test.describe('Phase 0B motion foundation', () => {
     });
 
     await page.goto('/', { waitUntil: 'networkidle' });
-    const hero = page.getByTestId('identity-hero');
+    const hero = page.getByTestId('editorial-hero');
     await expect(hero).toBeVisible();
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
 
@@ -65,7 +65,7 @@ test.describe('Phase 0B motion foundation', () => {
     });
     expect(styleState.visibility).toBe('visible');
     expect(styleState.inlineOpacity === '' || Number(styleState.inlineOpacity) > 0.5).toBe(true);
-    await expect(page.getByText(/Ready to share in seconds/i).first()).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
     expect(styleState.opacity).toBeGreaterThan(0);
 
     const hydrationErrors = errors.filter((e) => /hydration/i.test(e));
@@ -77,9 +77,9 @@ test.describe('Phase 0B motion foundation', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(400);
 
-    const hero = page.getByTestId('identity-hero');
+    const hero = page.getByTestId('editorial-hero');
     await expect(hero).toBeVisible();
-    await expect(page.getByText(/Ready to share in seconds/i).first()).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
 
     const state = await page.locator('[data-hero-statement]').first().evaluate((el) => {
       const style = getComputedStyle(el);
@@ -142,7 +142,7 @@ test.describe('Phase 0B motion foundation', () => {
 
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
-    await page.getByTestId('identity-assembly').scrollIntoViewIfNeeded();
+    await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const before = await getScrollTriggerCount(page);
     expect(before).toBeGreaterThanOrEqual(1);
@@ -152,7 +152,7 @@ test.describe('Phase 0B motion foundation', () => {
       await expect(workspaceGreeting(page)).toBeVisible();
       await page.goto('/', { waitUntil: 'networkidle' });
       await waitForMotionDebug(page);
-      await page.getByTestId('identity-assembly').scrollIntoViewIfNeeded();
+      await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
     }
 
@@ -178,7 +178,7 @@ test.describe('Phase 0B motion foundation', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
-    await page.getByTestId('identity-assembly').scrollIntoViewIfNeeded();
+    await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
     const beforeOwned = await getScrollTriggerCount(page);

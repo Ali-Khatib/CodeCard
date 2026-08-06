@@ -18,9 +18,9 @@ const FOOTER_COLUMNS = [
   {
     title: 'Resources',
     links: [
-      { label: 'Assembly', href: `${MARKETING_HOME_HREF}#assembly` },
-      { label: 'How it works', href: `${MARKETING_HOME_HREF}#how-it-works` },
-      { label: 'References', href: '/research/references' },
+      { label: 'Projects', href: `${MARKETING_HOME_HREF}#projects` },
+      { label: 'Circle', href: `${MARKETING_HOME_HREF}#circle` },
+      { label: 'Analysis', href: `${MARKETING_HOME_HREF}#analysis` },
     ],
   },
   {

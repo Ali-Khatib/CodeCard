@@ -8,14 +8,11 @@ function read(rel: string) {
 
 describe('Phase 0C LCP recovery contracts', () => {
   it('keeps hero LCP text free of opacity animation', () => {
-    const hero = read('src/components/landing/identity/identity-hero.tsx');
-    const client = read('src/components/landing/identity/identity-hero-client.tsx');
+    const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('data-hero-statement');
     expect(hero).not.toContain("'use client'");
     expect(hero).not.toContain('fromTo');
     expect(hero).not.toContain('opacity');
-    expect(client).toContain("'use client'");
-    expect(client).not.toContain('data-hero-statement');
   });
 
   it('preloads Instrument Serif with optional display for landing headline LCP', () => {
@@ -25,15 +22,15 @@ describe('Phase 0C LCP recovery contracts', () => {
     expect(layout).toMatch(/Instrument_Serif\([\s\S]*?preload:\s*true/);
   });
 
-  it('defers below-fold landing modules with dynamic import', () => {
-    const landing = read('src/components/landing/identity/identity-landing.tsx');
+  it('defers atmosphere with dynamic import; hero stays eager', () => {
+    const landing = read('src/components/landing/editorial/editorial-landing.tsx');
     const product = read('src/components/landing/product-page.tsx');
-    expect(product).toContain('IdentityLanding');
+    expect(product).toContain('EditorialLanding');
     expect(landing).toContain("from 'next/dynamic'");
-    expect(landing).toContain('IdentityAssembly');
-    expect(landing).toContain('HowItWorksSection');
-    expect(landing).toContain('AudienceBounceCards');
-    expect(landing).not.toContain('IdentityInspect');
+    expect(landing).toContain('EditorialAtmosphere');
+    expect(landing).toContain('EditorialHero');
+    expect(landing).not.toContain('AudienceBounceCards');
+    expect(landing).not.toContain('HowItWorksSection');
   });
 
   it('does not high-priority the demo avatar when bio text is LCP', () => {
