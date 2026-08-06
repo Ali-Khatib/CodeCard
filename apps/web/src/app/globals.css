@@ -5084,6 +5084,13 @@ select,
 }
 
 .cc-visitor-prompt {
+  /* Self-contained light surface — ignore page light/dark tokens so copy
+     stays high-contrast on phone, tablet, and large screens. */
+  --vp-ink: #1a191c;
+  --vp-smoke: #3a3735;
+  --vp-eyebrow: #3f2f4d;
+  --vp-paper: #ffffff;
+  --vp-border: rgba(26, 25, 28, 0.18);
   position: fixed;
   right: max(20px, env(safe-area-inset-right));
   bottom: max(20px, env(safe-area-inset-bottom));
@@ -5091,7 +5098,7 @@ select,
   isolation: isolate;
   width: min(390px, calc(100vw - 40px));
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--app-border, var(--ink)) 72%, transparent);
+  border: 1px solid var(--vp-border);
   border-radius: 24px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(252, 241, 231, 0.97));
@@ -5099,7 +5106,11 @@ select,
     0 24px 70px rgba(35, 35, 36, 0.2),
     0 4px 18px rgba(35, 35, 36, 0.1);
   padding: 24px;
-  color: var(--app-ink, var(--ink));
+  color: var(--vp-ink);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   animation: cc-visitor-prompt-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -5124,30 +5135,31 @@ select,
 .cc-visitor-prompt__eyebrow {
   margin: 0;
   font-family: var(--font-eyebrow);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   line-height: 1.4;
   text-transform: uppercase;
-  color: #5c466d;
+  color: var(--vp-eyebrow);
 }
 
 .cc-visitor-prompt__heading {
   margin: 10px 0 0;
   font-family: var(--font-display);
-  font-size: clamp(29px, 7vw, 37px);
-  font-weight: 400;
+  font-size: clamp(28px, 6.5vw, 36px);
+  font-weight: 600;
   letter-spacing: -0.035em;
-  line-height: 1;
-  color: var(--app-ink, var(--ink));
+  line-height: 1.05;
+  color: var(--vp-ink);
 }
 
 .cc-visitor-prompt__body {
   max-width: 34ch;
   margin: 14px 0 0;
   font-size: 15px;
+  font-weight: 500;
   line-height: 1.55;
-  color: var(--app-smoke, var(--smoke));
+  color: var(--vp-smoke);
 }
 
 .cc-visitor-prompt__actions {
@@ -5172,15 +5184,15 @@ select,
 }
 
 .cc-visitor-prompt__primary {
-  border: 1px solid var(--app-ink, var(--ink));
-  background: var(--app-ink, var(--ink));
-  color: var(--app-paper, var(--paper));
+  border: 1px solid var(--vp-ink);
+  background: var(--vp-ink);
+  color: var(--vp-paper);
 }
 
 .cc-visitor-prompt__secondary {
-  border: 1px solid color-mix(in srgb, var(--app-ink, var(--ink)) 40%, transparent);
-  background: rgba(255, 255, 255, 0.62);
-  color: var(--app-ink, var(--ink));
+  border: 1px solid color-mix(in srgb, var(--vp-ink) 42%, transparent);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--vp-ink);
 }
 
 .cc-visitor-prompt__stores {
@@ -5195,8 +5207,8 @@ select,
   min-height: 44px;
   align-items: center;
   gap: 5px;
-  color: var(--app-ink, var(--ink));
-  font-size: 13px;
+  color: var(--vp-ink);
+  font-size: 14px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -5222,7 +5234,7 @@ select,
   border-radius: 12px;
   background: transparent;
   padding: 10px 4px;
-  color: var(--app-ink, var(--ink));
+  color: var(--vp-ink);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
@@ -5234,14 +5246,57 @@ select,
   margin: 2px 0 0;
   max-width: 36ch;
   padding: 0 4px;
-  color: var(--app-smoke, var(--smoke));
-  font-size: 12px;
+  color: var(--vp-smoke);
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.45;
 }
 
 .cc-visitor-prompt :is(a, button):focus-visible {
-  outline: 3px solid var(--app-ink, var(--ink));
+  outline: 3px solid var(--vp-ink);
   outline-offset: 3px;
+}
+
+/* Large / TV-ish viewports — keep type readable at distance */
+@media (min-width: 1280px) {
+  .cc-visitor-prompt {
+    width: min(420px, calc(100vw - 48px));
+    padding: 26px;
+  }
+
+  .cc-visitor-prompt__heading {
+    font-size: 36px;
+  }
+
+  .cc-visitor-prompt__body {
+    font-size: 16px;
+  }
+}
+
+/* Forced-colors / high-contrast OS modes */
+@media (forced-colors: active) {
+  .cc-visitor-prompt {
+    border: 2px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .cc-visitor-prompt__eyebrow,
+  .cc-visitor-prompt__heading,
+  .cc-visitor-prompt__body,
+  .cc-visitor-prompt__secondary,
+  .cc-visitor-prompt__store-link,
+  .cc-visitor-prompt__dismiss,
+  .cc-visitor-prompt__refusal-support {
+    color: CanvasText;
+  }
+
+  .cc-visitor-prompt__primary {
+    background: ButtonText;
+    border-color: ButtonText;
+    color: ButtonFace;
+  }
 }
 
 @keyframes cc-visitor-prompt-enter {

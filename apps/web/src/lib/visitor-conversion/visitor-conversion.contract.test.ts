@@ -144,4 +144,20 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(reducedBlock).toContain('cc-visitor-prompt-fade');
     expect(reducedBlock).not.toContain('translate');
   });
+
+  it('keeps visitor prompt text contrast independent of page theme', () => {
+    const css = read('src/app/globals.css');
+    expect(css).toContain('--vp-ink:');
+    expect(css).toContain('--vp-smoke:');
+    expect(css).toContain('color-scheme: light');
+    const bodyBlock = css.match(/\.cc-visitor-prompt__body\s*\{[^}]+\}/)?.[0];
+    expect(bodyBlock).toBeTruthy();
+    expect(bodyBlock).toContain('color: var(--vp-smoke)');
+    expect(bodyBlock).not.toContain('var(--app-smoke');
+    expect(bodyBlock).not.toMatch(/color:\s*var\(--smoke\)/);
+    const headingBlock = css.match(/\.cc-visitor-prompt__heading\s*\{[^}]+\}/)?.[0];
+    expect(headingBlock).toBeTruthy();
+    expect(headingBlock).toContain('color: var(--vp-ink)');
+    expect(headingBlock).not.toContain('var(--app-ink');
+  });
 });
