@@ -28,19 +28,19 @@
 }
 
 /* 1 — charcoal */
-.cc-ed[data-chapter='hero'],
-.cc-ed[data-chapter='network'],
-.cc-ed[data-chapter='circle'],
-.cc-ed[data-chapter='connections'] {
+.cc-ed[data-chapter='hero'] {
   --ed-bg: var(--ed-dark);
   --ed-fg: #efedeb;
 }
 
-/* 2 — cool stone (not warm cream/yellow) */
+/* 2 — warm cream (yellow) for network + product mid */
 .cc-ed[data-chapter='statement'],
 .cc-ed[data-chapter='projects'],
-.cc-ed[data-chapter='research'] {
-  --ed-bg: var(--ed-stone);
+.cc-ed[data-chapter='research'],
+.cc-ed[data-chapter='network'],
+.cc-ed[data-chapter='circle'],
+.cc-ed[data-chapter='connections'] {
+  --ed-bg: var(--ed-cream);
   --ed-fg: var(--ed-ink);
 }
 
