@@ -21,13 +21,12 @@ export function ProductAnalysisSection() {
             id="editorial-analysis-heading"
             className="cc-ed__display mt-4"
           >
-            <span className="cc-ed__lead">FULL ANALYSIS.</span>
-            <span className="cc-ed__sub">EVERY DETAIL.</span>
+            <span className="cc-ed__lead">SEE EVERY SIGNAL.</span>
+            <span className="cc-ed__sub">ACT ON WHAT MATTERS.</span>
           </h2>
           <p className="cc-ed__lede mt-5">
-            Specific, all inclusive analysis across your profile, projects,
-            research, Circle, and connections. Views, opens, shares, and who
-            engaged. Demo signals from the Alex Chen workspace.
+            Profile views, project opens, research reads, Circle shares, QR
+            scans, and follow ups. One place to read how your work travels.
           </p>
           <p className="mt-6">
             <Link href={`${LIVE_DEMO_HREF}`} className="cc-ed__link">

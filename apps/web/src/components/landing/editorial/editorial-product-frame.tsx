@@ -220,8 +220,8 @@ export function EditorialProductFrame({
 
         {state === 'analysis' ? (
           <>
-            <p className="cc-ed__frame-kicker">Analysis · demo data</p>
-            <p className="cc-ed__frame-title">What people opened</p>
+            <p className="cc-ed__frame-kicker">Analysis</p>
+            <p className="cc-ed__frame-title">How your work travels</p>
             <div className="cc-ed__metric-grid" aria-label="Analysis metrics">
               <div className="cc-ed__metric-box">
                 <strong>1.2k</strong>
@@ -233,7 +233,21 @@ export function EditorialProductFrame({
               </div>
               <div className="cc-ed__metric-box">
                 <strong>24</strong>
-                <span>Research downloads</span>
+                <span>Research reads</span>
+              </div>
+            </div>
+            <div className="cc-ed__metric-grid cc-ed__metric-grid--row2">
+              <div className="cc-ed__metric-box">
+                <strong>41</strong>
+                <span>QR scans</span>
+              </div>
+              <div className="cc-ed__metric-box">
+                <strong>18</strong>
+                <span>Circle shares</span>
+              </div>
+              <div className="cc-ed__metric-box">
+                <strong>9</strong>
+                <span>Follow ups</span>
               </div>
             </div>
             <div className="cc-ed__analysis-split">
@@ -241,10 +255,12 @@ export function EditorialProductFrame({
                 <p className="cc-ed__analysis-label">Reach over time</p>
                 <svg className="cc-ed__chart" viewBox="0 0 220 72" aria-hidden>
                   <path
-                    d="M6 58 C 34 54, 48 28, 72 34 S 118 12, 148 22 S 188 48, 214 26"
+                    className="cc-ed__chart-line"
+                    d="M0 52 C 28 48, 42 30, 66 36 S 112 10, 142 20 S 182 46, 220 22"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2.5"
+                    strokeLinecap="round"
                   />
                 </svg>
               </div>

@@ -591,13 +591,17 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   margin-top: 1.15rem;
 }
 
+.cc-ed__metric-grid--row2 {
+  margin-top: 0.85rem;
+}
+
 .cc-ed__metric-box {
   border: 1px solid var(--ed-border);
   border-radius: 16px;
-  padding: 1.45rem 1rem 1.3rem;
+  padding: 1.15rem 0.85rem 1.05rem;
   text-align: center;
   background: color-mix(in srgb, var(--ed-cream) 40%, var(--ed-paper));
-  min-height: 7.5rem;
+  min-height: 6.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -606,7 +610,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed__metric-box strong {
   display: block;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.15rem, 3.5vw + 0.7rem, 3.1rem);
+  font-size: clamp(1.85rem, 3vw + 0.6rem, 2.65rem);
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -615,8 +619,8 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed__metric-box span {
   display: block;
-  margin-top: 0.45rem;
-  font-size: 0.75rem;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
   letter-spacing: 0.02em;
   color: var(--ed-mute);
 }
