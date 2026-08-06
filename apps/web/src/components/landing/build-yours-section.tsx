@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import {
   CODECARD_HEADLINE,
@@ -8,12 +7,10 @@ import {
   CODECARD_INTRO_PITCH,
   CODECARD_TAGLINE,
 } from '@/lib/marketing/positioning';
-import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
 import { ScrollReveal } from './scroll-reveal';
 import { MorphSignupCta } from './morph-signup-cta';
 import { TYPE } from '@/lib/design/tokens';
 import { CtaArrow } from '@/components/interactions/glow-press';
-import { UnifiedCodeCardPreview } from '@/components/cinematic/cinematic-previews';
 
 export function BuildYoursSection() {
   return (
@@ -21,10 +18,6 @@ export function BuildYoursSection() {
       <div className="cc-container">
         <ScrollReveal>
           <div className="cc-landing-closing cc-landing-closing--ambient mx-auto max-w-[820px] text-center">
-            <div className="cc-landing-closing__echo" aria-hidden>
-              <UnifiedCodeCardPreview />
-            </div>
-
             <h2 className={`${TYPE.sectionHeading} text-ink`}>{CODECARD_INTRO_PITCH}</h2>
 
             <p className="cc-landing-closing__tagline mx-auto mt-5 max-w-[640px] text-[17px] leading-[1.55] text-smoke md:text-[18px]">
@@ -45,14 +38,6 @@ export function BuildYoursSection() {
                 Live demo workspace <CtaArrow />
               </LiveDemoLink>
             </div>
-
-            <Link
-              href={LIVE_DEMO_PROFILE_HREF}
-              className="cc-landing-closing__profile-link"
-              data-testid="closing-profile-preview-link"
-            >
-              Preview public profile
-            </Link>
           </div>
         </ScrollReveal>
       </div>

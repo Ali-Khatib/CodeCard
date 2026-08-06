@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Image from 'next/image';
-import { motion, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion';
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ScrollExpandMediaProps {
@@ -65,29 +72,69 @@ function isQrCellFilled(index: number) {
   );
 }
 
-function FakeQrCode() {
+function FakeQrCode({ progress }: { progress: MotionValue<number> }) {
+  const scanY = useTransform(progress, [0, 0.26], ['6%', '94%']);
+  const scanOpacity = useTransform(progress, [0, 0.04, 0.2, 0.3], [0.15, 1, 1, 0]);
+  const glowOpacity = useTransform(progress, [0, 0.12, 0.28], [0.35, 0.7, 0.15]);
+  const frameScale = useTransform(progress, [0, 0.28], [1, 1.06]);
+  const gridOpacity = useTransform(progress, [0, 0.08, 0.2], [0.4, 0.75, 1]);
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center rounded-[28px] bg-[#fffaf4] p-8">
-      <div className="rounded-[28px] border border-[rgba(35,35,36,0.08)] bg-white p-5 shadow-[0_22px_70px_rgba(35,35,36,0.12)]">
-        <div
-          className="grid h-[min(48vw,260px)] w-[min(48vw,260px)] gap-[3px]"
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[28px] bg-[#fffaf4] p-8">
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          opacity: glowOpacity,
+          background:
+            'radial-gradient(ellipse at 50% 40%, rgba(192,148,228,0.28), transparent 62%)',
+        }}
+        aria-hidden
+      />
+
+      <motion.div
+        className="relative rounded-[28px] border border-[rgba(35,35,36,0.08)] bg-white p-5 shadow-[0_22px_70px_rgba(35,35,36,0.12)]"
+        style={{ scale: frameScale }}
+      >
+        <motion.div
+          className="relative grid h-[min(48vw,280px)] w-[min(48vw,280px)] gap-[3px] overflow-hidden"
           style={{
+            opacity: gridOpacity,
             gridTemplateColumns: `repeat(${QR_SIZE}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${QR_SIZE}, minmax(0, 1fr))`,
           }}
           aria-hidden
         >
-          {Array.from({ length: QR_SIZE * QR_SIZE }).map((_, index) => (
-            <span
-              key={index}
-              className="rounded-[2px]"
-              style={{
-                backgroundColor: isQrCellFilled(index) ? 'rgba(35,35,36,0.88)' : 'transparent',
-              }}
-            />
-          ))}
-        </div>
-      </div>
+          {Array.from({ length: QR_SIZE * QR_SIZE }).map((_, index) => {
+            const filled = isQrCellFilled(index);
+            const row = Math.floor(index / QR_SIZE);
+            return (
+              <span
+                key={index}
+                className="cc-hiw-qr-cell rounded-[2px]"
+                style={{
+                  backgroundColor: filled ? 'rgba(35,35,36,0.88)' : 'transparent',
+                  animationDelay: filled ? `${row * 28}ms` : undefined,
+                }}
+              />
+            );
+          })}
+
+          <motion.div
+            className="pointer-events-none absolute inset-x-0 h-[18%]"
+            style={{
+              top: scanY,
+              opacity: scanOpacity,
+              background:
+                'linear-gradient(180deg, transparent, rgba(192,148,228,0.55), rgba(255,255,255,0.85), rgba(192,148,228,0.45), transparent)',
+              boxShadow: '0 0 28px rgba(192,148,228,0.45)',
+            }}
+          />
+        </motion.div>
+
+        <p className="mt-4 text-center font-eyebrow text-[11px] uppercase tracking-[0.16em] text-[#8b7f76]">
+          Scanning…
+        </p>
+      </motion.div>
     </div>
   );
 }
@@ -112,35 +159,45 @@ export default function ScrollExpandMedia({
     offset: ['start start', 'end end'],
   });
 
-  const mediaWidthTarget = useTransform(scrollYProgress, [0, 0.3, 1], [320, expandedSize.width, expandedSize.width]);
-  const mediaHeightTarget = useTransform(scrollYProgress, [0, 0.3, 1], [360, expandedSize.height, expandedSize.height]);
-  const mediaWidth = useSpring(mediaWidthTarget, { stiffness: 120, damping: 28, mass: 0.45 });
-  const mediaHeight = useSpring(mediaHeightTarget, { stiffness: 120, damping: 28, mass: 0.45 });
-  const mediaY = useTransform(scrollYProgress, [0, 0.3], ['0px', '-10px']);
-  const mediaRadius = useTransform(scrollYProgress, [0, 0.28, 0.34], ['34px', '22px', '0px']);
-  const mediaBorderOpacity = useTransform(scrollYProgress, [0, 0.28, 0.34], [1, 0.45, 0]);
+  const mediaWidthTarget = useTransform(
+    scrollYProgress,
+    [0, 0.22, 1],
+    [420, expandedSize.width, expandedSize.width],
+  );
+  const mediaHeightTarget = useTransform(
+    scrollYProgress,
+    [0, 0.22, 1],
+    [460, expandedSize.height, expandedSize.height],
+  );
+  const mediaWidth = useSpring(mediaWidthTarget, { stiffness: 100, damping: 26, mass: 0.4 });
+  const mediaHeight = useSpring(mediaHeightTarget, { stiffness: 100, damping: 26, mass: 0.4 });
+  const mediaY = useTransform(scrollYProgress, [0, 0.22], ['0px', '-6px']);
+  const mediaRadius = useTransform(scrollYProgress, [0, 0.2, 0.28], ['36px', '18px', '0px']);
+  const mediaBorderOpacity = useTransform(scrollYProgress, [0, 0.2, 0.28], [1, 0.35, 0]);
   const mediaBorderColor = useTransform(
     mediaBorderOpacity,
-    (opacity) => `rgba(255,255,255,${opacity * 0.6})`,
+    (opacity) => `rgba(255,255,255,${opacity * 0.65})`,
   );
-  const bgOpacity = useTransform(scrollYProgress, [0, 0.28], [1, 0.18]);
-  const titleXLeft = useTransform(scrollYProgress, [0, 0.3], ['0vw', '-22vw']);
-  const titleXRight = useTransform(scrollYProgress, [0, 0.3], ['0vw', '22vw']);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.2, 0.34], [1, 0.72, 0]);
-  const mediaOpacity = useTransform(scrollYProgress, [0, 0.22, 0.34], [1, 0.45, 0]);
-  const contentOpacity = useTransform(scrollYProgress, [0.34, 0.43], [0, 1]);
-  const contentY = useTransform(scrollYProgress, [0.34, 0.43], ['26px', '0px']);
+  const bgOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0.08]);
+  const titleXLeft = useTransform(scrollYProgress, [0, 0.22], ['0vw', '-28vw']);
+  const titleXRight = useTransform(scrollYProgress, [0, 0.22], ['0vw', '28vw']);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.14, 0.26], [1, 0.65, 0]);
+  const mediaOpacity = useTransform(scrollYProgress, [0, 0.18, 0.3], [1, 0.55, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0.26, 0.36], [0, 1]);
+  const contentY = useTransform(scrollYProgress, [0.26, 0.36], ['40px', '0px']);
+  const contentScale = useTransform(scrollYProgress, [0.26, 0.36], [0.94, 1]);
+  const bloomOpacity = useTransform(scrollYProgress, [0.2, 0.26, 0.34], [0, 0.7, 0]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    onExpandChange?.(latest >= 0.3);
+    onExpandChange?.(latest >= 0.22);
   });
 
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
   return (
-    <section ref={sectionRef} className={cn('relative min-h-[360vh] overflow-x-clip', className)}>
-      <motion.div className="sticky top-0 flex min-h-[100dvh] items-center justify-center overflow-hidden">
+    <section ref={sectionRef} className={cn('relative min-h-[480vh] overflow-x-clip', className)}>
+      <motion.div className="sticky top-0 flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-4">
         <motion.div className="absolute inset-0" style={{ opacity: bgOpacity }}>
           <Image
             src={bgImageSrc}
@@ -150,12 +207,12 @@ export default function ScrollExpandMedia({
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-[#fff3e7]/55 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[#fff3e7]/6 backdrop-blur-[1.5px]" />
         </motion.div>
 
         <motion.div
           className={cn(
-            'pointer-events-none absolute inset-x-4 z-20 flex flex-col items-center gap-3 text-center',
+            'relative z-20 mb-6 flex max-w-[920px] flex-col items-center gap-2 text-center',
             textBlend ? 'mix-blend-difference' : 'mix-blend-normal',
           )}
           style={{ opacity: titleOpacity }}
@@ -168,7 +225,7 @@ export default function ScrollExpandMedia({
               {date}
             </motion.p>
           )}
-          <div className="flex flex-col gap-1 font-display text-[clamp(2.5rem,8vw,7rem)] leading-[0.9] tracking-[-0.06em] text-[#232324]">
+          <div className="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 font-display text-[clamp(2.8rem,7vw,6.2rem)] leading-[0.92] tracking-[-0.06em] text-[#232324]">
             <motion.span style={{ x: titleXLeft }}>{firstWord}</motion.span>
             <motion.span className="text-[#c094e4]" style={{ x: titleXRight }}>
               {restOfTitle}
@@ -176,7 +233,7 @@ export default function ScrollExpandMedia({
           </div>
           {scrollToExpand && (
             <motion.p
-              className="mt-2 font-sans text-[14px] font-medium text-[#6f6660]"
+              className="mt-1 font-sans text-[14px] font-medium text-[#6f6660]"
               style={{ x: titleXRight }}
             >
               {scrollToExpand}
@@ -196,7 +253,7 @@ export default function ScrollExpandMedia({
         >
           <motion.div className="absolute inset-0" style={{ opacity: mediaOpacity }}>
             {mediaType === 'qr' ? (
-              <FakeQrCode />
+              <FakeQrCode progress={scrollYProgress} />
             ) : mediaType === 'video' ? (
               <video
                 src={mediaSrc}
@@ -215,8 +272,14 @@ export default function ScrollExpandMedia({
           </motion.div>
 
           <motion.div
-            className="absolute inset-0 overflow-hidden bg-[#fffaf4] p-6 md:p-10"
-            style={{ opacity: contentOpacity, y: contentY }}
+            className="pointer-events-none absolute inset-0 z-[5] bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.95),rgba(192,148,228,0.35)_35%,transparent_70%)]"
+            style={{ opacity: bloomOpacity }}
+            aria-hidden
+          />
+
+          <motion.div
+            className="absolute inset-0 overflow-hidden bg-[#f7f1ea] p-5 md:p-8"
+            style={{ opacity: contentOpacity, y: contentY, scale: contentScale }}
           >
             {typeof children === 'function' ? children(scrollYProgress) : children}
           </motion.div>

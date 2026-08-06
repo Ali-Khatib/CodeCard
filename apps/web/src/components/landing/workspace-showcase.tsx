@@ -1,8 +1,6 @@
 'use client';
 
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
-import Link from 'next/link';
 import { TYPE } from '@/lib/design/tokens';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionCounter } from './section-counter';
@@ -68,12 +66,6 @@ export function WorkspaceShowcase() {
             <LiveDemoLink className="cc-btn-pill-demo cc-instant-press inline-flex h-11 px-8 text-[15px]">
               Open live demo workspace →
             </LiveDemoLink>
-            <Link
-              href={LIVE_DEMO_PROFILE_HREF}
-              className="text-[15px] font-medium text-ink underline-offset-4 transition-opacity hover:opacity-70 hover:underline"
-            >
-              View public profile
-            </Link>
           </div>
         </ScrollReveal>
 

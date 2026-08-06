@@ -3,7 +3,7 @@ import { LIVE_DEMO_ENTRY_HREF } from '@/lib/marketing/site-routes';
 /** Signed-out workspace demo — full dashboard preview with sidebar (canonical live demo). */
 export const LIVE_DEMO_WORKSPACE_HREF = LIVE_DEMO_ENTRY_HREF;
 
-/** Public profile demo — visitor-facing Alex Chen CodeCard page. */
+/** Public profile demo — visitor-facing CodeCard page. */
 export const LIVE_DEMO_PROFILE_HREF = '/demo/card';
 
 /** Default live demo entry (workspace). */
@@ -17,7 +17,7 @@ export const LIVE_DEMO_PREVIEW_ALIAS_HREF = '/dashboard/preview';
  */
 export const LIVE_DEMO_PROFILE_LEGACY_HREF = LIVE_DEMO_PROFILE_HREF;
 
-/** Public profile path for a slug (`/demo/card` for the Alex Chen demo). */
+/** Public profile path for a slug (`/demo/card` for the demo persona). */
 export function publicDemoProfileBasePath(profileSlug: string): string {
   return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
 }
