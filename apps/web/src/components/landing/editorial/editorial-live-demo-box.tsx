@@ -67,7 +67,7 @@ export function EditorialLiveDemoBox() {
           Explore {DEMO_PROFILE.display_name}’s full CodeCard inside the page, the
           same workspace as the live demo.
         </p>
-        <p className="mt-5">
+        <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>
         </p>
       </div>
