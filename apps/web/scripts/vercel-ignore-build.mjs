@@ -1,21 +1,17 @@
 /**
- * Per-project branch gate for the shared apps/web root.
+ * Per-project branch gate.
  * Exit 1 = build, exit 0 = skip (Vercel Ignored Build Step).
  *
- * code-card-web  → main only
  * codecard-mvp   → mvp only
+ * code-card-web  → main only
+ * codecard       → main only (monorepo-root project; must not build mvp)
+ * anything else  → main only
  */
 const projectId = process.env.VERCEL_PROJECT_ID ?? "";
 const branch = process.env.VERCEL_GIT_COMMIT_REF ?? "";
 
 const MVP_PROJECT_ID = "prj_ZTosasXt5TxnUQf4WTfcTbN8k1UN";
-const MAIN_PROJECT_ID = "prj_E5wdwC2T4SYTZsRS6xh20p56LJZn";
-
-const allowedBranch =
-  projectId === MVP_PROJECT_ID
-    ? "mvp"
-    : projectId === MAIN_PROJECT_ID
-      ? "main"
-      : "main";
+// code-card-web + codecard (monorepo root) and any other linked project → main only
+const allowedBranch = projectId === MVP_PROJECT_ID ? "mvp" : "main";
 
 process.exit(branch === allowedBranch ? 1 : 0);
