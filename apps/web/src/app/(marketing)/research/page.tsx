@@ -1,4 +1,4 @@
-import { MarketingHashRedirect } from '@/components/landing/marketing-hash-redirect';
+import { ResearchLandingPage } from '@/components/landing/research-landing-page';
 
 export const metadata = {
   title: 'Research | CodeCard',
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function ResearchPage() {
-  return <MarketingHashRedirect hash="assembly" />;
+  return <ResearchLandingPage />;
 }
