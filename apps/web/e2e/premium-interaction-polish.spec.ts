@@ -90,6 +90,20 @@ test.describe('Phase 1B premium interaction polish', () => {
     await expect(page.locator('.cc-app-sidebar').getByText('My Profile')).toHaveCount(0);
   });
 
+  test('workspace Copy Public Link success and reset', async ({ page, context, isMobile }) => {
+    test.skip(!!isMobile, 'Copy public link lives in the desktop sidebar.');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+    const copy = page
+      .getByRole('complementary')
+      .getByRole('button', { name: 'Copy public link' });
+    await expect(copy).toBeVisible();
+    await copy.click();
+    await expect(copy).toHaveAttribute('data-state', 'success');
+    await expect(copy).toHaveText(/Public link copied/i);
+    await expect(copy).toHaveAttribute('data-state', 'idle', { timeout: 5000 });
+  });
+
   test('workspace project and research actions remain available', async ({ page, isMobile }) => {
     // Desktop uses the sidebar; mobile uses the bottom nav. Exercise the real affordance.
     const navName = isMobile ? 'Mobile' : 'Main';
@@ -143,11 +157,12 @@ test.describe('Phase 1B premium interaction polish', () => {
     await page.goto('/demo/card', { waitUntil: 'networkidle' });
     await page.locator('#research').scrollIntoViewIfNeeded();
     const researchLink = page.getByRole('link', { name: /Open research paper:/i }).first();
-    await Promise.all([
-      page.waitForURL(/\/demo\/card\/research\//),
-      researchLink.click(),
-    ]);
-    await expect(page.locator('.cc-content-opening')).toBeHidden({ timeout: 8000 });
+    await researchLink.click();
+    const overlay = page.locator('.cc-content-opening');
+    await expect(overlay).toBeVisible({ timeout: 3000 });
+    await expect(overlay.getByText('Opening research')).toBeVisible();
+    await page.waitForURL(/\/demo\/card\/research\//);
+    await expect(overlay).toBeHidden({ timeout: 8000 });
   });
 
   test('Ctrl/Cmd-click preserves native new-tab behavior', async ({ page, browserName }) => {

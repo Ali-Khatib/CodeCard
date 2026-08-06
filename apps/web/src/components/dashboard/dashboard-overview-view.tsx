@@ -15,6 +15,7 @@ import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
 
 export type OverviewReachStats = {
   profileViews: number;
@@ -200,7 +201,7 @@ export function DashboardOverviewView({
       {suggested ? (
         <FadeInView delay={0.16}>
           <section className="cc-profile-home__zone">
-            <AppCard tone="rose" className="cc-profile-next-card !p-6">
+            <AppCard tone="rose" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
               <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-lg">
                   <AppMono>Suggested next step</AppMono>
@@ -212,8 +213,8 @@ export function DashboardOverviewView({
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
-                  <AppButton variant="primary" href={suggested.href}>
-                    Do this now →
+                  <AppButton variant="primary" href={suggested.href} className="cc-btn-pop-icon">
+                    Do this now <span className="cc-btn-pop-icon__glyph" aria-hidden>→</span>
                   </AppButton>
                 </div>
               </div>
@@ -240,7 +241,7 @@ export function DashboardOverviewView({
             </AppCard>
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
-              <AppCard className="!p-5">
+              <InteractiveSurfaceCard className="cc-app-card !p-5" lift parallax={false}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-[13px] text-[var(--app-smoke)]">Projects</p>
@@ -251,8 +252,11 @@ export function DashboardOverviewView({
                       {projectsSummary.published} published
                     </p>
                   </div>
-                  <AppButton variant="ghost" href={`${basePath}/projects`}>
+                  <AppButton variant="ghost" href={`${basePath}/projects`} className="cc-view-all-btn">
                     View all
+                    <span className="cc-view-all-btn__arrow" aria-hidden>
+                      →
+                    </span>
                   </AppButton>
                 </div>
                 {projectsSummary.total === 0 ? (
@@ -276,7 +280,7 @@ export function DashboardOverviewView({
                           href={href}
                           kind="project"
                           itemTitle={item.title}
-                          className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                          className="cc-overview-row flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)]"
                         >
                           <span className="min-w-0 truncate font-medium">{item.title}</span>
                           <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
@@ -288,9 +292,9 @@ export function DashboardOverviewView({
                     })}
                   </ul>
                 )}
-              </AppCard>
+              </InteractiveSurfaceCard>
 
-              <AppCard className="!p-5">
+              <InteractiveSurfaceCard className="cc-app-card !p-5" lift parallax={false}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-[13px] text-[var(--app-smoke)]">Research</p>
@@ -301,8 +305,11 @@ export function DashboardOverviewView({
                       {researchSummary.published} published
                     </p>
                   </div>
-                  <AppButton variant="ghost" href={`${basePath}/research`}>
+                  <AppButton variant="ghost" href={`${basePath}/research`} className="cc-view-all-btn">
                     View all
+                    <span className="cc-view-all-btn__arrow" aria-hidden>
+                      →
+                    </span>
                   </AppButton>
                 </div>
                 {researchSummary.total === 0 ? (
@@ -326,7 +333,7 @@ export function DashboardOverviewView({
                           href={href}
                           kind="research"
                           itemTitle={item.title}
-                          className="flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                          className="cc-overview-row flex items-center justify-between gap-3 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px] text-[var(--app-ink)]"
                         >
                           <span className="min-w-0 truncate font-medium">{item.title}</span>
                           <span className="shrink-0 text-[12px] text-[var(--app-smoke)]">
@@ -338,7 +345,7 @@ export function DashboardOverviewView({
                     })}
                   </ul>
                 )}
-              </AppCard>
+              </InteractiveSurfaceCard>
             </div>
           )}
         </section>

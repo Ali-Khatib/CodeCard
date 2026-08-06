@@ -4320,3 +4320,71 @@ html.dark [class*='uppercase'][class*='tracking'] {
     font-size: 13px !important;
   }
 }
+
+/* Phase 1B — workspace overview interaction polish */
+.cc-suggestion-card {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-suggestion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(34, 34, 34, 0.08);
+  }
+}
+
+.cc-view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-view-all-btn__arrow {
+  display: inline-block;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-view-all-btn:hover .cc-view-all-btn__arrow {
+    transform: translateX(3px);
+  }
+}
+
+.cc-overview-row {
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.cc-overview-row:hover {
+  background: var(--app-bone);
+  border-color: rgba(192, 148, 228, 0.35);
+}
+
+.cc-overview-row:focus-visible {
+  outline: 3px solid var(--app-iris);
+  outline-offset: 2px;
+}
+
+.cc-workspace-copy-link[data-state='success'] {
+  box-shadow: 0 0 0 2px rgba(192, 148, 228, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-suggestion-card,
+  .cc-view-all-btn__arrow,
+  .cc-overview-row {
+    transition: none;
+  }
+
+  .cc-suggestion-card:hover {
+    transform: none;
+  }
+
+  .cc-view-all-btn:hover .cc-view-all-btn__arrow {
+    transform: none;
+  }
+}

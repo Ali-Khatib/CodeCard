@@ -60,6 +60,7 @@ function CopyProfileLinkButton({ slug }: { slug: string }) {
     <AsyncActionButton
       variant="primary"
       block
+      className="cc-workspace-copy-link"
       ariaLabel="Copy public link"
       successLabel="Public link copied"
       onAction={async () => {
@@ -111,16 +112,18 @@ export function DashboardShell({
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const active = document.querySelector('.cc-app-mobile-nav a[aria-current="page"]');
+    const nav = document.querySelector('.cc-app-mobile-nav');
+    if (!(nav instanceof HTMLElement)) return;
+    const active = nav.querySelector('a[aria-current="page"]');
     if (!(active instanceof HTMLElement)) return;
     const reduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    active.scrollIntoView({
-      inline: 'center',
-      block: 'nearest',
-      behavior: reduced ? 'auto' : 'smooth',
-    });
+    // Scroll the nav itself rather than calling scrollIntoView on the link:
+    // scrollIntoView moves the sequential focus navigation starting point into
+    // this nav, which would make the skip link unreachable on the first Tab.
+    const left = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+    nav.scrollTo({ left: Math.max(0, left), behavior: reduced ? 'auto' : 'smooth' });
   }, [pathname]);
 
   useEffect(() => {
