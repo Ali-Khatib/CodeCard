@@ -4,6 +4,7 @@ import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 import { MagneticCta } from '@/components/interactions/magnetic-cta';
 import { CtaArrow } from '@/components/interactions/glow-press';
 import { ProductHeroInteractions } from './product-hero-interactions';
+import { HeroScrollCue } from '@/components/cinematic/hero-scroll-cue';
 
 /** Decorative island — keep float-icon client JS out of the LCP text chunk. */
 const ProductHeroDecorations = dynamic(
@@ -59,6 +60,8 @@ export function ProductHero() {
           </LiveDemoLink>
         </div>
       </div>
+
+      <HeroScrollCue />
     </section>
   );
 }
