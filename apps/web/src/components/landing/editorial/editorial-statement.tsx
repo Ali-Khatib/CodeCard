@@ -16,11 +16,11 @@ export function EditorialStatement() {
           id="editorial-statement-heading"
           className="cc-ed__display cc-ed__display--xl mt-5"
         >
-          <span className="cc-ed__lead">YOUR BEST WORK</span>
-          <span className="cc-ed__sub">SHOULDN’T LIVE IN FIVE PLACES.</span>
+          <span className="cc-ed__lead">YOUR BEST WORK SHOULDN’T</span>
+          <span className="cc-ed__sub">LIVE IN FIVE PLACES.</span>
         </h2>
         <p className="cc-ed__lede">
-          CodeCard brings your projects, research, Circle, and connections into one
+          CodeCard brings projects, research, Circle, and connections into one
           shareable identity.
         </p>
       </div>

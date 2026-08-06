@@ -300,9 +300,9 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed-audience__intro .cc-ed__lede,
 .cc-ed-proof__intro .cc-ed__lede,
 .cc-ed-finale__inner .cc-ed__lede {
-  max-width: min(44rem, 92vw);
+  max-width: min(36rem, 92vw);
   margin-inline: auto;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .cc-ed__actions {

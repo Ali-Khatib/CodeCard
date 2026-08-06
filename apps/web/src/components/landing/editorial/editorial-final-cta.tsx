@@ -20,7 +20,7 @@ export function EditorialFinalCta() {
           <span className="cc-ed__sub">YOUR WORK DESERVES.</span>
         </h2>
         <p className="cc-ed__lede mt-5">
-          Put projects, research, Circle, connections, and analysis in one living
+          Projects, research, Circle, connections, and analysis in one living
           identity.
         </p>
         <div className="cc-ed__actions mt-8">
