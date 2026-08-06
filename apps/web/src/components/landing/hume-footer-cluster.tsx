@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
 
 const FOOTER_COLUMNS = [
@@ -11,7 +11,6 @@ const FOOTER_COLUMNS = [
     links: [
       { label: 'Overview', href: '/' },
       { label: 'Live demo', href: LIVE_DEMO_HREF },
-      { label: 'View public profile', href: LIVE_DEMO_PROFILE_HREF },
       { label: 'Pricing', href: '/pricing' },
     ],
   },

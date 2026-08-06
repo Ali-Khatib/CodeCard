@@ -42,7 +42,7 @@ test.describe('Proof dossier landing', () => {
     await expect(closing).toBeVisible({ timeout: 20000 });
     await expect(page.getByTestId('closing-profile-preview-link')).toHaveAttribute(
       'href',
-      '/demo/card',
+      /\/demo\/?$/,
     );
     const demo = closing.locator('a').filter({ hasText: /live workspace/i }).first();
     await expect(demo).toHaveAttribute('href', /\/demo\/?$/);

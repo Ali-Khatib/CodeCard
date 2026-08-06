@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { DossierObject } from './dossier-object';
 
 export function ProofFinale() {
@@ -19,13 +19,14 @@ export function ProofFinale() {
           <Link href="/sign-up" className="cc-proof-btn cc-proof-btn--signal">
             Create your CodeCard
           </Link>
-          <Link href={LIVE_DEMO_HREF} className="cc-proof-btn cc-proof-btn--ghost">
+          <Link
+            href={LIVE_DEMO_HREF}
+            className="cc-proof-btn cc-proof-btn--ghost"
+            data-testid="closing-profile-preview-link"
+          >
             Enter the live workspace
           </Link>
         </div>
-        <Link href={LIVE_DEMO_PROFILE_HREF} className="cc-proof-finale__link" data-testid="closing-profile-preview-link">
-          Preview public profile
-        </Link>
       </div>
     </section>
   );
