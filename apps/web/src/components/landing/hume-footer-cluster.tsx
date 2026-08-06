@@ -63,14 +63,16 @@ export function HumeFooterCluster() {
           </div>
         </div>
 
-        <div className="cc-site-footer__seam" aria-hidden>
+        <div className="cc-site-footer__seam">
           <svg
             className="cc-site-footer__wave"
             viewBox="0 0 1440 160"
             preserveAspectRatio="none"
+            aria-hidden
           >
+            {/* Cream scallop on top of full-bleed dark */}
             <path
-              d="M0,40 C240,120 480,0 720,48 C960,96 1200,140 1440,56 L1440,160 L0,160 Z"
+              d="M0,0 L1440,0 L1440,56 C1200,140 960,96 720,48 C480,0 240,120 0,40 Z"
               fill="currentColor"
             />
           </svg>
