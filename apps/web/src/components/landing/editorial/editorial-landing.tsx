@@ -50,11 +50,11 @@ export function EditorialLanding() {
         eyebrow="Research"
         title={
           <>
-            <span className="cc-ed__lead">RESEARCH PAPERS.</span>
-            <span className="cc-ed__sub">IN ONE PLACE.</span>
+            <span className="cc-ed__lead">YOUR PAPERS.</span>
+            <span className="cc-ed__sub">NOT JUST A PDF.</span>
           </>
         }
-        body="Abstracts, methods, figures, collaborators, and PDFs live together. Open a paper and skim it in seconds."
+        body="Abstracts, methods, figures, collaborators, and findings in a real paper record people can open and skim in seconds."
         state="research"
         flip
         researchBoard
