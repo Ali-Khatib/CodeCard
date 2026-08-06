@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
-const DARK_CHAPTERS = new Set(['hero']);
+const DARK_CHAPTERS = new Set(['hero', 'network', 'circle', 'connections']);
 
 function navToneFor(chapter: string): 'dark' | 'light' {
   return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';

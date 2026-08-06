@@ -23,7 +23,10 @@
   transition: background-color 0.55s ease, color 0.45s ease;
 }
 
-.cc-ed[data-chapter='hero'] {
+.cc-ed[data-chapter='hero'],
+.cc-ed[data-chapter='network'],
+.cc-ed[data-chapter='circle'],
+.cc-ed[data-chapter='connections'] {
   --ed-bg: var(--ed-dark);
   --ed-fg: #efedeb;
 }
@@ -31,9 +34,6 @@
 .cc-ed[data-chapter='statement'],
 .cc-ed[data-chapter='projects'],
 .cc-ed[data-chapter='research'],
-.cc-ed[data-chapter='network'],
-.cc-ed[data-chapter='circle'],
-.cc-ed[data-chapter='connections'],
 .cc-ed[data-chapter='analysis'],
 .cc-ed[data-chapter='demo'],
 .cc-ed[data-chapter='audience'],
@@ -152,7 +152,10 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   color: color-mix(in srgb, var(--ed-fg) 55%, transparent);
 }
 
-.cc-ed[data-chapter='hero'] .cc-ed__eyebrow {
+.cc-ed[data-chapter='hero'] .cc-ed__eyebrow,
+.cc-ed[data-chapter='network'] .cc-ed__eyebrow,
+.cc-ed[data-chapter='circle'] .cc-ed__eyebrow,
+.cc-ed[data-chapter='connections'] .cc-ed__eyebrow {
   color: color-mix(in srgb, var(--ed-iris) 70%, #efedeb);
 }
 
