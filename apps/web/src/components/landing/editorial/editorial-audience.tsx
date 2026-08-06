@@ -1,3 +1,5 @@
+'use client';
+
 const AUDIENCE = [
   {
     eyebrow: 'Builders',
@@ -27,9 +29,11 @@ const AUDIENCE = [
 ] as const;
 
 /**
- * Who it’s for — five audience cards (editorial, no product mock on the side).
+ * Who it’s for — horizontal drifting audience cards (marquee).
  */
 export function EditorialAudience() {
+  const loop = [...AUDIENCE, ...AUDIENCE];
+
   return (
     <section
       id="audience"
@@ -51,14 +55,22 @@ export function EditorialAudience() {
         </p>
       </div>
 
-      <div className="cc-ed-audience__grid">
-        {AUDIENCE.map((card) => (
-          <article key={card.eyebrow} className="cc-ed-audience__card">
-            <p className="cc-ed-audience__eyebrow">{card.eyebrow}</p>
-            <h3 className="cc-ed-audience__title">{card.title}</h3>
-            <p className="cc-ed-audience__body">{card.body}</p>
-          </article>
-        ))}
+      <div className="cc-ed-audience__viewport">
+        <div
+          className="cc-ed-audience__track"
+          data-testid="editorial-audience-track"
+        >
+          {loop.map((card, index) => (
+            <article
+              key={`${card.eyebrow}-${index}`}
+              className="cc-ed-audience__card"
+            >
+              <p className="cc-ed-audience__eyebrow">{card.eyebrow}</p>
+              <h3 className="cc-ed-audience__title">{card.title}</h3>
+              <p className="cc-ed-audience__body">{card.body}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
