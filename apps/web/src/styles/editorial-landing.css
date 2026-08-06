@@ -47,15 +47,16 @@
   background: transparent;
 }
 
-/* Pill nav follows landing chapters (dark hero → cream body). */
+/* Pill nav — frosted glass that stays visible on dark and cream chapters. */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil {
   transition:
     background-color 0.55s ease,
     border-color 0.45s ease,
     box-shadow 0.45s ease,
-    color 0.45s ease;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+    color 0.45s ease,
+    backdrop-filter 0.45s ease;
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
@@ -63,12 +64,14 @@
   transition: color 0.45s ease, background-color 0.45s ease, border-color 0.45s ease;
 }
 
-/* Default / hero — charcoal bar on dark page */
+/* Dark chapters — light frosted glass (never solid page color) */
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: var(--ed-dark, #202020);
-  border: 1px solid color-mix(in srgb, #efedeb 12%, transparent);
-  box-shadow: none;
+  background: color-mix(in srgb, #efedeb 14%, transparent);
+  border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 color-mix(in srgb, #efedeb 22%, transparent);
 }
 
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
@@ -84,7 +87,7 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
-  background: color-mix(in srgb, var(--ed-iris, #c094e4) 28%, transparent);
+  background: color-mix(in srgb, var(--ed-iris, #c094e4) 42%, transparent);
   color: #efedeb;
   border-color: transparent;
 }
@@ -95,16 +98,22 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-
 }
 
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
-  border-color: color-mix(in srgb, #efedeb 22%, transparent);
+  border-color: color-mix(in srgb, #efedeb 28%, transparent);
   color: #efedeb;
 }
 
-/* Cream chapters — light bar matching page */
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+  background: color-mix(in srgb, #101010 55%, transparent);
+}
+
+/* Cream chapters — ink frosted glass (never flat cream match) */
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 92%, #fff);
-  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 10%, transparent);
-  box-shadow: 0 10px 28px rgba(35, 35, 36, 0.08);
+  background: color-mix(in srgb, #ffffff 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
+  box-shadow:
+    0 12px 32px rgba(35, 35, 36, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
@@ -120,7 +129,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
-  background: color-mix(in srgb, var(--ed-iris, #c094e4) 22%, transparent);
+  background: color-mix(in srgb, var(--ed-iris, #c094e4) 28%, transparent);
   color: var(--ed-ink, #232324);
   border-color: transparent;
 }
@@ -131,12 +140,12 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underl
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
-  border-color: color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
+  border-color: color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   color: var(--ed-ink, #232324);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 96%, #fff);
+  background: color-mix(in srgb, #ffffff 78%, transparent);
 }
 
 .cc-ed__section {
