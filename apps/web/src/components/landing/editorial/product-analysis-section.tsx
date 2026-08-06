@@ -1,33 +1,43 @@
 /**
- * Analysis proof section — former Impact composition, renamed + richer UI.
+ * Analysis — same two-column rhythm as product stories (copy + frame).
  */
 import { EditorialProductFrame } from './editorial-product-frame';
+import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
+import Link from 'next/link';
 
 export function ProductAnalysisSection() {
   return (
     <section
       id="analysis"
-      className="cc-ed__section cc-ed-analysis"
+      className="cc-ed__section cc-ed-story cc-ed-story--lg cc-ed-analysis"
       data-chapter-section="analysis"
       data-testid="editorial-analysis"
       aria-labelledby="editorial-analysis-heading"
     >
-      <div className="cc-ed-analysis__inner">
-        <p className="cc-ed__eyebrow">Analysis</p>
-        <h2 id="editorial-analysis-heading" className="cc-ed__display mt-4">
-          THE WORK IS THERE.
-          <br />
-          <span className="cc-ed__accent">MAKE IT VISIBLE.</span>
-        </h2>
-        <p className="cc-ed__lede mx-auto mt-5">
-          See which profiles, projects, and research items people view, open, and
-          share—demo signals from the Alex Chen workspace.
-        </p>
-
-        <div className="cc-ed-analysis__frame-wrap">
+      <div className="cc-ed-story__grid">
+        <div className="cc-ed-story__copy">
+          <p className="cc-ed__eyebrow">Analysis</p>
+          <h2
+            id="editorial-analysis-heading"
+            className="cc-ed__display mt-4"
+          >
+            THE WORK IS THERE.
+            <br />
+            MAKE IT VISIBLE.
+          </h2>
+          <p className="cc-ed__lede mt-5">
+            See which profiles, projects, and research items people view, open,
+            and share—demo signals from the Alex Chen workspace.
+          </p>
+          <p className="mt-6">
+            <Link href={`${LIVE_DEMO_HREF}`} className="cc-ed__link">
+              Open analysis in the live demo →
+            </Link>
+          </p>
+        </div>
+        <div className="cc-ed-story__visual">
           <EditorialProductFrame state="analysis" size="lg" />
         </div>
-        <p className="cc-ed-analysis__note">Demo metrics · Alex Chen workspace</p>
       </div>
     </section>
   );

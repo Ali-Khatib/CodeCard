@@ -36,10 +36,19 @@ describe('Editorial product landing contract', () => {
     expect(landing).not.toContain('chapter="impact"');
   });
 
-  it('keeps product stories copy-led without right-side product frames', () => {
+  it('keeps product stories with large product frames', () => {
     const story = read('src/components/landing/editorial/product-story.tsx');
-    expect(story).not.toContain('EditorialProductFrame');
-    expect(story).toContain('cc-ed-story__copy--solo');
+    expect(story).toContain('EditorialProductFrame');
+    expect(story).toContain('cc-ed-story__visual');
+  });
+
+  it('keeps analysis in the same two-column story rhythm', () => {
+    const analysis = read(
+      'src/components/landing/editorial/product-analysis-section.tsx',
+    );
+    expect(analysis).toContain('EditorialProductFrame');
+    expect(analysis).toContain('cc-ed-story__grid');
+    expect(analysis).not.toContain('cc-ed__accent');
   });
 
   it('embeds the live demo workspace in an iframe', () => {

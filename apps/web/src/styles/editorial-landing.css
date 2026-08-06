@@ -11,8 +11,12 @@
   --ed-mute: var(--smoke, #5c5856);
   --ed-iris: var(--iris, #c094e4);
   --ed-dark: var(--surface-dark, #202020);
+  /* Cool stone — replaces warm cream/yellow mid chapters */
+  --ed-stone: #e9e8e6;
+  /* Soft iris wash — third chapter tone */
+  --ed-lilac: #ebe6f4;
   --ed-border: color-mix(in srgb, var(--ed-ink) 10%, transparent);
-  --ed-tint: color-mix(in srgb, var(--ed-iris) 6%, var(--ed-cream));
+  --ed-tint: color-mix(in srgb, var(--ed-iris) 8%, var(--ed-stone));
   --ed-radius: 16px;
   --ed-display: clamp(2.875rem, 8vw + 1rem, 7.5rem);
   --ed-display-lg: clamp(3.25rem, 9vw + 1rem, 9rem);
@@ -23,6 +27,7 @@
   transition: background-color 0.55s ease, color 0.45s ease;
 }
 
+/* 1 — charcoal */
 .cc-ed[data-chapter='hero'],
 .cc-ed[data-chapter='network'],
 .cc-ed[data-chapter='circle'],
@@ -31,15 +36,21 @@
   --ed-fg: #efedeb;
 }
 
+/* 2 — cool stone (not warm cream/yellow) */
 .cc-ed[data-chapter='statement'],
 .cc-ed[data-chapter='projects'],
-.cc-ed[data-chapter='research'],
+.cc-ed[data-chapter='research'] {
+  --ed-bg: var(--ed-stone);
+  --ed-fg: var(--ed-ink);
+}
+
+/* 3 — soft iris */
 .cc-ed[data-chapter='analysis'],
 .cc-ed[data-chapter='demo'],
 .cc-ed[data-chapter='audience'],
 .cc-ed[data-chapter='proof'],
 .cc-ed[data-chapter='finale'] {
-  --ed-bg: var(--ed-cream);
+  --ed-bg: var(--ed-lilac);
   --ed-fg: var(--ed-ink);
 }
 
@@ -106,10 +117,10 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--
   background: color-mix(in srgb, #101010 55%, transparent);
 }
 
-/* Cream chapters — ink frosted glass (never flat cream match) */
+/* Cream / light chapters — white frosted glass */
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #ffffff 62%, transparent);
+  background: color-mix(in srgb, #ffffff 58%, transparent);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
   box-shadow:
     0 12px 32px rgba(35, 35, 36, 0.12),
@@ -588,32 +599,45 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   margin: 1.75rem auto 0;
 }
 
-/* —— Product stories (copy-led, no right-side white mock) —— */
+/* —— Product stories —— */
 .cc-ed-story {
-  padding: clamp(3.5rem, 9vh, 6rem) clamp(1.25rem, 4vw, 3.5rem);
+  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3.5rem);
 }
 
-.cc-ed-story__copy--solo {
-  max-width: 44rem;
+.cc-ed-story__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  max-width: 72rem;
+  margin: 0 auto;
 }
 
-.cc-ed-story--flip .cc-ed-story__copy--solo {
-  margin-left: auto;
-  text-align: right;
-}
-
-.cc-ed-story--flip .cc-ed-story__copy--solo .cc-ed__stat-board {
-  justify-content: flex-end;
-}
-
-@media (max-width: 767px) {
-  .cc-ed-story--flip .cc-ed-story__copy--solo {
-    text-align: left;
+@media (min-width: 960px) {
+  .cc-ed-story__grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
+    gap: clamp(2rem, 4vw, 3.5rem);
   }
 
-  .cc-ed-story--flip .cc-ed-story__copy--solo .cc-ed__stat-board {
-    justify-content: flex-start;
+  .cc-ed-story--flip .cc-ed-story__grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
   }
+
+  .cc-ed-story--flip .cc-ed-story__copy {
+    order: 2;
+  }
+
+  .cc-ed-story--flip .cc-ed-story__visual {
+    order: 1;
+  }
+}
+
+.cc-ed-story__visual {
+  display: flex;
+  justify-content: center;
+}
+
+.cc-ed-story__visual .cc-ed__frame {
+  max-width: min(62rem, 100%);
 }
 
 /* —— Network bridge + tight Circle/Connections pair —— */
@@ -641,32 +665,10 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   padding-top: clamp(1.25rem, 3vh, 2rem);
 }
 
-/* —— Analysis —— */
-.cc-ed-analysis {
-  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3.5rem);
-}
-
-.cc-ed-analysis__inner {
-  max-width: 60rem;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.cc-ed-analysis__frame-wrap {
-  margin-top: clamp(2rem, 5vh, 3.5rem);
-  display: flex;
-  justify-content: center;
-}
-
+/* —— Analysis shares .cc-ed-story grid —— */
 .cc-ed-analysis .cc-ed__frame {
   max-width: min(64rem, 100%);
   text-align: left;
-}
-
-.cc-ed-analysis__note {
-  margin-top: 1rem;
-  font-size: 0.75rem;
-  color: var(--ed-mute);
 }
 
 /* —— Live demo embed (iframe) —— */

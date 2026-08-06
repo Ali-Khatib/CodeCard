@@ -40,6 +40,8 @@ export function EditorialLanding() {
           </>
         }
         body="Present the problem, process, technologies, media, links, and results in one clear project record."
+        state="projects"
+        size="lg"
         linkHref={`${LIVE_DEMO_HREF}/projects`}
         linkLabel="Open projects in the live demo →"
       />
@@ -55,8 +57,10 @@ export function EditorialLanding() {
           </>
         }
         body="Give papers, methods, diagrams, collaborators, and findings a professional home."
+        state="research"
         flip
         researchBoard
+        size="lg"
         linkHref={`${LIVE_DEMO_HREF}/research`}
         linkLabel="Open research in the live demo →"
       />
@@ -79,6 +83,8 @@ export function EditorialLanding() {
             </>
           }
           body="Circle keeps trusted peers, shared work, and quiet updates in one calm feed."
+          state="circle"
+          size="lg"
           linkHref={`${LIVE_DEMO_HREF}/circle`}
           linkLabel="Open Circle in the live demo →"
         />
@@ -94,7 +100,9 @@ export function EditorialLanding() {
             </>
           }
           body="Capture people from events, intros, and QR opens—with notes and follow-ups that stay useful."
+          state="connections"
           flip
+          size="lg"
           linkHref={`${LIVE_DEMO_HREF}/connections`}
           linkLabel="Open connections in the live demo →"
         />
