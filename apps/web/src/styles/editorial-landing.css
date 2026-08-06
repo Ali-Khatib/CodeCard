@@ -598,19 +598,30 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed__circle-card-body {
   display: grid;
-  grid-template-columns: minmax(7rem, 9.5rem) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 0;
-  min-height: 8.5rem;
 }
 
 .cc-ed__circle-poster {
   position: relative;
-  min-height: 8.5rem;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 0;
+  overflow: hidden;
   background: var(--ed-page);
+  isolation: isolate;
+}
+
+.cc-ed__circle-poster img {
+  object-fit: cover;
 }
 
 .cc-ed__circle-card-copy {
+  position: relative;
+  z-index: 1;
   padding: 0.85rem 0.9rem 1rem;
+  background: color-mix(in srgb, var(--ed-cream) 40%, var(--ed-paper));
+  min-width: 0;
 }
 
 .cc-ed__circle-project {
@@ -620,16 +631,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--ed-ink);
-}
-
-@media (max-width: 420px) {
-  .cc-ed__circle-card-body {
-    grid-template-columns: 1fr;
-  }
-
-  .cc-ed__circle-poster {
-    min-height: 7rem;
-  }
 }
 
 .cc-ed__metric-grid {
@@ -886,26 +887,27 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .cc-ed-story__copy .cc-ed__display {
   width: 100%;
-  max-width: 12em;
+  max-width: 100%;
   align-items: flex-start;
   text-align: left;
-  text-wrap: unset;
+  text-wrap: balance;
+  /* Keep twin lines inside the copy column, never under the frame */
+  font-size: clamp(2.15rem, 3.4vw + 0.85rem, 4.25rem);
+  line-height: 1.02;
+  overflow-wrap: anywhere;
 }
 
 .cc-ed-story__copy .cc-ed__lead,
 .cc-ed-story__copy .cc-ed__sub {
-  white-space: nowrap;
-}
-
-@media (max-width: 520px) {
-  .cc-ed-story__copy .cc-ed__lead,
-  .cc-ed-story__copy .cc-ed__sub {
-    white-space: normal;
-  }
+  white-space: normal;
+  max-width: 100%;
 }
 
 .cc-ed-story__copy .cc-ed__lede {
@@ -921,10 +923,15 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed-story__visual {
   display: flex;
   justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .cc-ed-story__visual .cc-ed__frame {
   max-width: min(64rem, 100%);
+  width: 100%;
 }
 
 .cc-ed-story--research .cc-ed-story__visual .cc-ed__frame,
