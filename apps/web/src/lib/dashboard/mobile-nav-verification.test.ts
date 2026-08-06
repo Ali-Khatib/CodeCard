@@ -22,8 +22,12 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(shell).toContain("label: 'Connections'");
     expect(shell).toContain("label: 'Circle'");
     expect(shell).toContain("aria-current={active ? 'page' : undefined}");
-    expect(shell).toContain("querySelector('.cc-app-mobile-nav a[aria-current=\"page\"]')");
-    expect(shell).toContain('scrollIntoView');
+    expect(shell).toContain("querySelector('.cc-app-mobile-nav')");
+    expect(shell).toContain("querySelector('a[aria-current=\"page\"]')");
+    // Prefer scrolling the nav scroller (not link.scrollIntoView) so the skip
+    // link stays the first sequential focus target after route changes.
+    expect(shell).toContain('nav.scrollTo');
+    expect(shell).not.toContain('active.scrollIntoView');
     expect(shell).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
 
     expect(css).toContain('.cc-app-mobile-nav');
