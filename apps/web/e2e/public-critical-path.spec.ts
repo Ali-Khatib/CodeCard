@@ -14,7 +14,7 @@ test.describe('Phase 0D public critical rendering path', () => {
     const html = await page.content();
     expect(html).toMatch(/data-hero-statement/);
     expect(html).toMatch(/YOUR WORK/);
-    expect(html).toMatch(/One identity/i);
+    expect(html).toMatch(/ONE IDENTITY/);
     expect(html).not.toMatch(/supabase\.auth\.getSession/);
 
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();

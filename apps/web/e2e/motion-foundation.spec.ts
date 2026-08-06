@@ -65,7 +65,7 @@ test.describe('Phase 0B motion foundation', () => {
     });
     expect(styleState.visibility).toBe('visible');
     expect(styleState.inlineOpacity === '' || Number(styleState.inlineOpacity) > 0.5).toBe(true);
-    await expect(page.getByText(/One identity/i).first()).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
     expect(styleState.opacity).toBeGreaterThan(0);
 
     const hydrationErrors = errors.filter((e) => /hydration/i.test(e));
@@ -79,7 +79,7 @@ test.describe('Phase 0B motion foundation', () => {
 
     const hero = page.getByTestId('editorial-hero');
     await expect(hero).toBeVisible();
-    await expect(page.getByText(/One identity/i).first()).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
 
     const state = await page.locator('[data-hero-statement]').first().evaluate((el) => {
       const style = getComputedStyle(el);

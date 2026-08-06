@@ -115,7 +115,7 @@ export function EditorialResearchProof() {
         <p className="cc-ed__eyebrow">The research</p>
         <h2 id="editorial-research-proof-heading" className="cc-ed__display mt-3">
           <span className="cc-ed__lead">FIRST LOOKS ARE FAST.</span>
-          <span className="cc-ed__sub">Make the work easy to see.</span>
+          <span className="cc-ed__sub">MAKE THE WORK EASY TO SEE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
           Studies on how people scan profiles and résumés point to the same

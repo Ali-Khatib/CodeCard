@@ -34,7 +34,8 @@ export function EditorialLanding() {
         eyebrow="Projects"
         title={
           <>
-            <span className="cc-ed__lead">SHOW WHAT YOU BUILT.</span>
+            <span className="cc-ed__lead">SHOW WHAT</span>
+            <span className="cc-ed__sub">YOU BUILT.</span>
           </>
         }
         body="Present the problem, process, technologies, media, links, and results in one clear project record."
@@ -49,8 +50,8 @@ export function EditorialLanding() {
         eyebrow="Research"
         title={
           <>
-            <span className="cc-ed__lead">RESEARCH DESERVES MORE</span>
-            <span className="cc-ed__sub">than a PDF link.</span>
+            <span className="cc-ed__lead">RESEARCH DESERVES</span>
+            <span className="cc-ed__sub">MORE THAN A PDF LINK.</span>
           </>
         }
         body="Give papers, methods, diagrams, collaborators, and findings a professional home."
@@ -74,8 +75,8 @@ export function EditorialLanding() {
           eyebrow="Circle"
           title={
             <>
-              <span className="cc-ed__lead">STAY CLOSE</span>
-              <span className="cc-ed__sub">to the people who matter.</span>
+              <span className="cc-ed__lead">STAY CLOSE TO</span>
+              <span className="cc-ed__sub">THE PEOPLE WHO MATTER.</span>
             </>
           }
           body="Circle keeps trusted peers, shared work, and quiet updates in one calm feed."
@@ -91,7 +92,7 @@ export function EditorialLanding() {
           title={
             <>
               <span className="cc-ed__lead">REMEMBER WHO</span>
-              <span className="cc-ed__sub">you actually met.</span>
+              <span className="cc-ed__sub">YOU ACTUALLY MET.</span>
             </>
           }
           body="Capture people from events, intros, and QR opens—with notes and follow-ups that stay useful."

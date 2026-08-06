@@ -60,8 +60,8 @@ export function EditorialLiveDemoBox() {
       <div className="cc-ed-demo-embed__intro">
         <p className="cc-ed__eyebrow">Live workspace</p>
         <h2 id="editorial-live-demo-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">TRY THE REAL THING.</span>
-          <span className="cc-ed__sub">The full workspace, right here.</span>
+          <span className="cc-ed__lead">TRY THE</span>
+          <span className="cc-ed__sub">REAL THING.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
           Explore {DEMO_PROFILE.display_name}’s full CodeCard inside the page—same

@@ -22,7 +22,7 @@ export function ProductAnalysisSection() {
             className="cc-ed__display mt-4"
           >
             <span className="cc-ed__lead">THE WORK IS THERE.</span>
-            <span className="cc-ed__sub">Make it visible.</span>
+            <span className="cc-ed__sub">MAKE IT VISIBLE.</span>
           </h2>
           <p className="cc-ed__lede mt-5">
             See which profiles, projects, and research items people view, open,

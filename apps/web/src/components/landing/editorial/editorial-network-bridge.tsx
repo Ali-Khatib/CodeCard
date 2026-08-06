@@ -16,14 +16,12 @@ export function EditorialNetworkBridge() {
           id="editorial-network-bridge-heading"
           className="cc-ed__display mt-4"
         >
-          <span className="cc-ed__lead">NOT JUST FOR SHOWING WORK.</span>
-          <span className="cc-ed__sub">
-            Save connections and exchange cards in one place.
-          </span>
+          <span className="cc-ed__lead">CODECARD ISN’T JUST</span>
+          <span className="cc-ed__sub">FOR SHOWING WORK.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          CodeCard is your technical identity—and a card holder for the people
-          you actually meet.
+          It’s the easiest way to save connections and exchange cards—your
+          technical identity, and a card holder for the people you meet.
         </p>
       </div>
     </section>

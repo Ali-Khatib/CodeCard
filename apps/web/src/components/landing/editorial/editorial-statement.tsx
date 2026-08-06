@@ -17,9 +17,7 @@ export function EditorialStatement() {
           className="cc-ed__display cc-ed__display--xl mt-5"
         >
           <span className="cc-ed__lead">YOUR BEST WORK</span>
-          <span className="cc-ed__sub">
-            shouldn’t live in five different places.
-          </span>
+          <span className="cc-ed__sub">SHOULDN’T LIVE IN FIVE PLACES.</span>
         </h2>
         <p className="cc-ed__lede">
           CodeCard brings your projects, research, Circle, and connections into

@@ -199,28 +199,39 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   color: var(--ed-fg);
 }
 
+/* Same size as lead — all-caps twin line, not a quiet caption */
 .cc-ed__sub {
   display: block;
-  margin-top: 0.2em;
-  max-width: 18ch;
-  font-size: clamp(1.35rem, 2.4vw + 0.4rem, 2.35rem);
-  line-height: 1.18;
-  letter-spacing: -0.02em;
-  font-weight: 400;
-  text-transform: none;
-  color: color-mix(in srgb, var(--ed-fg) 62%, transparent);
+  margin-top: 0.04em;
+  max-width: none;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-weight: inherit;
+  text-transform: uppercase;
+  color: var(--ed-iris);
+}
+
+.cc-ed[data-chapter='statement'] .cc-ed__sub,
+.cc-ed[data-chapter='projects'] .cc-ed__sub,
+.cc-ed[data-chapter='research'] .cc-ed__sub,
+.cc-ed[data-chapter='network'] .cc-ed__sub,
+.cc-ed[data-chapter='circle'] .cc-ed__sub,
+.cc-ed[data-chapter='connections'] .cc-ed__sub,
+.cc-ed[data-chapter='analysis'] .cc-ed__sub,
+.cc-ed[data-chapter='demo'] .cc-ed__sub,
+.cc-ed[data-chapter='audience'] .cc-ed__sub,
+.cc-ed[data-chapter='proof'] .cc-ed__sub,
+.cc-ed[data-chapter='finale'] .cc-ed__sub {
+  /* Same size as lead; ink-tinted iris so it stays readable on cream/lilac */
+  color: color-mix(in srgb, var(--ed-iris) 55%, var(--ed-ink));
 }
 
 .cc-ed[data-chapter='hero'] .cc-ed__sub {
-  color: color-mix(in srgb, var(--ed-iris) 78%, #efedeb);
+  color: var(--ed-iris);
 }
 
-/* Legacy accent — prefer .cc-ed__sub for hierarchy */
 .cc-ed__accent {
-  color: color-mix(in srgb, var(--ed-iris) 72%, var(--ed-ink));
-}
-
-.cc-ed[data-chapter='hero'] .cc-ed__accent {
   color: var(--ed-iris);
 }
 

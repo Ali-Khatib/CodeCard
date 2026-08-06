@@ -6,7 +6,7 @@ test.describe('Editorial product landing', () => {
     expect(response?.ok()).toBeTruthy();
     const html = await page.content();
     expect(html).toContain('YOUR WORK.');
-    expect(html).toMatch(/One identity/i);
+    expect(html).toContain('ONE IDENTITY.');
     expect(html).not.toMatch(/View Public Profile/i);
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
@@ -16,7 +16,7 @@ test.describe('Editorial product landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-network-bridge')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/not just/i).first()).toBeVisible();
+    await expect(page.getByText(/isn.?t just/i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-network-pair')).toBeVisible();
     await expect(page.getByTestId('editorial-story-circle')).toBeVisible();
     await expect(page.getByTestId('editorial-story-connections')).toBeVisible();

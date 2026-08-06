@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
 /**
- * Dark editorial hero — lead + quieter sub line.
+ * Dark editorial hero — full-size display lines, clean breaks.
  */
 export function EditorialHero() {
   return (
@@ -22,7 +22,7 @@ export function EditorialHero() {
           data-hero-statement
         >
           <span className="cc-ed__lead">YOUR WORK.</span>
-          <span className="cc-ed__sub">One identity.</span>
+          <span className="cc-ed__sub cc-ed__sub--accent">ONE IDENTITY.</span>
         </h1>
         <p className="cc-ed__lede mt-6">
           Projects, research, Circle, and connections—presented through one
