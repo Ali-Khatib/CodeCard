@@ -7,6 +7,37 @@ import { AuroraDivider } from './aurora-divider';
 import { SectionCounter } from './section-counter';
 import { TYPE } from '@/lib/design/tokens';
 import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
+import '@/styles/cinematic-landing.css';
+
+/** Below-fold cinematic scenes — keep GSAP cinema off the LCP path. */
+const ScatteredWorkScene = dynamic(
+  () =>
+    import('@/components/cinematic/scattered-work-scene').then((m) => m.ScatteredWorkScene),
+  {
+    ssr: true,
+    loading: () => (
+      <section
+        className="scroll-mt-28 py-20"
+        aria-label="Scattered work story"
+        data-testid="cinematic-scattered-fallback"
+      />
+    ),
+  },
+);
+const ProductShowcaseScene = dynamic(
+  () =>
+    import('@/components/cinematic/product-showcase-scene').then((m) => m.ProductShowcaseScene),
+  {
+    ssr: true,
+    loading: () => (
+      <section
+        className="scroll-mt-28 py-20"
+        aria-label="Product showcase"
+        data-testid="cinematic-showcase-fallback"
+      />
+    ),
+  },
+);
 
 /** Below-fold islands — keep initial `/` JS free of their client graphs until needed. */
 const WorkspaceShowcase = dynamic(
@@ -56,6 +87,11 @@ export function ProductPage() {
     <ResearchProvider>
       <div className="pb-16">
         <ProductHero />
+
+        <ScatteredWorkScene />
+
+        <ProductShowcaseScene />
+
         <HumeStatStrip />
 
         <AuroraDivider className="cc-container" />
