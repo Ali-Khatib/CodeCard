@@ -1,6 +1,4 @@
-import { ContentOpeningProvider } from '@/components/navigation/content-opening-transition';
-
-/** Research detail under /demo needs the opening transition host. */
+/** Research detail inherits ContentOpeningProvider from `/demo/card` layout. */
 export default function DemoResearchLayout({ children }: { children: React.ReactNode }) {
-  return <ContentOpeningProvider>{children}</ContentOpeningProvider>;
+  return children;
 }

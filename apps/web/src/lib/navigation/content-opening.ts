@@ -6,7 +6,7 @@ export type ContentOpeningState = {
   href: string;
 };
 
-export const CONTENT_OPENING_MIN_MS = 375;
+export const CONTENT_OPENING_MIN_MS = 480;
 export const CONTENT_OPENING_FAILSAFE_MS = 8000;
 
 export function contentOpeningHeadline(kind: ContentOpeningKind): string {

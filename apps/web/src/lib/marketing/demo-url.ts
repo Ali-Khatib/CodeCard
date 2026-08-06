@@ -22,6 +22,16 @@ export function publicDemoProfileBasePath(profileSlug: string): string {
   return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
 }
 
+/** Public profile → Featured work / projects section (back from project detail). */
+export function publicDemoProfileProjectsHref(profileSlug: string): string {
+  return `${publicDemoProfileBasePath(profileSlug)}#projects`;
+}
+
+/** Public profile → research section (back from research detail). */
+export function publicDemoProfileResearchSectionHref(profileSlug: string): string {
+  return `${publicDemoProfileBasePath(profileSlug)}#research`;
+}
+
 export function publicDemoProjectHref(profileSlug: string, projectId: string): string {
   return `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
 }

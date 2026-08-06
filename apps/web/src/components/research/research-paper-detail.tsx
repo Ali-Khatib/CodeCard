@@ -12,7 +12,7 @@ import {
 import type { ResearchPaper } from '@/lib/research/research';
 import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProfileResearchSectionHref } from '@/lib/marketing/demo-url';
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
@@ -34,7 +34,7 @@ export function ResearchPaperDetail({
   paper,
   profileSlug,
   profileId,
-  displayName,
+  displayName: _displayName,
 }: {
   paper: ResearchPaper;
   profileSlug: string;
@@ -43,7 +43,7 @@ export function ResearchPaperDetail({
 }) {
   const [abstractExpanded, setAbstractExpanded] = useState(false);
   const reduced = useReducedMotion();
-  const backHref = publicDemoProfileBasePath(profileSlug);
+  const backHref = publicDemoProfileResearchSectionHref(profileSlug);
   const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
   useEffect(() => {
@@ -87,11 +87,12 @@ export function ResearchPaperDetail({
           <div className="flex items-center justify-between rounded-full border border-border/40 bg-midnight/75 px-4 py-2.5 shadow-rim">
             <Link
               href={backHref}
+              scroll={false}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
-              aria-label={`Back to ${displayName}`}
+              aria-label="Back to research"
             >
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
-              <span className="hidden sm:inline">{displayName}</span>
+              <span className="hidden sm:inline">Research</span>
             </Link>
 
             <div className="flex gap-2">

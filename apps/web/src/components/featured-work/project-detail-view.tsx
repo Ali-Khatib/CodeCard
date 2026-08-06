@@ -13,7 +13,7 @@ import {
   buildPublicProjectDetailHref,
   getAdjacentProjects,
 } from '@/lib/projects/project-navigation';
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProfileProjectsHref } from '@/lib/marketing/demo-url';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
 import { COLORS, TYPE } from '@/lib/design/tokens';
@@ -47,7 +47,7 @@ export function ProjectDetailView({
   project,
   profileSlug,
   profileId,
-  displayName,
+  displayName: _displayName,
   accentColor = COLORS.accent,
   projects,
   transitionHandoff = false,
@@ -133,7 +133,7 @@ export function ProjectDetailView({
     transitionHandoff,
   ]);
 
-  const backHref = publicDemoProfileBasePath(profileSlug);
+  const backHref = publicDemoProfileProjectsHref(profileSlug);
   const projectList = projects?.length ? projects : [project];
   const { previous: previousProject, next: nextProject } = getAdjacentProjects(
     projectList,
@@ -161,11 +161,12 @@ export function ProjectDetailView({
           <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
               href={backHref}
+              scroll={false}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
-              aria-label={`Back to ${displayName}`}
+              aria-label="Back to projects"
             >
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
-              <span className="hidden sm:inline">{displayName}</span>
+              <span className="hidden sm:inline">Projects</span>
             </Link>
             {profileId && profileSlug !== 'demo' ? (
               <PublicReportDialog targetType="project" targetId={project.id} />
