@@ -40,8 +40,8 @@ describe('Proof dossier landing contract', () => {
     const finale = read('src/components/landing/proof/proof-finale.tsx');
     expect(finale).toContain('/sign-up');
     expect(finale).toContain('LIVE_DEMO_HREF');
-    expect(finale).toContain('LIVE_DEMO_PROFILE_HREF');
     expect(finale).toContain('closing-profile-preview-link');
+    expect(finale).not.toContain('Preview public profile');
   });
 
   it('limits pinned triggers on the inspection scene to one', () => {
