@@ -147,7 +147,7 @@ export function EditorialProductFrame({
               <span>Engineers</span>
             </div>
             <ul className="cc-ed__circle-feed">
-              {DEMO_CIRCLE_FEED.slice(0, 2).map((item) => (
+              {DEMO_CIRCLE_FEED.slice(0, 1).map((item) => (
                 <li key={item.id} className="cc-ed__circle-card">
                   <div className="cc-ed__circle-card-head">
                     <div className="cc-ed__frame-avatar cc-ed__frame-avatar--sm">
