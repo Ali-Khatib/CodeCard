@@ -334,7 +334,8 @@
 
 .cc-cinematic-showcase__header {
   max-width: 640px;
-  margin-bottom: 2.5rem;
+  /* Clear sticky marketing nav when the pin shell engages at top 88px. */
+  margin-bottom: 5.5rem;
 }
 
 .cc-cinematic-showcase__pin {
