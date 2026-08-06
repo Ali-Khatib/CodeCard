@@ -1,11 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
-import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import '@/styles/site-footer.css';
 import '@/styles/editorial-landing.css';
 
@@ -44,22 +42,6 @@ export function HumeFooterCluster() {
               <span>Your work.</span>
               <span>One identity.</span>
             </h2>
-          </div>
-
-          <div className="cc-site-footer__media" aria-hidden>
-            <div className="cc-site-footer__media-card">
-              <Image
-                src={DEMO_PROFILE.avatar_url}
-                alt=""
-                fill
-                sizes="280px"
-                className="object-cover"
-              />
-              <span className="cc-site-footer__media-pulse" />
-            </div>
-            <p className="cc-site-footer__media-caption">
-              {DEMO_PROFILE.display_name}
-            </p>
           </div>
         </div>
 
