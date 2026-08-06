@@ -17,6 +17,8 @@ describe('Editorial product landing contract', () => {
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('data-hero-statement');
     expect(hero).toContain('YOUR WORK.');
+    expect(hero).toContain('cc-ed-hero__media');
+    expect(hero).toContain('priority');
     expect(hero).not.toContain('LIVE_DEMO_PROFILE_HREF');
     expect(hero).not.toContain('View Public Profile');
   });
