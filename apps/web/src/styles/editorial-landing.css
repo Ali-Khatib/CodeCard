@@ -711,31 +711,40 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
     linear-gradient(135deg, color-mix(in srgb, var(--ed-iris) 8%, var(--ed-page)), var(--ed-page));
 }
 
-/* —— Who it’s for —— */
+/* —— Who it’s for (horizontal marquee) —— */
 .cc-ed-audience {
-  padding: clamp(4rem, 11vh, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+  padding: clamp(4rem, 11vh, 7rem) 0;
+  overflow: hidden;
 }
 
 .cc-ed-audience__intro {
   max-width: 40rem;
   margin: 0 auto clamp(2rem, 5vh, 3rem);
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
   text-align: center;
 }
 
-.cc-ed-audience__grid {
-  max-width: 72rem;
-  margin: 0 auto;
-  display: grid;
+.cc-ed-audience__viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.cc-ed-audience__track {
+  display: flex;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14.5rem), 1fr));
+  width: max-content;
+  animation: cc-ed-audience-marquee 38s linear infinite;
 }
 
 .cc-ed-audience__card {
+  width: min(17.5rem, 78vw);
+  flex-shrink: 0;
   border: 1px solid var(--ed-border);
   border-radius: var(--ed-radius);
   background: var(--ed-paper);
-  padding: 1.25rem 1.2rem 1.4rem;
+  padding: 1.25rem 1.2rem 1.45rem;
   color: var(--ed-ink);
+  box-shadow: 0 10px 28px rgba(35, 35, 36, 0.06);
 }
 
 .cc-ed-audience__eyebrow {
@@ -760,6 +769,32 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--ed-mute);
+}
+
+@keyframes cc-ed-audience-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-ed-audience__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3.5rem);
+    justify-content: flex-start;
+  }
+
+  .cc-ed-audience__viewport {
+    mask-image: none;
+    overflow: visible;
+  }
 }
 
 /* —— Research importance proof —— */
