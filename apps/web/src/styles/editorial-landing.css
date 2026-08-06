@@ -245,11 +245,11 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 }
 
 .cc-ed__frame--lg {
-  max-width: min(52rem, 100%);
+  max-width: min(62rem, 100%);
 }
 
 .cc-ed-story--lg .cc-ed-story__visual .cc-ed__frame {
-  max-width: min(52rem, 100%);
+  max-width: min(62rem, 100%);
 }
 
 .cc-ed[data-chapter='hero'] .cc-ed__frame {
@@ -288,10 +288,11 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed__frame-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
-  padding: 0.5rem 0.85rem;
+  padding: 0.55rem 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--ed-ink) 8%, transparent);
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .cc-ed__frame-tab {
@@ -649,7 +650,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 }
 
 .cc-ed-analysis .cc-ed__frame {
-  max-width: min(54rem, 100%);
+  max-width: min(64rem, 100%);
   text-align: left;
 }
 
