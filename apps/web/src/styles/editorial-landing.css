@@ -539,6 +539,99 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-weight: 600;
 }
 
+.cc-ed__frame-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.85rem 0 1rem;
+}
+
+.cc-ed__frame-filters span {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ed-ink) 10%, transparent);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ed-mute);
+}
+
+.cc-ed__frame-filters span[data-active='true'] {
+  background: color-mix(in srgb, var(--ed-iris) 22%, transparent);
+  color: var(--ed-ink);
+  border-color: transparent;
+}
+
+.cc-ed__circle-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.cc-ed__circle-card {
+  border: 1px solid var(--ed-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ed-cream) 40%, var(--ed-paper));
+}
+
+.cc-ed__circle-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ed-ink) 8%, transparent);
+}
+
+.cc-ed__circle-new {
+  margin-left: auto;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #34d399 22%, transparent);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ed-ink);
+}
+
+.cc-ed__circle-card-body {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9.5rem) minmax(0, 1fr);
+  gap: 0;
+  min-height: 8.5rem;
+}
+
+.cc-ed__circle-poster {
+  position: relative;
+  min-height: 8.5rem;
+  background: var(--ed-page);
+}
+
+.cc-ed__circle-card-copy {
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+.cc-ed__circle-project {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.15rem, 1.2vw + 0.85rem, 1.45rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ed-ink);
+}
+
+@media (max-width: 420px) {
+  .cc-ed__circle-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-ed__circle-poster {
+    min-height: 7rem;
+  }
+}
+
 .cc-ed__metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -797,9 +890,22 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-story__copy .cc-ed__display {
   width: 100%;
-  max-width: 18ch;
+  max-width: 12em;
   align-items: flex-start;
   text-align: left;
+  text-wrap: unset;
+}
+
+.cc-ed-story__copy .cc-ed__lead,
+.cc-ed-story__copy .cc-ed__sub {
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .cc-ed-story__copy .cc-ed__lead,
+  .cc-ed-story__copy .cc-ed__sub {
+    white-space: normal;
+  }
 }
 
 .cc-ed-story__copy .cc-ed__lede {

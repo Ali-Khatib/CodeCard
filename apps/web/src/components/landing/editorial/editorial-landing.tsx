@@ -75,11 +75,11 @@ export function EditorialLanding() {
           eyebrow="Circle"
           title={
             <>
-              <span className="cc-ed__lead">STAY CLOSE TO</span>
-              <span className="cc-ed__sub">THE PEOPLE WHO MATTER.</span>
+              <span className="cc-ed__lead">YOUR CIRCLE.</span>
+              <span className="cc-ed__sub">THEIR PROJECTS.</span>
             </>
           }
-          body="Circle keeps trusted peers, shared work, and quiet updates in one calm feed."
+          body="A feed of work from people you trust. See what they ship without digging through chats."
           state="circle"
           size="lg"
           linkHref={`${LIVE_DEMO_HREF}/circle`}
@@ -91,11 +91,11 @@ export function EditorialLanding() {
           eyebrow="Connections"
           title={
             <>
-              <span className="cc-ed__lead">REMEMBER WHO</span>
-              <span className="cc-ed__sub">YOU ACTUALLY MET.</span>
+              <span className="cc-ed__lead">PEOPLE YOU MET.</span>
+              <span className="cc-ed__sub">NOTES THAT STICK.</span>
             </>
           }
-          body="Capture people from events, intros, and QR opens, with notes and follow ups that stay useful."
+          body="Save people from events, intros, and QR opens, with notes and follow ups you can actually use later."
           state="connections"
           flip
           size="lg"

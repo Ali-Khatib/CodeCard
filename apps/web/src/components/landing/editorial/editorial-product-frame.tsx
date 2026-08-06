@@ -139,28 +139,56 @@ export function EditorialProductFrame({
 
         {state === 'circle' ? (
           <>
-            <p className="cc-ed__frame-kicker">Circle feed</p>
-            <p className="cc-ed__frame-title">Trusted people, shared work</p>
-            <ul className="cc-ed__people cc-ed__people--rich">
-              {DEMO_CIRCLE_FEED.slice(0, 4).map((item) => (
-                <li key={item.id} className="cc-ed__person cc-ed__person--card">
-                  <div className="cc-ed__frame-avatar cc-ed__frame-avatar--sm">
-                    {item.avatarUrl ? (
-                      <Image
-                        src={item.avatarUrl}
-                        alt=""
-                        width={40}
-                        height={40}
-                        className="h-full w-full object-cover"
-                      />
+            <p className="cc-ed__frame-kicker">Circle</p>
+            <p className="cc-ed__frame-title">Projects from your circle</p>
+            <div className="cc-ed__frame-filters" aria-hidden>
+              <span data-active="true">All</span>
+              <span>New</span>
+              <span>Engineers</span>
+            </div>
+            <ul className="cc-ed__circle-feed">
+              {DEMO_CIRCLE_FEED.slice(0, 2).map((item) => (
+                <li key={item.id} className="cc-ed__circle-card">
+                  <div className="cc-ed__circle-card-head">
+                    <div className="cc-ed__frame-avatar cc-ed__frame-avatar--sm">
+                      {item.avatarUrl ? (
+                        <Image
+                          src={item.avatarUrl}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="cc-ed__person-name">{item.connectionName}</p>
+                      <p className="cc-ed__person-meta">{item.connectionRole}</p>
+                    </div>
+                    {item.isNew ? (
+                      <span className="cc-ed__circle-new">New</span>
                     ) : null}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="cc-ed__person-name">{item.connectionName}</p>
-                    <p className="cc-ed__person-meta">{item.connectionRole}</p>
-                    <p className="cc-ed__person-detail">
-                      Shared <strong>{item.projectTitle}</strong> · {item.updatedAt}
-                    </p>
+                  <div className="cc-ed__circle-card-body">
+                    {item.posterUrl ? (
+                      <div className="cc-ed__circle-poster">
+                        <Image
+                          src={item.posterUrl}
+                          alt=""
+                          fill
+                          sizes="220px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="cc-ed__circle-card-copy">
+                      <p className="cc-ed__frame-kicker">Featured project</p>
+                      <p className="cc-ed__circle-project">{item.projectTitle}</p>
+                      <p className="cc-ed__frame-text line-clamp-2">
+                        {item.projectTagline}
+                      </p>
+                      <p className="cc-ed__person-meta mt-2">{item.updatedAt}</p>
+                    </div>
                   </div>
                 </li>
               ))}
