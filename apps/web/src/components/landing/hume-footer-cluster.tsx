@@ -42,9 +42,11 @@ export function HumeFooterCluster() {
       <section className="cc-container py-16 md:py-20">
         <div className="mx-auto max-w-[640px] text-center">
           <h2 className="font-sans text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-[-0.03em] text-ink">
-            Get started with CodeCard today
+            Build your proof
           </h2>
-          <p className="mt-4 text-[17px] leading-relaxed text-smoke">{CODECARD_TAGLINE}</p>
+          <p className="mt-4 text-[17px] leading-relaxed text-smoke">
+            Projects, research, and impact — one technical identity to share.
+          </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/sign-up" className="cc-btn-pill-primary cc-instant-press px-8 py-3">
               Start free →
