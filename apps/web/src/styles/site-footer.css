@@ -57,17 +57,66 @@
   color: color-mix(in srgb, var(--sf-iris) 58%, var(--sf-ink));
 }
 
+/* Cream tab continues the statement surface into the dark bar */
+.cc-site-footer__to-top {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+  margin-top: clamp(1.75rem, 4vh, 3rem);
+  margin-bottom: -3.75rem;
+}
+
+.cc-site-footer__top-tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 5.5rem;
+  padding: 0.95rem 1.15rem 1.15rem;
+  border: 0;
+  border-radius: 0 0 1.15rem 1.15rem;
+  background: var(--sf-cream);
+  color: var(--sf-ink);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cc-site-footer__top-tab svg {
+  color: var(--sf-iris);
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.cc-site-footer__top-tab:hover {
+  color: color-mix(in srgb, var(--sf-iris) 40%, var(--sf-ink));
+}
+
+.cc-site-footer__top-tab:hover svg {
+  color: var(--sf-iris);
+  transform: translateY(-3px);
+}
+
+.cc-site-footer__top-tab:focus-visible {
+  outline: 2px solid var(--sf-iris);
+  outline-offset: 3px;
+}
+
 /* Full-bleed dark seam edge to edge */
 .cc-site-footer__seam {
   position: relative;
-  width: 100vw;
-  max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  margin-top: clamp(1.5rem, 4vh, 3rem);
-  height: clamp(5.5rem, 12vw, 8.5rem);
+  z-index: 1;
+  width: 100%;
+  margin-top: 0;
+  height: clamp(5.75rem, 12vw, 8.75rem);
   background: var(--sf-dark);
   color: var(--sf-dark);
+  overflow: hidden;
 }
 
 .cc-site-footer__wave {
@@ -78,42 +127,6 @@
   height: 100%;
   color: var(--sf-cream);
   pointer-events: none;
-}
-
-.cc-site-footer__top-tab {
-  position: absolute;
-  right: clamp(1.25rem, 5vw, 4rem);
-  top: 0;
-  z-index: 2;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.85rem 1.1rem 1rem;
-  border: 0;
-  border-radius: 0 0 1.25rem 1.25rem;
-  background: var(--sf-dark);
-  color: var(--sf-paper);
-  font: inherit;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.cc-site-footer__top-tab svg {
-  color: var(--sf-paper);
-  transition: transform 0.25s ease, color 0.2s ease;
-}
-
-.cc-site-footer__top-tab:hover {
-  color: #fff;
-}
-
-.cc-site-footer__top-tab:hover svg {
-  color: var(--sf-iris);
-  transform: translateY(-3px);
 }
 
 .cc-site-footer__bar {

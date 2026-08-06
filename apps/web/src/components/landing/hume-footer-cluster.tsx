@@ -46,19 +46,8 @@ export function HumeFooterCluster() {
           </div>
         </div>
 
-        <div className="cc-site-footer__seam">
-          <svg
-            className="cc-site-footer__wave"
-            viewBox="0 0 1440 160"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            {/* Cream scallop on top of full-bleed dark */}
-            <path
-              d="M0,0 L1440,0 L1440,56 C1200,140 960,96 720,48 C480,0 240,120 0,40 Z"
-              fill="currentColor"
-            />
-          </svg>
+        {/* Cream tab hangs into the dark bar — continuous with statement, not a floating black chip */}
+        <div className="cc-site-footer__to-top">
           <button
             type="button"
             className="cc-site-footer__top-tab"
@@ -66,7 +55,7 @@ export function HumeFooterCluster() {
             aria-label="Top of page"
           >
             <span>Top of page</span>
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
               <path
                 d="M12 19V5M5 12l7-7 7 7"
                 fill="none"
@@ -77,6 +66,20 @@ export function HumeFooterCluster() {
               />
             </svg>
           </button>
+        </div>
+
+        <div className="cc-site-footer__seam" aria-hidden>
+          <svg
+            className="cc-site-footer__wave"
+            viewBox="0 0 1440 160"
+            preserveAspectRatio="none"
+          >
+            {/* Gentle cream edge; flatter on the right so the tab reads as one surface */}
+            <path
+              d="M0,0 L1440,0 L1440,88 C1280,88 1180,118 980,64 C720,8 420,108 0,52 Z"
+              fill="currentColor"
+            />
+          </svg>
         </div>
       </section>
 
