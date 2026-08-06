@@ -20,8 +20,8 @@ export function EditorialStatement() {
           <span className="cc-ed__sub">SHOULDN’T LIVE IN FIVE PLACES.</span>
         </h2>
         <p className="cc-ed__lede">
-          CodeCard brings your projects, research, Circle, and connections into
-          one shareable identity.
+          CodeCard brings your projects, research, Circle, and connections into one
+          shareable identity.
         </p>
       </div>
     </section>
