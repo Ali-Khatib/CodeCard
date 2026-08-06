@@ -1,5 +1,5 @@
 /**
- * Analysis — same two-column rhythm as product stories (copy + frame).
+ * Analytics — same two-column rhythm as product stories (copy + live demo frame).
  */
 import { EditorialProductFrame } from './editorial-product-frame';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
@@ -16,7 +16,7 @@ export function ProductAnalysisSection() {
     >
       <div className="cc-ed-story__grid">
         <div className="cc-ed-story__copy">
-          <p className="cc-ed__eyebrow">Analysis</p>
+          <p className="cc-ed__eyebrow">Analytics</p>
           <h2
             id="editorial-analysis-heading"
             className="cc-ed__display mt-4"
@@ -25,12 +25,12 @@ export function ProductAnalysisSection() {
             <span className="cc-ed__sub">ACT ON WHAT MATTERS.</span>
           </h2>
           <p className="cc-ed__lede mt-5">
-            Profile views, project opens, research reads, Circle shares, QR
-            scans, and follow ups. One place to read how your work travels.
+            The same Analytics workspace as the live demo: reach, opens, scans,
+            and activity in one place so you can act on what matters.
           </p>
           <p className="mt-6">
-            <Link href={`${LIVE_DEMO_HREF}`} className="cc-ed__link">
-              Open analysis in the live demo →
+            <Link href={`${LIVE_DEMO_HREF}/analytics`} className="cc-ed__link">
+              Open analytics in the live demo →
             </Link>
           </p>
         </div>

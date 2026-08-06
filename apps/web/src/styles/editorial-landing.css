@@ -365,6 +365,60 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   overflow: hidden;
 }
 
+.cc-ed__frame--demo {
+  background: #ffffff;
+  color: #232324;
+}
+
+.cc-ed__demo-chrome {
+  border-bottom: 1px solid color-mix(in srgb, var(--ed-ink) 8%, transparent);
+  background: #ffffff;
+}
+
+.cc-ed__demo-chrome-title {
+  padding: 0.85rem 1.15rem 0.15rem;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  color: #232324;
+}
+
+.cc-ed__demo-snap {
+  max-height: min(42rem, 78vh);
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: var(--app-paper, #ffffff);
+}
+
+.cc-ed__demo-snap__inner {
+  transform: scale(0.82);
+  transform-origin: top left;
+  width: 121.95%;
+  padding: 0.5rem 0.75rem 1.25rem;
+}
+
+.cc-ed__frame--lg .cc-ed__demo-snap {
+  max-height: min(48rem, 82vh);
+}
+
+.cc-ed__frame--lg .cc-ed__demo-snap__inner {
+  transform: scale(0.88);
+  width: 113.64%;
+}
+
+@media (max-width: 767px) {
+  .cc-ed__demo-snap__inner {
+    transform: scale(0.72);
+    width: 138.89%;
+  }
+
+  .cc-ed__frame--lg .cc-ed__demo-snap__inner {
+    transform: scale(0.72);
+    width: 138.89%;
+  }
+}
+
 .cc-ed__frame--lg {
   max-width: min(62rem, 100%);
 }
@@ -433,6 +487,12 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed__frame-body {
   padding: 1.15rem 1.25rem 1.35rem;
+}
+
+.cc-ed__frame--demo .cc-ed__frame-tabs {
+  border-bottom: none;
+  padding-top: 0.35rem;
+  padding-bottom: 0.65rem;
 }
 
 .cc-ed__frame-kicker {

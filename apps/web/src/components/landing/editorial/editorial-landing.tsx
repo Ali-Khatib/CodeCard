@@ -91,11 +91,11 @@ export function EditorialLanding() {
           eyebrow="Connections"
           title={
             <>
-              <span className="cc-ed__lead">PEOPLE YOU MET.</span>
+              <span className="cc-ed__lead">PEOPLE YOU SAVED.</span>
               <span className="cc-ed__sub">NOTES THAT STICK.</span>
             </>
           }
-          body="Save people from events, intros, and QR opens, with notes and follow ups you can actually use later."
+          body="Private context for everyone you meet — search, source filters, follow ups, and notes from the same Connections workspace as the live demo."
           state="connections"
           flip
           size="lg"

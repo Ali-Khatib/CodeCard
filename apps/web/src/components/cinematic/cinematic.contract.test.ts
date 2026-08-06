@@ -63,9 +63,15 @@ describe('Editorial product landing contract', () => {
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
   });
 
-  it('labels analysis instead of impact in the product frame', () => {
+  it('mirrors live demo workspace tabs in the product frame', () => {
     const frame = read('src/components/landing/editorial/editorial-product-frame.tsx');
-    expect(frame).toContain("label: 'Analysis'");
+    expect(frame).toContain("label: 'Analytics'");
+    expect(frame).toContain("label: 'Connections'");
+    expect(frame).toContain('DashboardConnectionsView');
+    expect(frame).toContain('DashboardProjectsPortfolio');
+    expect(frame).toContain('DashboardResearchView');
+    expect(frame).toContain('DashboardCircleView');
+    expect(frame).toContain('PreviewAnalyticsView');
     expect(frame).toContain("state === 'analysis'");
     expect(frame).not.toContain("label: 'Impact'");
   });
