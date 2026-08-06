@@ -62,19 +62,14 @@ describe('Phase 0B motion foundation', () => {
   it('uses @gsap/react for the integration proof with transform/opacity only', () => {
     const proof = read('src/components/motion/section-reveal-proof.tsx');
     const product = read('src/components/landing/product-page.tsx');
-    const inspection = read('src/components/landing/proof/proof-inspection.tsx');
     expect(proof).toContain("from '@gsap/react'");
     expect(proof).toContain('useGSAP');
     expect(proof).toContain('immediateRender: false');
     expect(proof).toContain("data-motion-pattern=\"reveal-soft\"");
     expect(proof).not.toContain('pin:');
     expect(proof).not.toContain('scrub:');
-    // Marketing `/` is now the proof dossier; keep the soft-reveal module as the
-    // foundation proof, and assert landing GSAP lives in the inspection scene.
-    expect(product).toContain('ProofLanding');
-    expect(product).not.toContain('MotionSectionRevealProof');
-    expect(inspection).toContain("from '@gsap/react'");
-    expect(inspection).toContain('useGSAP');
+    expect(product).toContain('MotionSectionRevealProof');
+    expect(product).toContain('research-support');
   });
 
   it('keeps content visible without waiting for animation init', () => {
