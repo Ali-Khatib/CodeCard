@@ -20,36 +20,34 @@ describe('Identity cinematic landing contract', () => {
     expect(read('src/app/dashboard/layout.tsx')).not.toContain('IdentityLanding');
   });
 
-  it('keeps hero LCP rules: server headline, no opacity-0 headline', () => {
+  it('keeps hero LCP rules: server headline, pitch title, no opacity-0 headline', () => {
     const hero = read('src/components/landing/identity/identity-hero.tsx');
     expect(hero).toContain('data-hero-statement');
-    expect(hero).toContain('YOUR WORK.');
+    expect(hero).toContain('Your best work.');
+    expect(hero).toContain('Ready to share in seconds.');
     expect(hero).not.toContain('opacity-0');
     expect(hero).not.toContain("'use client'");
   });
 
-  it('owns identity scene files and responsive hook', () => {
-    expect(existsSync(resolve(WEB, 'src/components/landing/identity/identity-assembly.tsx'))).toBe(
-      true,
-    );
+  it('owns assembly + how-it-works + five audience cards; no inspect toy section', () => {
+    const landing = read('src/components/landing/identity/identity-landing.tsx');
+    expect(landing).toContain('IdentityAssembly');
+    expect(landing).toContain('HowItWorksSection');
+    expect(landing).toContain('AudienceBounceCards');
+    expect(landing).not.toContain('IdentityInspect');
     expect(existsSync(resolve(WEB, 'src/components/landing/identity/identity-inspect.tsx'))).toBe(
-      true,
+      false,
     );
+    expect(existsSync(resolve(WEB, 'src/components/landing/audience-bounce-cards.tsx'))).toBe(true);
+    expect(existsSync(resolve(WEB, 'src/components/landing/how-it-works-page.tsx'))).toBe(true);
     expect(existsSync(resolve(WEB, 'src/styles/cinematic-identity.css'))).toBe(true);
-    expect(existsSync(resolve(WEB, 'src/hooks/use-responsive-scroll-scene.ts'))).toBe(true);
 
     const assembly = read('src/components/landing/identity/identity-assembly.tsx');
-    const inspect = read('src/components/landing/identity/identity-inspect.tsx');
     expect(assembly).toContain('useGSAP');
-    expect(inspect).toContain('useGSAP');
     expect(assembly).toContain('identity-assembly-pin');
-    expect(inspect).toContain('identity-inspect-pin');
-    expect(assembly).toContain("start: PIN_START");
-    expect(inspect).toContain("start: PIN_START");
     expect(assembly).toContain('invalidateOnRefresh');
-    expect(inspect).toContain('invalidateOnRefresh');
     expect(assembly).not.toContain('killAllScrollTriggers');
-    expect(inspect).not.toContain('killAllScrollTriggers');
+    expect((assembly.match(/pin:\s*true/g) ?? []).length).toBe(1);
   });
 
   it('keeps final CTA destinations correct', () => {
@@ -59,14 +57,6 @@ describe('Identity cinematic landing contract', () => {
     expect(closing).toContain('LIVE_DEMO_PROFILE_HREF');
     expect(closing).toContain('closing-profile-preview-link');
     expect(closing).toContain('id="build-yours"');
-  });
-
-  it('limits pinned triggers to the two major scenes', () => {
-    const assembly = read('src/components/landing/identity/identity-assembly.tsx');
-    const inspect = read('src/components/landing/identity/identity-inspect.tsx');
-    const pinAssembly = (assembly.match(/pin:\s*true/g) ?? []).length;
-    const pinInspect = (inspect.match(/pin:\s*true/g) ?? []).length;
-    expect(pinAssembly).toBe(1);
-    expect(pinInspect).toBe(1);
+    expect(closing).toContain('Ready to share in seconds.');
   });
 });

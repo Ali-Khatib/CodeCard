@@ -5,8 +5,8 @@ test.describe('Identity cinematic landing', () => {
     const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(response?.ok()).toBeTruthy();
     const html = await page.content();
-    expect(html).toContain('YOUR WORK.');
-    expect(html).toContain('ONE IDENTITY.');
+    expect(html).toContain('Your best work.');
+    expect(html).toContain('Ready to share in seconds.');
     await expect(page.getByTestId('hero-section').locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toBeVisible();
   });
@@ -15,17 +15,17 @@ test.describe('Identity cinematic landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('identity-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('identity-assembly')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByTestId('identity-inspect')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('#how-it-works')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('identity-audience')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('identity-inspect')).toHaveCount(0);
 
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('identity-landing')).toHaveCount(0);
     await expect(page.getByTestId('identity-assembly')).toHaveCount(0);
-    await expect(page.getByTestId('identity-inspect')).toHaveCount(0);
 
     await page.goto('/demo/card', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('identity-landing')).toHaveCount(0);
     await expect(page.getByTestId('identity-assembly')).toHaveCount(0);
-    await expect(page.getByTestId('identity-inspect')).toHaveCount(0);
   });
 
   test('desktop pins assembly; reverse scroll restores earlier state', async ({ page }, testInfo) => {
@@ -54,25 +54,21 @@ test.describe('Identity cinematic landing', () => {
     expect(Number(topOpacity)).toBeLessThanOrEqual(Number(midOpacity) + 0.05);
   });
 
-  test('inspect advances stages on desktop scrub', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name === 'mobile-390', 'desktop sticky inspect');
+  test('how-it-works QR story mounts below the fold', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/#how-it-works', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#how-it-works')).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText(/Share once|One scan becomes|Six steps/i).first()).toBeVisible();
+  });
+
+  test('five audience cards are present', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-
-    const inspect = page.getByTestId('identity-inspect');
-    await inspect.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(400);
-    await expect(page.getByTestId('identity-inspect-frame')).toBeVisible();
-
-    for (let i = 0; i < 4; i += 1) {
-      await page.evaluate(() => window.scrollBy(0, Math.round(window.innerHeight * 0.55)));
-      await page.waitForTimeout(350);
-    }
-    await expect(page.getByTestId('identity-inspect-frame')).toBeVisible();
-    const stage = Number((await inspect.getAttribute('data-active-stage')) ?? '0');
-    expect(stage).toBeGreaterThanOrEqual(0);
-    expect(stage).toBeLessThanOrEqual(3);
+    const audience = page.getByTestId('identity-audience');
+    await expect(audience).toBeVisible({ timeout: 20000 });
+    await audience.scrollIntoViewIfNeeded();
+    await expect(page.getByText('Five ways people use CodeCard.')).toBeVisible();
+    await expect(page.getByText(/For builders/i).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/For freelancers/i).first()).toBeVisible({ timeout: 15000 });
   });
 
   test('mobile uses non-pinned alternatives', async ({ page }) => {
@@ -82,7 +78,7 @@ test.describe('Identity cinematic landing', () => {
     const scene = page.getByTestId('identity-assembly');
     await scene.scrollIntoViewIfNeeded();
     await expect(scene).toHaveAttribute('data-scene-mode', 'mobile');
-    await expect(page.getByTestId('identity-inspect-mobile')).toBeVisible();
+    await expect(page.getByTestId('identity-assembly-static')).toBeVisible();
     const overflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
     });
@@ -96,7 +92,6 @@ test.describe('Identity cinematic landing', () => {
     await scene.scrollIntoViewIfNeeded();
     await expect(scene).toHaveAttribute('data-scene-mode', 'reduced');
     await expect(page.getByTestId('identity-assembly-static')).toBeVisible();
-    await expect(page.getByTestId('identity-inspect-mobile')).toBeVisible();
   });
 
   test('final CTA destinations remain correct', async ({ page }) => {
@@ -131,24 +126,12 @@ test.describe('Identity cinematic landing', () => {
     await page.getByTestId('identity-assembly').scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
-    const before = await page.evaluate(() => {
-      const dbg = (
-        window as Window & {
-          __codecardMotionDebug?: { getScrollTriggerCount: () => number; hasTriggerId: (id: string) => boolean };
-        }
-      ).__codecardMotionDebug;
-      return {
-        count: dbg?.getScrollTriggerCount?.() ?? -1,
-        hasPin: dbg?.hasTriggerId?.('identity-assembly-pin') ?? false,
-      };
-    });
-
     await page.goto('/demo', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(400);
     const after = await page.evaluate(() => {
       const dbg = (
         window as Window & {
-          __codecardMotionDebug?: { getScrollTriggerCount: () => number; hasTriggerId: (id: string) => boolean };
+          __codecardMotionDebug?: { hasTriggerId: (id: string) => boolean };
         }
       ).__codecardMotionDebug;
       return {
@@ -158,14 +141,13 @@ test.describe('Identity cinematic landing', () => {
     });
     expect(after.hasAssembly).toBe(false);
     expect(after.hasInspect).toBe(false);
-    void before;
   });
 
   test('no console errors on landing load', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.getByTestId('identity-inspect').scrollIntoViewIfNeeded();
+    await page.locator('#how-it-works').scrollIntoViewIfNeeded();
     expect(errors.filter((e) => !/ResizeObserver|hydration/i.test(e))).toEqual([]);
   });
 });

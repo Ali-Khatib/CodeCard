@@ -11,6 +11,7 @@ const IdentityHeroClient = dynamic(
 
 /**
  * Identity hero — Server Component so the LCP headline ships in initial HTML.
+ * Headline stays visible in the first paint (never hidden before motion).
  */
 export function IdentityHero() {
   return (
@@ -29,15 +30,15 @@ export function IdentityHero() {
               data-hero-statement
               className="cc-id-hero__headline"
             >
-              <span className="cc-id-hero__headline-line">YOUR WORK.</span>
+              <span className="cc-id-hero__headline-line">Your best work.</span>
               <span className="cc-id-hero__headline-line cc-hume-gradient-text">
-                ONE IDENTITY.
+                Ready to share in seconds.
               </span>
             </h1>
 
             <p className="cc-id-hero__support">
-              Projects, research and professional impact—presented through one living technical
-              profile.
+              Import your best projects, publish one page, and share it by link, QR, or straight from
+              your screen.
             </p>
 
             <div className="cc-id-hero__ctas" data-hero-cta>

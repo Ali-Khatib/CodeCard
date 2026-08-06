@@ -18,7 +18,9 @@ export function IdentityFinale() {
           <div>
             <p className="cc-id__eyebrow">The finale</p>
             <h2 id="identity-finale-heading" className="cc-id-finale__heading">
-              BUILD YOUR CODECARD.
+              Your best work.
+              <br />
+              Ready to share in seconds.
             </h2>
             <p className="cc-id-finale__support">
               Publish one living profile — projects, research, and proof in a single link visitors

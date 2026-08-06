@@ -2,9 +2,9 @@ import { MarketingHashRedirect } from '@/components/landing/marketing-hash-redir
 
 export const metadata = {
   title: 'How it works | CodeCard',
-  description: 'See how CodeCard assembles projects, research, and impact into one identity.',
+  description: 'See how a QR or link opens into a full CodeCard story.',
 };
 
 export default function HowItWorksRoute() {
-  return <MarketingHashRedirect hash="inspect" />;
+  return <MarketingHashRedirect hash="how-it-works" />;
 }

@@ -31,7 +31,9 @@ describe('Phase 0C LCP recovery contracts', () => {
     expect(product).toContain('IdentityLanding');
     expect(landing).toContain("from 'next/dynamic'");
     expect(landing).toContain('IdentityAssembly');
-    expect(landing).toContain('IdentityInspect');
+    expect(landing).toContain('HowItWorksSection');
+    expect(landing).toContain('AudienceBounceCards');
+    expect(landing).not.toContain('IdentityInspect');
   });
 
   it('does not high-priority the demo avatar when bio text is LCP', () => {

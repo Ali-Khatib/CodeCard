@@ -203,11 +203,11 @@ export function IdentityAssembly() {
         <p className="cc-id-assembly__equation">
           <em>Project</em> + <em>Research</em> + <em>Impact</em> = CodeCard
         </p>
-        <p className="cc-id__eyebrow">The assembly</p>
-        <h2 className="cc-id__heading">Evidence becomes identity.</h2>
-        <p className="cc-id__body max-w-[42ch]">
-          Three proof points — shipped work, published research, measurable impact — converge into
-          one living profile.
+        <p className="cc-id__eyebrow">How it comes together</p>
+        <h2 className="cc-id__heading">Three proof points. One profile.</h2>
+        <p className="cc-id__body max-w-[48ch]">
+          Your projects, papers, and reach stop living in separate tabs. Scroll and watch them
+          assemble into the CodeCard people actually open.
         </p>
 
         {showStage ? (
