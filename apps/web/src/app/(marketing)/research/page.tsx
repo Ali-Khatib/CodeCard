@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function ResearchPage() {
-  return <MarketingHashRedirect hash="research" />;
+  return <MarketingHashRedirect hash="assembly" />;
 }

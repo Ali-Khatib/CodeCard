@@ -68,8 +68,8 @@ describe('Phase 0B motion foundation', () => {
     expect(proof).toContain("data-motion-pattern=\"reveal-soft\"");
     expect(proof).not.toContain('pin:');
     expect(proof).not.toContain('scrub:');
-    expect(product).toContain('MotionSectionRevealProof');
-    expect(product).toContain('research-support');
+    expect(product).toContain('IdentityLanding');
+    expect(product).not.toContain('MotionSectionRevealProof');
   });
 
   it('keeps content visible without waiting for animation init', () => {

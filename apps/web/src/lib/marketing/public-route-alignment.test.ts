@@ -24,7 +24,7 @@ describe('workspace-first public route alignment', () => {
     expect(LIVE_DEMO_ENTRY_HREF).toBe('/demo');
     expect(LIVE_DEMO_HREF).toBe('/demo');
     expect(LIVE_DEMO_WORKSPACE_HREF).toBe('/demo');
-    expect(LIVE_DEMO_PROFILE_HREF).toBe('/demo');
+    expect(LIVE_DEMO_PROFILE_HREF).toBe('/demo/card');
     expect(LIVE_DEMO_PROFILE_LEGACY_HREF).toBe('/demo/card');
     expect(LIVE_DEMO_PREVIEW_ALIAS_HREF).toBe('/dashboard/preview');
   });
@@ -48,11 +48,12 @@ describe('workspace-first public route alignment', () => {
     expect(demo).not.toContain('PublicProfileExperience');
   });
 
-  it('redirects retired /demo/card public-profile page to the workspace', () => {
+  it('serves the public-profile demo at /demo/card', () => {
     const card = read('src/app/demo/card/page.tsx');
-    expect(card).toContain('permanentRedirect');
-    expect(card).toContain('LIVE_DEMO_WORKSPACE_HREF');
-    expect(card).not.toContain('PublicProfileExperience');
+    expect(card).toContain('PublicProfileExperience');
+    expect(card).toContain('DEMO_PROFILE');
+    expect(card).toContain('profileSlug="demo"');
+    expect(card).not.toContain('permanentRedirect');
   });
 
   it('aliases /dashboard/preview to the workspace without loops', () => {
