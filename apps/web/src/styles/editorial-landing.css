@@ -172,10 +172,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   color: color-mix(in srgb, var(--ed-fg) 55%, transparent);
 }
 
-.cc-ed[data-chapter='hero'] .cc-ed__eyebrow,
-.cc-ed[data-chapter='network'] .cc-ed__eyebrow,
-.cc-ed[data-chapter='circle'] .cc-ed__eyebrow,
-.cc-ed[data-chapter='connections'] .cc-ed__eyebrow {
+.cc-ed[data-chapter='hero'] .cc-ed__eyebrow {
   color: color-mix(in srgb, var(--ed-iris) 70%, #efedeb);
 }
 
@@ -183,17 +180,47 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
   font-weight: 400;
   font-size: var(--ed-display);
-  line-height: 0.92;
-  letter-spacing: -0.03em;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   color: var(--ed-fg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  text-wrap: balance;
 }
 
 .cc-ed__display--xl {
   font-size: var(--ed-display-lg);
-  line-height: 0.88;
+  line-height: 0.98;
 }
 
+.cc-ed__lead {
+  display: block;
+  color: var(--ed-fg);
+}
+
+.cc-ed__sub {
+  display: block;
+  margin-top: 0.2em;
+  max-width: 18ch;
+  font-size: clamp(1.35rem, 2.4vw + 0.4rem, 2.35rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  text-transform: none;
+  color: color-mix(in srgb, var(--ed-fg) 62%, transparent);
+}
+
+.cc-ed[data-chapter='hero'] .cc-ed__sub {
+  color: color-mix(in srgb, var(--ed-iris) 78%, #efedeb);
+}
+
+/* Legacy accent — prefer .cc-ed__sub for hierarchy */
 .cc-ed__accent {
+  color: color-mix(in srgb, var(--ed-iris) 72%, var(--ed-ink));
+}
+
+.cc-ed[data-chapter='hero'] .cc-ed__accent {
   color: var(--ed-iris);
 }
 
@@ -202,6 +229,28 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-size: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
   line-height: 1.55;
   color: color-mix(in srgb, var(--ed-fg) 72%, transparent);
+}
+
+.cc-ed-statement .cc-ed__display,
+.cc-ed-network-bridge .cc-ed__display,
+.cc-ed-demo-embed__intro .cc-ed__display,
+.cc-ed-audience__intro .cc-ed__display,
+.cc-ed-proof__intro .cc-ed__display,
+.cc-ed-finale__inner .cc-ed__display,
+.cc-ed-hero__solo .cc-ed__display {
+  align-items: center;
+  text-align: center;
+}
+
+.cc-ed-statement .cc-ed__sub,
+.cc-ed-network-bridge .cc-ed__sub,
+.cc-ed-demo-embed__intro .cc-ed__sub,
+.cc-ed-audience__intro .cc-ed__sub,
+.cc-ed-proof__intro .cc-ed__sub,
+.cc-ed-finale__inner .cc-ed__sub,
+.cc-ed-hero__solo .cc-ed__sub {
+  margin-inline: auto;
+  text-align: center;
 }
 
 .cc-ed__actions {

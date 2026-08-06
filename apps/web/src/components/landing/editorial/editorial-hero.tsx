@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 
 /**
- * Dark editorial hero — copy-led, no right-side product mock.
+ * Dark editorial hero — lead + quieter sub line.
  */
 export function EditorialHero() {
   return (
@@ -21,9 +21,8 @@ export function EditorialHero() {
           className="cc-ed__display cc-ed__display--xl mt-4"
           data-hero-statement
         >
-          YOUR WORK.
-          <br />
-          <span className="cc-ed__accent">ONE IDENTITY.</span>
+          <span className="cc-ed__lead">YOUR WORK.</span>
+          <span className="cc-ed__sub">One identity.</span>
         </h1>
         <p className="cc-ed__lede mt-6">
           Projects, research, Circle, and connections—presented through one

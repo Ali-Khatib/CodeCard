@@ -16,11 +16,10 @@ export function EditorialStatement() {
           id="editorial-statement-heading"
           className="cc-ed__display cc-ed__display--xl mt-5"
         >
-          YOUR BEST WORK
-          <br />
-          SHOULDN’T LIVE
-          <br />
-          IN FIVE DIFFERENT PLACES.
+          <span className="cc-ed__lead">YOUR BEST WORK</span>
+          <span className="cc-ed__sub">
+            shouldn’t live in five different places.
+          </span>
         </h2>
         <p className="cc-ed__lede">
           CodeCard brings your projects, research, Circle, and connections into

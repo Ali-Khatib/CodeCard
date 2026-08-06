@@ -45,9 +45,10 @@ export function EditorialAudience() {
       <div className="cc-ed-audience__intro">
         <p className="cc-ed__eyebrow">Who it’s for</p>
         <h2 id="editorial-audience-heading" className="cc-ed__display mt-3">
-          FIVE WAYS PEOPLE
-          <br />
-          USE CODECARD.
+          <span className="cc-ed__lead">FIVE WAYS TO USE IT.</span>
+          <span className="cc-ed__sub">
+            Builders, recruiters, events, students, freelancers.
+          </span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
           Same living profile—whether you’re pitching, recruiting, networking,

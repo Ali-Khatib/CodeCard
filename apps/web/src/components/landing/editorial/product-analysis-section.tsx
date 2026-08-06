@@ -21,9 +21,8 @@ export function ProductAnalysisSection() {
             id="editorial-analysis-heading"
             className="cc-ed__display mt-4"
           >
-            THE WORK IS THERE.
-            <br />
-            MAKE IT VISIBLE.
+            <span className="cc-ed__lead">THE WORK IS THERE.</span>
+            <span className="cc-ed__sub">Make it visible.</span>
           </h2>
           <p className="cc-ed__lede mt-5">
             See which profiles, projects, and research items people view, open,

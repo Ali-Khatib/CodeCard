@@ -16,9 +16,8 @@ export function EditorialFinalCta() {
           id="editorial-finale-heading"
           className="cc-ed__display cc-ed__display--xl mt-4"
         >
-          BUILD THE PROFILE
-          <br />
-          YOUR WORK DESERVES.
+          <span className="cc-ed__lead">BUILD THE PROFILE</span>
+          <span className="cc-ed__sub">your work deserves.</span>
         </h2>
         <p className="cc-ed__lede mt-5">
           Put projects, research, Circle, connections, and analysis in one
