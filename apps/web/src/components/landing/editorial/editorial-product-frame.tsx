@@ -139,60 +139,48 @@ export function EditorialProductFrame({
 
         {state === 'circle' ? (
           <>
-            <p className="cc-ed__frame-kicker">Circle</p>
-            <p className="cc-ed__frame-title">Projects from your circle</p>
-            <div className="cc-ed__frame-filters" aria-hidden>
-              <span data-active="true">All</span>
-              <span>New</span>
-              <span>Engineers</span>
+            <div className="cc-ed__circle-byline">
+              <div className="cc-ed__frame-avatar cc-ed__frame-avatar--sm">
+                {DEMO_CIRCLE_FEED[0]?.avatarUrl ? (
+                  <Image
+                    src={DEMO_CIRCLE_FEED[0].avatarUrl}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="h-full w-full object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0">
+                <p className="cc-ed__person-name">
+                  {DEMO_CIRCLE_FEED[0]?.connectionName}
+                </p>
+                <p className="cc-ed__person-meta">
+                  {DEMO_CIRCLE_FEED[0]?.connectionRole}
+                </p>
+              </div>
             </div>
-            <ul className="cc-ed__circle-feed">
-              {DEMO_CIRCLE_FEED.slice(0, 1).map((item) => (
-                <li key={item.id} className="cc-ed__circle-card">
-                  <div className="cc-ed__circle-card-head">
-                    <div className="cc-ed__frame-avatar cc-ed__frame-avatar--sm">
-                      {item.avatarUrl ? (
-                        <Image
-                          src={item.avatarUrl}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="cc-ed__person-name">{item.connectionName}</p>
-                      <p className="cc-ed__person-meta">{item.connectionRole}</p>
-                    </div>
-                    {item.isNew ? (
-                      <span className="cc-ed__circle-new">New</span>
-                    ) : null}
-                  </div>
-                  <div className="cc-ed__circle-card-body">
-                    {item.posterUrl ? (
-                      <div className="cc-ed__circle-poster">
-                        <Image
-                          src={item.posterUrl}
-                          alt=""
-                          fill
-                          sizes="220px"
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : null}
-                    <div className="cc-ed__circle-card-copy">
-                      <p className="cc-ed__frame-kicker">Featured project</p>
-                      <p className="cc-ed__circle-project">{item.projectTitle}</p>
-                      <p className="cc-ed__frame-text line-clamp-2">
-                        {item.projectTagline}
-                      </p>
-                      <p className="cc-ed__person-meta mt-2">{item.updatedAt}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <p className="cc-ed__frame-kicker mt-4">Shared in Circle</p>
+            <p className="cc-ed__frame-title">
+              {DEMO_CIRCLE_FEED[0]?.projectTitle}
+            </p>
+            <p className="cc-ed__frame-text">
+              {DEMO_CIRCLE_FEED[0]?.projectTagline}
+            </p>
+            {DEMO_CIRCLE_FEED[0]?.posterUrl ? (
+              <div className="cc-ed__frame-media">
+                <Image
+                  src={DEMO_CIRCLE_FEED[0].posterUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 640px"
+                  className="object-cover object-top"
+                />
+              </div>
+            ) : null}
+            <p className="cc-ed__frame-text mt-3">
+              {DEMO_CIRCLE_FEED[0]?.updatedAt}
+            </p>
           </>
         ) : null}
 

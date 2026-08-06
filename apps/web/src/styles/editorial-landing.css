@@ -578,98 +578,10 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-weight: 600;
 }
 
-.cc-ed__frame-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: 0.85rem 0 1rem;
-}
-
-.cc-ed__frame-filters span {
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--ed-ink) 10%, transparent);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ed-mute);
-}
-
-.cc-ed__frame-filters span[data-active='true'] {
-  background: color-mix(in srgb, var(--ed-iris) 22%, transparent);
-  color: var(--ed-ink);
-  border-color: transparent;
-}
-
-.cc-ed__circle-feed {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.85rem;
-}
-
-.cc-ed__circle-card {
-  border: 1px solid var(--ed-border);
-  border-radius: 14px;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--ed-cream) 40%, var(--ed-paper));
-}
-
-.cc-ed__circle-card-head {
+.cc-ed__circle-byline {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.75rem 0.85rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--ed-ink) 8%, transparent);
-}
-
-.cc-ed__circle-new {
-  margin-left: auto;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, #34d399 22%, transparent);
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ed-ink);
-}
-
-.cc-ed__circle-card-body {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-}
-
-.cc-ed__circle-poster {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--ed-page);
-  isolation: isolate;
-}
-
-.cc-ed__circle-poster img {
-  object-fit: cover;
-}
-
-.cc-ed__circle-card-copy {
-  position: relative;
-  z-index: 1;
-  padding: 0.85rem 0.9rem 1rem;
-  background: color-mix(in srgb, var(--ed-cream) 40%, var(--ed-paper));
-  min-width: 0;
-}
-
-.cc-ed__circle-project {
-  margin: 0.2rem 0 0.35rem;
-  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.15rem, 1.2vw + 0.85rem, 1.45rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--ed-ink);
 }
 
 .cc-ed__metric-grid {
