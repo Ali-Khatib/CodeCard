@@ -34,11 +34,11 @@ export function EditorialLanding() {
         eyebrow="Projects"
         title={
           <>
-            <span className="cc-ed__lead">YOUR CODING</span>
-            <span className="cc-ed__sub">PROJECTS. FAST.</span>
+            <span className="cc-ed__lead">CODING PROJECTS.</span>
+            <span className="cc-ed__sub">IN ONE PLACE.</span>
           </>
         }
-        body="Repos, demos, tech, and results in one project record. People see what you built in seconds."
+        body="Put the repos, demos, tech, and results people need to see in one project record they can scan in seconds."
         state="projects"
         size="lg"
         linkHref={`${LIVE_DEMO_HREF}/projects`}
@@ -50,11 +50,11 @@ export function EditorialLanding() {
         eyebrow="Research"
         title={
           <>
-            <span className="cc-ed__lead">YOUR RESEARCH</span>
-            <span className="cc-ed__sub">PAPERS. FAST.</span>
+            <span className="cc-ed__lead">RESEARCH PAPERS.</span>
+            <span className="cc-ed__sub">IN ONE PLACE.</span>
           </>
         }
-        body="Abstracts, methods, figures, collaborators, and PDFs in one place. Open a paper and skim it in seconds."
+        body="Abstracts, methods, figures, collaborators, and PDFs live together. Open a paper and skim it in seconds."
         state="research"
         flip
         researchBoard
