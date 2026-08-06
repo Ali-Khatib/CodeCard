@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { RESEARCH_INSIGHTS } from '@/lib/research/insights';
 
 type GrowSpec = {
   end: number;
@@ -58,26 +57,26 @@ function GrowingStat({
   return <span className="cc-ed-proof__stat-num">{text}</span>;
 }
 
-  const LANDING_PROOF = [
-    {
-      id: 'attention',
-      title: 'First passes are short',
-      finding:
-        'Eye-tracking research found early résumé scans often lasted about six seconds—name, title, and school drew the first look before deeper project detail.',
-    },
-    {
-      id: 'pedigree',
-      title: 'Context shapes outcomes',
-      finding:
-        'In an audit study with identical qualifications, school and firm signals shifted callbacks by nearly 15 points. Clearer proof helps skill compete on equal footing.',
-    },
-    {
-      id: 'proof',
-      title: 'Visible skills travel farther',
-      finding:
-        'LinkedIn’s 2025 skills-based hiring research: pools can widen up to 6.1× when skills are easy to see up front—not buried below the fold.',
-    },
-  ] as const;
+const LANDING_PROOF = [
+  {
+    id: 'attention',
+    title: 'First passes are short',
+    finding:
+      'Eye-tracking research found early résumé scans often lasted about six seconds—name, title, and school drew the first look before deeper project detail.',
+  },
+  {
+    id: 'pedigree',
+    title: 'Context shapes outcomes',
+    finding:
+      'In an audit study with identical qualifications, school and firm signals shifted callbacks by nearly 15 points. Clearer proof helps skill compete on equal footing.',
+  },
+  {
+    id: 'proof',
+    title: 'Visible skills travel farther',
+    finding:
+      'LinkedIn’s 2025 skills-based hiring research: pools can widen up to 6.1× when skills are easy to see up front—not buried below the fold.',
+  },
+] as const;
 
 /**
  * Research importance — animated growing stats that argue for CodeCard.
