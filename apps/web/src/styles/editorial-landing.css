@@ -707,7 +707,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   min-height: 100dvh;
   min-height: 100svh;
   display: grid;
-  align-items: end;
+  align-items: center;
   padding: 0;
   overflow: hidden;
   color: #efedeb;
@@ -731,12 +731,11 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   background:
     linear-gradient(
       180deg,
-      rgba(12, 12, 14, 0.28) 0%,
-      rgba(12, 12, 14, 0.18) 38%,
-      rgba(12, 12, 14, 0.72) 78%,
-      rgba(12, 12, 14, 0.92) 100%
+      rgba(12, 12, 14, 0.35) 0%,
+      rgba(12, 12, 14, 0.42) 45%,
+      rgba(12, 12, 14, 0.55) 100%
     ),
-    linear-gradient(90deg, rgba(12, 12, 14, 0.55) 0%, transparent 55%);
+    linear-gradient(90deg, rgba(12, 12, 14, 0.62) 0%, rgba(12, 12, 14, 0.28) 42%, transparent 68%);
 }
 
 .cc-ed-hero__flare {
@@ -754,10 +753,9 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed-hero__content {
   position: relative;
   z-index: 1;
-  width: min(100% - 2.5rem, 52rem);
+  width: min(100% - 2.5rem, 62rem);
   margin: 0;
-  padding: clamp(6.5rem, 14vh, 9rem) clamp(1.35rem, 5vw, 4.5rem)
-    clamp(3.5rem, 9vh, 5.5rem);
+  padding: clamp(5.5rem, 12vh, 7.5rem) clamp(1.35rem, 5vw, 4.5rem);
   text-align: left;
 }
 
@@ -767,19 +765,31 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-hero__content .cc-ed__lede {
   margin-inline: 0;
-  max-width: 32rem;
-  color: color-mix(in srgb, #efedeb 78%, transparent);
+  max-width: 34rem;
+  font-size: clamp(1.05rem, 0.4vw + 0.95rem, 1.2rem);
+  color: color-mix(in srgb, #efedeb 82%, transparent);
 }
 
-.cc-ed-hero__content .cc-ed__display {
+.cc-ed-hero__content .cc-ed__display,
+.cc-ed-hero__content .cc-ed__display--xl {
   align-items: flex-start;
   text-align: left;
+  width: 100%;
+  max-width: none;
+  font-size: clamp(3.75rem, 11vw + 1rem, 9.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+
+.cc-ed-hero__content .cc-ed__lead,
+.cc-ed-hero__content .cc-ed__sub {
+  white-space: nowrap;
 }
 
 .cc-ed-hero__content .cc-ed__sub {
   margin-inline: 0;
   text-align: left;
-  color: color-mix(in srgb, #efedeb 90%, var(--ed-iris));
+  color: color-mix(in srgb, #efedeb 88%, var(--ed-iris));
 }
 
 .cc-ed-hero .cc-ed__eyebrow {
@@ -795,9 +805,20 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 @media (min-width: 960px) {
   .cc-ed-hero__content {
-    width: min(100% - 4rem, 58rem);
-    padding-left: clamp(2.5rem, 7vw, 5.5rem);
-    padding-bottom: clamp(4.5rem, 11vh, 7rem);
+    width: min(100% - 4rem, 68rem);
+    padding-left: clamp(2.75rem, 8vw, 6.5rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .cc-ed-hero__content .cc-ed__lead,
+  .cc-ed-hero__content .cc-ed__sub {
+    white-space: normal;
+  }
+
+  .cc-ed-hero__content .cc-ed__display,
+  .cc-ed-hero__content .cc-ed__display--xl {
+    font-size: clamp(3.1rem, 14vw, 4.5rem);
   }
 }
 
