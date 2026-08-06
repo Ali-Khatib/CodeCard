@@ -19,6 +19,7 @@ import {
 
 /** Desktop/tablet pin distance in vh — within 150–190vh brief. */
 const PIN_VH = { desktop: 170, tablet: 130 } as const;
+const PIN_START = 'top 88px'; // clear sticky marketing nav
 
 /** Scattered start offsets (percent of stage) → converge to card center. */
 const FRAGMENT_LAYOUT = [
@@ -86,7 +87,7 @@ export function ScatteredWorkScene() {
           scrollTrigger: {
             id: 'cinematic-scattered-pin',
             trigger: root,
-            start: 'top top',
+            start: PIN_START,
             end: `+=${pinVh}%`,
             pin: true,
             scrub: 0.65,
