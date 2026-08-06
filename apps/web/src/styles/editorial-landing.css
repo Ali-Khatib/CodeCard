@@ -46,28 +46,96 @@
   background: transparent;
 }
 
+/* Pill nav follows landing chapters (dark hero → cream body). */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil {
-  background: var(--ed-dark, #202020);
-  border: 1px solid color-mix(in srgb, #efedeb 12%, transparent);
-  box-shadow: none;
+  transition:
+    background-color 0.55s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease,
+    color 0.45s ease;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+  transition: color 0.45s ease, background-color 0.45s ease, border-color 0.45s ease;
+}
+
+/* Default / hero — charcoal bar on dark page */
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+  background: var(--ed-dark, #202020);
+  border: 1px solid color-mix(in srgb, #efedeb 12%, transparent);
+  box-shadow: none;
+}
+
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
   color: #efedeb;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
   background: #efedeb;
   color: var(--ed-dark, #202020);
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
   background: color-mix(in srgb, var(--ed-iris, #c094e4) 28%, transparent);
   color: #efedeb;
+  border-color: transparent;
+}
+
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-active-underline,
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
+  background: var(--ed-iris, #c094e4);
+}
+
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+  border-color: color-mix(in srgb, #efedeb 22%, transparent);
+  color: #efedeb;
+}
+
+/* Cream chapters — light bar matching page */
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 92%, #fff);
+  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 10%, transparent);
+  box-shadow: 0 10px 28px rgba(35, 35, 36, 0.08);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+  color: var(--ed-ink, #232324);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+  background: var(--ed-dark, #202020);
+  color: #efedeb;
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+  background: color-mix(in srgb, var(--ed-iris, #c094e4) 22%, transparent);
+  color: var(--ed-ink, #232324);
+  border-color: transparent;
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-active-underline,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
+  background: var(--ed-iris, #c094e4);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+  border-color: color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
+  color: var(--ed-ink, #232324);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 96%, #fff);
 }
 
 .cc-ed__section {
