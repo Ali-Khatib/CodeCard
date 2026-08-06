@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function HowItWorksRoute() {
-  return <MarketingHashRedirect hash="how-it-works" />;
+  return <MarketingHashRedirect hash="inspect" />;
 }

@@ -25,9 +25,14 @@ test.describe('Proof dossier landing', () => {
 
   test('evidence wall and finale are reachable', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.getByTestId('proof-evidence-wall').scrollIntoViewIfNeeded();
+    await expect(page.getByTestId('proof-landing')).toBeVisible({ timeout: 15000 });
+
+    await page.locator('#evidence').evaluate((el) => el.scrollIntoView({ block: 'start' }));
     await expect(page.getByTestId('proof-evidence-wall')).toBeVisible();
-    await page.getByTestId('proof-finale').scrollIntoViewIfNeeded();
+
+    // Pin/scrub scenes can detach intermediate locators during travel — re-query by id.
+    await page.locator('#build-yours').evaluate((el) => el.scrollIntoView({ block: 'start' }));
+    await expect(page.locator('#build-yours')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('proof-finale')).toBeVisible();
   });
 
