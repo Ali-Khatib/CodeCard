@@ -5,6 +5,8 @@ import { ProductStory } from './product-story';
 import { EditorialNetworkBridge } from './editorial-network-bridge';
 import { ProductAnalysisSection } from './product-analysis-section';
 import { EditorialLiveDemoBox } from './editorial-live-demo-box';
+import { EditorialAudience } from './editorial-audience';
+import { EditorialResearchProof } from './editorial-research-proof';
 import { EditorialFinalCta } from './editorial-final-cta';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import '@/styles/editorial-landing.css';
@@ -14,16 +16,11 @@ const EditorialAtmosphere = dynamic(
   { ssr: true, loading: () => null },
 );
 
-const EditorialMovingCards = dynamic(
-  () => import('./editorial-moving-cards').then((m) => m.EditorialMovingCards),
-  { ssr: true, loading: () => null },
-);
-
 /**
  * Marketing `/`
  * Hero → statement → Projects / Research →
- * network bridge → Circle + Connections (tight pair) →
- * Analysis → live demo → moving cards → finale.
+ * network bridge → Circle + Connections → Analysis →
+ * live demo embed → Who it’s for → research proof → finale.
  */
 export function EditorialLanding() {
   return (
@@ -43,8 +40,6 @@ export function EditorialLanding() {
           </>
         }
         body="Present the problem, process, technologies, media, links, and results in one clear project record."
-        state="projects"
-        size="lg"
         linkHref={`${LIVE_DEMO_HREF}/projects`}
         linkLabel="Open projects in the live demo →"
       />
@@ -60,10 +55,8 @@ export function EditorialLanding() {
           </>
         }
         body="Give papers, methods, diagrams, collaborators, and findings a professional home."
-        state="research"
         flip
         researchBoard
-        size="lg"
         linkHref={`${LIVE_DEMO_HREF}/research`}
         linkLabel="Open research in the live demo →"
       />
@@ -86,8 +79,6 @@ export function EditorialLanding() {
             </>
           }
           body="Circle keeps trusted peers, shared work, and quiet updates in one calm feed."
-          state="circle"
-          size="lg"
           linkHref={`${LIVE_DEMO_HREF}/circle`}
           linkLabel="Open Circle in the live demo →"
         />
@@ -103,9 +94,7 @@ export function EditorialLanding() {
             </>
           }
           body="Capture people from events, intros, and QR opens—with notes and follow-ups that stay useful."
-          state="connections"
           flip
-          size="lg"
           linkHref={`${LIVE_DEMO_HREF}/connections`}
           linkLabel="Open connections in the live demo →"
         />
@@ -113,7 +102,8 @@ export function EditorialLanding() {
 
       <ProductAnalysisSection />
       <EditorialLiveDemoBox />
-      <EditorialMovingCards />
+      <EditorialAudience />
+      <EditorialResearchProof />
       <EditorialFinalCta />
     </div>
   );

@@ -21,16 +21,32 @@ describe('Editorial product landing contract', () => {
     expect(hero).not.toContain('View Public Profile');
   });
 
-  it('includes analysis, circle, connections, network bridge, and live demo', () => {
+  it('includes analysis, circle, connections, live demo, audience, and research proof', () => {
     const landing = read('src/components/landing/editorial/editorial-landing.tsx');
     expect(landing).toContain('ProductAnalysisSection');
     expect(landing).toContain('EditorialNetworkBridge');
     expect(landing).toContain('EditorialLiveDemoBox');
+    expect(landing).toContain('EditorialAudience');
+    expect(landing).toContain('EditorialResearchProof');
     expect(landing).toContain('editorial-network-pair');
     expect(landing).toContain('circle');
     expect(landing).toContain('connections');
     expect(landing).toContain('researchBoard');
+    expect(landing).not.toContain('EditorialMovingCards');
     expect(landing).not.toContain('chapter="impact"');
+  });
+
+  it('keeps product stories copy-led without right-side product frames', () => {
+    const story = read('src/components/landing/editorial/product-story.tsx');
+    expect(story).not.toContain('EditorialProductFrame');
+    expect(story).toContain('cc-ed-story__copy--solo');
+  });
+
+  it('embeds the live demo workspace in an iframe', () => {
+    const demo = read('src/components/landing/editorial/editorial-live-demo-box.tsx');
+    expect(demo).toContain('iframe');
+    expect(demo).toContain('src="/demo"');
+    expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
   });
 
   it('labels analysis instead of impact in the product frame', () => {

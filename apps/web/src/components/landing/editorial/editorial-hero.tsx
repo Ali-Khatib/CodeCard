@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { EditorialProductFrame } from './editorial-product-frame';
 
 /**
- * Dark editorial hero — no public-profile link.
+ * Dark editorial hero — copy-led, no right-side product mock.
  */
 export function EditorialHero() {
   return (
@@ -14,39 +13,33 @@ export function EditorialHero() {
       data-testid="editorial-hero"
       aria-labelledby="editorial-hero-heading"
     >
-      <div className="cc-ed-hero__grid" data-testid="hero-section">
-        <div>
-          <div className="cc-ed-hero__mark" aria-hidden />
-          <p className="cc-ed__eyebrow">CodeCard</p>
-          <h1
-            id="editorial-hero-heading"
-            className="cc-ed__display cc-ed__display--xl mt-4"
-            data-hero-statement
+      <div className="cc-ed-hero__solo" data-testid="hero-section">
+        <div className="cc-ed-hero__mark" aria-hidden />
+        <p className="cc-ed__eyebrow">CodeCard</p>
+        <h1
+          id="editorial-hero-heading"
+          className="cc-ed__display cc-ed__display--xl mt-4"
+          data-hero-statement
+        >
+          YOUR WORK.
+          <br />
+          <span className="cc-ed__accent">ONE IDENTITY.</span>
+        </h1>
+        <p className="cc-ed__lede mt-6">
+          Projects, research, Circle, and connections—presented through one
+          living technical profile.
+        </p>
+        <div className="cc-ed__actions mt-8">
+          <Link
+            href="/sign-up"
+            className="cc-ed__btn-primary cc-instant-press"
+            data-testid="hero-primary-cta"
           >
-            YOUR WORK.
-            <br />
-            <span className="cc-ed__accent">ONE IDENTITY.</span>
-          </h1>
-          <p className="cc-ed__lede mt-6">
-            Projects, research, Circle, and connections—presented through one
-            living technical profile.
-          </p>
-          <div className="cc-ed__actions mt-8">
-            <Link
-              href="/sign-up"
-              className="cc-ed__btn-primary cc-instant-press"
-              data-testid="hero-primary-cta"
-            >
-              Create Your CodeCard
-            </Link>
-            <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
-              Open Live Demo
-            </LiveDemoLink>
-          </div>
-        </div>
-
-        <div className="cc-ed-hero__visual flex justify-center md:justify-end">
-          <EditorialProductFrame state="profile" size="lg" />
+            Create Your CodeCard
+          </Link>
+          <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
+            Open Live Demo
+          </LiveDemoLink>
         </div>
       </div>
     </section>

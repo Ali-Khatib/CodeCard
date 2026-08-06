@@ -12,7 +12,7 @@ test.describe('Editorial product landing', () => {
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
   });
 
-  test('analysis, circle, connections, and live demo box mount', async ({ page }) => {
+  test('analysis, circle, connections, live demo, audience, and research proof mount', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-network-bridge')).toBeVisible({ timeout: 15000 });
@@ -24,6 +24,9 @@ test.describe('Editorial product landing', () => {
     await expect(page.getByText(/MAKE IT VISIBLE/i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-analysis').getByText(/Analysis/i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
+    await expect(page.getByTestId('editorial-audience')).toBeVisible();
+    await expect(page.getByTestId('editorial-research-proof')).toBeVisible();
+    await expect(page.getByTestId('editorial-moving-cards')).toHaveCount(0);
     await expect(page.getByTestId('editorial-story-impact')).toHaveCount(0);
     await expect(page.getByText(/\bIMPACT\b/)).toHaveCount(0);
   });
