@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import { useGSAP } from '@gsap/react';
 import {
   ensureGsapPlugins,
@@ -21,16 +21,19 @@ import {
 const PIN_VH = { desktop: 170, tablet: 130 } as const;
 const PIN_START = 'top 88px'; // clear sticky marketing nav
 
-/** Scattered start offsets (percent of stage) → converge to card center. */
+/**
+ * Stage-relative positions (% of orbit box).
+ * Overlapping constellation that fills the stage — readable, not a sparse ring.
+ */
 const FRAGMENT_LAYOUT = [
-  { x: -38, y: -28, z: 0 },
-  { x: 36, y: -32, z: 0 },
-  { x: -42, y: 8, z: 0 },
-  { x: 40, y: 4, z: 0 },
-  { x: -28, y: 34, z: 0 },
-  { x: 30, y: 36, z: 0 },
-  { x: -8, y: -40, z: 0 },
-  { x: 6, y: 42, z: 0 },
+  { left: 24, top: 18, rotate: -7 },
+  { left: 74, top: 16, rotate: 6 },
+  { left: 14, top: 46, rotate: -5 },
+  { left: 82, top: 48, rotate: 7 },
+  { left: 28, top: 74, rotate: 4 },
+  { left: 70, top: 76, rotate: -6 },
+  { left: 48, top: 12, rotate: -3 },
+  { left: 50, top: 82, rotate: 3 },
 ] as const;
 
 /**
@@ -67,15 +70,18 @@ export function ScatteredWorkScene() {
         const pinVh = window.matchMedia('(min-width: 1024px)').matches
           ? PIN_VH.desktop
           : PIN_VH.tablet;
-        const depthScale = window.matchMedia('(min-width: 1024px)').matches ? 1 : 0.72;
+        const depthScale = window.matchMedia('(min-width: 1024px)').matches ? 1 : 0.88;
 
         chips.forEach((chip, i) => {
           const layout = FRAGMENT_LAYOUT[i % FRAGMENT_LAYOUT.length]!;
           gsap.set(chip, {
-            xPercent: layout.x * depthScale,
-            yPercent: layout.y * depthScale,
-            opacity: 0,
-            scale: 0.92,
+            left: `${layout.left}%`,
+            top: `${layout.top}%`,
+            xPercent: -50,
+            yPercent: -50,
+            rotation: layout.rotate * depthScale,
+            opacity: 1,
+            scale: 1,
             force3D: true,
           });
         });
@@ -97,46 +103,42 @@ export function ScatteredWorkScene() {
           },
         });
 
+        // Brief hold on the readable scattered state
+        tl.to({}, { duration: 0.18 });
+
         if (intro) {
-          tl.to(intro, { opacity: 0.35, duration: 0.2 }, 0);
+          tl.to(intro, { opacity: 0.42, duration: 0.22 }, 0.12);
         }
 
-        chips.forEach((chip, i) => {
-          tl.to(
-            chip,
-            {
-              opacity: 1,
-              scale: 1,
-              duration: 0.18,
-            },
-            0.08 + i * 0.04,
-          );
-        });
-
+        // Pull slightly inward so the “scattered → assembling” beat is readable
         chips.forEach((chip, i) => {
           const layout = FRAGMENT_LAYOUT[i % FRAGMENT_LAYOUT.length]!;
+          const midLeft = 50 + (layout.left - 50) * 0.55;
+          const midTop = 50 + (layout.top - 50) * 0.55;
           tl.to(
             chip,
             {
-              xPercent: layout.x * 0.55 * depthScale,
-              yPercent: layout.y * 0.55 * depthScale,
-              duration: 0.28,
+              left: `${midLeft}%`,
+              top: `${midTop}%`,
+              rotation: layout.rotate * 0.3,
+              duration: 0.32,
             },
-            0.42,
+            0.28,
           );
         });
 
         tl.to(
           chips,
           {
-            xPercent: 0,
-            yPercent: 0,
+            left: '50%',
+            top: '50%',
             opacity: 0,
-            scale: 0.86,
-            duration: 0.4,
-            stagger: 0.02,
+            scale: 0.7,
+            rotation: 0,
+            duration: 0.42,
+            stagger: 0.025,
           },
-          0.72,
+          0.62,
         );
 
         tl.to(
@@ -149,18 +151,18 @@ export function ScatteredWorkScene() {
               card.querySelector('.cc-cinematic-card')?.setAttribute('data-sweep', 'true');
             },
           },
-          0.9,
+          0.82,
         );
 
         tl.fromTo(
           card.querySelector('.cc-cinematic-card__sweep'),
           { xPercent: -120, opacity: 0 },
           { xPercent: 120, opacity: 1, duration: 0.45, ease: MOTION_EASE.soft },
-          1.05,
+          0.98,
         );
 
         // Hold completed state before unpin
-        tl.to({}, { duration: 0.22 });
+        tl.to({}, { duration: 0.24 });
 
         return () => {
           tl.scrollTrigger?.kill();
@@ -170,7 +172,7 @@ export function ScatteredWorkScene() {
 
       mm.add('(max-width: 767px)', () => {
         chips.forEach((chip) => {
-          gsap.set(chip, { clearProps: 'transform,opacity' });
+          gsap.set(chip, { clearProps: 'transform,opacity,left,top,rotation' });
         });
         gsap.set(card, { clearProps: 'transform,opacity' });
 
@@ -220,37 +222,52 @@ export function ScatteredWorkScene() {
       data-cinematic-runtime="landing"
     >
       <div className="cc-container cc-cinematic-scattered__inner">
-        <div data-cinematic-intro className="cc-cinematic-scattered__intro">
-          <p className="cc-cinematic-eyebrow">The problem</p>
-          <h2 className="cc-cinematic-heading">
-            Technical work is scattered across too many places.
-          </h2>
-          <p className="cc-cinematic-body">
-            GitHub, projects, research papers, resumes, LinkedIn, analytics, QR sharing, and
-            documents — each valuable alone, hard to present as one professional identity.
-          </p>
-        </div>
-
-        <div
-          className="cc-cinematic-scattered__stage"
-          data-cinematic-stage
-          aria-hidden={mode !== 'reduced' ? true : undefined}
-        >
-          <div className="cc-cinematic-scattered__orbit" aria-hidden>
-            {fragments.map((frag) => (
-              <div
-                key={frag.id}
-                className="cc-cinematic-scattered__chip-wrap"
-                data-cinematic-chip
-                data-fragment={frag.id}
-              >
-                <FragmentChip label={frag.label} kind={frag.kind} />
-              </div>
-            ))}
+        <div className="cc-cinematic-scattered__layout">
+          <div data-cinematic-intro className="cc-cinematic-scattered__intro">
+            <p className="cc-cinematic-eyebrow">The problem</p>
+            <h2 className="cc-cinematic-heading">
+              Technical work is scattered across too many places.
+            </h2>
+            <p className="cc-cinematic-body">
+              GitHub, projects, research papers, resumes, LinkedIn, analytics, QR sharing, and
+              documents — each valuable alone, hard to present as one professional identity.
+            </p>
+            <p className="cc-cinematic-scattered__cue" aria-hidden={mode === 'reduced'}>
+              Scroll — watch them assemble into one CodeCard.
+            </p>
           </div>
 
-          <div className="cc-cinematic-scattered__card-wrap" data-cinematic-card>
-            <UnifiedCodeCardPreview sweep />
+          <div
+            className="cc-cinematic-scattered__stage"
+            data-cinematic-stage
+            aria-hidden={mode !== 'reduced' ? true : undefined}
+          >
+            <div className="cc-cinematic-scattered__orbit" aria-hidden>
+              {fragments.map((frag, index) => {
+                const layout = FRAGMENT_LAYOUT[index % FRAGMENT_LAYOUT.length]!;
+                return (
+                  <div
+                    key={frag.id}
+                    className="cc-cinematic-scattered__chip-wrap"
+                    data-cinematic-chip
+                    data-fragment={frag.id}
+                    style={
+                      {
+                        '--chip-left': `${layout.left}%`,
+                        '--chip-top': `${layout.top}%`,
+                        '--chip-rotate': `${layout.rotate}deg`,
+                      } as CSSProperties
+                    }
+                  >
+                    <FragmentChip label={frag.label} hint={frag.hint} kind={frag.kind} />
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="cc-cinematic-scattered__card-wrap" data-cinematic-card>
+              <UnifiedCodeCardPreview sweep />
+            </div>
           </div>
         </div>
 
@@ -267,7 +284,7 @@ export function ScatteredWorkScene() {
             <ul className="cc-cinematic-scattered__list">
               {fragments.map((frag) => (
                 <li key={frag.id}>
-                  <FragmentChip label={frag.label} kind={frag.kind} />
+                  <FragmentChip label={frag.label} hint={frag.hint} kind={frag.kind} />
                 </li>
               ))}
             </ul>

@@ -235,11 +235,11 @@ export function SmoothScrollProvider({
         ref={lenisRef}
         options={{
           autoRaf: false,
-          // Slightly softer lerp for a more cinematic marketing feel (Phase 1A).
-          lerp: 0.075,
+          // Softer cinematic scrub — closer to Lenis marketing demos.
+          lerp: 0.055,
           smoothWheel: true,
-          wheelMultiplier: 0.92,
-          touchMultiplier: 1.05,
+          wheelMultiplier: 0.82,
+          touchMultiplier: 1.0,
         }}
       >
         {children}

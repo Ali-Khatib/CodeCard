@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useTransform, type MotionValue } from 'framer-motion';
+import { useMotionValueEvent, useTransform, type MotionValue } from 'framer-motion';
 import { HiOutlineFunnel, HiPlus, HiCheck } from 'react-icons/hi2';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -56,8 +57,8 @@ export function HowItWorksSection() {
             Share once. <span className="cc-text-reactor">They see your work.</span>
           </h2>
           <p className="mt-6 max-w-[680px] text-[18px] leading-[1.55] text-lichen">
-            Six steps from first scan to a saved connection, built for intros, events, and async
-            sharing.{useStaticLayout ? '' : ' Scroll to walk through it.'}
+            From the first scan to a saved connection — one continuous story.
+            {useStaticLayout ? '' : ' Scroll to watch it play like a film.'}
           </p>
         </ScrollReveal>
       </section>
@@ -106,6 +107,7 @@ export function HowItWorksSection() {
           bgImageSrc="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1920&q=80"
           title="Scan CodeCard"
           date="01 / QR to proof"
+          scrollToExpand="Scroll — watch the scan become a living CodeCard"
           className="mt-[-10px]"
         >
           {(scrollProgress) => <HowItWorksExpandedPage scrollProgress={scrollProgress} />}
@@ -124,82 +126,75 @@ export function HowItWorksPage() {
 }
 
 function HowItWorksExpandedPage({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
-  const introOpacity = useTransform(scrollProgress, [0.36, 0.46], [0, 1]);
-  const introY = useTransform(scrollProgress, [0.36, 0.46], ['22px', '0px']);
-  const stepsOpacity = useTransform(scrollProgress, [0.47, 0.54], [0, 1]);
+  const [activeStep, setActiveStep] = useState(0);
+
+  useMotionValueEvent(scrollProgress, 'change', (latest) => {
+    // After the QR engulfs the frame, scrub the phone story like a film reel.
+    const bands = [0.38, 0.48, 0.57, 0.66, 0.76, 0.86];
+    let next = 0;
+    for (let i = bands.length - 1; i >= 0; i -= 1) {
+      if (latest >= bands[i]!) {
+        next = i;
+        break;
+      }
+    }
+    setActiveStep((prev) => (prev === next ? prev : next));
+  });
+
+  const stageOpacity = useTransform(scrollProgress, [0.32, 0.4], [0, 1]);
+  const stageY = useTransform(scrollProgress, [0.32, 0.4], ['28px', '0px']);
+  const captionOpacity = useTransform(scrollProgress, [0.36, 0.44], [0, 1]);
+  const step = STEPS[activeStep] ?? STEPS[0];
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[1120px] flex-col justify-center">
-      <div className="flex flex-col gap-8 md:gap-10">
-        <motion.div className="max-w-[680px]" style={{ opacity: introOpacity, y: introY }}>
+    <div className="cc-hiw-cinema mx-auto flex h-full min-h-full w-full max-w-[1180px] flex-col justify-center">
+      <motion.div
+        className="cc-hiw-cinema__grid"
+        style={{ opacity: stageOpacity, y: stageY }}
+      >
+        <motion.div className="cc-hiw-cinema__caption" style={{ opacity: captionOpacity }}>
           <p className="font-eyebrow text-[11px] uppercase tracking-[0.16em] text-[#8b7f76]">
-            Expanded CodeCard
+            Live story · {String(activeStep + 1).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')}
           </p>
-          <h3 className="mt-4 font-display text-[clamp(3rem,8vw,6.8rem)] font-normal leading-[0.86] tracking-[-0.075em] text-[#232324]">
-            One scan becomes the whole story.
-          </h3>
-          <p className="mt-5 max-w-[520px] text-[17px] leading-[1.58] text-[#6f6660]">
-            The QR starts small, then opens into a guided proof page with your profile, best work,
-            filters, project details, and a saved connection moment.
-          </p>
-        </motion.div>
 
-        <motion.div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" style={{ opacity: stepsOpacity }}>
-          {STEPS.map((step, index) => (
-            <ExpandedStepCard
+          <AnimatePresence mode="wait">
+            <motion.div
               key={step.title}
-              step={step}
-              index={index}
-              scrollProgress={scrollProgress}
-            />
-          ))}
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function ExpandedStepCard({
-  step,
-  index,
-  scrollProgress,
-}: {
-  step: (typeof STEPS)[number];
-  index: number;
-  scrollProgress: MotionValue<number>;
-}) {
-  const start = 0.52 + index * 0.065;
-  const opacity = useTransform(scrollProgress, [start, start + 0.045], [0, 1]);
-  const y = useTransform(scrollProgress, [start, start + 0.045], ['24px', '0px']);
-  const scale = useTransform(scrollProgress, [start, start + 0.045], [0.96, 1]);
-
-  return (
-    <motion.article
-      className="min-h-[198px] rounded-[26px] border border-[rgba(35,35,36,0.12)] bg-white/85 p-5 shadow-[0_18px_52px_rgba(35,35,36,0.11)] backdrop-blur-sm md:p-6"
-      style={{ opacity, y, scale }}
-    >
-      <div className="flex items-center gap-4">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c094e4]/35 bg-[#f5e9ff] font-eyebrow text-[11px] text-[#7d5ca4] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-          {String(index + 1).padStart(2, '0')}
-        </span>
-        <h4 className="font-display text-[24px] font-medium leading-[1.02] tracking-[-0.02em] text-[#232324] md:text-[25px]">
-          {step.title}
-        </h4>
-      </div>
-      <p className="mt-4 text-[15px] leading-[1.62] text-[#6f6660] md:text-[16px]">{step.detail}</p>
-      {index === 3 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {['Screenshots', 'Repo link', 'Live demo'].map((label) => (
-            <span
-              key={label}
-              className="rounded-full border border-[#c094e4]/20 bg-[#c094e4]/10 px-3 py-1 text-[11px] font-medium text-[#6b527d]"
+              initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }}
+              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             >
-              {label}
-            </span>
-          ))}
+              <h3 className="mt-4 font-display text-[clamp(2.2rem,4.6vw,4.4rem)] font-normal leading-[0.92] tracking-[-0.06em] text-[#232324]">
+                {step.title}
+              </h3>
+              <p className="mt-5 max-w-[420px] text-[17px] leading-[1.58] text-[#6f6660]">
+                {step.detail}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="cc-hiw-cinema__dots" aria-hidden>
+            {STEPS.map((s, i) => (
+              <span
+                key={s.title}
+                className={`cc-hiw-cinema__dot ${i === activeStep ? 'cc-hiw-cinema__dot--active' : ''} ${i < activeStep ? 'cc-hiw-cinema__dot--done' : ''}`}
+              />
+            ))}
+          </div>
+
+          <p className="mt-6 hidden text-[13px] font-medium text-[#9a8f87] md:block">
+            Keep scrolling — the CodeCard keeps opening.
+          </p>
+        </motion.div>
+
+        <div className="cc-hiw-cinema__stage">
+          <div className="cc-hiw-cinema__phone-shell">
+            <PhoneMock step={activeStep} cinema />
+          </div>
         </div>
-      )}
-    </motion.article>
+      </motion.div>
+    </div>
   );
 }
 
@@ -311,7 +306,7 @@ function PreviewFilterBar({ active }: { active: PreviewFilter }) {
   );
 }
 
-function PhoneMock({ step }: { step: number }) {
+function PhoneMock({ step, cinema = false }: { step: number; cinema?: boolean }) {
   const reducedMotion = useReducedMotion();
   const allProjects = DEMO_FEATURED_PROJECTS.slice(0, 3);
   const showProjects = step >= 1;
@@ -332,7 +327,9 @@ function PhoneMock({ step }: { step: number }) {
   const showSavedToast = step === 5;
 
   return (
-    <div className="cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[min(92vw,390px)] md:max-w-[580px]">
+    <div
+      className={`cc-how-it-works-preview cc-how-it-works-preview--large relative mx-auto w-full max-w-[min(92vw,390px)] md:max-w-[580px] ${cinema ? 'cc-how-it-works-preview--cinema' : ''}`}
+    >
       <div className="cc-how-it-works-preview__glow" aria-hidden />
       <div className="cc-how-it-works-preview__frame">
         <div className="cc-how-it-works-preview__header">

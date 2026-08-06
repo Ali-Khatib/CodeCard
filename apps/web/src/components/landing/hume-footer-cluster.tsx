@@ -18,8 +18,8 @@ const FOOTER_COLUMNS = [
   {
     title: 'Resources',
     links: [
-      { label: 'Research', href: '/#research' },
-      { label: 'How it works', href: '/#how-it-works' },
+      { label: 'Evidence', href: '/#evidence' },
+      { label: 'Inspection', href: '/#inspect' },
       { label: 'References', href: '/research/references' },
     ],
   },

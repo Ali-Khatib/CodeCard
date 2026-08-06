@@ -3548,6 +3548,113 @@ select,
     min-height: 380px;
   }
 
+  .cc-how-it-works-preview--cinema {
+    max-width: min(92vw, 420px);
+    transform: scale(1.02);
+    transform-origin: center top;
+  }
+
+  .cc-how-it-works-preview--cinema .cc-how-it-works-preview__glow {
+    opacity: 0.9;
+    filter: blur(18px);
+  }
+
+  .cc-hiw-cinema {
+    height: 100%;
+  }
+
+  .cc-hiw-cinema__grid {
+    display: grid;
+    gap: 1.75rem;
+    align-items: center;
+    height: 100%;
+  }
+
+  @media (min-width: 960px) {
+    .cc-hiw-cinema__grid {
+      grid-template-columns: minmax(280px, 1fr) minmax(340px, 440px);
+      gap: 3rem;
+    }
+  }
+
+  .cc-hiw-cinema__caption {
+    max-width: 460px;
+  }
+
+  .cc-hiw-cinema__stage {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cc-hiw-cinema__phone-shell {
+    width: 100%;
+    position: relative;
+  }
+
+  .cc-hiw-cinema__phone-shell::before {
+    content: '';
+    position: absolute;
+    inset: -12% -8%;
+    border-radius: 40px;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(192, 148, 228, 0.22), transparent 55%),
+      radial-gradient(circle at 70% 80%, rgba(212, 165, 116, 0.14), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .cc-hiw-cinema__phone-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cc-hiw-cinema__dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.75rem;
+  }
+
+  .cc-hiw-cinema__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(35, 35, 36, 0.16);
+    transition:
+      width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.28s ease;
+  }
+
+  .cc-hiw-cinema__dot--done {
+    background: rgba(192, 148, 228, 0.45);
+  }
+
+  .cc-hiw-cinema__dot--active {
+    width: 28px;
+    background: #c094e4;
+  }
+
+  @keyframes cc-hiw-qr-cell-in {
+    from {
+      opacity: 0.2;
+      transform: scale(0.7);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .cc-hiw-qr-cell {
+    animation: cc-hiw-qr-cell-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-hiw-qr-cell {
+      animation: none;
+    }
+  }
+
   @media (max-width: 767px) {
     .cc-how-it-works-mobile__steps {
       display: flex;
