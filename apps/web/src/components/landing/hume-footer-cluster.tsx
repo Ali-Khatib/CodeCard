@@ -22,6 +22,7 @@ const FOOTER_LEGAL = [
 
 /**
  * New Form–inspired footer: oversized type, wave seam, live hover motion.
+ * No portrait media — statement type only above the dark bar.
  */
 export function HumeFooterCluster() {
   const year = new Date().getFullYear();
