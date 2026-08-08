@@ -23,11 +23,26 @@ import {
 } from '@/lib/research/research-form';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { cn } from '@/lib/cn';
+import { joinDescribedBy } from '@/lib/a11y/described-by';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 const initialCreateState: ResearchCreateState = {};
 const initialUpdateState: ResearchUpdateState = {};
+
+const RESEARCH_FIELD_FOCUS_ORDER = [
+  'title',
+  'slug',
+  'abstract',
+  'authors',
+  'venue',
+  'year',
+  'publication_status',
+  'doi_url',
+  'pdf_url',
+  'citation_text',
+  'related_project_id',
+] as const;
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -36,6 +51,24 @@ function FieldError({ id, message }: { id: string; message?: string }) {
       {message}
     </p>
   );
+}
+
+function focusResearchField(formId: string, field?: string) {
+  if (!field) return;
+  const id =
+    field === 'authors'
+      ? `${formId}-author-0`
+      : field === 'doi_url'
+        ? `${formId}-doi`
+        : field === 'citation_text'
+          ? `${formId}-citation`
+          : field === 'related_project_id'
+            ? `${formId}-related-project`
+            : field === 'publication_status'
+              ? `${formId}-publication-status`
+              : `${formId}-${field}`;
+  const el = document.getElementById(id);
+  if (el instanceof HTMLElement) el.focus();
 }
 
 function GhostButton({
@@ -96,6 +129,10 @@ export function ResearchForm({
   );
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [clientError, setClientError] = useState('');
+  const [clientFieldError, setClientFieldError] = useState<{
+    field?: string;
+    message: string;
+  } | null>(null);
   const [createState, createAction, createPending] = useActionState(
     createResearchAction,
     initialCreateState,
@@ -107,7 +144,12 @@ export function ResearchForm({
 
   const state = mode === 'edit' ? updateState : createState;
   const pending = mode === 'edit' ? updatePending : createPending;
-  const fieldErrors = state.fieldErrors ?? {};
+  const fieldErrors = {
+    ...(state.fieldErrors ?? {}),
+    ...(clientFieldError?.field
+      ? { [clientFieldError.field]: clientFieldError.message }
+      : {}),
+  };
 
   useEffect(() => {
     if (!state.success) {
@@ -138,10 +180,15 @@ export function ResearchForm({
   }, [state.errorCode, editPath, notifyError]);
 
   useEffect(() => {
-    if (state.errorCode === 'slug_taken' || state.fieldErrors?.slug) {
+    if (state.errorCode === 'slug_taken') {
       slugInputRef.current?.focus();
+      return;
     }
-  }, [state.errorCode, state.fieldErrors?.slug]);
+    const errors = state.fieldErrors ?? {};
+    const firstKey =
+      RESEARCH_FIELD_FOCUS_ORDER.find((key) => errors[key]) ?? Object.keys(errors)[0];
+    if (firstKey) focusResearchField(formId, firstKey);
+  }, [state.errorCode, state.fieldErrors, formId]);
 
   useEffect(() => {
     if (
@@ -203,13 +250,16 @@ export function ResearchForm({
       return;
     }
 
-    const clientMessage = validateResearchFormClient(form);
-    if (clientMessage) {
-      setClientError(clientMessage);
+    const validation = validateResearchFormClient(form);
+    if (!validation.success) {
+      setClientError(validation.message);
+      setClientFieldError({ field: validation.field, message: validation.message });
+      focusResearchField(formId, validation.field);
       return;
     }
 
     setClientError('');
+    setClientFieldError(null);
     submitLockRef.current = true;
 
     if (mode === 'edit' && researchPaperId) {
@@ -277,7 +327,10 @@ export function ResearchForm({
           }}
           required
           aria-invalid={Boolean(fieldErrors.slug)}
-          aria-describedby={`${formId}-slug-help${fieldErrors.slug ? ` ${formId}-slug-error` : ''}`}
+          aria-describedby={joinDescribedBy(
+            `${formId}-slug-help`,
+            fieldErrors.slug ? `${formId}-slug-error` : undefined,
+          )}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 font-mono text-[14px] text-[var(--app-ink)]"
         />
         <p id={`${formId}-slug-help`} className="text-[13px] text-[var(--app-smoke)]">
@@ -321,6 +374,10 @@ export function ResearchForm({
                 onChange={(event) => updateAuthor(index, event.target.value)}
                 maxLength={RESEARCH_FORM_LIMITS.author}
                 placeholder={`Author ${index + 1}`}
+                aria-invalid={Boolean(fieldErrors.authors)}
+                aria-describedby={
+                  fieldErrors.authors ? `${formId}-authors-error` : undefined
+                }
                 className="w-full flex-1 rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
               />
               <GhostButton
@@ -351,6 +408,8 @@ export function ResearchForm({
             value={form.venue}
             onChange={(event) => setForm((prev) => ({ ...prev, venue: event.target.value }))}
             maxLength={RESEARCH_FORM_LIMITS.venue}
+            aria-invalid={Boolean(fieldErrors.venue)}
+            aria-describedby={fieldErrors.venue ? `${formId}-venue-error` : undefined}
             className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
           />
           <FieldError id={`${formId}-venue-error`} message={fieldErrors.venue} />
@@ -365,7 +424,10 @@ export function ResearchForm({
             value={form.year}
             onChange={(event) => setForm((prev) => ({ ...prev, year: event.target.value }))}
             placeholder="2017"
-            aria-describedby={`${formId}-year-help`}
+            aria-describedby={joinDescribedBy(
+              `${formId}-year-help`,
+              fieldErrors.year ? `${formId}-year-error` : undefined,
+            )}
             aria-invalid={Boolean(fieldErrors.year)}
             className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
           />
@@ -391,6 +453,12 @@ export function ResearchForm({
             setForm((prev) => ({ ...prev, publication_status: event.target.value }))
           }
           placeholder="Published, Under review, Preprint…"
+          aria-invalid={Boolean(fieldErrors.publication_status)}
+          aria-describedby={
+            fieldErrors.publication_status
+              ? `${formId}-publication-status-error`
+              : undefined
+          }
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
         <FieldError
@@ -408,7 +476,10 @@ export function ResearchForm({
           value={form.doi_url}
           onChange={(event) => setForm((prev) => ({ ...prev, doi_url: event.target.value }))}
           placeholder="10.xxxx/… or https://doi.org/…"
-          aria-describedby={`${formId}-doi-help`}
+          aria-describedby={joinDescribedBy(
+            `${formId}-doi-help`,
+            fieldErrors.doi_url ? `${formId}-doi-error` : undefined,
+          )}
           aria-invalid={Boolean(fieldErrors.doi_url)}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
@@ -430,7 +501,10 @@ export function ResearchForm({
           value={form.pdf_url}
           onChange={(event) => setForm((prev) => ({ ...prev, pdf_url: event.target.value }))}
           placeholder="https://example.com/paper.pdf"
-          aria-describedby={`${formId}-pdf-url-help`}
+          aria-describedby={joinDescribedBy(
+            `${formId}-pdf-url-help`,
+            fieldErrors.pdf_url ? `${formId}-pdf-url-error` : undefined,
+          )}
           aria-invalid={Boolean(fieldErrors.pdf_url)}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
@@ -451,6 +525,10 @@ export function ResearchForm({
           onChange={(event) => setForm((prev) => ({ ...prev, citation_text: event.target.value }))}
           maxLength={RESEARCH_FORM_LIMITS.citation}
           rows={3}
+          aria-invalid={Boolean(fieldErrors.citation_text)}
+          aria-describedby={
+            fieldErrors.citation_text ? `${formId}-citation-error` : undefined
+          }
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
         <FieldError id={`${formId}-citation-error`} message={fieldErrors.citation_text} />
@@ -470,9 +548,12 @@ export function ResearchForm({
             setForm((prev) => ({ ...prev, related_project_id: event.target.value }))
           }
           aria-invalid={Boolean(fieldErrors.related_project_id)}
-          aria-describedby={`${formId}-related-project-help${
-            fieldErrors.related_project_id ? ` ${formId}-related-project-error` : ''
-          }`}
+          aria-describedby={joinDescribedBy(
+            `${formId}-related-project-help`,
+            fieldErrors.related_project_id
+              ? `${formId}-related-project-error`
+              : undefined,
+          )}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         >
           <option value="">No related project</option>

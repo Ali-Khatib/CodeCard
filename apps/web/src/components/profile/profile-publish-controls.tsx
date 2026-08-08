@@ -89,14 +89,17 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
                 Unpublish profile
               </Button>
             ) : (
-              <>
-                <p className="w-full text-sm text-amber-300/90" role="status">
+              <div
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="unpublish-profile-title"
+                className="flex w-full flex-wrap gap-2"
+              >
+                <p id="unpublish-profile-title" className="w-full text-sm text-amber-300/90">
                   Unpublishing will remove public access to your profile URL. Visitors will see a
-                  not-found page instead of your card.
+                  not-found page instead of your card. Your content remains editable — this is not
+                  deletion.
                 </p>
-                <Button type="button" disabled={pending} aria-busy={pending} onClick={runUnpublish}>
-                  {pending ? 'Unpublishing…' : 'Confirm unpublish'}
-                </Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -105,7 +108,10 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
                 >
                   Cancel
                 </Button>
-              </>
+                <Button type="button" disabled={pending} aria-busy={pending} onClick={runUnpublish}>
+                  {pending ? 'Unpublishing…' : 'Confirm unpublish'}
+                </Button>
+              </div>
             )}
           </>
         ) : (

@@ -45,13 +45,16 @@ export function parseProfileUpdate(
   form: ProfileFormState,
 ):
   | { success: true; data: z.infer<typeof updateProfileSchema> }
-  | { success: false; message: string } {
+  | { success: false; message: string; field?: string } {
   const payload = formStateToUpdatePayload(form);
   const parsed = updateProfileSchema.safeParse(payload);
   if (!parsed.success) {
+    const first = parsed.error.errors[0];
+    const field = first?.path[0];
     return {
       success: false,
-      message: parsed.error.errors[0]?.message ?? 'Invalid input',
+      message: first?.message ?? 'Invalid input',
+      field: typeof field === 'string' ? field : undefined,
     };
   }
   return { success: true, data: parsed.data };

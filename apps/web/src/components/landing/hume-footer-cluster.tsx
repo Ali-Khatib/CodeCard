@@ -3,124 +3,144 @@
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
-import { CODECARD_TAGLINE } from '@/lib/marketing/positioning';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
+import '@/styles/site-footer.css';
+import '@/styles/editorial-landing.css';
 
-const FOOTER_COLUMNS = [
-  {
-    title: 'Product',
-    links: [
-      { label: 'Overview', href: '/' },
-      { label: 'Live demo', href: LIVE_DEMO_HREF },
-      { label: 'Pricing', href: '/pricing' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Research', href: '/#research' },
-      { label: 'How it works', href: '/#how-it-works' },
-      { label: 'References', href: '/research/references' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'Sign in', href: '/sign-in' },
-      { label: 'Start free', href: '/sign-up' },
-      { label: 'Privacy', href: '/legal/privacy' },
-      { label: 'Terms', href: '/legal/terms' },
-    ],
-  },
+const FOOTER_NAV = [
+  { label: 'Home', href: MARKETING_HOME_HREF },
+  { label: 'Live demo', href: LIVE_DEMO_HREF },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Research', href: '/research' },
 ] as const;
 
+const FOOTER_LEGAL = [
+  { label: 'Privacy', href: '/legal/privacy' },
+  { label: 'Terms', href: '/legal/terms' },
+  { label: 'Sign in', href: '/sign-in' },
+] as const;
+
+/**
+ * New Form–inspired footer: oversized type, wave seam, live hover motion.
+ * No portrait media — statement type only above the dark bar.
+ */
 export function HumeFooterCluster() {
+  const year = new Date().getFullYear();
+
   return (
-    <div className="border-t border-[var(--border)] bg-bone">
-      {/* Contact CTA */}
-      <section className="cc-container py-16 md:py-20">
-        <div className="mx-auto max-w-[640px] text-center">
-          <h2 className="font-sans text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-[-0.03em] text-ink">
-            Get started with CodeCard today
-          </h2>
-          <p className="mt-4 text-[17px] leading-relaxed text-smoke">{CODECARD_TAGLINE}</p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/sign-up" className="cc-btn-pill-primary cc-instant-press px-8 py-3">
-              Start free →
-            </Link>
-            <LiveDemoLink className="cc-btn-pill-ghost cc-instant-press px-8 py-3">
-              Live demo
-            </LiveDemoLink>
+    <div className="cc-site-footer" data-testid="site-footer-cluster">
+      <div className="cc-site-footer__from-finale" aria-hidden />
+      <section
+        className="cc-site-footer__statement"
+        aria-labelledby="footer-statement-heading"
+      >
+        <div className="cc-site-footer__statement-grid">
+          <div className="cc-site-footer__statement-copy">
+            <p className="cc-site-footer__eyebrow">CodeCard</p>
+            <h2
+              id="footer-statement-heading"
+              className="cc-site-footer__display"
+            >
+              <span>Your work.</span>
+              <span>One identity.</span>
+            </h2>
           </div>
         </div>
-      </section>
 
-      {/* Newsletter stub */}
-      <section className="border-t border-[var(--border)] bg-paper">
-        <div className="cc-container flex flex-col items-center gap-6 py-14 md:flex-row md:justify-between md:py-16">
-          <div className="max-w-md text-center md:text-left">
-            <p className="font-eyebrow text-[11px] uppercase tracking-[0.08em] text-smoke">
-              Stay in the loop
-            </p>
-            <p className="mt-2 font-sans text-[20px] font-medium tracking-[-0.02em] text-ink">
-              Product updates & showcase tips
-            </p>
-          </div>
-          <form
-            className="flex w-full max-w-md gap-2"
-            onSubmit={(e) => e.preventDefault()}
-            aria-label="Newsletter signup"
+        {/* Cream tab hangs into the dark bar — continuous with statement, not a floating black chip */}
+        <div className="cc-site-footer__to-top">
+          <button
+            type="button"
+            className="cc-site-footer__top-tab"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Top of page"
           >
-            <label className="sr-only" htmlFor="footer-email">
-              Email
-            </label>
-            <input
-              id="footer-email"
-              type="email"
-              placeholder="you@email.com"
-              className="h-11 flex-1 rounded-full border border-[var(--line-soft)] bg-bone px-5 text-[15px] text-ink placeholder:text-smoke focus:outline-none focus:ring-2 focus:ring-iris/30"
+            <span>Top of page</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
+              <path
+                d="M12 19V5M5 12l7-7 7 7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="cc-site-footer__seam" aria-hidden>
+          <svg
+            className="cc-site-footer__wave"
+            viewBox="0 0 1440 160"
+            preserveAspectRatio="none"
+          >
+            {/* Gentle cream edge; flatter on the right so the tab reads as one surface */}
+            <path
+              d="M0,0 L1440,0 L1440,88 C1280,88 1180,118 980,64 C720,8 420,108 0,52 Z"
+              fill="currentColor"
             />
-            <button type="submit" className="cc-btn-pill-primary cc-instant-press shrink-0 px-6">
-              Subscribe
-            </button>
-          </form>
+          </svg>
         </div>
       </section>
 
-      {/* Footer columns */}
-      <footer className="border-t border-[var(--border)]">
-        <div className="cc-container grid gap-10 py-14 md:grid-cols-[1.2fr_repeat(3,1fr)] md:py-16">
-          <div>
-            <p className="font-sans text-[18px] font-semibold tracking-[-0.02em] text-ink">
-              CodeCard
-            </p>
-            <p className="mt-3 max-w-[260px] text-[15px] leading-relaxed text-smoke">
-              {CODECARD_TAGLINE}
-            </p>
-          </div>
-          {FOOTER_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <p className="font-eyebrow text-[11px] uppercase tracking-[0.08em] text-smoke">
-                {col.title}
-              </p>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((link) => (
+      <footer className="cc-site-footer__bar">
+        <div className="cc-site-footer__bar-inner">
+          <div className="cc-site-footer__contact">
+            <Link href="/sign-up" className="cc-site-footer__email">
+              Get in touch
+              <span className="cc-site-footer__email-line" aria-hidden />
+            </Link>
+            <div className="cc-site-footer__actions">
+              <Link
+                href="/sign-up"
+                className="cc-site-footer__btn cc-instant-press"
+              >
+                Create Your CodeCard
+              </Link>
+              <LiveDemoLink className="cc-site-footer__btn-ghost cc-instant-press">
+                Open Live Demo
+              </LiveDemoLink>
+            </div>
+            <div className="cc-site-footer__cols">
+              <ul>
+                {FOOTER_NAV.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-[15px] text-ink transition-opacity hover:opacity-70"
-                    >
+                    {link.href === LIVE_DEMO_HREF ? (
+                      <LiveDemoLink className="cc-site-footer__link">
+                        {link.label}
+                      </LiveDemoLink>
+                    ) : (
+                      <Link href={link.href} className="cc-site-footer__link">
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <ul>
+                {FOOTER_LEGAL.map((link) => (
+                  <li key={link.label}>
+                    <Link href={link.href} className="cc-site-footer__link">
                       {link.label}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
-          ))}
-        </div>
-        <div className="border-t border-[var(--border)] py-6">
-          <p className="cc-container text-center text-[13px] text-smoke">
-            © {new Date().getFullYear()} CodeCard. All rights reserved.
+          </div>
+
+          <p className="cc-site-footer__ghost" aria-hidden>
+            <span>Get</span>
+            <span>Started</span>
           </p>
+
+          <div className="cc-site-footer__meta">
+            <p>© {year} CodeCard</p>
+            <p className="cc-site-footer__meta-note">
+              Projects, papers, Circle, and analysis in one profile.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

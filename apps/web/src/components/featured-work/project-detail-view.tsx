@@ -24,6 +24,11 @@ import { hasShowcaseExtras } from '@/lib/projects/case-study-sections';
 import { trackProjectEngagementEvent, canTrackId } from '@/components/research/research-analytics';
 import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import {
+  projectCoverAlt,
+  projectScreenshotAlt,
+} from '@/lib/a11y/uploaded-image-alt';
 
 const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
@@ -151,7 +156,7 @@ export function ProjectDetailView({
     >
       <ProjectWorkAtmosphere variant="page" />
 
-      <main className="relative z-[1]">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
           <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
@@ -203,6 +208,7 @@ export function ProjectDetailView({
             {project.posterUrl && (
               <ProjectMedia
                 src={project.posterUrl}
+                alt={projectCoverAlt({ projectTitle: project.title, titleAdjacent: true })}
                 priority
                 className="object-cover object-center"
               />
@@ -364,10 +370,15 @@ export function ProjectDetailView({
                       trackProjectSection('Product flow', 'project_section_hover_or_click');
                       setLightbox(src);
                     }}
+                    aria-label={projectScreenshotAlt({
+                      projectTitle: project.title,
+                      index: i,
+                    })}
                     className="group relative aspect-[16/10] overflow-hidden rounded-[14px] border border-border/40 bg-midnight outline-none transition-colors hover:border-lavender/50 focus-visible:ring-2 focus-visible:ring-lavender md:min-h-[280px]"
                   >
                     <ProjectMedia
                       src={src}
+                      alt=""
                       className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void-canvas/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -395,7 +406,16 @@ export function ProjectDetailView({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightbox}
-            alt=""
+            alt={(() => {
+              const index = screenshots.indexOf(lightbox);
+              if (index >= 0) {
+                return projectScreenshotAlt({ projectTitle: project.title, index });
+              }
+              return projectCoverAlt({
+                projectTitle: project.title,
+                titleAdjacent: false,
+              });
+            })()}
             className="relative z-10 max-h-[90vh] max-w-full rounded-card object-contain shadow-rim"
           />
         </div>

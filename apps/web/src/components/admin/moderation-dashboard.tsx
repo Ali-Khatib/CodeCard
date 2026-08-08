@@ -8,6 +8,7 @@ import { MODERATION_STATUSES, MODERATION_TARGET_TYPES } from '@/lib/admin/modera
 import { toSafeHttpHref } from '@/lib/security/safe-href';
 import { ReportActions } from '@/components/admin/report-actions';
 import { ModerationNoteEditor } from '@/components/admin/moderation-note-editor';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 type ListState<T> =
   | { status: 'ready'; data: AdminPaginatedResult<T> }
@@ -106,7 +107,7 @@ export function AdminModerationDashboard({
         </Link>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <h1 className="text-3xl font-semibold tracking-[-0.03em]">Moderation</h1>
         <p className="mt-2 text-[var(--app-smoke)]">
           Review private abuse reports and legally distinct DMCA notices.

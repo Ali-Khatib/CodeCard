@@ -229,7 +229,8 @@ export function DashboardSettingsView({
                     type="button"
                     role="switch"
                     aria-checked={row.enabled}
-                    className={`h-6 w-11 rounded-full p-0.5 transition-colors ${
+                    aria-label={row.label}
+                    className={`h-6 w-11 rounded-full p-0.5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)] ${
                       row.enabled ? 'bg-[var(--app-iris)]' : 'bg-[var(--app-border-strong)]'
                     }`}
                   >

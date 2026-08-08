@@ -21,8 +21,10 @@ export function PublicReportDialog({
 }) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const reasonSelectRef = useRef<HTMLSelectElement | null>(null);
   const titleId = useId();
   const descriptionId = useId();
+  const reasonErrorId = useId();
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
   const [pending, setPending] = useState(false);
@@ -30,11 +32,13 @@ export function PublicReportDialog({
     kind: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [reasonInvalid, setReasonInvalid] = useState(false);
 
   function open() {
     setReason('');
     setDescription('');
     setFeedback(null);
+    setReasonInvalid(false);
     dialogRef.current?.showModal();
   }
 
@@ -47,12 +51,15 @@ export function PublicReportDialog({
     event.preventDefault();
     if (pending) return;
     if (!reason) {
+      setReasonInvalid(true);
       setFeedback({ kind: 'error', message: 'Choose a reason before submitting.' });
+      reasonSelectRef.current?.focus();
       return;
     }
 
     setPending(true);
     setFeedback(null);
+    setReasonInvalid(false);
     try {
       const response = await fetch('/api/moderation/report', {
         method: 'POST',
@@ -113,7 +120,11 @@ export function PublicReportDialog({
         }}
         onClose={() => triggerRef.current?.focus()}
       >
-        <form className="grid gap-5 p-6" onSubmit={(event) => void submit(event)}>
+        <form
+          className="grid gap-5 p-6"
+          noValidate
+          onSubmit={(event) => void submit(event)}
+        >
           <div>
             <h2 id={titleId} className="text-xl font-semibold">
               Report this {targetType}
@@ -142,9 +153,15 @@ export function PublicReportDialog({
               <label className="grid gap-2 text-sm font-semibold">
                 <span>Reason</span>
                 <select
+                  ref={reasonSelectRef}
                   required
                   value={reason}
-                  onChange={(event) => setReason(event.target.value)}
+                  onChange={(event) => {
+                    setReason(event.target.value);
+                    setReasonInvalid(false);
+                  }}
+                  aria-invalid={reasonInvalid ? true : undefined}
+                  aria-describedby={reasonInvalid ? reasonErrorId : undefined}
                   className="min-h-11 rounded-lg border border-[var(--app-line)] bg-transparent px-3 font-normal"
                 >
                   <option value="">Choose a reason</option>
@@ -176,7 +193,7 @@ export function PublicReportDialog({
               </span>
 
               {feedback && (
-                <p role="alert" className="text-sm text-red-700">
+                <p id={reasonErrorId} role="alert" className="text-sm text-red-700">
                   {feedback.message}
                 </p>
               )}

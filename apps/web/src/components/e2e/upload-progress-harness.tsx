@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 /**
  * Browser-only harness for the real authenticated avatar upload component.
@@ -18,6 +19,8 @@ export function UploadProgressHarness() {
   return (
     <MutationFeedbackProvider>
       <main
+        id={MAIN_CONTENT_ID}
+        tabIndex={-1}
         className="min-h-[100dvh] bg-[var(--app-canvas)] p-4 text-[var(--app-ink)] sm:p-8"
         data-e2e-ready={ready ? 'true' : 'false'}
       >

@@ -4,10 +4,10 @@ import { LIVE_DEMO_ENTRY_HREF } from '@/lib/marketing/site-routes';
 export const LIVE_DEMO_WORKSPACE_HREF = LIVE_DEMO_ENTRY_HREF;
 
 /**
- * Former public-profile demo path. Kept as a constant so redirects and legacy links
- * resolve to the workspace instead of a separate Alex Chen marketing page.
+ * Public profile demo — visitor-facing CodeCard page.
+ * Project Back from workspace still routes to `/demo/projects` (see helpers below).
  */
-export const LIVE_DEMO_PROFILE_HREF = LIVE_DEMO_WORKSPACE_HREF;
+export const LIVE_DEMO_PROFILE_HREF = '/demo/card';
 
 /** Default live demo entry (workspace). */
 export const LIVE_DEMO_HREF = LIVE_DEMO_WORKSPACE_HREF;
@@ -16,18 +16,19 @@ export const LIVE_DEMO_HREF = LIVE_DEMO_WORKSPACE_HREF;
 export const LIVE_DEMO_PREVIEW_ALIAS_HREF = '/dashboard/preview';
 
 /**
- * @deprecated Prefer LIVE_DEMO_PROFILE_HREF — same path as the workspace demo.
+ * @deprecated Prefer LIVE_DEMO_PROFILE_HREF.
  */
-export const LIVE_DEMO_PROFILE_LEGACY_HREF = '/demo/card';
+export const LIVE_DEMO_PROFILE_LEGACY_HREF = LIVE_DEMO_PROFILE_HREF;
 
-/** Public profile path for a slug (`/demo` workspace for the demo persona). */
+/** Public profile path for a slug (`/demo/card` for the demo persona). */
 export function publicDemoProfileBasePath(profileSlug: string): string {
-  return profileSlug === 'demo' ? LIVE_DEMO_WORKSPACE_HREF : `/${profileSlug}`;
+  return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
 }
 
 /**
  * Back target from project detail.
- * Demo persona returns to the workspace projects list — never `/demo/card`.
+ * Demo persona returns to the workspace projects list so workspace → project → Back
+ * never dumps visitors on the public profile page unexpectedly.
  */
 export function publicDemoProfileProjectsHref(profileSlug: string): string {
   if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/projects`;
@@ -36,7 +37,7 @@ export function publicDemoProfileProjectsHref(profileSlug: string): string {
 
 /**
  * Back target from research detail.
- * Demo persona returns to the workspace research list — never `/demo/card`.
+ * Demo persona returns to the workspace research list.
  */
 export function publicDemoProfileResearchSectionHref(profileSlug: string): string {
   if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/research`;

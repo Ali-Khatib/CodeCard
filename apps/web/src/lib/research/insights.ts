@@ -8,12 +8,12 @@ export const RESEARCH_INSIGHTS = [
     sourceId: 'pina-eye-tracking',
   },
   {
-    id: 'pedigree',
-    title: 'The same résumé, different results',
-    stat: 'Nearly +15 pts',
+    id: 'prestige',
+    title: 'Your school can decide first',
+    stat: '3 countries',
     finding:
-      'Audit study: identical qualifications, different school and firm signals. Callbacks rose nearly 15 points for the privileged version. Skill was not what moved first.',
-    sourceId: 'rivera-tilcsik',
+      'Cross-national experiment: institutional prestige cues influenced early screening across three countries, before direct capability assessment.',
+    sourceId: 'mihut-prestige',
   },
   {
     id: 'proof',

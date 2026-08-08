@@ -5,9 +5,9 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal';
 
 const CARDS = [
   {
-    title: 'Pedigree changes opportunity',
-    body: 'School prestige, employer prestige and class-coded signals can affect early screening before capability is directly assessed.',
-    sourceId: 'rivera-tilcsik',
+    title: 'Prestige can move the gate',
+    body: 'Cross-national experiments found institutional prestige cues still shaped early screening before capability was directly assessed.',
+    sourceId: 'mihut-prestige',
   },
   {
     title: 'Visible proof reduces inference',

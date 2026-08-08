@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -6,68 +6,118 @@ import { describe, expect, it } from 'vitest';
 const WEB = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = (path: string) => readFileSync(resolve(WEB, path), 'utf8');
 
-describe('Phase 2 cinematic landing contract', () => {
-  it('wires cinematic scenes only into the marketing ProductPage', () => {
+describe('Editorial product landing contract', () => {
+  it('wires editorial landing only into the marketing ProductPage', () => {
     const page = read('src/components/landing/product-page.tsx');
-    expect(page).toContain('ScatteredWorkScene');
-    expect(page).toContain('ProductShowcaseScene');
-    expect(page).toContain("import('@/components/cinematic/scattered-work-scene')");
-    expect(page).toContain("import('@/components/cinematic/product-showcase-scene')");
-    expect(page).toContain("import '@/styles/cinematic-landing.css'");
-
-    expect(read('src/app/demo/(workspace)/layout.tsx')).not.toContain('cinematic');
-    expect(read('src/app/demo/card/layout.tsx')).not.toContain('cinematic');
-    expect(read('src/app/dashboard/layout.tsx')).not.toContain('ScatteredWorkScene');
+    expect(page).toContain('EditorialLanding');
+    expect(page).not.toContain('IdentityLanding');
   });
 
-  it('keeps hero LCP rules: server headline, deferred scroll cue, no opacity-0 headline', () => {
-    const hero = read('src/components/landing/product-hero.tsx');
+  it('keeps hero LCP rules and removes public-profile CTA', () => {
+    const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('data-hero-statement');
-    expect(hero).toContain('cc-hume-hero__headline');
-    expect(hero).toContain('HeroScrollCue');
-    expect(hero).not.toContain('opacity-0');
-    expect(hero).toContain("from '@/components/cinematic/hero-scroll-cue'");
+    expect(hero).toContain('YOUR WORK.');
+    expect(hero).toContain('ONE IDENTITY.');
+    expect(hero).toContain('cc-ed__lead');
+    expect(hero).toContain('cc-ed__sub');
+    expect(hero).toContain('cc-ed-hero__media');
+    expect(hero).toContain('priority');
+    expect(hero).not.toContain('LIVE_DEMO_PROFILE_HREF');
+    expect(hero).not.toContain('View Public Profile');
   });
 
-  it('owns scene files and responsive hook', () => {
-    expect(existsSync(resolve(WEB, 'src/components/cinematic/scattered-work-scene.tsx'))).toBe(
-      true,
-    );
-    expect(existsSync(resolve(WEB, 'src/components/cinematic/product-showcase-scene.tsx'))).toBe(
-      true,
-    );
-    expect(existsSync(resolve(WEB, 'src/components/cinematic/cinematic-progress.tsx'))).toBe(true);
-    expect(existsSync(resolve(WEB, 'src/hooks/use-responsive-scroll-scene.ts'))).toBe(true);
-
-    const scattered = read('src/components/cinematic/scattered-work-scene.tsx');
-    const showcase = read('src/components/cinematic/product-showcase-scene.tsx');
-    expect(scattered).toContain('useGSAP');
-    expect(showcase).toContain('useGSAP');
-    expect(scattered).toContain('cinematic-scattered-pin');
-    expect(showcase).toContain('cinematic-showcase-pin');
-    expect(scattered).toContain("start: PIN_START");
-    expect(showcase).toContain("start: PIN_START");
-    expect(showcase).toContain('resolveStage');
-    expect(scattered).toContain('invalidateOnRefresh');
-    expect(showcase).toContain('invalidateOnRefresh');
-    expect(scattered).not.toContain('killAllScrollTriggers');
-    expect(showcase).not.toContain('killAllScrollTriggers');
+  it('uses a feature walkthrough instead of screenshot product stories', () => {
+    const landing = read('src/components/landing/editorial/editorial-landing.tsx');
+    expect(landing).toContain('EditorialFeatureWalkthrough');
+    expect(landing).toContain('EditorialLiveDemoBox');
+    expect(landing).toContain('EditorialAudience');
+    expect(landing).toContain('EditorialResearchProof');
+    expect(landing).not.toContain('ProductStory');
+    expect(landing).not.toContain('ProductAnalysisSection');
+    expect(landing).not.toContain('EditorialNetworkBridge');
+    expect(landing).not.toContain('EditorialProductFrame');
+    expect(landing).not.toContain('EditorialMovingCards');
+    expect(landing).not.toContain('chapter="impact"');
   });
 
-  it('keeps final CTA destinations correct', () => {
-    const closing = read('src/components/landing/build-yours-section.tsx');
-    expect(closing).toContain('MorphSignupCta');
+  it('walkthrough explains surfaces without dashboard frames', () => {
+    const walk = read(
+      'src/components/landing/editorial/editorial-feature-walkthrough.tsx',
+    );
+    expect(walk).toContain('EditorialFeatureWalkthrough');
+    expect(walk).toContain('FullScreenScrollFX');
+    expect(walk).toContain('Projects');
+    expect(walk).toContain('Research');
+    expect(walk).toContain('Circle');
+    expect(walk).toContain('Connections');
+    expect(walk).toContain('Analytics');
+    expect(walk).toContain('PROJECTS PEOPLE CAN READ');
+    expect(walk).toContain('SHARE YOUR RESEARCH TOO.');
+    expect(walk).toContain('Not only projects');
+    expect(walk).toContain('content:');
+    expect(walk).toContain('photo-1461749280684-dccba630e2f6');
+    expect(walk).toContain('photo-1497633762265-9d179a990aa6');
+    expect(walk).toContain('photo-1514565131-fce0801e5785');
+    expect(walk).toContain('Crash course');
+    expect(walk).toContain('Five surfaces. Learn the card.');
+    expect(walk).not.toContain('Walk the live product');
+    expect(walk).not.toContain('Scroll to see');
+    expect(walk).not.toContain('Five ways your work lives');
+    expect(walk).not.toContain('NOT JUST A PDF');
+    expect(walk).not.toContain('Yes, you can show research too');
+    expect(walk).not.toContain('photo-1551288049-bebda4e38f71');
+    expect(walk).not.toContain('EditorialProductFrame');
+    expect(walk).not.toContain('DashboardConnectionsView');
+  });
+
+  it('research proof uses three sticky image fades with centered copy', () => {
+    const proof = read(
+      'src/components/landing/editorial/editorial-research-proof.tsx',
+    );
+    const parallax = read('src/components/ui/text-parallax-content-scroll.tsx');
+    expect(proof).toContain('TextParallaxContent');
+    expect(parallax).toContain('StickyImage');
+    expect(parallax).toContain('OverlayCopy');
+    expect(proof).toContain('THEY DO NOT READ YOU.');
+    expect(proof).toContain('Your best work never gets the glance.');
+    expect(proof).toContain('Your school can decide first.');
+    expect(proof).toContain('Hidden skills get skipped.');
+    expect(proof).toContain('research=');
+    expect(proof).toContain('solution=');
+    expect(proof).toContain('images.unsplash.com');
+    expect(proof).toContain('photo-1450101499163-c8848c66ca85');
+    expect(proof).toContain('photo-1562774053-701939374585');
+    expect(proof).toContain('photo-1627398242454-45a1465c2479');
+    expect(proof).not.toContain('photo-1551836022-d5d88e9218df');
+    expect(proof).not.toContain('They look. Then they decide.');
+    expect(proof).not.toContain('auth-demo/');
+    expect(proof).not.toContain('auth-collage/');
+    expect(proof).not.toContain('1522071820081');
+    expect(proof).not.toContain('photo-1461749280684-dccba630e2f6');
+    expect(proof).not.toContain('+15 pts');
+    expect(proof).not.toContain('In one study');
+    expect(proof).toContain('See all research papers');
+  });
+
+  it('embeds the live demo workspace in an iframe', () => {
+    const demo = read('src/components/landing/editorial/editorial-live-demo-box.tsx');
+    const css = read('src/styles/editorial-landing.css');
+    expect(demo).toContain('iframe');
+    expect(demo).toContain('src="/demo?embed=1"');
+    expect(demo).toContain('loading="eager"');
+    expect(demo).toContain('cc-ed-walk__bridge--out');
+    expect(demo).not.toContain('IntersectionObserver');
+    expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
+    expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[^}]*transparent/s);
+    expect(css).toContain("data-chapter='demo'");
+    expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[^}]*--ed-cream/s);
+    expect(css).toMatch(/height:\s*min\(82vh,\s*860px\)/);
+  });
+
+  it('keeps final CTA without public profile', () => {
+    const closing = read('src/components/landing/editorial/editorial-final-cta.tsx');
     expect(closing).toContain('LiveDemoLink');
-    expect(closing).toContain('LIVE_DEMO_HREF');
-    expect(closing).toContain('closing-profile-preview-link');
-  });
-
-  it('limits pinned triggers to the two major scenes', () => {
-    const scattered = read('src/components/cinematic/scattered-work-scene.tsx');
-    const showcase = read('src/components/cinematic/product-showcase-scene.tsx');
-    const pinScattered = (scattered.match(/pin:\s*true/g) ?? []).length;
-    const pinShowcase = (showcase.match(/pin:\s*true/g) ?? []).length;
-    expect(pinScattered).toBe(1);
-    expect(pinShowcase).toBe(1);
+    expect(closing).toContain('/sign-up');
+    expect(closing).not.toContain('LIVE_DEMO_PROFILE_HREF');
   });
 });

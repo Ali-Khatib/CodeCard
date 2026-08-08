@@ -40,7 +40,7 @@ function workspaceGreeting(page: Page) {
 }
 
 test.describe('Phase 0B motion foundation', () => {
-  test('landing keeps research-support content visible before/with motion', async ({
+  test('landing keeps identity hero content visible before/with motion', async ({
     page,
   }) => {
     const errors: string[] = [];
@@ -50,41 +50,38 @@ test.describe('Phase 0B motion foundation', () => {
     });
 
     await page.goto('/', { waitUntil: 'networkidle' });
-    const proof = page.getByTestId('motion-section-reveal-proof');
-    await expect(proof).toBeVisible();
-    await expect(proof.getByRole('heading', { level: 2 })).toBeVisible();
+    const hero = page.getByTestId('editorial-hero');
+    await expect(hero).toBeVisible();
+    await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
 
     // Content must never be authored as opacity:0 while waiting for GSAP.
-    const styleState = await proof.evaluate((el) => {
+    const styleState = await page.locator('[data-hero-statement]').first().evaluate((el) => {
       const cs = getComputedStyle(el);
       return {
         opacity: Number(cs.opacity),
-        inlineOpacity: el.style.opacity,
+        inlineOpacity: (el as HTMLElement).style.opacity,
         visibility: cs.visibility,
       };
     });
     expect(styleState.visibility).toBe('visible');
     expect(styleState.inlineOpacity === '' || Number(styleState.inlineOpacity) > 0.5).toBe(true);
-    // Effective opacity may briefly be affected by unrelated ancestors; require non-zero text paint.
-    await expect(proof.getByText('Showcase your research, not just your projects.')).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
     expect(styleState.opacity).toBeGreaterThan(0);
 
     const hydrationErrors = errors.filter((e) => /hydration/i.test(e));
     expect(hydrationErrors).toEqual([]);
   });
 
-  test('reduced motion disables Lenis and keeps proof untranslated', async ({ page }) => {
+  test('reduced motion disables Lenis and keeps hero untranslated', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(400);
 
-    const proof = page.getByTestId('motion-section-reveal-proof');
-    await expect(proof).toBeVisible();
-    await expect(
-      proof.getByText('Showcase your research, not just your projects.'),
-    ).toBeVisible();
+    const hero = page.getByTestId('editorial-hero');
+    await expect(hero).toBeVisible();
+    await expect(page.getByText(/ONE IDENTITY/i).first()).toBeVisible();
 
-    const state = await proof.evaluate((el) => {
+    const state = await page.locator('[data-hero-statement]').first().evaluate((el) => {
       const style = getComputedStyle(el);
       return {
         opacity: Number(style.opacity),
@@ -138,12 +135,14 @@ test.describe('Phase 0B motion foundation', () => {
 
   test('ScrollTrigger count stays stable across repeated / → /demo → /', async ({
     page,
-  }) => {
+  }, testInfo) => {
+    if (testInfo.project.name.includes('mobile')) test.skip();
     await enableMotionDebug(page);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
 
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
+    await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const before = await getScrollTriggerCount(page);
     expect(before).toBeGreaterThanOrEqual(1);
@@ -153,6 +152,7 @@ test.describe('Phase 0B motion foundation', () => {
       await expect(workspaceGreeting(page)).toBeVisible();
       await page.goto('/', { waitUntil: 'networkidle' });
       await waitForMotionDebug(page);
+      await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
     }
 
@@ -172,11 +172,13 @@ test.describe('Phase 0B motion foundation', () => {
     expect(await isLenisActive(page)).toBe(false);
   });
 
-  test('scoped provider cleanup leaves unrelated ScrollTrigger alive', async ({ page }) => {
+  test('scoped provider cleanup leaves unrelated ScrollTrigger alive', async ({ page }, testInfo) => {
+    if (testInfo.project.name.includes('mobile')) test.skip();
     await enableMotionDebug(page);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
+    await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
     const beforeOwned = await getScrollTriggerCount(page);

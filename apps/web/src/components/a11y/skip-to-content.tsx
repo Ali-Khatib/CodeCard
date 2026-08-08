@@ -1,4 +1,4 @@
-﻿import { MAIN_CONTENT_HREF } from '@/lib/a11y/main-content';
+import { MAIN_CONTENT_HREF } from '@/lib/a11y/main-content';
 
 /**
  * WS12-T001 — First keyboard-focusable control in every document.

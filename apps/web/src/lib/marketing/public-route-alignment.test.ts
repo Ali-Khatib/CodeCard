@@ -24,7 +24,7 @@ describe('workspace-first public route alignment', () => {
     expect(LIVE_DEMO_ENTRY_HREF).toBe('/demo');
     expect(LIVE_DEMO_HREF).toBe('/demo');
     expect(LIVE_DEMO_WORKSPACE_HREF).toBe('/demo');
-    expect(LIVE_DEMO_PROFILE_HREF).toBe('/demo');
+    expect(LIVE_DEMO_PROFILE_HREF).toBe('/demo/card');
     expect(LIVE_DEMO_PROFILE_LEGACY_HREF).toBe('/demo/card');
     expect(LIVE_DEMO_PREVIEW_ALIAS_HREF).toBe('/dashboard/preview');
   });
@@ -48,11 +48,12 @@ describe('workspace-first public route alignment', () => {
     expect(demo).not.toContain('PublicProfileExperience');
   });
 
-  it('redirects retired /demo/card public-profile page to the workspace', () => {
+  it('serves the public-profile demo at /demo/card', () => {
     const card = read('src/app/demo/card/page.tsx');
-    expect(card).toContain('permanentRedirect');
-    expect(card).toContain('LIVE_DEMO_WORKSPACE_HREF');
-    expect(card).not.toContain('PublicProfileExperience');
+    expect(card).toContain('PublicProfileExperience');
+    expect(card).toContain('DEMO_PROFILE');
+    expect(card).toContain('profileSlug="demo"');
+    expect(card).not.toContain('permanentRedirect');
   });
 
   it('aliases /dashboard/preview to the workspace without loops', () => {
@@ -72,18 +73,21 @@ describe('workspace-first public route alignment', () => {
 
   it('keeps authenticated dashboard routes on owner data, not Alex Chen demo imports', () => {
     const authHome = read('src/app/dashboard/(authenticated)/page.tsx');
+    expect(authHome).toContain('loadOwnerOverviewContent');
     expect(authHome).toContain("eq('owner_user_id', user!.id)");
     expect(authHome).not.toContain('DEMO_PROFILE');
     expect(authHome).not.toContain('Alex Chen');
     expect(authHome).not.toContain('workspace-demo');
   });
 
-  it('treats / and /demo as live-demo-capable public entry surfaces', () => {
+  it('keeps visitor-conversion eligibility on / and /demo only', () => {
     expect(resolveVisitorConversionRoute({ pathname: '/' })?.context).toBe('landing');
     expect(resolveVisitorConversionRoute({ pathname: '/demo' })?.context).toBe(
       'live_demo',
     );
+    expect(resolveVisitorConversionRoute({ pathname: '/landing' })).toBeNull();
     expect(resolveVisitorConversionRoute({ pathname: '/demo/card' })).toBeNull();
+    expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })).toBeNull();
   });
 
   it('does not force authenticated users away from marketing via middleware matcher', () => {

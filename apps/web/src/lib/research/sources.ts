@@ -37,18 +37,6 @@ export const RESEARCH_SOURCES: Record<string, ResearchSource> = {
       'Industry-sponsored study with a modest sample; not all recruiters behave identically across sectors.',
     url: 'https://www.theladders.com/static/images/basicSite/pdfs/TheLadders-EyeTracking-StudyC2.pdf',
   },
-  'rivera-tilcsik': {
-    id: 'rivera-tilcsik',
-    title: 'Class Advantage, Commitment Penalty',
-    authors: 'Rivera & Tilcsik',
-    year: 2016,
-    studyType: 'Audit / correspondence experiment',
-    sampleSize: 'Elite law-firm hiring market (U.S.)',
-    finding:
-      'Higher-class signals increased callbacks for men by nearly 15 percentage points in this market, with qualifications held constant.',
-    limitation: 'Findings are specific to this elite-law market; effects may differ elsewhere.',
-    url: 'https://doi.org/10.1086/685972',
-  },
   'urquidi-prestige': {
     id: 'urquidi-prestige',
     title: 'University Reputation Correspondence Experiment',
@@ -129,7 +117,7 @@ export const RESEARCH_SOURCES: Record<string, ResearchSource> = {
     studyType: 'Labor-market analysis',
     sampleSize: 'Large U.S. job-posting and career data',
     finding:
-      'Skills-based approaches can broaden candidate pools when job requirements focus on demonstrable skills rather than pedigree proxies alone.',
+      'Skills-based approaches can broaden candidate pools when job requirements focus on demonstrable skills rather than credential proxies alone.',
     limitation: 'Observational labor-market data; adoption varies by employer.',
     url: 'https://www.hbs.edu/managing-the-future-of-work/research/Pages/default.aspx',
   },
@@ -180,12 +168,12 @@ export const EVIDENCE_RAIL_STATS = [
     contextNote: 'One study',
   },
   {
-    id: 'fifteen-points',
-    figure: 'Nearly +15 points',
+    id: 'three-countries',
+    figure: '3 countries',
     label:
-      'Higher-class signals increased callbacks for men by nearly 15 percentage points in an elite-law-market audit study, with qualifications held constant.',
-    sourceId: 'rivera-tilcsik',
-    contextNote: 'In this market',
+      'Institutional prestige cues influenced early screening across three national contexts in this comparative experiment.',
+    sourceId: 'mihut-prestige',
+    contextNote: 'Cross-national',
   },
   {
     id: 'six-point-one-x',

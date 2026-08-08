@@ -51,7 +51,7 @@ export function ProjectReorderToolbar({
         </span>
         <button
           type="button"
-          className="cc-btn-pill-ghost h-8 px-3 text-[12px]"
+          className="cc-btn-pill-ghost min-h-11 px-3 text-[12px]"
           disabled={pending || disabled || index === 0}
           aria-label={`Move project up from position ${index + 1}`}
           onClick={() => move('up')}
@@ -60,7 +60,7 @@ export function ProjectReorderToolbar({
         </button>
         <button
           type="button"
-          className="cc-btn-pill-ghost h-8 px-3 text-[12px]"
+          className="cc-btn-pill-ghost min-h-11 px-3 text-[12px]"
           disabled={pending || disabled || index === total - 1}
           aria-label={`Move project down from position ${index + 1}`}
           onClick={() => move('down')}

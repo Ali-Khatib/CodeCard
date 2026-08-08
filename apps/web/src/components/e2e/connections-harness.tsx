@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { DashboardConnectionsView } from '@/components/dashboard/dashboard-connections-view';
 import type { AuthenticatedConnectionCard } from '@/lib/connections/map-owner-connection';
 import type { OwnerCollection } from '@/lib/connections/collections-core';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 /**
  * Browser harness for Connections management UI (mocked — no live Supabase).
@@ -46,6 +47,8 @@ export function ConnectionsHarness() {
 
   return (
     <main
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
       className="min-h-[100dvh] overflow-x-hidden bg-[var(--app-canvas)] p-4 text-[var(--app-ink)] sm:p-8"
       data-e2e-ready={ready ? 'true' : 'false'}
       data-e2e-connected={connected ? 'true' : 'false'}

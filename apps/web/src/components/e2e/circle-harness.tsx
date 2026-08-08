@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AuthenticatedCircleView } from '@/components/dashboard/authenticated-circle-view';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 import type {
   CircleFeedCursor,
   CircleFeedFilter,
@@ -168,6 +169,8 @@ export function CircleHarness() {
 
   return (
     <main
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
       className="min-h-[100dvh] overflow-x-hidden bg-[var(--app-canvas)] p-4 text-[var(--app-ink)] sm:p-8"
       data-e2e-ready={ready ? 'true' : 'false'}
       data-e2e-circle-mode={mode}

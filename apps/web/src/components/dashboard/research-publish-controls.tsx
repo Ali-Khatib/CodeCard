@@ -135,10 +135,25 @@ export function ResearchPublishControls({
                 Unpublish research
               </button>
             ) : (
-              <>
-                <p className="w-full text-[13px] text-[var(--app-smoke)]" role="alert">
-                  Unpublishing removes this paper from your public profile.
+              <div
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="unpublish-research-title"
+                className="flex w-full flex-wrap gap-2"
+              >
+                <p id="unpublish-research-title" className="w-full text-[13px] text-[var(--app-smoke)]">
+                  Unpublishing removes this paper from your public profile. The paper remains
+                  editable on your dashboard — this is not deletion.
                 </p>
+                <button
+                  type="button"
+                  data-confirm-cancel
+                  disabled={pending}
+                  onClick={() => setShowUnpublishConfirm(false)}
+                  className="cc-app-btn cc-app-btn--ghost inline-flex h-10 items-center px-4 text-[13px]"
+                >
+                  Cancel
+                </button>
                 <button
                   type="button"
                   disabled={pending}
@@ -148,15 +163,7 @@ export function ResearchPublishControls({
                 >
                   Confirm unpublish
                 </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => setShowUnpublishConfirm(false)}
-                  className="cc-app-btn cc-app-btn--ghost inline-flex h-10 items-center px-4 text-[13px]"
-                >
-                  Cancel
-                </button>
-              </>
+              </div>
             )}
           </>
         ) : (

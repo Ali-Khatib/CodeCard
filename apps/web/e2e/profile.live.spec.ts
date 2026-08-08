@@ -53,7 +53,7 @@ async function fillStable(locator: Locator, value: string): Promise<void> {
 }
 
 test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)', () => {
-  test('provision disposable owner and reach the canonical profile editor from dashboard nav', async ({
+  test('provision disposable owner and reach the canonical profile editor from Home', async ({
     page,
     admin,
     env,
@@ -70,10 +70,9 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
     await signInViaUI(page, { email: owner.email, password: owner.password });
     await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
 
-    // Repaired navigation contract: the dashboard shell links to the canonical editor.
-    const profileNav = page.getByRole('link', { name: 'My profile', exact: true }).first();
-    await expect(profileNav).toBeVisible();
-    await profileNav.click();
+    // Profile stays off primary nav; Home "Edit profile" is the entry.
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /profile/i })).toHaveCount(0);
+    await page.getByRole('link', { name: /^Edit profile$/ }).click();
     await page.waitForURL(/\/dashboard\/profile$/, { timeout: 30_000 });
     await expect(page.getByLabel('Display name')).toBeVisible();
   });

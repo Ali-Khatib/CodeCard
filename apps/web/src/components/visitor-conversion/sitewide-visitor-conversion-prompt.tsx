@@ -3,23 +3,20 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { HiOutlineArrowUpRight, HiOutlineXMark } from 'react-icons/hi2';
+import { HiOutlineArrowUpRight } from 'react-icons/hi2';
 import { createClient } from '@/lib/supabase/client';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { trackVisitorConversionEvent } from '@/lib/analytics/visitor-conversion';
 import {
-  VISITOR_CONVERSION_DISMISSED_AT_KEY,
-  VISITOR_CONVERSION_SHOWN_KEY,
   buildVisitorConversionCtaHrefs,
   detectVisitorPlatform,
+  hasVisitorConversionBeenShown,
   isAutomatedVisitor,
-  isVisitorConversionDismissed,
-  readVisitorStorage,
+  markVisitorConversionShown,
   resolveStoreLinks,
   resolveVisitorConversionRoute,
   selectStoreLinksForPlatform,
   startVisibleDelay,
-  writeVisitorStorage,
   type VisitorConversionRoute,
 } from '@/lib/visitor-conversion/visitor-conversion';
 
@@ -29,6 +26,7 @@ declare global {
   }
 }
 
+/** Runtime guard against Strict Mode / duplicate mounts within one JS realm. */
 let shownDuringRuntime = false;
 
 function markerFromDocument(): {
@@ -93,6 +91,10 @@ function StoreActions({
   );
 }
 
+export const VISITOR_CONVERSION_REFUSAL_LABEL = 'No, I’ll keep my work scattered';
+export const VISITOR_CONVERSION_REFUSAL_SUPPORT =
+  'I’d rather keep sending people five different links and explaining everything manually.';
+
 export function SitewideVisitorConversionPrompt({
   iosAppUrl,
   androidAppUrl,
@@ -106,6 +108,7 @@ export function SitewideVisitorConversionPrompt({
   const reducedMotion = useReducedMotion();
   const headingId = useId();
   const descriptionId = useId();
+  const refusalSupportId = useId();
   const cardRef = useRef<HTMLElement | null>(null);
   const trackedActions = useRef(new Set<string>());
   const [route, setRoute] = useState<VisitorConversionRoute | null>(null);
@@ -139,13 +142,7 @@ export function SitewideVisitorConversionPrompt({
       return;
     }
 
-    if (
-      shownDuringRuntime ||
-      readVisitorStorage(window.sessionStorage, VISITOR_CONVERSION_SHOWN_KEY) === '1' ||
-      isVisitorConversionDismissed(
-        readVisitorStorage(window.localStorage, VISITOR_CONVERSION_DISMISSED_AT_KEY),
-      )
-    ) {
+    if (shownDuringRuntime || hasVisitorConversionBeenShown(window.sessionStorage)) {
       return;
     }
 
@@ -189,13 +186,11 @@ export function SitewideVisitorConversionPrompt({
             document,
             onElapsed: () => {
               if (cancelled || shownDuringRuntime) return;
+              if (hasVisitorConversionBeenShown(window.sessionStorage)) return;
               shownDuringRuntime = true;
               document.documentElement.dataset.visitorConversionTimer = 'shown';
-              writeVisitorStorage(
-                window.sessionStorage,
-                VISITOR_CONVERSION_SHOWN_KEY,
-                '1',
-              );
+              // Set the shared once-per-tab-session key only when the box becomes visible.
+              markVisitorConversionShown(window.sessionStorage);
               setRoute(resolvedRoute);
               trackVisitorConversionEvent({
                 event: 'visitor_prompt_viewed',
@@ -236,6 +231,26 @@ export function SitewideVisitorConversionPrompt({
     return () => window.cancelAnimationFrame(frame);
   }, [route]);
 
+  useEffect(() => {
+    if (!route) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      // Session shown key is already set when the box became visible — preserve it.
+      if (!trackedActions.current.has('dismiss')) {
+        trackedActions.current.add('dismiss');
+        trackVisitorConversionEvent({
+          event: 'visitor_prompt_dismissed',
+          context: route.context,
+          profileId: route.profileId,
+        });
+      }
+      setRoute(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [route]);
+
   if (!route) return null;
 
   const isDemo = route.context === 'live_demo';
@@ -260,11 +275,7 @@ export function SitewideVisitorConversionPrompt({
   };
 
   const dismiss = () => {
-    writeVisitorStorage(
-      window.localStorage,
-      VISITOR_CONVERSION_DISMISSED_AT_KEY,
-      String(Date.now()),
-    );
+    // Session shown key is already set when the box became visible — preserve it.
     trackActionOnce('dismiss', 'visitor_prompt_dismissed');
     setRoute(null);
   };
@@ -274,21 +285,13 @@ export function SitewideVisitorConversionPrompt({
       ref={cardRef}
       role="region"
       aria-labelledby={headingId}
-      aria-describedby={descriptionId}
+      aria-describedby={`${descriptionId} ${refusalSupportId}`}
       className="cc-visitor-prompt"
       data-avoid-focus={avoidFocusedElement || undefined}
       data-reduced-motion={reducedMotion || undefined}
       data-testid="sitewide-visitor-conversion-prompt"
     >
       <div className="cc-visitor-prompt__glow" aria-hidden />
-      <button
-        type="button"
-        className="cc-visitor-prompt__close"
-        onClick={dismiss}
-        aria-label="Dismiss CodeCard account prompt"
-      >
-        <HiOutlineXMark aria-hidden />
-      </button>
 
       <p className="cc-visitor-prompt__eyebrow">{isDemo ? 'CodeCard Demo' : 'CodeCard'}</p>
       <h2 id={headingId} className="cc-visitor-prompt__heading">
@@ -296,8 +299,8 @@ export function SitewideVisitorConversionPrompt({
       </h2>
       <p id={descriptionId} className="cc-visitor-prompt__body">
         {isDemo
-          ? 'Create your own CodeCard to showcase your projects, research and technical work.'
-          : 'Show your projects, research and technical work through one link or QR code.'}
+          ? 'Build your own CodeCard and give people one place to explore your projects, research, and technical work.'
+          : 'Give people one place to explore your projects, research, and technical work through a link or QR code.'}
       </p>
 
       <div className="cc-visitor-prompt__actions">
@@ -331,9 +334,19 @@ export function SitewideVisitorConversionPrompt({
         }
       />
 
-      <button type="button" className="cc-visitor-prompt__dismiss" onClick={dismiss}>
-        {isDemo ? 'Keep exploring' : 'Not now'}
-      </button>
+      <div className="cc-visitor-prompt__refusal">
+        <button
+          type="button"
+          className="cc-visitor-prompt__dismiss"
+          onClick={dismiss}
+          aria-describedby={refusalSupportId}
+        >
+          {VISITOR_CONVERSION_REFUSAL_LABEL}
+        </button>
+        <p id={refusalSupportId} className="cc-visitor-prompt__refusal-support">
+          {VISITOR_CONVERSION_REFUSAL_SUPPORT}
+        </p>
+      </div>
     </aside>
   );
 }

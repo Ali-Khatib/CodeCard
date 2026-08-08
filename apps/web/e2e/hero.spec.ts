@@ -12,8 +12,7 @@ test.describe('Overview page', () => {
     await expect(page.getByRole('heading', { name: /Share what you build/i })).toBeVisible();
     await expect(page.locator('#research')).toBeAttached();
     await expect(page.locator('#how-it-works')).toBeAttached();
-    await expect(page.getByRole('heading', { name: /Why order matters/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Tap → profile → project/i })).toBeVisible();
+    await expect(page.getByTestId('editorial-research-proof')).toBeAttached();
   });
 
   test('nav shows Overview, Profiles, and Pricing only', async ({ page }) => {

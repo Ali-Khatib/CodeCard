@@ -424,6 +424,7 @@ export function AuthenticatedCircleView({
             options={FILTER_OPTIONS}
             value={CIRCLE_FEED_FILTER_LABELS[filter]}
             onChange={onFilterChange}
+            ariaLabel="Circle feed filters"
           />
           <p className="sr-only" aria-live="polite">
             Filter: {CIRCLE_FEED_FILTER_LABELS[filter]}

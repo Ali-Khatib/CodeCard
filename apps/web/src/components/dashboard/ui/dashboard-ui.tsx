@@ -208,14 +208,16 @@ export function FilterBar<T extends string>({
   value,
   onChange,
   labels,
+  ariaLabel = 'Filters',
 }: {
   options: readonly T[];
   value: T;
   onChange: (v: T) => void;
   labels?: Record<T, string>;
+  ariaLabel?: string;
 }) {
   return (
-    <div className="cc-app-filter-bar" role="tablist">
+    <div className="cc-app-filter-bar" role="tablist" aria-label={ariaLabel}>
       {options.map((opt) => {
         const active = value === opt;
         const label = labels?.[opt] ?? opt;

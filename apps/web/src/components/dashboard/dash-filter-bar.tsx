@@ -8,6 +8,7 @@ type DashFilterBarProps<T extends string> = {
   value: T;
   onChange: (value: T) => void;
   showFilterLabel?: boolean;
+  ariaLabel?: string;
 };
 
 export function DashFilterBar<T extends string>({
@@ -15,6 +16,7 @@ export function DashFilterBar<T extends string>({
   value,
   onChange,
   showFilterLabel = true,
+  ariaLabel = 'Filters',
 }: DashFilterBarProps<T>) {
   return (
     <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -24,7 +26,7 @@ export function DashFilterBar<T extends string>({
           Filter
         </span>
       )}
-      <FilterBar options={options} value={value} onChange={onChange} />
+      <FilterBar options={options} value={value} onChange={onChange} ariaLabel={ariaLabel} />
     </div>
   );
 }

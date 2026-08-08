@@ -1,0 +1,263 @@
+/**
+ * Marketing /research index — New Form–inspired info density + motion.
+ * Colors stay on CodeCard cream / ink / iris.
+ */
+
+.cc-research-index {
+  --ri-cream: var(--hume-cream, #fcf1e7);
+  --ri-ink: var(--ink, #232324);
+  --ri-mute: var(--smoke, #5c5856);
+  --ri-iris: var(--iris, #c094e4);
+  --ri-paper: var(--paper, #ffffff);
+  --ri-line: color-mix(in srgb, var(--ri-ink) 12%, transparent);
+  min-height: 100dvh;
+  background: var(--ri-cream);
+  color: var(--ri-ink);
+  padding-bottom: clamp(4rem, 10vh, 7rem);
+}
+
+.cc-research-index__eyebrow {
+  margin: 0;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: clamp(0.8125rem, 1.1vw, 0.9375rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ri-iris);
+}
+
+.cc-research-index__hero {
+  position: relative;
+  min-height: min(92vh, 56rem);
+  display: grid;
+  align-items: end;
+  padding: clamp(6.5rem, 14vh, 9rem) clamp(1.25rem, 4vw, 3.5rem)
+    clamp(3.5rem, 9vh, 5.5rem);
+  overflow: hidden;
+}
+
+.cc-research-index__hero-inner {
+  max-width: min(58rem, 100%);
+}
+
+.cc-research-index__display {
+  margin: 1.15rem 0 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3.75rem, 11vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+}
+
+.cc-research-index__lede {
+  margin: 1.75rem 0 0;
+  max-width: 40rem;
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  line-height: 1.5;
+  color: var(--ri-mute);
+  text-wrap: pretty;
+}
+
+.cc-research-index__lede--tight {
+  margin-top: 1rem;
+}
+
+.cc-research-index__papers-intro {
+  max-width: min(52rem, 100%);
+  margin: 0 auto;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+.cc-research-index__papers-intro .cc-research-index__eyebrow {
+  font-size: clamp(0.875rem, 1.2vw, 1rem);
+}
+
+.cc-research-index__section-title {
+  margin: 0.95rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.75rem, 6.5vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.cc-research-index__papers-intro .cc-research-index__lede {
+  font-size: clamp(1.15rem, 1.7vw, 1.35rem);
+}
+
+.cc-research-index__papers {
+  padding: clamp(2.5rem, 6vh, 4rem) 0 0;
+  border-top: 1px solid var(--ri-line);
+}
+
+.cc-research-index__paper-list {
+  list-style: none;
+  margin: clamp(2rem, 5vh, 3.25rem) auto 0;
+  padding: 0 clamp(1.25rem, 4vw, 3.5rem);
+  max-width: 64rem;
+  border-top: 1px solid var(--ri-line);
+}
+
+.cc-research-index__paper {
+  border-bottom: 1px solid var(--ri-line);
+}
+
+.cc-research-index__paper-head {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem 1.35rem;
+  align-items: start;
+  padding: 1.55rem 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color 0.25s ease;
+}
+
+.cc-research-index__paper-head:hover,
+.cc-research-index__paper-head:focus-visible {
+  background: color-mix(in srgb, var(--ri-iris) 8%, transparent);
+}
+
+.cc-research-index__paper-head:focus-visible {
+  outline: 2px solid var(--ri-iris);
+  outline-offset: 2px;
+}
+
+.cc-research-index__paper-num {
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  color: var(--ri-iris);
+  padding-top: 0.45rem;
+}
+
+.cc-research-index__paper-main {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.cc-research-index__paper-title {
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.cc-research-index__paper-meta {
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  color: var(--ri-mute);
+}
+
+.cc-research-index__paper-toggle {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--ri-mute);
+  padding-top: 0.2rem;
+  transition: color 0.2s ease, transform 0.25s ease;
+}
+
+.cc-research-index__paper[data-open='true'] .cc-research-index__paper-toggle {
+  color: var(--ri-iris);
+}
+
+.cc-research-index__paper-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-inline-start: calc(0.875rem + 1.35rem + 1.75ch);
+}
+
+.cc-research-index__paper[data-open='true'] .cc-research-index__paper-body {
+  grid-template-rows: 1fr;
+}
+
+.cc-research-index__paper-body-inner {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.cc-research-index__paper[data-open='true'] .cc-research-index__paper-body-inner {
+  padding-bottom: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .cc-research-index__paper-body {
+    padding-inline-start: 0;
+  }
+}
+
+.cc-research-index__facts {
+  margin: 0;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.cc-research-index__facts dt {
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ri-mute) 90%, transparent);
+}
+
+.cc-research-index__facts dd {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.1rem, 1.45vw, 1.25rem);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cc-research-index__paper-link {
+  display: inline-flex;
+  margin-top: 1.35rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--ri-iris) 55%, var(--ri-ink));
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.cc-research-index__paper-link:hover,
+.cc-research-index__paper-link:focus-visible {
+  border-bottom-color: currentColor;
+  color: var(--ri-ink);
+}
+
+.cc-research-index__back {
+  margin: clamp(2.5rem, 6vh, 4rem) auto 0;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+  max-width: 64rem;
+}
+
+.cc-research-index__back a {
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--ri-iris) 55%, var(--ri-ink));
+  text-decoration: none;
+}
+
+.cc-research-index__back a:hover,
+.cc-research-index__back a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-research-index__paper-head,
+  .cc-research-index__paper-link,
+  .cc-research-index__paper-toggle {
+    transition: none;
+  }
+}

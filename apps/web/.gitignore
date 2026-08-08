@@ -40,6 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.vercel
+
 # Phase 0D measurement artifacts
 .lighthouse-phase0d/
 .lighthouse-*/

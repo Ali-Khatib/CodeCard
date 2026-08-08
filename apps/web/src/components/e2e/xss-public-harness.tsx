@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PUBLIC_XSS_PAYLOADS, toSafeHttpHref } from '@/lib/security/safe-href';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 /**
  * Renders representative XSS strings as plain React text and safe href checks.
@@ -18,6 +19,8 @@ export function XssPublicHarness() {
 
   return (
     <main
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
       className="min-h-[100dvh] overflow-x-hidden bg-[var(--app-canvas)] p-4 text-[var(--app-ink)]"
       data-e2e-ready={ready ? 'true' : 'false'}
       data-e2e-xss="true"

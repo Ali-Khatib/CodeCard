@@ -12,11 +12,12 @@ test.describe('Phase 0D public critical rendering path', () => {
     expect(response?.ok()).toBeTruthy();
 
     const html = await page.content();
-    expect(html).toMatch(/cc-hume-hero__headline/);
-    expect(html).toMatch(/Your best work\. Ready to/);
+    expect(html).toMatch(/data-hero-statement/);
+    expect(html).toMatch(/YOUR WORK/);
+    expect(html).toMatch(/ONE IDENTITY/);
     expect(html).not.toMatch(/supabase\.auth\.getSession/);
 
-    await expect(page.locator('h1.cc-hume-hero__headline')).toBeVisible();
+    await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     // Native scroll until (optional) Lenis boots — content must not be hidden.
     await expect(page.locator('main')).toBeVisible();
 
@@ -47,14 +48,14 @@ test.describe('Phase 0D public critical rendering path', () => {
       document.documentElement.classList.contains('lenis'),
     );
     expect(lenis).toBe(false);
-    await expect(page.locator('h1.cc-hume-hero__headline')).toBeVisible();
+    await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
   });
 
   test('optional smooth-scroll failure leaves native scrolling', async ({ page }) => {
     await page.route('**/lenis/**', (route) => route.abort());
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
-    await expect(page.locator('h1.cc-hume-hero__headline')).toBeVisible();
+    await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     await page.mouse.wheel(0, 400);
     await expect(page.locator('main')).toBeVisible();
   });

@@ -18,14 +18,14 @@ describe('visitor conversion analytics', () => {
     for (const event of VISITOR_CONVERSION_EVENTS) {
       trackVisitorConversionEvent({
         event,
-        context: 'public_profile',
+        context: 'landing',
         profileId: '11111111-1111-4111-8111-111111111111',
       });
     }
 
     expect(track).toHaveBeenCalledTimes(VISITOR_CONVERSION_EVENTS.length);
     expect(track).toHaveBeenCalledWith('visitor_prompt_viewed', {
-      route_context: 'public_profile',
+      route_context: 'landing',
       demo: false,
       profile_id: '11111111-1111-4111-8111-111111111111',
     });

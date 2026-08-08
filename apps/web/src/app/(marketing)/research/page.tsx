@@ -1,10 +1,14 @@
-import { MarketingHashRedirect } from '@/components/landing/marketing-hash-redirect';
+import { ResearchIndexPage } from '@/components/research/research-index-page';
 
 export const metadata = {
   title: 'Research | CodeCard',
-  description: 'Evidence and research that shapes the CodeCard experience.',
+  description:
+    'Research papers and sources that inform how CodeCard presents work.',
 };
 
+/**
+ * Marketing research index — New Form–inspired stats + expandable paper library.
+ */
 export default function ResearchPage() {
-  return <MarketingHashRedirect hash="research" />;
+  return <ResearchIndexPage />;
 }

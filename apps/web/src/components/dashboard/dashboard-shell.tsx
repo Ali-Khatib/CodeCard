@@ -12,8 +12,10 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
+import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
+import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -90,10 +92,19 @@ export function DashboardShell({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [embedded, setEmbedded] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
 
   useDashboardSessionGuard();
+
+  useEffect(() => {
+    try {
+      setEmbedded(window.self !== window.top);
+    } catch {
+      setEmbedded(true);
+    }
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem('cc-sidebar-open');
@@ -125,10 +136,39 @@ export function DashboardShell({
   }, [pathname]);
 
   useEffect(() => {
+    if (embedded) setPendingHref(null);
+  }, [embedded]);
+
+  useEffect(() => {
     if (!pendingHref) return;
-    const timeout = window.setTimeout(() => setPendingHref(null), 5000);
+    // Marketing iframe: never stick on "Loading next view".
+    const ms = embedded ? 0 : 5000;
+    const timeout = window.setTimeout(() => setPendingHref(null), ms);
     return () => window.clearTimeout(timeout);
-  }, [pendingHref]);
+  }, [pendingHref, embedded]);
+
+  const syncActivePill = useCallback(() => {
+    const nav = navRef.current;
+    const pill = activePillRef.current;
+    if (!nav || !pill) return;
+    const active = nav.querySelector<HTMLElement>('a[aria-current="page"]');
+    if (!active) {
+      pill.style.opacity = '0';
+      return;
+    }
+    pill.style.opacity = '1';
+    pill.style.transform = `translateY(${active.offsetTop}px)`;
+  }, []);
+
+  useLayoutEffect(() => {
+    syncActivePill();
+  }, [pathname, sidebarOpen, syncActivePill]);
+
+  useEffect(() => {
+    const onResize = () => syncActivePill();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [syncActivePill]);
 
   const syncActivePill = useCallback(() => {
     const nav = navRef.current;
@@ -165,10 +205,14 @@ export function DashboardShell({
 
   const markPending = useCallback(
     (href: string) => {
+      if (embedded) {
+        setUserMenuOpen(false);
+        return;
+      }
       if (href !== pathname) setPendingHref(href);
       setUserMenuOpen(false);
     },
-    [pathname],
+    [pathname, embedded],
   );
 
   const isActive = (segment: string) => {
@@ -230,8 +274,8 @@ export function DashboardShell({
 
   return (
     <MutationFeedbackProvider>
-    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref ? 'cc-app-root--route-pending' : ''}`}>
-      {pendingHref && <div className="cc-app-route-progress" aria-hidden />}
+    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref && !embedded ? 'cc-app-root--route-pending' : ''} ${embedded ? 'cc-app-root--embedded' : ''}`}>
+      {pendingHref && !embedded && <div className="cc-app-route-progress" aria-hidden />}
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
@@ -297,7 +341,7 @@ export function DashboardShell({
             <ThemeToggle />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
-          <AppButton variant="ghost" block href="/">
+          <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
             ← Back to landing
           </AppButton>
         </div>
@@ -318,7 +362,7 @@ export function DashboardShell({
             <button
               type="button"
               onClick={() => setUserMenuOpen((o) => !o)}
-              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]"
+              className="flex h-11 w-11 min-h-11 min-w-11 items-center justify-center overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]"
               aria-expanded={userMenuOpen}
               aria-label="User menu"
             >
@@ -344,7 +388,7 @@ export function DashboardShell({
                 {preview ? (
                   <>
                     <Link
-                      href="/"
+                      href={MARKETING_HOME_HREF}
                       className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)] md:hidden"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -379,8 +423,8 @@ export function DashboardShell({
           </div>
         </header>
 
-        <div className="cc-app-content">
-          {pendingHref && (
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="cc-app-content">
+          {pendingHref && !embedded && (
             <div className="cc-app-route-pending" role="status" aria-live="polite">
               <span className="cc-app-route-pending__pulse" aria-hidden />
               Loading next view
@@ -390,7 +434,7 @@ export function DashboardShell({
             <EmailVerificationBanner email={email} />
           )}
           <DashboardPageTransition>{children}</DashboardPageTransition>
-        </div>
+        </main>
       </div>
 
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">

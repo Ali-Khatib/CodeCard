@@ -169,7 +169,7 @@ export function SourceDrawer({ source, onClose }: SourceDrawerProps) {
                   External source →
                 </a>
                 <Link
-                  href="/research/references"
+                  href="/research"
                   className="text-[15px] text-text-secondary hover:text-text-primary"
                   onClick={onClose}
                 >

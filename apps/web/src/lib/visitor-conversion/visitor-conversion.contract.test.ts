@@ -30,7 +30,17 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(component).not.toContain('8000');
     expect(core).toContain('VISITOR_CONVERSION_DELAY_MS = 8_000');
     expect(core).toContain("codecard:visitor-conversion:shown");
-    expect(core).toContain("codecard:visitor-conversion:dismissed-at");
+    expect(core).toContain("VISITOR_CONVERSION_SHOWN_VALUE = 'true'");
+    expect(core).not.toContain('localStorage');
+    expect(core).not.toContain('dismissed-at');
+    expect(component).not.toContain('localStorage');
+  });
+
+  it('limits eligibility to landing and live-demo entry only', () => {
+    const core = read('src/lib/visitor-conversion/visitor-conversion.ts');
+    expect(core).toContain('MARKETING_HOME_HREF');
+    expect(core).toContain('LIVE_DEMO_ENTRY_HREF');
+    expect(core).toContain("['landing', 'live_demo']");
   });
 
   it('resolves auth before scheduling and fails closed', () => {
@@ -43,29 +53,52 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(component).toContain('Fail closed');
   });
 
-  it('renders non-modal accessible semantics without focus management', () => {
+  it('renders non-modal accessible semantics without focus management or unlabeled X', () => {
     const component = read(
       'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
     );
     expect(component).toContain('role="region"');
     expect(component).toContain('aria-labelledby={headingId}');
-    expect(component).toContain('aria-describedby={descriptionId}');
-    expect(component).toContain('Dismiss CodeCard account prompt');
+    expect(component).toContain('aria-describedby=');
+    expect(component).toContain('No, I’ll keep my work scattered');
+    expect(component).toContain(
+      'I’d rather keep sending people five different links and explaining everything manually.',
+    );
+    expect(component).toContain("event.key !== 'Escape'");
     expect(component).not.toContain('aria-modal');
     expect(component).not.toContain('.focus()');
     expect(component).not.toContain('inert');
+    expect(component).not.toContain('HiOutlineXMark');
+    expect(component).not.toContain('cc-visitor-prompt__close');
   });
 
-  it('keeps demo copy and real auth destinations in the same component', () => {
+  it('keeps landing and demo copy with real auth destinations in the same component', () => {
     const component = read(
       'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
     );
     expect(component).toContain('CodeCard Demo');
     expect(component).toContain('Like what you’re exploring?');
     expect(component).toContain('Build your own CodeCard');
+    expect(component).toContain(
+      'Build your own CodeCard and give people one place to explore your projects, research, and technical work.',
+    );
+    expect(component).toContain(
+      'Give people one place to explore your projects, research, and technical work through a link or QR code.',
+    );
     expect(component).toContain('Create your CodeCard');
     expect(component).toContain('signupHref');
     expect(component).toContain('signinHref');
+  });
+
+  it('marks the shared session key only when the box becomes visible', () => {
+    const component = read(
+      'src/components/visitor-conversion/sitewide-visitor-conversion-prompt.tsx',
+    );
+    expect(component).toContain('markVisitorConversionShown(window.sessionStorage)');
+    expect(component).toContain('hasVisitorConversionBeenShown(window.sessionStorage)');
+    expect(component).toContain(
+      'Set the shared once-per-tab-session key only when the box becomes visible.',
+    );
   });
 
   it('routes sign-in next through the existing internal redirect sanitizer', () => {
@@ -74,33 +107,16 @@ describe('site-wide visitor conversion prompt contract', () => {
     expect(signIn).toContain('sanitizeInternalRedirect');
   });
 
-  it('uses successful-content markers on real and demo detail routes', () => {
-    for (const path of [
-      'src/app/[slug]/page.tsx',
-      'src/app/[slug]/projects/[id]/page.tsx',
-      'src/app/[slug]/research/[paperSlug]/page.tsx',
-      // Workspace-first routing: the workspace lives at `/demo`, the public
-      // profile at `/demo/card`, and `/dashboard/preview/*` only redirects.
-      'src/app/demo/(workspace)/layout.tsx',
-      'src/app/demo/card/projects/[id]/page.tsx',
-      'src/app/demo/card/research/[paperSlug]/page.tsx',
-    ]) {
-      expect(read(path), path).toContain('VisitorConversionMarker');
-    }
-    expect(read('src/app/demo/layout.tsx')).toContain('DeferredVisitorConversionPrompt');
-  });
-
   it('uses safe optional app environment variables and no placeholder links', () => {
     const marketing = read('src/app/(marketing)/layout.tsx');
     const dashboard = read('src/app/dashboard/layout.tsx');
-    const demo = read('src/app/demo/layout.tsx');
     const env = read('src/lib/security/env.ts');
     expect(marketing).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(marketing).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(dashboard).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
-    expect(demo).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
-    expect(demo).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
+    expect(read('src/app/demo/layout.tsx')).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
+    expect(read('src/app/demo/layout.tsx')).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_IOS_APP_URL');
     expect(env).toContain('NEXT_PUBLIC_CODECARD_ANDROID_APP_URL');
   });
@@ -118,7 +134,7 @@ describe('site-wide visitor conversion prompt contract', () => {
       expect(analytics).toContain(event);
     }
     expect(analytics).toContain("input.context === 'live_demo'");
-    expect(analytics).toContain("profile_id: input.profileId");
+    expect(analytics).toContain('profile_id: input.profileId');
   });
 
   it('provides reduced-motion CSS with no translation', () => {

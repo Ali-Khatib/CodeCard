@@ -100,10 +100,25 @@ export function ProjectPublishControls({
                 Unpublish project
               </button>
             ) : (
-              <>
-                <p className="w-full text-[13px] text-ash" role="alert">
+              <div
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="unpublish-project-title"
+                className="flex w-full flex-wrap gap-2"
+              >
+                <p id="unpublish-project-title" className="w-full text-[13px] text-ash">
                   Unpublishing removes this project from your public profile and project navigation.
+                  The project remains editable on your dashboard — this is not deletion.
                 </p>
+                <button
+                  type="button"
+                  data-confirm-cancel
+                  disabled={pending}
+                  onClick={() => setShowUnpublishConfirm(false)}
+                  className="cc-btn-pill-ghost inline-flex h-10 items-center px-4 text-[13px]"
+                >
+                  Cancel
+                </button>
                 <button
                   type="button"
                   disabled={pending}
@@ -113,15 +128,7 @@ export function ProjectPublishControls({
                 >
                   Confirm unpublish
                 </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => setShowUnpublishConfirm(false)}
-                  className="cc-btn-pill-ghost inline-flex h-10 items-center px-4 text-[13px]"
-                >
-                  Cancel
-                </button>
-              </>
+              </div>
             )}
           </>
         ) : (

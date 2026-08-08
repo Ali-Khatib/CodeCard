@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useId, useRef, useState, useTransition } from 'react';
+import { useCallback, useId, useRef, useState, useTransition } from 'react';
 import {
   RESEARCH_FIGURE_CAPTION_MAX_LENGTH,
   RESEARCH_FIGURE_MAX_COUNT,
@@ -24,6 +24,66 @@ import { isRetryableUploadFailure } from '@/lib/storage/upload-failure';
 import { stageLabel, type UploadStage } from '@/lib/storage/upload-progress';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+import { useConfirmPanelA11y } from '@/lib/a11y/use-confirm-panel-a11y';
+
+function FigureDeleteConfirm({
+  figureId,
+  index,
+  pending,
+  onConfirm,
+  onCancel,
+}: {
+  figureId: string;
+  index: number;
+  pending: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const onClose = useCallback(() => onCancel(), [onCancel]);
+  const { panelRef, cancelRef, closePanel } = useConfirmPanelA11y({
+    open: true,
+    locked: pending,
+    initialFocus: 'cancel',
+    onClose,
+  });
+  const titleId = `delete-figure-${figureId}`;
+
+  return (
+    <div
+      ref={panelRef}
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      className="rounded-xl border border-[var(--app-border)] bg-[var(--app-mist)] p-3"
+    >
+      <p id={titleId} className="text-[14px] text-[var(--app-ink)]">
+        Delete figure {index + 1}? This cannot be undone.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <button
+          ref={cancelRef}
+          type="button"
+          data-confirm-cancel
+          className="cc-app-btn cc-app-btn--ghost !h-9"
+          disabled={pending}
+          onClick={closePanel}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="cc-app-btn cc-app-btn--primary !h-9"
+          disabled={pending}
+          aria-busy={pending}
+          aria-label={`Confirm delete figure ${index + 1}`}
+          onClick={onConfirm}
+        >
+          {pending ? 'Deleting…' : 'Confirm delete'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type LocalFigureJob = {
   clientId: string;
@@ -226,17 +286,18 @@ export function ResearchFigureManager({
   }
 
   function confirmDelete(figureId: string) {
+    if (pending) return;
     startTransition(async () => {
       const result = await deleteResearchFigureAction({
         researchPaperId,
         figureId,
       });
-      setConfirmDeleteId(null);
       if (!result.success) {
         setStatusMessage(result.error ?? 'Could not delete figure.');
         notifyError(result.error, MUTATION_FEEDBACK.research.figureFailed);
         return;
       }
+      setConfirmDeleteId(null);
       setFigures((prev) => prev.filter((figure) => figure.id !== figureId));
       setStatusMessage(
         result.cleanupWarning
@@ -253,7 +314,7 @@ export function ResearchFigureManager({
         <h2 id={`${inputId}-heading`} className="text-[16px] font-semibold text-[var(--app-ink)]">
           Research figures
         </h2>
-        <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+        <p className="mt-1 text-[13px] text-[var(--app-smoke)]" id={`${inputId}-constraints`}>
           JPEG, PNG, or WebP · up to 5 MB each · {remaining} of {RESEARCH_FIGURE_MAX_COUNT} remaining.
           Add figures to show results, diagrams or visual evidence.
         </p>
@@ -275,6 +336,7 @@ export function ResearchFigureManager({
           className="sr-only"
           disabled={remaining === 0 || pending}
           onChange={(event) => onFilesSelected(event.target.files)}
+          aria-describedby={`${inputId}-constraints`}
         />
       </div>
 
@@ -361,11 +423,16 @@ export function ResearchFigureManager({
                 <label className="block text-[13px] font-medium text-[var(--app-ink)]" htmlFor={`caption-${figure.id}`}>
                   Caption
                 </label>
+                <p id={`caption-help-${figure.id}`} className="text-[12px] text-[var(--app-smoke)]">
+                  Describe the meaningful conclusion of this figure for readers who cannot see the
+                  image. Do not paste filenames.
+                </p>
                 <textarea
                   id={`caption-${figure.id}`}
                   defaultValue={figure.caption ?? ''}
                   maxLength={RESEARCH_FIGURE_CAPTION_MAX_LENGTH}
                   rows={2}
+                  aria-describedby={`caption-help-${figure.id}`}
                   className="w-full rounded-xl border border-[var(--app-border)] px-3 py-2 text-[14px]"
                   onBlur={(event) => {
                     const next = event.target.value;
@@ -404,31 +471,13 @@ export function ResearchFigureManager({
                   </button>
                 </div>
                 {confirmDeleteId === figure.id && (
-                  <div
-                    role="dialog"
-                    aria-labelledby={`delete-figure-${figure.id}`}
-                    className="rounded-xl border border-[var(--app-border)] bg-[var(--app-mist)] p-3"
-                  >
-                    <p id={`delete-figure-${figure.id}`} className="text-[14px] text-[var(--app-ink)]">
-                      Delete this figure? This cannot be undone.
-                    </p>
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        type="button"
-                        className="cc-app-btn cc-app-btn--primary !h-9"
-                        onClick={() => confirmDelete(figure.id)}
-                      >
-                        Confirm delete
-                      </button>
-                      <button
-                        type="button"
-                        className="cc-app-btn cc-app-btn--ghost !h-9"
-                        onClick={() => setConfirmDeleteId(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
+                  <FigureDeleteConfirm
+                    figureId={figure.id}
+                    index={index}
+                    pending={pending}
+                    onConfirm={() => confirmDelete(figure.id)}
+                    onCancel={() => setConfirmDeleteId(null)}
+                  />
                 )}
               </div>
             </div>
