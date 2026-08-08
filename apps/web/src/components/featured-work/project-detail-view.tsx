@@ -39,6 +39,8 @@ interface ProjectDetailViewProps {
   displayName: string;
   accentColor?: string;
   projects?: FeaturedProject[];
+  /** Override the default public profile projects back link (owner preview). */
+  backHref?: string;
   /** Rendered by the transition provider during card → project handoff */
   transitionHandoff?: boolean;
 }
@@ -50,6 +52,7 @@ export function ProjectDetailView({
   displayName: _displayName,
   accentColor = COLORS.accent,
   projects,
+  backHref: backHrefProp,
   transitionHandoff = false,
 }: ProjectDetailViewProps) {
   const pathname = usePathname();
@@ -133,7 +136,7 @@ export function ProjectDetailView({
     transitionHandoff,
   ]);
 
-  const backHref = publicDemoProfileProjectsHref(profileSlug);
+  const backHref = backHrefProp ?? publicDemoProfileProjectsHref(profileSlug);
   const projectList = projects?.length ? projects : [project];
   const { previous: previousProject, next: nextProject } = getAdjacentProjects(
     projectList,

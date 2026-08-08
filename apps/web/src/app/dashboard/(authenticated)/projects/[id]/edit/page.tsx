@@ -70,10 +70,9 @@ export default async function EditProjectPage({
           {loaded.project.title}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Update your project details and save your changes.
+          Start with cover art and screenshots, then update the details and save at the bottom.
         </p>
       </div>
-      <ProjectForm mode="edit" projectId={id} initialValues={initialValues} />
       <ProjectMediaUpload
         projectId={id}
         cover={cover}
@@ -87,6 +86,7 @@ export default async function EditProjectPage({
         isPublished={loaded.project.is_published}
         profileIsPublic={loaded.profile.is_public}
       />
+      <ProjectForm mode="edit" projectId={id} initialValues={initialValues} />
       <ProjectDeleteDialog projectId={id} projectTitle={loaded.project.title} />
     </div>
   );

@@ -349,6 +349,193 @@ export function ProjectForm({
           </Link>
         </div>
       )}
+      <section className="space-y-4" aria-labelledby="project-showcase-heading">
+        <div>
+          <h2 id="project-showcase-heading" className="text-[15px] font-semibold text-graphite">
+            Showcase story (optional)
+          </h2>
+          <p id="project-showcase-help" className="mt-1 text-[13px] leading-relaxed text-ash">
+            Add up to five short written tabs on your project page. Write what a visitor should
+            read when they tap that tab, and optionally add a background image behind the text —
+            the text always stays readable on top. Skip any you do not need.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {CASE_STUDY_SECTIONS.map((section) => {
+            const enabled = Object.prototype.hasOwnProperty.call(
+              form.case_study_sections,
+              section.id,
+            );
+            const fieldId = `case_study_${section.id}`;
+            const helpId = `${fieldId}-help`;
+            const promptId = `${fieldId}-prompt`;
+            const imageInputId = `${fieldId}-image`;
+            const imageHelpId = `${fieldId}-image-help`;
+            const sectionImage = form.case_study_sections[section.id]?.mediaUrl ?? '';
+            const imageError = sectionImageErrors[section.id] ?? '';
+            const imageBusy = Boolean(sectionImageBusy[section.id]);
+            return (
+              <div
+                key={section.id}
+                className="rounded-[16px] border border-charcoal/70 bg-charcoal/20 p-4"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium text-vellum">{section.label}</p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.addHint}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={cn(
+                      'cc-app-btn min-h-11 shrink-0 px-4 text-[13px]',
+                      enabled ? 'cc-app-btn--ghost' : 'cc-app-btn--primary',
+                    )}
+                    aria-pressed={enabled}
+                    onClick={() => {
+                      setForm((prev) => {
+                        const next = { ...prev.case_study_sections };
+                        if (enabled) {
+                          delete next[section.id];
+                        } else {
+                          next[section.id] = { text: '' };
+                        }
+                        return { ...prev, case_study_sections: next };
+                      });
+                      setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
+                    }}
+                  >
+                    {enabled ? 'Remove' : 'Add'}
+                  </button>
+                </div>
+                {enabled ? (
+                  <div className="mt-4 space-y-2">
+                    <label htmlFor={fieldId} className="text-[13px] font-medium text-graphite">
+                      {section.label} text
+                    </label>
+                    <p id={promptId} className="text-[12px] leading-relaxed text-lichen">
+                      {section.prompt}
+                    </p>
+                    <textarea
+                      id={fieldId}
+                      name={fieldId}
+                      rows={4}
+                      maxLength={PROJECT_FORM_LIMITS.caseStudySection}
+                      value={form.case_study_sections[section.id]?.text ?? ''}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        setForm((prev) => ({
+                          ...prev,
+                          case_study_sections: {
+                            ...prev.case_study_sections,
+                            [section.id as CaseStudySectionId]: {
+                              ...prev.case_study_sections[section.id],
+                              text,
+                            },
+                          },
+                        }));
+                      }}
+                      className="cc-input w-full resize-y"
+                      placeholder={section.placeholder}
+                      aria-describedby={joinDescribedBy(promptId, helpId)}
+                    />
+                    <p id={helpId} className="text-[12px] text-ash">
+                      Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
+                    </p>
+
+                    <div className="mt-3 space-y-2 border-t border-charcoal/60 pt-3">
+                      <label
+                        htmlFor={imageInputId}
+                        className="text-[13px] font-medium text-graphite"
+                      >
+                        Background image <span className="text-ash">(optional)</span>
+                      </label>
+                      <p id={imageHelpId} className="text-[12px] leading-relaxed text-ash">
+                        Shown behind this tab&apos;s text with a dark overlay so the words stay
+                        readable. JPEG, PNG, or WebP — it is compressed automatically.
+                      </p>
+                      {sectionImage ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          {/* Bounded data-URL preview generated client-side. */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={sectionImage}
+                            alt={`${section.label} background preview`}
+                            className="h-16 w-28 rounded-[10px] border border-charcoal/70 object-cover"
+                          />
+                          <button
+                            type="button"
+                            className="cc-app-btn cc-app-btn--ghost min-h-11 px-4 text-[13px]"
+                            onClick={() => {
+                              setForm((prev) => {
+                                const current = prev.case_study_sections[section.id];
+                                const next = { ...current };
+                                delete next.mediaUrl;
+                                return {
+                                  ...prev,
+                                  case_study_sections: {
+                                    ...prev.case_study_sections,
+                                    [section.id as CaseStudySectionId]: next,
+                                  },
+                                };
+                              });
+                              setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
+                            }}
+                          >
+                            Remove image
+                          </button>
+                        </div>
+                      ) : (
+                        <input
+                          id={imageInputId}
+                          type="file"
+                          accept={CASE_STUDY_IMAGE_ACCEPT}
+                          disabled={imageBusy}
+                          aria-describedby={imageHelpId}
+                          className="block w-full text-[13px] text-ash file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-[10px] file:border file:border-charcoal/70 file:bg-charcoal/40 file:px-4 file:py-2 file:text-[13px] file:text-vellum"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = '';
+                            if (!file) return;
+                            setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
+                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: true }));
+                            const result = await compressCaseStudyImage(file);
+                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: false }));
+                            if (!result.ok) {
+                              setSectionImageErrors((prev) => ({
+                                ...prev,
+                                [section.id]: result.message,
+                              }));
+                              return;
+                            }
+                            setForm((prev) => ({
+                              ...prev,
+                              case_study_sections: {
+                                ...prev.case_study_sections,
+                                [section.id as CaseStudySectionId]: {
+                                  ...prev.case_study_sections[section.id],
+                                  mediaUrl: result.dataUrl,
+                                },
+                              },
+                            }));
+                          }}
+                        />
+                      )}
+                      {imageBusy ? (
+                        <p className="text-[12px] text-ash" role="status">
+                          Preparing image…
+                        </p>
+                      ) : null}
+                      <FieldError id={`${imageInputId}-error`} message={imageError || undefined} />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        <FieldError id="project-case-study-error" message={fieldErrors.case_study_sections} />
+      </section>
+
       <section className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="project-title" className="text-[13px] font-medium text-graphite">
@@ -602,193 +789,6 @@ export function ProjectForm({
           />
           <FieldError id="project-ended-at-error" message={fieldErrors.ended_at} />
         </div>
-      </section>
-
-      <section className="space-y-4" aria-labelledby="project-showcase-heading">
-        <div>
-          <h2 id="project-showcase-heading" className="text-[15px] font-semibold text-graphite">
-            Showcase story (optional)
-          </h2>
-          <p id="project-showcase-help" className="mt-1 text-[13px] leading-relaxed text-ash">
-            Add up to five short written tabs on your project page. Write what a visitor should
-            read when they tap that tab, and optionally add a background image behind the text —
-            the text always stays readable on top. Skip any you do not need.
-          </p>
-        </div>
-        <div className="space-y-4">
-          {CASE_STUDY_SECTIONS.map((section) => {
-            const enabled = Object.prototype.hasOwnProperty.call(
-              form.case_study_sections,
-              section.id,
-            );
-            const fieldId = `case_study_${section.id}`;
-            const helpId = `${fieldId}-help`;
-            const promptId = `${fieldId}-prompt`;
-            const imageInputId = `${fieldId}-image`;
-            const imageHelpId = `${fieldId}-image-help`;
-            const sectionImage = form.case_study_sections[section.id]?.mediaUrl ?? '';
-            const imageError = sectionImageErrors[section.id] ?? '';
-            const imageBusy = Boolean(sectionImageBusy[section.id]);
-            return (
-              <div
-                key={section.id}
-                className="rounded-[16px] border border-charcoal/70 bg-charcoal/20 p-4"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[14px] font-medium text-vellum">{section.label}</p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.addHint}</p>
-                  </div>
-                  <button
-                    type="button"
-                    className={cn(
-                      'cc-app-btn min-h-11 shrink-0 px-4 text-[13px]',
-                      enabled ? 'cc-app-btn--ghost' : 'cc-app-btn--primary',
-                    )}
-                    aria-pressed={enabled}
-                    onClick={() => {
-                      setForm((prev) => {
-                        const next = { ...prev.case_study_sections };
-                        if (enabled) {
-                          delete next[section.id];
-                        } else {
-                          next[section.id] = { text: '' };
-                        }
-                        return { ...prev, case_study_sections: next };
-                      });
-                      setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
-                    }}
-                  >
-                    {enabled ? 'Remove' : 'Add'}
-                  </button>
-                </div>
-                {enabled ? (
-                  <div className="mt-4 space-y-2">
-                    <label htmlFor={fieldId} className="text-[13px] font-medium text-graphite">
-                      {section.label} text
-                    </label>
-                    <p id={promptId} className="text-[12px] leading-relaxed text-lichen">
-                      {section.prompt}
-                    </p>
-                    <textarea
-                      id={fieldId}
-                      name={fieldId}
-                      rows={4}
-                      maxLength={PROJECT_FORM_LIMITS.caseStudySection}
-                      value={form.case_study_sections[section.id]?.text ?? ''}
-                      onChange={(e) => {
-                        const text = e.target.value;
-                        setForm((prev) => ({
-                          ...prev,
-                          case_study_sections: {
-                            ...prev.case_study_sections,
-                            [section.id as CaseStudySectionId]: {
-                              ...prev.case_study_sections[section.id],
-                              text,
-                            },
-                          },
-                        }));
-                      }}
-                      className="cc-input w-full resize-y"
-                      placeholder={section.placeholder}
-                      aria-describedby={joinDescribedBy(promptId, helpId)}
-                    />
-                    <p id={helpId} className="text-[12px] text-ash">
-                      Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
-                    </p>
-
-                    <div className="mt-3 space-y-2 border-t border-charcoal/60 pt-3">
-                      <label
-                        htmlFor={imageInputId}
-                        className="text-[13px] font-medium text-graphite"
-                      >
-                        Background image <span className="text-ash">(optional)</span>
-                      </label>
-                      <p id={imageHelpId} className="text-[12px] leading-relaxed text-ash">
-                        Shown behind this tab&apos;s text with a dark overlay so the words stay
-                        readable. JPEG, PNG, or WebP — it is compressed automatically.
-                      </p>
-                      {sectionImage ? (
-                        <div className="flex flex-wrap items-center gap-3">
-                          {/* Bounded data-URL preview generated client-side. */}
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={sectionImage}
-                            alt={`${section.label} background preview`}
-                            className="h-16 w-28 rounded-[10px] border border-charcoal/70 object-cover"
-                          />
-                          <button
-                            type="button"
-                            className="cc-app-btn cc-app-btn--ghost min-h-11 px-4 text-[13px]"
-                            onClick={() => {
-                              setForm((prev) => {
-                                const current = prev.case_study_sections[section.id];
-                                const next = { ...current };
-                                delete next.mediaUrl;
-                                return {
-                                  ...prev,
-                                  case_study_sections: {
-                                    ...prev.case_study_sections,
-                                    [section.id as CaseStudySectionId]: next,
-                                  },
-                                };
-                              });
-                              setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
-                            }}
-                          >
-                            Remove image
-                          </button>
-                        </div>
-                      ) : (
-                        <input
-                          id={imageInputId}
-                          type="file"
-                          accept={CASE_STUDY_IMAGE_ACCEPT}
-                          disabled={imageBusy}
-                          aria-describedby={imageHelpId}
-                          className="block w-full text-[13px] text-ash file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-[10px] file:border file:border-charcoal/70 file:bg-charcoal/40 file:px-4 file:py-2 file:text-[13px] file:text-vellum"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            e.target.value = '';
-                            if (!file) return;
-                            setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
-                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: true }));
-                            const result = await compressCaseStudyImage(file);
-                            setSectionImageBusy((prev) => ({ ...prev, [section.id]: false }));
-                            if (!result.ok) {
-                              setSectionImageErrors((prev) => ({
-                                ...prev,
-                                [section.id]: result.message,
-                              }));
-                              return;
-                            }
-                            setForm((prev) => ({
-                              ...prev,
-                              case_study_sections: {
-                                ...prev.case_study_sections,
-                                [section.id as CaseStudySectionId]: {
-                                  ...prev.case_study_sections[section.id],
-                                  mediaUrl: result.dataUrl,
-                                },
-                              },
-                            }));
-                          }}
-                        />
-                      )}
-                      {imageBusy ? (
-                        <p className="text-[12px] text-ash" role="status">
-                          Preparing image…
-                        </p>
-                      ) : null}
-                      <FieldError id={`${imageInputId}-error`} message={imageError || undefined} />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-        <FieldError id="project-case-study-error" message={fieldErrors.case_study_sections} />
       </section>
 
       {recoverableError && (

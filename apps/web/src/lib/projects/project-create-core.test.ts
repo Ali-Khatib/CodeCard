@@ -244,7 +244,7 @@ describe('executeCreateProject persistence', () => {
 
     expect(result.success).toBe(true);
     expect(result.projectId).toBe('project-new');
-    expect(result.redirectTo).toBe('/dashboard/projects');
+    expect(result.redirectTo).toBe('/dashboard/projects/project-new/edit');
 
     const insertCall = insertedProjectPayload();
     expect(insertCall).toMatchObject({

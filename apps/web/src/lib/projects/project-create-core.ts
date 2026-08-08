@@ -278,6 +278,6 @@ export async function executeCreateProject(
   return {
     success: true,
     projectId,
-    redirectTo: '/dashboard/projects',
+    redirectTo: `/dashboard/projects/${projectId}/edit`,
   };
 }

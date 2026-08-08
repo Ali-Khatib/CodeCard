@@ -52,7 +52,7 @@ describe('normalizeFeaturedProject media integration', () => {
 });
 
 describe('project editor media route contract', () => {
-  it('loads owned media and renders the upload manager outside the core project form', () => {
+  it('loads owned media and renders the upload manager above the core project form', () => {
     const editPage = readFileSync(
       resolve(
         process.cwd(),
@@ -64,7 +64,7 @@ describe('project editor media route contract', () => {
     expect(editPage).toContain('loadOwnedProjectMediaAssets');
     expect(editPage).toContain('<ProjectMediaUpload');
     expect(editPage).toContain('<ProjectForm');
-    expect(editPage.indexOf('<ProjectMediaUpload')).toBeGreaterThan(
+    expect(editPage.indexOf('<ProjectMediaUpload')).toBeLessThan(
       editPage.indexOf('<ProjectForm'),
     );
   });

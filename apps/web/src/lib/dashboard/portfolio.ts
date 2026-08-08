@@ -28,10 +28,12 @@ export type PortfolioProject = {
   title: string;
   tagline?: string;
   description?: string;
-  /** Primary navigation target (public when available, otherwise edit). */
+  /** Primary navigation target — public page when live, otherwise owner preview. */
   href: string;
   /** Authenticated editor route. */
   editHref: string;
+  /** Owner-only preview of the project detail page (drafts + private profiles). */
+  previewHref: string;
   /** Canonical public project URL when publication rules allow it. */
   publicHref?: string;
   posterUrl?: string;
@@ -107,6 +109,7 @@ export function dbProjectToPortfolioProject(
   const repo = firstSafeProjectLink(featured.links, ['repo']);
   const basePath = options?.basePath ?? '/dashboard';
   const editHref = `${basePath}/projects/${project.id}/edit`;
+  const previewHref = `${basePath}/projects/${project.id}/preview`;
   const canViewPublic =
     Boolean(project.is_published) &&
     Boolean(options?.isProfilePublic) &&
@@ -120,8 +123,9 @@ export function dbProjectToPortfolioProject(
     title: project.title,
     tagline: project.tagline ?? undefined,
     description: project.description ?? featured.description ?? undefined,
-    href: publicHref ?? editHref,
+    href: publicHref ?? previewHref,
     editHref,
+    previewHref,
     publicHref,
     posterUrl: featured.posterUrl ?? undefined,
     videoUrl: featured.videoUrl ?? undefined,
@@ -139,8 +143,7 @@ export function featuredToPortfolioProject(
 ): PortfolioProject {
   const live = firstSafeProjectLink(project.links, ['live', 'demo']);
   const repo = firstSafeProjectLink(project.links, ['repo']);
-  // Demo/preview has no editor; cards and "Edit" CTAs open the demo detail page
-  // (dashboard cards navigate via editHref since WS09-T004).
+  // Demo/preview has no separate editor; view and edit both open the demo detail page.
   const resolvedHref = href ?? `/demo/projects`;
 
   return {
@@ -150,6 +153,7 @@ export function featuredToPortfolioProject(
     description: project.description ?? undefined,
     href: resolvedHref,
     editHref: resolvedHref,
+    previewHref: resolvedHref,
     publicHref: resolvedHref.startsWith('/demo') || resolvedHref.startsWith('/')
       ? resolvedHref
       : undefined,
