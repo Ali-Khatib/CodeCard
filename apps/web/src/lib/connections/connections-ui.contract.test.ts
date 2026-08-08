@@ -133,6 +133,9 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('copy.primaryCta');
     expect(view).toContain('href="/profiles"');
+    expect(view).toContain('ShareYourCodeCardButton');
+    expect(view).toContain('getPublicProfileLinkForClipboard');
+    expect(view).toContain('/dashboard#share');
     expect(view).toContain("variant === 'authenticated'");
   });
 

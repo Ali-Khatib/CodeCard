@@ -11,10 +11,17 @@ import { AppButton, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 
 export default async function ConnectionsPage() {
   const supabase = await createClient();
-  const [result, collectionsResult, membershipResult] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [result, collectionsResult, membershipResult, profileResult] = await Promise.all([
     listOwnerConnections(supabase),
     listOwnerCollections(supabase),
     listOwnerMembershipMap(supabase),
+    user
+      ? supabase.from('profiles').select('slug').eq('owner_user_id', user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   if (result.error && result.code === 'UNAUTHENTICATED') {
@@ -59,6 +66,7 @@ export default async function ConnectionsPage() {
       initialConnections={cards}
       initialCollections={collectionsResult.collections}
       initialMemberships={membershipResult.memberships}
+      profileSlug={profileResult.data?.slug ?? null}
     />
   );
 }

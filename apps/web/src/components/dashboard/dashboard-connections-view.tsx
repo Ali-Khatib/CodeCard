@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
@@ -11,6 +12,9 @@ import {
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { DashFilterBar } from './dash-filter-bar';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
@@ -466,7 +470,40 @@ function ConnectionGridCard({
   );
 }
 
-function ConnectionsEmptyState() {
+function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null }) {
+  const router = useRouter();
+  const { notifySuccess, notifyError } = useMutationFeedback();
+  const [busy, setBusy] = useState(false);
+
+  const onShare = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const url = getPublicProfileLinkForClipboard(profileSlug);
+      if (!url) {
+        notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
+        router.push('/dashboard#share');
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      notifySuccess(MUTATION_FEEDBACK.share.linkCopied);
+      router.push('/dashboard#share');
+    } catch {
+      notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
+      router.push('/dashboard#share');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <AppButton variant="ghost" onClick={() => void onShare()} ariaLabel="Share your CodeCard">
+      {busy ? 'Copying…' : EMPTY_STATE_COPY.connections.secondaryCta}
+    </AppButton>
+  );
+}
+
+function ConnectionsEmptyState({ profileSlug }: { profileSlug?: string | null }) {
   const copy = EMPTY_STATE_COPY.connections;
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -482,9 +519,7 @@ function ConnectionsEmptyState() {
             <AppButton variant="primary" href="/profiles">
               {copy.primaryCta}
             </AppButton>
-            <AppButton variant="ghost" href="/dashboard/profile">
-              {copy.secondaryCta}
-            </AppButton>
+            <ShareYourCodeCardButton profileSlug={profileSlug} />
           </div>
         </div>
       </FadeInView>
@@ -496,6 +531,7 @@ export function DashboardConnectionsView({
   connections,
   basePath = '/dashboard',
   variant = 'demo',
+  profileSlug = null,
   onRemoveConnection,
   collections = [],
   memberships = {},
@@ -505,6 +541,7 @@ export function DashboardConnectionsView({
   connections: ViewConnection[];
   basePath?: string;
   variant?: 'demo' | 'authenticated';
+  profileSlug?: string | null;
   onRemoveConnection?: (connectionId: string) => void | Promise<void>;
   collections?: Array<{ id: string; name: string }>;
   memberships?: Record<string, string[]>;
@@ -573,7 +610,7 @@ export function DashboardConnectionsView({
   );
 
   if (variant === 'authenticated' && connections.length === 0) {
-    return <ConnectionsEmptyState />;
+    return <ConnectionsEmptyState profileSlug={profileSlug} />;
   }
 
   return (
