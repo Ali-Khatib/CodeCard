@@ -14,7 +14,6 @@ function PreloadedDemoFrame() {
         title="CodeCard live demo workspace"
         className="cc-ed-demo-embed__frame"
         loading="eager"
-        fetchPriority="high"
         allow="clipboard-write"
       />
     </div>
