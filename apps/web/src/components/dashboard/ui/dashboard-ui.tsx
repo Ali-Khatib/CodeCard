@@ -150,6 +150,7 @@ export function AppButton({
         aria-label={ariaLabel}
         target={target}
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+        onClick={onClick}
       >
         {children}
       </Link>

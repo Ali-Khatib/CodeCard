@@ -2,7 +2,6 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
@@ -12,8 +11,6 @@ import {
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
-import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
-import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { DashFilterBar } from './dash-filter-bar';
 import { FadeInView } from './fade-in-view';
@@ -470,35 +467,29 @@ function ConnectionGridCard({
   );
 }
 
+const SHARE_LINK_COPIED_FLAG = 'cc-share-link-copied';
+
 function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null }) {
-  const router = useRouter();
-  const { notifySuccess, notifyError } = useMutationFeedback();
-  const [busy, setBusy] = useState(false);
-
-  const onShare = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      const url = getPublicProfileLinkForClipboard(profileSlug);
-      if (!url) {
-        notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
-        router.push('/dashboard#share');
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      notifySuccess(MUTATION_FEEDBACK.share.linkCopied);
-      router.push('/dashboard#share');
-    } catch {
-      notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
-      router.push('/dashboard#share');
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
-    <AppButton variant="ghost" onClick={() => void onShare()} ariaLabel="Share your CodeCard">
-      {busy ? 'Copying…' : EMPTY_STATE_COPY.connections.secondaryCta}
+    <AppButton
+      variant="ghost"
+      href="/dashboard#share"
+      ariaLabel="Share your CodeCard"
+      onClick={() => {
+        const url = getPublicProfileLinkForClipboard(profileSlug);
+        try {
+          if (url) {
+            void navigator.clipboard.writeText(url);
+            sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '1');
+          } else {
+            sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '0');
+          }
+        } catch {
+          sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '0');
+        }
+      }}
+    >
+      {EMPTY_STATE_COPY.connections.secondaryCta}
     </AppButton>
   );
 }

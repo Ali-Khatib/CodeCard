@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { CountUp } from '@/components/landing/count-up';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -13,11 +14,15 @@ import { FadeInView } from './fade-in-view';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
 import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
+import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { InteractiveSurfaceCard } from '@/components/interactions/interactive-surface-card';
+
+const SHARE_LINK_COPIED_FLAG = 'cc-share-link-copied';
 
 export type OverviewReachStats = {
   profileViews: number;
@@ -81,6 +86,7 @@ export function DashboardOverviewView({
   suggested,
   basePath = '/dashboard',
 }: OverviewProps) {
+  const { notifySuccess, notifyError } = useMutationFeedback();
   const firstName = displayName.split(' ')[0];
   const views =
     typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
@@ -91,6 +97,18 @@ export function DashboardOverviewView({
     { key: 'linkClicks', label: 'Link clicks' },
     { key: 'qrDownloads', label: 'QR downloads' },
   ];
+
+  useEffect(() => {
+    const flag = sessionStorage.getItem(SHARE_LINK_COPIED_FLAG);
+    if (!flag) return;
+    sessionStorage.removeItem(SHARE_LINK_COPIED_FLAG);
+    if (flag === '1') {
+      notifySuccess(MUTATION_FEEDBACK.share.linkCopied);
+    } else {
+      notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
+    }
+    document.getElementById('share')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [notifySuccess, notifyError]);
 
   return (
     <div className="cc-profile-home">
