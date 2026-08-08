@@ -928,6 +928,55 @@ button.cc-app-nav-link:focus-visible {
   color: var(--app-ink);
 }
 
+.cc-app-toggle-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: var(--app-radius-pill);
+  border: 1px solid var(--app-border-strong);
+  background: var(--app-paper);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 520;
+  color: var(--app-ink);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cc-app-toggle-chip:hover {
+  background: var(--app-bone);
+  border-color: color-mix(in srgb, var(--app-ink) 28%, var(--app-border-strong));
+}
+
+.cc-app-toggle-chip:focus {
+  outline: none;
+}
+
+.cc-app-toggle-chip:focus-visible {
+  outline: 3px solid var(--app-iris);
+  outline-offset: 2px;
+}
+
+.cc-app-toggle-chip--selected,
+.cc-app-toggle-chip[aria-pressed='true'] {
+  border-color: var(--app-ink);
+  background: var(--app-ink);
+  color: var(--app-paper);
+  box-shadow: 0 1px 0 rgba(34, 34, 34, 0.08);
+}
+
+.cc-app-toggle-chip--selected:hover,
+.cc-app-toggle-chip[aria-pressed='true']:hover {
+  background: #333333;
+  border-color: #333333;
+  color: var(--app-paper);
+}
+
 /* ?? Filters ?? */
 .cc-app-filter-bar {
   display: inline-flex;

@@ -43,10 +43,12 @@ describe('WS12-T002 accessible form labels', () => {
     expect(source).toContain("'project-technologies-hint'");
     expect(source).toContain('joinDescribedBy');
     expect(source).not.toContain('aria-label="Add technology"');
-    expect(source).toContain('<legend className="text-[13px] font-medium text-graphite">Domains</legend>');
+    expect(source).toContain('<legend className="cc-app-field-label">Domains</legend>');
     expect(source).toContain(
-      '<legend className="text-[13px] font-medium text-graphite">Focus areas</legend>',
+      '<legend className="cc-app-field-label">Focus areas</legend>',
     );
+    expect(source).toContain('cc-app-toggle-chip');
+    expect(source).toContain('aria-pressed={selected}');
     expect(source).toContain('aria-label={`Remove technology ${tech}`}');
   });
 

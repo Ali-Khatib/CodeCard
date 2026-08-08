@@ -84,10 +84,8 @@ function ToggleChip({
       onClick={onToggle}
       aria-pressed={selected}
       className={cn(
-        'rounded-full border px-3 py-1.5 text-[13px] transition-colors',
-        selected
-          ? 'border-reactor/60 bg-reactor/15 text-vellum'
-          : 'border-charcoal/80 bg-charcoal/40 text-lichen hover:border-graphite',
+        'cc-app-toggle-chip',
+        selected ? 'cc-app-toggle-chip--selected' : undefined,
       )}
     >
       {label}
@@ -488,7 +486,7 @@ export function ProjectForm({
         aria-invalid={fieldErrors.domains ? true : undefined}
         aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
       >
-        <legend className="text-[13px] font-medium text-graphite">Domains</legend>
+        <legend className="cc-app-field-label">Domains</legend>
         <div id="project-domains" className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
             <ToggleChip
@@ -507,7 +505,7 @@ export function ProjectForm({
         aria-invalid={fieldErrors.focus_areas ? true : undefined}
         aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
       >
-        <legend className="text-[13px] font-medium text-graphite">Focus areas</legend>
+        <legend className="cc-app-field-label">Focus areas</legend>
         <div id="project-focus-areas" className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
             <ToggleChip
