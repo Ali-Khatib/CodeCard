@@ -13,7 +13,19 @@
   max-width: none;
   margin: 0;
   overflow: visible;
-  background: var(--sf-cream);
+  /* Match finale black so a peek under the CTA stays black, not muddy grey */
+  background: var(--sf-dark);
+}
+
+/* Short handoff only — then solid cream. No long grey wash behind the type. */
+.cc-site-footer__from-finale {
+  height: clamp(2.5rem, 7vh, 4.5rem);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--sf-dark) 0%,
+    var(--sf-cream) 100%
+  );
 }
 
 .cc-site-footer__statement {
@@ -21,7 +33,7 @@
   z-index: 2;
   background: var(--sf-cream);
   color: var(--sf-ink);
-  padding: clamp(4rem, 10vh, 7rem) 0 0;
+  padding: clamp(2.5rem, 6vh, 4.5rem) 0 0;
 }
 
 .cc-site-footer__statement-grid {
@@ -173,7 +185,7 @@
   margin-top: 0.35rem;
   width: 100%;
   transform-origin: left center;
-  transform: scaleX(0.28);
+  transform: scaleX(0);
   background: var(--sf-iris);
   transition: transform 0.35s ease;
 }
@@ -277,21 +289,33 @@
 
 .cc-site-footer__ghost {
   position: absolute;
-  right: clamp(-0.5rem, -1vw, 1rem);
-  bottom: 12%;
+  inset-inline-end: clamp(1rem, 4vw, 3rem);
+  inset-inline-start: auto;
+  bottom: 10%;
   margin: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(5rem, 16vw, 12.5rem);
-  line-height: 0.82;
+  font-size: clamp(4.5rem, 14vw, 11rem);
+  line-height: 1;
+  gap: 0.12em;
   letter-spacing: -0.045em;
-  color: color-mix(in srgb, var(--sf-paper) 7%, transparent);
+  /* Readable watermark — was ~7% and disappeared into the bar */
+  color: color-mix(in srgb, var(--sf-paper) 32%, transparent);
   pointer-events: none;
   user-select: none;
   text-align: right;
   animation: cc-sf-drift 14s ease-in-out infinite;
+}
+
+.cc-site-footer__ghost span:first-child {
+  padding-inline-end: 0.08em;
+}
+
+.cc-site-footer__ghost span:last-child {
+  color: color-mix(in srgb, var(--sf-iris) 42%, var(--sf-paper) 55%);
+  opacity: 0.88;
 }
 
 .cc-site-footer__meta {
@@ -309,7 +333,7 @@
 .cc-site-footer__meta p {
   margin: 0;
   font-size: 0.8125rem;
-  color: color-mix(in srgb, var(--sf-paper) 55%, transparent);
+  color: color-mix(in srgb, var(--sf-paper) 72%, transparent);
 }
 
 .cc-site-footer__meta-note {

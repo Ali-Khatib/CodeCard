@@ -1,110 +1,59 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { TextParallaxContent } from '@/components/ui/text-parallax-content-scroll';
 
-type GrowSpec = {
-  end: number;
-  decimals?: number;
-  prefix?: string;
-  suffix?: string;
+const U = (id: string, w = 2400) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+type ResearchBeat = {
+  id: string;
+  imgUrl: string;
+  problemTitle: string;
+  researchBody: string;
+  solutionBody: string;
 };
 
-const GROWS: Record<string, GrowSpec> = {
-  attention: { end: 6, prefix: '~', suffix: ' sec' },
-  pedigree: { end: 15, prefix: 'Nearly +', suffix: ' pts' },
-  proof: { end: 6.1, decimals: 1, prefix: 'Up to ', suffix: '×' },
-};
-
-function GrowingStat({
-  end,
-  decimals = 0,
-  prefix = '',
-  suffix = '',
-  active,
-}: GrowSpec & { active: boolean }) {
-  const reduced = useReducedMotion();
-  const zero = decimals > 0 ? (0).toFixed(decimals) : '0';
-  const [text, setText] = useState(`${prefix}${zero}${suffix}`);
-
-  useEffect(() => {
-    if (!active) return;
-    const finalCore = decimals > 0 ? end.toFixed(decimals) : String(Math.round(end));
-    if (reduced) {
-      setText(`${prefix}${finalCore}${suffix}`);
-      return;
-    }
-
-    const durationMs = 1400;
-    const start = performance.now();
-    let frame = 0;
-
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / durationMs);
-      const eased = 1 - (1 - t) ** 3;
-      const value = end * eased;
-      const core =
-        decimals > 0 ? value.toFixed(decimals) : String(Math.round(value));
-      setText(`${prefix}${core}${suffix}`);
-      if (t < 1) frame = requestAnimationFrame(tick);
-    };
-
-    setText(`${prefix}${zero}${suffix}`);
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [active, decimals, end, prefix, reduced, suffix, zero]);
-
-  return <span className="cc-ed-proof__stat-num">{text}</span>;
-}
-
-const LANDING_PROOF = [
+/** Atmospheric photos — CV screening, campus, unused code shot. */
+const BEATS: ResearchBeat[] = [
   {
     id: 'attention',
-    title: 'First passes are short',
-    finding:
-      'Eye tracking research found early résumé scans often lasted about six seconds. Name, title, and school drew the first look before deeper project detail.',
+    // People reviewing papers / CVs at a desk
+    imgUrl: U('photo-1450101499163-c8848c66ca85'),
+    problemTitle: 'Your best work never gets the glance.',
+    researchBody:
+      'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
+    solutionBody:
+      'CodeCard puts your projects up front. The good stuff shows before the glance is over.',
   },
   {
-    id: 'pedigree',
-    title: 'Context shapes outcomes',
-    finding:
-      'In an audit study with identical qualifications, school and firm signals shifted callbacks by nearly 15 points. Clearer proof helps skill compete on equal footing.',
+    id: 'prestige',
+    // University / school building
+    imgUrl: U('photo-1562774053-701939374585'),
+    problemTitle: 'Your school can decide first.',
+    researchBody:
+      'Cross-country experiments found school prestige cues still shaped early screening. The education line moved the cut before anyone tested the work.',
+    solutionBody:
+      'CodeCard leads with builds and outcomes. Proof shows up before the credential story takes over.',
   },
   {
     id: 'proof',
-    title: 'Visible skills travel farther',
-    finding:
-      'LinkedIn’s 2025 skills based hiring research: pools can widen up to 6.1× when skills are easy to see up front, not buried below the fold.',
+    // Code photo unused elsewhere on marketing / demo surfaces
+    imgUrl: U('photo-1627398242454-45a1465c2479'),
+    problemTitle: 'Hidden skills get skipped.',
+    researchBody:
+      'Skills-based hiring research shows pools open much wider when skills are easy to find. Buried work stays out of the match.',
+    solutionBody:
+      'CodeCard makes your skills and projects easy to see. More people can find you.',
   },
-] as const;
+];
 
 /**
- * Research importance — animated growing stats that argue for CodeCard.
+ * Three sticky image fades — same motion as before, problem / research / solution on each.
  */
 export function EditorialResearchProof() {
-  const rootRef = useRef<HTMLElement>(null);
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setActive(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.28 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
   return (
     <section
-      ref={rootRef}
       id="why-research"
       className="cc-ed__section cc-ed-proof"
       data-chapter-section="proof"
@@ -113,27 +62,31 @@ export function EditorialResearchProof() {
     >
       <div className="cc-ed-proof__intro">
         <p className="cc-ed__eyebrow">The research</p>
-        <h2 id="editorial-research-proof-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">FIRST LOOKS ARE FAST.</span>
-          <span className="cc-ed__sub">MAKE WORK EASY TO SEE.</span>
+        <h2
+          id="editorial-research-proof-heading"
+          className="cc-ed__display cc-ed__display--xl mt-3"
+        >
+          <span className="cc-ed__lead">THEY DO NOT READ YOU.</span>
+          <span className="cc-ed__sub">THEY SORT YOU.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Studies on how people scan profiles and résumés point to the same
-          opportunity: put your proof where it’s easy to find.
+          Seconds decide. Prestige steers the gate. Buried skills never enter the
+          pool. CodeCard puts proof where it cannot be ignored.
         </p>
       </div>
 
-      <div className="cc-ed-proof__grid">
-        {LANDING_PROOF.map((insight) => {
-          const grow = GROWS[insight.id] ?? { end: 0 };
-          return (
-            <article key={insight.id} className="cc-ed-proof__card">
-              <GrowingStat {...grow} active={active} />
-              <h3 className="cc-ed-proof__title">{insight.title}</h3>
-              <p className="cc-ed-proof__finding">{insight.finding}</p>
-            </article>
-          );
-        })}
+      <div className="cc-ed-proof__parallax">
+        {BEATS.map((beat) => (
+          <div key={beat.id} data-testid={`editorial-proof-box-${beat.id}`}>
+            <TextParallaxContent
+              imgUrl={beat.imgUrl}
+              subheading="The problem"
+              heading={beat.problemTitle}
+              research={beat.researchBody}
+              solution={beat.solutionBody}
+            />
+          </div>
+        ))}
       </div>
 
       <p className="cc-ed-proof__more">

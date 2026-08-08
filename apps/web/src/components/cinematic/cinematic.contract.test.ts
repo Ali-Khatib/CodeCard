@@ -26,54 +26,92 @@ describe('Editorial product landing contract', () => {
     expect(hero).not.toContain('View Public Profile');
   });
 
-  it('includes analysis, circle, connections, live demo, audience, and research proof', () => {
+  it('uses a feature walkthrough instead of screenshot product stories', () => {
     const landing = read('src/components/landing/editorial/editorial-landing.tsx');
-    expect(landing).toContain('ProductAnalysisSection');
-    expect(landing).toContain('EditorialNetworkBridge');
+    expect(landing).toContain('EditorialFeatureWalkthrough');
     expect(landing).toContain('EditorialLiveDemoBox');
     expect(landing).toContain('EditorialAudience');
     expect(landing).toContain('EditorialResearchProof');
-    expect(landing).toContain('editorial-network-pair');
-    expect(landing).toContain('circle');
-    expect(landing).toContain('connections');
-    expect(landing).toContain('researchBoard');
+    expect(landing).not.toContain('ProductStory');
+    expect(landing).not.toContain('ProductAnalysisSection');
+    expect(landing).not.toContain('EditorialNetworkBridge');
+    expect(landing).not.toContain('EditorialProductFrame');
     expect(landing).not.toContain('EditorialMovingCards');
     expect(landing).not.toContain('chapter="impact"');
   });
 
-  it('keeps product stories with large product frames', () => {
-    const story = read('src/components/landing/editorial/product-story.tsx');
-    expect(story).toContain('EditorialProductFrame');
-    expect(story).toContain('cc-ed-story__visual');
+  it('walkthrough explains surfaces without dashboard frames', () => {
+    const walk = read(
+      'src/components/landing/editorial/editorial-feature-walkthrough.tsx',
+    );
+    expect(walk).toContain('EditorialFeatureWalkthrough');
+    expect(walk).toContain('FullScreenScrollFX');
+    expect(walk).toContain('Projects');
+    expect(walk).toContain('Research');
+    expect(walk).toContain('Circle');
+    expect(walk).toContain('Connections');
+    expect(walk).toContain('Analytics');
+    expect(walk).toContain('PROJECTS PEOPLE CAN READ');
+    expect(walk).toContain('SHARE YOUR RESEARCH TOO.');
+    expect(walk).toContain('Not only projects');
+    expect(walk).toContain('content:');
+    expect(walk).toContain('photo-1461749280684-dccba630e2f6');
+    expect(walk).toContain('photo-1497633762265-9d179a990aa6');
+    expect(walk).toContain('photo-1514565131-fce0801e5785');
+    expect(walk).toContain('Crash course');
+    expect(walk).toContain('Five surfaces. Learn the card.');
+    expect(walk).not.toContain('Walk the live product');
+    expect(walk).not.toContain('Scroll to see');
+    expect(walk).not.toContain('Five ways your work lives');
+    expect(walk).not.toContain('NOT JUST A PDF');
+    expect(walk).not.toContain('Yes, you can show research too');
+    expect(walk).not.toContain('photo-1551288049-bebda4e38f71');
+    expect(walk).not.toContain('EditorialProductFrame');
+    expect(walk).not.toContain('DashboardConnectionsView');
   });
 
-  it('keeps analysis in the same two-column story rhythm', () => {
-    const analysis = read(
-      'src/components/landing/editorial/product-analysis-section.tsx',
+  it('research proof uses three sticky image fades with centered copy', () => {
+    const proof = read(
+      'src/components/landing/editorial/editorial-research-proof.tsx',
     );
-    expect(analysis).toContain('EditorialProductFrame');
-    expect(analysis).toContain('cc-ed-story__grid');
-    expect(analysis).not.toContain('cc-ed__accent');
+    const parallax = read('src/components/ui/text-parallax-content-scroll.tsx');
+    expect(proof).toContain('TextParallaxContent');
+    expect(parallax).toContain('StickyImage');
+    expect(parallax).toContain('OverlayCopy');
+    expect(proof).toContain('THEY DO NOT READ YOU.');
+    expect(proof).toContain('Your best work never gets the glance.');
+    expect(proof).toContain('Your school can decide first.');
+    expect(proof).toContain('Hidden skills get skipped.');
+    expect(proof).toContain('research=');
+    expect(proof).toContain('solution=');
+    expect(proof).toContain('images.unsplash.com');
+    expect(proof).toContain('photo-1450101499163-c8848c66ca85');
+    expect(proof).toContain('photo-1562774053-701939374585');
+    expect(proof).toContain('photo-1627398242454-45a1465c2479');
+    expect(proof).not.toContain('photo-1551836022-d5d88e9218df');
+    expect(proof).not.toContain('They look. Then they decide.');
+    expect(proof).not.toContain('auth-demo/');
+    expect(proof).not.toContain('auth-collage/');
+    expect(proof).not.toContain('1522071820081');
+    expect(proof).not.toContain('photo-1461749280684-dccba630e2f6');
+    expect(proof).not.toContain('+15 pts');
+    expect(proof).not.toContain('In one study');
+    expect(proof).toContain('See all research papers');
   });
 
   it('embeds the live demo workspace in an iframe', () => {
     const demo = read('src/components/landing/editorial/editorial-live-demo-box.tsx');
+    const css = read('src/styles/editorial-landing.css');
     expect(demo).toContain('iframe');
-    expect(demo).toContain('src="/demo"');
+    expect(demo).toContain('src="/demo?embed=1"');
+    expect(demo).toContain('loading="eager"');
+    expect(demo).toContain('cc-ed-walk__bridge--out');
+    expect(demo).not.toContain('IntersectionObserver');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
-  });
-
-  it('mirrors live demo workspace tabs in the product frame', () => {
-    const frame = read('src/components/landing/editorial/editorial-product-frame.tsx');
-    expect(frame).toContain("label: 'Analytics'");
-    expect(frame).toContain("label: 'Connections'");
-    expect(frame).toContain('DashboardConnectionsView');
-    expect(frame).toContain('DashboardProjectsPortfolio');
-    expect(frame).toContain('DashboardResearchView');
-    expect(frame).toContain('DashboardCircleView');
-    expect(frame).toContain('PreviewAnalyticsView');
-    expect(frame).toContain("state === 'analysis'");
-    expect(frame).not.toContain("label: 'Impact'");
+    expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[^}]*transparent/s);
+    expect(css).toContain("data-chapter='demo'");
+    expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[^}]*--ed-cream/s);
+    expect(css).toMatch(/height:\s*min\(82vh,\s*860px\)/);
   });
 
   it('keeps final CTA without public profile', () => {

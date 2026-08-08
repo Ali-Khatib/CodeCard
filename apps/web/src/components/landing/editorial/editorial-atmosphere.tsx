@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
-const DARK_CHAPTERS = new Set(['hero']);
+const DARK_CHAPTERS = new Set(['hero', 'finale']);
 
 function navToneFor(chapter: string): 'dark' | 'light' {
   return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';
@@ -65,16 +65,19 @@ export function EditorialAtmosphere() {
 
     ensureGsapPlugins();
 
-    const created = sections.map((section) =>
-      ScrollTrigger.create({
-        id: `editorial-atmosphere-${section.dataset.chapterSection}`,
+    const created = sections.map((section) => {
+      const id = section.dataset.chapterSection ?? 'hero';
+      // Flip when the chapter is the main surface — one solid color until then
+      const start = id === 'demo' ? 'top 38%' : 'top 55%';
+      return ScrollTrigger.create({
+        id: `editorial-atmosphere-${id}`,
         trigger: section,
-        start: 'top 55%',
+        start,
         end: 'bottom 45%',
-        onEnter: () => apply(section.dataset.chapterSection ?? 'hero'),
-        onEnterBack: () => apply(section.dataset.chapterSection ?? 'hero'),
-      }),
-    );
+        onEnter: () => apply(id),
+        onEnterBack: () => apply(id),
+      });
+    });
 
     return () => {
       created.forEach((t) => t.kill());

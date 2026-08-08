@@ -14,16 +14,16 @@ export function EditorialFinalCta() {
         <p className="cc-ed__eyebrow">Start</p>
         <h2
           id="editorial-finale-heading"
-          className="cc-ed__display cc-ed__display--xl mt-4"
+          className="cc-ed__display cc-ed__display--xl mt-3"
         >
           <span className="cc-ed__lead">BUILD THE PROFILE</span>
           <span className="cc-ed__sub">YOUR WORK DESERVES.</span>
         </h2>
-        <p className="cc-ed__lede mt-5">
+        <p className="cc-ed__lede mt-3">
           Projects, research, Circle, connections, and analysis in one living
           identity.
         </p>
-        <div className="cc-ed__actions mt-8">
+        <div className="cc-ed__actions mt-6">
           <Link
             href="/sign-up"
             className="cc-ed__btn-primary cc-instant-press"

@@ -92,10 +92,19 @@ export function DashboardShell({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [embedded, setEmbedded] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
 
   useDashboardSessionGuard();
+
+  useEffect(() => {
+    try {
+      setEmbedded(window.self !== window.top);
+    } catch {
+      setEmbedded(true);
+    }
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem('cc-sidebar-open');
@@ -127,10 +136,16 @@ export function DashboardShell({
   }, [pathname]);
 
   useEffect(() => {
+    if (embedded) setPendingHref(null);
+  }, [embedded]);
+
+  useEffect(() => {
     if (!pendingHref) return;
-    const timeout = window.setTimeout(() => setPendingHref(null), 5000);
+    // Marketing iframe: never stick on "Loading next view".
+    const ms = embedded ? 0 : 5000;
+    const timeout = window.setTimeout(() => setPendingHref(null), ms);
     return () => window.clearTimeout(timeout);
-  }, [pendingHref]);
+  }, [pendingHref, embedded]);
 
   const syncActivePill = useCallback(() => {
     const nav = navRef.current;
@@ -167,10 +182,14 @@ export function DashboardShell({
 
   const markPending = useCallback(
     (href: string) => {
+      if (embedded) {
+        setUserMenuOpen(false);
+        return;
+      }
       if (href !== pathname) setPendingHref(href);
       setUserMenuOpen(false);
     },
-    [pathname],
+    [pathname, embedded],
   );
 
   const isActive = (segment: string) => {
@@ -232,8 +251,8 @@ export function DashboardShell({
 
   return (
     <MutationFeedbackProvider>
-    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref ? 'cc-app-root--route-pending' : ''}`}>
-      {pendingHref && <div className="cc-app-route-progress" aria-hidden />}
+    <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref && !embedded ? 'cc-app-root--route-pending' : ''} ${embedded ? 'cc-app-root--embedded' : ''}`}>
+      {pendingHref && !embedded && <div className="cc-app-route-progress" aria-hidden />}
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
@@ -382,7 +401,7 @@ export function DashboardShell({
         </header>
 
         <main id={MAIN_CONTENT_ID} tabIndex={-1} className="cc-app-content">
-          {pendingHref && (
+          {pendingHref && !embedded && (
             <div className="cc-app-route-pending" role="status" aria-live="polite">
               <span className="cc-app-route-pending__pulse" aria-hidden />
               Loading next view

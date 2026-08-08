@@ -23,8 +23,11 @@ describe('WS09-T010 optimistic dashboard navigation', () => {
     expect(shell).toContain('Loading next view');
     expect(shell).toContain('aria-busy={pending}');
     expect(shell).toContain("aria-current={active ? 'page' : undefined}");
-    expect(shell).toContain('window.setTimeout(() => setPendingHref(null), 5000)');
+    expect(shell).toContain('window.setTimeout(() => setPendingHref(null), ms)');
+    expect(shell).toContain('const ms = embedded ? 0 : 5000');
     expect(shell).toContain('}, [pathname]');
+    expect(shell).toContain('window.self !== window.top');
+    expect(shell).toContain('pendingHref && !embedded');
 
     // Must not inject demo analytics/overview placeholders during pending transitions.
     expect(shell).not.toContain('buildAnalyticsData');

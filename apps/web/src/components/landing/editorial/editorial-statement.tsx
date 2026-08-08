@@ -1,5 +1,5 @@
 /**
- * Section 2 — quiet declarative statement on warm editorial canvas.
+ * Section 2 — quiet declarative beats on warm editorial canvas.
  */
 export function EditorialStatement() {
   return (
@@ -22,6 +22,22 @@ export function EditorialStatement() {
         <p className="cc-ed__lede">
           CodeCard brings projects, research, Circle, and connections into one
           shareable identity.
+        </p>
+      </div>
+
+      <div
+        className="cc-ed-statement__inner cc-ed-statement__beat"
+        data-testid="editorial-statement-showcase"
+      >
+        <p className="cc-ed__eyebrow">The shift</p>
+        <h2 className="cc-ed__display cc-ed__display--xl mt-5">
+          <span className="cc-ed__lead">DON’T SEND A LINK AND HOPE.</span>
+          <span className="cc-ed__sub">SHOW THE WORK ON THE SPOT.</span>
+        </h2>
+        <p className="cc-ed__lede">
+          The quickest, most impressive way to showcase exactly what you do, so
+          people see it clearly right away, not after they guess what a link
+          means.
         </p>
       </div>
     </section>

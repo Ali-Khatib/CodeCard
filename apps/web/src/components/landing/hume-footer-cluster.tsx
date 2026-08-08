@@ -29,6 +29,7 @@ export function HumeFooterCluster() {
 
   return (
     <div className="cc-site-footer" data-testid="site-footer-cluster">
+      <div className="cc-site-footer__from-finale" aria-hidden />
       <section
         className="cc-site-footer__statement"
         aria-labelledby="footer-statement-heading"

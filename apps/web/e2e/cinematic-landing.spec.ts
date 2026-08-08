@@ -12,17 +12,14 @@ test.describe('Editorial product landing', () => {
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
   });
 
-  test('analysis, circle, connections, live demo, audience, and research proof mount', async ({ page }) => {
+  test('feature walkthrough, live demo, audience, and research proof mount', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByTestId('editorial-network-bridge')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/isn.?t just/i).first()).toBeVisible();
-    await expect(page.getByTestId('editorial-network-pair')).toBeVisible();
-    await expect(page.getByTestId('editorial-story-circle')).toBeVisible();
-    await expect(page.getByTestId('editorial-story-connections')).toBeVisible();
-    await expect(page.getByTestId('editorial-analysis')).toBeVisible();
-    await expect(page.getByText(/MAKE IT VISIBLE/i).first()).toBeVisible();
-    await expect(page.getByTestId('editorial-analysis').getByText(/Analysis/i).first()).toBeVisible();
+    await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/ONE LIVING/i).first()).toBeVisible();
+    await expect(page.getByText(/TECHNICAL IDENTITY/i).first()).toBeVisible();
+    await expect(page.getByText(/CODING PROJECTS/i).first()).toBeVisible();
+    await expect(page.getByText(/Analytics/i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
     await expect(page.getByTestId('editorial-audience')).toBeVisible();
     await expect(page.getByTestId('editorial-research-proof')).toBeVisible();
@@ -45,7 +42,7 @@ test.describe('Editorial product landing', () => {
   test('mobile has no horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.getByTestId('editorial-analysis').scrollIntoViewIfNeeded();
+    await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
     );
@@ -55,7 +52,7 @@ test.describe('Editorial product landing', () => {
   test('reduced motion keeps sections readable', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/', { waitUntil: 'networkidle' });
-    await expect(page.getByTestId('editorial-analysis')).toBeVisible();
+    await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible();
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
     await expect(page.getByTestId('editorial-finale')).toBeVisible();
   });

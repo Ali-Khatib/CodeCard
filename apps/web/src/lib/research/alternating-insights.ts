@@ -23,16 +23,16 @@ export const ALTERNATING_RESEARCH: AlternatingResearchInsight[] = [
     citation: 'Pina et al., 2019',
   },
   {
-    id: 'pedigree',
-    sourceId: 'rivera-tilcsik',
+    id: 'prestige',
+    sourceId: 'mihut-prestige',
     category: 'Signals',
     accent: 'peach',
-    humanHeadline: 'Same skills. Different door.',
+    humanHeadline: 'Your school can decide first.',
     humanBody:
-      'When two candidates look identical on paper, small signals like the school on your header or the firm on your last line can swing who gets called back. Merit is real. But it is not always what gets seen first.',
+      'Before anyone tests what you can build, the education line can still steer the cut. Prestige cues shaped early screening across multiple countries in this experiment. Merit matters. It is not always what opens the gate.',
     paperQuote:
-      'Higher-class signals increased callbacks for men by nearly 15 percentage points in this market, with qualifications held constant.',
-    citation: 'Rivera & Tilcsik, 2016',
+      'Institutional prestige cues influenced screening in multiple national contexts, though effect sizes varied.',
+    citation: 'Mihut, 2020',
   },
   {
     id: 'proof',

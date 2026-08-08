@@ -142,7 +142,7 @@ test.describe('Phase 0B motion foundation', () => {
 
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
-    await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
+    await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const before = await getScrollTriggerCount(page);
     expect(before).toBeGreaterThanOrEqual(1);
@@ -152,7 +152,7 @@ test.describe('Phase 0B motion foundation', () => {
       await expect(workspaceGreeting(page)).toBeVisible();
       await page.goto('/', { waitUntil: 'networkidle' });
       await waitForMotionDebug(page);
-      await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
+      await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
     }
 
@@ -178,7 +178,7 @@ test.describe('Phase 0B motion foundation', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/', { waitUntil: 'networkidle' });
     await waitForMotionDebug(page);
-    await page.getByTestId('editorial-story-projects').scrollIntoViewIfNeeded();
+    await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
     const beforeOwned = await getScrollTriggerCount(page);
