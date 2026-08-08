@@ -72,6 +72,14 @@ export function ProfileShareHero({
     },
   });
 
+  const copyAnnouncement = isSuccess
+    ? isPublic
+      ? 'Public link copied'
+      : 'Link copied — publish your profile so visitors can open it'
+    : isError
+      ? 'Could not copy public link'
+      : '';
+
   useEffect(() => {
     setNativeShareAvailable(isNativeShareSupported());
   }, []);
@@ -149,12 +157,6 @@ export function ProfileShareHero({
       setShareBusy(false);
     }
   };
-
-  const copyAnnouncement = isSuccess
-    ? 'Public link copied'
-    : isError
-      ? 'Could not copy public link'
-      : '';
 
   return (
     <div className="cc-profile-share-hero">
@@ -272,7 +274,9 @@ export function ProfileShareHero({
                 transition={{ duration: 0.22, ease: EASE }}
               >
                 {isSuccess
-                  ? 'Public link copied'
+                  ? isPublic
+                    ? 'Public link copied'
+                    : 'Copied — still private'
                   : isLoading
                     ? 'Copying…'
                     : 'Copy public link'}
@@ -406,11 +410,15 @@ export function ProfileShareHero({
       ) : null}
 
       {!isPublic && canShare ? (
-        <p className="mt-4 text-[14px] leading-relaxed text-[var(--app-smoke)]" role="status">
-          Your profile is private. Shared links and QR codes still point to your public URL, but
-          visitors will not see it until you{' '}
-          <Link href="/dashboard/profile" className="underline underline-offset-2">
-            publish your profile
+        <p
+          className="mt-4 rounded-[12px] border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-[14px] leading-relaxed text-[var(--app-ink)]"
+          role="status"
+        >
+          Your profile is still private, so{' '}
+          <span className="font-medium">{displayUrl}</span> shows as page not found for everyone
+          else. Publish it first:{' '}
+          <Link href="/dashboard/profile" className="font-medium underline underline-offset-2">
+            Profile → Publish profile
           </Link>
           .
         </p>

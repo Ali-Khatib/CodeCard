@@ -64,6 +64,7 @@ export const MUTATION_FEEDBACK = {
   },
   share: {
     linkCopied: 'Link copied',
+    linkCopiedButPrivate: 'Link copied — publish your profile before visitors can open it',
     linkCopyFailed: 'Could not copy your link. Open Home to share from there.',
   },
   sessionExpired: 'Your session expired. Sign in again.',

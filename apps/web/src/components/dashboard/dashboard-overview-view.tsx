@@ -88,6 +88,7 @@ export function DashboardOverviewView({
 }: OverviewProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const firstName = displayName.split(' ')[0];
+  const isProfilePublic = profile?.is_public === true;
   const views =
     typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
   const visibleLinks = toSafeProfileLinkItems(links);
@@ -103,12 +104,16 @@ export function DashboardOverviewView({
     if (!flag) return;
     sessionStorage.removeItem(SHARE_LINK_COPIED_FLAG);
     if (flag === '1') {
-      notifySuccess(MUTATION_FEEDBACK.share.linkCopied);
+      notifySuccess(
+        isProfilePublic
+          ? MUTATION_FEEDBACK.share.linkCopied
+          : MUTATION_FEEDBACK.share.linkCopiedButPrivate,
+      );
     } else {
       notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
     }
     document.getElementById('share')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [notifySuccess, notifyError]);
+  }, [notifySuccess, notifyError, isProfilePublic]);
 
   return (
     <div className="cc-profile-home">
