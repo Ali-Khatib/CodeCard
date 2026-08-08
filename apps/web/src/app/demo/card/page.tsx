@@ -5,7 +5,18 @@ import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 export const dynamic = 'force-static';
 
-/** Public-profile demo retired — live demo is the workspace at `/demo`. */
+const DEMO_NAMES = ['DevFlow', 'SchemaSync', 'Pulse'] as const;
+
+const projects = DEMO_FEATURED_PROJECTS.filter((p) =>
+  DEMO_NAMES.includes(p.title as (typeof DEMO_NAMES)[number]),
+);
+
+const links: ProfileLinkItem[] = DEMO_PROFILE.links.map((l) => ({
+  type: l.type,
+  label: l.label,
+  url: l.url,
+}));
+
 export default function DemoCardPage() {
   return (
     <PublicProfileExperience
