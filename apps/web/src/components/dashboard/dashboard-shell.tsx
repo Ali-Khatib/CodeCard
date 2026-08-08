@@ -170,29 +170,6 @@ export function DashboardShell({
     return () => window.removeEventListener('resize', onResize);
   }, [syncActivePill]);
 
-  const syncActivePill = useCallback(() => {
-    const nav = navRef.current;
-    const pill = activePillRef.current;
-    if (!nav || !pill) return;
-    const active = nav.querySelector<HTMLElement>('a[aria-current="page"]');
-    if (!active) {
-      pill.style.opacity = '0';
-      return;
-    }
-    pill.style.opacity = '1';
-    pill.style.transform = `translateY(${active.offsetTop}px)`;
-  }, []);
-
-  useLayoutEffect(() => {
-    syncActivePill();
-  }, [pathname, sidebarOpen, syncActivePill]);
-
-  useEffect(() => {
-    const onResize = () => syncActivePill();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [syncActivePill]);
-
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((open) => {
       const next = !open;
