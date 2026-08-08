@@ -101,7 +101,7 @@ function SignUpForm() {
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
-          emailRedirectTo: authCallbackRedirectUrl('/dashboard'),
+          emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed'),
           data: {
             display_name: parsed.data.display_name,
             slug: parsed.data.slug,

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 
 export type ProjectCard = {
   key: string;
@@ -25,23 +26,25 @@ export function DashboardProjectsGrid({
       <div className="space-y-6">
         <div>
           <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">Projects</p>
-          <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">Featured work</h1>
+          <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">
+            {EMPTY_STATE_COPY.projects.title}
+          </h1>
           <p className="mt-2 max-w-lg text-[15px] text-lichen">
-            Your public profile leads with projects. Add your first one to go live.
+            {EMPTY_STATE_COPY.projects.description}
           </p>
         </div>
 
         <div className="cc-workspace-tile rounded-[14px] border border-border/40 p-8 text-center md:p-12">
-          <p className="font-display text-[22px] text-phosphor">No projects yet</p>
+          <p className="font-display text-[22px] text-phosphor">Empty for now</p>
           <p className="mx-auto mt-2 max-w-sm text-[15px] text-lichen">
-            Create a project card with a title, tagline, hero image, and links — the same format visitors
+            Create a project card with a title, tagline, hero image, and links. Same format visitors
             see on your CodeCard.
           </p>
           <Link
             href="/dashboard/projects/new"
             className="cc-btn-pill-primary mt-8 inline-flex h-11 items-center px-6 text-[15px]"
           >
-            Create your first project
+            {EMPTY_STATE_COPY.projects.cta}
           </Link>
         </div>
       </div>

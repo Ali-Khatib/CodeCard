@@ -46,5 +46,5 @@ export function resolveSignUpOutcome(args: {
 export const SIGNUP_CONFIRMATION_TITLE = 'Check your email';
 
 export function signupConfirmationBody(email: string): string {
-  return `We created your account. Confirm your email at ${email} to finish setup, then sign in.`;
+  return `We created your account. Open the confirmation link we sent to ${email}. After that you will land on a short setup guide, then you can sign in.`;
 }

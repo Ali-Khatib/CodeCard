@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, useTransition, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Label } from '@codecard/ui';
 import { PROFILE_LINK_TYPES, profileLinkUrlHelp, profileLinkUrlPlaceholder } from '@codecard/validation';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import {
@@ -75,7 +74,9 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     if (state.success) {
       resetEditor();
       notifySuccess(
-        mode.kind === 'edit' ? MUTATION_FEEDBACK.profile.linkUpdated : MUTATION_FEEDBACK.profile.linkAdded,
+        mode.kind === 'edit'
+          ? MUTATION_FEEDBACK.profile.linkUpdated
+          : MUTATION_FEEDBACK.profile.linkAdded,
       );
       router.refresh();
       return;
@@ -101,10 +102,14 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     fd.set('url', form.url);
     if (mode.kind === 'edit') {
       fd.set('link_id', mode.link.id);
-      updateAction(fd);
+      startTransition(() => {
+        updateAction(fd);
+      });
       return;
     }
-    createAction(fd);
+    startTransition(() => {
+      createAction(fd);
+    });
   }
 
   function handleDelete(link: ProfileLinkRow) {
@@ -141,31 +146,35 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   }
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-700/80 bg-zinc-900/40 p-4" aria-label="Profile links">
-      <div className="flex items-center justify-between gap-3">
+    <section
+      id="links"
+      className="space-y-4 scroll-mt-28 rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
+      aria-label="Profile links"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-medium text-zinc-100">Profile links</h3>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Profile links</h3>
+          <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
             GitHub, LinkedIn, and X must use the matching site URL. A personal website is optional.
           </p>
         </div>
-        {mode.kind === 'idle' && (
-          <Button type="button" variant="outline" onClick={openAdd}>
+        {mode.kind === 'idle' ? (
+          <button type="button" className="cc-app-btn cc-app-btn--ghost" onClick={openAdd}>
             Add link
-          </Button>
-        )}
+          </button>
+        ) : null}
       </div>
 
       <div aria-live="polite">
         {isPending ? (
-          <p className="text-sm text-zinc-400" role="status">
+          <p className="text-sm text-[var(--app-smoke)]" role="status">
             Updating links…
           </p>
         ) : null}
       </div>
 
       {sortedLinks.length === 0 && mode.kind === 'idle' ? (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-[var(--app-smoke)]">
           No links yet. Add GitHub, LinkedIn, your website, or email so people can reach you faster.
         </p>
       ) : (
@@ -177,46 +186,57 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
             return (
               <li
                 key={link.id}
-                className="flex flex-col gap-3 rounded-lg border border-zinc-700/60 p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-[12px] border border-[var(--app-border)] bg-[var(--app-bone)]/35 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--app-paper)] text-[var(--app-ink)] ring-1 ring-[var(--app-border)]">
                     <Icon className="text-sm" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-zinc-100">
+                    <p className="truncate text-sm font-medium text-[var(--app-ink)]">
                       {getProfileLinkAria(link.type, link.label)}
                     </p>
-                    <p className="truncate text-xs text-zinc-400">{link.url}</p>
+                    <p className="truncate text-xs text-[var(--app-smoke)]">{link.url}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button
+                  <button
                     type="button"
-                    variant="outline"
+                    className="cc-app-btn cc-app-btn--ghost"
                     disabled={busy || index === 0 || isPending}
                     aria-busy={busy}
                     onClick={() => handleMove(link, 'up')}
                     aria-label={`Move ${getProfileLinkAria(link.type, link.label)} up`}
                   >
                     Up
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     type="button"
-                    variant="outline"
+                    className="cc-app-btn cc-app-btn--ghost"
                     disabled={busy || index === sortedLinks.length - 1 || isPending}
                     aria-busy={busy}
                     onClick={() => handleMove(link, 'down')}
                     aria-label={`Move ${getProfileLinkAria(link.type, link.label)} down`}
                   >
                     Down
-                  </Button>
-                  <Button type="button" variant="outline" disabled={busy} onClick={() => openEdit(link)}>
+                  </button>
+                  <button
+                    type="button"
+                    className="cc-app-btn cc-app-btn--ghost"
+                    disabled={busy}
+                    onClick={() => openEdit(link)}
+                  >
                     Edit
-                  </Button>
-                  <Button type="button" variant="destructive" disabled={busy} aria-busy={busy} onClick={() => handleDelete(link)}>
+                  </button>
+                  <button
+                    type="button"
+                    className="cc-app-btn cc-app-btn--ghost text-[var(--app-error)]"
+                    disabled={busy}
+                    aria-busy={busy}
+                    onClick={() => handleDelete(link)}
+                  >
                     Delete
-                  </Button>
+                  </button>
                 </div>
               </li>
             );
@@ -224,16 +244,18 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
         </ul>
       )}
 
-      {mode.kind !== 'idle' && (
-        <form onSubmit={submitLink} className="space-y-4 border-t border-zinc-700/60 pt-4">
-          <h4 className="text-sm font-medium text-zinc-100">
+      {mode.kind !== 'idle' ? (
+        <form onSubmit={submitLink} className="space-y-4 border-t border-[var(--app-border)] pt-4">
+          <h4 className="text-[14px] font-medium text-[var(--app-ink)]">
             {mode.kind === 'edit' ? 'Edit link' : 'Add link'}
           </h4>
           <div className="space-y-2">
-            <Label htmlFor="profile-link-type">Type</Label>
+            <label htmlFor="profile-link-type" className="cc-app-field-label">
+              Type
+            </label>
             <select
               id="profile-link-type"
-              className="flex h-10 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100"
+              className="cc-app-input"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               aria-describedby="profile-link-type-help"
@@ -244,29 +266,35 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                 </option>
               ))}
             </select>
-            <p id="profile-link-type-help" className="text-xs text-zinc-400">
+            <p id="profile-link-type-help" className="text-xs text-[var(--app-smoke)]">
               Pick the network first so we can check the URL matches. Website and X are optional.
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profile-link-label">Label (optional)</Label>
-            <Input
+            <label htmlFor="profile-link-label" className="cc-app-field-label">
+              Label (optional)
+            </label>
+            <input
               id="profile-link-label"
+              className="cc-app-input"
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.label)}
               aria-describedby={fieldErrors?.label ? 'profile-link-label-error' : undefined}
             />
-            {fieldErrors?.label && (
-              <p id="profile-link-label-error" className="text-sm text-red-400" role="alert">
+            {fieldErrors?.label ? (
+              <p id="profile-link-label-error" className="text-sm text-[var(--app-error)]" role="alert">
                 {fieldErrors.label}
               </p>
-            )}
+            ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profile-link-url">{form.type === 'email' ? 'Email' : 'URL'}</Label>
-            <Input
+            <label htmlFor="profile-link-url" className="cc-app-field-label">
+              {form.type === 'email' ? 'Email' : 'URL'}
+            </label>
+            <input
               id="profile-link-url"
+              className="cc-app-input"
               value={form.url}
               onChange={(e) => setForm({ ...form, url: e.target.value })}
               aria-invalid={Boolean(fieldErrors?.url)}
@@ -275,36 +303,41 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               }
               placeholder={profileLinkUrlPlaceholder(form.type)}
             />
-            <p id="profile-link-url-help" className="text-xs text-zinc-400">
+            <p id="profile-link-url-help" className="text-xs text-[var(--app-smoke)]">
               {profileLinkUrlHelp(form.type)}
             </p>
-            {fieldErrors?.url && (
-              <p id="profile-link-url-error" className="text-sm text-red-400" role="alert">
+            {fieldErrors?.url ? (
+              <p id="profile-link-url-error" className="text-sm text-[var(--app-error)]" role="alert">
                 {fieldErrors.url}
               </p>
-            )}
+            ) : null}
           </div>
-          {error && !fieldErrors?.url && (
-            <p className="text-sm text-red-400" role="alert">
+          {error && !fieldErrors?.url ? (
+            <p className="text-sm text-[var(--app-error)]" role="alert">
               {error}
             </p>
-          )}
+          ) : null}
           <div className="flex flex-wrap gap-2">
-            <Button type="submit" disabled={createPending || updatePending} aria-busy={createPending || updatePending}>
+            <button
+              type="submit"
+              className="cc-app-btn cc-app-btn--primary"
+              disabled={createPending || updatePending}
+              aria-busy={createPending || updatePending}
+            >
               {createPending || updatePending ? 'Saving…' : 'Save link'}
-            </Button>
-            <Button type="button" variant="outline" onClick={resetEditor}>
+            </button>
+            <button type="button" className="cc-app-btn cc-app-btn--ghost" onClick={resetEditor}>
               Cancel
-            </Button>
+            </button>
           </div>
         </form>
-      )}
+      ) : null}
 
-      {error && mode.kind === 'idle' && (
-        <p className="text-sm text-red-400" role="alert">
+      {error && mode.kind === 'idle' ? (
+        <p className="text-sm text-[var(--app-error)]" role="alert">
           {error}
         </p>
-      )}
+      ) : null}
     </section>
   );
 }

@@ -7,6 +7,7 @@ import type {
   PortfolioOpenTransition,
   PortfolioProject,
 } from '@/lib/dashboard/portfolio';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { ProjectsProfileStrip } from './projects-profile-strip';
 import { FadeInView } from './fade-in-view';
 import { ProjectsVerticalStack } from './projects-vertical-stack';
@@ -121,13 +122,21 @@ export function DashboardProjectsPortfolio({
   if (emptyState) {
     return (
       <div className="cc-app-page cc-app-page--1040 space-y-10">
-        <ProjectsProfileStrip creator={creator} />
-        <p className="text-center text-[15px] text-[var(--app-smoke)]">
-          Add your first project to feature on your CodeCard.
-        </p>
+        <ProjectsProfileStrip
+          creator={creator}
+          editHref={basePath.startsWith('/dashboard') ? `${basePath}/profile` : undefined}
+        />
+        <div className="mx-auto max-w-xl space-y-3 text-center">
+          <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            {EMPTY_STATE_COPY.projects.title}
+          </h2>
+          <p className="text-[15px] leading-relaxed text-[var(--app-smoke)]">
+            {EMPTY_STATE_COPY.projects.description}
+          </p>
+        </div>
         <div className="text-center">
           <AppButton variant="primary" href={`${basePath}/projects/new`} ariaLabel="Create project">
-            Create project
+            {EMPTY_STATE_COPY.projects.cta}
           </AppButton>
         </div>
       </div>
@@ -136,7 +145,10 @@ export function DashboardProjectsPortfolio({
 
   return (
     <div className="cc-app-page cc-app-page--1040">
-      <ProjectsProfileStrip creator={creator} />
+      <ProjectsProfileStrip
+        creator={creator}
+        editHref={basePath.startsWith('/dashboard') ? `${basePath}/profile` : undefined}
+      />
 
       <FadeInView delay={0.05}>
         <div className="cc-projects-toolbar">

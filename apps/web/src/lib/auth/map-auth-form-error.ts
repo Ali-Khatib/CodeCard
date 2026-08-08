@@ -34,9 +34,11 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
   if (
     lower.includes('password must') ||
     lower.includes('password should') ||
-    lower.includes('weak password')
+    lower.includes('weak password') ||
+    lower.includes('at least 1 character') ||
+    lower.includes('at least one character')
   ) {
-    return 'Password requirement not met. Use at least 8 characters with upper, lower, and a number.';
+    return 'Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a number.';
   }
 
   if (lower.includes('session') && lower.includes('expired')) {

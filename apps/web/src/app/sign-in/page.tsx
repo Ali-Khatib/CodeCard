@@ -28,7 +28,9 @@ function SignInForm() {
     searchParams.get('next') ?? searchParams.get('redirect'),
   );
   const resetSuccess = searchParams.get('reset') === 'success';
-  const statusMessage = signInStatusMessage(searchParams.get('reason'));
+  const [statusBanner, setStatusBanner] = useState(() =>
+    signInStatusMessage(searchParams.get('reason')),
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -50,10 +52,15 @@ function SignInForm() {
     router.prefetch('/sign-up');
   }, [router]);
 
+  function clearAlerts() {
+    setError('');
+    setStatusBanner(null);
+  }
+
   async function oauthGithub() {
     if (oauthLock.current || authBlocked) return;
 
-    setError('');
+    clearAlerts();
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
@@ -75,8 +82,9 @@ function SignInForm() {
         setError(mapAuthFormError(oauthError.message, 'sign-in'));
         setOauthLoading(null);
       }
-    } catch {
-      setError(mapAuthFormError('network', 'sign-in'));
+    } catch (caught) {
+      const raw = caught instanceof Error && caught.message ? caught.message : 'network';
+      setError(mapAuthFormError(raw, 'sign-in'));
       setOauthLoading(null);
     } finally {
       oauthLock.current = false;
@@ -85,7 +93,7 @@ function SignInForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    clearAlerts();
     setFieldError({});
 
     if (submitLock.current || authBlocked) return;
@@ -125,13 +133,17 @@ function SignInForm() {
       setFadingOut(true);
       router.push(redirectTo);
       router.refresh();
-    } catch {
-      setError(mapAuthFormError('network', 'sign-in'));
+    } catch (caught) {
+      const raw = caught instanceof Error && caught.message ? caught.message : 'network';
+      setError(mapAuthFormError(raw, 'sign-in'));
+      requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       submitLock.current = false;
       setEmailLoading(false);
     }
   }
+
+  const alertMessage = error || statusBanner;
 
   return (
     <AuthShell
@@ -158,7 +170,7 @@ function SignInForm() {
             value={email}
             onChange={(value) => {
               setEmail(value);
-              if (error) setError('');
+              clearAlerts();
               if (fieldError.email) setFieldError((prev) => ({ ...prev, email: undefined }));
             }}
             required
@@ -172,7 +184,7 @@ function SignInForm() {
               value={password}
               onChange={(value) => {
                 setPassword(value);
-                if (error) setError('');
+                clearAlerts();
                 if (fieldError.password) setFieldError((prev) => ({ ...prev, password: undefined }));
               }}
               required
@@ -196,14 +208,8 @@ function SignInForm() {
             </p>
           ) : null}
 
-          {statusMessage ? (
-            <div className="mb-3">
-              <AuthErrorAlert message={statusMessage} />
-            </div>
-          ) : null}
-
           <div ref={errorRef} tabIndex={-1} className="mb-3 outline-none">
-            <AuthErrorAlert message={error} />
+            <AuthErrorAlert message={alertMessage ?? ''} />
           </div>
 
           <AuthPrimaryButton

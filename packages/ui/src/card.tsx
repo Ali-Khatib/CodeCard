@@ -5,7 +5,7 @@ export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-100', className)}
+      className={cn('rounded-xl border border-black/10 bg-white text-ink', className)}
       {...props}
     />
   ),
@@ -35,7 +35,7 @@ export const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-zinc-400', className)} {...props} />
+  <p ref={ref} className={cn('text-sm text-smoke', className)} {...props} />
 ));
 CardDescription.displayName = 'CardDescription';
 

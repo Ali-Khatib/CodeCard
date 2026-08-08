@@ -59,13 +59,19 @@ export async function middleware(request: NextRequest) {
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
+
+  // Transient Auth/network failures should not look like an expired session.
+  const authUnreachable =
+    Boolean(userError) &&
+    /fetch|network|timeout|offline|econnrefused|enotfound/i.test(userError!.message ?? '');
 
   if ((isDashboard || isAdmin) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
     url.searchParams.set('redirect', sanitizeInternalRedirect(pathname));
-    if (hasSupabaseAuthCookie(request.cookies.getAll())) {
+    if (!authUnreachable && hasSupabaseAuthCookie(request.cookies.getAll())) {
       url.searchParams.set('reason', 'session_expired');
     }
     return NextResponse.redirect(url);

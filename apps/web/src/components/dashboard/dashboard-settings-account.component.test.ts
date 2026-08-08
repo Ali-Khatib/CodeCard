@@ -12,9 +12,18 @@ describe('WS09-T008 Settings account controls wiring', () => {
     const view = read('src/components/dashboard/dashboard-settings-view.tsx');
     expect(page).toContain('accountControls="live"');
     expect(page).toContain('deletionAuth');
+    expect(page).toContain('resolveAccountPlanId');
+    expect(page).toContain("from('subscriptions')");
+    expect(page).toContain('profileSlug={profile?.slug}');
+    expect(page).toContain('isPublic={Boolean(profile?.is_public)}');
     expect(view).toContain('AccountExportAction');
     expect(view).toContain('AccountDeletionDialog');
     expect(view).toContain("accountControls === 'live'");
+    expect(view).toContain('formatCurrentPlanLabel(plan)');
+    expect(view).toContain("control: 'value-edit'");
+    expect(view).toContain("href: profileEditorHref('slug')");
+    expect(view).not.toContain('pro.codecard.app');
+    expect(view).not.toContain('Pro · $');
   });
 
   it('preview Settings stays on demo account controls', () => {

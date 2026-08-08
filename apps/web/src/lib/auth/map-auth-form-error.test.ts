@@ -16,6 +16,15 @@ describe('mapAuthFormError', () => {
     expect(result).toMatch(/try again/i);
   });
 
+  it('maps weak password copy to the full requirements', () => {
+    expect(mapAuthFormError('Password must contain an uppercase letter', 'sign-up')).toMatch(
+      /8 characters.*uppercase.*lowercase.*number/i,
+    );
+    expect(mapAuthFormError('String must contain at least 1 character(s)', 'sign-up')).toMatch(
+      /8 characters/i,
+    );
+  });
+
   it('keeps concise validation copy', () => {
     expect(mapAuthFormError('Invalid email', 'sign-in')).toBe('Invalid email');
   });

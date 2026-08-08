@@ -119,6 +119,7 @@ export function AppButton({
   type = 'button',
   block,
   ariaLabel,
+  target,
 }: {
   children: ReactNode;
   variant?: BtnVariant;
@@ -128,6 +129,7 @@ export function AppButton({
   type?: 'button' | 'submit';
   block?: boolean;
   ariaLabel?: string;
+  target?: string;
 }) {
   const cls = [
     'cc-app-btn',
@@ -142,7 +144,13 @@ export function AppButton({
 
   if (href) {
     return (
-      <Link href={href} className={cls} aria-label={ariaLabel}>
+      <Link
+        href={href}
+        className={cls}
+        aria-label={ariaLabel}
+        target={target}
+        rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+      >
         {children}
       </Link>
     );

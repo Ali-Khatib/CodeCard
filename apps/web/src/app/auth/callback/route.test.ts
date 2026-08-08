@@ -32,6 +32,22 @@ describe('GET /auth/callback', () => {
     expect(response.headers.get('location')).toBe('https://codecard-mvp.vercel.app/dashboard');
   });
 
+  it('can send confirmed email signups to the setup guide page', async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: null });
+    const { GET } = await import('@/app/auth/callback/route');
+
+    const response = await GET(
+      new Request(
+        'https://codecard-mvp.vercel.app/auth/callback?code=ok-code&redirect=%2Fauth%2Fconfirmed',
+      ),
+    );
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toBe(
+      'https://codecard-mvp.vercel.app/auth/confirmed',
+    );
+  });
+
   it('rejects unsafe external redirects after a successful exchange', async () => {
     exchangeCodeForSession.mockResolvedValue({ error: null });
     const { GET } = await import('@/app/auth/callback/route');

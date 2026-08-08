@@ -10,6 +10,7 @@ import {
   type ConnectionsCollectionFilter,
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { DashFilterBar } from './dash-filter-bar';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
@@ -466,25 +467,23 @@ function ConnectionGridCard({
 }
 
 function ConnectionsEmptyState() {
+  const copy = EMPTY_STATE_COPY.connections;
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
-      <PageHeader
-        title="Build a network you can actually remember"
-        description="Save people whose work matters to you. Add Connections from their public CodeCard, then organize and follow their work from here."
-      />
+      <PageHeader title={copy.title} description={copy.description} />
       <FadeInView delay={0}>
         <div className="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] px-6 py-10 md:px-10 md:py-14">
           <p className="max-w-xl text-[16px] leading-relaxed text-[var(--app-smoke)]">
             Open a person&apos;s CodeCard and choose{' '}
-            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>. Your
-            list stays private — only you can see who you saved.
+            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>.{' '}
+            {copy.body}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <AppButton variant="primary" href="/profiles">
-              Explore CodeCards
+              {copy.primaryCta}
             </AppButton>
             <AppButton variant="ghost" href="/dashboard/profile">
-              Share your CodeCard
+              {copy.secondaryCta}
             </AppButton>
           </div>
         </div>

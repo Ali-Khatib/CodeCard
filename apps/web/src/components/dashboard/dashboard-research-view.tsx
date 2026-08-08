@@ -8,6 +8,7 @@ import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { ResearchBubbleGrid } from '@/components/dashboard/research-bubble-grid';
 import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
 const VIEW_MODES = [
@@ -127,17 +128,16 @@ export function DashboardResearchView({
         )
       ) : (
         <AppCard className="!p-8 text-center">
-          <p className="cc-app-mono">No research yet</p>
+          <p className="cc-app-mono">Research</p>
           <h2 className="cc-work-title cc-work-title--compact mt-3">
-            Add your first paper
+            {EMPTY_STATE_COPY.research.title}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
-            Capture title, authors, venue, DOI, citation, and links. Papers stay unpublished until you
-            choose to share them.
+            {EMPTY_STATE_COPY.research.description}
           </p>
           <div className="mt-6 flex justify-center">
             <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
-              Create paper
+              {EMPTY_STATE_COPY.research.cta}
             </AppButton>
           </div>
         </AppCard>

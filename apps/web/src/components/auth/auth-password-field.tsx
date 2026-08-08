@@ -36,7 +36,6 @@ export function AuthPasswordField({
   const inputRef = useRef<HTMLInputElement>(null);
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [touched, setTouched] = useState(false);
   const [shakeKey, setShakeKey] = useState(0);
   const lastErrorRef = useRef<string | null>(null);
   const reduced = useReducedMotion();
@@ -70,7 +69,7 @@ export function AuthPasswordField({
       <label
         htmlFor={inputId}
         className={`text-[13px] font-medium transition-colors duration-150 ${
-          error ? 'text-[#b45353]' : focused ? 'text-[rgba(120,70,170,0.95)]' : 'text-ink'
+          error ? 'text-[#b45353]' : focused ? 'text-[rgba(120,70,170,0.95)]' : 'text-[#232324]'
         }`}
       >
         {label}
@@ -89,7 +88,6 @@ export function AuthPasswordField({
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
-            if (!touched) setTouched(true);
           }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -98,11 +96,7 @@ export function AuthPasswordField({
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={
-            [
-              error ? errorId : null,
-              showGuidance && touched ? guideId : null,
-              describedBy,
-            ]
+            [error ? errorId : null, showGuidance ? guideId : null, describedBy]
               .filter(Boolean)
               .join(' ') || undefined
           }
@@ -114,7 +108,7 @@ export function AuthPasswordField({
           type="button"
           onClick={toggleVisibility}
           disabled={disabled}
-          className="absolute inset-y-0 right-1 my-1 rounded-[8px] px-2.5 text-[12px] font-medium text-smoke outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-rgb),0.45)] disabled:opacity-50"
+          className="absolute inset-y-0 right-1 my-1 rounded-[8px] px-2.5 text-[12px] font-medium text-[#5c5856] outline-none transition-colors hover:text-[#232324] focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-rgb),0.45)] disabled:opacity-50"
           aria-pressed={visible}
           aria-label={visible ? 'Hide characters' : 'Show characters'}
         >
@@ -132,30 +126,39 @@ export function AuthPasswordField({
 
       {showGuidance ? (
         <AnimatePresence initial={false}>
-          {touched ? (
-            <motion.ul
-              id={guideId}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -2 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-smoke"
-            >
+          <motion.div
+            id={guideId}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -2 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="space-y-2 rounded-[12px] border border-[rgba(34,34,34,0.12)] bg-white/90 p-3"
+          >
+            <p className="text-[12px] font-medium text-[#232324]">Password must include:</p>
+            <ul className="space-y-1.5">
               {requirements.map((req) => (
                 <li
                   key={req.id}
-                  className={req.met ? 'text-[#2f6f4e]' : undefined}
+                  className={`flex items-start gap-2 text-[13px] leading-snug ${
+                    req.met ? 'text-[#2f6f4e]' : 'text-[#3f3c3a]'
+                  }`}
                   aria-label={`${req.label}: ${req.met ? 'met' : 'not met'}`}
                 >
-                  <span aria-hidden>{req.met ? '✓' : '·'}</span> {req.label}
+                  <span
+                    aria-hidden
+                    className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] font-semibold ${
+                      req.met
+                        ? 'border-[#2f6f4e] bg-[#e8f5ee] text-[#2f6f4e]'
+                        : 'border-[rgba(34,34,34,0.28)] bg-white text-[#7a7876]'
+                    }`}
+                  >
+                    {req.met ? '✓' : ''}
+                  </span>
+                  <span>{req.label}</span>
                 </li>
               ))}
-            </motion.ul>
-          ) : (
-            <p className="text-[12px] text-smoke">
-              Use 8+ characters with upper, lower, and a number.
-            </p>
-          )}
+            </ul>
+          </motion.div>
         </AnimatePresence>
       ) : null}
     </div>

@@ -8,11 +8,19 @@ import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator }) {
+export function ProjectsProfileStrip({
+  creator,
+  editHref,
+}: {
+  creator: PortfolioCreator;
+  /** When set, shows a quick Edit profile action (dashboard only). */
+  editHref?: string;
+}) {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { margin: '-8% 0px -35% 0px', amount: 0.45 });
   const reduced = useReducedMotion();
   const roleLine = [creator.role, creator.company].filter(Boolean).join(' · ');
+  const handleLine = creator.profileSlug ? `@${creator.profileSlug}` : null;
 
   return (
     <motion.header
@@ -41,6 +49,7 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
 
       <div className="cc-projects-profile-strip__copy">
         <h1 className="cc-projects-profile-strip__name">{creator.displayName}</h1>
+        {handleLine && <p className="cc-projects-profile-strip__role">{handleLine}</p>}
         {roleLine && <p className="cc-projects-profile-strip__role">{roleLine}</p>}
         {creator.links.length > 0 && (
           <nav className="cc-projects-profile-strip__links" aria-label="Profile links">
@@ -61,6 +70,14 @@ export function ProjectsProfileStrip({ creator }: { creator: PortfolioCreator })
             })}
           </nav>
         )}
+        {editHref ? (
+          <a
+            href={editHref}
+            className="mt-3 inline-flex text-[13px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
+          >
+            Edit photo, bio, links
+          </a>
+        ) : null}
       </div>
     </motion.header>
   );

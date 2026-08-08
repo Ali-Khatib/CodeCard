@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { CountUp } from '@/components/landing/count-up';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -11,6 +12,7 @@ import { ProfileShareHero } from './profile-share-hero';
 import { FadeInView } from './fade-in-view';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
 import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
@@ -133,24 +135,37 @@ export function DashboardOverviewView({
         </section>
       </FadeInView>
 
-      {/* ── Zone 4: Identity + edit ── */}
+      {/* ── Zone 4: Public card preview + edit shortcuts ── */}
       <FadeInView delay={0.12}>
         <section id="profile" className="cc-profile-home__zone scroll-mt-24">
           <div className="cc-profile-home__zone-head">
             <div>
-              <AppMono>Your card</AppMono>
+              <AppMono>Your public card</AppMono>
               <h2 className="cc-profile-home__zone-title">How people see you</h2>
+              <p className="mt-1 max-w-xl text-[14px] text-[var(--app-smoke)]">
+                Same vibe as LinkedIn: this is the face of your CodeCard. Fill photo, headline, bio,
+                and links so it does not look empty.
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AppButton variant="ghost" href="/dashboard/profile">
+              <AppButton variant="primary" href="/dashboard/profile">
                 Edit profile
               </AppButton>
+              {profileSlug ? (
+                <AppButton variant="ghost" href={`/${profileSlug}`} target="_blank">
+                  View public
+                </AppButton>
+              ) : null}
             </div>
           </div>
 
           <AppCard className="cc-profile-identity-card !p-0 overflow-hidden">
             <div className="cc-profile-identity-card__hero">
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm">
+              <Link
+                href="/dashboard/profile#photo"
+                className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)] focus-visible:ring-offset-2"
+                aria-label={avatarUrl ? 'Change profile photo' : 'Add profile photo'}
+              >
                 {avatarUrl ? (
                   <Image src={avatarUrl} alt="" fill className="object-cover" sizes="80px" />
                 ) : (
@@ -158,21 +173,45 @@ export function DashboardOverviewView({
                     {firstName[0]}
                   </span>
                 )}
-              </div>
+                <span className="absolute inset-x-0 bottom-0 bg-[rgba(34,34,34,0.72)] py-1 text-center text-[10px] font-medium uppercase tracking-[0.06em] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {avatarUrl ? 'Change' : 'Add photo'}
+                </span>
+              </Link>
               <div className="min-w-0 flex-1">
                 <h3 className="text-[26px] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
                   {displayName}
                 </h3>
-                <p className="mt-1 break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">{headline}</p>
-                {profile?.location && (
-                  <p className="mt-2 text-[14px] text-[var(--app-smoke)]">{profile.location}</p>
+                {profileSlug ? (
+                  <p className="mt-0.5 text-[14px] text-[var(--app-smoke)]">@{profileSlug}</p>
+                ) : null}
+                {headline ? (
+                  <p className="mt-1 break-words text-[15px] leading-relaxed text-[var(--app-smoke)]">
+                    {headline}
+                  </p>
+                ) : (
+                  <Link
+                    href="/dashboard/profile#headline"
+                    className="mt-1 inline-block text-[15px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
+                  >
+                    Add a headline
+                  </Link>
                 )}
-                {bio && (
+                {profile?.location ? (
+                  <p className="mt-2 text-[14px] text-[var(--app-smoke)]">{profile.location}</p>
+                ) : null}
+                {bio ? (
                   <p className="mt-3 max-w-xl break-words text-[14px] leading-relaxed text-[var(--app-smoke)]">
                     {bio}
                   </p>
+                ) : (
+                  <Link
+                    href="/dashboard/profile#bio"
+                    className="mt-3 inline-block text-[14px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
+                  >
+                    Add a short description
+                  </Link>
                 )}
-                {visibleLinks.length > 0 && (
+                {visibleLinks.length > 0 ? (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {visibleLinks.map((link) => {
                       const Icon = resolveProfileLinkIcon(link.type);
@@ -190,8 +229,29 @@ export function DashboardOverviewView({
                       );
                     })}
                   </div>
+                ) : (
+                  <Link
+                    href="/dashboard/profile#links"
+                    className="mt-4 inline-block text-[14px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
+                  >
+                    Add links (GitHub, site, LinkedIn…)
+                  </Link>
                 )}
               </div>
+            </div>
+            <div className="flex flex-wrap gap-2 border-t border-[var(--app-border)] bg-[var(--app-bone)]/50 px-5 py-3">
+              <AppButton variant="ghost" href="/dashboard/profile#photo" className="!min-h-9 !px-3 !text-[13px]">
+                Photo
+              </AppButton>
+              <AppButton variant="ghost" href="/dashboard/profile#headline" className="!min-h-9 !px-3 !text-[13px]">
+                Headline
+              </AppButton>
+              <AppButton variant="ghost" href="/dashboard/profile#bio" className="!min-h-9 !px-3 !text-[13px]">
+                Bio
+              </AppButton>
+              <AppButton variant="ghost" href="/dashboard/profile#links" className="!min-h-9 !px-3 !text-[13px]">
+                Links
+              </AppButton>
             </div>
           </AppCard>
         </section>
@@ -262,7 +322,7 @@ export function DashboardOverviewView({
                 {projectsSummary.total === 0 ? (
                   <div className="mt-4">
                     <p className="text-[14px] text-[var(--app-smoke)]">
-                      No projects yet. Create your first project to show on your CodeCard.
+                      {EMPTY_STATE_COPY.home.noProjects}
                     </p>
                     <AppButton variant="primary" href={`${basePath}/projects/new`} className="mt-3">
                       Add project
@@ -315,7 +375,7 @@ export function DashboardOverviewView({
                 {researchSummary.total === 0 ? (
                   <div className="mt-4">
                     <p className="text-[14px] text-[var(--app-smoke)]">
-                      No research papers yet. Add a paper when you are ready.
+                      {EMPTY_STATE_COPY.home.noResearch}
                     </p>
                     <AppButton variant="primary" href={`${basePath}/research/new`} className="mt-3">
                       Add paper

@@ -16,10 +16,10 @@ test.describe('WS15 Connections management (mocked browser)', () => {
   test('empty authenticated state never shows demo people', async ({ page }) => {
     await openFixture(page);
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
-    await expect(page.getByRole('heading', { name: 'Build a network you can actually remember' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Add people. Omg yes. Lets add peopleeee.' })).toBeVisible();
     await expect(page.getByText('Jordan Lee')).toHaveCount(0);
     await expect(page.getByText('Alex Chen')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Explore CodeCards' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Find people to add' })).toBeVisible();
   });
 
   test('full management: add, collect, note, search, remove collection membership, remove connection', async ({
@@ -75,7 +75,7 @@ test.describe('WS15 Connections management (mocked browser)', () => {
       await trigger.click();
     }
     await page.getByRole('button', { name: 'Remove Bob Smith from Connections' }).click();
-    await expect(page.getByRole('heading', { name: 'Build a network you can actually remember' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Add people. Omg yes. Lets add peopleeee.' })).toBeVisible();
     await expect(page.locator('main')).toHaveAttribute('data-e2e-count', '0');
   });
 

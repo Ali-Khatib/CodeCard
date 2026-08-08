@@ -6,6 +6,7 @@ import {
   listOwnerMembershipMap,
 } from '@/lib/connections/collections-core';
 import { mapOwnerConnectionToCard } from '@/lib/connections/map-owner-connection';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { AppButton, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
 
 export default async function ConnectionsPage() {
@@ -20,8 +21,8 @@ export default async function ConnectionsPage() {
     return (
       <div className="cc-app-page cc-app-page--1040 space-y-6">
         <PageHeader
-          title="Connections"
-          description="Sign in to see people you have saved."
+          title={EMPTY_STATE_COPY.connections.title}
+          description="Sign in first, then start stacking people."
           actions={
             <AppButton variant="primary" href="/sign-in?redirect=%2Fdashboard%2Fconnections">
               Sign in
@@ -36,8 +37,8 @@ export default async function ConnectionsPage() {
     return (
       <div className="cc-app-page cc-app-page--1040 space-y-6">
         <PageHeader
-          title="Connections"
-          description="We could not load your Connections right now."
+          title={EMPTY_STATE_COPY.connections.title}
+          description="Connections hiccuped for a second. Hit retry and we are right back to adding people."
           actions={
             <AppButton variant="primary" href="/dashboard/connections">
               Retry
@@ -45,7 +46,7 @@ export default async function ConnectionsPage() {
           }
         />
         <p className="text-[14px] text-[var(--app-smoke)]" role="alert">
-          Please try again in a moment.
+          {EMPTY_STATE_COPY.connections.description}
         </p>
       </div>
     );

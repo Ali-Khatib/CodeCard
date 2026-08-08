@@ -19,6 +19,7 @@ import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
+  { segment: 'profile', label: 'Profile', icon: 'profile' as const },
   { segment: 'projects', label: 'Projects', icon: 'projects' as const },
   { segment: 'research', label: 'Research', icon: 'research' as const },
   { segment: 'connections', label: 'Connections', icon: 'connections' as const },
@@ -274,7 +275,11 @@ export function DashboardShell({
           </Link>
         </div>
 
-        <div className="cc-app-user-card mt-8">
+        <Link
+          href={`${basePath}/profile`}
+          className="cc-app-user-card cc-app-user-card--link mt-8 block"
+          aria-label="Open profile editor: photo, bio, and links"
+        >
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
               {avatarUrl ? (
@@ -293,6 +298,9 @@ export function DashboardShell({
               <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
                 @{profileSlug ?? email?.split('@')[0] ?? 'you'}
               </p>
+              <p className="mt-1.5 text-[11px] font-medium text-[var(--app-iris)]">
+                Edit photo, bio, links
+              </p>
               {completion != null && (
                 <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
                   {completion}% ready
@@ -300,7 +308,7 @@ export function DashboardShell({
               )}
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="mt-6 flex-1 overflow-y-auto">{navLinks}</div>
 
@@ -355,6 +363,13 @@ export function DashboardShell({
                 <p className="border-b border-[var(--app-border)] px-3 py-2 text-[12px] text-[var(--app-smoke)]">
                   {email}
                 </p>
+                <Link
+                  href={`${basePath}/profile`}
+                  className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                  onClick={() => setUserMenuOpen(false)}
+                >
+                  Edit profile
+                </Link>
                 <Link
                   href={`${basePath}/settings`}
                   className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"

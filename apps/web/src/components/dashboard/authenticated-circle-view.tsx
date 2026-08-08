@@ -16,6 +16,7 @@ import { isActivityNewSince } from '@/lib/circle/circle-read-state-core';
 import { DashFilterBar } from '@/components/dashboard/dash-filter-bar';
 import { FadeInView } from '@/components/dashboard/fade-in-view';
 import { AppButton, AppCard, AppMono, PageHeader } from '@/components/dashboard/ui/dashboard-ui';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 
 function formatActivityTimestamp(iso: string): string {
   const parsed = new Date(iso);
@@ -49,10 +50,10 @@ function CircleEmptyNoConnections() {
         id="circle-empty-connections-title"
         className="text-[22px] font-medium tracking-[-0.02em] text-[var(--app-ink)]"
       >
-        Your Circle starts with your Connections
+        {EMPTY_STATE_COPY.circle.noConnectionsTitle}
       </h2>
       <p className="mx-auto mt-3 max-w-lg text-[15px] text-[var(--app-smoke)]">
-        Add people whose work you care about to see their latest projects and research here.
+        {EMPTY_STATE_COPY.circle.noConnectionsDescription}
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         <AppButton variant="primary" href="/profiles">
@@ -76,10 +77,10 @@ function CircleEmptyNoActivity() {
         id="circle-empty-activity-title"
         className="text-[22px] font-medium tracking-[-0.02em] text-[var(--app-ink)]"
       >
-        Nothing new yet
+        {EMPTY_STATE_COPY.circle.noActivityTitle}
       </h2>
       <p className="mx-auto mt-3 max-w-lg text-[15px] text-[var(--app-smoke)]">
-        New projects and research from your Connections will appear here when they publish.
+        {EMPTY_STATE_COPY.circle.noActivityDescription}
       </p>
       <div className="mt-6">
         <AppButton variant="ghost" href="/dashboard/connections">
