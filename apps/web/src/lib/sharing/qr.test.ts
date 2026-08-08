@@ -55,6 +55,31 @@ describe('canonical public profile URL', () => {
     );
   });
 
+  it('prefers the live page origin over a localhost env URL in the browser', () => {
+    const previousWindow = globalThis.window;
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { location: { origin: 'https://codecard-mvp.vercel.app' } },
+    });
+    try {
+      expect(
+        getTrustedAppOrigin({
+          NODE_ENV: 'production',
+          NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
+        } as NodeJS.ProcessEnv),
+      ).toBe('https://codecard-mvp.vercel.app');
+    } finally {
+      if (previousWindow === undefined) {
+        Reflect.deleteProperty(globalThis, 'window');
+      } else {
+        Object.defineProperty(globalThis, 'window', {
+          configurable: true,
+          value: previousWindow,
+        });
+      }
+    }
+  });
+
   it('never includes tracking params, emails, or ownership fields', () => {
     const result = buildCanonicalPublicProfileUrl('ada', TEST_ENV);
     expect(result.ok).toBe(true);

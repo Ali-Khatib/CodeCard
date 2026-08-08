@@ -60,6 +60,10 @@ export function ProfileShareHero({
       ? `/${profileSlug}`
       : 'Add a profile slug to share';
   const canShare = Boolean(clipboardUrl && canonical.ok);
+  const isLocalOnlyLink =
+    Boolean(clipboardUrl) &&
+    (clipboardUrl!.includes('://localhost') || clipboardUrl!.includes('://127.0.0.1'));
+
 
   const { copy, isLoading, isSuccess, isError, status } = useCopyToClipboard({
     successDuration: 2400,
@@ -275,6 +279,13 @@ export function ProfileShareHero({
               </motion.span>
             </AnimatePresence>
             <span className="cc-share-action__url break-all">{displayUrl}</span>
+            {isLocalOnlyLink ? (
+              <span className="mt-2 block text-[12px] leading-snug text-[var(--app-smoke)]">
+                Local only — this link only works on your computer. Open{' '}
+                <span className="font-medium text-[var(--app-ink)]">codecard-mvp.vercel.app</span>{' '}
+                and copy again to share with someone.
+              </span>
+            ) : null}
           </span>
 
           <span id={statusId} className="sr-only" role="status" aria-live="polite">

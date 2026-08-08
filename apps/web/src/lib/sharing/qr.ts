@@ -55,12 +55,33 @@ export function normalizeTrustedAppOrigin(raw: string | null | undefined): strin
   return `${parsed.protocol}//${parsed.host}`;
 }
 
+function isLocalDevOrigin(origin: string): boolean {
+  try {
+    const host = new URL(origin).hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Trusted application origin for share/QR surfaces.
  * Never derived from user-controlled request headers or profile content.
+ *
+ * On the client, if the baked env URL is localhost but the page is a real
+ * deploy host, prefer the page origin so copied links stay shareable.
  */
 export function getTrustedAppOrigin(env: NodeJS.ProcessEnv = process.env): string | null {
   const fromEnv = normalizeTrustedAppOrigin(env.NEXT_PUBLIC_APP_URL);
+
+  if (typeof window !== 'undefined') {
+    const pageOrigin = normalizeTrustedAppOrigin(window.location.origin);
+    if (pageOrigin && !isLocalDevOrigin(pageOrigin)) {
+      if (fromEnv && !isLocalDevOrigin(fromEnv)) return fromEnv;
+      return pageOrigin;
+    }
+  }
+
   if (fromEnv) return fromEnv;
 
   // Development/test may omit NEXT_PUBLIC_APP_URL; production must configure it.
