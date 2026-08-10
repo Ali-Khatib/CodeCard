@@ -17,6 +17,13 @@ import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
+import {
+  workspaceCreateProjectHref,
+  workspaceCreateResearchHref,
+  workspaceProfileHref,
+  workspaceProjectEditHref,
+  workspaceResearchEditHref,
+} from '@/lib/marketing/demo-url';
 import { AppButton, AppCard, AppMono, MetricCard } from './ui/dashboard-ui';
 import { ProfileCompletionIndicator } from './profile-completion-indicator';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
@@ -199,7 +206,7 @@ export function DashboardOverviewView({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AppButton variant="primary" href="/dashboard/profile">
+              <AppButton variant="primary" href={workspaceProfileHref(basePath)}>
                 Edit profile
               </AppButton>
               {profileSlug ? (
@@ -213,7 +220,7 @@ export function DashboardOverviewView({
           <AppCard className="cc-profile-identity-card !p-0 overflow-hidden">
             <div className="cc-profile-identity-card__hero">
               <Link
-                href="/dashboard/profile#photo"
+                href={workspaceProfileHref(basePath, 'photo')}
                 className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)] focus-visible:ring-offset-2"
                 aria-label={avatarUrl ? 'Change profile photo' : 'Add profile photo'}
               >
@@ -241,7 +248,7 @@ export function DashboardOverviewView({
                   </p>
                 ) : (
                   <Link
-                    href="/dashboard/profile#headline"
+                    href={workspaceProfileHref(basePath, 'headline')}
                     className="mt-1 inline-block text-[15px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
                   >
                     Add a headline
@@ -256,7 +263,7 @@ export function DashboardOverviewView({
                   </p>
                 ) : (
                   <Link
-                    href="/dashboard/profile#bio"
+                    href={workspaceProfileHref(basePath, 'bio')}
                     className="mt-3 inline-block text-[14px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
                   >
                     Add a short description
@@ -282,7 +289,7 @@ export function DashboardOverviewView({
                   </div>
                 ) : (
                   <Link
-                    href="/dashboard/profile#links"
+                    href={workspaceProfileHref(basePath, 'links')}
                     className="mt-4 inline-block text-[14px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
                   >
                     Add links (GitHub, site, LinkedIn…)
@@ -291,16 +298,16 @@ export function DashboardOverviewView({
               </div>
             </div>
             <div className="flex flex-wrap gap-2 border-t border-[var(--app-border)] bg-[var(--app-bone)]/50 px-5 py-3">
-              <AppButton variant="ghost" href="/dashboard/profile#photo" className="!min-h-9 !px-3 !text-[13px]">
+              <AppButton variant="ghost" href={workspaceProfileHref(basePath, 'photo')} className="!min-h-9 !px-3 !text-[13px]">
                 Photo
               </AppButton>
-              <AppButton variant="ghost" href="/dashboard/profile#headline" className="!min-h-9 !px-3 !text-[13px]">
+              <AppButton variant="ghost" href={workspaceProfileHref(basePath, 'headline')} className="!min-h-9 !px-3 !text-[13px]">
                 Headline
               </AppButton>
-              <AppButton variant="ghost" href="/dashboard/profile#bio" className="!min-h-9 !px-3 !text-[13px]">
+              <AppButton variant="ghost" href={workspaceProfileHref(basePath, 'bio')} className="!min-h-9 !px-3 !text-[13px]">
                 Bio
               </AppButton>
-              <AppButton variant="ghost" href="/dashboard/profile#links" className="!min-h-9 !px-3 !text-[13px]">
+              <AppButton variant="ghost" href={workspaceProfileHref(basePath, 'links')} className="!min-h-9 !px-3 !text-[13px]">
                 Links
               </AppButton>
             </div>
@@ -349,7 +356,7 @@ export function DashboardOverviewView({
                     <p className="text-[14px] text-[var(--app-smoke)]">
                       {EMPTY_STATE_COPY.home.noProjects}
                     </p>
-                    <AppButton variant="primary" href={`${basePath}/projects/new`} className="mt-3">
+                    <AppButton variant="primary" href={workspaceCreateProjectHref(basePath)} className="mt-3">
                       Add project
                     </AppButton>
                   </div>
@@ -358,7 +365,7 @@ export function DashboardOverviewView({
                     {projectsSummary.recent.map((item) => {
                       const href = item.href.startsWith('/')
                         ? item.href
-                        : `${basePath}/projects/${item.id}/edit`;
+                        : workspaceProjectEditHref(basePath, item.id);
                       return (
                       <li key={item.id}>
                         <ContentOpeningLink
@@ -402,7 +409,7 @@ export function DashboardOverviewView({
                     <p className="text-[14px] text-[var(--app-smoke)]">
                       {EMPTY_STATE_COPY.home.noResearch}
                     </p>
-                    <AppButton variant="primary" href={`${basePath}/research/new`} className="mt-3">
+                    <AppButton variant="primary" href={workspaceCreateResearchHref(basePath)} className="mt-3">
                       Add paper
                     </AppButton>
                   </div>
@@ -411,7 +418,7 @@ export function DashboardOverviewView({
                     {researchSummary.recent.map((item) => {
                       const href = item.href.startsWith('/')
                         ? item.href
-                        : `${basePath}/research/${item.id}/edit`;
+                        : workspaceResearchEditHref(basePath, item.id);
                       return (
                       <li key={item.id}>
                         <ContentOpeningLink

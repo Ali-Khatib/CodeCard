@@ -75,7 +75,7 @@ describe('WS09-T004 projects CRUD navigation', () => {
     expect(page).toContain('dbProjectToPortfolioProject');
     expect(page).toContain('isProfilePublic');
     expect(page).toContain("basePath: '/dashboard'");
-    expect(portfolio).toContain('/projects/new');
+    expect(portfolio).toContain('workspaceCreateProjectHref');
     expect(portfolio).toContain('Create project');
     expect(stack).toContain('editHref');
     expect(stack).toContain('View project');

@@ -7,7 +7,12 @@ import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { ResearchBubbleGrid } from '@/components/dashboard/research-bubble-grid';
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import {
+  isDemoWorkspacePath,
+  publicDemoProfileBasePath,
+  workspaceCreateResearchHref,
+  workspaceResearchEditHref,
+} from '@/lib/marketing/demo-url';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
@@ -17,8 +22,6 @@ const VIEW_MODES = [
 ];
 
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
-
-const DEMO_SIGN_IN_RESEARCH = `/sign-in?redirect=${encodeURIComponent('/dashboard/research')}`;
 
 function paperPublicHref(
   paper: ResearchPaper,
@@ -46,8 +49,8 @@ export function DashboardResearchView({
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const orderedPaperIds = papers.map((paper) => paper.id);
-  const isDemoWorkspace = basePath === '/demo' || basePath.startsWith('/demo/');
-  const createHref = isDemoWorkspace ? DEMO_SIGN_IN_RESEARCH : `${basePath}/research/new`;
+  const isDemoWorkspace = isDemoWorkspacePath(basePath);
+  const createHref = workspaceCreateResearchHref(basePath);
   const createLabel = isDemoWorkspace ? 'Sign in to add research' : 'Add research';
 
   return (
@@ -88,9 +91,7 @@ export function DashboardResearchView({
         ) : (
           <div className="flex flex-col gap-8">
             {papers.map((paper, index) => {
-              const editHref = isDemoWorkspace
-                ? DEMO_SIGN_IN_RESEARCH
-                : `${basePath}/research/${paper.id}/edit`;
+              const editHref = workspaceResearchEditHref(basePath, paper.id);
               const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
               return (
                 <div key={paper.id} className="space-y-3">

@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
+import { workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
@@ -196,10 +197,10 @@ export function DashboardShell({
         const supabase = createClient();
         await supabase.auth.signOut();
       }
-      router.replace('/sign-in');
+      router.replace('/');
       router.refresh();
     } catch {
-      window.location.assign('/sign-in');
+      window.location.assign('/');
     } finally {
       setSigningOut(false);
     }
@@ -373,7 +374,7 @@ export function DashboardShell({
           <AppButton
             variant="primary"
             className="cc-app-topbar-cta shrink-0"
-            href={`${basePath}/projects/new`}
+            href={workspaceCreateProjectHref(basePath)}
             ariaLabel="Create project"
           >
             Create project

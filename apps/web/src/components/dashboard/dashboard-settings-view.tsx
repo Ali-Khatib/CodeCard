@@ -55,8 +55,10 @@ export type SettingsSnapshot = {
   githubConnected?: boolean;
 };
 
-function profileEditorHref(hash?: string) {
-  return hash ? `/dashboard/profile#${hash}` : '/dashboard/profile';
+function profileEditorHref(hash?: string, live = true) {
+  const path = hash ? `/dashboard/profile#${hash}` : '/dashboard/profile';
+  if (!live) return `/sign-in?redirect=${encodeURIComponent(path)}`;
+  return path;
 }
 
 function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSection[] {
@@ -65,13 +67,19 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
   const isPublic = Boolean(snapshot.isPublic);
   const email = snapshot.email ?? (live ? 'Not set' : 'demo@codecard.app');
   const username = slug ?? (live ? 'Not set yet' : 'demo');
+  const billingHref = live
+    ? '/dashboard/billing'
+    : `/sign-in?redirect=${encodeURIComponent('/dashboard/billing')}`;
+  const shareHref = live
+    ? '/dashboard#share'
+    : `/sign-in?redirect=${encodeURIComponent('/dashboard#share')}`;
 
   return [
     {
       id: 'account',
       eyebrow: 'Account',
       title: 'Sign-in & email',
-      navHint: 'Password, Google & GitHub',
+      navHint: 'Password & GitHub',
       description:
         'The email and providers you use to sign in. Changes here affect how you access your workspace.',
       rows: [
@@ -86,18 +94,17 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: snapshot.hasPassword
             ? 'We will email you a reset link'
             : 'Add a password via email reset if you signed up with OAuth',
-          action: 'Change password',
+          action: 'Email reset link',
           href: '/forgot-password',
           control: 'value-edit',
           value: snapshot.hasPassword ? 'Set' : 'Not set',
         },
         {
           label: 'Google',
-          hint: 'One-tap sign-in',
-          value: snapshot.googleConnected ? 'Connected' : 'Not connected',
-          action: snapshot.googleConnected ? 'Manage' : 'Connect',
-          href: '/sign-in',
-          control: 'value-edit',
+          hint: 'Not available in MVP yet',
+          value: 'Coming later',
+          control: 'status',
+          comingSoon: true,
         },
         {
           label: 'GitHub',
@@ -122,7 +129,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: 'codecard.app/your-name',
           value: username,
           action: 'Edit',
-          href: profileEditorHref('slug'),
+          href: profileEditorHref('slug', live),
           control: 'value-edit',
         },
         {
@@ -130,7 +137,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: plan === 'pro' ? 'Pro feature' : 'Upgrade to Pro to claim a custom domain',
           value: plan === 'pro' ? 'Not configured' : 'Pro only',
           action: plan === 'pro' ? 'Set up' : 'Upgrade',
-          href: '/dashboard/billing',
+          href: billingHref,
           control: 'value-edit',
           comingSoon: plan === 'pro',
         },
@@ -139,7 +146,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: 'Who can open your card',
           value: isPublic ? 'Public' : 'Private',
           action: 'Edit',
-          href: profileEditorHref('visibility'),
+          href: profileEditorHref('visibility', live),
           control: 'value-edit',
         },
         {
@@ -147,7 +154,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: 'Everything visitors see on your card',
           value: 'Edit on Profile',
           action: 'Open Profile',
-          href: profileEditorHref('photo'),
+          href: profileEditorHref('photo', live),
           control: 'value-edit',
         },
         {
@@ -155,7 +162,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: 'Show up on Google when public',
           value: isPublic ? 'Follows public status' : 'Off while private',
           action: 'Edit visibility',
-          href: profileEditorHref('visibility'),
+          href: profileEditorHref('visibility', live),
           control: 'value-edit',
         },
       ],
@@ -173,7 +180,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: 'Copy link, native share, QR preview, and PNG download',
           value: 'On Home',
           action: 'Open',
-          href: '/dashboard',
+          href: shareHref,
           control: 'value-edit',
         },
         {
@@ -250,20 +257,20 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           hint: currentPlanHint(plan),
           value: formatCurrentPlanLabel(plan),
           action: plan === 'pro' ? 'Manage' : 'Upgrade',
-          href: '/dashboard/billing',
+          href: billingHref,
           control: 'value-edit',
         },
         {
           label: 'Manage subscription',
           hint: 'Change plan or cancel',
-          href: '/dashboard/billing',
+          href: billingHref,
           control: 'button',
           action: 'Manage subscription',
         },
         {
           label: 'Invoices',
           hint: 'PDF receipts for expenses',
-          href: '/dashboard/billing',
+          href: billingHref,
           control: 'button',
           action: 'View invoices',
         },

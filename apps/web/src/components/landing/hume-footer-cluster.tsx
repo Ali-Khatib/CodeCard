@@ -18,6 +18,7 @@ const FOOTER_NAV = [
 const FOOTER_LEGAL = [
   { label: 'Privacy', href: '/legal/privacy' },
   { label: 'Terms', href: '/legal/terms' },
+  { label: 'Contact', href: '/legal/contact' },
   { label: 'Sign in', href: '/sign-in' },
 ] as const;
 
@@ -91,7 +92,7 @@ export function HumeFooterCluster() {
       <footer className="cc-site-footer__bar">
         <div className="cc-site-footer__bar-inner">
           <div className="cc-site-footer__contact">
-            <Link href="/sign-up" className="cc-site-footer__email">
+            <Link href="/legal/contact" className="cc-site-footer__email">
               Get in touch
               <span className="cc-site-footer__email-line" aria-hidden />
             </Link>

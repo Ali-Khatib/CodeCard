@@ -15,8 +15,9 @@ describe('WS09-T007 overview share controls', () => {
     expect(overview).toContain('<ProfileShareHero');
     expect(overview).toContain('profileSlug={profileSlug}');
     expect(overview).toContain('profileId={profile?.id}');
-    expect(overview).toContain('isPublic={profile?.is_public ?? true}');
+    expect(overview).toContain('isPublic={isProfilePublic}');
     expect(overview).toContain('displayName={displayName}');
+    expect(overview).toContain('const isProfilePublic = profile?.is_public === true');
 
     expect(overview).not.toContain('generateProfileQrPreview');
     expect(overview).not.toContain('navigator.share');

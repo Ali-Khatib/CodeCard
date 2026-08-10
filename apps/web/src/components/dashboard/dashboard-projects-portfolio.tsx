@@ -8,6 +8,7 @@ import type {
   PortfolioProject,
 } from '@/lib/dashboard/portfolio';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
+import { workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
 import { ProjectsProfileStrip } from './projects-profile-strip';
 import { FadeInView } from './fade-in-view';
 import { ProjectsVerticalStack } from './projects-vertical-stack';
@@ -135,7 +136,7 @@ export function DashboardProjectsPortfolio({
           </p>
         </div>
         <div className="text-center">
-          <AppButton variant="primary" href={`${basePath}/projects/new`} ariaLabel="Create project">
+          <AppButton variant="primary" href={workspaceCreateProjectHref(basePath)} ariaLabel="Create project">
             {EMPTY_STATE_COPY.projects.cta}
           </AppButton>
         </div>
@@ -171,7 +172,7 @@ export function DashboardProjectsPortfolio({
               ))}
             </div>
           </div>
-          <AppButton variant="primary" href={`${basePath}/projects/new`} ariaLabel="Create project">
+          <AppButton variant="primary" href={workspaceCreateProjectHref(basePath)} ariaLabel="Create project">
             Create project
           </AppButton>
         </div>

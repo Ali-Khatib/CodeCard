@@ -30,9 +30,9 @@ describe('canonical dashboard profile route', () => {
     expect(navBlock).toContain("label: 'Profile'");
     expect(shell).toContain('cc-app-user-card--link');
     expect(shell).toContain('Edit photo, bio, links');
-    expect(overview).toContain('href="/dashboard/profile"');
+    expect(overview).toContain('workspaceProfileHref(basePath)');
     expect(overview).toContain('Edit profile');
-    expect(overview).toContain('/dashboard/profile#photo');
+    expect(overview).toContain("workspaceProfileHref(basePath, 'photo')");
     expect(overview).toContain('How people see you');
   });
 

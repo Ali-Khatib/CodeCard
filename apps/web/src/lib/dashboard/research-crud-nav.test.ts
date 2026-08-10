@@ -41,10 +41,10 @@ describe('WS09-T005 research CRUD navigation', () => {
     expect(page).toContain('isProfilePublic');
     expect(page).toContain('basePath="/dashboard"');
     expect(view).toContain('basePath');
-    expect(view).toContain('/research/new');
-    expect(view).toContain('/edit');
+    expect(view).toContain('workspaceCreateResearchHref');
+    expect(view).toContain('workspaceResearchEditHref');
     expect(view).toContain('View public');
-    expect(view).toContain('Add research paper');
+    expect(view).toMatch(/Add research/);
     expect(view).toContain('Research layout');
     expect(view).toContain("label: 'Grid'");
     expect(view).toContain('ResearchBubbleGrid');

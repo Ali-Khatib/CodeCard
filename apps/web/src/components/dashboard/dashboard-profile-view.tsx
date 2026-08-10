@@ -109,7 +109,6 @@ export function DashboardProfileView({
           )}
 
           <div className="flex flex-wrap gap-2 border-t border-[var(--app-border)] pt-6">
-            {!preview && <AppButton variant="primary">Save changes</AppButton>}
             {profile.slug && (
               <AppButton variant="ghost" href={getSavedProfilePreviewHref(profile)}>
                 Preview

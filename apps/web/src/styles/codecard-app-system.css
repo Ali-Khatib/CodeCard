@@ -5,6 +5,8 @@
 .cc-app-root {
   position: relative;
   z-index: 1;
+  overflow-x: clip;
+  max-width: 100%;
   --app-ink: #232324;
   --app-paper: #ffffff;
   --app-bone: #fcf1e7;
@@ -333,6 +335,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-app-content {
   position: relative;
   padding: 32px 40px 64px;
+  max-width: 100%;
+  overflow-x: clip;
   background:
     radial-gradient(1100px 380px at 8% -8%, color-mix(in srgb, var(--app-iris) 9%, transparent), transparent 58%),
     linear-gradient(180deg, color-mix(in srgb, var(--app-bone) 48%, var(--app-paper)), var(--app-paper));

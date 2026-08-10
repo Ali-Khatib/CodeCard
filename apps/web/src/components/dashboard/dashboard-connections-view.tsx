@@ -203,7 +203,9 @@ function ConnectionExpandedBody({
       </div>
 
       <div className="cc-connection-actions">
-        <AppButton variant="primary">Open CodeCard</AppButton>
+        <AppButton variant="primary" href="/demo/card">
+          Open CodeCard
+        </AppButton>
         <CopyLinkButton
           getText={() => connectionEmail(connection)}
           variant="ghost"
@@ -211,15 +213,12 @@ function ConnectionExpandedBody({
         >
           Copy email
         </CopyLinkButton>
-        <AsyncActionButton
+        <AppButton
           variant="ghost"
-          successLabel="Scheduled"
-          onAction={async () => {
-            await new Promise((r) => setTimeout(r, 400));
-          }}
+          href={`/sign-in?redirect=${encodeURIComponent('/dashboard/connections')}`}
         >
-          Add follow-up
-        </AsyncActionButton>
+          Sign in to schedule follow-up
+        </AppButton>
       </div>
     </div>
   );

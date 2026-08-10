@@ -60,7 +60,7 @@ export function ResearchPaperDetail({
     },
   });
 
-  const abstract = paper.abstract ?? 'Abstract coming soon.';
+  const abstract = paper.abstract ?? 'No abstract provided.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;
   const safePdfUrl = paper.pdfUrl;
   const safeDoiUrl = paper.doiUrl;
@@ -121,7 +121,7 @@ export function ResearchPaperDetail({
                 {paper.title}
               </h1>
               <p className="mt-5 break-words text-[17px] leading-relaxed text-ash md:text-[19px]">
-                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
+                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
               </p>
               <p className="mt-2 text-[15px] text-text-secondary">
                 {metadataLine(paper) || 'Publication details pending'}

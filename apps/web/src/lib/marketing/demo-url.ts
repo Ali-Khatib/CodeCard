@@ -64,3 +64,47 @@ export function publicDemoResearchHref(profileSlug: string, paperSlug: string): 
   }
   return `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
 }
+
+/** True for the signed-out `/demo` workspace (sample data, no mutations). */
+export function isDemoWorkspacePath(basePath: string): boolean {
+  return basePath === '/demo' || basePath.startsWith('/demo/');
+}
+
+function signInToDashboard(path: string): string {
+  return `/sign-in?redirect=${encodeURIComponent(path)}`;
+}
+
+/** Create-project CTA: live dashboard route, or sign-in from the demo workspace. */
+export function workspaceCreateProjectHref(basePath: string): string {
+  if (isDemoWorkspacePath(basePath)) return signInToDashboard('/dashboard/projects/new');
+  return `${basePath}/projects/new`;
+}
+
+/** Create-research CTA: live dashboard route, or sign-in from the demo workspace. */
+export function workspaceCreateResearchHref(basePath: string): string {
+  if (isDemoWorkspacePath(basePath)) return signInToDashboard('/dashboard/research/new');
+  return `${basePath}/research/new`;
+}
+
+/** Profile editor CTA that respects demo vs authenticated workspace. */
+export function workspaceProfileHref(basePath: string, hash?: string): string {
+  const path = hash ? `/dashboard/profile#${hash}` : '/dashboard/profile';
+  if (isDemoWorkspacePath(basePath)) return signInToDashboard(path);
+  return hash ? `${basePath}/profile#${hash}` : `${basePath}/profile`;
+}
+
+/** Project edit CTA; demo has no edit routes. */
+export function workspaceProjectEditHref(basePath: string, projectId: string): string {
+  if (isDemoWorkspacePath(basePath)) {
+    return signInToDashboard(`/dashboard/projects`);
+  }
+  return `${basePath}/projects/${projectId}/edit`;
+}
+
+/** Research edit CTA; demo has no edit routes. */
+export function workspaceResearchEditHref(basePath: string, paperId: string): string {
+  if (isDemoWorkspacePath(basePath)) {
+    return signInToDashboard('/dashboard/research');
+  }
+  return `${basePath}/research/${paperId}/edit`;
+}

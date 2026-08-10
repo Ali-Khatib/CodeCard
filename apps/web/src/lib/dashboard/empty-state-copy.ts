@@ -1,39 +1,39 @@
 /**
- * Hyped empty-state copy for first-session dashboard pages.
- * Casual and loud on purpose — empty screens should feel like a dare to start, not a tombstone.
+ * Empty-state copy for first-session dashboard pages.
+ * Clear and actionable — empty screens should invite the next step.
  */
 
 export const EMPTY_STATE_COPY = {
   connections: {
-    title: 'Add people. Omg yes. Lets add peopleeee.',
+    title: 'Add people you want to remember',
     description:
-      'Save the builders whose work you actually care about. Open their CodeCard, hit Add connection, and build a private list you can remember.',
+      'Save builders whose work you care about. Open their CodeCard, tap Add connection, and keep a private list only you can see.',
     body: 'Your list stays private. Only you see who you saved.',
     primaryCta: 'Find people to add',
     secondaryCta: 'Share your CodeCard',
   },
   projects: {
-    title: 'Add a project. Lets freaking go.',
+    title: 'Add your first project',
     description:
-      'Your card needs real work on it. Title, demo, stack, outcome. Make the first one loud.',
+      'Show real work on your card: title, demo, stack, and outcome. Start with one project you are proud of.',
     cta: 'Create your first project',
   },
   research: {
-    title: 'Drop a paper. Make it real.',
+    title: 'Add a research paper',
     description:
-      'Title, authors, venue, PDF, links. Publish when you are ready. Blank research pages are boring. Fix that.',
+      'Title, authors, venue, PDF, and links. Publish when you are ready.',
     cta: 'Create paper',
   },
   circle: {
-    noConnectionsTitle: 'Circle needs people first. Add someeee.',
+    noConnectionsTitle: 'Circle needs people first',
     noConnectionsDescription:
-      'Follow builders you trust, then this feed fills with what they ship.',
-    noActivityTitle: 'Nothing new yet. Stay ready.',
+      'Save people from public CodeCards. Their published work will show up here.',
+    noActivityTitle: 'Nothing new yet',
     noActivityDescription:
       'When your Connections publish projects or research, it shows up here.',
   },
   home: {
-    noProjects: 'No projects yet. Go make one and flex it on your card.',
+    noProjects: 'No projects yet. Create one to feature on your card.',
     noResearch: 'No papers yet. Add one when you have something to show.',
   },
 } as const;
