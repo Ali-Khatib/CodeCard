@@ -1339,12 +1339,13 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   /* Fixed width so both groups stay identical (seamless loop) */
   appearance: none;
   -webkit-appearance: none;
+  position: relative;
   width: 21rem;
   flex-shrink: 0;
   border: 1px solid var(--ed-border);
   border-radius: var(--ed-radius);
   background: var(--ed-paper);
-  padding: 1.55rem 1.4rem 1.7rem;
+  padding: 1.55rem 1.4rem 1.85rem;
   color: var(--ed-ink);
   box-shadow: 0 10px 28px rgba(35, 35, 36, 0.06);
   text-align: left;
@@ -1370,6 +1371,35 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   outline-offset: 3px;
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--ed-iris) 55%, var(--ed-border));
+}
+
+.cc-ed-audience__hint {
+  display: block;
+  margin-top: 0.85rem;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: color-mix(in srgb, var(--ed-mute) 55%, transparent);
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cc-ed-audience__card:hover .cc-ed-audience__hint,
+.cc-ed-audience__card:focus-visible .cc-ed-audience__hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (hover: none) {
+  .cc-ed-audience__hint {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
