@@ -41,6 +41,9 @@ export async function POST(request: Request) {
       headers: { Accept: 'application/json' },
     });
 
+    // Only block when Supabase explicitly says the provider is off.
+    // Any redirect / opaque / unexpected status still lets the browser continue —
+    // false "oauth_failed" here was aborting working GitHub flows.
     if (response.status >= 300 && response.status < 400) {
       return NextResponse.json({ ok: true });
     }
@@ -54,7 +57,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, reason: 'provider_disabled' });
     }
 
-    return NextResponse.json({ ok: false, reason: 'oauth_failed' });
+    return NextResponse.json({ ok: true, reason: 'preflight_inconclusive' });
   } catch {
     // Network failure — let the client attempt the redirect anyway.
     return NextResponse.json({ ok: true, reason: 'preflight_skipped' });

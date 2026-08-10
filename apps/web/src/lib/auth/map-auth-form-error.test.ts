@@ -34,4 +34,8 @@ describe('mapAuthFormError', () => {
       /not enabled/i,
     );
   });
+
+  it('maps fetch failures to a reachable-supabase hint', () => {
+    expect(mapAuthFormError('Failed to fetch', 'sign-in')).toMatch(/ad blocker|supabase/i);
+  });
 });

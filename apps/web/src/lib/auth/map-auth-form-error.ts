@@ -55,9 +55,10 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     lower.includes('offline') ||
     lower.includes('load failed') ||
     lower.includes('networkerror') ||
-    lower.includes('authretryablefetcherror')
+    lower.includes('authretryablefetcherror') ||
+    lower.includes('aborted')
   ) {
-    return 'Connection interrupted. Check your network and try again.';
+    return 'Can’t reach Supabase from this browser. Disable ad blockers/VPN for this site, hard-refresh, then try again.';
   }
 
   if (lower.includes('rate limit') || lower.includes('too many') || lower.includes('429')) {

@@ -19,6 +19,7 @@ import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
 import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
+import { assertSupabaseAuthReachable } from '@/lib/auth/assert-supabase-reachable';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -73,6 +74,7 @@ function SignInForm() {
 
     try {
       const supabase = createClient();
+      await withAuthNetworkRetry(() => assertSupabaseAuthReachable());
       const result = await startGithubOAuth({
         supabase,
         redirectPath: redirectTo,
@@ -122,6 +124,7 @@ function SignInForm() {
       }
 
       const supabase = createClient();
+      await withAuthNetworkRetry(() => assertSupabaseAuthReachable());
       const { error: authError } = await withAuthNetworkRetry(() =>
         supabase.auth.signInWithPassword(parsed.data),
       );
