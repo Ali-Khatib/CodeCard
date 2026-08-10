@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
@@ -23,7 +23,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuTrackRef = useRef<HTMLDivElement>(null);
   const hoverLineRef = useRef<HTMLDivElement>(null);
-  const activeLineRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [hovered, setHovered] = useState<number | null>(null);
 
@@ -45,64 +44,32 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     [pathname],
   );
 
-  const activeIndex = useMemo(
-    () => items.findIndex((item) => isActive(item.href, item.label)),
-    [items, isActive],
-  );
-
-  const moveHoverLine = useCallback(
-    (index: number | null) => {
-      const line = hoverLineRef.current;
-      const track = menuTrackRef.current;
-      if (!line || !track) return;
-      if (index === null || index < 0 || index === activeIndex) {
-        line.style.opacity = '0';
-        return;
-      }
-      const el = itemRefs.current[index];
-      if (!el) return;
-      const trackRect = track.getBoundingClientRect();
-      const rect = el.getBoundingClientRect();
-      line.style.opacity = '1';
-      line.style.left = `${rect.left - trackRect.left}px`;
-      line.style.width = `${rect.width}px`;
-    },
-    [activeIndex],
-  );
-
-  const moveActiveLine = useCallback(() => {
-    const line = activeLineRef.current;
+  const moveHoverLine = useCallback((index: number | null) => {
+    const line = hoverLineRef.current;
     const track = menuTrackRef.current;
     if (!line || !track) return;
-    if (activeIndex < 0) {
+    if (index === null || index < 0) {
       line.style.opacity = '0';
       return;
     }
-    const el = itemRefs.current[activeIndex];
+    const el = itemRefs.current[index];
     if (!el) return;
     const trackRect = track.getBoundingClientRect();
     const rect = el.getBoundingClientRect();
     line.style.opacity = '1';
     line.style.left = `${rect.left - trackRect.left}px`;
     line.style.width = `${rect.width}px`;
-  }, [activeIndex]);
+  }, []);
 
   useEffect(() => {
     moveHoverLine(hovered);
   }, [hovered, moveHoverLine]);
 
   useEffect(() => {
-    moveActiveLine();
-  }, [moveActiveLine]);
-
-  useEffect(() => {
-    const onResize = () => {
-      moveHoverLine(hovered);
-      moveActiveLine();
-    };
+    const onResize = () => moveHoverLine(hovered);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [hovered, moveHoverLine, moveActiveLine]);
+  }, [hovered, moveHoverLine]);
 
   return (
     <nav className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
@@ -118,7 +85,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         </Link>
 
         <div ref={menuTrackRef} className="relative hidden md:flex">
-          <div ref={activeLineRef} className="cc-nav-active-underline" aria-hidden />
           <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
           <ul className="cc-hume-fade-group flex items-center gap-1">
             {items.map((item, i) => {

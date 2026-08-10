@@ -116,7 +116,6 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a
   border-color: transparent;
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-active-underline,
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
   background: var(--ed-iris, #c094e4);
 }
@@ -167,7 +166,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href=
   font-weight: 560;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-active-underline,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
   background: var(--ed-iris, #c094e4);
 }

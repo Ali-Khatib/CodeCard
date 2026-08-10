@@ -13,14 +13,14 @@ async function assertNoHydrationErrors(page: Page) {
 }
 
 test.describe('Phase 1B premium interaction polish', () => {
-  test('landing sticky nav gains scrolled state and active underline', async ({ page }) => {
+  test('landing sticky nav gains scrolled state', async ({ page }) => {
     const flush = await assertNoHydrationErrors(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const shell = page.locator('.cc-marketing-nav-shell');
     await expect(shell).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 420));
     await expect(shell).toHaveAttribute('data-scrolled', 'true');
-    await expect(page.locator('.cc-nav-active-underline')).toBeAttached();
+    await expect(page.locator('.cc-nav-active-underline')).toHaveCount(0);
     flush();
   });
 
