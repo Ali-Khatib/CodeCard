@@ -135,6 +135,11 @@ export function HumeFooterCluster() {
             </div>
           </div>
 
+          <p className="cc-site-footer__ghost" aria-hidden>
+            <span>Get</span>
+            <span>Started</span>
+          </p>
+
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
             <p className="cc-site-footer__meta-note">
