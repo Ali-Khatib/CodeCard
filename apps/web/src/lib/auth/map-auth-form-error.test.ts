@@ -28,4 +28,10 @@ describe('mapAuthFormError', () => {
   it('keeps concise validation copy', () => {
     expect(mapAuthFormError('Invalid email', 'sign-in')).toBe('Invalid email');
   });
+
+  it('maps disabled GitHub provider clearly', () => {
+    expect(mapAuthFormError('Unsupported provider: provider is not enabled', 'sign-up')).toMatch(
+      /not enabled/i,
+    );
+  });
 });
