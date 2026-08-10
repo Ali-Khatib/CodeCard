@@ -1484,21 +1484,23 @@ html.dark .cc-project-nav-btn svg,
   }
 }
 
-/* Marketing live-demo iframe — phone-native chrome, not a crushed desktop UI */
+/* Marketing live-demo iframe — keep the real workspace chrome (sidebar included) */
 .cc-app-root--embedded {
-  --app-sidebar-width: 0px;
-}
-
-.cc-app-root--embedded .cc-app-sidebar-toggle {
-  display: none !important;
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
 }
 
 .cc-app-root--embedded .cc-app-sidebar {
-  display: none !important;
+  position: absolute;
+  height: 100%;
+}
+
+.cc-app-root--embedded .cc-app-sidebar-toggle--fixed {
+  position: absolute;
 }
 
 .cc-app-root--embedded .cc-app-main {
-  margin-left: 0 !important;
   min-height: 100%;
 }
 
@@ -1509,29 +1511,6 @@ html.dark .cc-project-nav-btn svg,
 
 .cc-app-root--embedded .cc-app-content {
   padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
-}
-
-.cc-app-root--embedded .cc-app-mobile-nav {
-  justify-content: space-between;
-  gap: 0;
-  overflow-x: hidden;
-  scroll-snap-type: none;
-  padding-inline: 8px;
-}
-
-.cc-app-root--embedded .cc-app-mobile-nav__link--embed {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: none;
-  scroll-snap-align: none;
-  font-size: 10px;
-  padding: 8px 4px;
-}
-
-.cc-app-root--embedded .cc-app-mobile-nav__link--embed span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 @media (max-width: 767px) {
