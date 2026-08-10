@@ -80,6 +80,7 @@ export function DashboardOverviewView({
   basePath = '/dashboard',
 }: OverviewProps) {
   const firstName = displayName.split(' ')[0];
+  const isProfilePublic = profile?.is_public === true;
   const views =
     typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
   const visibleLinks = toSafeProfileLinkItems(links);
