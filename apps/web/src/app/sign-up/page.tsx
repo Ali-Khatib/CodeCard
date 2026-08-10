@@ -16,6 +16,7 @@ import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 import {
   SIGNUP_CONFIRMATION_TITLE,
   resolveSignUpOutcome,
@@ -136,17 +137,19 @@ function SignUpForm() {
       }
 
       const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.signUp({
-        email: parsed.data.email,
-        password: parsed.data.password,
-        options: {
-          emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed'),
-          data: {
-            display_name: parsed.data.display_name,
-            slug: parsed.data.slug,
+      const { data, error: authError } = await withAuthNetworkRetry(() =>
+        supabase.auth.signUp({
+          email: parsed.data.email,
+          password: parsed.data.password,
+          options: {
+            emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed'),
+            data: {
+              display_name: parsed.data.display_name,
+              slug: parsed.data.slug,
+            },
           },
-        },
-      });
+        }),
+      );
 
       const outcome = resolveSignUpOutcome({
         data: { user: data.user, session: data.session },

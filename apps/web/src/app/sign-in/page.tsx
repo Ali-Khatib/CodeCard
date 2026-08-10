@@ -18,6 +18,7 @@ import { isAuthSubmissionBlocked, oauthButtonLabel } from '@/lib/auth/auth-loadi
 import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -121,7 +122,9 @@ function SignInForm() {
       }
 
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithPassword(parsed.data);
+      const { error: authError } = await withAuthNetworkRetry(() =>
+        supabase.auth.signInWithPassword(parsed.data),
+      );
 
       if (authError) {
         setError(mapAuthFormError(authError.message, 'sign-in'));

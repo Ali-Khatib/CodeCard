@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 export const GITHUB_PROVIDER_DISABLED_MESSAGE =
   'GitHub sign-in is not enabled yet. Use email for now, or ask the project owner to turn on GitHub under Supabase → Authentication → Providers.';
@@ -22,13 +23,15 @@ export async function startGithubOAuth({
   supabase,
   redirectPath = '/dashboard',
 }: StartGithubOAuthArgs): Promise<StartGithubOAuthResult> {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'github',
-    options: {
-      redirectTo: authCallbackRedirectUrl(redirectPath),
-      skipBrowserRedirect: true,
-    },
-  });
+  const { data, error } = await withAuthNetworkRetry(() =>
+    supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: authCallbackRedirectUrl(redirectPath),
+        skipBrowserRedirect: true,
+      },
+    }),
+  );
 
   if (error) {
     return { ok: false, message: error.message };

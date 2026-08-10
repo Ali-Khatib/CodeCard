@@ -52,7 +52,10 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     lower.includes('network') ||
     lower.includes('failed to fetch') ||
     lower.includes('timeout') ||
-    lower.includes('offline')
+    lower.includes('offline') ||
+    lower.includes('load failed') ||
+    lower.includes('networkerror') ||
+    lower.includes('authretryablefetcherror')
   ) {
     return 'Connection interrupted. Check your network and try again.';
   }
