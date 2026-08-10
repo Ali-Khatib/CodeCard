@@ -10,7 +10,6 @@ import {
   HiOutlineLink,
 } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
-import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
 import { publicDemoProfileResearchSectionHref } from '@/lib/marketing/demo-url';
 import { TYPE } from '@/lib/design/tokens';
@@ -23,11 +22,6 @@ import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 
 function metadataLine(paper: ResearchPaper) {
   return [paper.venue, paper.publicationStatus, paper.year].filter(Boolean).join(' · ');
-}
-
-function formatReadTime(seconds: number) {
-  const min = Math.max(1, Math.round(seconds / 60));
-  return `${min} min read`;
 }
 
 export function ResearchPaperDetail({
@@ -44,7 +38,6 @@ export function ResearchPaperDetail({
   const [abstractExpanded, setAbstractExpanded] = useState(false);
   const reduced = useReducedMotion();
   const backHref = publicDemoProfileResearchSectionHref(profileSlug);
-  const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
   useEffect(() => {
     trackResearchEvent({
@@ -131,7 +124,7 @@ export function ResearchPaperDetail({
                 {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
               </p>
               <p className="mt-2 text-[15px] text-text-secondary">
-                {metadataLine(paper) || 'Publication details pending'} · {formatReadTime(readTime)}
+                {metadataLine(paper) || 'Publication details pending'}
               </p>
               {externalPdfLabel && (
                 <p className="mt-3 text-[13px] text-text-secondary">
