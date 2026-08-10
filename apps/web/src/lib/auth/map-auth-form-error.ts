@@ -34,9 +34,11 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
   if (
     lower.includes('password must') ||
     lower.includes('password should') ||
-    lower.includes('weak password')
+    lower.includes('weak password') ||
+    lower.includes('at least 1 character') ||
+    lower.includes('at least one character')
   ) {
-    return 'Password requirement not met. Use at least 8 characters with upper, lower, and a number.';
+    return 'Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a number.';
   }
 
   if (lower.includes('session') && lower.includes('expired')) {
@@ -50,9 +52,13 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     lower.includes('network') ||
     lower.includes('failed to fetch') ||
     lower.includes('timeout') ||
-    lower.includes('offline')
+    lower.includes('offline') ||
+    lower.includes('load failed') ||
+    lower.includes('networkerror') ||
+    lower.includes('authretryablefetcherror') ||
+    lower.includes('aborted')
   ) {
-    return 'Connection interrupted. Check your network and try again.';
+    return 'Can’t reach Supabase from this browser. Disable ad blockers/VPN for this site, hard-refresh, then try again.';
   }
 
   if (lower.includes('rate limit') || lower.includes('too many') || lower.includes('429')) {
@@ -61,6 +67,14 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
 
   if (lower.includes('oauth') && (lower.includes('cancel') || lower.includes('denied'))) {
     return 'GitHub sign-in was cancelled.';
+  }
+
+  if (
+    lower.includes('provider is not enabled') ||
+    lower.includes('unsupported provider') ||
+    lower.includes('provider_disabled')
+  ) {
+    return 'GitHub sign-in is not enabled yet. Use email for now, or ask the project owner to turn on GitHub under Supabase → Authentication → Providers.';
   }
 
   if (lower.includes('oauth') || lower.includes('provider')) {

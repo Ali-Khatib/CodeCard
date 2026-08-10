@@ -7,7 +7,12 @@ import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { resetPasswordSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
+import { AuthPasswordField } from '@/components/auth/auth-password-field';
+import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
+import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { mapPasswordResetClientError } from '@/lib/auth/password-recovery';
+import { PASSWORD_REQUIREMENTS_SUMMARY } from '@/lib/auth/password-guidance';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -67,7 +72,12 @@ function ResetPasswordForm() {
 
     const parsed = resetPasswordSchema.safeParse({ password, confirmPassword });
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? 'Check your password and try again');
+      const message = parsed.error.errors[0]?.message ?? PASSWORD_REQUIREMENTS_SUMMARY;
+      setError(
+        message.toLowerCase().includes('at least 1 character')
+          ? PASSWORD_REQUIREMENTS_SUMMARY
+          : message,
+      );
       return;
     }
 
@@ -84,9 +94,11 @@ function ResetPasswordForm() {
         return;
       }
 
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: parsed.data.password,
-      });
+      const { error: updateError } = await withAuthNetworkRetry(() =>
+        supabase.auth.updateUser({
+          password: parsed.data.password,
+        }),
+      );
 
       if (updateError) {
         setError(mapPasswordResetClientError());
@@ -141,53 +153,38 @@ function ResetPasswordForm() {
   return (
     <AuthShell title="Set a new password" subtitle="Choose a strong password for your account.">
       <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-[14px] font-medium text-[#222222]">
-            New password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (error) setError('');
-            }}
-            required
-            autoComplete="new-password"
-            className="cc-input w-full"
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="confirmPassword" className="text-[14px] font-medium text-[#222222]">
-            Confirm password
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              if (error) setError('');
-            }}
-            required
-            autoComplete="new-password"
-            className="cc-input w-full"
-          />
-        </div>
-        {error && (
-          <p className="text-[14px] text-[#df6a6b]" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          className="cc-btn-pill-primary w-full py-2.5 text-[15px]"
+        <AuthPasswordField
+          id="password"
+          label="New password"
+          value={password}
+          onChange={(value) => {
+            setPassword(value);
+            if (error) setError('');
+          }}
+          required
+          autoComplete="new-password"
           disabled={loading}
-          aria-busy={loading}
-        >
-          {loading ? 'Updating…' : 'Update password'}
-        </button>
+          showGuidance
+        />
+        <AuthPasswordField
+          id="confirmPassword"
+          label="Confirm password"
+          value={confirmPassword}
+          onChange={(value) => {
+            setConfirmPassword(value);
+            if (error) setError('');
+          }}
+          required
+          autoComplete="new-password"
+          disabled={loading}
+        />
+        <AuthErrorAlert message={error} />
+        <AuthPrimaryButton
+          pending={loading}
+          pendingLabel="Updating…"
+          idleLabel="Update password"
+          disabled={loading}
+        />
       </form>
 
       <p className="mt-6 text-center text-[14px] text-[#7a7876]">

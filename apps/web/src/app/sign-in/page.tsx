@@ -13,10 +13,12 @@ import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
 import { AuthGithubButton } from '@/components/auth/auth-github-button';
 import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
-import { sanitizeInternalRedirect, authCallbackRedirectUrl } from '@/lib/auth/redirect';
+import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { isAuthSubmissionBlocked, oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
+import { startGithubOAuth } from '@/lib/auth/github-oauth';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -28,7 +30,9 @@ function SignInForm() {
     searchParams.get('next') ?? searchParams.get('redirect'),
   );
   const resetSuccess = searchParams.get('reset') === 'success';
-  const statusMessage = signInStatusMessage(searchParams.get('reason'));
+  const [statusBanner, setStatusBanner] = useState(() =>
+    signInStatusMessage(searchParams.get('reason')),
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -50,10 +54,15 @@ function SignInForm() {
     router.prefetch('/sign-up');
   }, [router]);
 
+  function clearAlerts() {
+    setError('');
+    setStatusBanner(null);
+  }
+
   async function oauthGithub() {
     if (oauthLock.current || authBlocked) return;
 
-    setError('');
+    clearAlerts();
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
@@ -64,19 +73,21 @@ function SignInForm() {
 
     try {
       const supabase = createClient();
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: authCallbackRedirectUrl(redirectTo),
-        },
-      });
+      const result = await withAuthNetworkRetry(() =>
+        startGithubOAuth({
+          supabase,
+          redirectPath: redirectTo,
+        }),
+      );
 
-      if (oauthError) {
-        setError(mapAuthFormError(oauthError.message, 'sign-in'));
+      if (!result.ok) {
+        setError(mapAuthFormError(result.message, 'sign-in'));
         setOauthLoading(null);
       }
-    } catch {
-      setError(mapAuthFormError('network', 'sign-in'));
+      // On success Supabase navigates away — keep the loading state.
+    } catch (caught) {
+      const raw = caught instanceof Error && caught.message ? caught.message : 'network';
+      setError(mapAuthFormError(raw, 'sign-in'));
       setOauthLoading(null);
     } finally {
       oauthLock.current = false;
@@ -85,7 +96,7 @@ function SignInForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    clearAlerts();
     setFieldError({});
 
     if (submitLock.current || authBlocked) return;
@@ -114,7 +125,9 @@ function SignInForm() {
       }
 
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithPassword(parsed.data);
+      const { error: authError } = await withAuthNetworkRetry(() =>
+        supabase.auth.signInWithPassword(parsed.data),
+      );
 
       if (authError) {
         setError(mapAuthFormError(authError.message, 'sign-in'));
@@ -125,13 +138,17 @@ function SignInForm() {
       setFadingOut(true);
       router.push(redirectTo);
       router.refresh();
-    } catch {
-      setError(mapAuthFormError('network', 'sign-in'));
+    } catch (caught) {
+      const raw = caught instanceof Error && caught.message ? caught.message : 'network';
+      setError(mapAuthFormError(raw, 'sign-in'));
+      requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       submitLock.current = false;
       setEmailLoading(false);
     }
   }
+
+  const alertMessage = error || statusBanner;
 
   return (
     <AuthShell
@@ -158,7 +175,7 @@ function SignInForm() {
             value={email}
             onChange={(value) => {
               setEmail(value);
-              if (error) setError('');
+              clearAlerts();
               if (fieldError.email) setFieldError((prev) => ({ ...prev, email: undefined }));
             }}
             required
@@ -172,7 +189,7 @@ function SignInForm() {
               value={password}
               onChange={(value) => {
                 setPassword(value);
-                if (error) setError('');
+                clearAlerts();
                 if (fieldError.password) setFieldError((prev) => ({ ...prev, password: undefined }));
               }}
               required
@@ -196,14 +213,8 @@ function SignInForm() {
             </p>
           ) : null}
 
-          {statusMessage ? (
-            <div className="mb-3">
-              <AuthErrorAlert message={statusMessage} />
-            </div>
-          ) : null}
-
           <div ref={errorRef} tabIndex={-1} className="mb-3 outline-none">
-            <AuthErrorAlert message={error} />
+            <AuthErrorAlert message={alertMessage ?? ''} />
           </div>
 
           <AuthPrimaryButton

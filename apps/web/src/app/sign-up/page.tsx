@@ -10,9 +10,13 @@ import { AuthShell } from '@/components/auth/auth-shell';
 import { AuthField } from '@/components/auth/auth-field';
 import { AuthPasswordField } from '@/components/auth/auth-password-field';
 import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
+import { AuthGithubButton } from '@/components/auth/auth-github-button';
 import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
+import { oauthButtonLabel } from '@/lib/auth/auth-loading';
+import { startGithubOAuth } from '@/lib/auth/github-oauth';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 import {
   SIGNUP_CONFIRMATION_TITLE,
   resolveSignUpOutcome,
@@ -34,12 +38,15 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const [fieldError, setFieldError] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<'github' | null>(null);
   const [fadingOut, setFadingOut] = useState(false);
   const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
   const submitLock = useRef(false);
+  const oauthLock = useRef(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
   const authConfigured = isSupabasePublicKeyConfigured();
+  const authBusy = loading || oauthLoading !== null || Boolean(pendingConfirmationEmail);
 
   useEffect(() => {
     router.prefetch('/sign-in');
@@ -62,12 +69,47 @@ function SignUpForm() {
     }
   }
 
+  async function oauthGithub() {
+    if (oauthLock.current || authBusy) return;
+
+    setError('');
+    if (!authConfigured) {
+      setError(SETUP_MSG);
+      return;
+    }
+
+    oauthLock.current = true;
+    setOauthLoading('github');
+
+    try {
+      const supabase = createClient();
+      const result = await withAuthNetworkRetry(() =>
+        startGithubOAuth({
+          supabase,
+          redirectPath: '/dashboard',
+        }),
+      );
+
+      if (!result.ok) {
+        setError(mapAuthFormError(result.message, 'sign-up'));
+        setOauthLoading(null);
+        requestAnimationFrame(() => errorRef.current?.focus());
+      }
+    } catch {
+      setError(mapAuthFormError('network', 'sign-up'));
+      setOauthLoading(null);
+      requestAnimationFrame(() => errorRef.current?.focus());
+    } finally {
+      oauthLock.current = false;
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setFieldError({});
 
-    if (submitLock.current || loading || pendingConfirmationEmail) return;
+    if (submitLock.current || authBusy) return;
 
     if (!authConfigured) {
       setError(SETUP_MSG);
@@ -97,17 +139,19 @@ function SignUpForm() {
       }
 
       const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.signUp({
-        email: parsed.data.email,
-        password: parsed.data.password,
-        options: {
-          emailRedirectTo: authCallbackRedirectUrl('/dashboard'),
-          data: {
-            display_name: parsed.data.display_name,
-            slug: parsed.data.slug,
+      const { data, error: authError } = await withAuthNetworkRetry(() =>
+        supabase.auth.signUp({
+          email: parsed.data.email,
+          password: parsed.data.password,
+          options: {
+            emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed'),
+            data: {
+              display_name: parsed.data.display_name,
+              slug: parsed.data.slug,
+            },
           },
-        },
-      });
+        }),
+      );
 
       const outcome = resolveSignUpOutcome({
         data: { user: data.user, session: data.session },
@@ -182,7 +226,7 @@ function SignUpForm() {
             onChange={(value) => update('display_name', value)}
             required={authConfigured}
             autoComplete="name"
-            disabled={loading}
+            disabled={authBusy}
             error={fieldError.display_name}
           />
           <AuthField
@@ -192,7 +236,7 @@ function SignUpForm() {
             onChange={(value) => update('slug', value.toLowerCase())}
             required={authConfigured}
             autoComplete="username"
-            disabled={loading}
+            disabled={authBusy}
             pattern="[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?"
             prefix="codecard.app/"
             error={fieldError.slug}
@@ -205,7 +249,7 @@ function SignUpForm() {
             onChange={(value) => update('email', value)}
             required={authConfigured}
             autoComplete="email"
-            disabled={loading}
+            disabled={authBusy}
             error={fieldError.email}
           />
           <AuthPasswordField
@@ -214,7 +258,7 @@ function SignUpForm() {
             onChange={(value) => update('password', value)}
             required={authConfigured}
             autoComplete="new-password"
-            disabled={loading}
+            disabled={authBusy}
             showGuidance
             error={fieldError.password}
           />
@@ -231,9 +275,24 @@ function SignUpForm() {
             pending={loading}
             pendingLabel="Creating account…"
             idleLabel="Create account"
-            disabled={loading}
+            disabled={authBusy && !loading}
           />
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+          <span className="cc-app-mono text-[11px] uppercase tracking-[0.08em] text-smoke">or</span>
+          <div className="h-px flex-1 bg-[rgba(34,34,34,0.08)]" />
+        </div>
+
+        <div aria-busy={oauthLoading !== null}>
+          <AuthGithubButton
+            label={oauthButtonLabel('github', oauthLoading)}
+            onClick={() => void oauthGithub()}
+            disabled={authBusy}
+            pending={oauthLoading === 'github'}
+          />
+        </div>
 
         <p className="mt-6 text-center text-[14px] text-smoke">
           Already have an account?{' '}

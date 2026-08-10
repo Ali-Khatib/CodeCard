@@ -37,6 +37,10 @@ describe('sanitizeInternalRedirect', () => {
     expect(sanitizeInternalRedirect('/auth/error')).toBe('/dashboard');
   });
 
+  it('allows the email-confirmed setup page as a post-auth destination', () => {
+    expect(sanitizeInternalRedirect('/auth/confirmed')).toBe('/auth/confirmed');
+  });
+
   it('falls back safely when redirect is missing', () => {
     expect(sanitizeInternalRedirect(null)).toBe('/dashboard');
     expect(sanitizeInternalRedirect('', '/settings')).toBe('/settings');

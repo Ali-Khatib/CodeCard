@@ -19,14 +19,21 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/**", "exp://localhost:8081/**"]
+additional_redirect_urls = [
+  "http://localhost:3000/**",
+  "exp://localhost:8081/**",
+  "https://codecard-mvp.vercel.app/**",
+  "https://codecard-mvp-*.vercel.app/**",
+]
+# Access token lifetime: 1 hour. Client auto-refreshes so users stay signed in.
 jwt_expiry = 3600
 enable_signup = true
 
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+# Staging/MVP: keep email confirmations on for signup → /auth/confirmed flow.
+enable_confirmations = true
 
 [storage]
 enabled = true
