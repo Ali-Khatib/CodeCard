@@ -6,10 +6,9 @@ import { useEffect, useState } from 'react';
 import { CountUp } from '@/components/landing/count-up';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { ProfileEditor } from '@/components/profile-editor';
-import { DashboardProfileHeader } from '@/components/dashboard/dashboard-profile-header';
+import { ProfileVisitorPreview } from '@/components/dashboard/profile-visitor-preview';
 import { ProfileCompletionIndicator } from '@/components/dashboard/profile-completion-indicator';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
-import { profileToPortfolioCreator } from '@/lib/dashboard/portfolio';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
@@ -42,23 +41,12 @@ export function DashboardProfileView({
     setAvatarUrl(profile.avatar_url);
   }, [profile.avatar_url]);
 
-  const creator = profileToPortfolioCreator(
-    {
-      display_name: profile.display_name,
-      headline: profile.headline,
-      avatar_url: avatarUrl,
-      slug: profile.slug,
-      location: profile.location,
-    },
-    links,
-  );
-
   return (
     <div className="cc-app-page cc-app-page--1120">
       <PageHeader
         eyebrow="Profile"
         title="Public identity"
-        description="Edit the information visitors see on your CodeCard."
+        description="Edit what visitors see when they open your shared link or scan your QR."
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
@@ -142,19 +130,24 @@ export function DashboardProfileView({
 
         <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
           <AppCard>
-            <AppMono>Live preview</AppMono>
-            <div className="mt-4 rounded-[16px] border border-[var(--app-border)] p-4">
-              <DashboardProfileHeader creator={creator} profileSlug={profile.slug} embedded />
-            </div>
+            <ProfileVisitorPreview
+              displayName={profile.display_name}
+              headline={profile.headline}
+              bio={profile.bio}
+              location={profile.location}
+              avatarUrl={avatarUrl}
+              slug={profile.slug}
+              isPublic={profile.is_public === true}
+              links={links}
+            />
           </AppCard>
 
           <AppCard>
             <AppMono>Share tools</AppMono>
             <p className="mt-3 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-              Use Home for the real QR preview, PNG download, Copy public link, and Share profile
-              (where your browser supports it). Wallet and NFC are not available in the MVP.
+              QR preview, PNG download, and Share profile live on Home next to Copy public link.
             </p>
-            <AppButton variant="ghost" className="mt-4" href="/dashboard">
+            <AppButton variant="ghost" className="mt-4" href="/dashboard#share">
               Open Home share tools
             </AppButton>
           </AppCard>

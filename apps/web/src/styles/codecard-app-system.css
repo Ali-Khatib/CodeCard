@@ -3454,6 +3454,15 @@ html.dark .cc-reactive-border:hover {
   border-color: var(--app-iris);
 }
 
+.cc-profile-visitor-preview__card {
+  border-radius: 18px;
+  border: 1px solid var(--app-border);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--app-iris) 8%, var(--app-paper)) 0%, var(--app-paper) 48%, var(--app-bone) 100%);
+  padding: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
 .cc-profile-next-card {
   border: 1px solid rgba(252, 224, 238, 0.8);
 }
