@@ -121,8 +121,3 @@ export function normalizeResearchPaper(
       .filter((figure) => Boolean(figure.imageUrl)),
   };
 }
-
-export function estimateReadTimeSeconds(paper: Pick<ResearchPaper, 'abstract' | 'citationText'>) {
-  const words = `${paper.abstract ?? ''} ${paper.citationText ?? ''}`.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(45, Math.round((words / 220) * 60));
-}

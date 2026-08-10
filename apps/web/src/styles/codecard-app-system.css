@@ -2524,6 +2524,8 @@ html.dark .cc-project-nav-btn svg,
 
 /* ?? Project stack cards ?? */
 .cc-app-project-card {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border-radius: var(--app-radius-large);
   border: 1px solid var(--app-border);
@@ -2538,7 +2540,9 @@ html.dark .cc-project-nav-btn svg,
 .cc-app-project-card__media {
   position: relative;
   width: 100%;
-  height: clamp(260px, 42vw, 480px);
+  /* Cap media so media + identity footer fit in one viewport scroll */
+  height: clamp(180px, min(36vw, 42dvh), 340px);
+  flex: 0 0 auto;
   overflow: hidden;
   background: var(--app-bone);
 }
@@ -3648,6 +3652,19 @@ html.dark .cc-reactive-border:hover {
   perspective: 1200px;
 }
 
+/* One project square per scroll gesture on mobile */
+@media (max-width: 767px) {
+  html:has(.cc-project-stack),
+  html:has(.cc-public-profile .cc-app-project-card) {
+    scroll-snap-type: y proximity;
+  }
+
+  .cc-project-stack .cc-project-hover-card {
+    scroll-snap-align: start;
+    scroll-margin-block: 12px;
+  }
+}
+
 .cc-projects-view-toggle {
   display: inline-flex;
   align-items: center;
@@ -4008,6 +4025,7 @@ html.dark .cc-share-qr-pattern__scan {
   position: relative;
   aspect-ratio: 16 / 10;
   width: 100%;
+  max-height: min(48dvh, 380px);
   overflow: hidden;
   border-radius: 16px;
   background: var(--app-bone);
@@ -4133,13 +4151,79 @@ html.dark .cc-share-qr-pattern__scan {
 }
 
 .cc-project-row {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 100%;
+  min-height: 0;
   padding-bottom: 0;
 }
 
 .cc-project-row__body {
+  flex: 0 0 auto;
   padding-top: 20px;
+}
+
+@media (max-width: 767px) {
+  .cc-project-hover-card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+
+  .cc-project-row {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .cc-project-hover-card__media {
+    flex: 0 1 auto;
+    min-height: 140px;
+    max-height: min(40dvh, 280px);
+    aspect-ratio: 16 / 10;
+  }
+
+  .cc-project-hover-card__body,
+  .cc-project-row__body {
+    padding-top: 12px;
+  }
+
+  .cc-project-hover-card .cc-work-title--compact {
+    font-size: clamp(1.35rem, 6.2vw, 1.85rem);
+  }
+
+  .cc-project-hover-card__tagline {
+    margin-top: 6px !important;
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+  }
+
+  .cc-project-hover-card__stats {
+    margin-top: 8px !important;
+  }
+
+  .cc-project-hover-card .cc-project-card-actions {
+    margin-top: 12px !important;
+    gap: 8px !important;
+  }
+
+  .cc-app-project-card {
+    scroll-snap-align: start;
+    scroll-margin-block: 12px;
+  }
+
+  .cc-app-project-card__media {
+    height: min(38dvh, 240px);
+  }
+
+  .cc-app-project-card__body {
+    padding: 16px;
+  }
+
+  .cc-app-project-card .cc-work-title {
+    font-size: clamp(1.55rem, 7vw, 2.15rem);
+  }
 }
 
 html.dark .cc-project-hover-card:hover {

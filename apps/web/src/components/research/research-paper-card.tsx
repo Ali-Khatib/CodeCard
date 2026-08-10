@@ -4,19 +4,12 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'motion/react';
 import { HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
-import { estimateReadTimeSeconds } from '@/lib/research/research';
 import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
 import { AppReveal } from '@/components/ui/app-reveal';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
 import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
 import { trackResearchEvent } from './research-analytics';
-
-function formatReadTime(seconds?: number) {
-  const sec = seconds ?? 0;
-  const min = Math.max(1, Math.round(sec / 60));
-  return `${min} min read`;
-}
 
 function abstractPreview(abstract: string | null) {
   if (!abstract) return 'Research abstract coming soon.';
@@ -35,7 +28,6 @@ export function ResearchPaperCard({
   delay?: number;
 }) {
   const reduced = useReducedMotion();
-  const readTime = paper.avgReadTimeSec ?? estimateReadTimeSeconds(paper);
 
   return (
     <AppReveal delay={delay}>
@@ -109,14 +101,11 @@ export function ResearchPaperCard({
             </div>
           )}
 
-          <p className="mt-4 text-[14px] text-[var(--app-smoke)]">
-            {paper.downloadCount != null && (
-              <>
-                <strong className="font-medium text-[var(--app-ink)]">{paper.downloadCount}</strong> downloads ·{' '}
-              </>
-            )}
-            <strong className="font-medium text-[var(--app-ink)]">{formatReadTime(readTime)}</strong>
-          </p>
+          {paper.downloadCount != null ? (
+            <p className="mt-4 text-[14px] text-[var(--app-smoke)]">
+              <strong className="font-medium text-[var(--app-ink)]">{paper.downloadCount}</strong> downloads
+            </p>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap gap-2">
             <ContentOpeningLink
