@@ -461,13 +461,23 @@
 }
 
 @media (max-width: 900px) {
+  /* More scroll distance per chapter so jumps feel paced, not instant */
+  .fx {
+    --fx-section-length: 160vh;
+  }
+
+  .fx-header {
+    padding-top: 3.25vh;
+    font-size: clamp(0.95rem, 3.6vw, 1.15rem);
+  }
+
   .fx-content,
   .fx--no-right .fx-content {
     grid-template-columns: 1fr;
-    row-gap: 2vh;
-    place-items: start center;
-    padding-top: 16vh;
-    padding-bottom: 18vh;
+    row-gap: 1vh;
+    place-items: start stretch;
+    padding-top: 11vh;
+    padding-bottom: 14vh;
   }
 
   .fx-left,
@@ -479,28 +489,67 @@
 
   .fx-left,
   .fx-right {
-    justify-items: start;
+    justify-items: stretch;
     max-height: none;
+    overflow: visible;
   }
 
-  .fx-left .fx-track,
-  .fx-right .fx-track {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.85rem;
+  .fx-right {
+    display: none;
+  }
+
+  /* Equal-width 5-up rail — never wraps Analytics onto its own line */
+  .fx-left .fx-track {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.3rem;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
     transform: none !important;
+    padding: 0;
+    mask-image: none;
   }
 
   .fx-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0;
-    font-size: 0.875rem;
+    min-width: 0;
+    width: 100%;
+    font-size: clamp(0.62rem, 2.7vw, 0.75rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.45rem 0.2rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--fx-text) 10%, transparent);
+    opacity: 0.55;
+    text-align: center;
+  }
+
+  .fx-item__full {
+    display: none;
+  }
+
+  .fx-item__short {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .fx-left-item.active,
   .fx-right-item.active {
-    transform: none;
-    padding-left: 0;
-    padding-right: 0;
+    transform: none !important;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    background: color-mix(in srgb, var(--fx-accent) 34%, transparent);
+    opacity: 1 !important;
   }
 
   .fx-left-item.active::before,
@@ -516,16 +565,43 @@
     display: none;
   }
 
+  .fx-story__kicker {
+    font-size: 0.68rem;
+  }
+
   .fx-story__title {
-    font-size: clamp(2.1rem, 9vw, 3rem);
+    margin-top: 0.45rem;
+    font-size: clamp(1.65rem, 7.5vw, 2.35rem);
   }
 
   .fx-story__lead {
-    font-size: clamp(1.4rem, 4.8vw, 1.75rem);
+    margin-top: 0.75rem;
+    font-size: clamp(1rem, 3.6vw, 1.2rem);
+    line-height: 1.4;
     white-space: normal;
   }
 
+  .fx-story__points {
+    margin-top: 0.9rem;
+    gap: 0.55rem;
+  }
+
   .fx-story__points li {
-    font-size: clamp(1.25rem, 4.2vw, 1.45rem);
+    font-size: clamp(0.92rem, 3.2vw, 1.08rem);
+    line-height: 1.4;
+  }
+
+  .fx-footer {
+    padding-bottom: 3.5vh;
+  }
+}
+
+@media (min-width: 901px) {
+  .fx-item__short {
+    display: none;
+  }
+
+  .fx-item__full {
+    display: inline;
   }
 }

@@ -28,6 +28,9 @@ const NAV_ITEMS = [
   { segment: 'settings', label: 'Settings', icon: 'settings' as const },
 ] as const;
 
+/** Marketing iframe bottom nav — five icons that fit one phone row with no scroll jump. */
+const EMBED_NAV_SEGMENTS = new Set(['', 'projects', 'research', 'connections', 'circle']);
+
 const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}`;
 
 const PAGE_TITLES: Record<string, string> = {
@@ -101,16 +104,23 @@ export function DashboardShell({
 
   useEffect(() => {
     try {
-      setEmbedded(window.self !== window.top);
+      const inIframe = window.self !== window.top;
+      const embedParam = new URLSearchParams(window.location.search).get('embed') === '1';
+      setEmbedded(inIframe || embedParam);
     } catch {
       setEmbedded(true);
     }
   }, []);
 
   useEffect(() => {
+    if (embedded) {
+      // Marketing iframe: sidebar is unused on phone and the toggle clips the chrome.
+      setSidebarOpen(false);
+      return;
+    }
     const stored = localStorage.getItem('cc-sidebar-open');
     if (stored === '0') setSidebarOpen(false);
-  }, []);
+  }, [embedded]);
 
   useEffect(() => {
     applyDarkMode(readDarkPreference());
@@ -254,19 +264,21 @@ export function DashboardShell({
     <MutationFeedbackProvider>
     <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref && !embedded ? 'cc-app-root--route-pending' : ''} ${embedded ? 'cc-app-root--embedded' : ''}`}>
       {pendingHref && !embedded && <div className="cc-app-route-progress" aria-hidden />}
-      <button
-        type="button"
-        className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed hidden md:inline-flex"
-        onClick={toggleSidebar}
-        aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
-        aria-expanded={sidebarOpen}
-      >
-        <span className="cc-app-sidebar-toggle__card" aria-hidden>
-          <span />
-          <span />
-        </span>
-        <span className="cc-app-sidebar-toggle__chevron" aria-hidden />
-      </button>
+      {!embedded ? (
+        <button
+          type="button"
+          className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed"
+          onClick={toggleSidebar}
+          aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+          aria-expanded={sidebarOpen}
+        >
+          <span className="cc-app-sidebar-toggle__card" aria-hidden>
+            <span />
+            <span />
+          </span>
+          <span className="cc-app-sidebar-toggle__chevron" aria-hidden />
+        </button>
+      ) : null}
 
       <aside className={`cc-app-sidebar ${sidebarOpen ? 'cc-app-sidebar--open' : ''}`}>
         <div className="cc-app-sidebar__head">
@@ -334,15 +346,35 @@ export function DashboardShell({
 
       <div className="cc-app-main">
         <header className="cc-app-topbar">
-          <div className="cc-app-mobile-theme-toggle md:hidden">
-            <ThemeToggle />
-          </div>
-          <h1 className="cc-app-topbar-title min-w-0 break-words text-[18px] font-medium text-[var(--app-ink)]">{pageTitle}</h1>
+          {!embedded ? (
+            <div className="cc-app-mobile-theme-toggle md:hidden">
+              <ThemeToggle />
+            </div>
+          ) : null}
+          <h1 className="cc-app-topbar-title min-w-0 break-words text-[18px] font-medium text-[var(--app-ink)]">
+            {embedded ? 'Live demo' : pageTitle}
+          </h1>
           <div className="flex-1" />
-          <DashboardNotifications basePath={basePath} />
-          <AppButton variant="primary" className="cc-app-topbar-cta shrink-0" href={`${basePath}/projects/new`}>
-            Create project
-          </AppButton>
+          {!embedded ? <DashboardNotifications basePath={basePath} /> : null}
+          {!embedded ? (
+            <AppButton
+              variant="primary"
+              className="cc-app-topbar-cta shrink-0"
+              href={`${basePath}/projects/new`}
+              ariaLabel="Create project"
+            >
+              Create project
+            </AppButton>
+          ) : (
+            <AppButton
+              variant="primary"
+              className="cc-app-topbar-cta shrink-0"
+              href={DEMO_SIGN_IN_HREF}
+              ariaLabel="Sign in to CodeCard"
+            >
+              Sign in
+            </AppButton>
+          )}
           <div className="relative">
             <button
               type="button"
@@ -430,7 +462,10 @@ export function DashboardShell({
       </div>
 
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
-        {NAV_ITEMS.map((item) => {
+        {(embedded
+          ? NAV_ITEMS.filter((item) => EMBED_NAV_SEGMENTS.has(item.segment))
+          : NAV_ITEMS
+        ).map((item) => {
           const href = hrefFor(item.segment);
           const active = isActive(item.segment);
           const pending = pendingHref === href;
@@ -442,7 +477,9 @@ export function DashboardShell({
               onClick={() => markPending(href)}
               className={`cc-app-mobile-nav__link ${
                 active ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
-              } ${pending ? 'cc-app-mobile-nav__link--pending' : ''}`}
+              } ${pending ? 'cc-app-mobile-nav__link--pending' : ''} ${
+                embedded ? 'cc-app-mobile-nav__link--embed' : ''
+              }`}
               aria-current={active ? 'page' : undefined}
               aria-busy={pending}
               aria-label={

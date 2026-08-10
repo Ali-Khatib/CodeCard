@@ -84,6 +84,15 @@ const STORIES: WalkStory[] = [
   },
 ];
 
+/** Short labels for the mobile equal-width chapter rail (must stay one row). */
+const MOBILE_LABELS: Record<string, string> = {
+  projects: 'Projects',
+  research: 'Research',
+  connections: 'Connect',
+  circle: 'Circle',
+  analytics: 'Stats',
+};
+
 function StoryContent({ story, index }: { story: WalkStory; index: number }) {
   return (
     <>
@@ -104,6 +113,7 @@ function StoryContent({ story, index }: { story: WalkStory; index: number }) {
 const SECTIONS: FullScreenFXSection[] = STORIES.map((story, index) => ({
   id: story.id,
   leftLabel: story.label,
+  leftLabelShort: MOBILE_LABELS[story.id] ?? story.label,
   background: story.background,
   content: <StoryContent story={story} index={index} />,
 }));
@@ -143,7 +153,7 @@ export function EditorialFeatureWalkthrough() {
           showProgress
           showEnd={false}
           bgTransition="fade"
-          durations={{ change: 0.7, snap: 850 }}
+          durations={{ change: 1.05, snap: 1400 }}
           colors={{
             text: 'rgba(245, 243, 240, 0.95)',
             overlay: 'rgba(32, 32, 36, 0.22)',

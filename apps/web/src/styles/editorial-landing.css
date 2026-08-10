@@ -1247,6 +1247,31 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   background: var(--ed-page);
 }
 
+@media (max-width: 767px) {
+  .cc-ed-demo-embed {
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    padding-bottom: clamp(2.75rem, 8vh, 4.5rem);
+  }
+
+  .cc-ed-demo-embed__intro {
+    margin-bottom: clamp(1.25rem, 3vh, 2rem);
+  }
+
+  .cc-ed-demo-embed__chrome {
+    width: 100%;
+    padding: 0;
+    border-radius: 20px;
+    /* Give the workspace real room — stop crushing desktop chrome into a postcard */
+    height: min(78vh, 720px);
+    min-height: 560px;
+    box-shadow: 0 18px 48px rgba(35, 35, 36, 0.12);
+  }
+
+  .cc-ed-demo-embed__frame {
+    border-radius: 20px;
+  }
+}
+
 .cc-ed-demo-embed__frame--placeholder {
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--ed-iris) 8%, var(--ed-page)), var(--ed-page));

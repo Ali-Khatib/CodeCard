@@ -152,7 +152,7 @@ export function DashboardOverviewView({
           <ProfileShareHero
             profileSlug={profileSlug}
             profileId={profile?.id}
-            isPublic={profile?.is_public ?? true}
+            isPublic={isProfilePublic}
             displayName={displayName}
           />
         </section>
