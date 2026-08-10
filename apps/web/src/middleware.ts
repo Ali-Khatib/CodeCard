@@ -1,12 +1,23 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import {
+  buildAuthCallbackForwardUrl,
+  shouldForwardAuthExchangeToCallback,
+} from '@/lib/auth/auth-link-forward';
 import { isAuthConfigured } from '@/lib/auth/configured';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Recovery / confirm links that fall back to Site URL (`/`) still carry `code`
+  // or `token_hash`. Forward before any session gate so `/reset-password` works.
+  if (shouldForwardAuthExchangeToCallback(pathname, searchParams)) {
+    return NextResponse.redirect(buildAuthCallbackForwardUrl(request));
+  }
+
   const isPreviewDashboard = pathname.startsWith('/dashboard/preview');
   const isAuthRoute =
     pathname.startsWith('/sign-in') ||
@@ -15,6 +26,12 @@ export async function middleware(request: NextRequest) {
   const isResetPasswordRoute = pathname.startsWith('/reset-password');
   const isDashboard = pathname.startsWith('/dashboard');
   const isAdmin = pathname.startsWith('/admin');
+  const needsSessionGate =
+    isPreviewDashboard || isAuthRoute || isResetPasswordRoute || isDashboard || isAdmin;
+
+  if (!needsSessionGate) {
+    return NextResponse.next();
+  }
 
   if (isPreviewDashboard) {
     const requestHeaders = new Headers(request.headers);
@@ -92,11 +109,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
+    '/landing',
     '/dashboard/:path*',
     '/admin/:path*',
     '/sign-in',
     '/sign-up',
     '/forgot-password',
     '/reset-password',
+    '/auth/confirmed',
   ],
 };

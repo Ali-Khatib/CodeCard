@@ -14,8 +14,21 @@ describe('resolveOAuthCallback', () => {
     const result = resolveOAuthCallback(params, { authConfigured: true });
     expect(result).toEqual({
       kind: 'success',
+      method: 'code',
       code: 'safe-code',
       redirectPath: '/dashboard?tab=projects',
+    });
+  });
+
+  it('accepts recovery token_hash and defaults redirect to reset-password', () => {
+    const params = new URLSearchParams('token_hash=recovery-hash&type=recovery');
+    const result = resolveOAuthCallback(params, { authConfigured: true });
+    expect(result).toEqual({
+      kind: 'success',
+      method: 'token_hash',
+      tokenHash: 'recovery-hash',
+      otpType: 'recovery',
+      redirectPath: '/reset-password',
     });
   });
 
@@ -53,6 +66,7 @@ describe('resolveOAuthCallback', () => {
     const result = resolveOAuthCallback(params, { authConfigured: true });
     expect(result.kind === 'success' || result.kind === 'error').toBe(true);
     if (result.kind === 'success') {
+      expect(result.method).toBe('code');
       expect(result.redirectPath).toBe('/dashboard');
     } else {
       expect(result.redirectPath).toBe('/dashboard');

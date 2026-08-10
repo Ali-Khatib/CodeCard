@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { EmailOtpType } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { isAuthConfigured } from '@/lib/auth/configured';
 import {
@@ -23,7 +24,13 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(resolution.code);
+    const { error } =
+      resolution.method === 'token_hash'
+        ? await supabase.auth.verifyOtp({
+            token_hash: resolution.tokenHash,
+            type: resolution.otpType as EmailOtpType,
+          })
+        : await supabase.auth.exchangeCodeForSession(resolution.code);
 
     if (error) {
       const reason = classifyCodeExchangeError(error.message);
