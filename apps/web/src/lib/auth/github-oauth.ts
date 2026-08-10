@@ -1,6 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
-import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 export const GITHUB_PROVIDER_DISABLED_MESSAGE =
   'GitHub sign-in is not enabled yet. Use email for now, or ask the project owner to turn on GitHub under Supabase → Authentication → Providers.';
@@ -16,53 +15,29 @@ type StartGithubOAuthResult =
   | { ok: false; message: string };
 
 /**
- * Starts GitHub OAuth with a server preflight so a disabled provider
- * shows an in-app error instead of a raw Supabase JSON page.
+ * Starts GitHub OAuth with the browser-native Supabase redirect.
+ * No server preflight — that was aborting healthy authorize flows.
  */
 export async function startGithubOAuth({
   supabase,
   redirectPath = '/dashboard',
 }: StartGithubOAuthArgs): Promise<StartGithubOAuthResult> {
-  const { data, error } = await withAuthNetworkRetry(() =>
-    supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: authCallbackRedirectUrl(redirectPath),
-        skipBrowserRedirect: true,
-      },
-    }),
-  );
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: {
+      redirectTo: authCallbackRedirectUrl(redirectPath),
+      skipBrowserRedirect: false,
+    },
+  });
 
   if (error) {
     return { ok: false, message: error.message };
   }
 
-  const authorizeUrl = data.url;
-  if (!authorizeUrl) {
+  // With skipBrowserRedirect: false, Supabase navigates immediately when a URL exists.
+  if (!data.url) {
     return { ok: false, message: 'oauth_missing_url' };
   }
 
-  try {
-    const preflight = await fetch('/api/auth/oauth-preflight', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: authorizeUrl }),
-    });
-    const payload = (await preflight.json()) as {
-      ok?: boolean;
-      reason?: string;
-    };
-
-    if (!payload.ok) {
-      if (payload.reason === 'provider_disabled') {
-        return { ok: false, message: 'provider is not enabled' };
-      }
-      return { ok: false, message: payload.reason ?? 'oauth_failed' };
-    }
-  } catch {
-    // If preflight is unreachable, fall through to the normal redirect.
-  }
-
-  window.location.assign(authorizeUrl);
   return { ok: true };
 }

@@ -7,6 +7,7 @@ export function createClient() {
     getSupabasePublicKey()!,
     {
       auth: {
+        flowType: 'pkce',
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,

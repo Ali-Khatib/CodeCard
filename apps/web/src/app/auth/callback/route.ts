@@ -21,16 +21,25 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(resolution.code);
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(resolution.code);
 
-  if (error) {
-    const reason = classifyCodeExchangeError(error.message);
+    if (error) {
+      const reason = classifyCodeExchangeError(error.message);
+      logOAuthCallbackFailure(reason);
+      return NextResponse.redirect(
+        buildAuthErrorUrl(origin, reason, resolution.redirectPath),
+      );
+    }
+
+    return NextResponse.redirect(`${origin}${resolution.redirectPath}`);
+  } catch (caught) {
+    const message = caught instanceof Error ? caught.message : 'exchange_failed';
+    const reason = classifyCodeExchangeError(message);
     logOAuthCallbackFailure(reason);
     return NextResponse.redirect(
       buildAuthErrorUrl(origin, reason, resolution.redirectPath),
     );
   }
-
-  return NextResponse.redirect(`${origin}${resolution.redirectPath}`);
 }

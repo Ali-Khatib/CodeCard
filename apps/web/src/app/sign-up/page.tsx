@@ -17,7 +17,6 @@ import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
 import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
-import { assertSupabaseAuthReachable } from '@/lib/auth/assert-supabase-reachable';
 import {
   SIGNUP_CONFIRMATION_TITLE,
   resolveSignUpOutcome,
@@ -84,11 +83,12 @@ function SignUpForm() {
 
     try {
       const supabase = createClient();
-      await withAuthNetworkRetry(() => assertSupabaseAuthReachable());
-      const result = await startGithubOAuth({
-        supabase,
-        redirectPath: '/dashboard',
-      });
+      const result = await withAuthNetworkRetry(() =>
+        startGithubOAuth({
+          supabase,
+          redirectPath: '/dashboard',
+        }),
+      );
 
       if (!result.ok) {
         setError(mapAuthFormError(result.message, 'sign-up'));
@@ -139,7 +139,6 @@ function SignUpForm() {
       }
 
       const supabase = createClient();
-      await withAuthNetworkRetry(() => assertSupabaseAuthReachable());
       const { data, error: authError } = await withAuthNetworkRetry(() =>
         supabase.auth.signUp({
           email: parsed.data.email,
