@@ -67,6 +67,28 @@ html.dark .cc-app-topbar {
   background: rgba(26, 25, 28, 0.92);
 }
 
+html.dark .cc-app-content {
+  background: var(--app-paper);
+}
+
+html.dark .cc-app-sidebar {
+  border-right-color: var(--app-border-strong);
+  background: var(--app-bone);
+  box-shadow: none;
+  scrollbar-color: color-mix(in srgb, var(--app-iris) 35%, transparent) transparent;
+}
+
+html.dark .cc-app-card:not(.cc-reactive-border) {
+  background: var(--app-paper);
+  border-color: var(--app-border);
+  box-shadow: none;
+}
+
+html.dark .cc-app-card:not(.cc-reactive-border):hover {
+  border-color: var(--app-border-strong);
+  box-shadow: none;
+}
+
 html.dark .cc-app-sidebar-toggle {
   background:
     linear-gradient(135deg, rgba(42, 40, 46, 0.92), rgba(18, 17, 20, 0.86)),
@@ -99,15 +121,17 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   width: var(--app-sidebar-width);
   height: 100dvh;
   flex-direction: column;
-  border-right: 2px solid var(--app-border-strong);
-  background: var(--app-bone);
+  border-right: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-paper) 55%, var(--app-bone)), var(--app-bone));
   padding: 20px 16px 20px 20px;
   transition: transform var(--app-slide-duration) var(--app-slide-ease);
   will-change: transform;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--app-iris) 35%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--app-ink) 22%, transparent) transparent;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.45);
 }
 
 .cc-app-sidebar::-webkit-scrollbar {
@@ -206,7 +230,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   position: fixed;
   top: 20px;
   left: calc(var(--app-sidebar-width) - 18px);
-  z-index: 55;
+  z-index: 70;
 }
 
 @media (min-width: 768px) {
@@ -216,7 +240,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle--fixed {
-  left: 0;
+  left: 12px;
 }
 
 .cc-app-sidebar-toggle:hover {
@@ -293,10 +317,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid var(--app-border);
-  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  background: color-mix(in srgb, var(--app-paper) 82%, transparent);
   padding: 16px 40px;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
 }
 
 @media (min-width: 768px) {
@@ -308,6 +333,9 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-app-content {
   position: relative;
   padding: 32px 40px 64px;
+  background:
+    radial-gradient(1100px 380px at 8% -8%, color-mix(in srgb, var(--app-iris) 9%, transparent), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--app-bone) 48%, var(--app-paper)), var(--app-paper));
 }
 
 .cc-app-page {
@@ -416,13 +444,20 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-card:not(.cc-reactive-border) {
-  border: 1px solid var(--app-border);
-  background: var(--app-paper);
-  transition: border-color 0.28s ease, background 0.28s ease;
+  border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--app-paper) 96%, transparent), color-mix(in srgb, var(--app-bone) 35%, var(--app-paper)));
+  box-shadow:
+    0 12px 32px rgba(34, 34, 34, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
 }
 
 .cc-app-card:not(.cc-reactive-border):hover {
-  border-color: var(--app-border-strong);
+  border-color: color-mix(in srgb, var(--app-ink) 16%, transparent);
+  box-shadow:
+    0 16px 36px rgba(34, 34, 34, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .cc-reactive-border.cc-app-card--blush {
@@ -727,7 +762,7 @@ button.cc-app-nav-link:focus-visible {
   right: 0;
   height: 40px;
   border-radius: var(--app-radius-pill);
-  background: var(--app-rose-mist);
+  background: color-mix(in srgb, var(--app-ink) 6%, var(--app-bone));
   pointer-events: none;
   opacity: 0;
   transform: translateY(0);
@@ -770,15 +805,11 @@ button.cc-app-nav-link:focus-visible {
 .cc-app-nav-link--active {
   background: transparent;
   color: var(--app-ink);
+  font-weight: 600;
 }
 
 .cc-app-nav-link--active::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--app-iris);
-  flex-shrink: 0;
+  content: none;
 }
 
 .cc-app-nav-link:active:not(.cc-app-nav-link--pending) {
@@ -788,11 +819,11 @@ button.cc-app-nav-link:focus-visible {
 .cc-app-nav-link--pending,
 .cc-app-mobile-nav__link--pending {
   position: relative;
-  color: var(--app-iris) !important;
+  color: var(--app-ink) !important;
 }
 
 .cc-app-nav-link--pending {
-  background: rgba(192, 148, 228, 0.12);
+  background: color-mix(in srgb, var(--app-ink) 6%, var(--app-bone));
 }
 
 .cc-app-nav-link--pending::after,
@@ -801,7 +832,7 @@ button.cc-app-nav-link:focus-visible {
   position: absolute;
   inset: 6px;
   border-radius: inherit;
-  border: 1px solid rgba(192, 148, 228, 0.32);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 14%, transparent);
   animation: cc-route-pending-pulse 0.9s ease-in-out infinite alternate;
   pointer-events: none;
 }
@@ -990,12 +1021,16 @@ button.cc-app-nav-link:focus-visible {
   flex-wrap: nowrap;
   gap: 6px;
   border-radius: var(--app-radius-pill);
-  border: 1px solid var(--app-border);
-  background: var(--app-paper);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--app-paper) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
   padding: 4px;
   max-width: 100%;
   overflow-x: auto;
-  box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
+  box-shadow:
+    0 8px 20px rgba(34, 34, 34, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -1580,7 +1615,7 @@ html.dark .cc-project-nav-btn svg,
 .cc-app-root--embedded {
   position: relative;
   min-height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-app-root--embedded .cc-app-sidebar {
@@ -1590,6 +1625,8 @@ html.dark .cc-project-nav-btn svg,
 
 .cc-app-root--embedded .cc-app-sidebar-toggle--fixed {
   position: absolute;
+  z-index: 80;
+  display: inline-flex;
 }
 
 .cc-app-root--embedded .cc-app-main {
@@ -1701,23 +1738,23 @@ html.dark .cc-project-nav-btn svg,
   .cc-app-filter-bar {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: clamp(1px, 0.55vw, 3px);
-    overflow-x: visible;
+    justify-content: flex-start;
+    gap: 2px;
+    overflow-x: auto;
     white-space: nowrap;
     width: 100%;
     max-width: 100%;
-    padding: clamp(3px, 1vw, 6px);
+    padding: 3px;
   }
 
   .cc-app-filter-pill {
     flex: 0 0 auto;
-    min-width: 44px;
-    min-height: 44px !important;
-    height: 44px !important;
-    padding-inline: clamp(10px, 1.15vw, 14px);
-    font-size: clamp(12px, 2.85vw, 13px);
-    font-weight: 700;
+    min-width: 0;
+    min-height: 36px !important;
+    height: 36px !important;
+    padding-inline: clamp(8px, 1.8vw, 11px);
+    font-size: clamp(10px, 2.4vw, 11.5px);
+    font-weight: 650;
     letter-spacing: -0.02em;
     color: color-mix(in srgb, var(--app-ink) 82%, transparent);
   }
@@ -1770,16 +1807,15 @@ html.dark .cc-project-nav-btn svg,
     right: 0;
     z-index: 50;
     display: flex;
-    gap: 4px;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
+    gap: 0;
+    justify-content: space-between;
+    align-items: stretch;
+    overflow-x: hidden;
     border-top: 1px solid var(--app-border);
-    background: var(--app-paper);
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-    scroll-padding-inline: 12px;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
+    background: color-mix(in srgb, var(--app-paper) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
   }
 
   .cc-app-mobile-nav::-webkit-scrollbar {
@@ -1792,19 +1828,30 @@ html.dark .cc-project-nav-btn svg,
 
   .cc-app-mobile-nav__link {
     display: flex;
-    min-width: 68px;
+    min-width: 0;
     min-height: 44px;
-    flex: 0 0 auto;
+    flex: 1 1 0;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    scroll-snap-align: center;
-    border-radius: 14px;
-    padding: 6px 8px;
-    font-size: 10px;
-    line-height: 1.1;
+    gap: 1px;
+    border-radius: 10px;
+    padding: 4px 2px;
+    font-size: 9px;
+    line-height: 1.05;
     white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cc-app-mobile-nav__link svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cc-app-mobile-nav__link > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -1864,11 +1911,11 @@ html.dark .cc-project-nav-btn svg,
     width: 30px;
   }
 
-  .cc-connections-results-section {
+  .cc-connections-followups-section {
     order: 1;
   }
 
-  .cc-connections-followups-section {
+  .cc-connections-results-section {
     order: 2;
   }
 
@@ -2016,8 +2063,14 @@ html.dark .cc-project-nav-btn svg,
   padding: 16px;
   text-align: left;
   border-radius: 18px;
-  border: 1.5px solid var(--app-border-strong);
-  background: var(--app-paper);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--app-paper) 90%, transparent), color-mix(in srgb, var(--app-bone) 65%, transparent));
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  box-shadow:
+    0 10px 28px rgba(34, 34, 34, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -2263,9 +2316,14 @@ html.dark .cc-project-nav-btn svg,
   overflow: hidden;
   height: 100%;
   border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48)),
-    var(--app-paper);
+    linear-gradient(160deg, color-mix(in srgb, var(--app-paper) 90%, transparent), color-mix(in srgb, var(--app-bone) 60%, transparent));
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  box-shadow:
+    0 10px 28px rgba(34, 34, 34, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .cc-connection-grid-card.cc-reactive-border {

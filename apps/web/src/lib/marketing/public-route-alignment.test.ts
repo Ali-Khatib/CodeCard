@@ -90,10 +90,13 @@ describe('workspace-first public route alignment', () => {
     expect(resolveVisitorConversionRoute({ pathname: '/dashboard/preview' })).toBeNull();
   });
 
-  it('does not force authenticated users away from marketing via middleware matcher', () => {
+  it('allows Site URL auth-code forwarding on / without forcing marketers off the landing', () => {
     const middleware = read('src/middleware.ts');
     expect(middleware).toContain("'/dashboard/:path*'");
-    expect(middleware).not.toMatch(/matcher:[\s\S]*'\/'/);
-    expect(middleware).not.toMatch(/pathname === '\/'/);
+    expect(middleware).toContain("'/'");
+    expect(middleware).toContain('shouldForwardAuthExchangeToCallback');
+    // Signed-in users are only bounced from auth forms, not from marketing `/`.
+    expect(middleware).toContain('isAuthRoute && user');
+    expect(middleware).not.toMatch(/if\s*\(\s*pathname\s*===\s*'\/'\s*&&\s*user/);
   });
 });

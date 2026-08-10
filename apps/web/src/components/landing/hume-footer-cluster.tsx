@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
@@ -25,11 +26,14 @@ const FOOTER_LEGAL = [
  * No portrait media — statement type only above the dark bar.
  */
 export function HumeFooterCluster() {
+  const pathname = usePathname();
   const year = new Date().getFullYear();
+  // Black→cream handoff only after the editorial landing finale — not pricing/research.
+  const fromFinale = pathname === MARKETING_HOME_HREF || pathname === '/landing';
 
   return (
     <div className="cc-site-footer" data-testid="site-footer-cluster">
-      <div className="cc-site-footer__from-finale" aria-hidden />
+      {fromFinale ? <div className="cc-site-footer__from-finale" aria-hidden /> : null}
       <section
         className="cc-site-footer__statement"
         aria-labelledby="footer-statement-heading"
@@ -129,11 +133,6 @@ export function HumeFooterCluster() {
               </ul>
             </div>
           </div>
-
-          <p className="cc-site-footer__ghost" aria-hidden>
-            <span>Get</span>
-            <span>Started</span>
-          </p>
 
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>

@@ -29,9 +29,12 @@ export function publicDemoProfileBasePath(profileSlug: string): string {
  * Back target from project detail.
  * Demo persona returns to the workspace projects list so workspace → project → Back
  * never dumps visitors on the public profile page unexpectedly.
+ * Authenticated owners editing from the dashboard should pass `backHref` explicitly
+ * (e.g. `/dashboard/projects`).
  */
 export function publicDemoProfileProjectsHref(profileSlug: string): string {
   if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/projects`;
+  // Prefer the public profile projects section for visitor browsing.
   return `${publicDemoProfileBasePath(profileSlug)}#projects`;
 }
 

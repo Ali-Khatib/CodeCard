@@ -111,7 +111,7 @@ describe('Editorial product landing contract', () => {
     expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[^}]*transparent/s);
     expect(css).toContain("data-chapter='demo'");
     expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[^}]*--ed-cream/s);
-    expect(css).toMatch(/height:\s*min\(82vh,\s*860px\)/);
+    expect(css).toMatch(/height:\s*min\(52vh,\s*520px\)/);
   });
 
   it('keeps final CTA without public profile', () => {

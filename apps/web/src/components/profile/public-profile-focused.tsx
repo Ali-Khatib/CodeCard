@@ -74,6 +74,17 @@ export function PublicProfileFocused({
         tabIndex={-1}
         className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
       >
+        <div className="mb-6">
+          <Link
+            href={profileSlug === 'demo' ? '/demo' : connectionControl?.isOwnProfile ? '/dashboard' : '/'}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--app-border)] bg-[var(--app-paper)] px-3 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)]"
+          >
+            <span aria-hidden>←</span>
+            {profileSlug === 'demo' || connectionControl?.isOwnProfile
+              ? 'Back to workspace'
+              : 'Back to CodeCard'}
+          </Link>
+        </div>
         <header
           id="profile-hero"
           className="cc-app-profile-preview cc-app-profile-preview--hero cc-demo-hero-enter pb-[min(36vh,18rem)]"

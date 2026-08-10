@@ -472,20 +472,74 @@ export function DashboardSettingsView({
       <FadeInView delay={0}>
         <div className="grid gap-6 lg:grid-cols-[minmax(260px,300px)_1fr]">
           <nav className="flex flex-col gap-1.5" aria-label="Settings categories">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                type="button"
-                onClick={() => setOpenId(section.id)}
-                className={`cc-settings-nav-link ${openId === section.id ? 'cc-settings-nav-link--active' : ''}`}
-              >
-                <span className="cc-settings-nav-link__title">{section.title}</span>
-                <span className="cc-settings-nav-link__hint">{section.navHint}</span>
-              </button>
-            ))}
+            {sections.map((section) => {
+              const isOpen = openId === section.id;
+              return (
+                <div key={section.id} className="cc-settings-accordion-item">
+                  <button
+                    type="button"
+                    onClick={() => setOpenId(section.id)}
+                    aria-expanded={isOpen}
+                    className={`cc-settings-nav-link ${isOpen ? 'cc-settings-nav-link--active' : ''}`}
+                  >
+                    <span className="cc-settings-nav-link__title">{section.title}</span>
+                    <span className="cc-settings-nav-link__hint">{section.navHint}</span>
+                  </button>
+                  {isOpen ? (
+                    <div className="cc-settings-accordion-panel lg:hidden">
+                      <AppCard reactive={false} className="!mt-2 !rounded-[16px]">
+                        <AppMono>{section.eyebrow}</AppMono>
+                        <h2 className="mt-2 text-[20px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
+                          {section.title}
+                        </h2>
+                        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[var(--app-smoke)]">
+                          {section.description}
+                        </p>
+                        <ul className="mt-5 divide-y divide-[var(--app-border)]">
+                          {section.rows.map((row) => (
+                            <li
+                              key={row.label}
+                              className="flex flex-wrap items-center justify-between gap-4 py-4"
+                            >
+                              <div className="min-w-0">
+                                <span className="text-[14px] font-medium text-[var(--app-ink)]">
+                                  {row.label}
+                                </span>
+                                {row.hint ? (
+                                  <p className="mt-0.5 text-[12px] leading-snug text-[var(--app-smoke)]">
+                                    {row.hint}
+                                  </p>
+                                ) : null}
+                              </div>
+                              <RowActions
+                                row={row}
+                                live={live}
+                                email={email}
+                                deletionAuth={deletionAuth}
+                                openDeletionOnMount={openDeletionOnMount}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                        {signOutAction && section.id === 'account' ? (
+                          <form
+                            action={signOutAction}
+                            className="mt-5 border-t border-[var(--app-border)] pt-5"
+                          >
+                            <AppButton variant="ghost" type="submit">
+                              Sign out
+                            </AppButton>
+                          </form>
+                        ) : null}
+                      </AppCard>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </nav>
 
-          <AppCard reactive={false}>
+          <AppCard reactive={false} className="hidden lg:block">
             <AppMono>{active.eyebrow}</AppMono>
             <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
               {active.title}

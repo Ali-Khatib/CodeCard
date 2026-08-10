@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { DASH_NAV_ICONS } from './dashboard-nav-icons';
 import { EmailVerificationBanner } from './email-verification-banner';
@@ -16,6 +16,8 @@ import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import { createClient } from '@/lib/supabase/client';
+import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', icon: 'home' as const },
@@ -90,10 +92,12 @@ export function DashboardShell({
   circleUnreadBadge = null,
 }: DashboardShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const [embedded, setEmbedded] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
 
@@ -182,6 +186,24 @@ export function DashboardShell({
       return next;
     });
   }, []);
+
+  const handleSignOut = useCallback(async () => {
+    if (signingOut || preview) return;
+    setSigningOut(true);
+    setUserMenuOpen(false);
+    try {
+      if (isSupabasePublicKeyConfigured()) {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      }
+      router.replace('/sign-in');
+      router.refresh();
+    } catch {
+      window.location.assign('/sign-in');
+    } finally {
+      setSigningOut(false);
+    }
+  }, [preview, router, signingOut]);
 
   const hrefFor = (segment: string) => (segment ? `${basePath}/${segment}` : basePath);
 
@@ -415,13 +437,14 @@ export function DashboardShell({
                     </Link>
                   </>
                 ) : (
-                  <Link
-                    href={`${basePath}/settings`}
-                    className="block px-3 py-2 text-[14px] text-[var(--app-smoke)] hover:bg-[var(--app-bone)]"
-                    onClick={() => setUserMenuOpen(false)}
+                  <button
+                    type="button"
+                    className="block w-full px-3 py-2 text-left text-[14px] text-[var(--app-smoke)] hover:bg-[var(--app-bone)] disabled:opacity-60"
+                    onClick={() => void handleSignOut()}
+                    disabled={signingOut}
                   >
-                    Sign out
-                  </Link>
+                    {signingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
                 )}
               </div>
             )}

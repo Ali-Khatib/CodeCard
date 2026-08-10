@@ -10,14 +10,17 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 export function ResearchBubbleGrid({
   papers,
   basePath = '/dashboard',
+  readOnly = false,
 }: {
   papers: ResearchPaper[];
   basePath?: string;
+  readOnly?: boolean;
 }) {
   const reduced = useReducedMotion();
   const count = papers.length;
   const colMin =
     count <= 2 ? 'minmax(200px, 1fr)' : count === 3 ? 'minmax(160px, 1fr)' : 'minmax(140px, 1fr)';
+  const demoSignIn = `/sign-in?redirect=${encodeURIComponent('/dashboard/research')}`;
 
   return (
     <motion.div
@@ -32,7 +35,7 @@ export function ResearchBubbleGrid({
     >
       {papers.map((paper, index) => {
         const isPublished = paper.isPublished === true;
-        const editHref = `${basePath}/research/${paper.id}/edit`;
+        const editHref = readOnly ? demoSignIn : `${basePath}/research/${paper.id}/edit`;
         return (
           <motion.div
             key={paper.id}

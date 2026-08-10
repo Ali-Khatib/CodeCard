@@ -18,6 +18,8 @@ const VIEW_MODES = [
 
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
 
+const DEMO_SIGN_IN_RESEARCH = `/sign-in?redirect=${encodeURIComponent('/dashboard/research')}`;
+
 function paperPublicHref(
   paper: ResearchPaper,
   profileSlug: string | null | undefined,
@@ -44,7 +46,9 @@ export function DashboardResearchView({
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const orderedPaperIds = papers.map((paper) => paper.id);
-  const createHref = `${basePath}/research/new`;
+  const isDemoWorkspace = basePath === '/demo' || basePath.startsWith('/demo/');
+  const createHref = isDemoWorkspace ? DEMO_SIGN_IN_RESEARCH : `${basePath}/research/new`;
+  const createLabel = isDemoWorkspace ? 'Sign in to add research' : 'Add research';
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -71,8 +75,8 @@ export function DashboardResearchView({
                 ))}
               </div>
             ) : null}
-            <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
-              Add research
+            <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+              {isDemoWorkspace ? 'Sign in to add' : 'Add research'}
             </AppButton>
           </div>
         }
@@ -80,29 +84,41 @@ export function DashboardResearchView({
 
       {papers.length > 0 ? (
         viewMode === 'grid' ? (
-          <ResearchBubbleGrid papers={papers} basePath={basePath} />
+          <ResearchBubbleGrid papers={papers} basePath={basePath} readOnly={isDemoWorkspace} />
         ) : (
           <div className="flex flex-col gap-8">
             {papers.map((paper, index) => {
-              const editHref = `${basePath}/research/${paper.id}/edit`;
+              const editHref = isDemoWorkspace
+                ? DEMO_SIGN_IN_RESEARCH
+                : `${basePath}/research/${paper.id}/edit`;
               const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
               return (
                 <div key={paper.id} className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <ResearchReorderToolbar
-                      paperId={paper.id}
-                      paperTitle={paper.title}
-                      index={index}
-                      total={papers.length}
-                      orderedPaperIds={orderedPaperIds}
-                    />
+                    {!isDemoWorkspace ? (
+                      <ResearchReorderToolbar
+                        paperId={paper.id}
+                        paperTitle={paper.title}
+                        index={index}
+                        total={papers.length}
+                        orderedPaperIds={orderedPaperIds}
+                      />
+                    ) : (
+                      <p className="text-[12px] text-[var(--app-smoke)]">
+                        Sign in to reorder and edit research.
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       <Link
                         href={editHref}
                         className="cc-app-btn cc-app-btn--ghost text-[13px]"
-                        aria-label={`Edit research paper ${paper.title}`}
+                        aria-label={
+                          isDemoWorkspace
+                            ? `Sign in to edit ${paper.title}`
+                            : `Edit research paper ${paper.title}`
+                        }
                       >
-                        Edit
+                        {isDemoWorkspace ? 'Sign in to edit' : 'Edit'}
                       </Link>
                       {publicHref ? (
                         <Link
@@ -136,8 +152,8 @@ export function DashboardResearchView({
             {EMPTY_STATE_COPY.research.description}
           </p>
           <div className="mt-6 flex justify-center">
-            <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
-              {EMPTY_STATE_COPY.research.cta}
+            <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+              {isDemoWorkspace ? 'Sign in to add research' : EMPTY_STATE_COPY.research.cta}
             </AppButton>
           </div>
         </AppCard>

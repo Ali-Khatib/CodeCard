@@ -139,12 +139,40 @@ export function DashboardOverviewView({
         </header>
       </FadeInView>
 
-      {/* ── Zone 2: Profile completion ── */}
-      <FadeInView delay={0.04}>
-        <section aria-label="Profile completion">
-          <ProfileCompletionIndicator completion={completion} />
-        </section>
-      </FadeInView>
+      {/* ── Zone 2: Profile completion (hidden at 100%) ── */}
+      {completion.percentage < 100 ? (
+        <FadeInView delay={0.04}>
+          <section aria-label="Profile completion">
+            <ProfileCompletionIndicator completion={completion} />
+          </section>
+        </FadeInView>
+      ) : null}
+
+      {/* ── Suggested next step (high on the page) ── */}
+      {suggested ? (
+        <FadeInView delay={0.06}>
+          <section className="cc-profile-home__zone" aria-label="Suggested next step">
+            <AppCard tone="rose" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div className="max-w-lg">
+                  <AppMono>Suggested next step</AppMono>
+                  <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
+                    {suggested.title}
+                  </h2>
+                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
+                    {suggested.detail}
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <AppButton variant="primary" href={suggested.href} className="cc-btn-pop-icon">
+                    Do this now <span className="cc-btn-pop-icon__glyph" aria-hidden>→</span>
+                  </AppButton>
+                </div>
+              </div>
+            </AppCard>
+          </section>
+        </FadeInView>
+      ) : null}
 
       {/* ── Zone 3: Share — copy link + QR (hero) ── */}
       <FadeInView delay={0.08}>
@@ -279,32 +307,6 @@ export function DashboardOverviewView({
           </AppCard>
         </section>
       </FadeInView>
-
-      {/* ── Zone 5: Do this next (single action card) ── */}
-      {suggested ? (
-        <FadeInView delay={0.16}>
-          <section className="cc-profile-home__zone">
-            <AppCard tone="rose" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
-              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                <div className="max-w-lg">
-                  <AppMono>Suggested next step</AppMono>
-                  <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
-                    {suggested.title}
-                  </h2>
-                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-                    {suggested.detail}
-                  </p>
-                </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <AppButton variant="primary" href={suggested.href} className="cc-btn-pop-icon">
-                    Do this now <span className="cc-btn-pop-icon__glyph" aria-hidden>→</span>
-                  </AppButton>
-                </div>
-              </div>
-            </AppCard>
-          </section>
-        </FadeInView>
-      ) : null}
 
       {/* ── Zone 5b: Real projects & research inventory ── */}
       <FadeInView delay={0.18}>
