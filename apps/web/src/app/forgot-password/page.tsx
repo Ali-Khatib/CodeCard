@@ -7,11 +7,11 @@ import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { forgotPasswordSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
 import {
-  PASSWORD_RESET_COOLDOWN_MS,
   PASSWORD_RESET_GENERIC_ERROR,
   PASSWORD_RESET_GENERIC_SUCCESS,
 } from '@/lib/auth/redirect';
 import { isRecoveryCooldownActive, passwordResetRedirectUrl } from '@/lib/auth/password-recovery';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -21,11 +21,11 @@ function ForgotPasswordForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [lastSentAt, setLastSentAt] = useState<number | null>(null);
   const submitLock = useRef(false);
 
   const authConfigured = isSupabasePublicKeyConfigured();
-  const onCooldown = isRecoveryCooldownActive(cooldownUntil);
+  const onCooldown = isRecoveryCooldownActive(lastSentAt);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,9 +50,11 @@ function ForgotPasswordForm() {
 
     try {
       const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-        redirectTo: passwordResetRedirectUrl(),
-      });
+      const { error: resetError } = await withAuthNetworkRetry(() =>
+        supabase.auth.resetPasswordForEmail(parsed.data.email, {
+          redirectTo: passwordResetRedirectUrl(),
+        }),
+      );
 
       if (resetError) {
         setError(PASSWORD_RESET_GENERIC_ERROR);
@@ -60,7 +62,7 @@ function ForgotPasswordForm() {
       }
 
       setSuccess(true);
-      setCooldownUntil(Date.now() + PASSWORD_RESET_COOLDOWN_MS);
+      setLastSentAt(Date.now());
     } catch {
       setError(PASSWORD_RESET_GENERIC_ERROR);
     } finally {

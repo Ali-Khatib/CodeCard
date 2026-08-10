@@ -12,6 +12,7 @@ import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
 import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { mapPasswordResetClientError } from '@/lib/auth/password-recovery';
 import { PASSWORD_REQUIREMENTS_SUMMARY } from '@/lib/auth/password-guidance';
+import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -93,9 +94,11 @@ function ResetPasswordForm() {
         return;
       }
 
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: parsed.data.password,
-      });
+      const { error: updateError } = await withAuthNetworkRetry(() =>
+        supabase.auth.updateUser({
+          password: parsed.data.password,
+        }),
+      );
 
       if (updateError) {
         setError(mapPasswordResetClientError());
