@@ -65,6 +65,14 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     return 'GitHub sign-in was cancelled.';
   }
 
+  if (
+    lower.includes('provider is not enabled') ||
+    lower.includes('unsupported provider') ||
+    lower.includes('provider_disabled')
+  ) {
+    return 'GitHub sign-in is not enabled yet. Use email for now, or ask the project owner to turn on GitHub under Supabase → Authentication → Providers.';
+  }
+
   if (lower.includes('oauth') || lower.includes('provider')) {
     return 'GitHub sign-in failed. Please try again.';
   }

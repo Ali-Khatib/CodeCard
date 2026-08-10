@@ -13,10 +13,11 @@ import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
 import { AuthGithubButton } from '@/components/auth/auth-github-button';
 import { AuthErrorAlert } from '@/components/auth/auth-error-alert';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
-import { sanitizeInternalRedirect, authCallbackRedirectUrl } from '@/lib/auth/redirect';
+import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { isAuthSubmissionBlocked, oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
+import { startGithubOAuth } from '@/lib/auth/github-oauth';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -71,15 +72,13 @@ function SignInForm() {
 
     try {
       const supabase = createClient();
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: authCallbackRedirectUrl(redirectTo),
-        },
+      const result = await startGithubOAuth({
+        supabase,
+        redirectPath: redirectTo,
       });
 
-      if (oauthError) {
-        setError(mapAuthFormError(oauthError.message, 'sign-in'));
+      if (!result.ok) {
+        setError(mapAuthFormError(result.message, 'sign-in'));
         setOauthLoading(null);
       }
     } catch (caught) {
