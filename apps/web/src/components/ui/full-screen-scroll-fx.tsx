@@ -23,6 +23,8 @@ export type FullScreenFXSection = {
   id?: string;
   background: string;
   leftLabel?: ReactNode;
+  /** Compact label for the mobile equal-width chapter rail. */
+  leftLabelShort?: string;
   /** Plain string titles still support word-mask animation. Prefer `content` for stories. */
   title?: string | ReactNode;
   /** Rich center story — skips word-mask; fades as a whole panel. */
@@ -202,7 +204,20 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       requestAnimationFrame(() => requestAnimationFrame(fn));
     };
 
+    const isCompactRail = () =>
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
+
     const measureAndCenterLists = (toIndex = index, animate = true) => {
+      // Mobile uses a fixed equal-width rail — never vertical-center or GSAP-shift it.
+      if (isCompactRail()) {
+        leftItemRefs.current.forEach((el, i) => {
+          if (!el) return;
+          gsap.set(el, { clearProps: 'transform,x,y' });
+          el.classList.toggle('active', i === toIndex);
+        });
+        return;
+      }
+
       const centerTrack = (
         track: HTMLDivElement | null,
         items: (HTMLDivElement | null)[],
@@ -350,9 +365,14 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
 
       measureAndCenterLists(to, !motionOff);
 
+      const compact = isCompactRail();
       leftItemRefs.current.forEach((el, i) => {
         if (!el) return;
         el.classList.toggle('active', i === to);
+        if (compact) {
+          gsap.set(el, { clearProps: 'transform,x,y', opacity: i === to ? 1 : 0.55 });
+          return;
+        }
         gsap.to(el, {
           opacity: i === to ? 1 : 0.35,
           x: i === to ? 10 : 0,
@@ -363,6 +383,10 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       rightItemRefs.current.forEach((el, i) => {
         if (!el) return;
         el.classList.toggle('active', i === to);
+        if (compact) {
+          gsap.set(el, { clearProps: 'transform,x,y', opacity: i === to ? 1 : 0.55 });
+          return;
+        }
         gsap.to(el, {
           opacity: i === to ? 1 : 0.35,
           x: i === to ? -10 : 0,
@@ -391,9 +415,13 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
           isSnappingRef.current = false;
         }, snapMs);
       } else {
+        // Hold the gate long enough that touch momentum cannot skip chapters.
+        const gateMs = motionOff
+          ? 40
+          : Math.max(420, Math.round((durations.change ?? 0.7) * 520));
         window.setTimeout(() => {
           isSnappingRef.current = false;
-        }, 10);
+        }, gateMs);
       }
     };
     goToRef.current = goTo;
@@ -566,7 +594,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
             style={{
               height: motionOff
                 ? 'auto'
-                : `calc(var(--fx-section-count) * 100vh)`,
+                : `calc(var(--fx-section-count) * var(--fx-section-length, 100vh))`,
             }}
           >
             <div className="fx-fixed" ref={fixedRef}>
@@ -618,7 +646,10 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
                           tabIndex={0}
                           aria-pressed={i === index}
                         >
-                          {s.leftLabel}
+                          <span className="fx-item__full">{s.leftLabel}</span>
+                          <span className="fx-item__short">
+                            {s.leftLabelShort ?? s.leftLabel}
+                          </span>
                         </div>
                       ))}
                     </div>
