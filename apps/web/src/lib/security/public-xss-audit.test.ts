@@ -162,7 +162,9 @@ describe('metadata and OG text remain inert', () => {
 describe('public rendering XSS contracts', () => {
   const publicComponents = [
     'src/components/profile/public-profile-focused.tsx',
+    'src/components/profile/public-project-card.tsx',
     'src/components/profile/public-project-stack.tsx',
+    'src/components/profile/public-project-stacking.tsx',
     'src/components/featured-work/project-detail-view.tsx',
     'src/components/research/research-paper-detail.tsx',
     'src/components/research/research-paper-card.tsx',
@@ -181,7 +183,7 @@ describe('public rendering XSS contracts', () => {
 
   it('keeps external public links on noopener noreferrer and safe project helpers', () => {
     const stack = readFileSync(
-      resolve(process.cwd(), 'src/components/profile/public-project-stack.tsx'),
+      resolve(process.cwd(), 'src/components/profile/public-project-card.tsx'),
       'utf8',
     );
     const detail = readFileSync(

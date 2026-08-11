@@ -45,4 +45,16 @@ describe('canonical dashboard profile route', () => {
     expect(overview).not.toContain('ProfileEditor');
     expect(overview).not.toContain('profile-edit');
   });
+
+  it('renders a working Alex Chen profile section on /demo/profile', () => {
+    const src = readFileSync(
+      resolve(process.cwd(), 'src/app/demo/(workspace)/profile/page.tsx'),
+      'utf8',
+    );
+
+    expect(src).toContain('DashboardProfileView');
+    expect(src).toContain('preview');
+    expect(src).toContain('DEMO_PROFILE');
+    expect(src).not.toContain('redirect(');
+  });
 });

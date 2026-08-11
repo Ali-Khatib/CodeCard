@@ -25,6 +25,15 @@ const PublicProfileSaveCard = dynamic(
   () => import('./public-profile-save-card').then((m) => m.PublicProfileSaveCard),
   { ssr: true },
 );
+const PublicProfileAtmosphere = dynamic(
+  () => import('./public-profile-atmosphere').then((m) => m.PublicProfileAtmosphere),
+  { ssr: false },
+);
+const PublicProfileDock = dynamic(
+  () => import('./public-profile-dock').then((m) => m.PublicProfileDock),
+  { ssr: false },
+);
+
 /**
  * Public profile view — Server Component shell so the above-fold bio (LCP)
  * is in the initial HTML without waiting on the motion/client chunk.
@@ -65,33 +74,34 @@ export function PublicProfileFocused({
     bio ??
     'I build developer tools that make complex workflows feel simple.';
   const firstName = displayName.split(' ')[0];
+  const backHref =
+    profileSlug === 'demo' ? '/demo' : connectionControl?.isOwnProfile ? '/dashboard' : '/';
+  const backLabel =
+    profileSlug === 'demo' || connectionControl?.isOwnProfile
+      ? 'Back to workspace'
+      : 'Back to CodeCard';
 
   return (
     <div className="cc-public-profile">
+      <PublicProfileAtmosphere />
       <ProfileSectionHashScroll />
+      <PublicProfileDock
+        backHref={backHref}
+        backLabel={backLabel}
+        hasResearch={researchPapers.length > 0}
+      />
       <main
         id={MAIN_CONTENT_ID}
         tabIndex={-1}
-        className="cc-app-page cc-app-page--920 px-5 py-12 md:px-8 md:py-16"
+        className="cc-app-page cc-app-page--920 relative z-[1] px-5 pb-12 pt-24 md:px-8 md:pb-16 md:pt-28"
       >
-        <div className="mb-6">
-          <Link
-            href={profileSlug === 'demo' ? '/demo' : connectionControl?.isOwnProfile ? '/dashboard' : '/'}
-            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--app-border)] bg-[var(--app-paper)] px-3 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)]"
-          >
-            <span aria-hidden>←</span>
-            {profileSlug === 'demo' || connectionControl?.isOwnProfile
-              ? 'Back to workspace'
-              : 'Back to CodeCard'}
-          </Link>
-        </div>
         <header
           id="profile-hero"
-          className="cc-app-profile-preview cc-app-profile-preview--hero cc-demo-hero-enter pb-[min(36vh,18rem)]"
+          className="cc-public-hero cc-app-profile-preview cc-app-profile-preview--hero cc-demo-hero-enter cc-public-hero--fade"
         >
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-              <div className="relative h-[96px] w-[96px] shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
+          <div className="cc-public-hero__stage">
+            <div className="cc-public-hero__portrait">
+              <div className="cc-public-hero__portrait-frame">
                 {avatarUrl ? (
                   <Image
                     src={avatarUrl}
@@ -100,57 +110,66 @@ export function PublicProfileFocused({
                     // LCP on `/demo` is the bio text, not the avatar — avoid high-priority
                     // image decode competing with text paint (Phase 0C).
                     className="object-cover"
-                    sizes="96px"
+                    sizes="(max-width: 640px) 100vw, 420px"
                   />
                 ) : (
                   <span
-                    className="flex h-full w-full items-center justify-center text-3xl font-medium"
+                    className="flex h-full w-full items-center justify-center bg-[var(--app-bone)] text-5xl font-medium text-[var(--app-ink)]"
                     aria-hidden
                   >
                     {displayName[0]}
                   </span>
                 )}
               </div>
-
-              <div className="min-w-0 flex-1">
-                <h1 className="break-words text-[clamp(1.75rem,7vw,2.25rem)] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
-                  {displayName}
-                </h1>
-                {role ? (
-                  <p className="mt-1 break-words text-[16px] text-[var(--app-smoke)]">{role}</p>
-                ) : null}
-                {company ? (
-                  <p className="mt-0.5 break-words text-[16px] text-[var(--app-smoke)]">{company}</p>
-                ) : null}
-                {location ? (
-                  <p className="mt-1 break-words text-[15px] text-[var(--app-smoke)]">{location}</p>
-                ) : null}
-                <p className="mt-4 max-w-lg break-words text-[16px] leading-relaxed text-[var(--app-ink)]">
-                  {intro}
-                </p>
-                <PublicProfileSocialLinks links={safeLinks} profileId={profileId} />
-              </div>
             </div>
 
-            <PublicProfileHeroActions
-              profileId={profileId}
-              profileSlug={profileSlug}
-              displayName={displayName}
-              connectionControl={connectionControl}
-            />
+            <div className="cc-public-hero__panel min-w-0">
+              <p className="cc-app-mono text-[var(--app-panel-muted)]">CodeCard</p>
+              <h1 className="mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em] text-[var(--app-panel-ink)]">
+                {displayName}
+              </h1>
+              {role ? (
+                <p className="mt-2 break-words text-[15px] text-[var(--app-panel-muted)] md:text-[16px]">
+                  {role}
+                  {company ? (
+                    <>
+                      <span aria-hidden> · </span>
+                      {company}
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
+              {location ? (
+                <p className="mt-1 break-words text-[14px] text-[var(--app-panel-muted)]">{location}</p>
+              ) : null}
+              <p className="mt-4 max-w-md break-words text-[15px] leading-relaxed text-[var(--app-panel-ink)] md:text-[16px]">
+                {intro}
+              </p>
+              <div className="cc-public-hero__social mt-5 [&>nav]:mt-0">
+                <PublicProfileSocialLinks links={safeLinks} profileId={profileId} />
+              </div>
+              <div className="mt-6">
+                <PublicProfileHeroActions
+                  profileId={profileId}
+                  profileSlug={profileSlug}
+                  displayName={displayName}
+                  connectionControl={connectionControl}
+                />
+              </div>
+            </div>
           </div>
         </header>
 
-        <section id="projects" className="mt-16 scroll-mt-24">
+        <section id="projects" className="mt-10 scroll-mt-28 md:mt-14">
           <p className="cc-app-mono">Featured work</p>
-          <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+          <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)] md:text-[28px]">
             What {firstName} built
           </h2>
           <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-            Projects, demos, research, and outcomes — shown before credentials.
+            Scroll to stack projects — the quickest way to see the work.
           </p>
 
-          <div className="mt-8">
+          <div className="mt-6 md:mt-8">
             {projects.length > 0 ? (
               <PublicProjectStack
                 projects={projects}

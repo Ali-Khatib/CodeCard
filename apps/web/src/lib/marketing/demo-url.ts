@@ -86,11 +86,10 @@ export function workspaceCreateResearchHref(basePath: string): string {
   return `${basePath}/research/new`;
 }
 
-/** Profile editor CTA that respects demo vs authenticated workspace. */
+/** Profile section CTA — stays inside the demo workspace; auth dashboard otherwise. */
 export function workspaceProfileHref(basePath: string, hash?: string): string {
-  const path = hash ? `/dashboard/profile#${hash}` : '/dashboard/profile';
-  if (isDemoWorkspacePath(basePath)) return signInToDashboard(path);
-  return hash ? `${basePath}/profile#${hash}` : `${basePath}/profile`;
+  const root = isDemoWorkspacePath(basePath) ? LIVE_DEMO_WORKSPACE_HREF : basePath;
+  return hash ? `${root}/profile#${hash}` : `${root}/profile`;
 }
 
 /** Project edit CTA; demo has no edit routes. */

@@ -5771,9 +5771,139 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 /* ── Phase 1B premium interaction polish ── */
 .cc-marketing-nav-shell {
+  --nav-compact-nudge: clamp(0.5rem, 11vw, 6.5rem);
   transition:
-    padding-top 0.28s ease,
-    transform 0.28s ease;
+    padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.cc-marketing-nav-shell .cc-nav-veil {
+  transform-origin: center center;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    background-color 0.45s ease,
+    border-color 0.45s ease;
+}
+
+.cc-marketing-nav-shell .cc-nav-veil__inner {
+  transition:
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-marketing-nav-shell .cc-nav-veil__inner a,
+.cc-marketing-nav-shell .cc-nav-veil__inner button,
+.cc-marketing-nav-shell .cc-btn-pill-primary,
+.cc-marketing-nav-shell .cc-btn-pill-demo {
+  transition:
+    font-size 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.45s ease,
+    color 0.45s ease,
+    background-color 0.45s ease,
+    border-color 0.45s ease;
+}
+
+/* Crash course + research — compress, drift left, settle once */
+html[data-nav-compact='true'] .cc-marketing-nav-shell {
+  padding-top: 0.45rem;
+  transform: translate3d(calc(-1 * var(--nav-compact-nudge)), 0, 0);
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil {
+  transform: scale(0.9);
+  animation: cc-nav-compact-settle 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil__inner {
+  height: 46px;
+  gap: 12px;
+  padding-inline: 14px;
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil__inner > a[aria-label='CodeCard home'] {
+  font-size: 14px;
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-ghost-link {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding-inline: 6px;
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-btn-pill-primary,
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-btn-pill-demo {
+  min-height: 32px;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-hume-fade-group {
+  gap: 0;
+}
+
+@keyframes cc-nav-compact-settle {
+  0% {
+    transform: scale(1);
+  }
+  58% {
+    transform: scale(0.875);
+  }
+  78% {
+    transform: scale(0.915);
+  }
+  100% {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-nav-compact='true'] .cc-marketing-nav-shell {
+    --nav-compact-nudge: 0px;
+    padding-top: 0.35rem;
+    transform: none;
+  }
+
+  html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil {
+    transform: scale(0.94);
+    animation: cc-nav-compact-settle-mobile 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil__inner {
+    height: auto;
+    min-height: 44px;
+    gap: 10px;
+    padding-inline: 12px;
+    padding-block: 4px;
+  }
+}
+
+@keyframes cc-nav-compact-settle-mobile {
+  0% {
+    transform: scale(1);
+  }
+  65% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-marketing-nav-shell,
+  .cc-marketing-nav-shell .cc-nav-veil,
+  .cc-marketing-nav-shell .cc-nav-veil__inner {
+    transition-duration: 0.01ms !important;
+  }
+
+  html[data-nav-compact='true'] .cc-marketing-nav-shell .cc-nav-veil {
+    animation: none !important;
+  }
 }
 
 .cc-marketing-nav-shell--scrolled .cc-nav-veil {

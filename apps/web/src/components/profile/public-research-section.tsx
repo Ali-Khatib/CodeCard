@@ -14,7 +14,7 @@ export function PublicResearchSection({
   researchPapers: ResearchPaper[];
 }) {
   return (
-    <section id="research" className="mt-16 scroll-mt-24">
+    <section id="research" className="mt-16 scroll-mt-28">
       <p className="cc-app-mono">Research</p>
       <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
         Papers &amp; publications

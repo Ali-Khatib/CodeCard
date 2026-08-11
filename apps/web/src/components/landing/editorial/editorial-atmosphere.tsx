@@ -6,6 +6,8 @@ import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
 const DARK_CHAPTERS = new Set(['hero', 'finale']);
+/** Full-bleed immersive chapters — nav compresses left to clear the stage. */
+const COMPACT_NAV_CHAPTERS = new Set(['walkthrough', 'proof']);
 
 function navToneFor(chapter: string): 'dark' | 'light' {
   return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';
@@ -35,6 +37,11 @@ export function EditorialAtmosphere() {
       root.dataset.chapter = id;
       document.documentElement.dataset.landingChapter = id;
       document.documentElement.dataset.navTone = navToneFor(id);
+      if (COMPACT_NAV_CHAPTERS.has(id)) {
+        document.documentElement.dataset.navCompact = 'true';
+      } else {
+        delete document.documentElement.dataset.navCompact;
+      }
     };
 
     apply(sections[0]?.dataset.chapterSection ?? 'hero');
@@ -42,6 +49,7 @@ export function EditorialAtmosphere() {
     const cleanupHtml = () => {
       delete document.documentElement.dataset.landingChapter;
       delete document.documentElement.dataset.navTone;
+      delete document.documentElement.dataset.navCompact;
     };
 
     if (!canEnhanceMotion) {

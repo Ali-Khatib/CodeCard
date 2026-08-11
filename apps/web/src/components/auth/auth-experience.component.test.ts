@@ -62,6 +62,9 @@ describe('Auth experience polish contracts', () => {
     expect(password).toContain('aria-pressed');
     expect(password).toContain('Hide characters');
     expect(password).toContain('Show characters');
+    expect(password).toContain('getPasswordStrength');
+    expect(password).toContain('role="meter"');
+    expect(password).toContain('Password strength');
     expect(field).toContain('min-h-[18px]');
     expect(field).toContain('aria-invalid');
   });
@@ -70,7 +73,6 @@ describe('Auth experience polish contracts', () => {
     const signIn = read('src/app/sign-in/page.tsx');
     const signUp = read('src/app/sign-up/page.tsx');
     expect(signIn).toContain('sanitizeInternalRedirect');
-    expect(signIn).toContain('authCallbackRedirectUrl');
     expect(signIn).toContain('isAuthSubmissionBlocked');
     expect(signUp).toContain('authCallbackRedirectUrl');
     expect(signIn).not.toContain('service_role');

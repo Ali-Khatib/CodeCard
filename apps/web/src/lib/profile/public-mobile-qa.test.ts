@@ -24,7 +24,7 @@ describe('WS06-T007 mobile public page QA contracts', () => {
       'utf8',
     );
     const projects = readFileSync(
-      resolve(process.cwd(), 'src/components/profile/public-project-stack.tsx'),
+      resolve(process.cwd(), 'src/components/profile/public-project-card.tsx'),
       'utf8',
     );
     const research = readFileSync(

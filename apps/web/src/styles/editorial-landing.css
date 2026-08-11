@@ -955,6 +955,21 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-statement .cc-ed__lede {
   margin: 1.75rem auto 0;
+  max-width: min(42rem, 94vw);
+  font-size: clamp(1.2rem, 1.1vw + 1.05rem, 1.45rem);
+  font-weight: 560;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  color: color-mix(in srgb, var(--ed-ink) 88%, transparent);
+}
+
+.cc-ed-walk__intro .cc-ed__lede {
+  max-width: min(42rem, 94vw);
+  font-size: clamp(1.2rem, 1.1vw + 1.05rem, 1.45rem);
+  font-weight: 560;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  color: color-mix(in srgb, var(--ed-ink) 88%, transparent);
 }
 
 /* —— Feature walkthrough (full-screen scroll FX) —— */
@@ -1373,14 +1388,14 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-audience__hint {
   display: block;
-  margin-top: 0.85rem;
+  margin-top: 0.9rem;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  color: color-mix(in srgb, var(--ed-mute) 55%, transparent);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--ed-iris) 55%, var(--ed-ink));
   opacity: 0;
-  transform: translateY(2px);
+  transform: translateY(3px);
   transition:
     opacity 0.22s ease,
     transform 0.22s ease;
@@ -1390,7 +1405,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
 .cc-ed-audience__card:hover .cc-ed-audience__hint,
 .cc-ed-audience__card:focus-visible .cc-ed-audience__hint {
-  opacity: 1;
+  opacity: 0.92;
   transform: translateY(0);
 }
 
