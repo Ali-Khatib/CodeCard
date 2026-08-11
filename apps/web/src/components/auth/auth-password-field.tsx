@@ -170,20 +170,22 @@ export function AuthPasswordField({
                 aria-label="Password strength"
               >
                 {Array.from({ length: 4 }, (_, index) => {
-                  const filled = index < strength.score && strength.level !== 'empty';
+                  const level =
+                    strength.level === 'empty' ? null : strength.level;
+                  const filled = index < strength.score && level !== null;
                   return (
                     <span
                       key={index}
                       className={`h-1.5 rounded-full transition-colors duration-200 ${
-                        filled
-                          ? STRENGTH_BAR_COLOR[strength.level]
+                        filled && level
+                          ? STRENGTH_BAR_COLOR[level]
                           : 'bg-[rgba(34,34,34,0.1)]'
                       }`}
                     />
                   );
                 })}
               </div>
-              {strength.label ? (
+              {strength.label && strength.level !== 'empty' ? (
                 <p
                   id={strengthId}
                   className={`text-[12px] font-semibold ${STRENGTH_TEXT_COLOR[strength.level]}`}
