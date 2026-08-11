@@ -27,11 +27,11 @@ const PublicProfileSaveCard = dynamic(
 );
 const PublicProfileAtmosphere = dynamic(
   () => import('./public-profile-atmosphere').then((m) => m.PublicProfileAtmosphere),
-  { ssr: false },
+  { ssr: true },
 );
 const PublicProfileDock = dynamic(
   () => import('./public-profile-dock').then((m) => m.PublicProfileDock),
-  { ssr: false },
+  { ssr: true },
 );
 
 /**
