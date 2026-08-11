@@ -11,7 +11,7 @@ export const MARKETING_NAV_ITEMS: NavItem[] = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
-const MORPH_MS = 720;
+const MORPH_MS = 480;
 const MORPH_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 function prefersReducedMotion() {
@@ -41,20 +41,15 @@ function morphNavVeil(veil: HTMLElement, previous: DOMRect) {
   const wide = Math.max(startWidth, endWidth);
 
   window.clearTimeout(morphTimer);
+  veil.getAnimations().forEach((animation) => animation.cancel());
   document.documentElement.dataset.navMorphing = 'true';
   veil.classList.add('cc-nav-veil--morphing');
   veil.style.transition = 'none';
-  veil.style.width = `${startWidth}px`;
-  veil.style.maxWidth = `${startWidth}px`;
-  veil.style.height = `${startHeight}px`;
-  veil.style.minHeight = `${startHeight}px`;
-  veil.style.transform = `translateX(${dx}px)`;
   if (inner) {
     inner.style.width = `${wide}px`;
     inner.style.minWidth = `${wide}px`;
     inner.style.maxWidth = 'none';
   }
-  void veil.offsetWidth;
 
   const finish = () => {
     window.clearTimeout(morphTimer);
@@ -71,34 +66,32 @@ function morphNavVeil(veil: HTMLElement, previous: DOMRect) {
     }
     veil.classList.remove('cc-nav-veil--morphing');
     delete document.documentElement.dataset.navMorphing;
-    veil.removeEventListener('transitionend', onEnd);
   };
 
-  const onEnd = (event: TransitionEvent) => {
-    if (event.target !== veil) return;
-    if (event.propertyName !== 'width' && event.propertyName !== 'transform') return;
-    finish();
-  };
+  const animation = veil.animate(
+    [
+      {
+        width: `${startWidth}px`,
+        maxWidth: `${startWidth}px`,
+        height: `${startHeight}px`,
+        minHeight: `${startHeight}px`,
+        transform: `translateX(${dx}px)`,
+        borderRadius: `${Math.min(startHeight, startWidth) / 2}px`,
+      },
+      {
+        width: `${endWidth}px`,
+        maxWidth: `${endWidth}px`,
+        height: `${endHeight}px`,
+        minHeight: `${endHeight}px`,
+        transform: 'translateX(0)',
+        borderRadius: '9999px',
+      },
+    ],
+    { duration: MORPH_MS, easing: MORPH_EASE, fill: 'forwards' },
+  );
 
-  const play = () => {
-    veil.addEventListener('transitionend', onEnd);
-    morphTimer = window.setTimeout(finish, MORPH_MS + 80);
-    veil.style.transition = [
-      `transform ${MORPH_MS}ms ${MORPH_EASE}`,
-      `width ${MORPH_MS}ms ${MORPH_EASE}`,
-      `max-width ${MORPH_MS}ms ${MORPH_EASE}`,
-      `height ${MORPH_MS}ms ${MORPH_EASE}`,
-      `min-height ${MORPH_MS}ms ${MORPH_EASE}`,
-      `border-radius ${MORPH_MS}ms ${MORPH_EASE}`,
-    ].join(', ');
-    veil.style.width = `${endWidth}px`;
-    veil.style.maxWidth = `${endWidth}px`;
-    veil.style.height = `${endHeight}px`;
-    veil.style.minHeight = `${endHeight}px`;
-    veil.style.transform = 'translateX(0)';
-  };
-
-  requestAnimationFrame(() => requestAnimationFrame(play));
+  animation.onfinish = finish;
+  morphTimer = window.setTimeout(finish, MORPH_MS + 60);
 }
 
 export function LandingShellNav() {

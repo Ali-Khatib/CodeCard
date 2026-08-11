@@ -35,6 +35,7 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(css).toContain('min-height: 44px');
     expect(css).toContain('white-space: nowrap');
     expect(css).toContain('min-width: 0');
+    expect(css).toContain('grid-template-columns: repeat(8, minmax(0, 1fr))');
     expect(css).toContain('flex: 1 1 0');
   });
 

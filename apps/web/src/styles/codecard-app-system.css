@@ -220,7 +220,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
     0 10px 24px rgba(34, 34, 34, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
   transition:
-    left 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    left var(--app-slide-duration) var(--app-slide-ease),
+    gap var(--app-slide-duration) var(--app-slide-ease),
     transform 0.25s ease,
     background 0.25s ease,
     border-color 0.25s ease;
@@ -260,6 +261,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   display: block;
   width: 14px;
   height: 18px;
+  overflow: hidden;
+  transition:
+    width var(--app-slide-duration) var(--app-slide-ease),
+    opacity var(--app-slide-duration) var(--app-slide-ease),
+    transform var(--app-slide-duration) var(--app-slide-ease);
 }
 
 .cc-app-sidebar-toggle__card span {
@@ -291,7 +297,17 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-right: 1.75px solid var(--app-ink);
   border-bottom: 1.75px solid var(--app-ink);
   transform: rotate(135deg) translateX(1px);
-  transition: transform 0.35s ease;
+  transition: transform var(--app-slide-duration) var(--app-slide-ease);
+}
+
+.cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle {
+  gap: 0;
+}
+
+.cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle__card {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.65) translateX(-6px);
 }
 
 .cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle__chevron {
@@ -895,6 +911,31 @@ button.cc-app-nav-link:focus-visible {
 
 .cc-settings-nav-link--active .cc-settings-nav-link__hint {
   color: color-mix(in srgb, var(--app-smoke) 75%, var(--app-iris));
+}
+
+.cc-settings-accordion-panel {
+  display: block;
+}
+
+.cc-settings-desktop-panel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .cc-settings-accordion-panel {
+    display: none !important;
+  }
+
+  .cc-settings-desktop-panel {
+    display: block !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cc-settings-nav-link {
+    min-height: 44px;
+    padding: 8px 12px 8px 20px;
+  }
 }
 
 /* ?? User card ?? */
@@ -1836,16 +1877,17 @@ html.dark .cc-project-nav-btn svg,
     left: 0;
     right: 0;
     z-index: 50;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 0;
-    justify-content: space-between;
-    align-items: stretch;
+    width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
     border-top: 1px solid var(--app-border);
     background: color-mix(in srgb, var(--app-paper) 92%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+    padding: 2px 1px calc(2px + env(safe-area-inset-bottom));
   }
 
   .cc-app-mobile-nav::-webkit-scrollbar {
@@ -1860,22 +1902,23 @@ html.dark .cc-project-nav-btn svg,
     display: flex;
     min-width: 0;
     min-height: 44px;
+    width: 100%;
     flex: 1 1 0;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1px;
-    border-radius: 10px;
-    padding: 4px 2px;
-    font-size: 9px;
+    border-radius: 8px;
+    padding: 4px 0;
+    font-size: 8px;
     line-height: 1.05;
     white-space: nowrap;
     overflow: hidden;
   }
 
   .cc-app-mobile-nav__link svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 
   .cc-app-mobile-nav__link > span {

@@ -21,14 +21,14 @@ import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 
 const NAV_ITEMS = [
-  { segment: '', label: 'Home', icon: 'home' as const },
-  { segment: 'profile', label: 'Profile', icon: 'profile' as const },
-  { segment: 'projects', label: 'Projects', icon: 'projects' as const },
-  { segment: 'research', label: 'Research', icon: 'research' as const },
-  { segment: 'connections', label: 'Connections', icon: 'connections' as const },
-  { segment: 'circle', label: 'Circle', icon: 'circle' as const },
-  { segment: 'analytics', label: 'Analytics', icon: 'analytics' as const },
-  { segment: 'settings', label: 'Settings', icon: 'settings' as const },
+  { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
+  { segment: 'profile', label: 'Profile', short: 'Profile', icon: 'profile' as const },
+  { segment: 'projects', label: 'Projects', short: 'Projects', icon: 'projects' as const },
+  { segment: 'research', label: 'Research', short: 'Research', icon: 'research' as const },
+  { segment: 'connections', label: 'Connections', short: 'Connect', icon: 'connections' as const },
+  { segment: 'circle', label: 'Circle', short: 'Circle', icon: 'circle' as const },
+  { segment: 'analytics', label: 'Analytics', short: 'Analytics', icon: 'analytics' as const },
+  { segment: 'settings', label: 'Settings', short: 'Settings', icon: 'settings' as const },
 ] as const;
 
 const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}`;
@@ -489,12 +489,12 @@ export function DashboardShell({
               aria-label={
                 item.segment === 'circle' && circleUnreadBadge
                   ? `Circle, ${circleUnreadBadge} new`
-                  : undefined
+                  : item.label
               }
             >
               <Icon />
-              <span className="inline-flex items-center gap-1">
-                {item.label}
+              <span className="inline-flex max-w-full items-center gap-1">
+                {item.short}
                 {item.segment === 'circle' && circleUnreadBadge ? (
                   <span className="cc-app-badge cc-app-badge--mint px-1 text-[10px]" aria-hidden>
                     {circleUnreadBadge}

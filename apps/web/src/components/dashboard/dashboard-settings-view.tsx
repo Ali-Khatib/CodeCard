@@ -449,7 +449,7 @@ export function DashboardSettingsView({
   openDeletionOnMount?: boolean;
 }) {
   const [openId, setOpenId] = useState<string>(
-    openDeletionOnMount ? 'security' : 'public',
+    openDeletionOnMount ? 'security' : 'account',
   );
   const live = accountControls === 'live';
 
@@ -478,23 +478,33 @@ export function DashboardSettingsView({
 
       <FadeInView delay={0}>
         <div className="grid gap-6 lg:grid-cols-[minmax(260px,300px)_1fr]">
-          <nav className="flex flex-col gap-1.5" aria-label="Settings categories">
+          <nav className="flex flex-col gap-1" aria-label="Settings categories">
             {sections.map((section) => {
               const isOpen = openId === section.id;
               return (
                 <div key={section.id} className="cc-settings-accordion-item">
                   <button
                     type="button"
-                    onClick={() => setOpenId(section.id)}
+                    onClick={(event) => {
+                      setOpenId(section.id);
+                      const item = event.currentTarget.closest('.cc-settings-accordion-item');
+                      window.requestAnimationFrame(() => {
+                        item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                      });
+                    }}
                     aria-expanded={isOpen}
+                    aria-controls={`settings-panel-${section.id}`}
                     className={`cc-settings-nav-link ${isOpen ? 'cc-settings-nav-link--active' : ''}`}
                   >
                     <span className="cc-settings-nav-link__title">{section.title}</span>
                     <span className="cc-settings-nav-link__hint">{section.navHint}</span>
                   </button>
                   {isOpen ? (
-                    <div className="cc-settings-accordion-panel lg:hidden">
-                      <AppCard reactive={false} className="!mt-2 !rounded-[16px]">
+                    <div
+                      id={`settings-panel-${section.id}`}
+                      className="cc-settings-accordion-panel"
+                    >
+                      <AppCard reactive={false} className="!mt-2 !rounded-[16px] !p-4 sm:!p-5">
                         <AppMono>{section.eyebrow}</AppMono>
                         <h2 className="mt-2 text-[20px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
                           {section.title}
@@ -546,7 +556,7 @@ export function DashboardSettingsView({
             })}
           </nav>
 
-          <AppCard reactive={false} className="hidden lg:block">
+          <AppCard reactive={false} className="cc-settings-desktop-panel">
             <AppMono>{active.eyebrow}</AppMono>
             <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
               {active.title}
