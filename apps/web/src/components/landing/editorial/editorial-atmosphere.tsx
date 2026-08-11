@@ -6,7 +6,7 @@ import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
 const DARK_CHAPTERS = new Set(['hero', 'finale']);
-/** Full-bleed immersive chapters — nav compresses left to clear the stage. */
+/** Full-bleed immersive chapters — nav collapses to a circular expand control. */
 const COMPACT_NAV_CHAPTERS = new Set(['walkthrough', 'proof']);
 
 function navToneFor(chapter: string): 'dark' | 'light' {

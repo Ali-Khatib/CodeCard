@@ -21,6 +21,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [compactPeek, setCompactPeek] = useState(false);
   const menuTrackRef = useRef<HTMLDivElement>(null);
   const hoverLineRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -71,12 +72,69 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     return () => window.removeEventListener('resize', onResize);
   }, [hovered, moveHoverLine]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncCompact = () => {
+      if (root.dataset.navCompact !== 'true') {
+        setCompactPeek(false);
+      }
+    };
+    syncCompact();
+    const observer = new MutationObserver(syncCompact);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-nav-compact'] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!compactPeek) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      const nav = document.querySelector('.cc-nav-veil');
+      if (nav && target && !nav.contains(target)) {
+        setCompactPeek(false);
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [compactPeek]);
+
   return (
-    <nav className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''}`} aria-label="Primary">
+    <nav
+      className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''} ${compactPeek ? 'cc-nav-veil--peek' : ''}`}
+      aria-label="Primary"
+      data-nav-peek={compactPeek ? 'true' : 'false'}
+      onMouseEnter={() => {
+        if (document.documentElement.dataset.navCompact === 'true') {
+          setCompactPeek(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (!mobileOpen) setCompactPeek(false);
+      }}
+    >
       <div className="cc-nav-veil__inner">
+        <button
+          type="button"
+          className="cc-nav-compact-trigger"
+          aria-label={compactPeek ? 'Collapse navigation' : 'Expand navigation'}
+          aria-expanded={compactPeek}
+          onClick={() => setCompactPeek((open) => !open)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M5 12h12m0 0-5-5m5 5-5 5"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
         <Link
           href={MARKETING_HOME_HREF}
-          className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press"
+          className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press cc-nav-brand"
           aria-label="CodeCard home"
           onMouseEnter={() => router.prefetch(MARKETING_HOME_HREF)}
           onFocus={() => router.prefetch(MARKETING_HOME_HREF)}
@@ -84,7 +142,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           CodeCard
         </Link>
 
-        <div ref={menuTrackRef} className="relative hidden md:flex">
+        <div ref={menuTrackRef} className="relative hidden md:flex cc-nav-desktop-links">
           <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
           <ul className="cc-hume-fade-group flex items-center gap-1">
             {items.map((item, i) => {
@@ -114,7 +172,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           </ul>
         </div>
 
-        <div className="ml-auto hidden items-center gap-3 md:flex">
+        <div className="ml-auto hidden items-center gap-3 md:flex cc-nav-desktop-actions">
           <LiveDemoLink className="cc-btn-pill-demo cc-instant-press">
             Live demo
           </LiveDemoLink>
@@ -141,7 +199,10 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           className="cc-nav-mobile-trigger ml-auto flex items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
           aria-expanded={mobileOpen}
           aria-label="Open menu"
-          onClick={() => setMobileOpen((o) => !o)}
+          onClick={() => {
+            setMobileOpen((o) => !o);
+            setCompactPeek(true);
+          }}
         >
           <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
             <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" strokeWidth="1.5" />

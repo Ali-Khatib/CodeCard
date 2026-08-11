@@ -33,7 +33,7 @@ export function ResearchPaperCard({
     <AppReveal delay={delay}>
       <motion.article
         layout
-        className="cc-app-project-card"
+        className="cc-app-project-card cc-glass-card"
         whileTap={reduced ? undefined : { scale: 0.985 }}
         transition={{ duration: HUME_MOTION.press, ease: HUME_EASE }}
       >

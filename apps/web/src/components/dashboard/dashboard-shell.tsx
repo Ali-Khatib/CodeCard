@@ -115,10 +115,13 @@ export function DashboardShell({
   }, []);
 
   useEffect(() => {
+    // Marketing live demo: always show the real PC sidebar.
+    if (embedded) {
+      setSidebarOpen(true);
+      return;
+    }
     const stored = localStorage.getItem('cc-sidebar-open');
     if (stored === '0') setSidebarOpen(false);
-    // Marketing live demo: keep the real sidebar open so the iframe matches the product.
-    if (embedded && stored !== '0') setSidebarOpen(true);
   }, [embedded]);
 
   useEffect(() => {
@@ -466,6 +469,7 @@ export function DashboardShell({
         </main>
       </div>
 
+      {!embedded ? (
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
         {NAV_ITEMS.map((item) => {
           const href = hrefFor(item.segment);
@@ -501,6 +505,7 @@ export function DashboardShell({
           );
         })}
       </nav>
+      ) : null}
     </div>
     </MutationFeedbackProvider>
   );

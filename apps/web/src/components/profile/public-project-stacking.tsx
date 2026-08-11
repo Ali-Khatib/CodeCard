@@ -5,7 +5,6 @@ import { motion, useScroll, useTransform, type MotionValue } from 'motion/react'
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { PublicProjectCard } from './public-project-card';
-import { cn } from '@/lib/utils';
 
 type PublicProjectStackingProps = {
   projects: FeaturedProject[];
@@ -26,6 +25,7 @@ function StackingCard({
   progress,
   range,
   targetScale,
+  step,
 }: {
   i: number;
   project: FeaturedProject;
@@ -37,21 +37,38 @@ function StackingCard({
   progress: MotionValue<number>;
   range: [number, number];
   targetScale: number;
+  step: number;
 }) {
+  const container = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: enterProgress } = useScroll({
+    target: container,
+    offset: ['start end', 'start start'],
+  });
+
   const scale = useTransform(progress, range, [1, targetScale]);
+  // Fade in as the card arrives, hold, then fade out as the next card takes over.
+  const enterOpacity = useTransform(enterProgress, [0, 0.35, 1], [0.15, 1, 1]);
+  const exitOpacity = useTransform(
+    progress,
+    [range[0], range[0] + step * 0.55, Math.min(1, range[0] + step * 0.95), 1],
+    [1, 1, 0.35, 0.12],
+  );
+  const opacity = useTransform([enterOpacity, exitOpacity], ([enter, exit]) =>
+    Math.min(Number(enter), Number(exit)),
+  );
 
   return (
-    <div className="cc-stacking-card sticky top-0 flex h-[100dvh] items-center justify-center px-1 sm:px-0">
+    <div
+      ref={container}
+      className="cc-stacking-card sticky top-0 flex h-[100dvh] items-center justify-center px-1 sm:px-0"
+    >
       <motion.div
         style={{
           scale,
+          opacity,
           top: `calc(-4vh + ${i * 22}px)`,
         }}
-        className={cn(
-          'cc-stacking-card__panel relative w-[min(100%,920px)] origin-top',
-          'max-h-[min(88dvh,780px)] overflow-y-auto overscroll-contain',
-          'rounded-[var(--app-radius-large)]',
-        )}
+        className="cc-stacking-card__panel relative w-[min(100%,860px)] origin-top"
       >
         <PublicProjectCard
           project={project}
@@ -60,7 +77,7 @@ function StackingCard({
           profileSlug={profileSlug}
           views={views}
           saves={saves}
-          className="cc-stacking-card__project shadow-[0_24px_80px_-32px_rgba(34,34,34,0.45)]"
+          className="cc-stacking-card__project cc-glass-card"
           mediaClassName="overflow-hidden"
         />
       </motion.div>
@@ -98,6 +115,7 @@ export function PublicProjectStacking({
             profileSlug={profileSlug}
             views={demoViews?.[project.id]?.views ?? 280 + index * 40}
             saves={demoViews?.[project.id]?.saves ?? 24 + index * 8}
+            className="cc-glass-card"
           />
         ))}
       </div>
@@ -122,6 +140,7 @@ export function PublicProjectStacking({
             progress={scrollYProgress}
             range={[i * step, 1]}
             targetScale={targetScale}
+            step={step}
           />
         );
       })}

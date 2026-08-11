@@ -23,7 +23,7 @@ export const DEMO_PROFILE = {
   display_name: 'Alex Chen',
   headline: 'Senior AI Engineer · Stripe',
   bio: 'I ship tools that help teams move faster. Previously early engineer at infra startups.',
-  avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200',
+  avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=1200&q=80',
   accentColor: '#9382ff',
   location: 'San Francisco',
   followers: 1240,

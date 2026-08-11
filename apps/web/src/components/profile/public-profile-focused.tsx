@@ -110,7 +110,8 @@ export function PublicProfileFocused({
                     // LCP on `/demo` is the bio text, not the avatar — avoid high-priority
                     // image decode competing with text paint (Phase 0C).
                     className="object-cover"
-                    sizes="(max-width: 640px) 100vw, 420px"
+                    sizes="(max-width: 640px) 92vw, 440px"
+                    quality={90}
                   />
                 ) : (
                   <span
@@ -124,12 +125,12 @@ export function PublicProfileFocused({
             </div>
 
             <div className="cc-public-hero__panel min-w-0">
-              <p className="cc-app-mono text-[var(--app-panel-muted)]">CodeCard</p>
-              <h1 className="mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em] text-[var(--app-panel-ink)]">
+              <p className="cc-app-mono cc-public-hero__eyebrow">CodeCard</p>
+              <h1 className="cc-public-hero__title mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em]">
                 {displayName}
               </h1>
               {role ? (
-                <p className="mt-2 break-words text-[15px] text-[var(--app-panel-muted)] md:text-[16px]">
+                <p className="cc-public-hero__meta mt-2 break-words text-[15px] md:text-[16px]">
                   {role}
                   {company ? (
                     <>
@@ -140,9 +141,9 @@ export function PublicProfileFocused({
                 </p>
               ) : null}
               {location ? (
-                <p className="mt-1 break-words text-[14px] text-[var(--app-panel-muted)]">{location}</p>
+                <p className="cc-public-hero__meta mt-1 break-words text-[14px]">{location}</p>
               ) : null}
-              <p className="mt-4 max-w-md break-words text-[15px] leading-relaxed text-[var(--app-panel-ink)] md:text-[16px]">
+              <p className="cc-public-hero__bio mt-4 max-w-md break-words text-[15px] leading-relaxed md:text-[16px]">
                 {intro}
               </p>
               <div className="cc-public-hero__social mt-5 [&>nav]:mt-0">
