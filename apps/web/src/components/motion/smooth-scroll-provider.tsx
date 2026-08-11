@@ -53,6 +53,7 @@ type LenisRootProps = {
     smoothWheel?: boolean;
     wheelMultiplier?: number;
     touchMultiplier?: number;
+    syncTouch?: boolean;
   };
   children?: ReactNode;
 };
@@ -80,8 +81,17 @@ export function SmoothScrollProvider({
   const gsapRef = useRef<GsapRuntimeModule | null>(null);
   const [ReactLenis, setReactLenis] = useState<ComponentType<LenisRootProps> | null>(null);
   const [runtimeFailed, setRuntimeFailed] = useState(false);
+  const [allowSmooth, setAllowSmooth] = useState(false);
 
-  const wantsEnhancement = enabled && canEnhanceMotion && !runtimeFailed;
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)');
+    const sync = () => setAllowSmooth(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const wantsEnhancement = enabled && canEnhanceMotion && allowSmooth && !runtimeFailed;
   const active = Boolean(wantsEnhancement && ReactLenis);
 
   useEffect(() => {
@@ -235,11 +245,11 @@ export function SmoothScrollProvider({
         ref={lenisRef}
         options={{
           autoRaf: false,
-          // Slightly softer lerp for a more cinematic marketing feel (Phase 1A).
           lerp: 0.075,
           smoothWheel: true,
           wheelMultiplier: 0.92,
-          touchMultiplier: 1.05,
+          touchMultiplier: 1,
+          syncTouch: false,
         }}
       >
         {children}

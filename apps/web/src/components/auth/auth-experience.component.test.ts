@@ -11,7 +11,8 @@ describe('Auth experience polish contracts', () => {
     const signIn = read('src/app/sign-in/page.tsx');
     expect(signIn).toContain('href="/sign-up"');
     expect(signIn).toContain('AuthGithubButton');
-    expect(signIn).toContain('Signing in…');
+    expect(signIn).toContain('Signing you in…');
+    expect(signIn).toContain('AuthBusyNotice');
     expect(signIn).toContain('Welcome back');
     expect(signIn).toContain('Explore demo workspace');
     expect(signIn).toContain('sample data');
@@ -24,7 +25,8 @@ describe('Auth experience polish contracts', () => {
   it('keeps sign-up validation and password guidance without leaking passwords across modes', () => {
     const signUp = read('src/app/sign-up/page.tsx');
     expect(signUp).toContain('href="/sign-in"');
-    expect(signUp).toContain('Creating account…');
+    expect(signUp).toContain('Creating your account…');
+    expect(signUp).toContain('AuthBusyNotice');
     expect(signUp).toContain('Create your account');
     expect(signUp).toContain('showGuidance');
     expect(signUp).toContain('signUpSchema');

@@ -1,10 +1,24 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { PublicProjectCard } from './public-project-card';
+
+const PHONE_SCROLL_QUERY = '(max-width: 1023px), (pointer: coarse)';
+
+function useNativePhoneScroll() {
+  const [native, setNative] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_SCROLL_QUERY);
+    const sync = () => setNative(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  return native;
+}
 
 type PublicProjectStackingProps = {
   projects: FeaturedProject[];
@@ -81,42 +95,38 @@ function StackingCard({
   );
 }
 
-/**
- * Sticky stacking project cards (native scroll — no Lenis on public profiles).
- * Falls back to a simple vertical list when reduced motion is preferred.
- */
-export function PublicProjectStacking({
+function FlatProjectList({
   projects,
   displayName,
   profileId,
-  profileSlug = 'demo',
+  profileSlug,
   demoViews,
 }: PublicProjectStackingProps) {
-  const reduceMotion = useReducedMotion();
+  return (
+    <div className="flex flex-col gap-8">
+      {projects.map((project, index) => (
+        <PublicProjectCard
+          key={project.id}
+          project={project}
+          displayName={displayName}
+          profileId={profileId}
+          profileSlug={profileSlug}
+          views={demoViews?.[project.id]?.views ?? 280 + index * 40}
+          saves={demoViews?.[project.id]?.saves ?? 24 + index * 8}
+          className="cc-glass-card"
+        />
+      ))}
+    </div>
+  );
+}
+
+function StackedProjectList(props: PublicProjectStackingProps) {
+  const { projects, displayName, profileId, profileSlug = 'demo', demoViews } = props;
   const container = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ['start start', 'end end'],
   });
-
-  if (reduceMotion) {
-    return (
-      <div className="flex flex-col gap-8">
-        {projects.map((project, index) => (
-          <PublicProjectCard
-            key={project.id}
-            project={project}
-            displayName={displayName}
-            profileId={profileId}
-            profileSlug={profileSlug}
-            views={demoViews?.[project.id]?.views ?? 280 + index * 40}
-            saves={demoViews?.[project.id]?.saves ?? 24 + index * 8}
-            className="cc-glass-card"
-          />
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div ref={container} className="cc-stacking-projects relative">
@@ -142,4 +152,19 @@ export function PublicProjectStacking({
       })}
     </div>
   );
+}
+
+/**
+ * Sticky stacking project cards on fine-pointer desktops.
+ * Phones use a normal list so native scrolling isn't fighting 175dvh sticky runways.
+ */
+export function PublicProjectStacking(props: PublicProjectStackingProps) {
+  const reduceMotion = useReducedMotion();
+  const nativePhoneScroll = useNativePhoneScroll();
+
+  if (reduceMotion || nativePhoneScroll) {
+    return <FlatProjectList {...props} />;
+  }
+
+  return <StackedProjectList {...props} />;
 }

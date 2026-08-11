@@ -1755,11 +1755,11 @@ select,
   .cc-skeleton {
     background: linear-gradient(
       90deg,
-      rgba(28, 26, 38, 0.9) 0%,
-      rgba(46, 43, 61, 0.95) 45%,
-      rgba(var(--accent-rgb), 0.12) 50%,
-      rgba(46, 43, 61, 0.95) 55%,
-      rgba(28, 26, 38, 0.9) 100%
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 8%, var(--app-paper, var(--paper, #fff9f3))) 0%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 13%, var(--app-paper, var(--paper, #fff9f3))) 42%,
+      color-mix(in srgb, var(--app-iris, #c094e4) 22%, var(--app-paper, var(--paper, #fff9f3))) 50%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 13%, var(--app-paper, var(--paper, #fff9f3))) 58%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 8%, var(--app-paper, var(--paper, #fff9f3))) 100%
     );
     background-size: 240% 100%;
     animation: cc-skeleton-shimmer 1.35s ease-in-out infinite;
@@ -1777,7 +1777,11 @@ select,
   @media (prefers-reduced-motion: reduce) {
     .cc-skeleton {
       animation: none;
-      background: rgba(28, 26, 38, 0.92);
+      background: color-mix(
+        in srgb,
+        var(--app-ink, var(--ink, #232324)) 10%,
+        var(--app-paper, var(--paper, #fff9f3))
+      );
     }
   }
 
@@ -4420,11 +4424,11 @@ select,
   .cc-skeleton {
     background: linear-gradient(
       90deg,
-      #08080c 0%,
-      #181826 42%,
-      rgba(var(--accent-rgb), 0.12) 50%,
-      #181826 58%,
-      #08080c 100%
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 8%, var(--app-paper, var(--paper, #fff9f3))) 0%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 13%, var(--app-paper, var(--paper, #fff9f3))) 42%,
+      color-mix(in srgb, var(--app-iris, #c094e4) 22%, var(--app-paper, var(--paper, #fff9f3))) 50%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 13%, var(--app-paper, var(--paper, #fff9f3))) 58%,
+      color-mix(in srgb, var(--app-ink, var(--ink, #232324)) 8%, var(--app-paper, var(--paper, #fff9f3))) 100%
     );
     background-size: 220% 100%;
     animation: cc-skeleton-shimmer 1.35s ease-in-out infinite;
@@ -4489,7 +4493,11 @@ select,
   }
 
   .cc-skeleton {
-    background: #08080c !important;
+    background: color-mix(
+      in srgb,
+      var(--app-ink, var(--ink, #232324)) 10%,
+      var(--app-paper, var(--paper, #fff9f3))
+    ) !important;
   }
 
   .cc-instant-press {
@@ -5787,7 +5795,6 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   height: 48px;
   flex-shrink: 0;
   opacity: 0;
-  visibility: hidden;
   border: none;
   border-radius: 9999px;
   background: transparent;
@@ -5795,9 +5802,7 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   cursor: pointer;
   pointer-events: none;
   transform: translateY(-50%);
-  transition:
-    opacity 0.28s ease,
-    visibility 0.28s ease;
+  transition: opacity 0.28s ease;
 }
 
 .cc-nav-compact-trigger:focus-visible {
@@ -5806,22 +5811,36 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 }
 
 .cc-marketing-nav-shell .cc-nav-veil__inner > :not(.cc-nav-compact-trigger) {
-  transition: opacity 0.32s ease;
+  transition: opacity 0.28s ease;
+}
+
+html[data-nav-morphing='true'] .cc-nav-veil,
+.cc-nav-veil--morphing {
+  pointer-events: none;
+  overflow: hidden;
+  will-change: transform, width, height;
+}
+
+html[data-nav-morphing='true'] .cc-nav-veil__inner {
+  max-width: none;
+  width: max-content;
+  flex-wrap: nowrap;
 }
 
 /*
  * Crash course + research: collapse the full pill into one circular
  * right-arrow control on the LEFT. Hover / focus / peek expands rightward.
+ * Hide/show and the 48px lock wait until the FLIP morph finishes.
  */
 html[data-nav-compact='true'] .cc-marketing-nav-shell {
   justify-content: flex-start;
   padding-top: 0.55rem;
 }
 
-html[data-nav-compact='true']
+html[data-nav-compact='true']:not([data-nav-morphing='true'])
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
-  /* Keep width:fit-content; animate max-width so the pill visibly shrinks. */
   max-width: 48px;
+  width: 48px;
   height: 48px;
   min-height: 48px;
   border-radius: 9999px;
@@ -5829,7 +5848,7 @@ html[data-nav-compact='true']
   overflow: hidden;
 }
 
-html[data-nav-compact='true']
+html[data-nav-compact='true']:not([data-nav-morphing='true'])
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
   .cc-nav-veil__inner {
   height: 48px;
@@ -5837,19 +5856,18 @@ html[data-nav-compact='true']
   padding: 0;
   justify-content: flex-start;
   margin-inline: 0;
-  /* Full nav width stays in layout; parent max-width clips to the arrow. */
   width: max-content;
 }
 
-html[data-nav-compact='true']
+html[data-nav-compact='true']:not([data-nav-morphing='true'])
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
   .cc-nav-compact-trigger {
   opacity: 1;
-  visibility: visible;
   pointer-events: auto;
+  transition: opacity 0.22s ease 0.06s;
 }
 
-html[data-nav-compact='true']
+html[data-nav-compact='true']:not([data-nav-morphing='true'])
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
   .cc-nav-veil__inner
   > :not(.cc-nav-compact-trigger) {
@@ -5861,13 +5879,14 @@ html[data-nav-compact='true']
   .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
   .cc-nav-compact-trigger {
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
+  transition: opacity 0.16s ease;
 }
 
 html[data-nav-compact='true']
   .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open) {
   max-width: min(920px, calc(100% - 24px));
+  width: fit-content;
   height: auto;
   min-height: 0;
 }
@@ -5884,17 +5903,19 @@ html[data-nav-compact='true']
   > :not(.cc-nav-compact-trigger) {
   opacity: 1;
   pointer-events: auto;
+  transition: opacity 0.28s ease 0.2s;
 }
 
 @media (max-width: 767px) {
-  html[data-nav-compact='true']
+  html[data-nav-compact='true']:not([data-nav-morphing='true'])
     .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
     max-width: 44px;
+    width: 44px;
     height: 44px;
     min-height: 44px;
   }
 
-  html[data-nav-compact='true']
+  html[data-nav-compact='true']:not([data-nav-morphing='true'])
     .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
     .cc-nav-veil__inner {
     height: 44px;

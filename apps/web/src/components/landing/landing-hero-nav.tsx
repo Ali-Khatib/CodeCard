@@ -105,6 +105,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       aria-label="Primary"
       data-nav-peek={compactPeek ? 'true' : 'false'}
       onMouseEnter={() => {
+        if (document.documentElement.dataset.navMorphing === 'true') return;
         if (document.documentElement.dataset.navCompact === 'true') {
           setCompactPeek(true);
         }

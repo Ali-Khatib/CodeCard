@@ -3889,10 +3889,10 @@ html.dark .cc-reactive-border:hover {
   perspective: 1200px;
 }
 
-/* One project square per scroll gesture on mobile */
+/* Snap only inside a dedicated stack scroller — never on <html>.
+ * Document snap + sticky cards makes phone scroll feel like it's fighting you. */
 @media (max-width: 767px) {
-  html:has(.cc-project-stack),
-  html:has(.cc-public-profile .cc-app-project-card) {
+  .cc-project-stack {
     scroll-snap-type: y proximity;
   }
 
@@ -4445,7 +4445,7 @@ html.dark .cc-share-qr-pattern__scan {
     gap: 8px !important;
   }
 
-  .cc-app-project-card {
+  .cc-project-stack .cc-app-project-card {
     scroll-snap-align: start;
     scroll-margin-block: 12px;
   }
@@ -4709,8 +4709,20 @@ html.dark .cc-public-profile {
   border-radius: 9999px;
   filter: blur(48px);
   opacity: 0.85;
-  will-change: transform;
   animation: cc-public-orb 18s ease-in-out infinite alternate;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-public-atmosphere__orb {
+    will-change: transform;
+  }
+}
+
+@media (max-width: 1023px), (pointer: coarse) {
+  .cc-public-atmosphere__orb,
+  .cc-public-atmosphere__grain {
+    display: none;
+  }
 }
 
 .cc-public-atmosphere__orb--a {
@@ -4943,10 +4955,15 @@ html.dark .cc-public-atmosphere__grain {
   max-height: min(92dvh, 860px);
   height: auto;
   border-radius: 32px;
-  overflow: hidden !important; /* clip — never show a scrollbar inside the card */
-  overscroll-behavior: none;
-  will-change: transform, opacity;
+  overflow: hidden; /* clip — never show a scrollbar inside the card */
+  touch-action: pan-y;
   box-shadow: 0 32px 80px -36px rgba(34, 34, 34, 0.42);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-stacking-card__panel {
+    will-change: transform, opacity;
+  }
 }
 
 .cc-stacking-card__project {
@@ -5010,16 +5027,31 @@ html.dark .cc-public-atmosphere__grain {
   max-width: 100%;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 1023px), (pointer: coarse) {
+  .cc-stacking-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
   .cc-stacking-card {
-    min-height: 160dvh;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .cc-stacking-card .sticky {
+    position: relative !important;
+    height: auto !important;
+    top: auto !important;
   }
 
   .cc-stacking-card__panel {
-    max-height: min(88dvh, 720px);
+    max-height: none;
     width: 100%;
     border-radius: 26px;
-    overflow: hidden !important;
+    will-change: auto;
+    transform: none !important;
+    opacity: 1 !important;
   }
 
   .cc-stacking-card__project {
@@ -5059,6 +5091,10 @@ html.dark .cc-public-atmosphere__grain {
   }
 }
 
+.cc-public-profile {
+  touch-action: pan-y;
+}
+
 .cc-public-profile .cc-app-page {
   max-width: min(100%, var(--app-page-public));
   width: 100%;
@@ -5096,6 +5132,14 @@ html.dark .cc-public-atmosphere__grain {
 .cc-public-dock > div {
   max-width: min(920px, calc(100% - 0px));
   min-width: 0;
+}
+
+.cc-public-dock nav {
+  scrollbar-width: none;
+}
+
+.cc-public-dock nav::-webkit-scrollbar {
+  display: none;
 }
 
 .cc-public-breakable {
