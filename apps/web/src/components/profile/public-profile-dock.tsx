@@ -56,17 +56,17 @@ export function PublicProfileDock({ backHref, backLabel, hasResearch }: PublicPr
     <div className="cc-public-dock pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
       <div
         className={cn(
-          'pointer-events-auto flex w-full max-w-[920px] items-center gap-2',
+          'pointer-events-auto flex w-full max-w-[min(920px,100%)] min-w-0 items-center gap-2',
           'rounded-full border border-[var(--app-border)] bg-[color-mix(in_srgb,var(--app-paper)_82%,transparent)]',
           'px-2 py-1.5 shadow-[0_12px_40px_-18px_rgba(34,34,34,0.35)] backdrop-blur-xl',
         )}
       >
         <Link
           href={backHref}
-          className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)]"
+          className="inline-flex min-h-10 min-w-0 shrink items-center gap-1.5 truncate rounded-full px-3 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)]"
         >
           <span aria-hidden>←</span>
-          <span className="hidden sm:inline">{backLabel}</span>
+          <span className="hidden truncate sm:inline">{backLabel}</span>
           <span className="sm:hidden">Back</span>
         </Link>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -53,8 +53,7 @@ export function ProfileMagicBento({
   const openProject = () => {
     if (!featuredProject) return;
     saveScrollForProfile(profileSlug);
-    const base = publicDemoProfileBasePath(profileSlug);
-    navigate(`${base}/projects/${featuredProject.id}`);
+    navigate(publicDemoProjectHref(profileSlug, featuredProject.id, 'preview'));
   };
 
   const tileClass =

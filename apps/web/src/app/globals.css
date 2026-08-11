@@ -3414,19 +3414,38 @@ select,
   /* Cream scroll bodies — lock ink type (fixes white/lilac-white on void-canvas) */
   .cc-on-cream-surface {
     --ink: #232324;
+    --smoke: #5c5856;
+    --ash: #5c5856;
     --text-primary: #232324;
+    --text-secondary: #5c5856;
     color: #232324;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .cc-on-cream-surface :where(h1, h2, h3, h4, p, li, span, a, label) {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .cc-on-cream-surface :where(h1, h2, h3, h4) {
     color: #232324;
   }
 
+  .cc-on-cream-surface img,
+  .cc-on-cream-surface video {
+    max-width: 100%;
+    height: auto;
+  }
+
   /* Night mode flips the cream surfaces dark, so the locked ink must flip light
      too — otherwise case-study/story text renders dark-on-dark and disappears. */
   html.dark .cc-on-cream-surface {
     --ink: #efedeb;
+    --smoke: #b5b1b6;
+    --ash: #b5b1b6;
     --text-primary: #efedeb;
+    --text-secondary: #b5b1b6;
     color: #efedeb;
   }
 
@@ -5690,49 +5709,6 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   }
 }
 
-.cc-demo-progress {
-  position: fixed;
-  right: 14px;
-  top: 50%;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transform: translateY(-50%);
-}
-
-.cc-demo-progress__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--app-ink, #232324) 22%, transparent);
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    height 0.2s ease;
-}
-
-.cc-demo-progress__dot:hover {
-  transform: scale(1.15);
-  background: color-mix(in srgb, var(--app-iris, #c094e4) 55%, transparent);
-}
-
-.cc-demo-progress__dot:focus-visible {
-  outline: 2px solid var(--cc-focus-ring, var(--iris, #c094e4));
-  outline-offset: 3px;
-}
-
-.cc-demo-progress__dot--active {
-  background: var(--app-iris, #c094e4);
-  height: 18px;
-}
-
-@media (max-width: 900px) {
-  .cc-demo-progress {
-    display: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cc-hero-ambient-light,
   .cc-landing-closing--ambient::before,
@@ -5756,10 +5732,6 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
     transform: none !important;
   }
 
-  .cc-demo-progress--static .cc-demo-progress__dot--active {
-    height: 8px;
-  }
-
   .cc-visitor-prompt {
     animation: none !important;
   }
@@ -5771,41 +5743,61 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 /* ── Phase 1B premium interaction polish ── */
 .cc-marketing-nav-shell {
-  transition: padding-top 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/*
+ * Animate max-width (not width:auto) so Crash Course / Research collapse
+ * can interpolate into the circle. Origin left so it shrinks toward the
+ * left edge of the bar.
+ */
 .cc-marketing-nav-shell .cc-nav-veil {
-  transform-origin: center center;
+  max-width: min(920px, calc(100% - 24px));
+  transform-origin: left center;
   transition:
-    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    padding 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.45s ease,
-    background-color 0.45s ease,
-    border-color 0.45s ease;
+    max-width 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.55s ease,
+    background-color 0.55s ease,
+    border-color 0.55s ease;
 }
 
 .cc-marketing-nav-shell .cc-nav-veil__inner {
+  position: relative;
   transition:
-    height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    gap 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    padding 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.62s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Absolutely positioned so it never steals flex gap when the full pill is shown. */
 .cc-nav-compact-trigger {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  z-index: 2;
   width: 48px;
   height: 48px;
   flex-shrink: 0;
+  opacity: 0;
+  visibility: hidden;
   border: none;
   border-radius: 9999px;
   background: transparent;
   color: inherit;
   cursor: pointer;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease;
 }
 
 .cc-nav-compact-trigger:focus-visible {
@@ -5813,21 +5805,22 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   outline-offset: 3px;
 }
 
-/*
- * Crash course + research: collapse the full pill into one circular
- * right-arrow control. Hover / focus / peek expands it back.
- */
-html[data-nav-compact='true'] .cc-marketing-nav-shell {
-  padding-top: 0.55rem;
+.cc-marketing-nav-shell .cc-nav-veil__inner > :not(.cc-nav-compact-trigger) {
+  transition: opacity 0.32s ease;
 }
 
-html[data-nav-compact='true'] .cc-nav-compact-trigger {
-  display: inline-flex;
+/*
+ * Crash course + research: collapse the full pill into one circular
+ * right-arrow control on the LEFT. Hover / focus / peek expands rightward.
+ */
+html[data-nav-compact='true'] .cc-marketing-nav-shell {
+  justify-content: flex-start;
+  padding-top: 0.55rem;
 }
 
 html[data-nav-compact='true']
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
-  width: 48px;
+  /* Keep width:fit-content; animate max-width so the pill visibly shrinks. */
   max-width: 48px;
   height: 48px;
   min-height: 48px;
@@ -5840,25 +5833,26 @@ html[data-nav-compact='true']
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
   .cc-nav-veil__inner {
   height: 48px;
-  width: 48px;
   gap: 0;
   padding: 0;
-  justify-content: center;
+  justify-content: flex-start;
+  margin-inline: 0;
+  /* Full nav width stays in layout; parent max-width clips to the arrow. */
+  width: max-content;
+}
+
+html[data-nav-compact='true']
+  .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
+  .cc-nav-compact-trigger {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 html[data-nav-compact='true']
   .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
   .cc-nav-veil__inner
   > :not(.cc-nav-compact-trigger) {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -5866,32 +5860,35 @@ html[data-nav-compact='true']
 html[data-nav-compact='true']
   .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
   .cc-nav-compact-trigger {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 html[data-nav-compact='true']
   .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open) {
-  width: auto;
-  max-width: min(100%, 920px);
+  max-width: min(920px, calc(100% - 24px));
   height: auto;
-  animation: cc-nav-expand-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  min-height: 0;
 }
 
-@keyframes cc-nav-expand-in {
-  0% {
-    transform: scale(0.92);
-    opacity: 0.88;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+html[data-nav-compact='true']
+  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
+  .cc-nav-veil__inner {
+  padding-inline: 22px;
+}
+
+html[data-nav-compact='true']
+  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
+  .cc-nav-veil__inner
+  > :not(.cc-nav-compact-trigger) {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 @media (max-width: 767px) {
   html[data-nav-compact='true']
     .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
-    width: 44px;
     max-width: 44px;
     height: 44px;
     min-height: 44px;
@@ -5901,7 +5898,6 @@ html[data-nav-compact='true']
     .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
     .cc-nav-veil__inner {
     height: 44px;
-    width: 44px;
   }
 
   .cc-nav-compact-trigger {
@@ -5913,13 +5909,11 @@ html[data-nav-compact='true']
 @media (prefers-reduced-motion: reduce) {
   .cc-marketing-nav-shell,
   .cc-marketing-nav-shell .cc-nav-veil,
-  .cc-marketing-nav-shell .cc-nav-veil__inner {
+  .cc-marketing-nav-shell .cc-nav-veil__inner,
+  .cc-nav-compact-trigger,
+  .cc-marketing-nav-shell .cc-nav-veil__inner > :not(.cc-nav-compact-trigger) {
     transition-duration: 0.01ms !important;
-  }
-
-  html[data-nav-compact='true']
-    .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open) {
-    animation: none !important;
+    transition-delay: 0s !important;
   }
 }
 

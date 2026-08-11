@@ -1,6 +1,6 @@
 'use client';
 
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
 
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
@@ -44,8 +44,7 @@ export function ChromaWorkSection({ projects, profileSlug, accentColor }: Chroma
     if (!url?.startsWith('project:')) return;
     const id = url.replace('project:', '');
     saveScrollForProfile(profileSlug);
-    const base = publicDemoProfileBasePath(profileSlug);
-    navigate(`${base}/projects/${id}`);
+    navigate(publicDemoProjectHref(profileSlug, id, 'preview'));
   };
 
   if (projects.length === 0) return null;

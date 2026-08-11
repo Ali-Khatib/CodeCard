@@ -1,4 +1,4 @@
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoResearchHref } from '@/lib/marketing/demo-url';
 import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_MOTION } from '@/lib/motion/hume-motion';
@@ -28,9 +28,7 @@ export function PublicResearchSection({
           <ResearchPaperCard
             key={paper.id}
             paper={paper}
-            href={
-              `${publicDemoProfileBasePath(profileSlug)}/research/${paper.slug}`
-            }
+            href={publicDemoResearchHref(profileSlug, paper.slug, 'preview')}
             profileId={profileId}
             delay={index * HUME_MOTION.stagger}
           />

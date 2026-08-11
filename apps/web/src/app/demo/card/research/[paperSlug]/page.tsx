@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
@@ -19,11 +20,13 @@ export default async function DemoResearchDetailPage({ params }: PageProps) {
         context="live_demo"
         referrer={`demo/card/research/${paperSlug}`}
       />
-      <ResearchPaperDetail
-        paper={paper}
-        profileSlug="demo"
-        displayName={DEMO_PROFILE.display_name}
-      />
+      <Suspense fallback={null}>
+        <ResearchPaperDetail
+          paper={paper}
+          profileSlug="demo"
+          displayName={DEMO_PROFILE.display_name}
+        />
+      </Suspense>
     </>
   );
 }

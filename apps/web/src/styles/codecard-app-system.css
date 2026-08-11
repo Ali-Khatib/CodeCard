@@ -4645,9 +4645,23 @@ html.dark [class*='uppercase'][class*='tracking'] {
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: clip;
   background: var(--app-bone);
   color: var(--app-ink);
   font-family: var(--app-font);
+}
+
+.cc-public-profile *,
+.cc-public-profile *::before,
+.cc-public-profile *::after {
+  box-sizing: border-box;
+}
+
+.cc-public-profile img,
+.cc-public-profile video,
+.cc-public-profile svg {
   max-width: 100%;
 }
 
@@ -4866,6 +4880,8 @@ html.dark .cc-public-atmosphere__grain {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
     align-items: center;
     gap: 0;
+    /* Contain the overlapping panel so it cannot force page-wide horizontal scroll */
+    overflow: visible;
   }
 
   .cc-public-hero__portrait-frame {
@@ -4875,8 +4891,11 @@ html.dark .cc-public-atmosphere__grain {
 
   .cc-public-hero__panel {
     margin-top: 0;
-    margin-left: -18%;
+    /* Cap the overlap — never push past the page edge */
+    margin-left: clamp(-4.5rem, -14%, -1.25rem);
     margin-right: 0;
+    max-width: 100%;
+    min-width: 0;
     padding: 1.75rem 1.6rem 1.8rem;
   }
 }
@@ -4903,25 +4922,31 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-stacking-projects {
-  margin-inline: -0.25rem;
+  margin-inline: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .cc-stacking-card {
   /* Keep cards centered; never force an inner scrollport */
   overflow: visible;
+  width: 100%;
+  max-width: 100%;
 }
 
 .cc-stacking-card__panel {
   display: flex;
   flex-direction: column;
-  width: min(100%, 860px);
-  max-height: min(84dvh, 680px);
+  width: min(100%, 1100px);
+  max-width: 100%;
+  max-height: min(92dvh, 860px);
   height: auto;
-  border-radius: 28px;
+  border-radius: 32px;
   overflow: hidden !important; /* clip — never show a scrollbar inside the card */
   overscroll-behavior: none;
   will-change: transform, opacity;
-  box-shadow: 0 28px 70px -36px rgba(34, 34, 34, 0.4);
+  box-shadow: 0 32px 80px -36px rgba(34, 34, 34, 0.42);
 }
 
 .cc-stacking-card__project {
@@ -4931,32 +4956,39 @@ html.dark .cc-public-atmosphere__grain {
   min-height: 0;
   max-height: 100%;
   height: 100%;
-  border-radius: 28px !important;
+  max-width: 100%;
+  border-radius: 32px !important;
+  color: var(--app-ink);
 }
 
 .cc-stacking-card__project .cc-app-project-card__media {
-  /* Shorter hero so title + tags + CTAs always fit without scrolling */
-  height: clamp(132px, 26dvh, 220px) !important;
-  flex: 0 0 auto;
-  border-top-left-radius: 27px;
-  border-top-right-radius: 27px;
+  height: clamp(160px, 28dvh, 280px) !important;
+  flex: 0 1 auto;
+  max-height: 34dvh;
+  border-top-left-radius: 31px;
+  border-top-right-radius: 31px;
 }
 
 .cc-stacking-card__project .cc-app-project-card__body {
-  flex: 0 0 auto;
-  padding: 16px 18px 18px !important;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 18px 18px 20px !important;
+  color: var(--app-ink);
 }
 
 .cc-stacking-card__project .cc-work-title {
-  font-size: clamp(1.55rem, 3.8vw, 2.25rem) !important;
+  font-size: clamp(1.55rem, 4vw, 2.45rem) !important;
   line-height: 1.05 !important;
+  color: var(--app-ink) !important;
 }
 
 .cc-stacking-card__project .cc-app-project-card__body > p {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: var(--app-smoke);
 }
 
 .cc-stacking-card__project .cc-app-project-card__body .mt-5 {
@@ -4970,33 +5002,50 @@ html.dark .cc-public-atmosphere__grain {
 .cc-stacking-card__project .cc-app-project-card__body .mt-8 {
   /* Expanded quick-details: keep clipped rather than inventing a scrollbar */
   margin-top: 0.85rem !important;
-  max-height: 7.5rem;
+  max-height: 6.5rem;
   overflow: hidden;
+}
+
+.cc-stacking-card__project .cc-app-btn {
+  max-width: 100%;
 }
 
 @media (max-width: 639px) {
   .cc-stacking-card {
-    height: 100dvh;
-    min-height: 100dvh;
-    padding-block: 0.75rem;
+    min-height: 160dvh;
   }
 
   .cc-stacking-card__panel {
-    max-height: min(86dvh, 640px);
-    border-radius: 24px;
+    max-height: min(88dvh, 720px);
+    width: 100%;
+    border-radius: 26px;
     overflow: hidden !important;
   }
 
   .cc-stacking-card__project {
-    border-radius: 24px !important;
+    border-radius: 26px !important;
   }
 
   .cc-stacking-card__project .cc-app-project-card__media {
-    height: clamp(120px, 22dvh, 180px) !important;
+    height: clamp(120px, 22dvh, 200px) !important;
   }
 
   .cc-stacking-card__project .cc-app-project-card__body {
     padding: 14px 14px 16px !important;
+  }
+}
+
+@media (max-height: 720px) {
+  .cc-stacking-card__project .cc-app-project-card__media {
+    height: clamp(96px, 18dvh, 150px) !important;
+  }
+
+  .cc-stacking-card__project .cc-work-title {
+    font-size: clamp(1.35rem, 3.6vw, 1.85rem) !important;
+  }
+
+  .cc-stacking-card__project .cc-app-project-card__body {
+    padding: 12px 14px 14px !important;
   }
 }
 
@@ -5014,6 +5063,7 @@ html.dark .cc-public-atmosphere__grain {
   max-width: min(100%, var(--app-page-public));
   width: 100%;
   min-width: 0;
+  overflow-x: clip;
 }
 
 .cc-public-profile .cc-app-project-card,
@@ -5028,9 +5078,40 @@ html.dark .cc-public-atmosphere__grain {
   min-width: 0;
 }
 
+.cc-public-profile .cc-app-project-card__body {
+  color: var(--app-ink);
+}
+
+.cc-public-profile .cc-app-tech-tag,
+.cc-public-profile .cc-chip-react {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.cc-public-dock {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.cc-public-dock > div {
+  max-width: min(920px, calc(100% - 0px));
+  min-width: 0;
+}
+
 .cc-public-breakable {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+/* Project / research detail — no horizontal scroll, theme-safe type */
+.cc-project-detail-shell {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.cc-project-detail-shell img,
+.cc-project-detail-shell video {
+  max-width: 100%;
 }
 
 @media (max-width: 430px) {
@@ -5041,6 +5122,11 @@ html.dark .cc-public-atmosphere__grain {
 
   .cc-public-profile .cc-app-btn {
     min-height: 44px;
+  }
+
+  .cc-public-hero__panel {
+    margin-inline: 0.5rem;
+    padding: 1.15rem 1rem 1.2rem;
   }
 }
 

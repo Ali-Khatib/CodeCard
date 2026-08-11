@@ -25,7 +25,7 @@ function StackingCard({
   progress,
   range,
   targetScale,
-  step,
+  isLast,
 }: {
   i: number;
   project: FeaturedProject;
@@ -37,50 +37,46 @@ function StackingCard({
   progress: MotionValue<number>;
   range: [number, number];
   targetScale: number;
-  step: number;
+  isLast: boolean;
 }) {
-  const container = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: enterProgress } = useScroll({
-    target: container,
-    offset: ['start end', 'start start'],
+  const section = useRef<HTMLDivElement>(null);
+  // Local runway: stick fully opaque, then a long scroll-driven fade out (~1s of scrolling).
+  const { scrollYProgress: cardProgress } = useScroll({
+    target: section,
+    offset: ['start start', 'end start'],
   });
 
   const scale = useTransform(progress, range, [1, targetScale]);
-  // Fade in as the card arrives, hold, then fade out as the next card takes over.
-  const enterOpacity = useTransform(enterProgress, [0, 0.35, 1], [0.15, 1, 1]);
-  const exitOpacity = useTransform(
-    progress,
-    [range[0], range[0] + step * 0.55, Math.min(1, range[0] + step * 0.95), 1],
-    [1, 1, 0.35, 0.12],
-  );
-  const opacity = useTransform([enterOpacity, exitOpacity], ([enter, exit]) =>
-    Math.min(Number(enter), Number(exit)),
+  // No fade-in — cards arrive solid. Only the outgoing card fades away.
+  const opacity = useTransform(
+    cardProgress,
+    isLast ? [0, 1] : [0, 0.42, 0.88, 1],
+    isLast ? [1, 1] : [1, 1, 0, 0],
   );
 
   return (
-    <div
-      ref={container}
-      className="cc-stacking-card sticky top-0 flex h-[100dvh] items-center justify-center px-1 sm:px-0"
-    >
-      <motion.div
-        style={{
-          scale,
-          opacity,
-          top: `calc(-4vh + ${i * 22}px)`,
-        }}
-        className="cc-stacking-card__panel relative w-[min(100%,860px)] origin-top"
-      >
-        <PublicProjectCard
-          project={project}
-          displayName={displayName}
-          profileId={profileId}
-          profileSlug={profileSlug}
-          views={views}
-          saves={saves}
-          className="cc-stacking-card__project cc-glass-card"
-          mediaClassName="overflow-hidden"
-        />
-      </motion.div>
+    <div ref={section} className="cc-stacking-card relative h-[175dvh]">
+      <div className="sticky top-0 z-0 flex h-[100dvh] w-full max-w-full items-center justify-center px-2 sm:px-3">
+        <motion.div
+          style={{
+            scale,
+            opacity,
+            top: `calc(-3vh + ${i * 18}px)`,
+          }}
+          className="cc-stacking-card__panel relative w-full max-w-[min(100%,1100px)] origin-top"
+        >
+          <PublicProjectCard
+            project={project}
+            displayName={displayName}
+            profileId={profileId}
+            profileSlug={profileSlug}
+            views={views}
+            saves={saves}
+            className="cc-stacking-card__project cc-glass-card"
+            mediaClassName="overflow-hidden"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -125,7 +121,7 @@ export function PublicProjectStacking({
   return (
     <div ref={container} className="cc-stacking-projects relative">
       {projects.map((project, i) => {
-        const targetScale = 1 - (projects.length - i) * 0.05;
+        const targetScale = 1 - (projects.length - i) * 0.04;
         const step = projects.length > 1 ? 1 / projects.length : 1;
         return (
           <StackingCard
@@ -140,7 +136,7 @@ export function PublicProjectStacking({
             progress={scrollYProgress}
             range={[i * step, 1]}
             targetScale={targetScale}
-            step={step}
+            isLast={i === projects.length - 1}
           />
         );
       })}

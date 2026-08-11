@@ -1,4 +1,4 @@
-import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
+import { publicDemoProjectHref, type PublicDetailFrom } from '@/lib/marketing/demo-url';
 
 export type AdjacentProjects<T> = {
   previous: T | null;
@@ -28,6 +28,10 @@ export function getAdjacentProjects<T extends { id: string }>(
   };
 }
 
-export function buildPublicProjectDetailHref(profileSlug: string, projectId: string): string {
-  return publicDemoProjectHref(profileSlug, projectId);
+export function buildPublicProjectDetailHref(
+  profileSlug: string,
+  projectId: string,
+  from?: PublicDetailFrom,
+): string {
+  return publicDemoProjectHref(profileSlug, projectId, from);
 }

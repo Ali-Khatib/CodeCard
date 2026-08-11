@@ -9,7 +9,7 @@ import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-
 import { ResearchBubbleGrid } from '@/components/dashboard/research-bubble-grid';
 import {
   isDemoWorkspacePath,
-  publicDemoProfileBasePath,
+  publicDemoResearchHref,
   workspaceCreateResearchHref,
   workspaceResearchEditHref,
 } from '@/lib/marketing/demo-url';
@@ -31,7 +31,7 @@ function paperPublicHref(
   if (!paper.isPublished || !isProfilePublic || !profileSlug || !paper.slug) {
     return null;
   }
-  return `${publicDemoProfileBasePath(profileSlug)}/research/${paper.slug}`;
+  return publicDemoResearchHref(profileSlug, paper.slug, 'research');
 }
 
 export function DashboardResearchView({

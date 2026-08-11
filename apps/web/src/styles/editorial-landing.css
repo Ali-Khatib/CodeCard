@@ -1206,13 +1206,13 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   /* Follow chapter atmosphere — one page color until scroll flips data-chapter */
   background: transparent;
   color: var(--ed-ink, #232324);
-  padding: 0 clamp(1.5rem, 6vw, 5rem) clamp(3.5rem, 10vh, 6.5rem);
+  padding: 0 clamp(0.75rem, 2.5vw, 2rem) clamp(3.5rem, 10vh, 6.5rem);
 }
 
 .cc-ed-demo-embed .cc-ed-walk__bridge--out {
-  width: calc(100% + 2 * clamp(1.5rem, 6vw, 5rem));
-  margin-left: calc(-1 * clamp(1.5rem, 6vw, 5rem));
-  margin-right: calc(-1 * clamp(1.5rem, 6vw, 5rem));
+  width: calc(100% + 2 * clamp(0.75rem, 2.5vw, 2rem));
+  margin-left: calc(-1 * clamp(0.75rem, 2.5vw, 2rem));
+  margin-right: calc(-1 * clamp(0.75rem, 2.5vw, 2rem));
   margin-bottom: clamp(2rem, 5vh, 3.25rem);
 }
 
@@ -1249,18 +1249,19 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
-  width: min(56rem, 100%);
+  width: min(92rem, 100%);
   max-width: 100%;
   margin-inline: auto;
   align-self: center;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 24px;
   border: 1px solid var(--ed-border);
   background: var(--ed-paper);
-  box-shadow: 0 24px 60px rgba(35, 35, 36, 0.1);
-  padding: 10px;
-  height: min(52vh, 520px);
-  min-height: 360px;
+  box-shadow: 0 28px 72px rgba(35, 35, 36, 0.12);
+  padding: 12px;
+  /* Room for sidebar + home content — not a letterbox strip */
+  height: min(82vh, 860px);
+  min-height: 620px;
 }
 
 .cc-ed-demo-embed__frame {
@@ -1268,13 +1269,20 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   width: 100%;
   height: 100%;
   border: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--ed-page);
+}
+
+@media (max-width: 1100px) {
+  .cc-ed-demo-embed__chrome {
+    height: min(78vh, 760px);
+    min-height: 540px;
+  }
 }
 
 @media (max-width: 767px) {
   .cc-ed-demo-embed {
-    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    padding-inline: clamp(0.75rem, 3vw, 1.25rem);
     padding-bottom: clamp(2.75rem, 8vh, 4.5rem);
   }
 
@@ -1286,8 +1294,8 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
     width: 100%;
     padding: 0;
     border-radius: 20px;
-    height: min(48vh, 420px);
-    min-height: 300px;
+    height: min(72vh, 640px);
+    min-height: 440px;
     box-shadow: 0 18px 48px rgba(35, 35, 36, 0.12);
   }
 

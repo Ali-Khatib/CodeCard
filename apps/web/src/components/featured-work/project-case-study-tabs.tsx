@@ -24,16 +24,13 @@ const FALLBACK_IMAGES = [
 ] as const;
 
 function imagesForSection(mediaUrl: string | null, index: number): string[] {
-  const primary = mediaUrl?.trim() || FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]!;
-  const secondary =
-    mediaUrl?.trim() ||
-    FALLBACK_IMAGES[(index + 1) % FALLBACK_IMAGES.length]!;
-  // Dual layer when we have a real media URL — reuse it for both frames;
-  // otherwise show two distinct fallbacks for depth.
-  if (mediaUrl?.trim()) {
-    return [primary, primary];
-  }
-  return [primary, secondary];
+  const trimmed = mediaUrl?.trim();
+  if (trimmed) return [trimmed];
+  // Distinct pair of fallbacks only when the section has no real media.
+  return [
+    FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]!,
+    FALLBACK_IMAGES[(index + 2) % FALLBACK_IMAGES.length]!,
+  ];
 }
 
 export function ProjectCaseStudyTabs({
@@ -80,16 +77,16 @@ export function ProjectCaseStudyTabs({
       data-testid="project-case-study-carousel"
       aria-label="Project showcase"
     >
-      <div className="mb-5 px-1 text-center md:mb-7">
+      <div className="mb-6 px-1 md:mb-8">
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-smoke md:text-[11px]">
           Extra showcase
         </p>
         {project.tagline ? (
-          <p className="mx-auto mt-2 max-w-2xl text-[15px] font-medium leading-snug tracking-[-0.02em] text-ink md:text-[18px]">
+          <p className="mt-2 max-w-2xl font-display text-[clamp(1.35rem,2.8vw,1.75rem)] font-medium leading-snug tracking-[-0.02em] text-ink">
             {project.tagline}
           </p>
         ) : (
-          <p className="mx-auto mt-2 max-w-xl text-[13px] leading-relaxed text-smoke md:text-[14px]">
+          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-smoke md:text-[15px]">
             Optional story beats — tap through each section of the work.
           </p>
         )}

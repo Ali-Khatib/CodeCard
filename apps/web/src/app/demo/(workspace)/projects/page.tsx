@@ -28,7 +28,7 @@ const creator = profileToPortfolioCreator(
 const projects = DEMO_FEATURED_PROJECTS.filter((p) =>
   DEMO_NAMES.includes(p.title as (typeof DEMO_NAMES)[number]),
 ).map((p) =>
-  featuredToPortfolioProject(p, publicDemoProjectHref(DEMO_WORKSPACE.profileSlug, p.id)),
+  featuredToPortfolioProject(p, publicDemoProjectHref(DEMO_WORKSPACE.profileSlug, p.id, 'projects')),
 );
 
 export default function DemoWorkspaceProjectsPage() {

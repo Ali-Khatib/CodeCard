@@ -1,30 +1,8 @@
 'use client';
 
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useState,
-  type ComponentProps,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-} from 'react';
-import {
-  AnimatePresence,
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  type MotionStyle,
-  type MotionValue,
-  type Variants,
-} from 'motion/react';
+import { useCallback, useEffect, useState, type ComponentProps } from 'react';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { cn } from '@/lib/cn';
-
-type WrapperStyle = MotionStyle & {
-  '--x': MotionValue<string>;
-  '--y': MotionValue<string>;
-};
 
 export type FeatureCarouselStep = {
   id: string;
@@ -34,46 +12,6 @@ export type FeatureCarouselStep = {
   /** One or two image URLs for this beat. */
   images: string[];
 };
-
-type StepImageProps = {
-  src: string;
-  alt: string;
-  className?: string;
-  style?: CSSProperties;
-};
-
-const ANIMATION_PRESETS = {
-  fadeInScale: {
-    initial: { opacity: 0, scale: 0.95 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.95 },
-    transition: { type: 'spring' as const, stiffness: 300, damping: 25, mass: 0.5 },
-  },
-  slideInRight: {
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 },
-    transition: { type: 'spring' as const, stiffness: 300, damping: 25, mass: 0.5 },
-  },
-  slideInLeft: {
-    initial: { opacity: 0, x: -20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 20 },
-    transition: { type: 'spring' as const, stiffness: 300, damping: 25, mass: 0.5 },
-  },
-} as const;
-
-type AnimationPreset = keyof typeof ANIMATION_PRESETS;
-
-const IMAGE_FRAME =
-  'rounded-xl border border-[color:var(--line-soft)] shadow-[0_24px_60px_rgba(35,35,36,0.14)] object-cover';
-
-const DUAL_LAYOUT = {
-  primary: 'w-[52%] left-0 top-[12%]',
-  secondary: 'w-[58%] left-[38%] top-[34%]',
-} as const;
-
-const SINGLE_LAYOUT = 'w-[90%] left-[5%] top-[18%]';
 
 function useNumberCycler(totalSteps: number, interval: number, enabled: boolean) {
   const [currentNumber, setCurrentNumber] = useState(0);
@@ -101,19 +39,6 @@ function useNumberCycler(totalSteps: number, interval: number, enabled: boolean)
   return { currentNumber, setStep };
 }
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkDevice = () => {
-      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
-    };
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
-  }, []);
-  return isMobile;
-}
-
 function IconCheck({ className, ...props }: ComponentProps<'svg'>) {
   return (
     <svg
@@ -130,118 +55,9 @@ function IconCheck({ className, ...props }: ComponentProps<'svg'>) {
 }
 
 const stepVariants: Variants = {
-  inactive: { scale: 0.96, opacity: 0.72 },
-  active: { scale: 1, opacity: 1 },
+  inactive: { opacity: 0.55 },
+  active: { opacity: 1 },
 };
-
-const StepImage = forwardRef<HTMLImageElement, StepImageProps>(
-  ({ src, alt, className, style, ...props }, ref) => (
-    // Decorative showcase frames — alt provided by caller for the beat.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      ref={ref}
-      alt={alt}
-      className={className}
-      src={src}
-      style={{ position: 'absolute', userSelect: 'none', maxWidth: 'unset', ...style }}
-      {...props}
-    />
-  ),
-);
-StepImage.displayName = 'StepImage';
-
-const MotionStepImage = motion.create(StepImage);
-
-function AnimatedStepImage({
-  preset = 'fadeInScale',
-  delay = 0,
-  reducedMotion,
-  ...props
-}: StepImageProps & { preset?: AnimationPreset; delay?: number; reducedMotion?: boolean }) {
-  if (reducedMotion) {
-    return <StepImage {...props} />;
-  }
-  const presetConfig = ANIMATION_PRESETS[preset];
-  return (
-    <MotionStepImage
-      {...props}
-      initial={presetConfig.initial}
-      animate={presetConfig.animate}
-      exit={presetConfig.exit}
-      transition={{ ...presetConfig.transition, delay }}
-    />
-  );
-}
-
-function FeatureCard({
-  children,
-  step,
-  steps,
-  reducedMotion,
-}: {
-  children: ReactNode;
-  step: number;
-  steps: readonly FeatureCarouselStep[];
-  reducedMotion?: boolean;
-}) {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const spotlightX = useMotionTemplate`${mouseX}px`;
-  const spotlightY = useMotionTemplate`${mouseY}px`;
-  const isMobile = useIsMobile();
-  const active = steps[step];
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: MouseEvent) {
-    if (isMobile) return;
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  if (!active) return null;
-
-  return (
-    <motion.div
-      className="animated-cards group relative w-full rounded-2xl"
-      onMouseMove={handleMouseMove}
-      style={{ '--x': spotlightX, '--y': spotlightY } as WrapperStyle}
-    >
-      <div
-        className={cn(
-          'relative w-full overflow-hidden rounded-[28px] border border-[color:var(--line-soft)] bg-paper',
-          'shadow-[0_24px_70px_rgba(35,35,36,0.12)]',
-          'before:pointer-events-none before:absolute before:inset-0 before:z-[1] before:opacity-0 before:transition-opacity before:duration-300',
-          'before:bg-[radial-gradient(420px_circle_at_var(--x)_var(--y),rgba(192,148,228,0.18),transparent_55%)]',
-          'group-hover:before:opacity-100',
-        )}
-      >
-        <div className="relative m-6 min-h-[420px] w-auto sm:m-8 md:m-10 md:min-h-[450px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.id}
-              className="relative z-[2] flex w-full flex-col gap-3 md:w-[52%] md:gap-4"
-              initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-              transition={{ duration: reducedMotion ? 0.15 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--iris,#c094e4)]">
-                {active.name}
-              </p>
-              <h2 className="text-[clamp(1.65rem,3.2vw,2.15rem)] font-semibold tracking-[-0.04em] text-ink md:text-[1.95rem]">
-                {active.title}
-              </h2>
-              <p className="max-w-[38ch] text-[15px] leading-relaxed text-smoke md:text-[16px]">
-                {active.description}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-          {children}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 function StepsNav({
   steps: stepItems,
@@ -268,7 +84,7 @@ function StepsNav({
               initial="inactive"
               animate={isCurrent ? 'active' : 'inactive'}
               variants={stepVariants}
-              transition={{ duration: 0.28 }}
+              transition={{ duration: 0.22 }}
               className="relative"
             >
               <button
@@ -282,8 +98,8 @@ function StepsNav({
                   'group flex min-h-11 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--iris,#c094e4)] focus-visible:ring-offset-2',
                   isCurrent
-                    ? 'bg-[color:var(--iris,#c094e4)] text-white shadow-[0_10px_26px_rgba(192,148,228,0.35)]'
-                    : 'border border-[color:var(--line-soft)] bg-paper text-smoke hover:border-[color:var(--iris,#c094e4)] hover:text-ink',
+                    ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
+                    : 'border border-[color:var(--line-soft)] bg-transparent text-[color:var(--smoke)] hover:border-[color:color-mix(in_srgb,var(--ink)_25%,transparent)] hover:text-[color:var(--ink)]',
                 )}
                 onClick={() => onChange(stepIdx)}
                 onFocus={() => onChange(stepIdx)}
@@ -310,15 +126,15 @@ function StepsNav({
                   className={cn(
                     'flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
                     isCurrent
-                      ? 'bg-white/30 text-white'
+                      ? 'bg-white/20 text-[color:var(--paper)]'
                       : isCompleted
-                        ? 'bg-[color:var(--iris,#c094e4)] text-white'
-                        : 'bg-[color:var(--hume-lavender-mist,#ebe6f4)] text-smoke group-hover:bg-[color:var(--iris,#c094e4)]/25 group-hover:text-ink',
+                        ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
+                        : 'bg-[color:var(--line-soft)] text-[color:var(--smoke)]',
                   )}
                 >
                   {isCompleted ? <IconCheck className="h-3.5 w-3.5" /> : <span>{stepIdx + 1}</span>}
                 </span>
-                <span className="hidden sm:inline-block">{step.title}</span>
+                <span className="hidden max-w-[12ch] truncate sm:inline-block">{step.title}</span>
               </button>
             </motion.li>
           );
@@ -328,54 +144,62 @@ function StepsNav({
   );
 }
 
-function StepVisuals({
-  step,
+function StepMedia({
+  images,
+  title,
   reducedMotion,
 }: {
-  step: FeatureCarouselStep;
+  images: string[];
+  title: string;
   reducedMotion?: boolean;
 }) {
-  const imgs = step.images.filter(Boolean);
+  const imgs = images.filter(Boolean);
   if (imgs.length === 0) {
     return (
       <div
-        className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(circle_at_72%_40%,rgba(192,148,228,0.2),transparent_52%),linear-gradient(150deg,var(--paper),var(--hume-lavender-mist)_58%,var(--hume-cream))]"
+        className="aspect-[4/3] w-full min-w-0 rounded-2xl bg-[linear-gradient(145deg,color-mix(in_srgb,var(--iris,#c094e4)_12%,var(--paper)),var(--paper))]"
         aria-hidden
       />
     );
   }
 
-  if (imgs.length === 1) {
+  if (imgs.length === 1 || imgs[0] === imgs[1]) {
     return (
-      <div className="pointer-events-none absolute inset-0">
-        <AnimatedStepImage
-          alt=""
-          className={cn(IMAGE_FRAME, SINGLE_LAYOUT, 'h-[70%]')}
+      <motion.div
+        className="relative aspect-[4/3] w-full min-w-0 overflow-hidden rounded-2xl bg-[color:var(--charcoal,#ece7df)]"
+        initial={reducedMotion ? false : { opacity: 0.6 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: reducedMotion ? 0.12 : 0.45 }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={imgs[0]!}
-          preset="fadeInScale"
-          reducedMotion={reducedMotion}
+          alt=""
+          className="h-full w-full max-w-full object-cover"
+          draggable={false}
         />
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="pointer-events-none absolute inset-0">
-      <AnimatedStepImage
-        alt=""
-        className={cn(IMAGE_FRAME, DUAL_LAYOUT.primary, 'h-[58%]')}
-        src={imgs[0]!}
-        preset="slideInLeft"
-        reducedMotion={reducedMotion}
-      />
-      <AnimatedStepImage
-        alt=""
-        className={cn(IMAGE_FRAME, DUAL_LAYOUT.secondary, 'h-[52%]')}
-        src={imgs[1]!}
-        preset="slideInRight"
-        delay={0.1}
-        reducedMotion={reducedMotion}
-      />
+    <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:gap-4">
+      {imgs.slice(0, 2).map((src, index) => (
+        <motion.div
+          key={`${src}-${index}`}
+          className={cn(
+            'relative min-w-0 overflow-hidden rounded-2xl bg-[color:var(--charcoal,#ece7df)]',
+            index === 0 ? 'aspect-[3/4]' : 'aspect-[3/4] mt-4 sm:mt-10',
+          )}
+          initial={reducedMotion ? false : { opacity: 0.55 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reducedMotion ? 0.12 : 0.45, delay: reducedMotion ? 0 : index * 0.06 }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt="" className="h-full w-full max-w-full object-cover" draggable={false} />
+        </motion.div>
+      ))}
+      <span className="sr-only">{title} visuals</span>
     </div>
   );
 }
@@ -411,35 +235,46 @@ export function FeatureCarousel({
   const active = steps[step]!;
 
   return (
-    <div className={cn('mx-auto flex w-full max-w-4xl flex-col gap-8 p-1 sm:gap-10', className)}>
-      <FeatureCard step={step} steps={steps} reducedMotion={reducedMotion}>
+    <div className={cn('mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-7 overflow-x-clip sm:gap-9', className)}>
+      <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[color:var(--line-soft)] bg-[color:var(--paper)] shadow-[0_20px_50px_rgba(35,35,36,0.08)]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active.id}
-            className="absolute inset-0"
-            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
-            transition={{ duration: reducedMotion ? 0.15 : 0.35 }}
+            id={`case-study-panel-${active.id}`}
+            role="tabpanel"
+            aria-labelledby={`case-study-tab-${active.id}`}
+            className="grid min-w-0 gap-0 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reducedMotion ? 0.12 : 0.35 }}
           >
-            <div
-              id={`case-study-panel-${active.id}`}
-              role="tabpanel"
-              aria-labelledby={`case-study-tab-${active.id}`}
-              className="absolute inset-0"
-            >
-              <StepVisuals step={active} reducedMotion={reducedMotion} />
+            {/* Copy — always on solid paper, never over photos */}
+            <div className="relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-[color:var(--paper)] px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
+              <p className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--smoke)]">
+                {active.name}
+              </p>
+              <h2 className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words text-[color:var(--ink)]">
+                {active.title}
+              </h2>
+              <p className="max-w-[36ch] break-words text-[15px] leading-[1.65] text-[color:var(--smoke)] sm:text-[16px]">
+                {active.description}
+              </p>
+            </div>
+
+            {/* Media — separate column, no overlap with text */}
+            <div className="min-w-0 border-t border-[color:var(--line-soft)] bg-[color:var(--page,#f7f1ea)] px-4 py-5 sm:px-7 sm:py-8 md:border-l md:border-t-0 md:px-8 md:py-10 dark:bg-[color:color-mix(in_srgb,var(--paper)_88%,#000)]">
+              <StepMedia
+                images={active.images}
+                title={active.title}
+                reducedMotion={reducedMotion}
+              />
             </div>
           </motion.div>
         </AnimatePresence>
-      </FeatureCard>
-      <motion.div
-        initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: reducedMotion ? 0 : 0.2 }}
-      >
-        <StepsNav current={step} onChange={setStep} steps={steps} />
-      </motion.div>
+      </div>
+
+      <StepsNav current={step} onChange={setStep} steps={steps} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import type { FeaturedProject } from '@/lib/projects/featured';
 import { firstSafeProjectLink } from '@/lib/projects/safe-project-link-url';
 import { trackLinkClick } from '@/lib/analytics/link-click';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
 import { cn } from '@/lib/utils';
 
 function descriptionParts(description: string | null): { lead: string | null; rest: string[] } {
@@ -41,13 +41,12 @@ export function PublicProjectCard({
   mediaRef,
 }: PublicProjectCardProps) {
   const [isOpen, setOpen] = useState(false);
-  const base = publicDemoProfileBasePath(profileSlug);
   const liveLink = firstSafeProjectLink(project.links ?? [], ['live', 'demo']);
   const repoLink = firstSafeProjectLink(project.links ?? [], ['repo']);
   const liveUrl = liveLink?.url;
   const repoUrl = repoLink?.url;
   const { lead, rest } = descriptionParts(project.description);
-  const detailHref = `${base}/projects/${project.id}`;
+  const detailHref = publicDemoProjectHref(profileSlug, project.id, 'preview');
 
   return (
     <article

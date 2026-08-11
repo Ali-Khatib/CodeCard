@@ -25,6 +25,19 @@ export function publicDemoProfileBasePath(profileSlug: string): string {
   return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
 }
 
+/** Where a project/research detail was opened from — drives the Back target. */
+export type PublicDetailFrom = 'preview' | 'projects' | 'research';
+
+export function appendDetailFrom(href: string, from: PublicDetailFrom): string {
+  const join = href.includes('?') ? '&' : '?';
+  return `${href}${join}from=${from}`;
+}
+
+export function parseDetailFrom(value: string | null | undefined): PublicDetailFrom | null {
+  if (value === 'preview' || value === 'projects' || value === 'research') return value;
+  return null;
+}
+
 /**
  * Back target from project detail.
  * Demo persona returns to the workspace projects list so workspace → project → Back
@@ -47,22 +60,60 @@ export function publicDemoProfileResearchSectionHref(profileSlug: string): strin
   return `${publicDemoProfileBasePath(profileSlug)}#research`;
 }
 
-/**
- * Demo project detail URLs stay under `/demo/card/projects/...` (existing detail
- * routes). Back navigation uses `publicDemoProfileProjectsHref` → `/demo/projects`.
- */
-export function publicDemoProjectHref(profileSlug: string, projectId: string): string {
-  if (profileSlug === 'demo') {
-    return `/demo/card/projects/${encodeURIComponent(projectId)}`;
-  }
-  return `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
+/** Public CodeCard preview root (stacking projects / research on the card). */
+export function publicDemoProfilePreviewHref(profileSlug: string, hash?: 'projects' | 'research'): string {
+  const base = publicDemoProfileBasePath(profileSlug);
+  return hash ? `${base}#${hash}` : base;
 }
 
-export function publicDemoResearchHref(profileSlug: string, paperSlug: string): string {
-  if (profileSlug === 'demo') {
-    return `/demo/card/research/${encodeURIComponent(paperSlug)}`;
+export function resolveProjectDetailBack(
+  profileSlug: string,
+  from?: string | null,
+): { href: string; label: string } {
+  const source = parseDetailFrom(from);
+  if (source === 'preview') {
+    return { href: publicDemoProfilePreviewHref(profileSlug, 'projects'), label: 'Preview' };
   }
-  return `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
+  return { href: publicDemoProfileProjectsHref(profileSlug), label: 'Projects' };
+}
+
+export function resolveResearchDetailBack(
+  profileSlug: string,
+  from?: string | null,
+): { href: string; label: string } {
+  const source = parseDetailFrom(from);
+  if (source === 'preview') {
+    return { href: publicDemoProfilePreviewHref(profileSlug, 'research'), label: 'Preview' };
+  }
+  return { href: publicDemoProfileResearchSectionHref(profileSlug), label: 'Research' };
+}
+
+/**
+ * Demo project detail URLs stay under `/demo/card/projects/...` (existing detail
+ * routes). Pass `from` so Back returns to preview vs projects tab correctly.
+ */
+export function publicDemoProjectHref(
+  profileSlug: string,
+  projectId: string,
+  from?: PublicDetailFrom,
+): string {
+  const path =
+    profileSlug === 'demo'
+      ? `/demo/card/projects/${encodeURIComponent(projectId)}`
+      : `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
+  return from ? appendDetailFrom(path, from) : path;
+}
+
+export function publicDemoResearchHref(
+  profileSlug: string,
+  paperSlug: string,
+  from?: PublicDetailFrom,
+): string {
+  const path =
+    profileSlug === 'demo'
+      ? `/demo/card/research/${encodeURIComponent(paperSlug)}`
+      : `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
+  return from ? appendDetailFrom(path, from) : path;
 }
 
 /** True for the signed-out `/demo` workspace (sample data, no mutations). */
