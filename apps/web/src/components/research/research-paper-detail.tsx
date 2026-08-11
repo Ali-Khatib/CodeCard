@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   HiOutlineArrowLeft,
@@ -11,7 +12,7 @@ import {
 } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
-import { publicDemoProfileResearchSectionHref } from '@/lib/marketing/demo-url';
+import { resolveResearchDetailBack } from '@/lib/marketing/demo-url';
 import { TYPE } from '@/lib/design/tokens';
 import { ProjectWorkAtmosphere } from '@/components/featured-work/project-work-atmosphere';
 import { CitationCopyButton } from '@/components/research/citation-copy-button';
@@ -29,15 +30,22 @@ export function ResearchPaperDetail({
   profileSlug,
   profileId,
   displayName: _displayName,
+  backHref: backHrefProp,
+  backLabel: backLabelProp,
 }: {
   paper: ResearchPaper;
   profileSlug: string;
   profileId?: string;
   displayName: string;
+  backHref?: string;
+  backLabel?: string;
 }) {
   const [abstractExpanded, setAbstractExpanded] = useState(false);
   const reduced = useReducedMotion();
-  const backHref = publicDemoProfileResearchSectionHref(profileSlug);
+  const searchParams = useSearchParams();
+  const resolvedBack = resolveResearchDetailBack(profileSlug, searchParams.get('from'));
+  const backHref = backHrefProp ?? resolvedBack.href;
+  const backLabel = backLabelProp ?? resolvedBack.label;
 
   useEffect(() => {
     trackResearchEvent({
@@ -60,7 +68,7 @@ export function ResearchPaperDetail({
     },
   });
 
-  const abstract = paper.abstract ?? 'Abstract coming soon.';
+  const abstract = paper.abstract ?? 'No abstract provided.';
   const abstractPreview = abstract.length > 520 ? `${abstract.slice(0, 520).trim()}...` : abstract;
   const safePdfUrl = paper.pdfUrl;
   const safeDoiUrl = paper.doiUrl;
@@ -68,7 +76,7 @@ export function ResearchPaperDetail({
 
   return (
     <motion.div
-      className="relative min-h-[100dvh] text-text-primary"
+      className="cc-project-detail-shell relative min-h-[100dvh] max-w-[100vw] overflow-x-clip text-text-primary"
       initial={reduced ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -82,10 +90,10 @@ export function ResearchPaperDetail({
               href={backHref}
               scroll={false}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
-              aria-label="Back to research"
+              aria-label={`Back to ${backLabel.toLowerCase()}`}
             >
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
-              <span className="hidden sm:inline">Research</span>
+              <span className="hidden sm:inline">{backLabel}</span>
             </Link>
 
             <div className="flex gap-2">
@@ -121,7 +129,7 @@ export function ResearchPaperDetail({
                 {paper.title}
               </h1>
               <p className="mt-5 break-words text-[17px] leading-relaxed text-ash md:text-[19px]">
-                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
+                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
               </p>
               <p className="mt-2 text-[15px] text-text-secondary">
                 {metadataLine(paper) || 'Publication details pending'}

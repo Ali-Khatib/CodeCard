@@ -108,10 +108,13 @@ describe('Editorial product landing contract', () => {
     expect(demo).toContain('cc-ed-walk__bridge--out');
     expect(demo).not.toContain('IntersectionObserver');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
-    expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[^}]*transparent/s);
+    expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[\s\S]*?transparent/);
     expect(css).toContain("data-chapter='demo'");
-    expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[^}]*--ed-cream/s);
+    expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[\s\S]*?--ed-cream/);
+    expect(css).toMatch(/width:\s*min\(92rem,\s*100%\)/);
     expect(css).toMatch(/height:\s*min\(82vh,\s*860px\)/);
+    expect(css).not.toMatch(/aspect-ratio:\s*1\s*\/\s*1/);
+    expect(css).not.toMatch(/width:\s*min\(22rem,/);
   });
 
   it('keeps final CTA without public profile', () => {

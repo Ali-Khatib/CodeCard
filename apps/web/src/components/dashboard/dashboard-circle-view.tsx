@@ -11,12 +11,20 @@ import {
   type CircleFeedItem,
   type CircleFilter,
 } from '@/lib/dashboard/circle-demo';
+import { LIVE_DEMO_PROFILE_HREF, publicDemoProjectHref } from '@/lib/marketing/demo-url';
 
 function matchesCircleFilter(item: CircleFeedItem, filter: CircleFilter): boolean {
   if (filter === 'All') return true;
   if (filter === 'New') return Boolean(item.isNew);
   return item.category === filter;
 }
+
+const DEMO_PROJECT_BY_TITLE: Record<string, string> = {
+  PipelineX: 'demo-1',
+  Pulse: 'demo-3',
+  SchemaSync: 'demo-2',
+  TraceKit: 'demo-1',
+};
 
 export function DashboardCircleView({ items = DEMO_CIRCLE_FEED }: { items?: CircleFeedItem[] }) {
   const [filter, setFilter] = useState<CircleFilter>('All');
@@ -38,7 +46,10 @@ export function DashboardCircleView({ items = DEMO_CIRCLE_FEED }: { items?: Circ
       </FadeInView>
 
       <ul className="space-y-4">
-        {filtered.map((item, index) => (
+        {filtered.map((item, index) => {
+          const demoProjectId = DEMO_PROJECT_BY_TITLE[item.projectTitle] ?? 'demo-1';
+          const projectHref = publicDemoProjectHref('demo', demoProjectId);
+          return (
           <li key={item.id}>
             <FadeInView delay={0.08 + index * 0.08}>
             <AppCard className="overflow-hidden !p-0">
@@ -78,15 +89,20 @@ export function DashboardCircleView({ items = DEMO_CIRCLE_FEED }: { items?: Circ
                     <p className="mt-3 text-[13px] text-[var(--app-smoke)]">{item.updatedAt}</p>
                   </div>
                   <div className="mt-6 flex flex-wrap gap-2">
-                    <AppButton variant="primary">View project</AppButton>
-                    <AppButton variant="ghost">Their CodeCard</AppButton>
+                    <AppButton variant="primary" href={projectHref}>
+                      View project
+                    </AppButton>
+                    <AppButton variant="ghost" href={LIVE_DEMO_PROFILE_HREF}>
+                      Their CodeCard
+                    </AppButton>
                   </div>
                 </div>
               </div>
             </AppCard>
             </FadeInView>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

@@ -5,6 +5,8 @@
 .cc-app-root {
   position: relative;
   z-index: 1;
+  overflow-x: clip;
+  max-width: 100%;
   --app-ink: #232324;
   --app-paper: #ffffff;
   --app-bone: #fcf1e7;
@@ -67,6 +69,28 @@ html.dark .cc-app-topbar {
   background: rgba(26, 25, 28, 0.92);
 }
 
+html.dark .cc-app-content {
+  background: var(--app-paper);
+}
+
+html.dark .cc-app-sidebar {
+  border-right-color: var(--app-border-strong);
+  background: var(--app-bone);
+  box-shadow: none;
+  scrollbar-color: color-mix(in srgb, var(--app-iris) 35%, transparent) transparent;
+}
+
+html.dark .cc-app-card:not(.cc-reactive-border) {
+  background: var(--app-paper);
+  border-color: var(--app-border);
+  box-shadow: none;
+}
+
+html.dark .cc-app-card:not(.cc-reactive-border):hover {
+  border-color: var(--app-border-strong);
+  box-shadow: none;
+}
+
 html.dark .cc-app-sidebar-toggle {
   background:
     linear-gradient(135deg, rgba(42, 40, 46, 0.92), rgba(18, 17, 20, 0.86)),
@@ -99,15 +123,17 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   width: var(--app-sidebar-width);
   height: 100dvh;
   flex-direction: column;
-  border-right: 2px solid var(--app-border-strong);
-  background: var(--app-bone);
+  border-right: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-paper) 55%, var(--app-bone)), var(--app-bone));
   padding: 20px 16px 20px 20px;
   transition: transform var(--app-slide-duration) var(--app-slide-ease);
   will-change: transform;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--app-iris) 35%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--app-ink) 22%, transparent) transparent;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.45);
 }
 
 .cc-app-sidebar::-webkit-scrollbar {
@@ -194,7 +220,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
     0 10px 24px rgba(34, 34, 34, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
   transition:
-    left 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    left var(--app-slide-duration) var(--app-slide-ease),
+    gap var(--app-slide-duration) var(--app-slide-ease),
     transform 0.25s ease,
     background 0.25s ease,
     border-color 0.25s ease;
@@ -206,7 +233,13 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   position: fixed;
   top: 20px;
   left: calc(var(--app-sidebar-width) - 18px);
-  z-index: 55;
+  z-index: 70;
+}
+
+@media (min-width: 768px) {
+  .cc-app-sidebar-toggle--fixed {
+    display: inline-flex;
+  }
 }
 
 @media (min-width: 768px) {
@@ -216,7 +249,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle--fixed {
-  left: 0;
+  left: 12px;
 }
 
 .cc-app-sidebar-toggle:hover {
@@ -234,6 +267,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   display: block;
   width: 14px;
   height: 18px;
+  overflow: hidden;
+  transition:
+    width var(--app-slide-duration) var(--app-slide-ease),
+    opacity var(--app-slide-duration) var(--app-slide-ease),
+    transform var(--app-slide-duration) var(--app-slide-ease);
 }
 
 .cc-app-sidebar-toggle__card span {
@@ -265,7 +303,17 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-right: 1.75px solid var(--app-ink);
   border-bottom: 1.75px solid var(--app-ink);
   transform: rotate(135deg) translateX(1px);
-  transition: transform 0.35s ease;
+  transition: transform var(--app-slide-duration) var(--app-slide-ease);
+}
+
+.cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle {
+  gap: 0;
+}
+
+.cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle__card {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.65) translateX(-6px);
 }
 
 .cc-app-root--sidebar-collapsed .cc-app-sidebar-toggle__chevron {
@@ -293,10 +341,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid var(--app-border);
-  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  background: color-mix(in srgb, var(--app-paper) 82%, transparent);
   padding: 16px 40px;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
 }
 
 @media (min-width: 768px) {
@@ -308,6 +357,11 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-app-content {
   position: relative;
   padding: 32px 40px 64px;
+  max-width: 100%;
+  overflow-x: clip;
+  background:
+    radial-gradient(1100px 380px at 8% -8%, color-mix(in srgb, var(--app-iris) 9%, transparent), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--app-bone) 48%, var(--app-paper)), var(--app-paper));
 }
 
 .cc-app-page {
@@ -416,13 +470,20 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-card:not(.cc-reactive-border) {
-  border: 1px solid var(--app-border);
-  background: var(--app-paper);
-  transition: border-color 0.28s ease, background 0.28s ease;
+  border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--app-paper) 96%, transparent), color-mix(in srgb, var(--app-bone) 35%, var(--app-paper)));
+  box-shadow:
+    0 12px 32px rgba(34, 34, 34, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
 }
 
 .cc-app-card:not(.cc-reactive-border):hover {
-  border-color: var(--app-border-strong);
+  border-color: color-mix(in srgb, var(--app-ink) 16%, transparent);
+  box-shadow:
+    0 16px 36px rgba(34, 34, 34, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .cc-reactive-border.cc-app-card--blush {
@@ -727,7 +788,7 @@ button.cc-app-nav-link:focus-visible {
   right: 0;
   height: 40px;
   border-radius: var(--app-radius-pill);
-  background: var(--app-rose-mist);
+  background: color-mix(in srgb, var(--app-ink) 6%, var(--app-bone));
   pointer-events: none;
   opacity: 0;
   transform: translateY(0);
@@ -770,15 +831,11 @@ button.cc-app-nav-link:focus-visible {
 .cc-app-nav-link--active {
   background: transparent;
   color: var(--app-ink);
+  font-weight: 600;
 }
 
 .cc-app-nav-link--active::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--app-iris);
-  flex-shrink: 0;
+  content: none;
 }
 
 .cc-app-nav-link:active:not(.cc-app-nav-link--pending) {
@@ -788,11 +845,11 @@ button.cc-app-nav-link:focus-visible {
 .cc-app-nav-link--pending,
 .cc-app-mobile-nav__link--pending {
   position: relative;
-  color: var(--app-iris) !important;
+  color: var(--app-ink) !important;
 }
 
 .cc-app-nav-link--pending {
-  background: rgba(192, 148, 228, 0.12);
+  background: color-mix(in srgb, var(--app-ink) 6%, var(--app-bone));
 }
 
 .cc-app-nav-link--pending::after,
@@ -801,7 +858,7 @@ button.cc-app-nav-link:focus-visible {
   position: absolute;
   inset: 6px;
   border-radius: inherit;
-  border: 1px solid rgba(192, 148, 228, 0.32);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 14%, transparent);
   animation: cc-route-pending-pulse 0.9s ease-in-out infinite alternate;
   pointer-events: none;
 }
@@ -860,6 +917,31 @@ button.cc-app-nav-link:focus-visible {
 
 .cc-settings-nav-link--active .cc-settings-nav-link__hint {
   color: color-mix(in srgb, var(--app-smoke) 75%, var(--app-iris));
+}
+
+.cc-settings-accordion-panel {
+  display: block;
+}
+
+.cc-settings-desktop-panel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .cc-settings-accordion-panel {
+    display: none !important;
+  }
+
+  .cc-settings-desktop-panel {
+    display: block !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cc-settings-nav-link {
+    min-height: 44px;
+    padding: 8px 12px 8px 20px;
+  }
 }
 
 /* ?? User card ?? */
@@ -990,12 +1072,16 @@ button.cc-app-nav-link:focus-visible {
   flex-wrap: nowrap;
   gap: 6px;
   border-radius: var(--app-radius-pill);
-  border: 1px solid var(--app-border);
-  background: var(--app-paper);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--app-paper) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
   padding: 4px;
   max-width: 100%;
   overflow-x: auto;
-  box-shadow: 0 8px 20px rgba(34, 34, 34, 0.055);
+  box-shadow:
+    0 8px 20px rgba(34, 34, 34, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -1580,16 +1666,19 @@ html.dark .cc-project-nav-btn svg,
 .cc-app-root--embedded {
   position: relative;
   min-height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-app-root--embedded .cc-app-sidebar {
   position: absolute;
   height: 100%;
+  display: flex;
 }
 
 .cc-app-root--embedded .cc-app-sidebar-toggle--fixed {
   position: absolute;
+  z-index: 80;
+  display: inline-flex;
 }
 
 .cc-app-root--embedded .cc-app-main {
@@ -1602,10 +1691,31 @@ html.dark .cc-project-nav-btn svg,
 }
 
 .cc-app-root--embedded .cc-app-content {
-  padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
+  padding: 20px 16px 28px;
+}
+
+/* Embedded preview is always the desktop product chrome — never the phone dock. */
+.cc-app-root--embedded .cc-app-mobile-nav {
+  display: none !important;
+}
+
+.cc-app-root--embedded.cc-app-root--sidebar-collapsed .cc-app-main {
+  margin-left: 0;
 }
 
 @media (max-width: 767px) {
+  .cc-app-root--embedded .cc-app-sidebar {
+    display: flex;
+  }
+
+  .cc-app-root--embedded .cc-app-main {
+    margin-left: var(--app-sidebar-width, 248px);
+  }
+
+  .cc-app-root--embedded.cc-app-root--sidebar-collapsed .cc-app-main {
+    margin-left: 0;
+  }
+
   .cc-app-root--embedded .cc-app-topbar-title {
     display: block;
     flex: 1 1 auto;
@@ -1615,6 +1725,10 @@ html.dark .cc-project-nav-btn svg,
   .cc-app-root--embedded .cc-app-topbar-cta {
     padding-inline: 14px;
     font-size: 13px;
+  }
+
+  .cc-app-root--embedded .cc-app-content {
+    padding-bottom: 28px;
   }
 }
 
@@ -1701,23 +1815,23 @@ html.dark .cc-project-nav-btn svg,
   .cc-app-filter-bar {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: clamp(1px, 0.55vw, 3px);
-    overflow-x: visible;
+    justify-content: flex-start;
+    gap: 2px;
+    overflow-x: auto;
     white-space: nowrap;
     width: 100%;
     max-width: 100%;
-    padding: clamp(3px, 1vw, 6px);
+    padding: 3px;
   }
 
   .cc-app-filter-pill {
     flex: 0 0 auto;
-    min-width: 44px;
-    min-height: 44px !important;
-    height: 44px !important;
-    padding-inline: clamp(10px, 1.15vw, 14px);
-    font-size: clamp(12px, 2.85vw, 13px);
-    font-weight: 700;
+    min-width: 0;
+    min-height: 36px !important;
+    height: 36px !important;
+    padding-inline: clamp(8px, 1.8vw, 11px);
+    font-size: clamp(10px, 2.4vw, 11.5px);
+    font-weight: 650;
     letter-spacing: -0.02em;
     color: color-mix(in srgb, var(--app-ink) 82%, transparent);
   }
@@ -1769,17 +1883,17 @@ html.dark .cc-project-nav-btn svg,
     left: 0;
     right: 0;
     z-index: 50;
-    display: flex;
-    gap: 4px;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
     border-top: 1px solid var(--app-border);
-    background: var(--app-paper);
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-    scroll-padding-inline: 12px;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
+    background: color-mix(in srgb, var(--app-paper) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 2px 1px calc(2px + env(safe-area-inset-bottom));
   }
 
   .cc-app-mobile-nav::-webkit-scrollbar {
@@ -1792,19 +1906,31 @@ html.dark .cc-project-nav-btn svg,
 
   .cc-app-mobile-nav__link {
     display: flex;
-    min-width: 68px;
+    min-width: 0;
     min-height: 44px;
-    flex: 0 0 auto;
+    width: 100%;
+    flex: 1 1 0;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    scroll-snap-align: center;
-    border-radius: 14px;
-    padding: 6px 8px;
-    font-size: 10px;
-    line-height: 1.1;
+    gap: 1px;
+    border-radius: 8px;
+    padding: 4px 0;
+    font-size: 8px;
+    line-height: 1.05;
     white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cc-app-mobile-nav__link svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .cc-app-mobile-nav__link > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -1864,11 +1990,11 @@ html.dark .cc-project-nav-btn svg,
     width: 30px;
   }
 
-  .cc-connections-results-section {
+  .cc-connections-followups-section {
     order: 1;
   }
 
-  .cc-connections-followups-section {
+  .cc-connections-results-section {
     order: 2;
   }
 
@@ -2016,8 +2142,14 @@ html.dark .cc-project-nav-btn svg,
   padding: 16px;
   text-align: left;
   border-radius: 18px;
-  border: 1.5px solid var(--app-border-strong);
-  background: var(--app-paper);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--app-paper) 90%, transparent), color-mix(in srgb, var(--app-bone) 65%, transparent));
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  box-shadow:
+    0 10px 28px rgba(34, 34, 34, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -2263,9 +2395,14 @@ html.dark .cc-project-nav-btn svg,
   overflow: hidden;
   height: 100%;
   border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48)),
-    var(--app-paper);
+    linear-gradient(160deg, color-mix(in srgb, var(--app-paper) 90%, transparent), color-mix(in srgb, var(--app-bone) 60%, transparent));
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  box-shadow:
+    0 10px 28px rgba(34, 34, 34, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .cc-connection-grid-card.cc-reactive-border {
@@ -2622,7 +2759,7 @@ html.dark .cc-project-nav-btn svg,
   border-radius: var(--app-radius-large);
   border: 1px solid var(--app-border);
   background: var(--app-paper);
-  transition: background 160ms ease;
+  transition: background 160ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 
 .cc-app-project-card:hover {
@@ -2652,6 +2789,54 @@ html.dark .cc-project-nav-btn svg,
 
 .cc-app-project-card__body {
   padding: 28px;
+}
+
+/* Glassy gradient edge — projects, research, connections, public cards */
+.cc-glass-card,
+.cc-public-profile .cc-app-project-card,
+.cc-public-profile .cc-app-card,
+.cc-app-root .cc-connection-blob,
+.cc-app-root .cc-connection-grid-card,
+.cc-app-root .cc-connection-followup-card {
+  --glass-radius: 28px;
+  border-radius: var(--glass-radius) !important;
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(192, 148, 228, 0.55) 28%,
+      rgba(252, 224, 238, 0.65) 58%,
+      rgba(218, 247, 238, 0.4) 78%,
+      rgba(255, 255, 255, 0.75) 100%
+    )
+      border-box !important;
+  box-shadow:
+    0 18px 48px -28px rgba(34, 34, 34, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  overflow: hidden;
+}
+
+html.dark .cc-glass-card,
+html.dark .cc-public-profile .cc-app-project-card,
+html.dark .cc-public-profile .cc-app-card,
+html.dark .cc-app-root .cc-connection-blob,
+html.dark .cc-app-root .cc-connection-grid-card,
+html.dark .cc-app-root .cc-connection-followup-card {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(244, 239, 232, 0.22) 0%,
+      rgba(192, 148, 228, 0.4) 35%,
+      rgba(252, 224, 238, 0.22) 70%,
+      rgba(244, 239, 232, 0.12) 100%
+    )
+      border-box !important;
+  box-shadow:
+    0 18px 48px -24px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 .cc-work-title {
@@ -2729,9 +2914,18 @@ html.dark .cc-project-nav-btn svg,
   --glow-rgb: 192, 148, 228;
   position: relative;
   overflow: hidden;
-  border-radius: var(--app-radius-large);
-  border: 2.5px solid var(--app-border-strong);
-  background: var(--app-paper);
+  border-radius: 28px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(192, 148, 228, 0.5) 32%,
+      rgba(252, 224, 238, 0.55) 62%,
+      rgba(255, 255, 255, 0.72) 100%
+    )
+      border-box;
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease,
@@ -3744,10 +3938,10 @@ html.dark .cc-reactive-border:hover {
   perspective: 1200px;
 }
 
-/* One project square per scroll gesture on mobile */
+/* Snap only inside a dedicated stack scroller — never on <html>.
+ * Document snap + sticky cards makes phone scroll feel like it's fighting you. */
 @media (max-width: 767px) {
-  html:has(.cc-project-stack),
-  html:has(.cc-public-profile .cc-app-project-card) {
+  .cc-project-stack {
     scroll-snap-type: y proximity;
   }
 
@@ -4300,7 +4494,7 @@ html.dark .cc-share-qr-pattern__scan {
     gap: 8px !important;
   }
 
-  .cc-app-project-card {
+  .cc-project-stack .cc-app-project-card {
     scroll-snap-align: start;
     scroll-margin-block: 12px;
   }
@@ -4484,24 +4678,477 @@ html.dark [class*='uppercase'][class*='tracking'] {
   --app-slate-plum: #574853;
   --app-border: rgba(34, 34, 34, 0.08);
   --app-border-strong: rgba(34, 34, 34, 0.14);
-  --app-radius-large: 24px;
+  --app-radius-large: 28px;
   --app-radius-pill: 9999px;
   --app-page-public: 920px;
   --app-section-gap: 48px;
   --app-card-pad: 28px;
   --app-font: var(--font-sans), 'Inter', system-ui, sans-serif;
   --app-mono: ui-monospace, 'JetBrains Mono', monospace;
+  --app-panel-ink: #f7f2eb;
+  --app-panel-muted: rgba(247, 242, 235, 0.68);
+  --app-hero-panel: #1c1a19;
+  --app-atmosphere-a: rgba(192, 148, 228, 0.42);
+  --app-atmosphere-b: rgba(252, 224, 238, 0.55);
+  --app-atmosphere-c: rgba(218, 247, 238, 0.4);
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: clip;
   background: var(--app-bone);
   color: var(--app-ink);
   font-family: var(--app-font);
+}
+
+.cc-public-profile *,
+.cc-public-profile *::before,
+.cc-public-profile *::after {
+  box-sizing: border-box;
+}
+
+.cc-public-profile img,
+.cc-public-profile video,
+.cc-public-profile svg {
   max-width: 100%;
+}
+
+html.dark .cc-public-profile {
+  --app-ink: #f4efe8;
+  --app-paper: #171513;
+  --app-bone: #0f0e0d;
+  --app-smoke: #a8a29e;
+  --app-iris: #d4b3f0;
+  --app-blush: #3a2430;
+  --app-rose-mist: #2a1c24;
+  --app-mint: #1a2e28;
+  --app-slate-plum: #d6c6cf;
+  --app-border: rgba(244, 239, 232, 0.1);
+  --app-border-strong: rgba(244, 239, 232, 0.18);
+  --app-panel-ink: #f7f2eb;
+  --app-panel-muted: rgba(247, 242, 235, 0.7);
+  --app-hero-panel: #12100f;
+  --app-atmosphere-a: rgba(192, 148, 228, 0.28);
+  --app-atmosphere-b: rgba(252, 224, 238, 0.16);
+  --app-atmosphere-c: rgba(218, 247, 238, 0.14);
+  background: var(--app-bone);
+}
+
+.cc-public-atmosphere {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.cc-public-atmosphere__base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 12% -10%, var(--app-atmosphere-a), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 92% 8%, var(--app-atmosphere-b), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, var(--app-atmosphere-c), transparent 55%),
+    var(--app-bone);
+}
+
+.cc-public-atmosphere__orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.85;
+  animation: cc-public-orb 18s ease-in-out infinite alternate;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-public-atmosphere__orb {
+    will-change: transform;
+  }
+}
+
+@media (max-width: 1023px), (pointer: coarse) {
+  .cc-public-atmosphere__orb,
+  .cc-public-atmosphere__grain {
+    display: none;
+  }
+}
+
+.cc-public-atmosphere__orb--a {
+  width: min(52vw, 420px);
+  height: min(52vw, 420px);
+  left: -8%;
+  top: 12%;
+  background: var(--app-atmosphere-a);
+}
+
+.cc-public-atmosphere__orb--b {
+  width: min(44vw, 360px);
+  height: min(44vw, 360px);
+  right: -6%;
+  top: 28%;
+  background: var(--app-atmosphere-b);
+  animation-duration: 22s;
+  animation-delay: -4s;
+}
+
+.cc-public-atmosphere__orb--c {
+  width: min(60vw, 480px);
+  height: min(60vw, 480px);
+  left: 28%;
+  bottom: -18%;
+  background: var(--app-atmosphere-c);
+  animation-duration: 26s;
+  animation-delay: -8s;
+}
+
+.cc-public-atmosphere__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+html.dark .cc-public-atmosphere__grain {
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+}
+
+.cc-public-atmosphere__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--app-bone) 35%, transparent) 0%,
+    transparent 28%,
+    transparent 72%,
+    color-mix(in srgb, var(--app-bone) 55%, transparent) 100%
+  );
+}
+
+@keyframes cc-public-orb {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(4%, -6%, 0) scale(1.08);
+  }
+}
+
+.cc-public-hero {
+  position: relative;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.cc-public-hero__stage {
+  display: grid;
+  gap: 0;
+  align-items: end;
+}
+
+.cc-public-hero__portrait {
+  position: relative;
+  z-index: 1;
+}
+
+.cc-public-hero__portrait-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--app-iris) 18%, var(--app-bone));
+  box-shadow: 0 28px 60px -36px rgba(34, 34, 34, 0.55);
+}
+
+.cc-public-hero__portrait-frame img {
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.cc-public-hero__panel {
+  /* Isolate panel tokens so light-mode --app-ink never leaks onto the dark card */
+  --hero-ink: #f7f2eb;
+  --hero-muted: rgba(247, 242, 235, 0.72);
+  --hero-panel: #1c1a19;
+  position: relative;
+  z-index: 2;
+  margin-top: -3.5rem;
+  margin-inline: 0.75rem;
+  padding: 1.35rem 1.25rem 1.4rem;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--hero-panel) 94%, #000);
+  color: var(--hero-ink);
+  box-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.cc-public-hero__panel .cc-app-mono,
+.cc-public-hero__panel p,
+.cc-public-hero__panel h1 {
+  color: inherit;
+}
+
+.cc-public-hero__panel .cc-app-mono,
+.cc-public-hero__eyebrow,
+.cc-public-hero__meta {
+  color: var(--hero-muted) !important;
+}
+
+.cc-public-hero__title,
+.cc-public-hero__bio {
+  color: var(--hero-ink) !important;
+}
+
+.cc-public-hero__social a,
+.cc-public-hero__social button {
+  color: var(--hero-ink);
+}
+
+.cc-public-hero__social .cc-profile-identity-card__social {
+  border-color: rgba(247, 242, 235, 0.28);
+  background: rgba(247, 242, 235, 0.1);
+  color: var(--hero-ink) !important;
+}
+
+.cc-public-hero__social .cc-profile-identity-card__social:hover {
+  background: rgba(247, 242, 235, 0.18);
+}
+
+.cc-public-hero__panel .cc-app-btn--primary {
+  background: var(--hero-ink) !important;
+  color: var(--hero-panel) !important;
+  border-color: var(--hero-ink) !important;
+}
+
+.cc-public-hero__panel .cc-app-btn--ghost,
+.cc-public-hero__panel .cc-app-btn--soft {
+  border-color: rgba(247, 242, 235, 0.35) !important;
+  color: var(--hero-ink) !important;
+  background: transparent !important;
+}
+
+@media (min-width: 640px) {
+  .cc-public-hero__stage {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: 0;
+    /* Contain the overlapping panel so it cannot force page-wide horizontal scroll */
+    overflow: visible;
+  }
+
+  .cc-public-hero__portrait-frame {
+    margin-inline: 0;
+    max-width: none;
+  }
+
+  .cc-public-hero__panel {
+    margin-top: 0;
+    /* Cap the overlap — never push past the page edge */
+    margin-left: clamp(-4.5rem, -14%, -1.25rem);
+    margin-right: 0;
+    max-width: 100%;
+    min-width: 0;
+    padding: 1.75rem 1.6rem 1.8rem;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .cc-public-hero--fade {
+    animation: cc-public-hero-fade linear both;
+    animation-timeline: view();
+    animation-range: exit -10% exit 55%;
+  }
+}
+
+@keyframes cc-public-hero-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12%) scale(0.96);
+    filter: blur(6px);
+  }
+}
+
+.cc-stacking-projects {
+  margin-inline: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cc-stacking-card {
+  /* Keep cards centered; never force an inner scrollport */
+  overflow: visible;
+  width: 100%;
+  max-width: 100%;
+}
+
+.cc-stacking-card__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 1100px);
+  max-width: 100%;
+  max-height: min(92dvh, 860px);
+  height: auto;
+  border-radius: 32px;
+  overflow: hidden; /* clip — never show a scrollbar inside the card */
+  touch-action: pan-y;
+  box-shadow: 0 32px 80px -36px rgba(34, 34, 34, 0.42);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cc-stacking-card__panel {
+    will-change: transform, opacity;
+  }
+}
+
+.cc-stacking-card__project {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  height: 100%;
+  max-width: 100%;
+  border-radius: 32px !important;
+  color: var(--app-ink);
+}
+
+.cc-stacking-card__project .cc-app-project-card__media {
+  height: clamp(160px, 28dvh, 280px) !important;
+  flex: 0 1 auto;
+  max-height: 34dvh;
+  border-top-left-radius: 31px;
+  border-top-right-radius: 31px;
+}
+
+.cc-stacking-card__project .cc-app-project-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 18px 18px 20px !important;
+  color: var(--app-ink);
+}
+
+.cc-stacking-card__project .cc-work-title {
+  font-size: clamp(1.55rem, 4vw, 2.45rem) !important;
+  line-height: 1.05 !important;
+  color: var(--app-ink) !important;
+}
+
+.cc-stacking-card__project .cc-app-project-card__body > p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--app-smoke);
+}
+
+.cc-stacking-card__project .cc-app-project-card__body .mt-5 {
+  margin-top: 0.75rem !important;
+}
+
+.cc-stacking-card__project .cc-app-project-card__body .mt-6 {
+  margin-top: 0.85rem !important;
+}
+
+.cc-stacking-card__project .cc-app-project-card__body .mt-8 {
+  /* Expanded quick-details: keep clipped rather than inventing a scrollbar */
+  margin-top: 0.85rem !important;
+  max-height: 6.5rem;
+  overflow: hidden;
+}
+
+.cc-stacking-card__project .cc-app-btn {
+  max-width: 100%;
+}
+
+@media (max-width: 1023px), (pointer: coarse) {
+  .cc-stacking-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .cc-stacking-card {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .cc-stacking-card .sticky {
+    position: relative !important;
+    height: auto !important;
+    top: auto !important;
+  }
+
+  .cc-stacking-card__panel {
+    max-height: none;
+    width: 100%;
+    border-radius: 26px;
+    will-change: auto;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .cc-stacking-card__project {
+    border-radius: 26px !important;
+  }
+
+  .cc-stacking-card__project .cc-app-project-card__media {
+    height: clamp(120px, 22dvh, 200px) !important;
+  }
+
+  .cc-stacking-card__project .cc-app-project-card__body {
+    padding: 14px 14px 16px !important;
+  }
+}
+
+@media (max-height: 720px) {
+  .cc-stacking-card__project .cc-app-project-card__media {
+    height: clamp(96px, 18dvh, 150px) !important;
+  }
+
+  .cc-stacking-card__project .cc-work-title {
+    font-size: clamp(1.35rem, 3.6vw, 1.85rem) !important;
+  }
+
+  .cc-stacking-card__project .cc-app-project-card__body {
+    padding: 12px 14px 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-public-atmosphere__orb {
+    animation: none;
+  }
+
+  .cc-public-hero--fade {
+    animation: none;
+  }
+}
+
+.cc-public-profile {
+  touch-action: pan-y;
 }
 
 .cc-public-profile .cc-app-page {
   max-width: min(100%, var(--app-page-public));
   width: 100%;
   min-width: 0;
+  overflow-x: clip;
 }
 
 .cc-public-profile .cc-app-project-card,
@@ -4516,9 +5163,48 @@ html.dark [class*='uppercase'][class*='tracking'] {
   min-width: 0;
 }
 
+.cc-public-profile .cc-app-project-card__body {
+  color: var(--app-ink);
+}
+
+.cc-public-profile .cc-app-tech-tag,
+.cc-public-profile .cc-chip-react {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.cc-public-dock {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.cc-public-dock > div {
+  max-width: min(920px, calc(100% - 0px));
+  min-width: 0;
+}
+
+.cc-public-dock nav {
+  scrollbar-width: none;
+}
+
+.cc-public-dock nav::-webkit-scrollbar {
+  display: none;
+}
+
 .cc-public-breakable {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+/* Project / research detail — no horizontal scroll, theme-safe type */
+.cc-project-detail-shell {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.cc-project-detail-shell img,
+.cc-project-detail-shell video {
+  max-width: 100%;
 }
 
 @media (max-width: 430px) {
@@ -4529,6 +5215,11 @@ html.dark [class*='uppercase'][class*='tracking'] {
 
   .cc-public-profile .cc-app-btn {
     min-height: 44px;
+  }
+
+  .cc-public-hero__panel {
+    margin-inline: 0.5rem;
+    padding: 1.15rem 1rem 1.2rem;
   }
 }
 

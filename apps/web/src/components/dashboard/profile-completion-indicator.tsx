@@ -21,6 +21,7 @@ export function ProfileCompletionIndicator({
   const detailsId = useId();
 
   if (variant === 'compact') {
+    if (percentage >= 100) return null;
     return (
       <div>
         <AppMono>Completion</AppMono>
@@ -33,6 +34,8 @@ export function ProfileCompletionIndicator({
       </div>
     );
   }
+
+  if (percentage >= 100) return null;
 
   return (
     <AppCard className="cc-profile-completion-card relative overflow-hidden">

@@ -30,10 +30,13 @@ describe('WS16-T004 real circle feed experience', () => {
 
   it('renders truthful empty states and real activity cards without social controls', () => {
     const view = readWeb('src/components/dashboard/authenticated-circle-view.tsx');
-    expect(view).toContain('Your Circle starts with your Connections');
+    const empty = readWeb('src/lib/dashboard/empty-state-copy.ts');
+    expect(view).toContain('EMPTY_STATE_COPY.circle.noConnectionsTitle');
     expect(view).toContain('Find people to add');
     expect(view).toContain('href="/profiles"');
-    expect(view).toContain('Nothing new yet');
+    expect(view).toContain('EMPTY_STATE_COPY.circle.noActivityTitle');
+    expect(empty).toContain('noConnectionsTitle');
+    expect(empty).toContain('noActivityTitle');
     expect(view).toContain('activitySentence');
     expect(view).toContain('dateTime={item.createdAt}');
     expect(view).toContain('Read paper');

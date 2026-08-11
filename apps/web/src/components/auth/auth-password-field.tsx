@@ -2,7 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { getPasswordRequirements } from '@/lib/auth/password-guidance';
+import {
+  getPasswordRequirements,
+  getPasswordStrength,
+  type PasswordStrengthLevel,
+} from '@/lib/auth/password-guidance';
 
 type AuthPasswordFieldProps = {
   id?: string;
@@ -15,6 +19,20 @@ type AuthPasswordFieldProps = {
   error?: string | null;
   showGuidance?: boolean;
   describedBy?: string;
+};
+
+const STRENGTH_BAR_COLOR: Record<Exclude<PasswordStrengthLevel, 'empty'>, string> = {
+  weak: 'bg-[#c45c5c]',
+  medium: 'bg-[#d4a017]',
+  strong: 'bg-[#3d8f6a]',
+  very_strong: 'bg-[#2f6f4e]',
+};
+
+const STRENGTH_TEXT_COLOR: Record<Exclude<PasswordStrengthLevel, 'empty'>, string> = {
+  weak: 'text-[#b45353]',
+  medium: 'text-[#9a7b12]',
+  strong: 'text-[#2f6f4e]',
+  very_strong: 'text-[#2f6f4e]',
 };
 
 export function AuthPasswordField({
@@ -33,14 +51,15 @@ export function AuthPasswordField({
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
   const guideId = `${inputId}-guide`;
+  const strengthId = `${inputId}-strength`;
   const inputRef = useRef<HTMLInputElement>(null);
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [touched, setTouched] = useState(false);
   const [shakeKey, setShakeKey] = useState(0);
   const lastErrorRef = useRef<string | null>(null);
   const reduced = useReducedMotion();
   const requirements = getPasswordRequirements(value);
+  const strength = getPasswordStrength(value);
 
   useEffect(() => {
     if (error && error !== lastErrorRef.current) {
@@ -70,7 +89,7 @@ export function AuthPasswordField({
       <label
         htmlFor={inputId}
         className={`text-[13px] font-medium transition-colors duration-150 ${
-          error ? 'text-[#b45353]' : focused ? 'text-[rgba(120,70,170,0.95)]' : 'text-ink'
+          error ? 'text-[#b45353]' : focused ? 'text-[rgba(120,70,170,0.95)]' : 'text-[#232324]'
         }`}
       >
         {label}
@@ -89,7 +108,6 @@ export function AuthPasswordField({
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
-            if (!touched) setTouched(true);
           }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -100,7 +118,8 @@ export function AuthPasswordField({
           aria-describedby={
             [
               error ? errorId : null,
-              showGuidance && touched ? guideId : null,
+              showGuidance ? guideId : null,
+              showGuidance && strength.level !== 'empty' ? strengthId : null,
               describedBy,
             ]
               .filter(Boolean)
@@ -114,7 +133,7 @@ export function AuthPasswordField({
           type="button"
           onClick={toggleVisibility}
           disabled={disabled}
-          className="absolute inset-y-0 right-1 my-1 rounded-[8px] px-2.5 text-[12px] font-medium text-smoke outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-rgb),0.45)] disabled:opacity-50"
+          className="absolute inset-y-0 right-1 my-1 rounded-[8px] px-2.5 text-[12px] font-medium text-[#5c5856] outline-none transition-colors hover:text-[#232324] focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-rgb),0.45)] disabled:opacity-50"
           aria-pressed={visible}
           aria-label={visible ? 'Hide characters' : 'Show characters'}
         >
@@ -132,30 +151,79 @@ export function AuthPasswordField({
 
       {showGuidance ? (
         <AnimatePresence initial={false}>
-          {touched ? (
-            <motion.ul
-              id={guideId}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -2 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-smoke"
-            >
-              {requirements.map((req) => (
-                <li
-                  key={req.id}
-                  className={req.met ? 'text-[#2f6f4e]' : undefined}
-                  aria-label={`${req.label}: ${req.met ? 'met' : 'not met'}`}
+          <motion.div
+            id={guideId}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -2 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="space-y-3 rounded-[12px] border border-[rgba(34,34,34,0.12)] bg-white/90 p-3"
+          >
+            <div className="space-y-1.5" aria-live="polite">
+              <div
+                className="grid grid-cols-4 gap-1.5"
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={4}
+                aria-valuenow={strength.score}
+                aria-valuetext={strength.label || 'Empty'}
+                aria-label="Password strength"
+              >
+                {Array.from({ length: 4 }, (_, index) => {
+                  const level =
+                    strength.level === 'empty' ? null : strength.level;
+                  const filled = index < strength.score && level !== null;
+                  return (
+                    <span
+                      key={index}
+                      className={`h-1.5 rounded-full transition-colors duration-200 ${
+                        filled && level
+                          ? STRENGTH_BAR_COLOR[level]
+                          : 'bg-[rgba(34,34,34,0.1)]'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+              {strength.label && strength.level !== 'empty' ? (
+                <p
+                  id={strengthId}
+                  className={`text-[12px] font-semibold ${STRENGTH_TEXT_COLOR[strength.level]}`}
                 >
-                  <span aria-hidden>{req.met ? '✓' : '·'}</span> {req.label}
-                </li>
-              ))}
-            </motion.ul>
-          ) : (
-            <p className="text-[12px] text-smoke">
-              Use 8+ characters with upper, lower, and a number.
-            </p>
-          )}
+                  {strength.label}
+                </p>
+              ) : (
+                <p className="text-[12px] font-medium text-[#7a7876]">Password strength</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[12px] font-medium text-[#232324]">Password must include:</p>
+              <ul className="space-y-1.5">
+                {requirements.map((req) => (
+                  <li
+                    key={req.id}
+                    className={`flex items-start gap-2 text-[13px] leading-snug ${
+                      req.met ? 'text-[#2f6f4e]' : 'text-[#3f3c3a]'
+                    }`}
+                    aria-label={`${req.label}: ${req.met ? 'met' : 'not met'}`}
+                  >
+                    <span
+                      aria-hidden
+                      className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] font-semibold ${
+                        req.met
+                          ? 'border-[#2f6f4e] bg-[#e8f5ee] text-[#2f6f4e]'
+                          : 'border-[rgba(34,34,34,0.28)] bg-white text-[#7a7876]'
+                      }`}
+                    >
+                      {req.met ? '✓' : ''}
+                    </span>
+                    <span>{req.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
         </AnimatePresence>
       ) : null}
     </div>

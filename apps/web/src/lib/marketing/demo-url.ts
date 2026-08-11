@@ -25,13 +25,29 @@ export function publicDemoProfileBasePath(profileSlug: string): string {
   return profileSlug === 'demo' ? LIVE_DEMO_PROFILE_HREF : `/${profileSlug}`;
 }
 
+/** Where a project/research detail was opened from — drives the Back target. */
+export type PublicDetailFrom = 'preview' | 'projects' | 'research';
+
+export function appendDetailFrom(href: string, from: PublicDetailFrom): string {
+  const join = href.includes('?') ? '&' : '?';
+  return `${href}${join}from=${from}`;
+}
+
+export function parseDetailFrom(value: string | null | undefined): PublicDetailFrom | null {
+  if (value === 'preview' || value === 'projects' || value === 'research') return value;
+  return null;
+}
+
 /**
  * Back target from project detail.
  * Demo persona returns to the workspace projects list so workspace → project → Back
  * never dumps visitors on the public profile page unexpectedly.
+ * Authenticated owners editing from the dashboard should pass `backHref` explicitly
+ * (e.g. `/dashboard/projects`).
  */
 export function publicDemoProfileProjectsHref(profileSlug: string): string {
   if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/projects`;
+  // Prefer the public profile projects section for visitor browsing.
   return `${publicDemoProfileBasePath(profileSlug)}#projects`;
 }
 
@@ -44,20 +60,101 @@ export function publicDemoProfileResearchSectionHref(profileSlug: string): strin
   return `${publicDemoProfileBasePath(profileSlug)}#research`;
 }
 
-/**
- * Demo project detail URLs stay under `/demo/card/projects/...` (existing detail
- * routes). Back navigation uses `publicDemoProfileProjectsHref` → `/demo/projects`.
- */
-export function publicDemoProjectHref(profileSlug: string, projectId: string): string {
-  if (profileSlug === 'demo') {
-    return `/demo/card/projects/${encodeURIComponent(projectId)}`;
-  }
-  return `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
+/** Public CodeCard preview root (stacking projects / research on the card). */
+export function publicDemoProfilePreviewHref(profileSlug: string, hash?: 'projects' | 'research'): string {
+  const base = publicDemoProfileBasePath(profileSlug);
+  return hash ? `${base}#${hash}` : base;
 }
 
-export function publicDemoResearchHref(profileSlug: string, paperSlug: string): string {
-  if (profileSlug === 'demo') {
-    return `/demo/card/research/${encodeURIComponent(paperSlug)}`;
+export function resolveProjectDetailBack(
+  profileSlug: string,
+  from?: string | null,
+): { href: string; label: string } {
+  const source = parseDetailFrom(from);
+  if (source === 'preview') {
+    return { href: publicDemoProfilePreviewHref(profileSlug, 'projects'), label: 'Preview' };
   }
-  return `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
+  return { href: publicDemoProfileProjectsHref(profileSlug), label: 'Projects' };
+}
+
+export function resolveResearchDetailBack(
+  profileSlug: string,
+  from?: string | null,
+): { href: string; label: string } {
+  const source = parseDetailFrom(from);
+  if (source === 'preview') {
+    return { href: publicDemoProfilePreviewHref(profileSlug, 'research'), label: 'Preview' };
+  }
+  return { href: publicDemoProfileResearchSectionHref(profileSlug), label: 'Research' };
+}
+
+/**
+ * Demo project detail URLs stay under `/demo/card/projects/...` (existing detail
+ * routes). Pass `from` so Back returns to preview vs projects tab correctly.
+ */
+export function publicDemoProjectHref(
+  profileSlug: string,
+  projectId: string,
+  from?: PublicDetailFrom,
+): string {
+  const path =
+    profileSlug === 'demo'
+      ? `/demo/card/projects/${encodeURIComponent(projectId)}`
+      : `${publicDemoProfileBasePath(profileSlug)}/projects/${encodeURIComponent(projectId)}`;
+  return from ? appendDetailFrom(path, from) : path;
+}
+
+export function publicDemoResearchHref(
+  profileSlug: string,
+  paperSlug: string,
+  from?: PublicDetailFrom,
+): string {
+  const path =
+    profileSlug === 'demo'
+      ? `/demo/card/research/${encodeURIComponent(paperSlug)}`
+      : `${publicDemoProfileBasePath(profileSlug)}/research/${encodeURIComponent(paperSlug)}`;
+  return from ? appendDetailFrom(path, from) : path;
+}
+
+/** True for the signed-out `/demo` workspace (sample data, no mutations). */
+export function isDemoWorkspacePath(basePath: string): boolean {
+  return basePath === '/demo' || basePath.startsWith('/demo/');
+}
+
+function signInToDashboard(path: string): string {
+  return `/sign-in?redirect=${encodeURIComponent(path)}`;
+}
+
+/** Create-project CTA: live dashboard route, or sign-in from the demo workspace. */
+export function workspaceCreateProjectHref(basePath: string): string {
+  if (isDemoWorkspacePath(basePath)) return signInToDashboard('/dashboard/projects/new');
+  return `${basePath}/projects/new`;
+}
+
+/** Create-research CTA: live dashboard route, or sign-in from the demo workspace. */
+export function workspaceCreateResearchHref(basePath: string): string {
+  if (isDemoWorkspacePath(basePath)) return signInToDashboard('/dashboard/research/new');
+  return `${basePath}/research/new`;
+}
+
+/** Profile section CTA — stays inside the demo workspace; auth dashboard otherwise. */
+export function workspaceProfileHref(basePath: string, hash?: string): string {
+  const root = isDemoWorkspacePath(basePath) ? LIVE_DEMO_WORKSPACE_HREF : basePath;
+  return hash ? `${root}/profile#${hash}` : `${root}/profile`;
+}
+
+/** Project edit CTA; demo has no edit routes. */
+export function workspaceProjectEditHref(basePath: string, projectId: string): string {
+  if (isDemoWorkspacePath(basePath)) {
+    return signInToDashboard(`/dashboard/projects`);
+  }
+  return `${basePath}/projects/${projectId}/edit`;
+}
+
+/** Research edit CTA; demo has no edit routes. */
+export function workspaceResearchEditHref(basePath: string, paperId: string): string {
+  if (isDemoWorkspacePath(basePath)) {
+    return signInToDashboard('/dashboard/research');
+  }
+  return `${basePath}/research/${paperId}/edit`;
 }

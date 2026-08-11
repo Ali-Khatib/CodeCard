@@ -77,11 +77,12 @@ https://*-<team-slug>.vercel.app/**   # if using Vercel preview deployments
 |------|-----------|----------------|
 | OAuth (Google/GitHub) | `sign-in`, `sign-up` buttons | Provider → `{APP_URL}/auth/callback?redirect={safePath}` → internal path |
 | Password recovery | `forgot-password` | Email link → `{APP_URL}/auth/callback?redirect=%2Freset-password` → `/reset-password` |
+| Email confirmation | Sign-up | Email link → `{APP_URL}/auth/callback?redirect=%2Fauth%2Fconfirmed` → `/auth/confirmed` |
 | Email sign-in | `sign-in` | Session in-app → `sanitizeInternalRedirect(?redirect=)` |
 | OAuth / callback errors | `auth/callback` | Failure → `/auth/error?reason=…` |
 | Expired session | `middleware` | `/sign-in?redirect=…&reason=session_expired` (when stale auth cookie detected) |
 
-**Email confirmation:** Sign-up (`sign-up/page.tsx`) does **not** currently pass `emailRedirectTo`. Supabase default confirmation links use Site URL. **External required:** confirm `Confirm email` template redirect matches your deployment. Consider adding `emailRedirectTo: authCallbackRedirectUrl('/dashboard')` in a future task.
+**Email confirmation:** Sign-up passes `emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed')`. After the user opens the email link, `/auth/callback` exchanges the code and sends them to `/auth/confirmed` (success copy, sign-in CTA, and a new-account setup guide). **External required:** Site URL + Redirect allow list must include `{APP_URL}/auth/callback` (and preferably `{APP_URL}/**`).
 
 ---
 
@@ -120,6 +121,10 @@ Enable each provider in Supabase and supply client ID/secret there (server-side 
 ---
 
 ## 5. PKCE and session model
+
+Access tokens last **1 hour** (`jwt_expiry = 3600` in `supabase/config.toml`, and Auth → Sessions → Access token expiry in the Supabase dashboard for each remote project). The browser client refreshes tokens in the background (`autoRefreshToken: true`), so a healthy session continues past one hour until the user signs out or refresh fails for real.
+
+Do **not** treat a failed token refresh as an immediate “session expired” redirect. That false positive was stacking with “Connection interrupted” on the sign-in form.
 
 | Topic | Implementation | Status |
 |-------|----------------|--------|

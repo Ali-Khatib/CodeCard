@@ -25,7 +25,7 @@ describe('WS07-T009 remove wallet NFC stubs', () => {
     const settings = read('src/components/dashboard/dashboard-settings-view.tsx');
     expect(settings).toContain('QR & profile sharing');
     expect(settings).toContain('Coming later');
-    expect(settings).toContain('Wallet passes and NFC are not part of the MVP');
+    expect(settings).toContain('Wallet and NFC come later');
     expect(settings).not.toContain('Add to Apple Wallet');
     expect(settings).not.toContain('Configure tag');
     expect(settings).not.toContain("'Download QR': 'Saved'");

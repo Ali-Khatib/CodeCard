@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { DASH_NAV_ICONS } from './dashboard-nav-icons';
 import { EmailVerificationBanner } from './email-verification-banner';
@@ -13,18 +13,22 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
+import { workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import { createClient } from '@/lib/supabase/client';
+import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 
 const NAV_ITEMS = [
-  { segment: '', label: 'Home', icon: 'home' as const },
-  { segment: 'projects', label: 'Projects', icon: 'projects' as const },
-  { segment: 'research', label: 'Research', icon: 'research' as const },
-  { segment: 'connections', label: 'Connections', icon: 'connections' as const },
-  { segment: 'circle', label: 'Circle', icon: 'circle' as const },
-  { segment: 'analytics', label: 'Analytics', icon: 'analytics' as const },
-  { segment: 'settings', label: 'Settings', icon: 'settings' as const },
+  { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
+  { segment: 'profile', label: 'Profile', short: 'Profile', icon: 'profile' as const },
+  { segment: 'projects', label: 'Projects', short: 'Projects', icon: 'projects' as const },
+  { segment: 'research', label: 'Research', short: 'Research', icon: 'research' as const },
+  { segment: 'connections', label: 'Connections', short: 'Connect', icon: 'connections' as const },
+  { segment: 'circle', label: 'Circle', short: 'Circle', icon: 'circle' as const },
+  { segment: 'analytics', label: 'Analytics', short: 'Analytics', icon: 'analytics' as const },
+  { segment: 'settings', label: 'Settings', short: 'Settings', icon: 'settings' as const },
 ] as const;
 
 const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}`;
@@ -89,10 +93,12 @@ export function DashboardShell({
   circleUnreadBadge = null,
 }: DashboardShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const [embedded, setEmbedded] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
 
@@ -109,10 +115,13 @@ export function DashboardShell({
   }, []);
 
   useEffect(() => {
+    // Marketing live demo: always show the real PC sidebar.
+    if (embedded) {
+      setSidebarOpen(true);
+      return;
+    }
     const stored = localStorage.getItem('cc-sidebar-open');
     if (stored === '0') setSidebarOpen(false);
-    // Marketing live demo: keep the real sidebar open so the iframe matches the product.
-    if (embedded && stored !== '0') setSidebarOpen(true);
   }, [embedded]);
 
   useEffect(() => {
@@ -181,6 +190,24 @@ export function DashboardShell({
       return next;
     });
   }, []);
+
+  const handleSignOut = useCallback(async () => {
+    if (signingOut || preview) return;
+    setSigningOut(true);
+    setUserMenuOpen(false);
+    try {
+      if (isSupabasePublicKeyConfigured()) {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      }
+      router.replace('/');
+      router.refresh();
+    } catch {
+      window.location.assign('/');
+    } finally {
+      setSigningOut(false);
+    }
+  }, [preview, router, signingOut]);
 
   const hrefFor = (segment: string) => (segment ? `${basePath}/${segment}` : basePath);
 
@@ -278,7 +305,11 @@ export function DashboardShell({
           </Link>
         </div>
 
-        <div className="cc-app-user-card mt-8">
+        <Link
+          href={`${basePath}/profile`}
+          className="cc-app-user-card cc-app-user-card--link mt-8 block"
+          aria-label="Open profile editor: photo, bio, and links"
+        >
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
               {avatarUrl ? (
@@ -297,6 +328,9 @@ export function DashboardShell({
               <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
                 @{profileSlug ?? email?.split('@')[0] ?? 'you'}
               </p>
+              <p className="mt-1.5 text-[11px] font-medium text-[var(--app-iris)]">
+                Edit photo, bio, links
+              </p>
               {completion != null && (
                 <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
                   {completion}% ready
@@ -304,7 +338,7 @@ export function DashboardShell({
               )}
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="mt-6 flex-1 overflow-y-auto">{navLinks}</div>
 
@@ -343,7 +377,7 @@ export function DashboardShell({
           <AppButton
             variant="primary"
             className="cc-app-topbar-cta shrink-0"
-            href={`${basePath}/projects/new`}
+            href={workspaceCreateProjectHref(basePath)}
             ariaLabel="Create project"
           >
             Create project
@@ -368,6 +402,13 @@ export function DashboardShell({
                 <p className="border-b border-[var(--app-border)] px-3 py-2 text-[12px] text-[var(--app-smoke)]">
                   {email}
                 </p>
+                <Link
+                  href={`${basePath}/profile`}
+                  className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                  onClick={() => setUserMenuOpen(false)}
+                >
+                  Edit profile
+                </Link>
                 <Link
                   href={`${basePath}/settings`}
                   className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
@@ -400,13 +441,14 @@ export function DashboardShell({
                     </Link>
                   </>
                 ) : (
-                  <Link
-                    href={`${basePath}/settings`}
-                    className="block px-3 py-2 text-[14px] text-[var(--app-smoke)] hover:bg-[var(--app-bone)]"
-                    onClick={() => setUserMenuOpen(false)}
+                  <button
+                    type="button"
+                    className="block w-full px-3 py-2 text-left text-[14px] text-[var(--app-smoke)] hover:bg-[var(--app-bone)] disabled:opacity-60"
+                    onClick={() => void handleSignOut()}
+                    disabled={signingOut}
                   >
-                    Sign out
-                  </Link>
+                    {signingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
                 )}
               </div>
             )}
@@ -427,6 +469,7 @@ export function DashboardShell({
         </main>
       </div>
 
+      {!embedded ? (
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
         {NAV_ITEMS.map((item) => {
           const href = hrefFor(item.segment);
@@ -446,12 +489,12 @@ export function DashboardShell({
               aria-label={
                 item.segment === 'circle' && circleUnreadBadge
                   ? `Circle, ${circleUnreadBadge} new`
-                  : undefined
+                  : item.label
               }
             >
               <Icon />
-              <span className="inline-flex items-center gap-1">
-                {item.label}
+              <span className="inline-flex max-w-full items-center gap-1">
+                {item.short}
                 {item.segment === 'circle' && circleUnreadBadge ? (
                   <span className="cc-app-badge cc-app-badge--mint px-1 text-[10px]" aria-hidden>
                     {circleUnreadBadge}
@@ -462,6 +505,7 @@ export function DashboardShell({
           );
         })}
       </nav>
+      ) : null}
     </div>
     </MutationFeedbackProvider>
   );

@@ -10,15 +10,17 @@ function read(rel: string) {
 
 describe('WS12-T008 touch interaction fallbacks', () => {
   it('case-study tabs expose tab semantics and click/keyboard activation', () => {
-    const source = read('components/featured-work/project-case-study-tabs.tsx');
-    expect(source).toContain('role="tablist"');
-    expect(source).toContain('role="tab"');
-    expect(source).toContain('role="tabpanel"');
-    expect(source).toContain('aria-selected={active}');
-    expect(source).toContain('onClick={() => setActive(id, label)}');
-    expect(source).toContain('onFocus={() => setActive(id, label)}');
-    expect(source).toContain('ArrowRight');
-    expect(source).toContain("(hover: hover) and (pointer: fine)");
+    const tabs = read('components/featured-work/project-case-study-tabs.tsx');
+    const carousel = read('components/ui/animated-feature-carousel.tsx');
+    expect(tabs).toContain('FeatureCarousel');
+    expect(carousel).toContain('role="tablist"');
+    expect(carousel).toContain('role="tab"');
+    expect(carousel).toContain('role="tabpanel"');
+    expect(carousel).toContain('aria-selected={isCurrent}');
+    expect(carousel).toContain('onClick={() => onChange(stepIdx)}');
+    expect(carousel).toContain('onFocus={() => onChange(stepIdx)}');
+    expect(carousel).toContain('ArrowRight');
+    expect(carousel).toContain('min-h-11');
   });
 
   it('image accordion activates by click and focus, not hover-only', () => {

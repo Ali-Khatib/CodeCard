@@ -16,9 +16,8 @@ describe('canonical dashboard profile route', () => {
     expect(src).not.toContain('notFound()');
   });
 
-  it('keeps the profile editor off primary nav; Home CTA is the entry', () => {
+  it('exposes Profile in primary nav and Home edit CTAs', () => {
     const shell = readFileSync(resolve(process.cwd(), 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
-    const nav = readFileSync(resolve(process.cwd(), 'src/components/dashboard/dashboard-nav.tsx'), 'utf8');
     const overview = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/dashboard-overview-view.tsx'),
       'utf8',
@@ -27,11 +26,14 @@ describe('canonical dashboard profile route', () => {
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
     const navBlock = navMatch![1];
-    expect(navBlock).not.toContain("segment: 'profile'");
-    expect(navBlock).not.toMatch(/label:\s*'My profile'|label:\s*'Profile'/);
-    expect(nav).not.toContain("href: '/dashboard/profile'");
-    expect(overview).toContain('href="/dashboard/profile"');
+    expect(navBlock).toContain("segment: 'profile'");
+    expect(navBlock).toContain("label: 'Profile'");
+    expect(shell).toContain('cc-app-user-card--link');
+    expect(shell).toContain('Edit photo, bio, links');
+    expect(overview).toContain('workspaceProfileHref(basePath)');
     expect(overview).toContain('Edit profile');
+    expect(overview).toContain("workspaceProfileHref(basePath, 'photo')");
+    expect(overview).toContain('How people see you');
   });
 
   it('does not keep a second full profile editor on the dashboard overview', () => {
@@ -42,5 +44,17 @@ describe('canonical dashboard profile route', () => {
 
     expect(overview).not.toContain('ProfileEditor');
     expect(overview).not.toContain('profile-edit');
+  });
+
+  it('renders a working Alex Chen profile section on /demo/profile', () => {
+    const src = readFileSync(
+      resolve(process.cwd(), 'src/app/demo/(workspace)/profile/page.tsx'),
+      'utf8',
+    );
+
+    expect(src).toContain('DashboardProfileView');
+    expect(src).toContain('preview');
+    expect(src).toContain('DEMO_PROFILE');
+    expect(src).not.toContain('redirect(');
   });
 });

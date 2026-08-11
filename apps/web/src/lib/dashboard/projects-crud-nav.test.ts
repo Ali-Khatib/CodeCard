@@ -25,7 +25,8 @@ describe('WS09-T004 projects CRUD navigation', () => {
     );
     expect(draft.editHref).toBe('/dashboard/projects/p-draft/edit');
     expect(draft.publicHref).toBeUndefined();
-    expect(draft.href).toBe('/dashboard/projects/p-draft/edit');
+    expect(draft.previewHref).toBe('/dashboard/projects/p-draft/preview');
+    expect(draft.href).toBe('/dashboard/projects/p-draft/preview');
     expect(draft.views).toBeUndefined();
     expect(draft.saves).toBeUndefined();
 
@@ -45,6 +46,7 @@ describe('WS09-T004 projects CRUD navigation', () => {
     );
     expect(live.editHref).toBe('/dashboard/projects/p-live/edit');
     expect(live.publicHref).toBe('/alex/projects/p-live');
+    expect(live.previewHref).toBe('/dashboard/projects/p-live/preview');
     expect(live.href).toBe('/alex/projects/p-live');
 
     const privateProfile = dbProjectToPortfolioProject(
@@ -62,6 +64,7 @@ describe('WS09-T004 projects CRUD navigation', () => {
       },
     );
     expect(privateProfile.publicHref).toBeUndefined();
+    expect(privateProfile.href).toBe('/dashboard/projects/p-hidden/preview');
   });
 
   it('wires Projects tab create/edit actions to real routes', () => {
@@ -72,9 +75,10 @@ describe('WS09-T004 projects CRUD navigation', () => {
     expect(page).toContain('dbProjectToPortfolioProject');
     expect(page).toContain('isProfilePublic');
     expect(page).toContain("basePath: '/dashboard'");
-    expect(portfolio).toContain('/projects/new');
+    expect(portfolio).toContain('workspaceCreateProjectHref');
     expect(portfolio).toContain('Create project');
     expect(stack).toContain('editHref');
+    expect(stack).toContain('View project');
     expect(stack).toContain('View public');
     expect(stack).not.toContain('Math.random');
   });

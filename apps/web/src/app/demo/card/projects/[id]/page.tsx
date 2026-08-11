@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
@@ -15,13 +16,15 @@ export default async function DemoProjectPage({ params }: PageProps) {
   return (
     <>
       <VisitorConversionMarker context="live_demo" referrer={`demo/card/projects/${id}`} />
-      <ProjectDetailView
-        project={project}
-        profileSlug="demo"
-        displayName={DEMO_PROFILE.display_name}
-        accentColor={DEMO_PROFILE.accentColor}
-        projects={DEMO_FEATURED_PROJECTS}
-      />
+      <Suspense fallback={null}>
+        <ProjectDetailView
+          project={project}
+          profileSlug="demo"
+          displayName={DEMO_PROFILE.display_name}
+          accentColor={DEMO_PROFILE.accentColor}
+          projects={DEMO_FEATURED_PROJECTS}
+        />
+      </Suspense>
     </>
   );
 }

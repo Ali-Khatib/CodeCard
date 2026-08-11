@@ -74,7 +74,7 @@ describe('WS15-T008 connections quality completion', () => {
     const spec = readWeb('e2e/connections.spec.ts');
     expect(harness).toContain('Connections save flow fixture');
     expect(spec).toContain('WS15');
-    expect(spec).toContain('Build a network you can actually remember');
+    expect(spec).toContain('Add people you want to remember');
     expect(spec).toContain('Jordan Lee');
     expect(spec).toContain('Alex Chen');
   });

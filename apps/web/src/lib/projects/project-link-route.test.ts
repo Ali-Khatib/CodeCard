@@ -25,7 +25,7 @@ describe('project links CRUD integration', () => {
   });
 
   it('filters unsafe project links on public rendering', () => {
-    const stack = read('src/components/profile/public-project-stack.tsx');
+    const stack = read('src/components/profile/public-project-card.tsx');
     const portfolio = read('src/lib/dashboard/portfolio.ts');
     expect(stack).toContain('firstSafeProjectLink');
     expect(stack).toContain('noopener noreferrer');

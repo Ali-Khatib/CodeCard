@@ -1,6 +1,6 @@
 'use client';
 
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoProjectHref } from '@/lib/marketing/demo-url';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -107,7 +107,7 @@ export function ScrollProjectCard({
     };
   }, [isActive, reducedMotion, proximity]);
 
-  const projectUrl = `${publicDemoProfileBasePath(profileSlug)}/projects/${project.id}`;
+  const projectUrl = publicDemoProjectHref(profileSlug, project.id, 'preview');
 
   const handlePrefetch = useCallback(() => {
     prefetchProjectRoute(profileSlug, project.id, router);

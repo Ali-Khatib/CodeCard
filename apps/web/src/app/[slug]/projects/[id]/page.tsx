@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { normalizeFeaturedProject } from '@/lib/projects/featured';
@@ -113,13 +114,15 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         referrer={`${slug}/projects/${id}`}
         profileId={profile.id}
       />
-      <ProjectDetailView
-        project={featured}
-        profileSlug={slug}
-        profileId={profile.id}
-        displayName={profile.display_name}
-        projects={featuredProjects}
-      />
+      <Suspense fallback={null}>
+        <ProjectDetailView
+          project={featured}
+          profileSlug={slug}
+          profileId={profile.id}
+          displayName={profile.display_name}
+          projects={featuredProjects}
+        />
+      </Suspense>
     </>
   );
 }

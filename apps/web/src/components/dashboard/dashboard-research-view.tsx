@@ -7,7 +7,13 @@ import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { ResearchReorderToolbar } from '@/components/dashboard/research-reorder-toolbar';
 import { ResearchBubbleGrid } from '@/components/dashboard/research-bubble-grid';
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import {
+  isDemoWorkspacePath,
+  publicDemoResearchHref,
+  workspaceCreateResearchHref,
+  workspaceResearchEditHref,
+} from '@/lib/marketing/demo-url';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
 
 const VIEW_MODES = [
@@ -25,7 +31,7 @@ function paperPublicHref(
   if (!paper.isPublished || !isProfilePublic || !profileSlug || !paper.slug) {
     return null;
   }
-  return `${publicDemoProfileBasePath(profileSlug)}/research/${paper.slug}`;
+  return publicDemoResearchHref(profileSlug, paper.slug, 'research');
 }
 
 export function DashboardResearchView({
@@ -43,7 +49,9 @@ export function DashboardResearchView({
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const orderedPaperIds = papers.map((paper) => paper.id);
-  const createHref = `${basePath}/research/new`;
+  const isDemoWorkspace = isDemoWorkspacePath(basePath);
+  const createHref = workspaceCreateResearchHref(basePath);
+  const createLabel = isDemoWorkspace ? 'Sign in to add research' : 'Add research';
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -70,8 +78,8 @@ export function DashboardResearchView({
                 ))}
               </div>
             ) : null}
-            <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
-              Add research
+            <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+              {isDemoWorkspace ? 'Sign in to add' : 'Add research'}
             </AppButton>
           </div>
         }
@@ -79,29 +87,39 @@ export function DashboardResearchView({
 
       {papers.length > 0 ? (
         viewMode === 'grid' ? (
-          <ResearchBubbleGrid papers={papers} basePath={basePath} />
+          <ResearchBubbleGrid papers={papers} basePath={basePath} readOnly={isDemoWorkspace} />
         ) : (
           <div className="flex flex-col gap-8">
             {papers.map((paper, index) => {
-              const editHref = `${basePath}/research/${paper.id}/edit`;
+              const editHref = workspaceResearchEditHref(basePath, paper.id);
               const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
               return (
                 <div key={paper.id} className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <ResearchReorderToolbar
-                      paperId={paper.id}
-                      paperTitle={paper.title}
-                      index={index}
-                      total={papers.length}
-                      orderedPaperIds={orderedPaperIds}
-                    />
+                    {!isDemoWorkspace ? (
+                      <ResearchReorderToolbar
+                        paperId={paper.id}
+                        paperTitle={paper.title}
+                        index={index}
+                        total={papers.length}
+                        orderedPaperIds={orderedPaperIds}
+                      />
+                    ) : (
+                      <p className="text-[12px] text-[var(--app-smoke)]">
+                        Sign in to reorder and edit research.
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       <Link
                         href={editHref}
                         className="cc-app-btn cc-app-btn--ghost text-[13px]"
-                        aria-label={`Edit research paper ${paper.title}`}
+                        aria-label={
+                          isDemoWorkspace
+                            ? `Sign in to edit ${paper.title}`
+                            : `Edit research paper ${paper.title}`
+                        }
                       >
-                        Edit
+                        {isDemoWorkspace ? 'Sign in to edit' : 'Edit'}
                       </Link>
                       {publicHref ? (
                         <Link
@@ -127,17 +145,16 @@ export function DashboardResearchView({
         )
       ) : (
         <AppCard className="!p-8 text-center">
-          <p className="cc-app-mono">No research yet</p>
+          <p className="cc-app-mono">Research</p>
           <h2 className="cc-work-title cc-work-title--compact mt-3">
-            Add your first paper
+            {EMPTY_STATE_COPY.research.title}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
-            Capture title, authors, venue, DOI, citation, and links. Papers stay unpublished until you
-            choose to share them.
+            {EMPTY_STATE_COPY.research.description}
           </p>
           <div className="mt-6 flex justify-center">
-            <AppButton variant="primary" href={createHref} ariaLabel="Add research paper">
-              Create paper
+            <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+              {isDemoWorkspace ? 'Sign in to add research' : EMPTY_STATE_COPY.research.cta}
             </AppButton>
           </div>
         </AppCard>

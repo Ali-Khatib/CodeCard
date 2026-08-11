@@ -84,10 +84,8 @@ function ToggleChip({
       onClick={onToggle}
       aria-pressed={selected}
       className={cn(
-        'rounded-full border px-3 py-1.5 text-[13px] transition-colors',
-        selected
-          ? 'border-reactor/60 bg-reactor/15 text-vellum'
-          : 'border-charcoal/80 bg-charcoal/40 text-lichen hover:border-graphite',
+        'cc-app-toggle-chip',
+        selected ? 'cc-app-toggle-chip--selected' : undefined,
       )}
     >
       {label}
@@ -351,261 +349,6 @@ export function ProjectForm({
           </Link>
         </div>
       )}
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="project-title" className="text-[13px] font-medium text-graphite">
-            Project title <span className="text-reactor">*</span>
-          </label>
-          <input
-            id="project-title"
-            name="title"
-            required
-            value={form.title}
-            onChange={(e) => updateTitle(e.target.value)}
-            maxLength={PROJECT_FORM_LIMITS.title}
-            className="cc-input w-full"
-            placeholder="DevFlow"
-            aria-invalid={Boolean(fieldErrors.title)}
-            aria-describedby={fieldErrors.title ? 'project-title-error' : undefined}
-          />
-          <FieldError id="project-title-error" message={fieldErrors.title} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-slug" className="text-[13px] font-medium text-graphite">
-            Project URL <span className="text-reactor">*</span>
-          </label>
-          <input
-            id="project-slug"
-            name="slug"
-            required
-            ref={slugInputRef}
-            value={form.slug}
-            onChange={(e) => updateSlug(e.target.value)}
-            className="cc-input w-full"
-            placeholder="dev-flow"
-            aria-invalid={Boolean(fieldErrors.slug)}
-            aria-describedby={joinDescribedBy(
-              'project-slug-hint',
-              fieldErrors.slug && 'project-slug-error',
-            )}
-          />
-          <p id="project-slug-hint" className="text-[12px] text-ash">
-            Lowercase letters, numbers, and hyphens only.
-          </p>
-          <FieldError id="project-slug-error" message={fieldErrors.slug} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-tagline" className="text-[13px] font-medium text-graphite">
-            Tagline <span className="text-ash">(optional)</span>
-          </label>
-          <input
-            id="project-tagline"
-            name="tagline"
-            value={form.tagline}
-            onChange={(e) => setForm((prev) => ({ ...prev, tagline: e.target.value }))}
-            maxLength={PROJECT_FORM_LIMITS.tagline}
-            className="cc-input w-full"
-            placeholder="Ship faster with better workflows"
-            aria-invalid={Boolean(fieldErrors.tagline)}
-            aria-describedby={
-              fieldErrors.tagline ? 'project-tagline-error' : undefined
-            }
-          />
-          <FieldError id="project-tagline-error" message={fieldErrors.tagline} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-description" className="text-[13px] font-medium text-graphite">
-            Description <span className="text-ash">(optional)</span>
-          </label>
-          <textarea
-            id="project-description"
-            name="description"
-            value={form.description}
-            onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-            maxLength={PROJECT_FORM_LIMITS.description}
-            rows={5}
-            className="cc-input w-full resize-y"
-            placeholder="What you built, why it matters, and what you learned."
-            aria-invalid={Boolean(fieldErrors.description)}
-            aria-describedby={
-              fieldErrors.description ? 'project-description-error' : undefined
-            }
-          />
-          <FieldError id="project-description-error" message={fieldErrors.description} />
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <div>
-          <label htmlFor="project-technologies" className="text-[13px] font-medium text-graphite">
-            Technologies
-          </label>
-          <p id="project-technologies-hint" className="text-[12px] text-ash">
-            Add tools and languages, then press Enter.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2" role="list" aria-label="Selected technologies">
-          {form.technologies.map((tech) => (
-            <span key={tech} className="cc-dash-tech-chip inline-flex items-center gap-2" role="listitem">
-              {tech}
-              <button
-                type="button"
-                className="text-ash hover:text-vellum"
-                onClick={() => removeTechnology(tech)}
-                aria-label={`Remove technology ${tech}`}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-        <input
-          id="project-technologies"
-          value={techInput}
-          onChange={(e) => setTechInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addTechnology();
-            }
-          }}
-          className="cc-input w-full"
-          placeholder="TypeScript, Next.js, C++"
-          aria-invalid={Boolean(fieldErrors.technologies)}
-          aria-describedby={joinDescribedBy(
-            'project-technologies-hint',
-            fieldErrors.technologies && 'project-technologies-error',
-          )}
-        />
-        <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
-      </section>
-
-      <fieldset
-        className="space-y-3 border-0 p-0"
-        aria-invalid={fieldErrors.domains ? true : undefined}
-        aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
-      >
-        <legend className="text-[13px] font-medium text-graphite">Domains</legend>
-        <div id="project-domains" className="flex flex-wrap gap-2">
-          {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
-            <ToggleChip
-              key={domain}
-              label={domain}
-              selected={form.domains.includes(domain)}
-              onToggle={() => toggleDomain(domain)}
-            />
-          ))}
-        </div>
-        <FieldError id="project-domains-error" message={fieldErrors.domains} />
-      </fieldset>
-
-      <fieldset
-        className="space-y-3 border-0 p-0"
-        aria-invalid={fieldErrors.focus_areas ? true : undefined}
-        aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
-      >
-        <legend className="text-[13px] font-medium text-graphite">Focus areas</legend>
-        <div id="project-focus-areas" className="flex flex-wrap gap-2">
-          {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
-            <ToggleChip
-              key={area}
-              label={area}
-              selected={form.focus_areas.includes(area)}
-              onToggle={() => toggleFocusArea(area)}
-            />
-          ))}
-        </div>
-        <FieldError id="project-focus-areas-error" message={fieldErrors.focus_areas} />
-      </fieldset>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="project-user-role" className="text-[13px] font-medium text-graphite">
-            Your role <span className="text-ash">(optional)</span>
-          </label>
-          <input
-            id="project-user-role"
-            name="user_role"
-            value={form.user_role}
-            onChange={(e) => setForm((prev) => ({ ...prev, user_role: e.target.value }))}
-            maxLength={PROJECT_FORM_LIMITS.userRole}
-            className="cc-input w-full"
-            placeholder="Lead Engineer"
-            aria-invalid={Boolean(fieldErrors.user_role)}
-            aria-describedby={
-              fieldErrors.user_role ? 'project-user-role-error' : undefined
-            }
-          />
-          <FieldError id="project-user-role-error" message={fieldErrors.user_role} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-status" className="text-[13px] font-medium text-graphite">
-            Lifecycle status
-          </label>
-          <select
-            id="project-status"
-            name="status"
-            value={form.status}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                status: e.target.value as ProjectFormValues['status'],
-              }))
-            }
-            className="cc-input w-full"
-            aria-invalid={Boolean(fieldErrors.status)}
-            aria-describedby={fieldErrors.status ? 'project-status-error' : undefined}
-          >
-            {PROJECT_FORM_STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status.replace('_', ' ')}
-              </option>
-            ))}
-          </select>
-          <FieldError id="project-status-error" message={fieldErrors.status} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-started-at" className="text-[13px] font-medium text-graphite">
-            Started <span className="text-ash">(optional)</span>
-          </label>
-          <input
-            id="project-started-at"
-            name="started_at"
-            type="date"
-            value={form.started_at}
-            onChange={(e) => setForm((prev) => ({ ...prev, started_at: e.target.value }))}
-            className="cc-input w-full"
-            aria-invalid={Boolean(fieldErrors.started_at)}
-            aria-describedby={
-              fieldErrors.started_at ? 'project-started-at-error' : undefined
-            }
-          />
-          <FieldError id="project-started-at-error" message={fieldErrors.started_at} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-ended-at" className="text-[13px] font-medium text-graphite">
-            Ended <span className="text-ash">(optional)</span>
-          </label>
-          <input
-            id="project-ended-at"
-            name="ended_at"
-            type="date"
-            value={form.ended_at}
-            onChange={(e) => setForm((prev) => ({ ...prev, ended_at: e.target.value }))}
-            className="cc-input w-full"
-            aria-invalid={Boolean(fieldErrors.ended_at)}
-            aria-describedby={fieldErrors.ended_at ? 'project-ended-at-error' : undefined}
-          />
-          <FieldError id="project-ended-at-error" message={fieldErrors.ended_at} />
-        </div>
-      </section>
-
       <section className="space-y-4" aria-labelledby="project-showcase-heading">
         <div>
           <h2 id="project-showcase-heading" className="text-[15px] font-semibold text-graphite">
@@ -791,6 +534,261 @@ export function ProjectForm({
           })}
         </div>
         <FieldError id="project-case-study-error" message={fieldErrors.case_study_sections} />
+      </section>
+
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="project-title" className="text-[13px] font-medium text-graphite">
+            Project title <span className="text-reactor">*</span>
+          </label>
+          <input
+            id="project-title"
+            name="title"
+            required
+            value={form.title}
+            onChange={(e) => updateTitle(e.target.value)}
+            maxLength={PROJECT_FORM_LIMITS.title}
+            className="cc-input w-full"
+            placeholder="DevFlow"
+            aria-invalid={Boolean(fieldErrors.title)}
+            aria-describedby={fieldErrors.title ? 'project-title-error' : undefined}
+          />
+          <FieldError id="project-title-error" message={fieldErrors.title} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-slug" className="text-[13px] font-medium text-graphite">
+            Project URL <span className="text-reactor">*</span>
+          </label>
+          <input
+            id="project-slug"
+            name="slug"
+            required
+            ref={slugInputRef}
+            value={form.slug}
+            onChange={(e) => updateSlug(e.target.value)}
+            className="cc-input w-full"
+            placeholder="dev-flow"
+            aria-invalid={Boolean(fieldErrors.slug)}
+            aria-describedby={joinDescribedBy(
+              'project-slug-hint',
+              fieldErrors.slug && 'project-slug-error',
+            )}
+          />
+          <p id="project-slug-hint" className="text-[12px] text-ash">
+            Lowercase letters, numbers, and hyphens only.
+          </p>
+          <FieldError id="project-slug-error" message={fieldErrors.slug} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-tagline" className="text-[13px] font-medium text-graphite">
+            Tagline <span className="text-ash">(optional)</span>
+          </label>
+          <input
+            id="project-tagline"
+            name="tagline"
+            value={form.tagline}
+            onChange={(e) => setForm((prev) => ({ ...prev, tagline: e.target.value }))}
+            maxLength={PROJECT_FORM_LIMITS.tagline}
+            className="cc-input w-full"
+            placeholder="Ship faster with better workflows"
+            aria-invalid={Boolean(fieldErrors.tagline)}
+            aria-describedby={
+              fieldErrors.tagline ? 'project-tagline-error' : undefined
+            }
+          />
+          <FieldError id="project-tagline-error" message={fieldErrors.tagline} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-description" className="text-[13px] font-medium text-graphite">
+            Description <span className="text-ash">(optional)</span>
+          </label>
+          <textarea
+            id="project-description"
+            name="description"
+            value={form.description}
+            onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+            maxLength={PROJECT_FORM_LIMITS.description}
+            rows={5}
+            className="cc-input w-full resize-y"
+            placeholder="What you built, why it matters, and what you learned."
+            aria-invalid={Boolean(fieldErrors.description)}
+            aria-describedby={
+              fieldErrors.description ? 'project-description-error' : undefined
+            }
+          />
+          <FieldError id="project-description-error" message={fieldErrors.description} />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <label htmlFor="project-technologies" className="text-[13px] font-medium text-graphite">
+            Technologies
+          </label>
+          <p id="project-technologies-hint" className="text-[12px] text-ash">
+            Add tools and languages, then press Enter.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2" role="list" aria-label="Selected technologies">
+          {form.technologies.map((tech) => (
+            <span key={tech} className="cc-dash-tech-chip inline-flex items-center gap-2" role="listitem">
+              {tech}
+              <button
+                type="button"
+                className="text-ash hover:text-vellum"
+                onClick={() => removeTechnology(tech)}
+                aria-label={`Remove technology ${tech}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <input
+          id="project-technologies"
+          value={techInput}
+          onChange={(e) => setTechInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addTechnology();
+            }
+          }}
+          className="cc-input w-full"
+          placeholder="TypeScript, Next.js, C++"
+          aria-invalid={Boolean(fieldErrors.technologies)}
+          aria-describedby={joinDescribedBy(
+            'project-technologies-hint',
+            fieldErrors.technologies && 'project-technologies-error',
+          )}
+        />
+        <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
+      </section>
+
+      <fieldset
+        className="space-y-3 border-0 p-0"
+        aria-invalid={fieldErrors.domains ? true : undefined}
+        aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
+      >
+        <legend className="cc-app-field-label">Domains</legend>
+        <div id="project-domains" className="flex flex-wrap gap-2">
+          {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
+            <ToggleChip
+              key={domain}
+              label={domain}
+              selected={form.domains.includes(domain)}
+              onToggle={() => toggleDomain(domain)}
+            />
+          ))}
+        </div>
+        <FieldError id="project-domains-error" message={fieldErrors.domains} />
+      </fieldset>
+
+      <fieldset
+        className="space-y-3 border-0 p-0"
+        aria-invalid={fieldErrors.focus_areas ? true : undefined}
+        aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
+      >
+        <legend className="cc-app-field-label">Focus areas</legend>
+        <div id="project-focus-areas" className="flex flex-wrap gap-2">
+          {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
+            <ToggleChip
+              key={area}
+              label={area}
+              selected={form.focus_areas.includes(area)}
+              onToggle={() => toggleFocusArea(area)}
+            />
+          ))}
+        </div>
+        <FieldError id="project-focus-areas-error" message={fieldErrors.focus_areas} />
+      </fieldset>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <label htmlFor="project-user-role" className="text-[13px] font-medium text-graphite">
+            Your role <span className="text-ash">(optional)</span>
+          </label>
+          <input
+            id="project-user-role"
+            name="user_role"
+            value={form.user_role}
+            onChange={(e) => setForm((prev) => ({ ...prev, user_role: e.target.value }))}
+            maxLength={PROJECT_FORM_LIMITS.userRole}
+            className="cc-input w-full"
+            placeholder="Lead Engineer"
+            aria-invalid={Boolean(fieldErrors.user_role)}
+            aria-describedby={
+              fieldErrors.user_role ? 'project-user-role-error' : undefined
+            }
+          />
+          <FieldError id="project-user-role-error" message={fieldErrors.user_role} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-status" className="text-[13px] font-medium text-graphite">
+            Lifecycle status
+          </label>
+          <select
+            id="project-status"
+            name="status"
+            value={form.status}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                status: e.target.value as ProjectFormValues['status'],
+              }))
+            }
+            className="cc-input w-full"
+            aria-invalid={Boolean(fieldErrors.status)}
+            aria-describedby={fieldErrors.status ? 'project-status-error' : undefined}
+          >
+            {PROJECT_FORM_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {status.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+          <FieldError id="project-status-error" message={fieldErrors.status} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-started-at" className="text-[13px] font-medium text-graphite">
+            Started <span className="text-ash">(optional)</span>
+          </label>
+          <input
+            id="project-started-at"
+            name="started_at"
+            type="date"
+            value={form.started_at}
+            onChange={(e) => setForm((prev) => ({ ...prev, started_at: e.target.value }))}
+            className="cc-input w-full"
+            aria-invalid={Boolean(fieldErrors.started_at)}
+            aria-describedby={
+              fieldErrors.started_at ? 'project-started-at-error' : undefined
+            }
+          />
+          <FieldError id="project-started-at-error" message={fieldErrors.started_at} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-ended-at" className="text-[13px] font-medium text-graphite">
+            Ended <span className="text-ash">(optional)</span>
+          </label>
+          <input
+            id="project-ended-at"
+            name="ended_at"
+            type="date"
+            value={form.ended_at}
+            onChange={(e) => setForm((prev) => ({ ...prev, ended_at: e.target.value }))}
+            className="cc-input w-full"
+            aria-invalid={Boolean(fieldErrors.ended_at)}
+            aria-describedby={fieldErrors.ended_at ? 'project-ended-at-error' : undefined}
+          />
+          <FieldError id="project-ended-at-error" message={fieldErrors.ended_at} />
+        </div>
       </section>
 
       {recoverableError && (

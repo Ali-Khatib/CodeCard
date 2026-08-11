@@ -21,9 +21,12 @@ describe('WS14-T019 public profile performance contract', () => {
   });
 
   it('prioritizes above-fold LCP image and avoids opacity gates on hero', () => {
+    const card = readWeb('src/components/profile/public-project-card.tsx');
     const stack = readWeb('src/components/profile/public-project-stack.tsx');
-    expect(stack).toContain('loading="lazy"');
-    expect(stack).not.toContain('priority={index === 0}');
+    expect(card).toContain('loading="lazy"');
+    expect(card).not.toContain('priority={index === 0}');
+    expect(card).not.toContain('motion/react');
+    expect(card).not.toContain('AppReveal');
     expect(stack).not.toContain('motion/react');
     expect(stack).not.toContain('AppReveal');
 

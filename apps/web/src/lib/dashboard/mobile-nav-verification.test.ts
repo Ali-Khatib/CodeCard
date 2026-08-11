@@ -7,15 +7,14 @@ function read(rel: string) {
 }
 
 describe('WS09-T011 mobile dashboard navigation', () => {
-  it('keeps every real MVP tab in a horizontally scrollable mobile nav', () => {
+  it('keeps every real MVP tab in a mobile nav that fits without side scrolling', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
     const css = read('src/styles/codecard-app-system.css');
 
     expect(shell).toContain('cc-app-mobile-nav md:hidden');
     expect(shell).toContain('aria-label="Mobile"');
     expect(shell).toContain("label: 'Home'");
-    expect(shell).not.toContain("label: 'Profile'");
-    expect(shell).not.toContain("label: 'My profile'");
+    expect(shell).toContain("label: 'Profile'");
     expect(shell).toContain("label: 'Projects'");
     expect(shell).toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");
@@ -32,14 +31,12 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(shell).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
 
     expect(css).toContain('.cc-app-mobile-nav');
-    expect(css).toContain('overflow-x: auto');
-    expect(css).toContain('overscroll-behavior-x: contain');
-    expect(css).toContain('-webkit-overflow-scrolling: touch');
-    expect(css).toContain('scroll-snap-type: x proximity');
+    expect(css).toContain('overflow-x: hidden');
     expect(css).toContain('min-height: 44px');
     expect(css).toContain('white-space: nowrap');
-    expect(css).toContain('min-width: 68px');
-    expect(css).toContain('flex: 0 0 auto');
+    expect(css).toContain('min-width: 0');
+    expect(css).toContain('grid-template-columns: repeat(8, minmax(0, 1fr))');
+    expect(css).toContain('flex: 1 1 0');
   });
 
   it('does not claim Billing is a primary mobile tab while Settings remains the entry', () => {

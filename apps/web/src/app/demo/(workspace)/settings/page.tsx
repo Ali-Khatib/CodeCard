@@ -2,5 +2,13 @@ import { DashboardSettingsView } from '@/components/dashboard/dashboard-settings
 import { DEMO_WORKSPACE } from '@/lib/dashboard/workspace-demo';
 
 export default function PreviewSettingsPage() {
-  return <DashboardSettingsView email={DEMO_WORKSPACE.email} accountControls="demo" />;
+  return (
+    <DashboardSettingsView
+      email={DEMO_WORKSPACE.email}
+      plan="pro"
+      profileSlug={DEMO_WORKSPACE.profileSlug}
+      isPublic
+      accountControls="demo"
+    />
+  );
 }

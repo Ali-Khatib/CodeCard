@@ -58,7 +58,7 @@ describe('WS12-T009 uploaded image alt text', () => {
     expect(figures).toContain('aria-describedby={`caption-help-${figure.id}`}');
     expect(figures).toContain('Do not paste filenames');
 
-    const publicStack = read('components/profile/public-project-stack.tsx');
+    const publicStack = read('components/profile/public-project-card.tsx');
     expect(publicStack).toContain('alt=""');
   });
 

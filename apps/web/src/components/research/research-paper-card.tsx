@@ -12,7 +12,7 @@ import { ContentOpeningLink } from '@/components/navigation/content-opening-tran
 import { trackResearchEvent } from './research-analytics';
 
 function abstractPreview(abstract: string | null) {
-  if (!abstract) return 'Research abstract coming soon.';
+  if (!abstract) return 'No abstract provided.';
   return abstract.length > 220 ? `${abstract.slice(0, 220).trim()}...` : abstract;
 }
 
@@ -33,7 +33,7 @@ export function ResearchPaperCard({
     <AppReveal delay={delay}>
       <motion.article
         layout
-        className="cc-app-project-card"
+        className="cc-app-project-card cc-glass-card"
         whileTap={reduced ? undefined : { scale: 0.985 }}
         transition={{ duration: HUME_MOTION.press, ease: HUME_EASE }}
       >
@@ -75,7 +75,7 @@ export function ResearchPaperCard({
                 </h3>
               </ContentOpeningLink>
               <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
-                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors coming soon'}
+                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
               </p>
             </div>
             <span className="cc-app-badge cc-app-badge--mint">

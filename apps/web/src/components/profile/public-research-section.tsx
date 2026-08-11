@@ -1,4 +1,4 @@
-import { publicDemoProfileBasePath } from '@/lib/marketing/demo-url';
+import { publicDemoResearchHref } from '@/lib/marketing/demo-url';
 import type { ResearchPaper } from '@/lib/research/research';
 import { ResearchPaperCard } from '@/components/research/research-paper-card';
 import { HUME_MOTION } from '@/lib/motion/hume-motion';
@@ -14,7 +14,7 @@ export function PublicResearchSection({
   researchPapers: ResearchPaper[];
 }) {
   return (
-    <section id="research" className="mt-16 scroll-mt-24">
+    <section id="research" className="mt-16 scroll-mt-28">
       <p className="cc-app-mono">Research</p>
       <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
         Papers &amp; publications
@@ -28,9 +28,7 @@ export function PublicResearchSection({
           <ResearchPaperCard
             key={paper.id}
             paper={paper}
-            href={
-              `${publicDemoProfileBasePath(profileSlug)}/research/${paper.slug}`
-            }
+            href={publicDemoResearchHref(profileSlug, paper.slug, 'preview')}
             profileId={profileId}
             delay={index * HUME_MOTION.stagger}
           />

@@ -10,6 +10,8 @@ import {
   type ConnectionsCollectionFilter,
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { DashFilterBar } from './dash-filter-bar';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
@@ -201,7 +203,9 @@ function ConnectionExpandedBody({
       </div>
 
       <div className="cc-connection-actions">
-        <AppButton variant="primary">Open CodeCard</AppButton>
+        <AppButton variant="primary" href="/demo/card">
+          Open CodeCard
+        </AppButton>
         <CopyLinkButton
           getText={() => connectionEmail(connection)}
           variant="ghost"
@@ -209,15 +213,12 @@ function ConnectionExpandedBody({
         >
           Copy email
         </CopyLinkButton>
-        <AsyncActionButton
+        <AppButton
           variant="ghost"
-          successLabel="Scheduled"
-          onAction={async () => {
-            await new Promise((r) => setTimeout(r, 400));
-          }}
+          href={`/sign-in?redirect=${encodeURIComponent('/dashboard/connections')}`}
         >
-          Add follow-up
-        </AsyncActionButton>
+          Sign in to schedule follow-up
+        </AppButton>
       </div>
     </div>
   );
@@ -465,27 +466,50 @@ function ConnectionGridCard({
   );
 }
 
-function ConnectionsEmptyState() {
+const SHARE_LINK_COPIED_FLAG = 'cc-share-link-copied';
+
+function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null }) {
+  return (
+    <AppButton
+      variant="ghost"
+      href="/dashboard#share"
+      ariaLabel="Share your CodeCard"
+      onClick={() => {
+        const url = getPublicProfileLinkForClipboard(profileSlug);
+        try {
+          if (url) {
+            void navigator.clipboard.writeText(url);
+            sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '1');
+          } else {
+            sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '0');
+          }
+        } catch {
+          sessionStorage.setItem(SHARE_LINK_COPIED_FLAG, '0');
+        }
+      }}
+    >
+      {EMPTY_STATE_COPY.connections.secondaryCta}
+    </AppButton>
+  );
+}
+
+function ConnectionsEmptyState({ profileSlug }: { profileSlug?: string | null }) {
+  const copy = EMPTY_STATE_COPY.connections;
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
-      <PageHeader
-        title="Build a network you can actually remember"
-        description="Save people whose work matters to you. Add Connections from their public CodeCard, then organize and follow their work from here."
-      />
+      <PageHeader title={copy.title} description={copy.description} />
       <FadeInView delay={0}>
         <div className="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] px-6 py-10 md:px-10 md:py-14">
           <p className="max-w-xl text-[16px] leading-relaxed text-[var(--app-smoke)]">
             Open a person&apos;s CodeCard and choose{' '}
-            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>. Your
-            list stays private — only you can see who you saved.
+            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>.{' '}
+            {copy.body}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <AppButton variant="primary" href="/profiles">
-              Explore CodeCards
+              {copy.primaryCta}
             </AppButton>
-            <AppButton variant="ghost" href="/dashboard/profile">
-              Share your CodeCard
-            </AppButton>
+            <ShareYourCodeCardButton profileSlug={profileSlug} />
           </div>
         </div>
       </FadeInView>
@@ -497,6 +521,7 @@ export function DashboardConnectionsView({
   connections,
   basePath = '/dashboard',
   variant = 'demo',
+  profileSlug = null,
   onRemoveConnection,
   collections = [],
   memberships = {},
@@ -506,6 +531,7 @@ export function DashboardConnectionsView({
   connections: ViewConnection[];
   basePath?: string;
   variant?: 'demo' | 'authenticated';
+  profileSlug?: string | null;
   onRemoveConnection?: (connectionId: string) => void | Promise<void>;
   collections?: Array<{ id: string; name: string }>;
   memberships?: Record<string, string[]>;
@@ -574,7 +600,7 @@ export function DashboardConnectionsView({
   );
 
   if (variant === 'authenticated' && connections.length === 0) {
-    return <ConnectionsEmptyState />;
+    return <ConnectionsEmptyState profileSlug={profileSlug} />;
   }
 
   return (

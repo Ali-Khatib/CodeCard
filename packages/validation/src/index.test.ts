@@ -34,6 +34,26 @@ describe('signUpSchema', () => {
       slug: 'test-user',
     });
     expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.errors[0]?.message).toMatch(/8 characters/i);
+      expect(result.error.errors[0]?.message).toMatch(/uppercase/i);
+      expect(result.error.errors[0]?.message).toMatch(/lowercase/i);
+      expect(result.error.errors[0]?.message).toMatch(/number/i);
+    }
+  });
+
+  it('rejects empty password with the full requirements message', () => {
+    const result = signUpSchema.safeParse({
+      email: 'test@example.com',
+      password: '',
+      display_name: 'Test User',
+      slug: 'test-user',
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.errors[0]?.message).not.toMatch(/at least 1 character/i);
+      expect(result.error.errors[0]?.message).toMatch(/8 characters/i);
+    }
   });
 
   it('accepts valid signup', () => {

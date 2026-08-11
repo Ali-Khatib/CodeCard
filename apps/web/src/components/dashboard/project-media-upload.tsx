@@ -505,7 +505,7 @@ export function ProjectMediaUpload({
   const displayCoverUrl = coverPreviewUrl ?? savedCoverUrl;
 
   return (
-    <section className="mt-10 max-w-[720px] space-y-8" aria-labelledby="project-media-heading">
+    <section className="mb-10 max-w-[720px] space-y-8" aria-labelledby="project-media-heading">
       <div>
         <h2
           id="project-media-heading"

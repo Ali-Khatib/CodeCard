@@ -19,6 +19,7 @@ import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
 import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
+import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -108,6 +109,7 @@ function SignInForm() {
 
     submitLock.current = true;
     setEmailLoading(true);
+    let succeeded = false;
 
     try {
       const parsed = signInSchema.safeParse({ email, password });
@@ -135,6 +137,7 @@ function SignInForm() {
         return;
       }
 
+      succeeded = true;
       setFadingOut(true);
       router.push(redirectTo);
       router.refresh();
@@ -144,7 +147,7 @@ function SignInForm() {
       requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       submitLock.current = false;
-      setEmailLoading(false);
+      if (!succeeded) setEmailLoading(false);
     }
   }
 
@@ -217,9 +220,16 @@ function SignInForm() {
             <AuthErrorAlert message={alertMessage ?? ''} />
           </div>
 
+          {emailLoading || fadingOut ? (
+            <AuthBusyNotice>Signing you in…</AuthBusyNotice>
+          ) : null}
+          {oauthLoading === 'github' ? (
+            <AuthBusyNotice>Connecting to GitHub…</AuthBusyNotice>
+          ) : null}
+
           <AuthPrimaryButton
-            pending={emailLoading}
-            pendingLabel="Signing in…"
+            pending={emailLoading || fadingOut}
+            pendingLabel="Signing you in…"
             idleLabel="Sign in"
             disabled={authBlocked && !emailLoading}
           />

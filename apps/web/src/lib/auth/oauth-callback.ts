@@ -1,3 +1,4 @@
+import { defaultPostAuthRedirectForType } from '@/lib/auth/auth-link-forward';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 
 export const OAUTH_ERROR_REASONS = [
@@ -20,11 +21,22 @@ export const OAUTH_LINK_EXPIRED_MESSAGE =
 export const OAUTH_MISCONFIGURED_MESSAGE =
   'Sign-in is temporarily unavailable. Please try again later.';
 
-export type OAuthCallbackSuccess = {
+export type OAuthCallbackCodeSuccess = {
   kind: 'success';
+  method: 'code';
   code: string;
   redirectPath: string;
 };
+
+export type OAuthCallbackOtpSuccess = {
+  kind: 'success';
+  method: 'token_hash';
+  tokenHash: string;
+  otpType: string;
+  redirectPath: string;
+};
+
+export type OAuthCallbackSuccess = OAuthCallbackCodeSuccess | OAuthCallbackOtpSuccess;
 
 export type OAuthCallbackFailure = {
   kind: 'error';
@@ -34,11 +46,17 @@ export type OAuthCallbackFailure = {
 
 export type OAuthCallbackResolution = OAuthCallbackSuccess | OAuthCallbackFailure;
 
+function resolveCallbackRedirectPath(searchParams: URLSearchParams): string {
+  const type = searchParams.get('type');
+  const fallback = defaultPostAuthRedirectForType(type);
+  return sanitizeInternalRedirect(searchParams.get('redirect'), fallback);
+}
+
 export function resolveOAuthCallback(
   searchParams: URLSearchParams,
   options: { authConfigured: boolean },
 ): OAuthCallbackResolution {
-  const redirectPath = sanitizeInternalRedirect(searchParams.get('redirect'));
+  const redirectPath = resolveCallbackRedirectPath(searchParams);
 
   if (!options.authConfigured) {
     return { kind: 'error', reason: 'misconfigured', redirectPath };
@@ -49,12 +67,18 @@ export function resolveOAuthCallback(
     return { kind: 'error', reason: 'provider_denied', redirectPath };
   }
 
+  const tokenHash = searchParams.get('token_hash')?.trim();
+  const otpType = searchParams.get('type')?.trim();
+  if (tokenHash && otpType) {
+    return { kind: 'success', method: 'token_hash', tokenHash, otpType, redirectPath };
+  }
+
   const code = searchParams.get('code');
   if (!code || !code.trim()) {
     return { kind: 'error', reason: 'missing_code', redirectPath };
   }
 
-  return { kind: 'success', code, redirectPath };
+  return { kind: 'success', method: 'code', code, redirectPath };
 }
 
 export function oauthErrorMessage(reason: OAuthErrorReason): string {

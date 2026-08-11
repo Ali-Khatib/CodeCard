@@ -93,7 +93,7 @@ describe('WS15-T007 connections search filter sort', () => {
     expect(view).toContain('Filter by collection');
     expect(view).toContain('Sort Connections');
     expect(view).toContain('No Connections match these filters.');
-    expect(view).toContain('Build a network you can actually remember');
+    expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('Clear filters');
     expect(view).toContain('uncategorized');
   });

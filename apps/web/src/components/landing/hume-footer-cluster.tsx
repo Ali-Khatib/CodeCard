@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { LIVE_DEMO_HREF } from '@/lib/marketing/demo-url';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
@@ -17,6 +18,7 @@ const FOOTER_NAV = [
 const FOOTER_LEGAL = [
   { label: 'Privacy', href: '/legal/privacy' },
   { label: 'Terms', href: '/legal/terms' },
+  { label: 'Contact', href: '/legal/contact' },
   { label: 'Sign in', href: '/sign-in' },
 ] as const;
 
@@ -25,11 +27,14 @@ const FOOTER_LEGAL = [
  * No portrait media — statement type only above the dark bar.
  */
 export function HumeFooterCluster() {
+  const pathname = usePathname();
   const year = new Date().getFullYear();
+  // Black→cream handoff only after the editorial landing finale — not pricing/research.
+  const fromFinale = pathname === MARKETING_HOME_HREF || pathname === '/landing';
 
   return (
     <div className="cc-site-footer" data-testid="site-footer-cluster">
-      <div className="cc-site-footer__from-finale" aria-hidden />
+      {fromFinale ? <div className="cc-site-footer__from-finale" aria-hidden /> : null}
       <section
         className="cc-site-footer__statement"
         aria-labelledby="footer-statement-heading"
@@ -87,7 +92,7 @@ export function HumeFooterCluster() {
       <footer className="cc-site-footer__bar">
         <div className="cc-site-footer__bar-inner">
           <div className="cc-site-footer__contact">
-            <Link href="/sign-up" className="cc-site-footer__email">
+            <Link href="/legal/contact" className="cc-site-footer__email">
               Get in touch
               <span className="cc-site-footer__email-line" aria-hidden />
             </Link>

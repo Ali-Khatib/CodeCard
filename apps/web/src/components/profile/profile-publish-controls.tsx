@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@codecard/ui';
 import {
   publishProfileAction,
   unpublishProfileAction,
@@ -56,11 +55,14 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
   }
 
   return (
-    <div className="rounded-lg border border-zinc-700/80 bg-zinc-900/40 p-4">
+    <div
+      id="visibility"
+      className="scroll-mt-28 rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-zinc-100">Profile visibility</p>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="text-[15px] font-medium text-[var(--app-ink)]">Profile visibility</p>
+          <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
             {isPublic
               ? 'Published — your profile is publicly accessible at your CodeCard URL.'
               : 'Unpublished — only you can preview your saved profile.'}
@@ -68,7 +70,9 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
         </div>
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            isPublic ? 'bg-emerald-500/15 text-emerald-300' : 'bg-zinc-700 text-zinc-300'
+            isPublic
+              ? 'bg-[var(--app-mint)] text-[var(--app-slate-plum)]'
+              : 'bg-[var(--app-bone)] text-[var(--app-ink)]'
           }`}
         >
           {isPublic ? 'Published' : 'Unpublished'}
@@ -79,15 +83,15 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
         {isPublic ? (
           <>
             {!showUnpublishConfirm ? (
-              <Button
+              <button
                 type="button"
-                variant="outline"
+                className="cc-app-btn cc-app-btn--ghost"
                 disabled={pending}
                 aria-busy={pending}
                 onClick={() => setShowUnpublishConfirm(true)}
               >
                 Unpublish profile
-              </Button>
+              </button>
             ) : (
               <div
                 role="alertdialog"
@@ -95,37 +99,49 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
                 aria-labelledby="unpublish-profile-title"
                 className="flex w-full flex-wrap gap-2"
               >
-                <p id="unpublish-profile-title" className="w-full text-sm text-amber-300/90">
+                <p id="unpublish-profile-title" className="w-full text-sm text-amber-800">
                   Unpublishing will remove public access to your profile URL. Visitors will see a
                   not-found page instead of your card. Your content remains editable — this is not
                   deletion.
                 </p>
-                <Button
+                <button
                   type="button"
-                  variant="outline"
+                  className="cc-app-btn cc-app-btn--ghost"
                   disabled={pending}
                   onClick={() => setShowUnpublishConfirm(false)}
                 >
                   Cancel
-                </Button>
-                <Button type="button" disabled={pending} aria-busy={pending} onClick={runUnpublish}>
+                </button>
+                <button
+                  type="button"
+                  className="cc-app-btn cc-app-btn--primary"
+                  disabled={pending}
+                  aria-busy={pending}
+                  onClick={runUnpublish}
+                >
                   {pending ? 'Unpublishing…' : 'Confirm unpublish'}
-                </Button>
+                </button>
               </div>
             )}
           </>
         ) : (
-          <Button type="button" disabled={pending} aria-busy={pending} onClick={runPublish}>
+          <button
+            type="button"
+            className="cc-app-btn cc-app-btn--primary"
+            disabled={pending}
+            aria-busy={pending}
+            onClick={runPublish}
+          >
             {pending ? 'Publishing…' : 'Publish profile'}
-          </Button>
+          </button>
         )}
       </div>
 
-      {error && (
-        <p className="mt-3 text-sm text-red-400" role="alert">
+      {error ? (
+        <p className="mt-3 text-sm text-[var(--app-error)]" role="alert">
           {error}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

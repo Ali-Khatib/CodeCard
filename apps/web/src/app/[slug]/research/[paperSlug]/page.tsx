@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { normalizeResearchSlug } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
@@ -105,12 +106,14 @@ export default async function ResearchDetailPage({ params }: PageProps) {
         referrer={`${slug}/research/${paperSlug}`}
         profileId={profile.id}
       />
-      <ResearchPaperDetail
-        paper={publicPaper}
-        profileSlug={slug}
-        profileId={profile.id}
-        displayName={profile.display_name}
-      />
+      <Suspense fallback={null}>
+        <ResearchPaperDetail
+          paper={publicPaper}
+          profileSlug={slug}
+          profileId={profile.id}
+          displayName={profile.display_name}
+        />
+      </Suspense>
     </>
   );
 }

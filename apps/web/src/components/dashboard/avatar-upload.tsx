@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
-import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import {
   executeAvatarUploadFlow,
   mapAvatarValidationMessage,
@@ -112,6 +111,94 @@ export function AvatarUpload({
     }
   }, [revokePreviewUrl]);
 
+  const runUpload = useCallback(
+    async (file: File) => {
+      if (disabled || inFlightRef.current) return;
+
+      inFlightRef.current = true;
+      setError('');
+      setRetryable(false);
+      setSuccess(false);
+      setCleanupWarning(false);
+      setOptimizationNote(null);
+      setProgressPercent(null);
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      const result = await executeAvatarUploadFlow({
+        file,
+        signal: controller.signal,
+        onPhaseChange: (phase) => setStage(normalizeStage(phase)),
+        onProgress: (progress) => setProgressPercent(progress.percent),
+        uploadToStorage: (_init, uploadFile, options) =>
+          uploadAvatarToSignedUrl(null, _init, uploadFile, options),
+        finalizeUpload: async (path) => {
+          const finalized = finalizeUpload
+            ? await finalizeUpload(path)
+            : await finalizeAvatarUploadAction({ path });
+          if (finalized.success && finalized.avatarUrl) {
+            return {
+              success: true as const,
+              avatarUrl: finalized.avatarUrl,
+              cleanupWarning: finalized.cleanupWarning,
+            };
+          }
+          return { success: false as const, error: finalized.error };
+        },
+      });
+
+      abortRef.current = null;
+      inFlightRef.current = false;
+
+      if (!result.ok) {
+        setStage(result.cancelled ? 'cancelled' : 'failed');
+        setError(result.message);
+        setRetryable(result.retryable);
+        setProgressPercent(null);
+        if (!result.cancelled) {
+          notifyError(result.message, MUTATION_FEEDBACK.profile.photoFailed);
+        }
+        return;
+      }
+
+      revokePreviewUrl();
+      setPreviewUrl(null);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      setSavedAvatarUrl(result.avatarUrl);
+      setCleanupWarning(Boolean(result.cleanupWarning));
+      setOptimizationNote(result.optimizationNote ?? null);
+      setSuccess(true);
+      setStage('complete');
+      setProgressPercent(null);
+      notifySuccess(MUTATION_FEEDBACK.profile.photoUpdated);
+      onAvatarSaved?.(result.avatarUrl);
+      if (refreshAfterSave) {
+        router.refresh();
+      }
+
+      window.setTimeout(() => {
+        setSuccess(false);
+        setOptimizationNote(null);
+        setStage('idle');
+      }, 2500);
+    },
+    [
+      disabled,
+      finalizeUpload,
+      notifyError,
+      notifySuccess,
+      onAvatarSaved,
+      refreshAfterSave,
+      revokePreviewUrl,
+      router,
+    ],
+  );
+
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (pending) {
@@ -146,8 +233,10 @@ export function AvatarUpload({
       previewUrlRef.current = objectUrl;
       setPreviewUrl(objectUrl);
       setSelectedFile(file);
+      // Upload immediately — users expect choosing a photo to save it.
+      void runUpload(file);
     },
-    [pending, resetSelection, revokePreviewUrl],
+    [pending, resetSelection, revokePreviewUrl, runUpload],
   );
 
   const handleCancelSelection = useCallback(() => {
@@ -163,94 +252,9 @@ export function AvatarUpload({
   }, [pending]);
 
   const handleUpload = useCallback(async () => {
-    if (pending || disabled || !selectedFile || inFlightRef.current) {
-      return;
-    }
-
-    inFlightRef.current = true;
-    setError('');
-    setRetryable(false);
-    setSuccess(false);
-    setCleanupWarning(false);
-    setOptimizationNote(null);
-    setProgressPercent(null);
-
-    const file = selectedFile;
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    const result = await executeAvatarUploadFlow({
-      file,
-      signal: controller.signal,
-      onPhaseChange: (phase) => setStage(normalizeStage(phase)),
-      onProgress: (progress) => setProgressPercent(progress.percent),
-      uploadToStorage: (_init, uploadFile, options) =>
-        uploadAvatarToSignedUrl(null, _init, uploadFile, options),
-      finalizeUpload: async (path) => {
-        const finalized = finalizeUpload
-          ? await finalizeUpload(path)
-          : await finalizeAvatarUploadAction({ path });
-        if (finalized.success && finalized.avatarUrl) {
-          return {
-            success: true as const,
-            avatarUrl: finalized.avatarUrl,
-            cleanupWarning: finalized.cleanupWarning,
-          };
-        }
-        return { success: false as const, error: finalized.error };
-      },
-    });
-
-    abortRef.current = null;
-    inFlightRef.current = false;
-
-    if (!result.ok) {
-      setStage(result.cancelled ? 'cancelled' : 'failed');
-      setError(result.message);
-      setRetryable(result.retryable);
-      setProgressPercent(null);
-      if (!result.cancelled) {
-        notifyError(result.message, MUTATION_FEEDBACK.profile.photoFailed);
-      }
-      return;
-    }
-
-    revokePreviewUrl();
-    setPreviewUrl(null);
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-
-    setSavedAvatarUrl(result.avatarUrl);
-    setCleanupWarning(Boolean(result.cleanupWarning));
-    setOptimizationNote(result.optimizationNote ?? null);
-    setSuccess(true);
-    setStage('complete');
-    setProgressPercent(null);
-    notifySuccess(MUTATION_FEEDBACK.profile.photoUpdated);
-    onAvatarSaved?.(result.avatarUrl);
-    if (refreshAfterSave) {
-      router.refresh();
-    }
-
-    window.setTimeout(() => {
-      setSuccess(false);
-      setOptimizationNote(null);
-      setStage('idle');
-    }, 2500);
-  }, [
-    disabled,
-    finalizeUpload,
-    notifyError,
-    notifySuccess,
-    onAvatarSaved,
-    pending,
-    refreshAfterSave,
-    revokePreviewUrl,
-    router,
-    selectedFile,
-  ]);
+    if (pending || disabled || !selectedFile) return;
+    await runUpload(selectedFile);
+  }, [disabled, pending, runUpload, selectedFile]);
 
   const statusMessage =
     error ||
@@ -265,7 +269,7 @@ export function AvatarUpload({
           : '');
 
   return (
-    <div className="space-y-3" aria-busy={pending} data-testid="avatar-upload">
+    <div id="photo" className="space-y-3 scroll-mt-28" aria-busy={pending} data-testid="avatar-upload">
       <div className="flex flex-wrap items-center gap-4">
         <div className="relative h-20 w-20 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
           {displayUrl ? (
@@ -299,53 +303,51 @@ export function AvatarUpload({
             aria-describedby={`${inputId}-constraints`}
           />
           <div className="flex flex-wrap gap-2">
-            <AppButton
+            <button
               type="button"
-              variant="ghost"
-              className={disabled || pending ? 'pointer-events-none opacity-50' : ''}
-              onClick={disabled || pending ? undefined : () => fileInputRef.current?.click()}
+              className={`cc-app-btn cc-app-btn--ghost ${disabled || pending ? 'opacity-50' : ''}`}
+              disabled={disabled || pending}
+              onClick={() => fileInputRef.current?.click()}
             >
-              {savedAvatarUrl ? 'Replace photo' : 'Choose photo'}
-            </AppButton>
-            {selectedFile && !pending && stage !== 'failed' && stage !== 'cancelled' && (
-              <>
-                <AppButton type="button" variant="primary" onClick={handleUpload}>
-                  {savedAvatarUrl ? 'Upload replacement' : 'Upload photo'}
-                </AppButton>
-                <AppButton type="button" variant="ghost" onClick={handleCancelSelection}>
-                  Cancel
-                </AppButton>
-              </>
-            )}
-            {selectedFile && (stage === 'failed' || stage === 'cancelled') && retryable && (
-              <AppButton
+              {pending
+                ? 'Uploading…'
+                : savedAvatarUrl
+                  ? 'Replace photo'
+                  : 'Choose photo'}
+            </button>
+            {selectedFile && (stage === 'failed' || stage === 'cancelled') && retryable ? (
+              <button
                 type="button"
-                variant="primary"
-                ariaLabel={`Retry upload for ${selectedFile.name}`}
+                className="cc-app-btn cc-app-btn--primary"
+                aria-label={`Retry upload for ${selectedFile.name}`}
                 onClick={handleUpload}
               >
                 Retry
-              </AppButton>
-            )}
-            {pending && stage === 'uploading' && (
-              <AppButton
+              </button>
+            ) : null}
+            {selectedFile && !pending && (stage === 'failed' || stage === 'cancelled') ? (
+              <button
                 type="button"
-                variant="ghost"
-                ariaLabel={`Cancel upload for ${selectedFile?.name ?? 'avatar'}`}
+                className="cc-app-btn cc-app-btn--ghost"
+                onClick={handleCancelSelection}
+              >
+                Cancel
+              </button>
+            ) : null}
+            {pending && stage === 'uploading' ? (
+              <button
+                type="button"
+                className="cc-app-btn cc-app-btn--ghost"
+                aria-label={`Cancel upload for ${selectedFile?.name ?? 'avatar'}`}
                 onClick={handleCancelUpload}
               >
                 Cancel upload
-              </AppButton>
-            )}
+              </button>
+            ) : null}
           </div>
           <p id={`${inputId}-constraints`} className="text-[13px] text-[var(--app-smoke)]">
-            JPEG, PNG, or WebP up to 5 MB.
+            JPEG, PNG, or WebP up to 5 MB. Choosing a photo uploads it right away.
           </p>
-          {savedAvatarUrl && selectedFile ? (
-            <p className="text-[13px] text-[var(--app-smoke)]">
-              Replacement occurs only after upload succeeds. The current photo stays until then.
-            </p>
-          ) : null}
         </div>
       </div>
 

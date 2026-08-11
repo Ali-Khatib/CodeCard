@@ -119,6 +119,9 @@ function AudienceCards({
           <p className="cc-ed-audience__eyebrow">{card.eyebrow}</p>
           <h3 className="cc-ed-audience__title">{card.title}</h3>
           <p className="cc-ed-audience__body">{card.body}</p>
+          <span className="cc-ed-audience__hint" aria-hidden="true">
+            click me :D
+          </span>
         </button>
       ))}
     </div>

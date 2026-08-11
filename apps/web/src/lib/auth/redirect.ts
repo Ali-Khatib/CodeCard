@@ -83,9 +83,22 @@ export function sanitizeInternalRedirect(
   return `${pathname}${search}${hash}`;
 }
 
+/**
+ * Canonical app origin for auth email `redirectTo` URLs.
+ * Prefer `NEXT_PUBLIC_APP_URL` even in the browser so recovery links always
+ * target the configured MVP/production host (not a preview or wrong origin).
+ */
 export function getAppOrigin(): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configured) {
+    try {
+      return new URL(configured).origin;
+    } catch {
+      // fall through
+    }
+  }
   if (typeof window !== 'undefined') return window.location.origin;
-  return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  return 'http://localhost:3000';
 }
 
 export function authCallbackRedirectUrl(redirectPath: string): string {

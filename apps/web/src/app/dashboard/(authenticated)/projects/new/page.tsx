@@ -39,8 +39,7 @@ export default async function NewProjectPage() {
           Create a project card
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Add the core details for your project. You can add media, links, and publishing controls in
-          later steps.
+          Start with showcase images, fill in the project details, then create at the bottom.
         </p>
       </div>
       <ProjectCreateForm usage={usage} />

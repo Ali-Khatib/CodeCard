@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ProjectMedia } from '@/components/profile/project-media';
 import { HiOutlineArrowLeft, HiOutlineChevronLeft, HiOutlineChevronRight } from 'react-icons/hi2';
 import type { FeaturedProject } from '@/lib/projects/featured';
@@ -13,7 +13,7 @@ import {
   buildPublicProjectDetailHref,
   getAdjacentProjects,
 } from '@/lib/projects/project-navigation';
-import { publicDemoProfileProjectsHref } from '@/lib/marketing/demo-url';
+import { parseDetailFrom, resolveProjectDetailBack } from '@/lib/marketing/demo-url';
 import { TechLogoRow } from '@/components/profile/tech-logo-row';
 import { createSessionId, trackEvent } from '@codecard/analytics';
 import { COLORS, TYPE } from '@/lib/design/tokens';
@@ -39,6 +39,10 @@ interface ProjectDetailViewProps {
   displayName: string;
   accentColor?: string;
   projects?: FeaturedProject[];
+  /** Override the default public profile projects back link (owner preview). */
+  backHref?: string;
+  /** Override back button label when `backHref` is set. */
+  backLabel?: string;
   /** Rendered by the transition provider during card → project handoff */
   transitionHandoff?: boolean;
 }
@@ -50,9 +54,12 @@ export function ProjectDetailView({
   displayName: _displayName,
   accentColor = COLORS.accent,
   projects,
+  backHref: backHrefProp,
+  backLabel: backLabelProp,
   transitionHandoff = false,
 }: ProjectDetailViewProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const openCtx = useProjectOpenOptional();
   const reducedMotion = useReducedMotion();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -133,7 +140,10 @@ export function ProjectDetailView({
     transitionHandoff,
   ]);
 
-  const backHref = publicDemoProfileProjectsHref(profileSlug);
+  const from = parseDetailFrom(searchParams.get('from'));
+  const resolvedBack = resolveProjectDetailBack(profileSlug, from);
+  const backHref = backHrefProp ?? resolvedBack.href;
+  const backLabel = backLabelProp ?? resolvedBack.label;
   const projectList = projects?.length ? projects : [project];
   const { previous: previousProject, next: nextProject } = getAdjacentProjects(
     projectList,
@@ -151,22 +161,22 @@ export function ProjectDetailView({
 
   return (
     <div
-      className={`relative min-h-[100dvh] text-text-primary ${fromTransition ? 'cc-project-detail-instant' : ''}`}
+      className={`cc-project-detail-shell relative min-h-[100dvh] max-w-[100vw] overflow-x-clip text-text-primary ${fromTransition ? 'cc-project-detail-instant' : ''}`}
       style={{ '--profile-accent': accentColor } as React.CSSProperties}
     >
       <ProjectWorkAtmosphere variant="page" />
 
       <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative z-[1]">
-        <header className="cc-container sticky top-0 z-20 py-4 backdrop-blur-md">
-          <div className="flex items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
+        <header className="cc-container sticky top-0 z-20 max-w-full py-3 sm:py-4 backdrop-blur-md">
+          <div className="flex min-w-0 items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
             <Link
               href={backHref}
               scroll={false}
               className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
-              aria-label="Back to projects"
+              aria-label={`Back to ${backLabel.toLowerCase()}`}
             >
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
-              <span className="hidden sm:inline">Projects</span>
+              <span className="hidden sm:inline">{backLabel}</span>
             </Link>
             {profileId && profileSlug !== 'demo' ? (
               <PublicReportDialog targetType="project" targetId={project.id} />
@@ -178,7 +188,7 @@ export function ProjectDetailView({
           <nav className="pointer-events-none fixed inset-x-0 top-1/2 z-30 hidden -translate-y-1/2 justify-between px-4 md:flex lg:px-8" aria-label="Project navigation">
             {previousProject ? (
               <Link
-                href={buildPublicProjectDetailHref(profileSlug, previousProject.id)}
+                href={buildPublicProjectDetailHref(profileSlug, previousProject.id, from ?? undefined)}
                 className={PROJECT_NAV_BTN}
                 aria-label={`Previous project: ${previousProject.title}`}
                 title={previousProject.title}
@@ -190,7 +200,7 @@ export function ProjectDetailView({
             )}
             {nextProject ? (
               <Link
-                href={buildPublicProjectDetailHref(profileSlug, nextProject.id)}
+                href={buildPublicProjectDetailHref(profileSlug, nextProject.id, from ?? undefined)}
                 className={PROJECT_NAV_BTN}
                 aria-label={`Next project: ${nextProject.title}`}
                 title={nextProject.title}
@@ -245,25 +255,25 @@ export function ProjectDetailView({
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.9)_0%,rgba(5,3,15,0.62)_40%,rgba(5,3,15,0.28)_72%,rgba(5,3,15,0.1)_100%),linear-gradient(90deg,rgba(5,3,15,0.68)_0%,rgba(5,3,15,0.34)_42%,rgba(5,3,15,0.1)_100%)]" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-lavender/50 to-transparent" />
 
-            <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
-              <div className="max-w-[680px] rounded-[26px] border border-white/22 bg-black/48 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.42)] backdrop-blur-md md:p-6">
+            <div className="absolute inset-x-0 bottom-0 cc-container max-w-full pb-8 pt-24 sm:pb-10 sm:pt-28 md:pb-14 md:pt-36">
+              <div className="max-w-[min(680px,100%)] rounded-[26px] border border-white/22 bg-black/55 p-4 shadow-[0_22px_70px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-5 md:p-6">
                 <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
                   Featured project
                 </p>
-                <h1 className="cc-fit-title mt-3 max-w-full break-words font-display text-[clamp(1.75rem,8vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] md:max-w-[14ch]">
+                <h1 className="cc-fit-title mt-3 max-w-full break-words font-display text-[clamp(1.55rem,7vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] md:max-w-[14ch]">
                   {project.title}
                 </h1>
                 {project.tagline && (
-                  <p className="mt-4 max-w-[42ch] break-words text-[17px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] md:text-[18px]">
+                  <p className="mt-3 max-w-[42ch] break-words text-[15px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] sm:mt-4 sm:text-[17px] md:text-[18px]">
                     {project.tagline}
                   </p>
                 )}
                 {(project.domains.length > 0 || project.focusAreas.length > 0) && (
-                  <div className="mt-6 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2 sm:mt-6">
                     {[...project.domains, ...project.focusAreas].map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/40 bg-black/55 px-3 py-1.5 text-[13px] font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-sm"
+                        className="max-w-full break-words rounded-full border border-white/40 bg-black/55 px-3 py-1.5 text-[12px] font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-sm sm:text-[13px]"
                       >
                         {tag}
                       </span>
@@ -282,7 +292,7 @@ export function ProjectDetailView({
             <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
               {previousProject ? (
                 <Link
-                  href={buildPublicProjectDetailHref(profileSlug, previousProject.id)}
+                  href={buildPublicProjectDetailHref(profileSlug, previousProject.id, from ?? undefined)}
                   className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Previous project: ${previousProject.title}`}
                 >
@@ -293,7 +303,7 @@ export function ProjectDetailView({
               )}
               {nextProject ? (
                 <Link
-                  href={buildPublicProjectDetailHref(profileSlug, nextProject.id)}
+                  href={buildPublicProjectDetailHref(profileSlug, nextProject.id, from ?? undefined)}
                   className="cc-instant-press rounded-full border border-[var(--app-ink)]/14 bg-[var(--app-paper)] px-4 py-3 text-center text-[14px] font-semibold text-[var(--app-ink)] shadow-[0_8px_20px_rgba(34,34,34,0.06)]"
                   aria-label={`Next project: ${nextProject.title}`}
                 >

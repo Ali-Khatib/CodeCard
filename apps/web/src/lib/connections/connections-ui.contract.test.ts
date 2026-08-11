@@ -130,9 +130,13 @@ describe('WS15-T004 real Connections save flow', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-connections-view.tsx'),
       'utf8',
     );
-    expect(view).toContain('Build a network you can actually remember');
-    expect(view).toContain('Explore CodeCards');
+    expect(view).toContain('EMPTY_STATE_COPY.connections');
+    expect(view).toContain('copy.primaryCta');
     expect(view).toContain('href="/profiles"');
+    expect(view).toContain('ShareYourCodeCardButton');
+    expect(view).toContain('getPublicProfileLinkForClipboard');
+    expect(view).toContain('href="/dashboard#share"');
+    expect(view).not.toContain('href="/dashboard/profile"');
     expect(view).toContain("variant === 'authenticated'");
   });
 

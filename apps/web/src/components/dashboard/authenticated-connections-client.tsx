@@ -17,10 +17,12 @@ export function AuthenticatedConnectionsClient({
   initialConnections,
   initialCollections,
   initialMemberships,
+  profileSlug = null,
 }: {
   initialConnections: AuthenticatedConnectionCard[];
   initialCollections: OwnerCollection[];
   initialMemberships: Record<string, string[]>;
+  profileSlug?: string | null;
 }) {
   const router = useRouter();
   const [connections, setConnections] = useState(initialConnections);
@@ -148,6 +150,7 @@ export function AuthenticatedConnectionsClient({
       <DashboardConnectionsView
         connections={connections}
         variant="authenticated"
+        profileSlug={profileSlug}
         onRemoveConnection={onRemove}
         collections={collections}
         memberships={memberships}

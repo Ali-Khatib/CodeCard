@@ -20,9 +20,8 @@ export default function ContactPage() {
       <section>
         <h2>Mailing address</h2>
         <p>
-          CodeCard, Inc.
-          <br />
-          [Physical address placeholder. Update before launch]
+          For postal correspondence, email hello@codecard.app and we will provide a current mailing
+          address.
         </p>
       </section>
     </LegalPage>

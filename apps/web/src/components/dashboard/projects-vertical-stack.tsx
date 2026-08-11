@@ -34,17 +34,18 @@ function ProjectRow({
   const reduced = useReducedMotion();
   const router = useRouter();
   const opening = useContentOpeningOptional();
+  const viewHref = project.href;
 
-  const openProject = () => {
+  const openProjectView = () => {
     if (opening) {
       opening.navigateWithOpening({
         kind: 'project',
         title: project.title,
-        href: project.editHref,
+        href: viewHref,
       });
       return;
     }
-    router.push(project.editHref);
+    router.push(viewHref);
   };
 
   const revealImages = [
@@ -61,12 +62,12 @@ function ProjectRow({
         className="group/project cc-project-row-card cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
         role="button"
         tabIndex={0}
-        aria-label={`Open ${project.title}`}
-        onClick={() => openProject()}
+        aria-label={`View ${project.title}`}
+        onClick={() => openProjectView()}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            openProject();
+            openProjectView();
           }
         }}
       >
@@ -110,8 +111,8 @@ function ProjectRow({
             ) : null}
 
             <div className="cc-project-hover-card__cta-slot">
-              <Link href={project.editHref} className="cc-project-hover-card__cta" tabIndex={-1}>
-                Edit project →
+              <Link href={viewHref} className="cc-project-hover-card__cta" tabIndex={-1}>
+                View project →
               </Link>
             </div>
 

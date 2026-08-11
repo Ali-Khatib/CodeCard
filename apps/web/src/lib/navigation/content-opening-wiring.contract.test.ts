@@ -11,7 +11,9 @@ describe('content opening wiring', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
-    expect(navMatch![1]).not.toMatch(/My profile|My Profile|segment: 'profile'/);
+    expect(navMatch![1]).not.toMatch(/My profile|My Profile/);
+    expect(navMatch![1]).toContain("segment: 'profile'");
+    expect(navMatch![1]).toContain("label: 'Profile'");
   });
 
   it('wires the shared opening transition into project and research entry points', () => {

@@ -7,10 +7,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variants = {
-  default: 'bg-violet-600 text-white hover:bg-violet-500',
-  secondary: 'bg-zinc-800 text-zinc-100 hover:bg-zinc-700',
-  outline: 'border border-zinc-700 bg-transparent hover:bg-zinc-800/50',
-  ghost: 'hover:bg-zinc-800/50',
+  default: 'bg-ink text-white hover:bg-ink/90',
+  secondary: 'bg-black/5 text-ink hover:bg-black/10',
+  outline: 'border border-black/15 bg-white text-ink hover:bg-black/[0.03]',
+  ghost: 'text-ink hover:bg-black/5',
   destructive: 'bg-red-600 text-white hover:bg-red-500',
 };
 
@@ -27,7 +27,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       className={cn(
         'inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
         'disabled:pointer-events-none disabled:opacity-50',
         variants[variant],
         sizes[size],

@@ -593,24 +593,54 @@ export const connectionCollectionsInputSchema = z.object({
   connectionId: z.string().uuid(),
 });
 
+export const PASSWORD_REQUIREMENT_LINES = [
+  'At least 8 characters',
+  'At least one uppercase letter (A-Z)',
+  'At least one lowercase letter (a-z)',
+  'At least one number (0-9)',
+] as const;
+
+/** Single message that lists every password rule (empty, weak, or partial). */
+export const PASSWORD_REQUIREMENTS_SUMMARY =
+  'Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a number.';
+
 export const passwordSchema = z
-  .string()
-  .min(8, 'Password must be at least 8 characters')
-  .max(128)
-  .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-  .regex(/[a-z]/, 'Password must contain a lowercase letter')
-  .regex(/[0-9]/, 'Password must contain a number');
+  .string({
+    required_error: PASSWORD_REQUIREMENTS_SUMMARY,
+    invalid_type_error: PASSWORD_REQUIREMENTS_SUMMARY,
+  })
+  .min(1, PASSWORD_REQUIREMENTS_SUMMARY)
+  .max(128, 'Password must be at most 128 characters')
+  .superRefine((value, ctx) => {
+    const missing: string[] = [];
+    if (value.length < 8) missing.push('at least 8 characters');
+    if (!/[A-Z]/.test(value)) missing.push('an uppercase letter');
+    if (!/[a-z]/.test(value)) missing.push('a lowercase letter');
+    if (!/[0-9]/.test(value)) missing.push('a number');
+    if (missing.length === 0) return;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: PASSWORD_REQUIREMENTS_SUMMARY,
+    });
+  });
 
 export const signUpSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.string().email('Enter a valid email address').max(255),
   password: passwordSchema,
-  display_name: z.string().min(1).max(80).trim(),
+  display_name: z
+    .string()
+    .trim()
+    .min(1, 'Enter your display name')
+    .max(80, 'Display name must be at most 80 characters'),
   slug: slugSchema,
 });
 
 export const signInSchema = z.object({
-  email: z.string().email().max(255),
-  password: z.string().min(1).max(128),
+  email: z.string().email('Enter a valid email address').max(255),
+  password: z
+    .string()
+    .min(1, 'Enter your password')
+    .max(128, 'Password must be at most 128 characters'),
 });
 
 export const forgotPasswordSchema = z.object({

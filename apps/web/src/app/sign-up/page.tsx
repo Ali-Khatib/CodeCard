@@ -22,6 +22,7 @@ import {
   resolveSignUpOutcome,
   signupConfirmationBody,
 } from '@/lib/auth/signup-result';
+import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 
 const SETUP_MSG =
   'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
@@ -118,6 +119,7 @@ function SignUpForm() {
 
     submitLock.current = true;
     setLoading(true);
+    let succeeded = false;
 
     try {
       const parsed = signUpSchema.safeParse(form);
@@ -170,6 +172,7 @@ function SignUpForm() {
         return;
       }
 
+      succeeded = true;
       setFadingOut(true);
       router.push('/dashboard');
       router.refresh();
@@ -177,7 +180,7 @@ function SignUpForm() {
       setError(mapAuthFormError('network', 'sign-up'));
     } finally {
       submitLock.current = false;
-      setLoading(false);
+      if (!succeeded) setLoading(false);
     }
   }
 
@@ -271,9 +274,13 @@ function SignUpForm() {
             <p className="mb-3 text-[13px] leading-relaxed text-smoke">{SETUP_MSG}</p>
           ) : null}
 
+          {loading || fadingOut ? (
+            <AuthBusyNotice>Creating your account…</AuthBusyNotice>
+          ) : null}
+
           <AuthPrimaryButton
-            pending={loading}
-            pendingLabel="Creating account…"
+            pending={loading || fadingOut}
+            pendingLabel="Creating your account…"
             idleLabel="Create account"
             disabled={authBusy && !loading}
           />

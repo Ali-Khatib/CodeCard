@@ -10,6 +10,7 @@ import { ProfileVisitorPreview } from '@/components/dashboard/profile-visitor-pr
 import { ProfileCompletionIndicator } from '@/components/dashboard/profile-completion-indicator';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -109,7 +110,6 @@ export function DashboardProfileView({
           )}
 
           <div className="flex flex-wrap gap-2 border-t border-[var(--app-border)] pt-6">
-            {!preview && <AppButton variant="primary">Save changes</AppButton>}
             {profile.slug && (
               <AppButton variant="ghost" href={getSavedProfilePreviewHref(profile)}>
                 Preview
@@ -147,7 +147,11 @@ export function DashboardProfileView({
             <p className="mt-3 text-[14px] leading-relaxed text-[var(--app-smoke)]">
               QR preview, PNG download, and Share profile live on Home next to Copy public link.
             </p>
-            <AppButton variant="ghost" className="mt-4" href="/dashboard#share">
+            <AppButton
+              variant="ghost"
+              className="mt-4"
+              href={preview ? `${LIVE_DEMO_WORKSPACE_HREF}#share` : '/dashboard#share'}
+            >
               Open Home share tools
             </AppButton>
           </AppCard>

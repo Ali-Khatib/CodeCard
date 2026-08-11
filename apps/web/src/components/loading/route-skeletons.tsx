@@ -33,23 +33,25 @@ export function ProfilePageSkeleton() {
 export function DashboardProfileEditorSkeleton() {
   return (
     <div className="cc-app-page cc-app-page--1120" aria-busy="true" aria-label="Loading profile editor">
+      <p className="mb-6 text-[14px] font-medium text-[var(--app-smoke)]" role="status">
+        Loading profile…
+      </p>
       <div className="space-y-3" aria-hidden>
-        <ThemedSkeleton className="h-4 w-20" />
-        <ThemedSkeleton className="h-8 w-[min(320px,70%)]" />
-        <ThemedSkeleton className="h-5 w-[min(480px,90%)]" />
+        <ThemedSkeleton className="h-3 w-16 rounded-full" />
+        <ThemedSkeleton className="h-7 w-[min(280px,65%)] rounded-full" />
+        <ThemedSkeleton className="h-4 w-[min(420px,80%)] rounded-full" />
       </div>
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_400px]" aria-hidden>
-        <div className="space-y-4 rounded-[16px] border border-[var(--app-border)] p-6">
-          <ThemedSkeleton className="h-6 w-40" />
-          <ThemedSkeleton className="h-20 w-20 rounded-full" />
-          {Array.from({ length: 6 }).map((_, index) => (
-            <ThemedSkeleton key={index} className="h-10 w-full" />
+      <div className="mt-8 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)]" aria-hidden>
+        <div className="space-y-4 overflow-hidden rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5 sm:p-6">
+          <ThemedSkeleton className="h-5 w-36 rounded-full" />
+          <ThemedSkeleton className="h-16 w-16 rounded-full" />
+          {Array.from({ length: 5 }).map((_, index) => (
+            <ThemedSkeleton key={index} className="h-11 w-full rounded-[12px]" />
           ))}
-          <ThemedSkeleton className="h-32 w-full rounded-lg" />
         </div>
         <div className="space-y-4">
-          <ThemedSkeleton className="h-48 w-full rounded-[16px]" />
-          <ThemedSkeleton className="h-40 w-full rounded-[16px]" />
+          <ThemedSkeleton className="h-40 w-full rounded-[20px]" />
+          <ThemedSkeleton className="h-32 w-full rounded-[20px]" />
         </div>
       </div>
     </div>
@@ -59,20 +61,23 @@ export function DashboardProfileEditorSkeleton() {
 export function DashboardOverviewSkeleton() {
   return (
     <div className="cc-profile-home" aria-busy="true" aria-label="Loading dashboard">
+      <p className="mb-5 text-[14px] font-medium text-[var(--app-smoke)]" role="status">
+        Opening your workspace…
+      </p>
       <div className="cc-profile-home__greeting" aria-hidden>
         <div className="space-y-3">
-          <ThemedSkeleton className="h-4 w-16" />
-          <ThemedSkeleton className="h-9 w-[min(360px,80%)]" />
+          <ThemedSkeleton className="h-3 w-14 rounded-full" />
+          <ThemedSkeleton className="h-8 w-[min(320px,75%)] rounded-full" />
         </div>
         <div className="flex gap-2">
-          <ThemedSkeleton className="h-8 w-28 rounded-full" />
-          <ThemedSkeleton className="h-8 w-24 rounded-full" />
+          <ThemedSkeleton className="h-9 w-28 rounded-full" />
+          <ThemedSkeleton className="h-9 w-24 rounded-full" />
         </div>
       </div>
       <div className="mt-8 space-y-4" aria-hidden>
-        <ThemedSkeleton className="h-40 w-full rounded-[16px]" />
-        <ThemedSkeleton className="h-48 w-full rounded-[16px]" />
-        <ThemedSkeleton className="h-56 w-full rounded-[16px]" />
+        <ThemedSkeleton className="h-28 w-full rounded-[20px]" />
+        <ThemedSkeleton className="h-36 w-full rounded-[20px]" />
+        <ThemedSkeleton className="h-44 w-full rounded-[20px]" />
       </div>
     </div>
   );
