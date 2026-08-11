@@ -2272,7 +2272,7 @@ select,
   }
 
   @media (max-width: 767px) {
-    .cc-nav-veil {
+    .cc-nav-veil:not(.cc-nav-veil--collapsed) {
       width: calc(100% - 24px);
       max-width: calc(100% - 24px);
       transition:
@@ -5754,21 +5754,10 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   transition: padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/*
- * Animate max-width (not width:auto) so Crash Course / Research collapse
- * can interpolate into the circle. Origin left so it shrinks toward the
- * left edge of the bar.
- */
 .cc-marketing-nav-shell .cc-nav-veil {
   max-width: min(920px, calc(100% - 24px));
-  transform-origin: left center;
+  transform-origin: center top;
   transition:
-    max-width 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    border-radius 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    padding 0.62s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.55s ease,
     background-color 0.55s ease,
     border-color 0.55s ease;
@@ -5776,165 +5765,44 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 .cc-marketing-nav-shell .cc-nav-veil__inner {
   position: relative;
-  transition:
-    height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    gap 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    padding 0.62s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Absolutely positioned so it never steals flex gap when the full pill is shown. */
-.cc-nav-compact-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  z-index: 2;
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  opacity: 0;
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  pointer-events: none;
-  transform: translateY(-50%);
-  transition: opacity 0.28s ease;
+.cc-nav-veil--collapsed {
+  padding: 0;
 }
 
-.cc-nav-compact-trigger:focus-visible {
+.cc-nav-veil--collapsed:focus-visible {
   outline: 2px solid var(--cc-focus-ring, var(--iris, #c094e4));
   outline-offset: 3px;
 }
 
-.cc-marketing-nav-shell .cc-nav-veil__inner > :not(.cc-nav-compact-trigger) {
-  transition: opacity 0.28s ease;
-}
-
-html[data-nav-morphing='true'] .cc-nav-veil,
-.cc-nav-veil--morphing {
-  pointer-events: none;
-  overflow: hidden;
-  will-change: transform, width, height;
-}
-
-html[data-nav-morphing='true'] .cc-nav-veil__inner {
-  max-width: none;
-  width: max-content;
-  flex-wrap: nowrap;
-}
-
-/*
- * Crash course + research: collapse the full pill into one circular
- * right-arrow control on the LEFT. Hover / focus / peek expands rightward.
- * Hide/show and the 48px lock wait until the FLIP morph finishes.
- */
-html[data-nav-compact='true'] .cc-marketing-nav-shell {
-  justify-content: flex-start;
-  padding-top: 0.55rem;
-}
-
-html[data-nav-compact='true']:not([data-nav-morphing='true'])
-  .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
-  max-width: 48px;
-  width: 48px;
-  height: 48px;
-  min-height: 48px;
-  border-radius: 9999px;
-  padding: 0;
-  overflow: hidden;
-}
-
-html[data-nav-compact='true']:not([data-nav-morphing='true'])
-  .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
-  .cc-nav-veil__inner {
-  height: 48px;
-  gap: 0;
-  padding: 0;
-  justify-content: flex-start;
-  margin-inline: 0;
-  width: max-content;
-}
-
-html[data-nav-compact='true']:not([data-nav-morphing='true'])
-  .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
-  .cc-nav-compact-trigger {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.22s ease 0.06s;
-}
-
-html[data-nav-compact='true']:not([data-nav-morphing='true'])
-  .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
-  .cc-nav-veil__inner
-  > :not(.cc-nav-compact-trigger) {
-  opacity: 0;
-  pointer-events: none;
-}
-
-html[data-nav-compact='true']
-  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
-  .cc-nav-compact-trigger {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.16s ease;
-}
-
-html[data-nav-compact='true']
-  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open) {
-  max-width: min(920px, calc(100% - 24px));
-  width: fit-content;
-  height: auto;
-  min-height: 0;
-}
-
-html[data-nav-compact='true']
-  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
-  .cc-nav-veil__inner {
-  padding-inline: 22px;
-}
-
-html[data-nav-compact='true']
-  .cc-nav-veil:is(:hover, :focus-within, .cc-nav-veil--peek, .cc-nav-veil--mobile-open)
-  .cc-nav-veil__inner
-  > :not(.cc-nav-compact-trigger) {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.28s ease 0.2s;
-}
-
 @media (max-width: 767px) {
-  html[data-nav-compact='true']:not([data-nav-morphing='true'])
-    .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open) {
-    max-width: 44px;
-    width: 44px;
-    height: 44px;
-    min-height: 44px;
-  }
-
-  html[data-nav-compact='true']:not([data-nav-morphing='true'])
-    .cc-nav-veil:not(:hover):not(:focus-within):not(.cc-nav-veil--peek):not(.cc-nav-veil--mobile-open)
-    .cc-nav-veil__inner {
-    height: 44px;
-  }
-
-  .cc-nav-compact-trigger {
-    width: 44px;
-    height: 44px;
+  .cc-nav-veil:not(.cc-nav-veil--collapsed) {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cc-marketing-nav-shell,
   .cc-marketing-nav-shell .cc-nav-veil,
-  .cc-marketing-nav-shell .cc-nav-veil__inner,
-  .cc-nav-compact-trigger,
-  .cc-marketing-nav-shell .cc-nav-veil__inner > :not(.cc-nav-compact-trigger) {
+  .cc-marketing-nav-shell .cc-nav-veil__inner {
     transition-duration: 0.01ms !important;
     transition-delay: 0s !important;
+  }
+
+  .cc-nav-veil--collapsed {
+    width: 3rem;
+    height: 3rem;
+    min-height: 3rem;
+    max-width: 3rem;
+  }
+
+  .cc-nav-veil--collapsed .cc-nav-veil__inner {
+    height: 3rem;
+    gap: 0;
+    padding: 0;
+    opacity: 0;
   }
 }
 

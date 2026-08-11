@@ -123,4 +123,18 @@ describe('Editorial product landing contract', () => {
     expect(closing).toContain('/sign-up');
     expect(closing).not.toContain('LIVE_DEMO_PROFILE_HREF');
   });
+
+  it('morphs the marketing pill into a menu circle instead of clipping CodeCard', () => {
+    const framer = read('src/components/ui/animated-nav-framer.tsx');
+    const shell = read('src/components/landing/landing-shell-nav.tsx');
+    const hero = read('src/components/landing/landing-hero-nav.tsx');
+    expect(framer).toContain('AnimatedNavFramer');
+    expect(framer).toContain('from \'lucide-react\'');
+    expect(framer).toContain('<Menu');
+    expect(framer).toContain("width: '3rem'");
+    expect(shell).not.toContain('morphNavVeil');
+    expect(shell).not.toContain('data-nav-morphing');
+    expect(hero).toContain('AnimatedNavFramer');
+    expect(hero).not.toContain('cc-nav-compact-trigger');
+  });
 });

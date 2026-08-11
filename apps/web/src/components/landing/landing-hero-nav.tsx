@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { AnimatedNavFramer } from '@/components/ui/animated-nav-framer';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 export type NavItem = {
@@ -21,11 +22,14 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [compactPeek, setCompactPeek] = useState(false);
   const menuTrackRef = useRef<HTMLDivElement>(null);
   const hoverLineRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [hovered, setHovered] = useState<number | null>(null);
+
+  const isExpanded = !compact || compactPeek || mobileOpen;
 
   const isActive = useCallback(
     (href: string, _label: string) => {
@@ -75,8 +79,11 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   useEffect(() => {
     const root = document.documentElement;
     const syncCompact = () => {
-      if (root.dataset.navCompact !== 'true') {
+      const next = root.dataset.navCompact === 'true';
+      setCompact(next);
+      if (!next) {
         setCompactPeek(false);
+        setMobileOpen(false);
       }
     };
     syncCompact();
@@ -100,118 +107,18 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   }, [compactPeek]);
 
   return (
-    <nav
-      className={`cc-nav-veil ${mobileOpen ? 'cc-nav-veil--mobile-open' : ''} ${compactPeek ? 'cc-nav-veil--peek' : ''}`}
-      aria-label="Primary"
-      data-nav-peek={compactPeek ? 'true' : 'false'}
-      onMouseEnter={() => {
-        if (document.documentElement.dataset.navMorphing === 'true') return;
-        if (document.documentElement.dataset.navCompact === 'true') {
-          setCompactPeek(true);
+    <AnimatedNavFramer
+      isExpanded={isExpanded}
+      onCollapsedClick={() => {
+        setCompactPeek(true);
+        if (window.matchMedia('(max-width: 767px)').matches) {
+          setMobileOpen(true);
         }
       }}
-      onMouseLeave={() => {
-        if (!mobileOpen) setCompactPeek(false);
-      }}
-    >
-      <div className="cc-nav-veil__inner">
-        <button
-          type="button"
-          className="cc-nav-compact-trigger"
-          aria-label={compactPeek ? 'Collapse navigation' : 'Expand navigation'}
-          aria-expanded={compactPeek}
-          onClick={() => setCompactPeek((open) => !open)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path
-              d="M5 12h12m0 0-5-5m5 5-5 5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        <Link
-          href={MARKETING_HOME_HREF}
-          className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press cc-nav-brand"
-          aria-label="CodeCard home"
-          onMouseEnter={() => router.prefetch(MARKETING_HOME_HREF)}
-          onFocus={() => router.prefetch(MARKETING_HOME_HREF)}
-        >
-          CodeCard
-        </Link>
-
-        <div ref={menuTrackRef} className="relative hidden md:flex cc-nav-desktop-links">
-          <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
-          <ul className="cc-hume-fade-group flex items-center gap-1">
-            {items.map((item, i) => {
-              const active = isActive(item.href, item.label);
-              return (
-                <li key={`${item.label}-${i}`}>
-                  <Link
-                    ref={(el) => {
-                      itemRefs.current[i] = el;
-                    }}
-                    href={item.href}
-                    aria-current={active ? 'page' : undefined}
-                    aria-label={item.ariaLabel ?? item.label}
-                    onMouseEnter={() => {
-                      setHovered(i);
-                      prefetchHref(item.href, router);
-                    }}
-                    onFocus={() => prefetchHref(item.href, router)}
-                    onMouseLeave={() => setHovered(null)}
-                    className={`cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <div className="ml-auto hidden items-center gap-3 md:flex cc-nav-desktop-actions">
-          <LiveDemoLink className="cc-btn-pill-demo cc-instant-press">
-            Live demo
-          </LiveDemoLink>
-          <Link
-            href="/sign-in"
-            className="cc-nav-ghost-link cc-instant-press"
-            onMouseEnter={() => router.prefetch('/sign-in')}
-            onFocus={() => router.prefetch('/sign-in')}
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/sign-up"
-            className="cc-btn-pill-primary cc-instant-press"
-            onMouseEnter={() => router.prefetch('/sign-up')}
-            onFocus={() => router.prefetch('/sign-up')}
-          >
-            Start free
-          </Link>
-        </div>
-
-        <button
-          type="button"
-          className="cc-nav-mobile-trigger ml-auto flex items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
-          aria-expanded={mobileOpen}
-          aria-label="Open menu"
-          onClick={() => {
-            setMobileOpen((o) => !o);
-            setCompactPeek(true);
-          }}
-        >
-          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
-            <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" strokeWidth="1.5" />
-          </svg>
-        </button>
-      </div>
-
-      {mobileOpen && (
+      className={mobileOpen ? 'cc-nav-veil--mobile-open' : undefined}
+      collapsedLabel="Expand navigation"
+      panel={
+        mobileOpen ? (
         <div className="cc-nav-mobile-menu md:hidden">
           <ul className="flex flex-col gap-1">
             {items.map((item, i) => {
@@ -224,7 +131,10 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                     className={`block px-3 py-2.5 text-[15px] ${
                       active ? 'font-medium text-iris' : 'text-ash'
                     }`}
-                    onClick={() => setMobileOpen(false)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setMobileOpen(false);
+                    }}
                   >
                     {item.label}
                   </Link>
@@ -243,6 +153,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
               <Link
                 href="/sign-in"
                 className="cc-btn-pill-ghost flex-1 py-2 text-center"
+                onClick={(event) => event.stopPropagation()}
                 onMouseEnter={() => router.prefetch('/sign-in')}
                 onFocus={() => router.prefetch('/sign-in')}
               >
@@ -251,6 +162,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
               <Link
                 href="/sign-up"
                 className="cc-btn-pill-primary flex-1 py-2 text-center"
+                onClick={(event) => event.stopPropagation()}
                 onMouseEnter={() => router.prefetch('/sign-up')}
                 onFocus={() => router.prefetch('/sign-up')}
               >
@@ -259,7 +171,90 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
             </li>
           </ul>
         </div>
-      )}
-    </nav>
+        ) : null
+      }
+    >
+      <Link
+        href={MARKETING_HOME_HREF}
+        className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press cc-nav-brand"
+        aria-label="CodeCard home"
+        onClick={(event) => event.stopPropagation()}
+        onMouseEnter={() => router.prefetch(MARKETING_HOME_HREF)}
+        onFocus={() => router.prefetch(MARKETING_HOME_HREF)}
+      >
+        CodeCard
+      </Link>
+
+      <div ref={menuTrackRef} className="relative hidden md:flex cc-nav-desktop-links">
+        <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
+        <ul className="cc-hume-fade-group flex items-center gap-1">
+          {items.map((item, i) => {
+            const active = isActive(item.href, item.label);
+            return (
+              <li key={`${item.label}-${i}`}>
+                <Link
+                  ref={(el) => {
+                    itemRefs.current[i] = el;
+                  }}
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  aria-label={item.ariaLabel ?? item.label}
+                  onClick={(event) => event.stopPropagation()}
+                  onMouseEnter={() => {
+                    setHovered(i);
+                    prefetchHref(item.href, router);
+                  }}
+                  onFocus={() => prefetchHref(item.href, router)}
+                  onMouseLeave={() => setHovered(null)}
+                  className={`cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div className="ml-auto hidden items-center gap-3 md:flex cc-nav-desktop-actions">
+        <LiveDemoLink className="cc-btn-pill-demo cc-instant-press">
+          Live demo
+        </LiveDemoLink>
+        <Link
+          href="/sign-in"
+          className="cc-nav-ghost-link cc-instant-press"
+          onClick={(event) => event.stopPropagation()}
+          onMouseEnter={() => router.prefetch('/sign-in')}
+          onFocus={() => router.prefetch('/sign-in')}
+        >
+          Sign in
+        </Link>
+        <Link
+          href="/sign-up"
+          className="cc-btn-pill-primary cc-instant-press"
+          onClick={(event) => event.stopPropagation()}
+          onMouseEnter={() => router.prefetch('/sign-up')}
+          onFocus={() => router.prefetch('/sign-up')}
+        >
+          Start free
+        </Link>
+      </div>
+
+      <button
+        type="button"
+        className="cc-nav-mobile-trigger ml-auto flex items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
+        aria-expanded={mobileOpen}
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        onClick={(event) => {
+          event.stopPropagation();
+          setMobileOpen((open) => !open);
+          setCompactPeek(true);
+        }}
+      >
+        <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
+          <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </button>
+    </AnimatedNavFramer>
   );
 }
