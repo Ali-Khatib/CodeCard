@@ -60,7 +60,12 @@ function createClientId(file: File): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2)}`;
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    return `${file.name}-${file.size}-${file.lastModified}-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
+  }
+  return `${file.name}-${file.size}-${file.lastModified}-${Date.now().toString(36)}`;
 }
 
 export function ProjectMediaUpload({

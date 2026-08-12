@@ -28,10 +28,16 @@ export function isAnalyticsResourceId(id: string | undefined): id is string {
 }
 
 function createEphemeralSessionId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  // Last resort — unreachable on modern browsers / Node 20+.
+  return `cc-${Date.now().toString(36)}`;
 }
 
 type SessionStore = {

@@ -45,23 +45,19 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Tests may isolate build artifacts from a concurrently running local dev server.
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   /**
    * WS11-T007: Server Action CSRF.
    * Next.js compares Origin to Host / X-Forwarded-Host (Vercel).
    * `allowedOrigins` lists extra reverse-proxy hostnames that may bypass that check.
    * Keep empty for direct Vercel deploys — never use wildcards.
+   *
+   * WS11-T002: `authInterrupts` enables `forbidden()` so `/admin` returns a real HTTP 403
+   * (app/forbidden.tsx) instead of a 200 "access denied" page.
    */
   experimental: {
     serverActions: {
       allowedOrigins: [],
     },
-    /**
-     * WS11-T002: enables `forbidden()` so the `/admin` gate can return a
-     * real HTTP 403 (app/forbidden.tsx) instead of a 200 "access denied" page.
-     */
     authInterrupts: true,
   },
   transpilePackages: [

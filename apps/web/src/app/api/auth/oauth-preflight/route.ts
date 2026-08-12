@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 /**
  * Probes a Supabase authorize URL before the browser follows it.
  * Catches "provider is not enabled" so the UI can show a clear message.
+ *
+ * SSRF: the outbound request is rebuilt from NEXT_PUBLIC_SUPABASE_URL only —
+ * never from an attacker-controlled host/path.
  */
 export async function POST(request: Request) {
   let url: unknown;
@@ -23,19 +26,28 @@ export async function POST(request: Request) {
   }
 
   let parsed: URL;
+  let allowedOrigin: URL;
   try {
     parsed = new URL(url);
+    allowedOrigin = new URL(supabaseOrigin);
   } catch {
     return NextResponse.json({ ok: false, reason: 'invalid_url' }, { status: 400 });
   }
 
-  const allowedPrefix = `${supabaseOrigin}/auth/v1/authorize`;
-  if (!url.startsWith(allowedPrefix) || parsed.origin !== new URL(supabaseOrigin).origin) {
+  if (
+    parsed.protocol !== 'https:' ||
+    parsed.origin !== allowedOrigin.origin ||
+    parsed.pathname !== '/auth/v1/authorize'
+  ) {
     return NextResponse.json({ ok: false, reason: 'invalid_url' }, { status: 400 });
   }
 
+  // Rebuild from the trusted origin so fetch never receives a user-controlled host.
+  const safeUrl = new URL('/auth/v1/authorize', allowedOrigin);
+  safeUrl.search = parsed.search;
+
   try {
-    const response = await fetch(url, {
+    const response = await fetch(safeUrl, {
       method: 'GET',
       redirect: 'manual',
       headers: { Accept: 'application/json' },

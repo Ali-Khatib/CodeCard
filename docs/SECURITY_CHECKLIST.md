@@ -199,7 +199,7 @@ See [`STRIPE_WEBHOOK_SECURITY.md`](./STRIPE_WEBHOOK_SECURITY.md) (WS11-T011).
 
 - [x] Lint, typecheck, and tests blocking
 - [x] Secret scanning blocking (`secret-scan` job)
-- [x] Dependency vulnerability audit blocking (`dependency-audit`, high/critical via `npm audit --audit-level=high --package-lock-only`)
+- [x] Dependency vulnerability audit blocking (`dependency-audit`, high/critical via `npm run security:audit` / `scripts/security-audit.mjs`)
 - [ ] Error monitoring configured
 - [ ] Audit logs for admin/billing/security actions where applicable
 

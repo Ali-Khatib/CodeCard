@@ -60,13 +60,28 @@ export type ProjectLifecycleStatus = (typeof PROJECT_LIFECYCLE_STATUSES)[number]
 
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Collapse runs of non-alphanumerics to single hyphens without backtracking regexes. */
+function slugifySegment(value: string): string {
+  const lower = value.trim().toLowerCase();
+  let out = '';
+  let pendingHyphen = false;
+  for (let i = 0; i < lower.length; i += 1) {
+    const code = lower.charCodeAt(i);
+    const isNum = code >= 48 && code <= 57;
+    const isAlpha = code >= 97 && code <= 122;
+    if (isNum || isAlpha) {
+      if (pendingHyphen && out.length > 0) out += '-';
+      out += lower[i];
+      pendingHyphen = false;
+    } else {
+      pendingHyphen = true;
+    }
+  }
+  return out;
+}
+
 export function normalizeProjectSlug(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return slugifySegment(value);
 }
 
 export const projectSlugSchema = z

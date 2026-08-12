@@ -32,7 +32,7 @@ Do not broadly exclude application directories. Never allowlist a real credentia
 | Control | Detail |
 |---------|--------|
 | Tool | `npm audit` |
-| Command | `npm run security:audit` → `npm audit --audit-level=high --package-lock-only` |
+| Command | `npm run security:audit` → `node scripts/security-audit.mjs` (wraps `npm audit --audit-level=high --package-lock-only --json`) |
 | Lockfile | Root `package-lock.json` only (`--package-lock-only`) |
 | Severity threshold | **Fail on high and critical**. Moderate/low are reported by `npm audit` but do not fail CI at this threshold. |
 | CI job | `dependency-audit` (runs after `npm ci`) |
@@ -40,7 +40,18 @@ Do not broadly exclude application directories. Never allowlist a real credentia
 
 Development tooling vulnerabilities that reach build/test tooling or deployed bundles are still in scope when npm classifies them at high/critical under the root lockfile.
 
-Justified exceptions (if ever needed): document package, severity, path, owner, and expiry in this file — never silence the step.
+### Justified exceptions
+
+Documented in `scripts/security-audit.mjs` (`EXCEPTIONS`) and enforced with an expiry date. Renew or remove before expiry — expired exceptions fail CI.
+
+| GHSA | Package | Reason | Owner | Expires |
+|------|---------|--------|-------|---------|
+| `GHSA-w3rx-r6r6-pgpr` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. | platform | 2026-09-30 |
+| `GHSA-5p2g-fcmc-qvqq` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. | platform | 2026-09-30 |
+
+Root `package.json` `overrides` force patched `postcss`, `sharp`, and `brace-expansion` into Next/ESLint trees where possible.
+
+Never silence the audit step itself.
 
 ## Workflow permissions
 

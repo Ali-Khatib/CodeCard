@@ -28,9 +28,9 @@ describe('WS11-T009 CI security auditing', () => {
 
   it('defines blocking secret-scan and dependency-audit scripts', () => {
     expect(rootPkg.scripts?.['security:scan']).toBe('node scripts/check-secrets.js');
-    expect(rootPkg.scripts?.['security:audit']).toBe(
-      'npm audit --audit-level=high --package-lock-only',
-    );
+    expect(rootPkg.scripts?.['security:audit']).toBe('node scripts/security-audit.mjs');
+    expect(readRepo('scripts/security-audit.mjs')).toContain('--audit-level=high');
+    expect(readRepo('scripts/security-audit.mjs')).toContain('GHSA-w3rx-r6r6-pgpr');
     expect(scanner).toContain('process.exit(1)');
     expect(scanner).toContain('SECRET SCAN FAILED');
   });
@@ -46,6 +46,8 @@ describe('WS11-T009 CI security auditing', () => {
   it('documents and applies a high/critical severity threshold', () => {
     expect(docs).toMatch(/Fail on high and critical/i);
     expect(docs).toContain('--audit-level=high');
+    expect(docs).toContain('Justified exceptions');
+    expect(docs).toContain('GHSA-w3rx-r6r6-pgpr');
     expect(workflow).toContain('security:audit');
   });
 

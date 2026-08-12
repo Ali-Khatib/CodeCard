@@ -16,14 +16,24 @@ export const RESEARCH_SLUG_TAKEN_MESSAGE = 'This research URL is already in use.
 
 const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
-/** Same normalization as project/profile URL slugs. */
+/** Same normalization as project/profile URL slugs — no backtracking hyphen collapse. */
 export function normalizeResearchSlug(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  const lower = value.trim().toLowerCase();
+  let out = '';
+  let pendingHyphen = false;
+  for (let i = 0; i < lower.length; i += 1) {
+    const code = lower.charCodeAt(i);
+    const isNum = code >= 48 && code <= 57;
+    const isAlpha = code >= 97 && code <= 122;
+    if (isNum || isAlpha) {
+      if (pendingHyphen && out.length > 0) out += '-';
+      out += lower[i];
+      pendingHyphen = false;
+    } else {
+      pendingHyphen = true;
+    }
+  }
+  return out;
 }
 
 export const researchSlugSchema = z

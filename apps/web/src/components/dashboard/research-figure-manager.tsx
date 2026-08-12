@@ -200,7 +200,10 @@ export function ResearchFigureManager({
 
     for (const file of selected) {
       const validation = validateResearchFigureFile(file);
-      const clientId = `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`;
+      const clientId =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `${file.name}-${file.size}-${file.lastModified}-${Date.now().toString(36)}`;
       if (!validation.ok) {
         setJobs((prev) => [
           ...prev,

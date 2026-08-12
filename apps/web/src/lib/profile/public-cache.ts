@@ -96,7 +96,8 @@ function revalidatePublicProfileDataTag(profileSlug: string) {
   if (!tag) return;
   try {
     // Bust tagged public profile data-cache entries (WS14-T019).
-    revalidateTag(tag);
+    // Next 16 requires a cacheLife profile; expire:0 matches prior immediate invalidation.
+    revalidateTag(tag, { expire: 0 });
   } catch (error) {
     console.error('[public-cache] tag revalidation failed', {
       tag,
