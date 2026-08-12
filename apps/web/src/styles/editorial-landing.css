@@ -98,6 +98,7 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-
     inset 0 1px 0 color-mix(in srgb, #efedeb 22%, transparent);
 }
 
+html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
 html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
   color: #efedeb;
@@ -139,6 +140,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-sh
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
   color: var(--ed-ink, #232324);

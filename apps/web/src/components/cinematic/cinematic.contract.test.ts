@@ -128,6 +128,7 @@ describe('Editorial product landing contract', () => {
     const framer = read('src/components/ui/animated-nav-framer.tsx');
     const shell = read('src/components/landing/landing-shell-nav.tsx');
     const hero = read('src/components/landing/landing-hero-nav.tsx');
+    const css = read('src/app/globals.css');
     expect(framer).toContain('AnimatedNavFramer');
     expect(framer).toContain('from \'lucide-react\'');
     expect(framer).toContain('<Menu');
@@ -136,5 +137,9 @@ describe('Editorial product landing contract', () => {
     expect(shell).not.toContain('data-nav-morphing');
     expect(hero).toContain('AnimatedNavFramer');
     expect(hero).not.toContain('cc-nav-compact-trigger');
+    expect(css).toContain('pointer-events: none');
+    expect(css).toContain("html[data-nav-compact='true'] .cc-marketing-nav-shell");
+    expect(css).toContain('justify-content: flex-start');
+    expect(css).toMatch(/\.cc-nav-veil--collapsed[\s\S]*?background:\s*transparent/);
   });
 });

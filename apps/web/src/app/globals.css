@@ -5751,24 +5751,48 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 /* ── Phase 1B premium interaction polish ── */
 .cc-marketing-nav-shell {
-  transition: padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Full-bleed shell must not steal clicks from Crash Course / Research titles. */
+  pointer-events: none;
+  transition:
+    padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    justify-content 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cc-marketing-nav-shell .cc-nav-veil {
+  pointer-events: auto;
   max-width: min(920px, calc(100% - 24px));
-  transform-origin: center top;
+  transform-origin: left center;
   transition:
     box-shadow 0.55s ease,
     background-color 0.55s ease,
-    border-color 0.55s ease;
+    border-color 0.55s ease,
+    backdrop-filter 0.35s ease;
 }
 
 .cc-marketing-nav-shell .cc-nav-veil__inner {
   position: relative;
 }
 
+/* Crash Course / Research: park the circle on the left, clear of centered titles. */
+html[data-nav-compact='true'] .cc-marketing-nav-shell {
+  justify-content: flex-start;
+  padding-top: 0.55rem;
+}
+
 .cc-nav-veil--collapsed {
   padding: 0;
+  /* Ghost control — titles show through; icon stays readable. */
+  background: transparent !important;
+  border-color: color-mix(in srgb, currentColor 32%, transparent) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.cc-nav-veil--collapsed:hover,
+.cc-nav-veil--collapsed:focus-visible {
+  background: color-mix(in srgb, currentColor 10%, transparent) !important;
+  border-color: color-mix(in srgb, currentColor 48%, transparent) !important;
 }
 
 .cc-nav-veil--collapsed:focus-visible {
