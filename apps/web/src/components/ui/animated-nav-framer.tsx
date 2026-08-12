@@ -20,6 +20,8 @@ export const navContainerVariants: Variants = {
   collapsed: {
     width: '3rem',
     height: '3rem',
+    minWidth: '3rem',
+    maxWidth: '3rem',
     transition: {
       ...SPRING,
       when: 'afterChildren',
@@ -129,9 +131,20 @@ export function AnimatedNavFramer({
       role={expanded ? undefined : 'button'}
       className={cn(
         'cc-nav-veil relative flex flex-col overflow-hidden rounded-full',
-        !expanded && 'cc-nav-veil--collapsed cursor-pointer justify-center',
+        !expanded && 'cc-nav-veil--collapsed mx-auto cursor-pointer justify-center',
         className,
       )}
+      style={
+        !expanded
+          ? {
+              background: 'transparent',
+              borderColor: 'transparent',
+              boxShadow: 'none',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
+            }
+          : undefined
+      }
     >
       <motion.div
         variants={reduced ? undefined : navContentVariants}
@@ -154,7 +167,10 @@ export function AnimatedNavFramer({
           initial={false}
           aria-hidden={expanded}
         >
-          <Menu className="h-5 w-5" aria-hidden />
+          <Menu
+            className="h-5 w-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]"
+            aria-hidden
+          />
           <span className="sr-only">{collapsedLabel}</span>
         </motion.div>
       </div>
