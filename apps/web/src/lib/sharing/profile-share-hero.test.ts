@@ -27,7 +27,7 @@ describe('WS07-T003 dashboard QR preview', () => {
     expect(hero).toContain('isPublic');
     expect(hero).toContain('publish your profile');
     expect(hero).toContain('aria-live="polite"');
-    expect(overview).toContain('isPublic={profile?.is_public');
+    expect(overview).toContain('isPublic={isProfilePublic}');
     expect(overview).toContain('displayName={displayName}');
   });
 

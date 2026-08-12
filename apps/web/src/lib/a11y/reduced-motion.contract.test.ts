@@ -33,14 +33,15 @@ describe('WS12-T006 reduced motion', () => {
   });
 
   it('uses preference-aware smooth scrolling in JS helpers', () => {
-    expect(read('components/landing/marketing-hash-redirect.tsx')).toContain(
-      'scrollBehaviorForPreference()',
-    );
     expect(read('components/profile/scroll-strip.tsx')).toContain(
       'scrollBehaviorForPreference()',
     );
     expect(read('hooks/use-view-transition-navigate.ts')).toContain(
       "matchMedia('(prefers-reduced-motion: reduce)')",
+    );
+    // Hash redirects now hard-navigate home; reduced-motion still honored by the browser.
+    expect(read('components/landing/marketing-hash-redirect.tsx')).toContain(
+      'window.location.replace',
     );
   });
 

@@ -51,10 +51,12 @@ describe('dashboard new project route', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-projects-portfolio.tsx'),
       'utf8',
     );
+    const demoUrl = readFileSync(resolve(process.cwd(), 'src/lib/marketing/demo-url.ts'), 'utf8');
 
-    expect(shell).toContain('/projects/new');
+    expect(shell).toContain('workspaceCreateProjectHref(basePath)');
     expect(home).toContain('/dashboard/projects/new');
-    expect(portfolio).toContain('/projects/new');
+    expect(portfolio).toContain('workspaceCreateProjectHref(basePath)');
+    expect(demoUrl).toContain("return `${basePath}/projects/new`");
   });
 
   it('requires authentication through the dashboard layout', () => {

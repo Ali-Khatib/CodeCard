@@ -5753,15 +5753,13 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 .cc-marketing-nav-shell {
   /* Full-bleed shell must not steal clicks from Crash Course / Research titles. */
   pointer-events: none;
-  transition:
-    padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    justify-content 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: padding-top 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cc-marketing-nav-shell .cc-nav-veil {
   pointer-events: auto;
   max-width: min(920px, calc(100% - 24px));
-  transform-origin: left center;
+  transform-origin: center top;
   transition:
     box-shadow 0.55s ease,
     background-color 0.55s ease,
@@ -5771,12 +5769,6 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 .cc-marketing-nav-shell .cc-nav-veil__inner {
   position: relative;
-}
-
-/* Crash Course / Research: park the circle on the left, clear of centered titles. */
-html[data-nav-compact='true'] .cc-marketing-nav-shell {
-  justify-content: flex-start;
-  padding-top: 0.55rem;
 }
 
 .cc-nav-veil--collapsed {

@@ -107,9 +107,11 @@ describe('dashboard research edit route', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-research-view.tsx'),
       'utf8',
     );
+    const demoUrl = readFileSync(resolve(process.cwd(), 'src/lib/marketing/demo-url.ts'), 'utf8');
 
-    expect(view).toContain('${basePath}/research/${paper.id}/edit');
+    expect(view).toContain('workspaceResearchEditHref(basePath, paper.id)');
     expect(view).toContain('Edit');
+    expect(demoUrl).toContain('return `${basePath}/research/${paperId}/edit`');
   });
 
   it('uses an accessible delete confirmation dialog', () => {

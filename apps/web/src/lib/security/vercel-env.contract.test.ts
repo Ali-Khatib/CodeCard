@@ -49,9 +49,10 @@ describe('WS14-T013 Vercel environment contract', () => {
     const vercelJson = readWeb('vercel.json');
     expect(vercelJson).toContain('ignoreCommand');
     expect(ignore).toContain('prj_ZTosasXt5TxnUQf4WTfcTbN8k1UN');
-    expect(ignore).toContain('prj_E5wdwC2T4SYTZsRS6xh20p56LJZn');
     expect(ignore).toMatch(/codecard-mvp[\s\S]*mvp/);
     expect(ignore).toMatch(/code-card-web[\s\S]*main/);
+    // Non-MVP projects (including code-card-web) gate on main only.
+    expect(ignore).toContain('allowedBranch = projectId === MVP_PROJECT_ID ? "mvp" : "main"');
   });
 
   it('excludes E2E-only variables from Production guidance', () => {

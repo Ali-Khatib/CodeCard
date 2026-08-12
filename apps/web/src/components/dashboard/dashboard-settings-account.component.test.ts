@@ -21,7 +21,7 @@ describe('WS09-T008 Settings account controls wiring', () => {
     expect(view).toContain("accountControls === 'live'");
     expect(view).toContain('formatCurrentPlanLabel(plan)');
     expect(view).toContain("control: 'value-edit'");
-    expect(view).toContain("href: profileEditorHref('slug')");
+    expect(view).toContain("href: profileEditorHref('slug', live)");
     expect(view).not.toContain('pro.codecard.app');
     expect(view).not.toContain('Pro · $');
   });

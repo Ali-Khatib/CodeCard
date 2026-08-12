@@ -138,8 +138,7 @@ describe('Editorial product landing contract', () => {
     expect(hero).toContain('AnimatedNavFramer');
     expect(hero).not.toContain('cc-nav-compact-trigger');
     expect(css).toContain('pointer-events: none');
-    expect(css).toContain("html[data-nav-compact='true'] .cc-marketing-nav-shell");
-    expect(css).toContain('justify-content: flex-start');
     expect(css).toMatch(/\.cc-nav-veil--collapsed[\s\S]*?background:\s*transparent/);
+    expect(css).not.toContain("html[data-nav-compact='true'] .cc-marketing-nav-shell");
   });
 });

@@ -65,12 +65,13 @@ describe('dashboard new research route', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-research-view.tsx'),
       'utf8',
     );
+    const demoUrl = readFileSync(resolve(process.cwd(), 'src/lib/marketing/demo-url.ts'), 'utf8');
 
-    expect(view).toContain('${basePath}/research/new');
+    expect(view).toContain('workspaceCreateResearchHref(basePath)');
     expect(view).toContain('Add research');
-    expect(view).toContain('Create paper');
     expect(view).not.toContain('Add from projects');
     expect(view).not.toContain('href="/dashboard/projects"');
+    expect(demoUrl).toContain("return `${basePath}/research/new`");
   });
 
   it('requires authentication through the dashboard layout', () => {
