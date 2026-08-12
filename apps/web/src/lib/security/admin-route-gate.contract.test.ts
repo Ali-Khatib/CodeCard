@@ -19,8 +19,15 @@ describe('WS11-T002 admin route gate contracts', () => {
   const page = readWeb('src/app/admin/page.tsx');
   const forbiddenPage = readWeb('src/app/forbidden.tsx');
   const nextConfig = readWeb('next.config.ts');
-  const middleware = readWeb('src/middleware.ts');
+  const proxy = readWeb('src/proxy.ts');
   const docs = readRepo('docs/ADMIN_AUTHORIZATION.md');
+
+  it('uses Next.js 16 proxy convention instead of deprecated middleware.ts', () => {
+    expect(existsSync(resolve(WEB, 'src/proxy.ts'))).toBe(true);
+    expect(existsSync(resolve(WEB, 'src/middleware.ts'))).toBe(false);
+    expect(proxy).toMatch(/export\s+async\s+function\s+proxy\s*\(/);
+    expect(proxy).not.toMatch(/export\s+async\s+function\s+middleware\s*\(/);
+  });
 
   it('gate is server-only and reuses only the canonical WS13-T001 resolver', () => {
     expect(gate).toContain("import 'server-only'");
@@ -71,9 +78,9 @@ describe('WS11-T002 admin route gate contracts', () => {
     expect(rendered).not.toMatch(/error\.message|digest/);
   });
 
-  it('middleware keeps coarse auth routing only (no metadata role decision)', () => {
-    expect(middleware).toContain("pathname.startsWith('/admin')");
-    expect(middleware).not.toMatch(/app_metadata|user_metadata|role/);
+  it('proxy keeps coarse auth routing only (no metadata role decision)', () => {
+    expect(proxy).toContain("pathname.startsWith('/admin')");
+    expect(proxy).not.toMatch(/app_metadata|user_metadata|role/);
   });
 
   it('documents enforcement location and that APIs still need their own checks', () => {

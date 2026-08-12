@@ -9,7 +9,7 @@ import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
   // Recovery / confirm links that fall back to Site URL (`/`) still carry `code`

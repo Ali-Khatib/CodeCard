@@ -15,7 +15,7 @@ import {
  * (`resolveGlobalAdminAuthorization`). It introduces no second role source.
  *
  * Contract (docs/ADMIN_AUTHORIZATION.md §16):
- * - anonymous / missing session → redirect to /sign-in (same as middleware)
+ * - anonymous / missing session → redirect to /sign-in (same as proxy)
  * - authenticated non-admin, demo, malformed/misconfigured claim,
  *   identity-provider failure → fail closed with a real 403 (`forbidden()`)
  * - global admin → render continues

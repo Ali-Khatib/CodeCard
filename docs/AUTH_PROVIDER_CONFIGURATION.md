@@ -17,7 +17,7 @@ Safe reference for configuring Supabase authentication with CodeCard. **Do not c
 | Variable | Browser-safe? | Required for auth UI | Code reference | Status |
 |----------|---------------|----------------------|----------------|--------|
 | `NEXT_PUBLIC_APP_URL` | Yes | Recommended | `redirect.ts`, `password-recovery.ts`, metadata, Stripe callbacks | Code-verified |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Yes | `client.ts`, `server.ts`, `configured.ts`, `middleware.ts` | Code-verified |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Yes | `client.ts`, `server.ts`, `configured.ts`, `proxy.ts` | Code-verified |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Yes | Yes (preferred) | `public-key.ts` | Code-verified |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Yes (fallback) | `public-key.ts` | Code-verified |
 | `SUPABASE_SERVICE_ROLE_KEY` | **No — server only** | No for sign-in/OAuth (webhooks/admin only) | `server.ts` `createServiceClient()` | Code-verified |
@@ -80,7 +80,7 @@ https://*-<team-slug>.vercel.app/**   # if using Vercel preview deployments
 | Email confirmation | Sign-up | Email link → `{APP_URL}/auth/callback?redirect=%2Fauth%2Fconfirmed` → `/auth/confirmed` |
 | Email sign-in | `sign-in` | Session in-app → `sanitizeInternalRedirect(?redirect=)` |
 | OAuth / callback errors | `auth/callback` | Failure → `/auth/error?reason=…` |
-| Expired session | `middleware` | `/sign-in?redirect=…&reason=session_expired` (when stale auth cookie detected) |
+| Expired session | `proxy` | `/sign-in?redirect=…&reason=session_expired` (when stale auth cookie detected) |
 
 **Email confirmation:** Sign-up passes `emailRedirectTo: authCallbackRedirectUrl('/auth/confirmed')`. After the user opens the email link, `/auth/callback` exchanges the code and sends them to `/auth/confirmed` (success copy, sign-in CTA, and a new-account setup guide). **External required:** Site URL + Redirect allow list must include `{APP_URL}/auth/callback` (and preferably `{APP_URL}/**`).
 
@@ -200,7 +200,7 @@ Automated coverage: `apps/web/src/lib/auth/*.test.ts`, `apps/web/e2e/auth.spec.t
 | `/forgot-password` | `apps/web/src/app/forgot-password/page.tsx` |
 | `/reset-password` | `apps/web/src/app/reset-password/page.tsx` |
 
-Middleware matcher: `/dashboard/*`, `/admin/*`, auth routes (`middleware.ts`).
+Proxy matcher: `/dashboard/*`, `/admin/*`, auth routes (`proxy.ts`).
 
 ---
 
@@ -220,5 +220,5 @@ Middleware matcher: `/dashboard/*`, `/admin/*`, auth routes (`middleware.ts`).
 - `apps/web/src/lib/auth/redirect.ts`
 - `apps/web/src/lib/auth/oauth-callback.ts`
 - `apps/web/src/lib/auth/session-expiry.ts`
-- `apps/web/src/middleware.ts`
+- `apps/web/src/proxy.ts`
 - `README.md` (environment security rules)

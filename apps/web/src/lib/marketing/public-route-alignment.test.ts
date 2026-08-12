@@ -91,12 +91,13 @@ describe('workspace-first public route alignment', () => {
   });
 
   it('allows Site URL auth-code forwarding on / without forcing marketers off the landing', () => {
-    const middleware = read('src/middleware.ts');
-    expect(middleware).toContain("'/dashboard/:path*'");
-    expect(middleware).toContain("'/'");
-    expect(middleware).toContain('shouldForwardAuthExchangeToCallback');
+    const proxy = read('src/proxy.ts');
+    expect(proxy).toContain("'/dashboard/:path*'");
+    expect(proxy).toContain("'/'");
+    expect(proxy).toContain('shouldForwardAuthExchangeToCallback');
+    expect(proxy).toMatch(/export\s+async\s+function\s+proxy\s*\(/);
     // Signed-in users are only bounced from auth forms, not from marketing `/`.
-    expect(middleware).toContain('isAuthRoute && user');
-    expect(middleware).not.toMatch(/if\s*\(\s*pathname\s*===\s*'\/'\s*&&\s*user/);
+    expect(proxy).toContain('isAuthRoute && user');
+    expect(proxy).not.toMatch(/if\s*\(\s*pathname\s*===\s*'\/'\s*&&\s*user/);
   });
 });
