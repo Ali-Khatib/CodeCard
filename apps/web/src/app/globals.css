@@ -5773,12 +5773,10 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 .cc-nav-veil--collapsed {
   padding: 0;
-  width: 3rem !important;
-  min-width: 3rem !important;
-  max-width: 3rem !important;
-  height: 3rem !important;
   margin-inline: auto;
-  /* Ghost control — titles show through; icon stays readable. */
+  /* Ghost control — titles show through; icon stays readable.
+     Size is driven by Motion pixel animation (not !important CSS locks)
+     so the pill can expand back after Crash Course / Research. */
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -5819,13 +5817,6 @@ html[data-nav-compact='true'] .cc-nav-veil--collapsed {
   .cc-marketing-nav-shell .cc-nav-veil__inner {
     transition-duration: 0.01ms !important;
     transition-delay: 0s !important;
-  }
-
-  .cc-nav-veil--collapsed {
-    width: 3rem;
-    height: 3rem;
-    min-height: 3rem;
-    max-width: 3rem;
   }
 
   .cc-nav-veil--collapsed .cc-nav-veil__inner {

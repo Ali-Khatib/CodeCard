@@ -132,7 +132,8 @@ describe('Editorial product landing contract', () => {
     expect(framer).toContain('AnimatedNavFramer');
     expect(framer).toContain('from \'lucide-react\'');
     expect(framer).toContain('<Menu');
-    expect(framer).toContain("width: '3rem'");
+    expect(framer).toContain('NAV_COLLAPSED_SIZE');
+    expect(framer).toContain('scrollWidth');
     expect(shell).not.toContain('morphNavVeil');
     expect(shell).not.toContain('data-nav-morphing');
     expect(hero).toContain('AnimatedNavFramer');
