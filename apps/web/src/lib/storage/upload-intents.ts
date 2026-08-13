@@ -1,5 +1,24 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { STORAGE_BUCKETS } from '@codecard/config';
+import { parseCanonicalStoragePath } from '@/lib/storage/path';
 import type { UploadOwnershipContext } from '@/lib/storage/upload-ownership';
+
+const ALLOWED_UPLOAD_BUCKETS = new Set<string>(Object.values(STORAGE_BUCKETS));
+
+/**
+ * Defense-in-depth before storage.remove: only allowlist buckets + canonical
+ * object keys (rejects `..`, absolute paths, odd segment counts, etc.).
+ * Intent rows are server-written, but reconciliation must not trust DB poison.
+ */
+export function isSafeStorageRemovalTarget(bucket: string, objectPath: string): boolean {
+  if (!ALLOWED_UPLOAD_BUCKETS.has(bucket)) return false;
+  try {
+    parseCanonicalStoragePath(objectPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export type UploadIntentRecord = {
   bucket: string;
@@ -86,11 +105,14 @@ export async function reconcileAbandonedUploadIntents(
 
   let abandoned = 0;
   for (const row of rows) {
-    if (options.removeObject) {
-      await options.removeObject(row.bucket, row.object_path);
-    } else {
-      await supabase.storage.from(row.bucket).remove([row.object_path]);
+    if (isSafeStorageRemovalTarget(row.bucket, row.object_path)) {
+      if (options.removeObject) {
+        await options.removeObject(row.bucket, row.object_path);
+      } else {
+        await supabase.storage.from(row.bucket).remove([row.object_path]);
+      }
     }
+    // Still mark abandoned when the path is unsafe so poisoned rows do not retry forever.
     const { error } = await supabase
       .from('storage_upload_intents')
       .update({ abandoned_at: now.toISOString() })

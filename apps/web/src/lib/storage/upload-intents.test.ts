@@ -9,6 +9,9 @@ import {
 } from './finalize-raster-verification';
 
 describe('upload intents and orphan reconciliation', () => {
+  const orphanPath =
+    '11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/avatar/33333333-3333-4333-8333-333333333333/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.png';
+
   it('records a signed-upload intent for the authenticated owner', async () => {
     const insert = vi.fn().mockResolvedValue({ error: null });
     const supabase = {
@@ -49,7 +52,7 @@ describe('upload intents and orphan reconciliation', () => {
           is: vi.fn(() => ({
             is: vi.fn(() => ({
               lt: vi.fn().mockResolvedValue({
-                data: [{ id: '1', bucket: 'avatars', object_path: 'orphan.png' }],
+                data: [{ id: '1', bucket: 'avatars', object_path: orphanPath }],
                 error: null,
               }),
             })),
@@ -88,7 +91,7 @@ describe('upload intents and orphan reconciliation', () => {
               is: vi.fn(() => ({
                 is: vi.fn(() => ({
                   lt: vi.fn().mockResolvedValue({
-                    data: [{ id: '1', bucket: 'avatars', object_path: 'orphan.png' }],
+                    data: [{ id: '1', bucket: 'avatars', object_path: orphanPath }],
                     error: null,
                   }),
                 })),
@@ -107,7 +110,53 @@ describe('upload intents and orphan reconciliation', () => {
       removeObject,
     });
     expect(first.abandoned).toBe(1);
-    expect(removeObject).toHaveBeenCalledWith('avatars', 'orphan.png');
+    expect(removeObject).toHaveBeenCalledWith('avatars', orphanPath);
+  });
+
+  it('never removes traversal-shaped or non-canonical object paths', async () => {
+    const removeObject = vi.fn().mockResolvedValue(undefined);
+    const updateEq = vi.fn().mockResolvedValue({ error: null });
+    const update = vi.fn(() => ({
+      eq: vi.fn(() => ({
+        is: updateEq,
+      })),
+    }));
+
+    const supabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'storage_upload_intents') {
+          return {
+            select: vi.fn(() => ({
+              is: vi.fn(() => ({
+                is: vi.fn(() => ({
+                  lt: vi.fn().mockResolvedValue({
+                    data: [
+                      {
+                        id: 'poison',
+                        bucket: 'avatars',
+                        object_path: '../etc/passwd',
+                      },
+                    ],
+                    error: null,
+                  }),
+                })),
+              })),
+            })),
+            update,
+          };
+        }
+        throw new Error(`unexpected ${table}`);
+      }),
+    } as unknown as SupabaseClient;
+
+    const result = await reconcileAbandonedUploadIntents(supabase, {
+      dryRun: false,
+      removeObject,
+      now: new Date('2026-07-18T00:00:00.000Z'),
+    });
+
+    expect(result.abandoned).toBe(1);
+    expect(removeObject).not.toHaveBeenCalled();
   });
 });
 

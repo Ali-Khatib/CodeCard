@@ -23,6 +23,9 @@ const TIME_SPENT_EVENTS = new Set([
 ]);
 
 export async function POST(request: Request) {
+  // Public audience telemetry: clients send the *viewed* public profile/project ids.
+  // Owner-only events (share/QR) require auth + ownership. View events validate
+  // the target is public/published and attribute using server-resolved owner ids.
   return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
     // After rate-limit + schema validation: ignore obvious automated agents.
     if (isObviousAnalyticsBot(request.headers.get('user-agent'))) {
@@ -254,8 +257,13 @@ export async function POST(request: Request) {
         .eq('is_published', true)
         .single();
 
-      if (!project) {
+      if (!project?.profile_id) {
         return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+      }
+
+      // Never trust client profile_id for attribution — use the published project's owner.
+      if (profile_id !== project.profile_id) {
+        return NextResponse.json({ ok: true, status: 'ignored' });
       }
 
       if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
@@ -265,14 +273,14 @@ export async function POST(request: Request) {
       await supabase.from('project_view_events').insert({
         tenant_id: project.tenant_id,
         project_id,
-        profile_id,
+        profile_id: project.profile_id,
         source,
         session_id,
       });
 
       await supabase.from('analytics_events').insert({
         tenant_id: project.tenant_id,
-        profile_id: project.profile_id ?? profile_id,
+        profile_id: project.profile_id,
         target_type: 'project',
         target_id: project_id,
         event_type,
@@ -296,14 +304,14 @@ export async function POST(request: Request) {
         .eq('is_published', true)
         .single();
 
-      if (project) {
+      if (project?.profile_id && profile_id === project.profile_id) {
         if (await isDuplicateAnalyticsEvent(supabase, eventForDedupe)) {
           return NextResponse.json({ ok: true, status: 'ignored' });
         }
 
         await supabase.from('analytics_events').insert({
           tenant_id: project.tenant_id,
-          profile_id: project.profile_id ?? profile_id,
+          profile_id: project.profile_id,
           target_type: 'project',
           target_id: resolvedTargetId,
           event_type,

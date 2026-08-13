@@ -46,10 +46,10 @@ Documented in `scripts/security-audit.mjs` (`EXCEPTIONS`) and enforced with an e
 
 | GHSA | Package | Reason | Owner | Expires |
 |------|---------|--------|-------|---------|
-| `GHSA-w3rx-r6r6-pgpr` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. | platform | 2026-09-30 |
-| `GHSA-5p2g-fcmc-qvqq` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. | platform | 2026-09-30 |
+| `GHSA-w3rx-r6r6-pgpr` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. Corgea CVE-2025-71330 maps here. | platform | 2026-09-30 |
+| `GHSA-5p2g-fcmc-qvqq` | `image-size` | No fixed release yet (range includes latest `2.0.2`). Reachable only via Expo/Metro mobile tooling, not the web runtime. Corgea CVE-2025-71329 maps here. | platform | 2026-09-30 |
 
-Root `package.json` `overrides` force patched `postcss`, `sharp`, and `brace-expansion` into Next/ESLint trees where possible.
+Root `package.json` pins `uuid@11.1.1` (CVE-2026-41907 / GHSA-w5hq-g745-h8pq) and overrides `uuid` to that release. Expo’s `xcode` may still nest `uuid@7` under mobile tooling; npm currently classifies that advisory as **moderate** (below this repo’s high/critical CI gate). Re-check when Expo updates `xcode`.
 
 Never silence the audit step itself.
 

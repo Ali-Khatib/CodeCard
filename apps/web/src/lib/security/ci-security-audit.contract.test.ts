@@ -14,6 +14,8 @@ describe('WS11-T009 CI security auditing', () => {
     scripts?: Record<string, string>;
     workspaces?: string[];
     packageManager?: string;
+    overrides?: Record<string, unknown>;
+    devDependencies?: Record<string, string>;
   };
   const docs = readRepo('docs/CI_SECURITY_AUDITING.md');
   const scanner = readRepo('scripts/check-secrets.js');
@@ -48,6 +50,9 @@ describe('WS11-T009 CI security auditing', () => {
     expect(docs).toContain('--audit-level=high');
     expect(docs).toContain('Justified exceptions');
     expect(docs).toContain('GHSA-w3rx-r6r6-pgpr');
+    expect(docs).toContain('uuid@11.1.1');
+    expect(rootPkg.devDependencies?.uuid).toBe('11.1.1');
+    expect(rootPkg.overrides?.uuid).toBeTruthy();
     expect(workflow).toContain('security:audit');
   });
 

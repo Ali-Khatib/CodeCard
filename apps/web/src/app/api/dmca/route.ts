@@ -3,6 +3,14 @@ import { dmcaNoticeSchema } from '@codecard/validation';
 import { secureJsonRoute } from '@/lib/security/secure-route';
 import { createServiceClient } from '@/lib/supabase/server';
 
+/**
+ * Public DMCA notice intake (intentional).
+ *
+ * Copyright claimants are often not CodeCard users. Notices are rate-limited,
+ * schema-validated, stored for human review, and never trigger automatic
+ * content removal. Identity/ownership verification is an admin review step —
+ * not a missing session gate on this route.
+ */
 export async function POST(request: Request) {
   return secureJsonRoute(
     request,

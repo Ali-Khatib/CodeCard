@@ -136,6 +136,10 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
   it('documents deliberate DMCA public INSERT and denies client jobs/billing/deletion ops', () => {
     expect(sql).toMatch(/CREATE POLICY dmca_notices_insert[\s\S]*WITH CHECK\s*\(\s*true\s*\)/);
     expect(matrix).toContain('Deliberate public legal intake');
+    const dmcaRoute = read('apps/web/src/app/api/dmca/route.ts');
+    expect(dmcaRoute).toMatch(/Public DMCA notice intake \(intentional\)/);
+    expect(dmcaRoute).toContain("rateLimitType: 'dmca'");
+    expect(dmcaRoute).not.toMatch(/getUser\(|requireAuth|createClient\(/);
     for (const table of NO_CLIENT_ACCESS_TABLES) {
       expect(matrix).toMatch(new RegExp(`${table}[\\s\\S]*No client|❌.*❌`));
     }
