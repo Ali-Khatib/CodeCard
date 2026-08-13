@@ -43,7 +43,7 @@ test.describe('Authentication pages', () => {
     await page.getByRole('button', { name: /^Sign in$/i }).click();
     const formAlert = page.getByTestId('auth-shell').getByRole('alert');
     await expect(formAlert).toBeVisible();
-    await expect(formAlert).toContainText(/invalid email/i);
+    await expect(formAlert).toContainText('Enter a valid email address');
     await expect(formAlert).not.toContainText(/access_token|refresh_token|code=/i);
   });
 
