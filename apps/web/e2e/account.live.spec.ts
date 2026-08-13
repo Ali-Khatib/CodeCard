@@ -25,8 +25,10 @@ async function openSettings(page: Page): Promise<void> {
   await page.goto('/dashboard/settings', { waitUntil: 'domcontentloaded' });
   // Settings is sectioned — export/deletion live under "Sessions & data".
   await page.getByRole('button', { name: /Sessions & data/i }).click();
-  // Category rail can mirror the same trigger; target the main settings panel.
-  await expect(page.getByRole('main').getByTestId('account-deletion-open')).toBeVisible({
+  // Accordion rail + desktop panel both render the same trigger; use the desktop panel.
+  await expect(
+    page.locator('.cc-settings-desktop-panel').getByTestId('account-deletion-open'),
+  ).toBeVisible({
     timeout: 30_000,
   });
 }
@@ -91,7 +93,7 @@ test.describe('WS14-T007 account export and deletion E2E (isolated real backend)
     env,
   }) => {
     await openSettings(page);
-    await page.getByRole('main').getByTestId('account-deletion-open').click();
+    await page.locator('.cc-settings-desktop-panel').getByTestId('account-deletion-open').click();
     await expect(page.getByTestId('account-deletion-dialog')).toBeVisible();
     await expect(page.getByText('Delete your CodeCard account?')).toBeVisible();
 
@@ -122,7 +124,7 @@ test.describe('WS14-T007 account export and deletion E2E (isolated real backend)
     env,
   }) => {
     await openSettings(page);
-    await page.getByRole('main').getByTestId('account-deletion-open').click();
+    await page.locator('.cc-settings-desktop-panel').getByTestId('account-deletion-open').click();
     await expect(page.getByTestId('account-deletion-dialog')).toBeVisible();
 
     await page.getByTestId('account-deletion-confirmation').fill('DELETE');

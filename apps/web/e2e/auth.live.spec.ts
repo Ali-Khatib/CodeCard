@@ -359,6 +359,10 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     run,
     env,
   }) => {
+    // Prior forgot-password case already hits GoTrue per-email limits; allow
+    // cooldown retries + Mailtrap wait beyond the default 90s test timeout.
+    test.setTimeout(300_000);
+
     const mailtrap = loadMailtrapConfig();
     test.skip(!mailtrap, 'Mailtrap sandbox credentials not configured in .env.e2e.local');
     if (!mailtrap) return;
@@ -378,16 +382,46 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     //    user would use (the PKCE verifier lives in this context's cookies).
     //    GoTrue rate-limits recovery emails per address (the previous test just
     //    requested one for this account), so retry until the send is accepted.
+    //    A broken Auth SMTP config returns 500 "Error sending recovery email"
+    //    forever — detect that and skip instead of burning the retry budget.
     await page.context().clearCookies();
     const requestDeadline = Date.now() + 180_000;
     for (;;) {
+      const recoverResponsePromise = page.waitForResponse(
+        (res) => res.url().includes(`${isolatedHost}/auth/v1/recover`),
+        { timeout: 20_000 },
+      );
       await page.goto('/forgot-password', { waitUntil: 'networkidle' });
       const emailInput = page.getByLabel('Email');
       await emailInput.fill(primary.email);
       // Guard against the hydration race resetting the controlled input.
       await expect(emailInput).toHaveValue(primary.email);
       await page.getByRole('button', { name: /Send reset link/i }).click();
-      const outcome = page.locator('[role="status"], [role="alert"]').first();
+      const recoverResponse = await recoverResponsePromise;
+      if (recoverResponse.status() >= 500) {
+        const body = (await recoverResponse.json().catch(() => ({}))) as {
+          error_code?: string;
+          msg?: string;
+          message?: string;
+        };
+        const msg = `${body.msg ?? body.message ?? ''}`;
+        if (
+          body.error_code === 'unexpected_failure' ||
+          /sending recovery email/i.test(msg)
+        ) {
+          test.skip(
+            true,
+            'codecard-e2e Supabase Auth cannot send recovery email (custom SMTP/Mailtrap). Reconfigure Auth → SMTP on the isolated project, then re-run.',
+          );
+          return;
+        }
+      }
+      // Scope to AuthShell — Next's route announcer is also role=alert.
+      const outcome = page
+        .getByTestId('auth-shell')
+        .locator('[role="status"], [role="alert"]')
+        .filter({ hasText: /.+/ })
+        .first();
       await expect(outcome).toContainText(
         /if an account exists|something went wrong|valid email/i,
         { timeout: 20_000 },

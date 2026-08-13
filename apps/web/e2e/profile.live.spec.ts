@@ -231,8 +231,7 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
       mimeType: 'image/png',
       buffer: Buffer.from(AVATAR_PNG_BASE64, 'base64'),
     });
-    await upload.getByRole('button', { name: /^Upload (photo|replacement)$/ }).click();
-
+    // Choosing a file uploads immediately — no separate Upload button.
     await expect(upload.getByRole('status').filter({ hasText: /Avatar saved/ })).toBeVisible({
       timeout: 45_000,
     });

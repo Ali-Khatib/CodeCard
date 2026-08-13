@@ -135,11 +135,12 @@ test.describe('WS14-T006 public profile, sharing and QR E2E (isolated real backe
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const copyBtn = page.getByRole('button', { name: 'Copy public link' }).first();
+    const share = page.getByRole('region', { name: 'Share your CodeCard' });
+    const copyBtn = share.getByRole('button', { name: 'Copy public link' });
     await expect(copyBtn).toBeVisible({ timeout: 30_000 });
     await copyBtn.click();
     await expect(
-      page.getByRole('button', { name: /Public link copied|Copy public link/i }).first(),
+      share.getByRole('button', { name: /Public link copied|Copy public link/i }),
     ).toBeVisible({ timeout: 10_000 });
 
     const clipboard = await page.evaluate(() => navigator.clipboard.readText());
@@ -149,8 +150,16 @@ test.describe('WS14-T006 public profile, sharing and QR E2E (isolated real backe
     expect(clipboard).not.toContain('source=qr');
 
     // Open the real QR panel (not the decorative public-page fake QR).
-    await page.getByRole('button', { name: 'Show profile QR code' }).click();
-    await expect(page.locator('#profile-qr')).toBeVisible({ timeout: 30_000 });
+    const qrToggle = share.getByRole('button', { name: /Show profile QR code|Hide profile QR code/ });
+    await qrToggle.scrollIntoViewIfNeeded();
+    await expect(async () => {
+      const expanded = await qrToggle.getAttribute('aria-expanded');
+      if (expanded !== 'true') {
+        await share.getByRole('button', { name: 'Show profile QR code' }).click();
+      }
+      await expect(qrToggle).toHaveAttribute('aria-expanded', 'true', { timeout: 2_000 });
+      await expect(page.locator('#profile-qr')).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await expect(
       page.getByAltText(new RegExp(`QR code for public CodeCard profile .*/${owner.slug}$`)),
     ).toBeVisible({ timeout: 30_000 });
@@ -158,7 +167,7 @@ test.describe('WS14-T006 public profile, sharing and QR E2E (isolated real backe
     await expect(page.getByText(new RegExp(`/${owner.slug}\\?source=qr$`))).toBeVisible();
 
     const downloadPromise = page.waitForEvent('download', { timeout: 30_000 });
-    await page.getByRole('button', { name: 'Download QR as PNG' }).click();
+    await page.getByRole('button', { name: /Download QR( as PNG)?/i }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toBe(`codecard-${owner.slug}-qr.png`);
   });
