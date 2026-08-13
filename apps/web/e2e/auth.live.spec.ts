@@ -313,7 +313,12 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     // Generic public response for an existing account; must not reveal existence
     // or expose raw provider errors. (A rate-limited send surfaces the same
     // generic error shape and reveals nothing.)
-    const existingStatus = page.locator('[role="status"], [role="alert"]').first();
+    // Scope to AuthShell — Next's route announcer is also role=alert and can win .first().
+    const existingStatus = page
+      .getByTestId('auth-shell')
+      .locator('[role="status"], [role="alert"]')
+      .filter({ hasText: /.+/ })
+      .first();
     await expect(existingStatus).toContainText(/if an account exists|something went wrong/i, {
       timeout: 20_000,
     });
@@ -325,7 +330,11 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
     await page.getByLabel('Email').fill(`missing-${Date.now()}@codecard-e2e.example.com`);
     await page.getByRole('button', { name: /Send reset link/i }).click();
-    const missingStatus = page.locator('[role="status"], [role="alert"]').first();
+    const missingStatus = page
+      .getByTestId('auth-shell')
+      .locator('[role="status"], [role="alert"]')
+      .filter({ hasText: /.+/ })
+      .first();
     await expect(missingStatus).toContainText(/if an account exists|something went wrong/i, {
       timeout: 20_000,
     });

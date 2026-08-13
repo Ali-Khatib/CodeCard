@@ -70,8 +70,10 @@ test.describe('WS14-T003 profile edit and publishing E2E (isolated real backend)
     await signInViaUI(page, { email: owner.email, password: owner.password });
     await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
 
-    // Profile stays off primary nav; Home "Edit profile" is the entry.
-    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /profile/i })).toHaveCount(0);
+    // Profile is a primary nav destination; Home "Edit profile" remains an alternate entry.
+    await expect(
+      page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Profile$/i }),
+    ).toBeVisible();
     await page.getByRole('link', { name: /^Edit profile$/ }).click();
     await page.waitForURL(/\/dashboard\/profile$/, { timeout: 30_000 });
     await expect(page.getByLabel('Display name')).toBeVisible();

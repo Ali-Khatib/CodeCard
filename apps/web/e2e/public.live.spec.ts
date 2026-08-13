@@ -92,7 +92,7 @@ test.describe('WS14-T006 public profile, sharing and QR E2E (isolated real backe
 
     await anonPage.getByRole('button', { name: /^Copy link$/ }).first().click();
     await expect(
-      anonPage.getByRole('button', { name: /Profile link copied/i }).first(),
+      anonPage.getByRole('button', { name: /copied/i }).first(),
     ).toBeVisible({ timeout: 10_000 });
 
     const clipboard = await anonPage.evaluate(() => navigator.clipboard.readText());

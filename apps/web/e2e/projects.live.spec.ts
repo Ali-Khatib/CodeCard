@@ -114,9 +114,11 @@ test.describe('WS14-T004 project CRUD E2E (isolated real backend)', () => {
     );
 
     await page.locator('button[type="submit"]').filter({ hasText: 'Create project' }).click();
-    // Create redirects to the projects list (not the edit page).
-    await page.waitForURL(/\/dashboard\/projects\/?$/, { timeout: 30_000 });
-    await expect(page.getByText('WS14 T004 Project').first()).toBeVisible({ timeout: 30_000 });
+    // Create lands on the project editor so the owner can keep polishing immediately.
+    await page.waitForURL(/\/dashboard\/projects\/[^/]+\/edit\/?$/, { timeout: 30_000 });
+    await expect(page.getByLabel('Project title *')).toHaveValue('WS14 T004 Project', {
+      timeout: 30_000,
+    });
 
     const { data: rows, error } = await admin
       .from('projects')
