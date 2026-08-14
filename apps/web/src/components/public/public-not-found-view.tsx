@@ -32,8 +32,8 @@ export function PublicNotFoundView({
           <Link href="/" className="cc-app-btn cc-app-btn--primary min-h-11">
             Back to CodeCard
           </Link>
-          <Link href="/pricing" className="cc-app-btn cc-app-btn--ghost min-h-11">
-            View pricing
+          <Link href="/sign-up" className="cc-app-btn cc-app-btn--ghost min-h-11">
+            Create your CodeCard
           </Link>
         </div>
       </div>

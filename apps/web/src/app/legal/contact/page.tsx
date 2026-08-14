@@ -1,6 +1,9 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'Contact' };
+export const metadata = {
+  title: 'Contact',
+  description: 'Contact CodeCard for product, privacy, and copyright questions.',
+};
 
 export default function ContactPage() {
   return (

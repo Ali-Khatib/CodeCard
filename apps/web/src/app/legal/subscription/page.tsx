@@ -1,6 +1,9 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'Subscription Terms' };
+export const metadata = {
+  title: 'Subscription Terms',
+  description: 'Billing, renewal, and cancellation terms for CodeCard subscriptions.',
+};
 
 export default function SubscriptionTermsPage() {
   return (

@@ -1,6 +1,9 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'DMCA Policy' };
+export const metadata = {
+  title: 'DMCA Policy',
+  description: 'How to submit copyright notices and counter-notices for content hosted on CodeCard.',
+};
 
 export default function DmcaPage() {
   return (

@@ -29,6 +29,13 @@
   transition: background-color 0.9s ease, color 0.55s ease;
 }
 
+/* Room for sticky mobile CTA so finale content stays reachable. */
+@media (max-width: 767px) {
+  .cc-ed {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* 1 — charcoal */
 .cc-ed[data-chapter='hero'] {
   --ed-bg: var(--ed-dark);

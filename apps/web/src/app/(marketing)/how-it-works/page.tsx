@@ -1,7 +1,7 @@
 import { MarketingHashRedirect } from '@/components/landing/marketing-hash-redirect';
 
 export const metadata = {
-  title: 'How it works | CodeCard',
+  title: 'How it works',
   description: 'See how CodeCard presents projects, research, and impact in one identity.',
 };
 

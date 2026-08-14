@@ -6,6 +6,7 @@ import { EditorialLiveDemoBox } from './editorial-live-demo-box';
 import { EditorialAudience } from './editorial-audience';
 import { EditorialResearchProof } from './editorial-research-proof';
 import { EditorialFinalCta } from './editorial-final-cta';
+import { EditorialStickyMobileCta } from './editorial-sticky-mobile-cta';
 import '@/styles/editorial-landing.css';
 
 const EditorialAtmosphere = dynamic(
@@ -29,6 +30,7 @@ export function EditorialLanding() {
       <EditorialAudience />
       <EditorialResearchProof />
       <EditorialFinalCta />
+      <EditorialStickyMobileCta />
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'Privacy Policy' };
+export const metadata = {
+  title: 'Privacy Policy',
+  description:
+    'How CodeCard collects, uses, stores, and protects account, profile, upload, and analytics data.',
+};
 
 export default function PrivacyPage() {
   return (

@@ -74,15 +74,17 @@ export function buildPublicProfileMetadata(input: {
   const headline = normalizePublicMetadataText(input.headline, PUBLIC_METADATA_DESCRIPTION_MAX);
   const bio = normalizePublicMetadataText(input.bio, PUBLIC_METADATA_DESCRIPTION_MAX);
   const description = headline || bio || `${displayName} on CodeCard`;
+  const titleRole = normalizePublicMetadataText(input.headline, 60);
+  const title = titleRole ? `${displayName} — ${titleRole}` : displayName;
   const canonical = buildPublicProfilePath(input.profileSlug);
   const image = socialImageEntry(canonical);
 
   return {
-    title: displayName,
+    title,
     description,
     alternates: { canonical },
     openGraph: {
-      title: displayName,
+      title,
       description,
       url: canonical,
       type: 'profile',
@@ -90,7 +92,7 @@ export function buildPublicProfileMetadata(input: {
     },
     twitter: {
       card: 'summary_large_image',
-      title: displayName,
+      title,
       description,
       images: [image.url],
     },

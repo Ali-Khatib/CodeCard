@@ -34,7 +34,7 @@ describe('buildPublicProfileMetadata', () => {
       bio: 'Unused when headline present',
     });
 
-    expect(metadata.title).toBe('Ada Lovelace');
+    expect(metadata.title).toBe('Ada Lovelace — Analyst');
     expect(metadata.description).toBe('Analyst');
     expect(metadata.alternates?.canonical).toBe('/ada-lovelace');
     expect(metadata.openGraph).toMatchObject({

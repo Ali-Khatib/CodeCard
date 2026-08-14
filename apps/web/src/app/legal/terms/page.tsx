@@ -1,6 +1,10 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'Terms of Service' };
+export const metadata = {
+  title: 'Terms of Service',
+  description:
+    'Terms governing CodeCard accounts, public profiles, uploaded content, and acceptable use of the service.',
+};
 
 export default function TermsPage() {
   return (

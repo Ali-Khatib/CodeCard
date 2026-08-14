@@ -1,6 +1,9 @@
 import { LegalPage } from '@/components/legal-page';
 
-export const metadata = { title: 'Acceptable Use Policy' };
+export const metadata = {
+  title: 'Acceptable Use Policy',
+  description: 'Rules for acceptable use of CodeCard, including prohibited content and abuse.',
+};
 
 export default function AcceptableUsePage() {
   return (

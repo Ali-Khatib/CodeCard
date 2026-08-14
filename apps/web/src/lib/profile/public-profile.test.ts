@@ -34,7 +34,7 @@ describe('mapPublicProfileMetadata', () => {
       display_name: 'Ada',
       headline: 'Builder',
     });
-    expect(withHeadline.title).toBe('Ada');
+    expect(withHeadline.title).toBe('Ada — Builder');
     expect(withHeadline.description).toBe('Builder');
     expect(withHeadline.alternates?.canonical).toBe('/ada');
     expect(withHeadline.openGraph).toMatchObject({ url: '/ada' });

@@ -1,7 +1,7 @@
 import { ResearchIndexPage } from '@/components/research/research-index-page';
 
 export const metadata = {
-  title: 'Research | CodeCard',
+  title: 'Research',
   description:
     'Research papers and sources that inform how CodeCard presents work.',
 };
