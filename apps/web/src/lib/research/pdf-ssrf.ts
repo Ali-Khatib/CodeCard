@@ -38,6 +38,31 @@ function isBlockedIpv4(nums: number[]): boolean {
   return false;
 }
 
+function embeddedIpv4FromIpv6(normalized: string): number[] | null {
+  const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (mapped) return parseIpv4(mapped[1]);
+
+  // NAT64 well-known prefix 64:ff9b::/96 → 64:ff9b::a.b.c.d
+  const nat64Dotted = normalized.match(/^64:ff9b::(\d+\.\d+\.\d+\.\d+)$/i);
+  if (nat64Dotted) return parseIpv4(nat64Dotted[1]);
+  const nat64Hex = normalized.match(/^64:ff9b::([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+  if (nat64Hex) {
+    const hi = Number.parseInt(nat64Hex[1], 16);
+    const lo = Number.parseInt(nat64Hex[2], 16);
+    return [(hi >> 8) & 255, hi & 255, (lo >> 8) & 255, lo & 255];
+  }
+
+  // 6to4 2002:xxyy:zzww::/48
+  const sixToFour = normalized.match(/^2002:([0-9a-f]{1,4}):([0-9a-f]{1,4}):/i);
+  if (sixToFour) {
+    const hi = Number.parseInt(sixToFour[1], 16);
+    const lo = Number.parseInt(sixToFour[2], 16);
+    return [(hi >> 8) & 255, hi & 255, (lo >> 8) & 255, lo & 255];
+  }
+
+  return null;
+}
+
 function isBlockedIpv6(hostname: string): boolean {
   const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '');
   if (normalized === '::1' || normalized === '::') return true;
@@ -45,12 +70,8 @@ function isBlockedIpv6(hostname: string): boolean {
   if (normalized.startsWith('fe8') || normalized.startsWith('fe9') || normalized.startsWith('fea') || normalized.startsWith('feb')) {
     return true; // link-local
   }
-  // IPv4-mapped IPv6 (::ffff:a.b.c.d)
-  const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
-  if (mapped) {
-    const nums = parseIpv4(mapped[1]);
-    return nums ? isBlockedIpv4(nums) : true;
-  }
+  const embedded = embeddedIpv4FromIpv6(normalized);
+  if (embedded) return isBlockedIpv4(embedded);
   return false;
 }
 

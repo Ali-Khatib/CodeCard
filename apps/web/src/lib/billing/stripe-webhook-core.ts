@@ -6,6 +6,7 @@ import { getStripe } from '@/lib/stripe';
 import { createServiceClient } from '@/lib/supabase/server';
 import { requireServerSecret } from '@/lib/security/env';
 import { readBodyWithLimit } from '@/lib/security/request';
+import { logSecurityEvent } from '@/lib/security/security-events';
 
 type BillingEventStatus = 'processing' | 'completed' | 'failed';
 
@@ -173,7 +174,35 @@ async function applySubscriptionSideEffects(
       .maybeSingle();
 
     if (customerError) return { ok: false, code: 'customer_lookup_failed' };
-    if (!customer) return { ok: true, skipped: 'no_customer' };
+
+    const periodStart = new Date(subscription.current_period_start * 1000).toISOString();
+    const periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+    const priceId = subscription.items.data[0]?.price.id ?? '';
+
+    if (!customer) {
+      // Mapping may have been deleted by the owner; still apply status to the
+      // existing subscription row so paid entitlements cannot freeze stale.
+      const { data: existing, error: existingError } = await supabase
+        .from('subscriptions')
+        .select('stripe_subscription_id')
+        .eq('stripe_subscription_id', subscription.id)
+        .maybeSingle();
+      if (existingError) return { ok: false, code: 'subscription_lookup_failed' };
+      if (!existing) return { ok: true, skipped: 'no_customer' };
+
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({
+          stripe_price_id: priceId,
+          status: subscription.status,
+          current_period_start: periodStart,
+          current_period_end: periodEnd,
+          cancel_at_period_end: subscription.cancel_at_period_end,
+        })
+        .eq('stripe_subscription_id', subscription.id);
+      if (updateError) return { ok: false, code: 'subscription_update_failed' };
+      return { ok: true };
+    }
 
     // WS10-T006: do not recreate billing linkage for deleted / mid-deletion accounts.
     const { data: profile, error: profileError } = await supabase
@@ -190,10 +219,10 @@ async function applySubscriptionSideEffects(
         tenant_id: customer.tenant_id,
         user_id: customer.user_id,
         stripe_subscription_id: subscription.id,
-        stripe_price_id: subscription.items.data[0]?.price.id ?? '',
+        stripe_price_id: priceId,
         status: subscription.status,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_start: periodStart,
+        current_period_end: periodEnd,
         cancel_at_period_end: subscription.cancel_at_period_end,
       },
       { onConflict: 'stripe_subscription_id' },
@@ -241,6 +270,7 @@ export async function processStripeWebhookRequest(
   try {
     event = constructEvent(bodyResult.text, signature, getWebhookSecret());
   } catch {
+    logSecurityEvent('STRIPE_WEBHOOK_FAILED', { reason: 'invalid_signature' });
     return apiError('Invalid signature', 400);
   }
 

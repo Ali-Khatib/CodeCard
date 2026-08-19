@@ -254,6 +254,19 @@ function createMemoryDb(state: {
 
       if (table === 'subscriptions') {
         return {
+          select() {
+            return {
+              eq(_col: string, subId: string) {
+                return {
+                  maybeSingle: async () => ({
+                    data:
+                      subscriptions.find((s) => s.stripe_subscription_id === subId) ?? null,
+                    error: null,
+                  }),
+                };
+              },
+            };
+          },
           upsert: async (row: SubscriptionRow) => {
             upsertCount += 1;
             if (failUpsertOnce) {
@@ -273,7 +286,7 @@ function createMemoryDb(state: {
           update(patch: Partial<SubscriptionRow>) {
             return {
               eq: async (_col: string, subId: string) => {
-                cancelCount += 1;
+                if (patch.status === 'canceled') cancelCount += 1;
                 subscriptions = subscriptions.map((s) =>
                   s.stripe_subscription_id === subId ? { ...s, ...patch } : s,
                 );
@@ -562,6 +575,34 @@ describe('WS14-T011 Stripe webhook unit coverage gaps', () => {
     expect(await res.json()).toEqual({ received: true, skipped: 'no_customer' });
     expect(db.upsertCount).toBe(0);
     expect(db.events.get('evt_no_customer')?.status).toBe('completed');
+  });
+
+  it('updates an existing subscription when customer mapping is gone', async () => {
+    const db = createMemoryDb({
+      profiles: [baseProfile],
+      subscriptions: [
+        {
+          tenant_id: 'tenant-1',
+          user_id: 'user-1',
+          stripe_subscription_id: 'sub_test_ws11',
+          stripe_price_id: 'price_test_ws11',
+          status: 'active',
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date().toISOString(),
+          cancel_at_period_end: false,
+        },
+      ],
+    });
+    const payload = buildEvent(
+      'customer.subscription.updated',
+      'evt_stale_mapping',
+      subscriptionObject({ status: 'past_due' }),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ received: true });
+    expect(db.upsertCount).toBe(0);
+    expect(db.subscriptions[0]?.status).toBe('past_due');
   });
 
   it('skips subscription upsert when the mapped profile is gone (no_profile)', async () => {

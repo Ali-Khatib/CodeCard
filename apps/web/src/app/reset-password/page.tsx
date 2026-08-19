@@ -105,7 +105,7 @@ function ResetPasswordForm() {
         return;
       }
 
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'global' });
       router.push('/sign-in?reset=success');
       router.refresh();
     } catch {

@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   PASSWORD_RESET_GENERIC_SUCCESS,
 } from '@/lib/auth/redirect';
@@ -68,6 +70,11 @@ describe('resetPasswordSchema', () => {
 describe('recovery UX helpers', () => {
   it('uses generic success copy', () => {
     expect(PASSWORD_RESET_GENERIC_SUCCESS).toContain('If an account exists');
+  });
+
+  it('revokes all sessions after a successful password reset', () => {
+    const page = readFileSync(resolve(process.cwd(), 'src/app/reset-password/page.tsx'), 'utf8');
+    expect(page).toContain("signOut({ scope: 'global' })");
   });
 
   it('maps client errors to generic messages', () => {

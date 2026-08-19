@@ -14,12 +14,27 @@ export type SignUpOutcome =
  * Interprets supabase.auth.signUp() for Confirm Email enabled vs disabled.
  * A null session with a user is success-pending-confirmation — not session expiry.
  */
+function isAlreadyRegisteredError(message: string | undefined): boolean {
+  const lower = (message ?? '').toLowerCase();
+  return (
+    lower.includes('already registered') ||
+    lower.includes('already been registered') ||
+    lower.includes('user already exists')
+  );
+}
+
 export function resolveSignUpOutcome(args: {
   data: SignUpAuthResult;
   error: { message?: string } | null;
   email: string;
 }): SignUpOutcome {
   if (args.error) {
+    if (isAlreadyRegisteredError(args.error.message)) {
+      return {
+        kind: 'needs_email_confirmation',
+        email: args.email.trim(),
+      };
+    }
     return {
       kind: 'error',
       message: mapAuthFormError(args.error.message, 'sign-up'),
@@ -46,5 +61,5 @@ export function resolveSignUpOutcome(args: {
 export const SIGNUP_CONFIRMATION_TITLE = 'Check your email';
 
 export function signupConfirmationBody(email: string): string {
-  return `We created your account. Open the confirmation link we sent to ${email}. After that you will land on a short setup guide, then you can sign in.`;
+  return `If this email can be used for a new CodeCard, open the confirmation link sent to ${email}. If you already have an account, sign in instead.`;
 }

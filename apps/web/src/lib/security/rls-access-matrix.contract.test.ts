@@ -87,7 +87,7 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
     expect(matrix).toContain('circle_viewer_state');
     expect(matrix).toContain('saved_connections');
     expect(matrix).toContain('connection_notes');
-    expect(matrix).toContain('Target cannot see saver');
+    expect(matrix).toContain('SELECT + INSERT');
     expect(matrix).toContain('Viewer-private');
     expect(matrix).toContain('Manual deploy only');
   });
@@ -117,6 +117,18 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
     expect(sql).toContain('REVOKE ALL ON public.circle_activity FROM anon');
     expect(sql).toContain('REVOKE ALL ON public.circle_viewer_state FROM anon');
     expect(sql).toContain('REVOKE ALL ON TABLE account_deletion_operations FROM authenticated');
+  });
+
+  it('limits subscription_customers owner writes to SELECT and INSERT', () => {
+    expect(sql).toContain('DROP POLICY IF EXISTS subscription_customers_owner');
+    expect(sql).toContain('CREATE POLICY subscription_customers_owner_select');
+    expect(sql).toContain('CREATE POLICY subscription_customers_owner_insert');
+    expect(sql).toMatch(
+      /CREATE POLICY subscription_customers_owner_select[\s\S]*FOR SELECT/,
+    );
+    expect(sql).toMatch(
+      /CREATE POLICY subscription_customers_owner_insert[\s\S]*FOR INSERT/,
+    );
   });
 
   it('does not grant broad USING(true) SELECT on private owner tables', () => {

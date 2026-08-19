@@ -6,8 +6,11 @@ describe('mapAuthFormError', () => {
     expect(mapAuthFormError('Invalid login credentials', 'sign-in')).toMatch(/don’t match/i);
   });
 
-  it('maps already-registered accounts', () => {
-    expect(mapAuthFormError('User already registered', 'sign-up')).toMatch(/already exists/i);
+  it('maps already-registered accounts without confirming existence', () => {
+    expect(mapAuthFormError('User already registered', 'sign-up')).not.toMatch(
+      /already exists/i,
+    );
+    expect(mapAuthFormError('User already registered', 'sign-up')).toMatch(/sign in/i);
   });
 
   it('hides vendor internals', () => {

@@ -7,6 +7,7 @@ import {
   resolveGlobalAdminAuthorization,
   type AdminAuthorizationDecision,
 } from '@/lib/security/admin-authorization';
+import { logSecurityEvent } from '@/lib/security/security-events';
 
 /**
  * WS11-T002 — Server-side route gate for the `/admin` tree.
@@ -80,6 +81,7 @@ export async function enforceGlobalAdminAccess(): Promise<AdminAuthorizationDeci
     if (decision.reason === 'misconfigured') {
       console.error('[admin-gate] authorization misconfigured; failing closed');
     }
+    logSecurityEvent('ADMIN_ACCESS_DENIED', { reason: decision.reason });
     forbidden();
   }
 

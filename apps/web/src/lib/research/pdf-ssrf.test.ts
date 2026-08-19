@@ -39,6 +39,8 @@ describe('pdf-ssrf hardening', () => {
     expect(isBlockedHostnameOrIp('10.1.2.3')).toBe(true);
     expect(isBlockedHostnameOrIp('169.254.169.254')).toBe(true);
     expect(isBlockedHostnameOrIp('arxiv.org')).toBe(false);
+    expect(isBlockedHostnameOrIp('64:ff9b::10.0.0.1')).toBe(true);
+    expect(isBlockedHostnameOrIp('2002:0a00:0001::1')).toBe(true);
   });
 
   it('validates PDF magic bytes and content types', () => {

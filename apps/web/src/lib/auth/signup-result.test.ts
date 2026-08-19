@@ -34,17 +34,18 @@ describe('resolveSignUpOutcome', () => {
     expect(outcome).toEqual({ kind: 'authenticated' });
   });
 
-  it('maps real signup errors without claiming session expiry', () => {
+  it('treats already-registered signup like confirmation so existence is not revealed', () => {
     const outcome = resolveSignUpOutcome({
       data: { user: null, session: null },
       error: { message: 'User already registered' },
       email: 'a@example.com',
     });
-    expect(outcome.kind).toBe('error');
-    if (outcome.kind === 'error') {
-      expect(outcome.message).toMatch(/already exists/i);
-      expect(outcome.message).not.toBe(SESSION_EXPIRED_MESSAGE);
-    }
+    expect(outcome).toEqual({
+      kind: 'needs_email_confirmation',
+      email: 'a@example.com',
+    });
+    expect(signupConfirmationBody('a@example.com')).not.toMatch(/already exists/i);
+    expect(signupConfirmationBody('a@example.com')).toContain('a@example.com');
   });
 
   it('does not treat missing user as authenticated or confirmation', () => {

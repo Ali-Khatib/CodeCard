@@ -28,7 +28,8 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     lower.includes('already been registered') ||
     lower.includes('user already exists')
   ) {
-    return 'An account with this email already exists. Sign in instead.';
+    // Same outcome as a new signup pending confirmation — do not confirm account existence.
+    return 'If this email can be used, check your inbox. If you already have an account, sign in instead.';
   }
 
   if (
