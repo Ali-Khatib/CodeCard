@@ -1,9 +1,15 @@
 'use client';
 
+import { useRef } from 'react';
+import { useGSAP } from '@gsap/react';
 import {
   FullScreenScrollFX,
   type FullScreenFXSection,
 } from '@/components/ui/full-screen-scroll-fx';
+import {
+  ensureGsapPlugins,
+  gsap,
+} from '@/components/motion/gsap-runtime';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 const U = (id: string) =>
@@ -123,6 +129,39 @@ const SECTIONS: FullScreenFXSection[] = STORIES.map((story, index) => ({
  */
 export function EditorialFeatureWalkthrough() {
   const reduced = useReducedMotion();
+  const introRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (reduced) return;
+      ensureGsapPlugins();
+      const intro = introRef.current;
+      if (!intro) return;
+
+      const lines = intro.querySelectorAll(
+        '.cc-ed__eyebrow, .cc-ed__lead, .cc-ed__sub, .cc-ed__lede',
+      );
+      // Play once on enter — do not scrub color or clip against the wheel.
+      gsap.fromTo(
+        lines,
+        { y: 36, clipPath: 'inset(0% 0% 100% 0%)' },
+        {
+          y: 0,
+          clipPath: 'inset(0% 0% 0% 0%)',
+          duration: 0.85,
+          ease: 'power3.out',
+          stagger: 0.08,
+          overwrite: true,
+          scrollTrigger: {
+            trigger: intro,
+            start: 'top 82%',
+            once: true,
+          },
+        },
+      );
+    },
+    { scope: introRef, dependencies: [reduced], revertOnUpdate: true },
+  );
 
   return (
     <section
@@ -132,7 +171,7 @@ export function EditorialFeatureWalkthrough() {
       data-testid="editorial-feature-walkthrough"
       aria-labelledby="editorial-walkthrough-heading"
     >
-      <div className="cc-ed-walk__intro">
+      <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">What CodeCard is</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
           <span className="cc-ed__lead">ONE LIVING</span>

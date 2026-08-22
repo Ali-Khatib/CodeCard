@@ -28,7 +28,7 @@
   --ed-fg: #efedeb;
   color: var(--ed-fg);
   background: var(--ed-bg);
-  transition: background-color 0.9s ease, color 0.55s ease;
+  transition: background-color 0.9s ease;
 }
 
 /* Room for sticky mobile CTA so finale content stays reachable. */
@@ -99,6 +99,7 @@
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil {
   pointer-events: auto;
+  color: var(--ed-ink, #232324);
 }
 
 /* Pill nav — frosted glass on non-editorial pages. Editorial uses tone rules below. */
@@ -115,10 +116,10 @@
 
 /* Collapsed expand control must stay a clear ghost over Crash Course titles. */
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed,
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -132,8 +133,8 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-sh
 }
 
 /* Dark chapters — light frosted glass (never solid page color) */
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   background: color-mix(in srgb, #efedeb 14%, transparent);
   border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
   box-shadow:
@@ -143,43 +144,43 @@ html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-marketing-
   -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
   color: #efedeb;
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
   background: #efedeb;
   color: var(--ed-dark, #202020);
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a.cc-btn-pill-demo,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a.cc-btn-pill-demo,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
   background: color-mix(in srgb, #efedeb 10%, transparent);
   color: #efedeb;
   border: 1px solid color-mix(in srgb, #efedeb 26%, transparent);
   box-shadow: none;
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
   background: var(--ed-accent, #a86f55);
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
   border-color: color-mix(in srgb, #efedeb 28%, transparent);
   color: #efedeb;
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
   background: color-mix(in srgb, #101010 55%, transparent);
 }
 
 /* Cream / light chapters — white frosted glass */
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   background: color-mix(in srgb, #ffffff 58%, transparent);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
   box-shadow:
@@ -189,34 +190,34 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-sh
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
   background: var(--ed-dark, #202020);
   color: #efedeb;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
   background: transparent;
   color: var(--ed-ink, #232324);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   box-shadow: none;
 }
 
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
-html:not([data-nav-tone='light']) .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, #efedeb 16%, transparent);
   border-color: color-mix(in srgb, #efedeb 34%, transparent);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, var(--ed-ink, #232324) 4%, transparent);
   border-color: color-mix(in srgb, var(--ed-ink, #232324) 24%, transparent);
 }
@@ -230,16 +231,16 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href=
   font-weight: 560;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
   background: var(--ed-accent, #a86f55);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
   border-color: color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
   background: color-mix(in srgb, #ffffff 78%, transparent);
 }
 
@@ -350,8 +351,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   text-wrap: unset;
 }
 
-.cc-ed-finale__inner .cc-ed__display--xl,
-.cc-ed-statement .cc-ed__display--xl {
+.cc-ed-finale__inner .cc-ed__display--xl {
   font-size: clamp(2.55rem, 5.2vw + 0.75rem, 5.75rem);
 }
 
@@ -368,8 +368,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 }
 
 @media (min-width: 640px) {
-  .cc-ed-statement .cc-ed__lead,
-  .cc-ed-statement .cc-ed__sub,
   .cc-ed-network-bridge .cc-ed__lead,
   .cc-ed-network-bridge .cc-ed__sub,
   .cc-ed-demo-embed__intro .cc-ed__lead,
@@ -1154,12 +1152,12 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 .cc-ed-statement__slides {
   position: relative;
   width: 100%;
-  max-width: min(58rem, 100%);
+  max-width: min(72rem, 100%);
   min-height: min(42vh, 28rem);
 }
 
 .cc-ed-statement__beat {
-  max-width: min(58rem, 100%);
+  max-width: min(72rem, 100%);
   width: 100%;
   text-align: left;
   overflow: hidden;
@@ -1175,9 +1173,20 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   margin-inline: 0;
 }
 
-.cc-ed-statement .cc-ed__display {
-  font-size: clamp(2.75rem, 6.5vw + 1rem, 6.25rem);
-  line-height: 0.94;
+.cc-ed-statement .cc-ed__display,
+.cc-ed-statement .cc-ed__display--xl {
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(2.05rem, 4vw + 0.55rem, 4.65rem);
+  line-height: 0.98;
+  text-wrap: pretty;
+}
+
+.cc-ed-statement .cc-ed__lead,
+.cc-ed-statement .cc-ed__sub {
+  white-space: normal;
+  overflow-wrap: break-word;
+  padding-right: 0.08em;
 }
 
 .cc-ed-statement .cc-ed__lede {
@@ -1215,6 +1224,33 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   padding-bottom: clamp(2rem, 5vh, 3rem);
   text-align: center;
   scroll-margin-top: var(--cc-ed-nav-clearance);
+}
+
+/* Never inherit hero's light --ed-fg — this block lives on cream. */
+.cc-ed .cc-ed-walk__intro,
+.cc-ed .cc-ed-walk__intro .cc-ed__display,
+.cc-ed .cc-ed-walk__intro .cc-ed__lead {
+  color: var(--ed-ink, #232324);
+}
+
+.cc-ed .cc-ed-walk__intro .cc-ed__sub {
+  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 58%, var(--ed-ink, #232324));
+}
+
+.cc-ed .cc-ed-walk__intro .cc-ed__eyebrow {
+  color: color-mix(in srgb, var(--ed-ink, #232324) 52%, transparent);
+}
+
+.cc-ed .cc-ed-walk__intro .cc-ed__lede {
+  color: color-mix(in srgb, var(--ed-ink, #232324) 88%, transparent);
+}
+
+.cc-ed-walk__intro .cc-ed__display,
+.cc-ed-walk__intro .cc-ed__eyebrow,
+.cc-ed-walk__intro .cc-ed__lead,
+.cc-ed-walk__intro .cc-ed__sub,
+.cc-ed-walk__intro .cc-ed__lede {
+  overflow: hidden;
 }
 
 /* Continuous color wash — no hard cream / charcoal seam */
@@ -2066,7 +2102,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   display: flex;
   align-items: center;
   min-height: min(48vh, 32rem);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-ed-hero-scene--enhanced .cc-ed-statement__beat {
@@ -2174,31 +2210,34 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   padding-bottom: clamp(1rem, 3vh, 2rem);
 }
 
-/* —— Scroll-pinned research story —— */
+/* —— In-flow research story (never stack slides) —— */
 .cc-ed-research-story {
   position: relative;
+  display: grid;
+  gap: clamp(3.5rem, 12vh, 7rem);
   width: 100%;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+  padding-bottom: clamp(2rem, 6vh, 4rem);
 }
 
-.cc-ed-research-story__pin {
+.cc-ed-research-story__beat {
   position: relative;
   display: grid;
-  place-items: center;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding: clamp(4.5rem, 11vh, 6.5rem) clamp(1.25rem, 4vw, 3.5rem)
-    clamp(5rem, 12vh, 7rem);
+  gap: clamp(2.25rem, 7vh, 4rem);
+  width: min(46rem, 100%);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 5vh, 3rem) 0;
   overflow: hidden;
 }
 
 .cc-ed-research-story__bg-index {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 42%;
   z-index: 0;
   transform: translate(-50%, -50%);
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(10rem, 24vw, 18rem);
+  font-size: clamp(8rem, 22vw, 16rem);
   font-weight: 400;
   line-height: 0.82;
   letter-spacing: -0.06em;
@@ -2207,23 +2246,9 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   user-select: none;
 }
 
-.cc-ed-research-story__viewport {
-  position: relative;
-  z-index: 2;
-  width: min(46rem, 100%);
-  min-height: clamp(18rem, 44vh, 28rem);
-  margin-inline: auto;
-}
-
-.cc-ed-research-story__track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
 .cc-ed-research-story__slide {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2232,7 +2257,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   border: 0;
   background: transparent;
   box-shadow: none;
-  will-change: transform, opacity;
 }
 
 .cc-ed-research-story__panel {
@@ -2348,62 +2372,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   font-weight: 500;
 }
 
-.cc-ed-research-story__progress {
-  position: absolute;
-  left: clamp(1.25rem, 4vw, 3.5rem);
-  right: clamp(1.25rem, 4vw, 3.5rem);
-  bottom: clamp(1.25rem, 4vh, 2rem);
-  z-index: 3;
-  display: grid;
-  gap: 0.65rem;
-}
-
-.cc-ed-research-story__progress-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--ed-mute) 78%, var(--ed-ink));
-}
-
-.cc-ed-research-story__progress-track {
-  height: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ed-ink) 10%, transparent);
-  overflow: hidden;
-}
-
-.cc-ed-research-story__progress-bar {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--ed-accent, #e95a0b),
-    color-mix(in srgb, var(--ed-accent, #e95a0b) 72%, #ffb760)
-  );
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-.cc-ed-research-story--static .cc-ed-research-story__static-grid {
-  display: grid;
-  gap: clamp(1.25rem, 3vh, 2rem);
-  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  padding-bottom: clamp(1rem, 3vh, 2rem);
-}
-
-.cc-ed-research-story--static .cc-ed-research-story__slide {
-  position: relative;
-  inset: auto;
-  opacity: 1 !important;
-  transform: none !important;
-  filter: none !important;
-}
-
 @media (max-width: 767px) {
   .cc-ed-research-story__bg-index {
     font-size: clamp(7rem, 32vw, 10rem);
@@ -2411,11 +2379,6 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 
   .cc-ed-research-story__headline-line {
     font-size: clamp(1.85rem, 8.5vw, 2.65rem);
-  }
-
-  .cc-ed-research-story__pin {
-    padding-top: clamp(4rem, 10vh, 5.5rem);
-    padding-bottom: clamp(4.5rem, 11vh, 6rem);
   }
 }
 
@@ -2678,9 +2641,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
 }
 
 .cc-ed-demo-preview__invitation-bar {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
+  position: relative;
   z-index: 4;
   display: flex;
   flex-direction: column;

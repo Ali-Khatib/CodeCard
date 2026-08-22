@@ -245,9 +245,9 @@ export function SmoothScrollProvider({
         ref={lenisRef}
         options={{
           autoRaf: false,
-          lerp: 0.1,
+          lerp: 0.12,
           smoothWheel: true,
-          wheelMultiplier: 0.85,
+          wheelMultiplier: 0.92,
           touchMultiplier: 0.92,
           syncTouch: false,
         }}

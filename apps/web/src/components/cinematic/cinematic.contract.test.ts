@@ -75,6 +75,7 @@ describe('Editorial product landing contract', () => {
       'src/components/landing/editorial/editorial-research-scene.tsx',
     );
     const story = read('src/components/ui/editorial-research-story.tsx');
+    const css = read('src/styles/editorial-landing.css');
     expect(proof).toContain('EditorialResearchStory');
     expect(story).toContain('EditorialResearchStory');
     expect(proof).toContain('THEY DO NOT');
@@ -85,7 +86,13 @@ describe('Editorial product landing contract', () => {
     expect(proof).toContain('The research');
     expect(story).toContain('The solution');
     expect(story).toContain('data-research-reveal');
-    expect(story).toContain('cc-ed-research-story__progress');
+    expect(story).toContain('cc-ed-research-story__beat');
+    expect(story).not.toContain('Keep scrolling');
+    expect(story).not.toContain('pin: true');
+    expect(story).not.toContain('autoAlpha');
+    expect(css).toContain('.cc-ed-research-story__beat');
+    expect(css).not.toContain('.cc-ed-research-story__pin');
+    expect(css).not.toContain('Keep scrolling');
     expect(proof).not.toContain('TextParallaxContent');
     expect(proof).not.toContain('images.unsplash.com');
     expect(proof).not.toContain('photo-1450101499163-c8848c66ca85');
@@ -107,6 +114,9 @@ describe('Editorial product landing contract', () => {
     expect(demo).toContain('cc-ed-walk__bridge--out');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
     expect(css).toContain('.cc-ed-demo-preview__device');
+    const nextConfig = read('next.config.ts');
+    expect(nextConfig).toContain("source: '/demo/:path*'");
+    expect(nextConfig).toContain("frame-ancestors 'self'");
     expect(css).toContain('.cc-ed-hero-scene');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');

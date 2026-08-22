@@ -323,6 +323,7 @@
   height: 62vh;
   overflow: hidden;
   position: relative;
+  isolation: isolate;
 }
 
 .fx-featured {

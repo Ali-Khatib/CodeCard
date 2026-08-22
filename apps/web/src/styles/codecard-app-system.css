@@ -343,7 +343,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   gap: 12px;
   border-bottom: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
   background: color-mix(in srgb, var(--app-paper) 82%, transparent);
-  padding: 16px 40px;
+  padding: 16px 40px 16px 56px;
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
 }
@@ -457,7 +457,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 520;
-  line-height: 0.98;
+  line-height: 1.15;
   letter-spacing: -0.055em;
   color: var(--app-ink);
 }
@@ -1708,7 +1708,7 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-root--embedded .cc-app-topbar {
   gap: 10px;
-  padding: 14px 16px;
+  padding: 14px 16px 14px 56px;
 }
 
 .cc-app-root--embedded .cc-app-content {

@@ -94,9 +94,10 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
         scrollTrigger: {
           trigger: track,
           start: 'top top',
-          end: mobile ? '+=240%' : '+=300%',
-          scrub: mobile ? 0.85 : 1.05,
+          end: mobile ? '+=170%' : '+=210%',
+          scrub: 0.4,
           pin: stage,
+          fastScrollEnd: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           markers: gsapMarkersEnabled(),
@@ -135,23 +136,23 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       }
 
       beats.forEach((beat, i) => {
-        const start = 0.26 + i * 0.22;
+        const start = 0.28 + i * 0.22;
         tl.fromTo(
           beat,
-          { autoAlpha: 0, y: 40, clipPath: 'inset(0% 0% 100% 0%)' },
+          { autoAlpha: 0, y: 28, clipPath: 'inset(0% 0% 100% 0%)' },
           {
             autoAlpha: 1,
             y: 0,
             clipPath: 'inset(0% 0% 0% 0%)',
-            duration: 0.12,
+            duration: 0.1,
           },
           start,
         );
         if (i < BEAT_COUNT - 1) {
           tl.to(
             beat,
-            { autoAlpha: 0, y: -28, duration: 0.08 },
-            start + 0.18,
+            { autoAlpha: 0, y: -20, duration: 0.08 },
+            start + 0.12,
           );
         }
       });

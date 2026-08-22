@@ -39,6 +39,15 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(css).toContain('flex: 1 1 0');
   });
 
+  it('keeps workspace page copy visible instead of waiting on opacity fade-ins', () => {
+    const fade = read('src/components/dashboard/fade-in-view.tsx');
+    const css = read('src/styles/codecard-app-system.css');
+    expect(fade).not.toContain('opacity: 0');
+    expect(fade).not.toContain('useInView');
+    expect(css).toContain('padding: 16px 40px 16px 56px');
+    expect(css).toContain('padding: 14px 16px 14px 56px');
+  });
+
   it('does not claim Billing is a primary mobile tab while Settings remains the entry', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
     const navBlock = shell.slice(

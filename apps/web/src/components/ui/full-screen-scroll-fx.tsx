@@ -81,7 +81,7 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
-const SCRUB_SMOOTH = 0.42;
+const SCRUB_SMOOTH = 0.28;
 
 /** Smoothstep for crossfades tied directly to scroll progress. */
 function smoothCrossfade(t: number) {
@@ -298,10 +298,20 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
 
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
+        const isStory = sections[i]?.content != null;
         let opacity = 0;
         let y = 0;
         if (from === to) {
           opacity = i === from ? 1 : 0;
+        } else if (isStory) {
+          // Dense story copy cannot stack — outgoing out, then incoming in.
+          if (i === from) {
+            opacity = blend < 0.3 ? 1 - blend / 0.3 : 0;
+            y = -22 * Math.min(1, blend / 0.3);
+          } else if (i === to) {
+            opacity = blend > 0.38 ? (blend - 0.38) / 0.62 : 0;
+            y = 18 * (1 - Math.min(1, Math.max(0, (blend - 0.38) / 0.62)));
+          }
         } else if (i === from) {
           opacity = 1 - blend;
           y = -blend * 10;
@@ -309,10 +319,13 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
           opacity = blend;
           y = (1 - blend) * 12;
         }
-        const visible = opacity > 0.02;
-        gsap.set(panel, { opacity, y });
-        panel.style.visibility = visible ? 'visible' : 'hidden';
-        panel.style.pointerEvents = visible && i === to ? 'auto' : 'none';
+        gsap.set(panel, {
+          autoAlpha: opacity,
+          y,
+          zIndex: i === to || (from === to && i === from) ? 2 : 1,
+        });
+        panel.style.pointerEvents =
+          opacity > 0.6 && i === (blend < 0.5 ? from : to) ? 'auto' : 'none';
       });
 
       wordRefs.current.forEach((words, sIdx) => {
@@ -409,7 +422,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
           if (!panel) return;
           if (sections[sIdx]?.content != null) {
             gsap.set(panel, {
-              opacity: sIdx === index ? 1 : 0,
+              autoAlpha: sIdx === index ? 1 : 0,
               y: sIdx === index ? 0 : 16,
             });
           }
@@ -442,6 +455,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         pin: fixed,
         pinSpacing: true,
         scrub: SCRUB_SMOOTH,
+        fastScrollEnd: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
