@@ -57,6 +57,9 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'CodeCard',
   },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export const viewport: Viewport = {
@@ -76,7 +79,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-theme="original" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#fcf1e7" />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body

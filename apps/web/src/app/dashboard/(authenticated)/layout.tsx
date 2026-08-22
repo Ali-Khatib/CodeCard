@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { userNeedsEmailVerification } from '@/lib/auth/email-verification';
+import { userHasPasswordRecoveryPrivilege } from '@/lib/auth/recovery-session';
 import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { getCircleUnreadSummary } from '@/lib/circle/circle-read-state-core';
 
@@ -19,6 +20,10 @@ export default async function AuthenticatedDashboardLayout({
   if (!user) {
     const pathname = (await headers()).get('x-pathname') ?? '/dashboard';
     redirect(buildSignInHref(pathname));
+  }
+
+  if (userHasPasswordRecoveryPrivilege(user)) {
+    redirect('/reset-password');
   }
 
   const [{ data: profile }, circleUnread] = await Promise.all([

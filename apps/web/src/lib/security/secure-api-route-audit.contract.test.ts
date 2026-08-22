@@ -40,6 +40,7 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/reports/route.ts',
         'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
+        'auth/complete-password-reset/route.ts',
         'auth/oauth-preflight/route.ts',
         'dmca/route.ts',
         'internal/rate-limit-verify/route.ts',

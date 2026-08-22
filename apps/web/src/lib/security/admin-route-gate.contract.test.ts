@@ -39,6 +39,8 @@ describe('WS11-T002 admin route gate contracts', () => {
     expect(gate).not.toMatch(/user_metadata/);
     expect(gate).not.toMatch(/tenant_role|tenantRole/);
     // Identity comes only from the verified server user — never request input.
+    // Recovery privilege is also read from that verified user (app_metadata flag).
+    expect(gate).toContain('userHasPasswordRecoveryPrivilege');
     expect(gate).not.toMatch(/headers\(|cookies\(|searchParams|request\./);
     expect(gate).not.toContain('createServiceClient');
   });
@@ -80,7 +82,11 @@ describe('WS11-T002 admin route gate contracts', () => {
 
   it('proxy keeps coarse auth routing only (no metadata role decision)', () => {
     expect(proxy).toContain("pathname.startsWith('/admin')");
-    expect(proxy).not.toMatch(/app_metadata|user_metadata|role/);
+    // Recovery privilege may reference app_metadata in comments / helpers, but
+    // proxy must not make admin role decisions from metadata.
+    expect(proxy).not.toMatch(/user_metadata/);
+    expect(proxy).not.toMatch(/app_metadata\.role|role\s*===\s*['"]admin['"]/);
+    expect(proxy).toContain('userHasPasswordRecoveryPrivilege');
   });
 
   it('documents enforcement location and that APIs still need their own checks', () => {

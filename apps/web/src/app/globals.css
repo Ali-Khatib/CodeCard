@@ -117,6 +117,7 @@ svg {
   --hume-periwinkle: #c3c0f2;
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
+  --hume-copper: #a86f55;
   --ink: #232324;
   --smoke: #5c5856;
   --muted: #5c5856;
@@ -252,6 +253,8 @@ svg {
   --muted: #fff9f3;
   --muted-foreground: #5c5856;
   --accent-foreground: #222222;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
   --success-foreground: #574853;
   --input: rgba(34, 34, 34, 0.08);
   --ring: #c094e4;
@@ -337,6 +340,7 @@ select,
   --hume-periwinkle: #c3c0f2;
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
+  --hume-copper: #a86f55;
   --ink: #232324;
   --smoke: #5c5856;
   --line-soft: #c2bcbb;

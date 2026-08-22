@@ -94,18 +94,24 @@ function ResetPasswordForm() {
         return;
       }
 
-      const { error: updateError } = await withAuthNetworkRetry(() =>
-        supabase.auth.updateUser({
-          password: parsed.data.password,
-        }),
-      );
+      const response = await withAuthNetworkRetry(async () => {
+        const res = await fetch('/api/auth/complete-password-reset', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            password: parsed.data.password,
+            confirmPassword: parsed.data.confirmPassword,
+          }),
+        });
+        return res;
+      });
 
-      if (updateError) {
+      if (!response.ok) {
         setError(mapPasswordResetClientError());
         return;
       }
 
-      await supabase.auth.signOut({ scope: 'global' });
       router.push('/sign-in?reset=success');
       router.refresh();
     } catch {

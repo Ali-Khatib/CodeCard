@@ -153,13 +153,13 @@ export function EditorialFeatureWalkthrough() {
           showProgress
           showEnd={false}
           bgTransition="fade"
-          durations={{ change: 1.05, snap: 1400 }}
+          durations={{ change: 0.88, snap: 950 }}
           colors={{
             text: 'rgba(245, 243, 240, 0.95)',
             overlay: 'rgba(32, 32, 36, 0.22)',
             pageBg: '#202020',
             stageBg: '#202020',
-            accent: 'var(--ed-iris, #c094e4)',
+            accent: 'var(--ed-accent, #a86f55)',
           }}
           fontFamily='var(--font-display), "Instrument Serif", Georgia, serif'
           header={

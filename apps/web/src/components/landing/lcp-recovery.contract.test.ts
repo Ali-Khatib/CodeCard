@@ -28,6 +28,7 @@ describe('Phase 0C LCP recovery contracts', () => {
     expect(product).toContain('EditorialLanding');
     expect(landing).toContain("from 'next/dynamic'");
     expect(landing).toContain('EditorialAtmosphere');
+    expect(landing).toContain('EditorialHeroScene');
     expect(landing).toContain('EditorialHero');
     expect(landing).not.toContain('AudienceBounceCards');
     expect(landing).not.toContain('HowItWorksSection');

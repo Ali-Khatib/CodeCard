@@ -74,7 +74,12 @@ describe('recovery UX helpers', () => {
 
   it('revokes all sessions after a successful password reset', () => {
     const page = readFileSync(resolve(process.cwd(), 'src/app/reset-password/page.tsx'), 'utf8');
-    expect(page).toContain("signOut({ scope: 'global' })");
+    const api = readFileSync(
+      resolve(process.cwd(), 'src/app/api/auth/complete-password-reset/route.ts'),
+      'utf8',
+    );
+    expect(page).toContain('/api/auth/complete-password-reset');
+    expect(api).toContain("signOut({ scope: 'global' })");
   });
 
   it('maps client errors to generic messages', () => {

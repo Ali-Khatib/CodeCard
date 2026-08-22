@@ -29,7 +29,7 @@ type EventRow = {
 };
 
 type CustomerRow = { user_id: string; tenant_id: string; stripe_customer_id: string };
-type ProfileRow = { id: string; owner_user_id: string };
+type ProfileRow = { id: string; owner_user_id: string; tenant_id: string };
 type SubscriptionRow = {
   tenant_id: string;
   user_id: string;
@@ -324,7 +324,11 @@ const baseCustomer: CustomerRow = {
   tenant_id: 'tenant_a',
   stripe_customer_id: 'cus_test_ws11',
 };
-const baseProfile: ProfileRow = { id: 'profile_a', owner_user_id: 'user_a' };
+const baseProfile: ProfileRow = {
+  id: 'profile_a',
+  owner_user_id: 'user_a',
+  tenant_id: 'tenant_a',
+};
 
 async function handle(request: NextRequest, db: ReturnType<typeof createMemoryDb>) {
   return processStripeWebhookRequest(request, {
@@ -445,6 +449,27 @@ describe('WS11-T011 Stripe webhook hardening', () => {
     expect(db.subscriptions).toHaveLength(1);
     expect(db.subscriptions[0]?.stripe_subscription_id).toBe('sub_test_ws11');
     expect(db.subscriptions[0]?.status).toBe('active');
+    expect(db.subscriptions[0]?.tenant_id).toBe('tenant_a');
+  });
+
+  it('rejects customer mappings whose tenant_id does not match the owner profile', async () => {
+    const poisoned: CustomerRow = {
+      user_id: 'user_a',
+      tenant_id: 'tenant_victim_b',
+      stripe_customer_id: 'cus_test_ws11',
+    };
+    const db = createMemoryDb({ customers: [poisoned], profiles: [baseProfile] });
+    const payload = buildEvent(
+      'customer.subscription.created',
+      'evt_tenant_poison',
+      subscriptionObject(),
+    );
+    const res = await handle(signedRequest(payload), db);
+    expect(res.status).toBe(500);
+    expect(db.upsertCount).toBe(0);
+    expect(db.subscriptions).toHaveLength(0);
+    expect(db.events.get('evt_tenant_poison')?.status).toBe('failed');
+    expect(db.events.get('evt_tenant_poison')?.failure_code).toBe('tenant_mismatch');
   });
 
   it('delivers the same event twice with only one mutation', async () => {

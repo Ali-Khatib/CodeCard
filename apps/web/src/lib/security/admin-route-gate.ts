@@ -2,6 +2,7 @@ import 'server-only';
 
 import { forbidden, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { userHasPasswordRecoveryPrivilege } from '@/lib/auth/recovery-session';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import {
   resolveGlobalAdminAuthorization,
@@ -67,6 +68,10 @@ export async function enforceGlobalAdminAccess(): Promise<AdminAuthorizationDeci
 
   if (redirectToSignIn || !user) {
     redirect(SIGN_IN_REDIRECT);
+  }
+
+  if (userHasPasswordRecoveryPrivilege(user)) {
+    redirect('/reset-password');
   }
 
   const decision = resolveGlobalAdminAuthorization({

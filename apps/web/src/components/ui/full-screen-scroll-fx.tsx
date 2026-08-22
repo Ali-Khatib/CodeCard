@@ -81,21 +81,41 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
+const SECTION_EASE = 'power2.inOut';
+
 function scrollToY(y: number, durationMs: number) {
   if (typeof window === 'undefined') return;
   const root = document.documentElement as HTMLElement & {
-    lenis?: { scrollTo: (v: number, opts?: { duration?: number }) => void };
+    lenis?: {
+      scrollTo: (
+        v: number,
+        opts?: { duration?: number; easing?: (t: number) => number },
+      ) => void;
+    };
   };
   const lenis =
     root.lenis ??
     (window as unknown as {
-      lenis?: { scrollTo: (v: number, opts?: { duration?: number }) => void };
+      lenis?: {
+        scrollTo: (
+          v: number,
+          opts?: { duration?: number; easing?: (t: number) => number },
+        ) => void;
+      };
     }).lenis;
   if (lenis?.scrollTo) {
-    lenis.scrollTo(y, { duration: durationMs / 1000 });
+    lenis.scrollTo(y, {
+      duration: durationMs / 1000,
+      easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+    });
     return;
   }
   window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+function indexFromProgress(progress: number, sectionCount: number) {
+  if (sectionCount <= 1) return 0;
+  return clamp(Math.round(progress * (sectionCount - 1)), 0, sectionCount - 1);
 }
 
 export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
@@ -250,9 +270,30 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
     };
 
     const changeSection = (to: number) => {
-      if (to === lastIndexRef.current || isAnimatingRef.current) return;
+      if (to === lastIndexRef.current) return;
       const from = lastIndexRef.current;
+      lastIndexRef.current = to;
       const down = to > from;
+      const skipping = Math.abs(to - from) > 1;
+
+      featuredRefs.current.forEach((panel) => {
+        if (panel) gsap.killTweensOf(panel);
+      });
+      bgRefs.current.forEach((bg) => {
+        if (bg) gsap.killTweensOf(bg);
+      });
+      wordRefs.current.forEach((words) => {
+        words.filter(Boolean).forEach((word) => gsap.killTweensOf(word));
+      });
+      if (leftTrackRef.current) gsap.killTweensOf(leftTrackRef.current);
+      if (rightTrackRef.current) gsap.killTweensOf(rightTrackRef.current);
+      leftItemRefs.current.forEach((el) => {
+        if (el) gsap.killTweensOf(el);
+      });
+      rightItemRefs.current.forEach((el) => {
+        if (el) gsap.killTweensOf(el);
+      });
+
       isAnimatingRef.current = true;
 
       if (!isControlled) setLocalIndex(to);
@@ -268,27 +309,42 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
 
       const D = motionOff ? 0.01 : (durations.change ?? 0.7);
 
+      if (skipping) {
+        featuredRefs.current.forEach((panel, i) => {
+          if (!panel) return;
+          gsap.set(panel, { opacity: i === to ? 1 : 0, y: 0 });
+        });
+        bgRefs.current.forEach((bg, i) => {
+          if (!bg) return;
+          gsap.set(bg, { opacity: i === to ? 1 : 0, scale: 1, yPercent: 0 });
+        });
+      }
+
       // Rich story panels: fade the whole block. String titles: word masks.
       const fromHasContent = sections[from]?.content != null;
       const toHasContent = sections[to]?.content != null;
       if (fromHasContent || toHasContent) {
         const outPanel = featuredRefs.current[from];
         const inPanel = featuredRefs.current[to];
-        if (outPanel) {
+        if (outPanel && !skipping) {
           gsap.to(outPanel, {
             opacity: 0,
-            y: down ? -18 : 18,
-            duration: D * 0.55,
-            ease: 'power3.out',
+            y: down ? -10 : 10,
+            duration: D * 0.5,
+            ease: SECTION_EASE,
           });
+        } else if (outPanel && skipping) {
+          gsap.set(outPanel, { opacity: 0, y: 0 });
         }
         if (inPanel) {
-          gsap.set(inPanel, { opacity: 0, y: down ? 22 : -22 });
+          if (!skipping) {
+            gsap.set(inPanel, { opacity: 0, y: down ? 14 : -14 });
+          }
           gsap.to(inPanel, {
             opacity: 1,
             y: 0,
             duration: D,
-            ease: 'power3.out',
+            ease: SECTION_EASE,
           });
         }
       } else {
@@ -319,26 +375,30 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       const newBg = bgRefs.current[to];
       if (bgTransition === 'fade') {
         if (newBg) {
-          gsap.set(newBg, {
-            opacity: 0,
-            scale: 1.04,
-            yPercent: down ? 1 : -1,
-          });
+          if (!skipping) {
+            gsap.set(newBg, {
+              opacity: 0,
+              scale: 1.025,
+              yPercent: down ? 0.6 : -0.6,
+            });
+          }
           gsap.to(newBg, {
             opacity: 1,
             scale: 1,
             yPercent: 0,
-            duration: D,
-            ease: 'power2.out',
+            duration: D * 1.05,
+            ease: SECTION_EASE,
           });
         }
-        if (prevBg) {
+        if (prevBg && !skipping) {
           gsap.to(prevBg, {
             opacity: 0,
-            yPercent: down ? -parallaxAmount : parallaxAmount,
-            duration: D,
-            ease: 'power2.out',
+            yPercent: down ? -parallaxAmount * 0.65 : parallaxAmount * 0.65,
+            duration: D * 0.95,
+            ease: SECTION_EASE,
           });
+        } else if (prevBg && skipping) {
+          gsap.set(prevBg, { opacity: 0, yPercent: 0, scale: 1 });
         }
       } else {
         if (newBg) {
@@ -376,8 +436,8 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.to(el, {
           opacity: i === to ? 1 : 0.35,
           x: i === to ? 10 : 0,
-          duration: D * 0.6,
-          ease: 'power3.out',
+          duration: D * 0.75,
+          ease: SECTION_EASE,
         });
       });
       rightItemRefs.current.forEach((el, i) => {
@@ -390,16 +450,17 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.to(el, {
           opacity: i === to ? 1 : 0.35,
           x: i === to ? -10 : 0,
-          duration: D * 0.6,
-          ease: 'power3.out',
+          duration: D * 0.75,
+          ease: SECTION_EASE,
         });
       });
 
-      gsap.delayedCall(D, () => {
-        lastIndexRef.current = to;
+      gsap.delayedCall(D * 0.85, () => {
         isAnimatingRef.current = false;
       });
     };
+    const changeSectionRef = useRef(changeSection);
+    changeSectionRef.current = changeSection;
 
     const goTo = (to: number, withScroll = true) => {
       const clamped = clamp(to, 0, total - 1);
@@ -418,7 +479,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         // Hold the gate long enough that touch momentum cannot skip chapters.
         const gateMs = motionOff
           ? 40
-          : Math.max(420, Math.round((durations.change ?? 0.7) * 520));
+          : Math.max(280, Math.round((durations.change ?? 0.7) * 380));
         window.setTimeout(() => {
           isSnappingRef.current = false;
         }, gateMs);
@@ -475,21 +536,25 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         end: 'bottom bottom',
         pin: fixed,
         pinSpacing: true,
+        anticipatePin: 1,
+        snap:
+          total > 1
+            ? {
+                snapTo: 1 / (total - 1),
+                duration: { min: 0.18, max: 0.65 },
+                delay: 0.04,
+                ease: SECTION_EASE,
+                inertia: false,
+              }
+            : undefined,
         onUpdate: (self) => {
           if (isSnappingRef.current) return;
-          const target = Math.min(
-            total - 1,
-            Math.floor(self.progress * total + 1e-6),
-          );
-          if (target !== lastIndexRef.current && !isAnimatingRef.current) {
-            const next =
-              lastIndexRef.current +
-              (target > lastIndexRef.current ? 1 : -1);
-            goToRef.current(next, false);
+          const target = indexFromProgress(self.progress, total);
+          if (target !== lastIndexRef.current) {
+            changeSectionRef.current(target);
           }
           if (progressFillRef.current) {
-            const p = (lastIndexRef.current / (total - 1 || 1)) * 100;
-            progressFillRef.current.style.width = `${p}%`;
+            progressFillRef.current.style.width = `${self.progress * 100}%`;
           }
         },
       });

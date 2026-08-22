@@ -49,9 +49,26 @@ export default {
         'text-secondary': 'var(--text-secondary)',
         'text-on-light': 'var(--text-on-light)',
         border: 'var(--border)',
-        accent: 'var(--accent)',
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        input: 'var(--input)',
+        ring: 'var(--ring)',
         card: 'var(--surface)',
         muted: 'var(--text-secondary)',
         'muted-foreground': 'var(--muted-foreground)',

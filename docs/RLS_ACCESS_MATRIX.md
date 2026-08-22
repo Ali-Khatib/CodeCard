@@ -48,7 +48,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `public_profile_events` | ✅ | INSERT if public profile | INSERT only | SELECT own | ❌ SELECT | |
 | `project_view_events` | ✅ | INSERT if published | INSERT only | SELECT own | ❌ SELECT | |
 | `analytics_events` | ✅ | INSERT if published target | INSERT only | SELECT own | ❌ SELECT | |
-| `subscription_customers` | ✅ | ❌ | ❌ | SELECT + INSERT | ❌ | No client UPDATE/DELETE; webhook + service role for mutations |
+| `subscription_customers` | ✅ | ❌ | ❌ | SELECT + INSERT (tenant bound to owner profile tenant) | ❌ | No client UPDATE/DELETE; INSERT cannot choose another tenant; webhook + service role for mutations |
 | `subscriptions` | ✅ | ❌ | ❌ | SELECT | ❌ | |
 | `billing_events` | ✅ | ❌ | ❌ | ❌ | ❌ | No client policies |
 | `moderation_reports` | ✅ | INSERT (reporter nullable) | INSERT | SELECT own reports | ❌ | |

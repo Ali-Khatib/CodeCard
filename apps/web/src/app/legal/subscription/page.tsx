@@ -1,9 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/subscription',
   title: 'Subscription Terms',
   description: 'Billing, renewal, and cancellation terms for CodeCard subscriptions.',
-};
+});
 
 export default function SubscriptionTermsPage() {
   return (

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { EditorialHeroAnimatedHeadline } from './editorial-hero-animated-headline';
 
 /** Warm full-bleed editorial photo — Parloa-scale first impression. */
 const HERO_IMAGE =
@@ -39,7 +40,8 @@ export function EditorialHero() {
           data-hero-statement
         >
           <span className="cc-ed__lead">YOUR WORK.</span>
-          <span className="cc-ed__sub">ONE IDENTITY.</span>
+          <span className="sr-only">ONE IDENTITY.</span>
+          <EditorialHeroAnimatedHeadline />
         </h1>
         <p className="cc-ed__lede mt-6">
           Projects, research, Circle, and connections, presented through one

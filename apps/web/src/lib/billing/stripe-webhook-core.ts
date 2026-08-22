@@ -205,18 +205,27 @@ async function applySubscriptionSideEffects(
     }
 
     // WS10-T006: do not recreate billing linkage for deleted / mid-deletion accounts.
+    // Tenant must come from the owner's profile — never trust a client-chosen mapping tenant_id.
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, tenant_id')
       .eq('owner_user_id', customer.user_id)
       .maybeSingle();
 
     if (profileError) return { ok: false, code: 'profile_lookup_failed' };
     if (!profile) return { ok: true, skipped: 'no_profile' };
 
+    if (customer.tenant_id !== profile.tenant_id) {
+      logSecurityEvent('STRIPE_WEBHOOK_FAILED', {
+        reason: 'tenant_mismatch',
+        stripe_event_type: event.type,
+      });
+      return { ok: false, code: 'tenant_mismatch' };
+    }
+
     const { error: upsertError } = await supabase.from('subscriptions').upsert(
       {
-        tenant_id: customer.tenant_id,
+        tenant_id: profile.tenant_id,
         user_id: customer.user_id,
         stripe_subscription_id: subscription.id,
         stripe_price_id: priceId,

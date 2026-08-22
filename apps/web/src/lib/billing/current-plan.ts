@@ -1,4 +1,5 @@
 import { PLANS } from '@codecard/config';
+import { grantsProEntitlement } from '@/lib/billing/pro-price';
 
 export type AccountPlanId = 'free' | 'pro';
 
@@ -11,10 +12,15 @@ export function isPaidSubscriptionStatus(status: string | null | undefined): boo
   );
 }
 
+/**
+ * Account plan for display / settings. Requires allowlisted Stripe price —
+ * status alone must not grant Pro.
+ */
 export function resolveAccountPlanId(
   subscriptionStatus: string | null | undefined,
+  stripePriceId?: string | null,
 ): AccountPlanId {
-  return isPaidSubscriptionStatus(subscriptionStatus) ? 'pro' : 'free';
+  return grantsProEntitlement(subscriptionStatus, stripePriceId) ? 'pro' : 'free';
 }
 
 export function formatCurrentPlanLabel(plan: AccountPlanId): string {

@@ -1,9 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/dmca',
   title: 'DMCA Policy',
   description: 'How to submit copyright notices and counter-notices for content hosted on CodeCard.',
-};
+});
 
 export default function DmcaPage() {
   return (

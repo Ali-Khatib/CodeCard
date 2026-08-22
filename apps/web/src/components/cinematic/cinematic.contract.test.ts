@@ -19,7 +19,7 @@ describe('Editorial product landing contract', () => {
     expect(hero).toContain('YOUR WORK.');
     expect(hero).toContain('ONE IDENTITY.');
     expect(hero).toContain('cc-ed__lead');
-    expect(hero).toContain('cc-ed__sub');
+    expect(hero).toContain('EditorialHeroAnimatedHeadline');
     expect(hero).toContain('cc-ed-hero__media');
     expect(hero).toContain('priority');
     expect(hero).not.toContain('LIVE_DEMO_PROFILE_HREF');
@@ -31,7 +31,7 @@ describe('Editorial product landing contract', () => {
     expect(landing).toContain('EditorialFeatureWalkthrough');
     expect(landing).toContain('EditorialLiveDemoBox');
     expect(landing).toContain('EditorialAudience');
-    expect(landing).toContain('EditorialResearchProof');
+    expect(landing).toContain('EditorialResearchScene');
     expect(landing).not.toContain('ProductStory');
     expect(landing).not.toContain('ProductAnalysisSection');
     expect(landing).not.toContain('EditorialNetworkBridge');
@@ -70,51 +70,38 @@ describe('Editorial product landing contract', () => {
     expect(walk).not.toContain('DashboardConnectionsView');
   });
 
-  it('research proof uses three sticky image fades with centered copy', () => {
+  it('research proof uses editorial scroll reveal instead of parallax cards', () => {
     const proof = read(
-      'src/components/landing/editorial/editorial-research-proof.tsx',
+      'src/components/landing/editorial/editorial-research-scene.tsx',
     );
-    const parallax = read('src/components/ui/text-parallax-content-scroll.tsx');
-    expect(proof).toContain('TextParallaxContent');
-    expect(parallax).toContain('StickyImage');
-    expect(parallax).toContain('OverlayCopy');
+    expect(proof).toContain('EditorialResearchScene');
     expect(proof).toContain('THEY DO NOT READ YOU.');
     expect(proof).toContain('Your best work never gets the glance.');
     expect(proof).toContain('Your school can decide first.');
     expect(proof).toContain('Hidden skills get skipped.');
-    expect(proof).toContain('research=');
-    expect(proof).toContain('solution=');
-    expect(proof).toContain('images.unsplash.com');
-    expect(proof).toContain('photo-1450101499163-c8848c66ca85');
-    expect(proof).toContain('photo-1562774053-701939374585');
-    expect(proof).toContain('photo-1627398242454-45a1465c2479');
-    expect(proof).not.toContain('photo-1551836022-d5d88e9218df');
-    expect(proof).not.toContain('They look. Then they decide.');
-    expect(proof).not.toContain('auth-demo/');
-    expect(proof).not.toContain('auth-collage/');
-    expect(proof).not.toContain('1522071820081');
-    expect(proof).not.toContain('photo-1461749280684-dccba630e2f6');
-    expect(proof).not.toContain('+15 pts');
-    expect(proof).not.toContain('In one study');
+    expect(proof).toContain('The research');
+    expect(proof).toContain('The solution');
+    expect(proof).toContain('data-research-reveal');
+    expect(proof).not.toContain('TextParallaxContent');
+    expect(proof).not.toContain('images.unsplash.com');
+    expect(proof).not.toContain('photo-1450101499163-c8848c66ca85');
     expect(proof).toContain('See all research papers');
   });
 
-  it('embeds the live demo workspace in an iframe', () => {
+  it('embeds a square live demo preview with engagement invitation', () => {
     const demo = read('src/components/landing/editorial/editorial-live-demo-box.tsx');
+    const preview = read('src/components/landing/editorial/editorial-live-demo-preview.tsx');
     const css = read('src/styles/editorial-landing.css');
-    expect(demo).toContain('iframe');
-    expect(demo).toContain('src="/demo?embed=1"');
-    expect(demo).toContain('loading="eager"');
+    expect(demo).toContain('EditorialLiveDemoPreview');
+    expect(preview).toContain('iframe');
+    expect(preview).toContain('src="/demo?embed=1"');
+    expect(preview).toContain('EXPLORE THE FULL EXPERIENCE');
+    expect(preview).toContain('Open Live Demo →');
     expect(demo).toContain('cc-ed-walk__bridge--out');
-    expect(demo).not.toContain('IntersectionObserver');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
-    expect(css).toMatch(/\.cc-ed-demo-embed\s*\{[\s\S]*?transparent/);
-    expect(css).toContain("data-chapter='demo'");
-    expect(css).toMatch(/\.cc-ed-walk__bridge--out\s*\{[\s\S]*?--ed-cream/);
-    expect(css).toMatch(/width:\s*min\(92rem,\s*100%\)/);
-    expect(css).toMatch(/height:\s*min\(82vh,\s*860px\)/);
-    expect(css).not.toMatch(/aspect-ratio:\s*1\s*\/\s*1/);
-    expect(css).not.toMatch(/width:\s*min\(22rem,/);
+    expect(css).toMatch(/\.cc-ed-demo-preview__frame[\s\S]*?aspect-ratio:\s*1\s*\/\s*1/);
+    expect(css).toContain('.cc-ed-hero-scene');
+    expect(css).toContain('.cc-ed-research-scene');
   });
 
   it('keeps final CTA without public profile', () => {

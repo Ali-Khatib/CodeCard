@@ -1,9 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/contact',
   title: 'Contact',
   description: 'Contact CodeCard for product, privacy, and copyright questions.',
-};
+});
 
 export default function ContactPage() {
   return (

@@ -1,3 +1,4 @@
+import type { NextResponse } from 'next/server';
 import type { ZodSchema } from 'zod';
 import { rateLimit } from '@/lib/rate-limit';
 import {
@@ -8,6 +9,7 @@ import {
   unauthorized,
   validationError,
 } from '@/lib/api-utils';
+import { recoverySessionForbiddenResponse } from '@/lib/auth/recovery-session-guard';
 import { parseJsonBody } from '@/lib/security/request';
 import { createClient } from '@/lib/supabase/server';
 import { isProduction } from '@/lib/security/env';
@@ -39,7 +41,7 @@ export async function secureJsonRoute<T, R>(
   request: Request,
   options: SecureRouteOptions<T>,
   handler: (data: T, ctx: { userId: string | null; ip: string }) => Promise<R>,
-): Promise<R | ReturnType<typeof apiError>> {
+): Promise<R | ReturnType<typeof apiError> | NextResponse> {
   try {
     const ip = getClientIp(request);
     const rlKey = `${options.rateLimitType}:${ip}`;
@@ -71,6 +73,9 @@ export async function secureJsonRoute<T, R>(
       } = await supabase.auth.getUser();
       if (!user) return unauthorized();
       userId = user.id;
+
+      const recoveryBlocked = recoverySessionForbiddenResponse(user);
+      if (recoveryBlocked) return recoveryBlocked;
 
       const userRl = await rateLimit(`${options.rateLimitType}:user:${user.id}`, options.rateLimitType);
       if (!userRl.success) return rateLimited();

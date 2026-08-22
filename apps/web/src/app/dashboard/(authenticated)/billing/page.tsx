@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
 import { PLANS } from '@codecard/config';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@codecard/ui';
+import { grantsProEntitlement } from '@/lib/billing/pro-price';
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -14,16 +15,12 @@ export default async function BillingPage() {
 
   const { data: subscription } = await supabase
     .from('subscriptions')
-    .select('*')
+    .select('status, stripe_price_id, current_period_end')
     .eq('user_id', user.id)
-    .eq('status', 'active')
+    .in('status', ['active', 'trialing'])
     .maybeSingle();
 
-  const { data: customer } = await supabase
-    .from('subscription_customers')
-    .select('stripe_customer_id')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const isPro = grantsProEntitlement(subscription?.status, subscription?.stripe_price_id);
 
   async function createCheckout() {
     'use server';
@@ -134,7 +131,7 @@ export default async function BillingPage() {
           <CardTitle className="font-display text-phosphor">Plan</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {subscription ? (
+          {isPro && subscription ? (
             <>
               <p className="text-reactor">Pro (Active)</p>
               <p className="text-sm text-lichen">

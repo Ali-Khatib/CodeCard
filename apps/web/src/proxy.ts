@@ -5,6 +5,10 @@ import {
   shouldForwardAuthExchangeToCallback,
 } from '@/lib/auth/auth-link-forward';
 import { isAuthConfigured } from '@/lib/auth/configured';
+import {
+  isRecoveryAllowedPath,
+  userHasPasswordRecoveryPrivilege,
+} from '@/lib/auth/recovery-session';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
 import { getSupabasePublicKey } from '@/lib/supabase/public-key';
@@ -94,6 +98,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Recovery privilege is stamped server-side on app_metadata (service role).
+  // getUser() returns the Auth user record — clients cannot clear the flag.
+  if (user && userHasPasswordRecoveryPrivilege(user) && !isRecoveryAllowedPath(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/reset-password';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
@@ -118,5 +131,6 @@ export const config = {
     '/forgot-password',
     '/reset-password',
     '/auth/confirmed',
+    '/auth/mark-recovery',
   ],
 };

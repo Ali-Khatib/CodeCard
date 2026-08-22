@@ -2,12 +2,24 @@ import { NextResponse } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { isAuthConfigured } from '@/lib/auth/configured';
+import { stampPasswordRecoveryPrivilege } from '@/lib/auth/recovery-privilege';
 import {
   buildAuthErrorUrl,
   classifyCodeExchangeError,
   logOAuthCallbackFailure,
   resolveOAuthCallback,
 } from '@/lib/auth/oauth-callback';
+
+function isRecoveryExchange(resolution: {
+  method: 'code' | 'token_hash';
+  otpType?: string;
+  redirectPath: string;
+}): boolean {
+  if (resolution.method === 'token_hash' && resolution.otpType === 'recovery') {
+    return true;
+  }
+  return resolution.redirectPath.startsWith('/reset-password');
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -38,6 +50,15 @@ export async function GET(request: Request) {
       return NextResponse.redirect(
         buildAuthErrorUrl(origin, reason, resolution.redirectPath),
       );
+    }
+
+    if (isRecoveryExchange(resolution)) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await stampPasswordRecoveryPrivilege(user.id);
+      }
     }
 
     return NextResponse.redirect(`${origin}${resolution.redirectPath}`);

@@ -69,7 +69,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const [{ data: subscription }, { data: profile }] = await Promise.all([
     supabase
       .from('subscriptions')
-      .select('status')
+      .select('status, stripe_price_id')
       .eq('user_id', user!.id)
       .in('status', ['active', 'trialing'])
       .maybeSingle(),
@@ -83,7 +83,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   return (
     <DashboardSettingsView
       email={user!.email ?? undefined}
-      plan={resolveAccountPlanId(subscription?.status)}
+      plan={resolveAccountPlanId(subscription?.status, subscription?.stripe_price_id)}
       profileSlug={profile?.slug}
       isPublic={Boolean(profile?.is_public)}
       hasPassword={providers.hasPassword}

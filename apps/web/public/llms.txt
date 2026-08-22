@@ -1,0 +1,33 @@
+# CodeCard
+
+> CodeCard helps developers share projects, research, and proof of work through a public profile, link, and QR.
+
+CodeCard is a public-first portfolio product. Visitors can browse published profiles, projects, and research pages without signing in.
+
+## Public pages
+
+- Home: /
+- Pricing: /pricing
+- How it works: /how-it-works
+- Research index: /research
+- Public profiles: /{profileSlug}
+- Public projects: /{profileSlug}/projects/{projectId}
+- Public research: /{profileSlug}/research/{paperSlug}
+- Legal: /legal/privacy, /legal/terms, /legal/acceptable-use, /legal/dmca, /legal/subscription, /legal/contact
+
+## Not for indexing
+
+Do not treat these as public product documentation:
+
+- /dashboard/
+- /admin/
+- /api/
+- /auth/
+- /sign-in
+- /forgot-password
+- /reset-password
+- /demo/ (preview workspace)
+
+## Contact
+
+- Legal contact: /legal/contact

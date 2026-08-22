@@ -35,6 +35,7 @@ export default function robots(): MetadataRoute.Robots {
           '/demo/research',
           '/forgot-password',
           '/reset-password',
+          '/sign-in',
         ],
       },
     ],

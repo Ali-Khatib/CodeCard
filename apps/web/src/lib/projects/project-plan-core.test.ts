@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PLANS } from '@codecard/config';
 import {
@@ -9,8 +9,16 @@ import {
   resolveTenantPlanId,
 } from './project-plan-core';
 
+const ORIGINAL = process.env.STRIPE_PRO_PRICE_ID;
+
+afterEach(() => {
+  if (ORIGINAL === undefined) delete process.env.STRIPE_PRO_PRICE_ID;
+  else process.env.STRIPE_PRO_PRICE_ID = ORIGINAL;
+});
+
 function createMockSupabase(options: {
   subscriptionStatus?: string | null;
+  stripePriceId?: string | null;
   projectCount?: number;
   otherProfileCount?: number;
 }) {
@@ -21,7 +29,12 @@ function createMockSupabase(options: {
           eq: vi.fn(() => ({
             in: vi.fn(() => ({
               maybeSingle: vi.fn().mockResolvedValue({
-                data: options.subscriptionStatus ? { status: options.subscriptionStatus } : null,
+                data: options.subscriptionStatus
+                  ? {
+                      status: options.subscriptionStatus,
+                      stripe_price_id: options.stripePriceId ?? null,
+                    }
+                  : null,
                 error: null,
               }),
             })),
@@ -63,12 +76,26 @@ describe('getProjectLimitForPlan', () => {
 });
 
 describe('resolveTenantPlanId', () => {
-  it('treats active subscriptions as pro', async () => {
-    const supabase = createMockSupabase({ subscriptionStatus: 'active' });
+  it('treats active allowlisted subscriptions as pro', async () => {
+    process.env.STRIPE_PRO_PRICE_ID = 'price_pro_allowlisted';
+    const supabase = createMockSupabase({
+      subscriptionStatus: 'active',
+      stripePriceId: 'price_pro_allowlisted',
+    });
     await expect(resolveTenantPlanId(supabase, 'tenant-1')).resolves.toBe('pro');
   });
 
+  it('denies pro for active subscriptions on an unknown price', async () => {
+    process.env.STRIPE_PRO_PRICE_ID = 'price_pro_allowlisted';
+    const supabase = createMockSupabase({
+      subscriptionStatus: 'active',
+      stripePriceId: 'price_attacker',
+    });
+    await expect(resolveTenantPlanId(supabase, 'tenant-1')).resolves.toBe('free');
+  });
+
   it('defaults to free without an active subscription', async () => {
+    process.env.STRIPE_PRO_PRICE_ID = 'price_pro_allowlisted';
     const supabase = createMockSupabase({ subscriptionStatus: null });
     await expect(resolveTenantPlanId(supabase, 'tenant-1')).resolves.toBe('free');
   });
@@ -115,7 +142,12 @@ describe('evaluateProjectCreationQuota', () => {
   });
 
   it('allows unlimited projects on pro', async () => {
-    const supabase = createMockSupabase({ subscriptionStatus: 'active', projectCount: 50 });
+    process.env.STRIPE_PRO_PRICE_ID = 'price_pro_allowlisted';
+    const supabase = createMockSupabase({
+      subscriptionStatus: 'active',
+      stripePriceId: 'price_pro_allowlisted',
+      projectCount: 50,
+    });
     const result = await evaluateProjectCreationQuota(supabase, {
       tenantId: 'tenant-1',
       profileId: 'profile-1',

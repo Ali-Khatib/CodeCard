@@ -131,6 +131,18 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
     );
   });
 
+  it('binds subscription_customers INSERT tenant_id to the owner profile tenant', () => {
+    const bound = read(
+      'supabase/migrations/20260820194500_subscription_customers_tenant_bound_insert.sql',
+    );
+    expect(bound).toContain('DROP POLICY IF EXISTS subscription_customers_owner_insert');
+    expect(bound).toMatch(/user_id = auth\.uid\(\)/);
+    expect(bound).toMatch(
+      /tenant_id = \(\s*SELECT p\.tenant_id[\s\S]+WHERE p\.owner_user_id = auth\.uid\(\)\s*\)/,
+    );
+    expect(matrix).toMatch(/subscription_customers[\s\S]*profile tenant/i);
+  });
+
   it('does not grant broad USING(true) SELECT on private owner tables', () => {
     for (const table of OWNER_PRIVATE_TABLES) {
       const policyBlocks = sql.match(

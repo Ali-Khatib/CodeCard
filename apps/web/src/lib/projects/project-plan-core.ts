@@ -1,5 +1,6 @@
 import { PLANS } from '@codecard/config';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { grantsProEntitlement } from '@/lib/billing/pro-price';
 
 export type TenantPlanId = 'free' | 'pro';
 
@@ -15,12 +16,13 @@ export async function resolveTenantPlanId(
 ): Promise<TenantPlanId> {
   const { data } = await supabase
     .from('subscriptions')
-    .select('status')
+    .select('status, stripe_price_id')
     .eq('tenant_id', tenantId)
     .in('status', ['active', 'trialing'])
     .maybeSingle();
 
-  return data ? 'pro' : 'free';
+  if (!data) return 'free';
+  return grantsProEntitlement(data.status, data.stripe_price_id) ? 'pro' : 'free';
 }
 
 export async function countOwnedProjects(

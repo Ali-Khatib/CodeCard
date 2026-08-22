@@ -4,7 +4,6 @@ import { EditorialStatement } from './editorial-statement';
 import { EditorialFeatureWalkthrough } from './editorial-feature-walkthrough';
 import { EditorialLiveDemoBox } from './editorial-live-demo-box';
 import { EditorialAudience } from './editorial-audience';
-import { EditorialResearchProof } from './editorial-research-proof';
 import { EditorialFinalCta } from './editorial-final-cta';
 import { EditorialStickyMobileCta } from './editorial-sticky-mobile-cta';
 import '@/styles/editorial-landing.css';
@@ -14,21 +13,29 @@ const EditorialAtmosphere = dynamic(
   { ssr: true, loading: () => null },
 );
 
+const EditorialHeroScene = dynamic(
+  () => import('./editorial-hero-scene').then((m) => m.EditorialHeroScene),
+  { ssr: true },
+);
+
+const EditorialResearchScene = dynamic(
+  () => import('./editorial-research-scene').then((m) => m.EditorialResearchScene),
+  { ssr: true },
+);
+
 /**
  * Marketing `/`
- * Hero → statement → feature walkthrough →
- * live demo embed → Who it’s for → research proof → finale.
+ * Hero scene → walkthrough → live demo preview → audience → research → finale.
  */
 export function EditorialLanding() {
   return (
     <div className="cc-ed" data-testid="editorial-landing" data-chapter="hero">
       <EditorialAtmosphere />
-      <EditorialHero />
-      <EditorialStatement />
+      <EditorialHeroScene hero={<EditorialHero />} statement={<EditorialStatement />} />
       <EditorialFeatureWalkthrough />
       <EditorialLiveDemoBox />
       <EditorialAudience />
-      <EditorialResearchProof />
+      <EditorialResearchScene />
       <EditorialFinalCta />
       <EditorialStickyMobileCta />
     </div>

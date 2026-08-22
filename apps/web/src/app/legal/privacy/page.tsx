@@ -1,10 +1,12 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/privacy',
   title: 'Privacy Policy',
   description:
     'How CodeCard collects, uses, stores, and protects account, profile, upload, and analytics data.',
-};
+});
 
 export default function PrivacyPage() {
   return (

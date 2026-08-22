@@ -29,7 +29,7 @@ export function AuthHashRecoveryCatcher() {
     const destination =
       type === 'recovery' ||
       (!type && (pathname === '/' || pathname === '/landing'))
-        ? '/reset-password'
+        ? '/auth/mark-recovery'
         : defaultPostAuthRedirectForType(type);
 
     let cancelled = false;

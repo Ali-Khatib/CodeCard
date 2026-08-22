@@ -7,6 +7,7 @@ import {
 } from '@codecard/validation';
 import { createClient } from '@/lib/supabase/server';
 import { getClientIp, rateLimited, unauthorized } from '@/lib/api-utils';
+import { recoverySessionForbiddenResponse } from '@/lib/auth/recovery-session-guard';
 import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 import { rateLimit } from '@/lib/rate-limit';
@@ -50,6 +51,9 @@ export async function POST(request: Request) {
   if (!user) {
     return unauthorized();
   }
+
+  const recoveryBlocked = recoverySessionForbiddenResponse(user);
+  if (recoveryBlocked) return recoveryBlocked;
 
   const userLimit = await rateLimit(`upload:user:${user.id}`, 'upload');
   if (!userLimit.success) {

@@ -1,9 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/acceptable-use',
   title: 'Acceptable Use Policy',
   description: 'Rules for acceptable use of CodeCard, including prohibited content and abuse.',
-};
+});
 
 export default function AcceptableUsePage() {
   return (

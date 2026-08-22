@@ -2,25 +2,9 @@
 
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
+import { EditorialLiveDemoPreview } from './editorial-live-demo-preview';
 
-/**
- * Always-preloaded iframe of the real /demo workspace on the marketing page.
- */
-function PreloadedDemoFrame() {
-  return (
-    <div className="cc-ed-demo-embed__chrome">
-      <iframe
-        src="/demo?embed=1"
-        title="CodeCard live demo workspace"
-        className="cc-ed-demo-embed__frame"
-        loading="eager"
-        allow="clipboard-write"
-      />
-    </div>
-  );
-}
-
-/** Full minimized live workspace on the marketing page — no side product mock. */
+/** Square workspace preview with engagement-based invitation to the full demo. */
 export function EditorialLiveDemoBox() {
   return (
     <section
@@ -30,7 +14,6 @@ export function EditorialLiveDemoBox() {
       data-testid="editorial-live-demo-box"
       aria-labelledby="editorial-live-demo-heading"
     >
-      {/* Dark → cream wash; chapter flips to lilac a beat later on the intro */}
       <div className="cc-ed-walk__bridge cc-ed-walk__bridge--out" aria-hidden />
       <div className="cc-ed-demo-embed__intro">
         <p className="cc-ed__eyebrow">Live workspace</p>
@@ -39,14 +22,14 @@ export function EditorialLiveDemoBox() {
           <span className="cc-ed__sub">DEMO WORKSPACE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Explore {DEMO_PROFILE.display_name}’s full CodeCard inside the page, the
-          same workspace as the live demo.
+          Inspect {DEMO_PROFILE.display_name}&apos;s CodeCard here. When you are
+          ready, step into the full workspace.
         </p>
         <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>
         </p>
       </div>
-      <PreloadedDemoFrame />
+      <EditorialLiveDemoPreview />
     </section>
   );
 }

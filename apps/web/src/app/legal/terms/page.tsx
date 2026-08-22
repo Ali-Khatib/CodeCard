@@ -1,10 +1,12 @@
 import { LegalPage } from '@/components/legal-page';
+import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
-export const metadata = {
+export const metadata = buildIndexablePageMetadata({
+  path: '/legal/terms',
   title: 'Terms of Service',
   description:
     'Terms governing CodeCard accounts, public profiles, uploaded content, and acceptable use of the service.',
-};
+});
 
 export default function TermsPage() {
   return (
