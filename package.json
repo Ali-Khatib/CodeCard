@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "brace-expansion": "^1.1.18",
-    "prettier": "^3.4.2",
+    "prettier": "^3.9.6",
     "tsx": "^4.19.3",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",
