@@ -26,11 +26,30 @@ export function FadeInView({
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.01, margin: '0px' });
   const reduced = useReducedMotion();
-  const [forceVisible, setForceVisible] = useState(false);
+  const [forceVisible, setForceVisible] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return (
+        window.self !== window.top ||
+        new URLSearchParams(window.location.search).get('embed') === '1'
+      );
+    } catch {
+      return true;
+    }
+  });
   const MotionTag = motion.create(Tag);
 
   useEffect(() => {
-    // Failsafe: embeds / odd viewports can miss IntersectionObserver.
+    try {
+      const inEmbed =
+        window.self !== window.top ||
+        new URLSearchParams(window.location.search).get('embed') === '1';
+      if (inEmbed) setForceVisible(true);
+    } catch {
+      setForceVisible(true);
+    }
+
+    // Failsafe: odd viewports can miss IntersectionObserver.
     const id = window.setTimeout(() => setForceVisible(true), 600);
     return () => window.clearTimeout(id);
   }, []);

@@ -62,7 +62,7 @@ export function ResearchBubbleGrid({
                     sizes="(max-width: 640px) 45vw, 220px"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_25%_20%,rgba(147,130,255,0.28),transparent_30%),linear-gradient(135deg,#10093a,#030014)]">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_25%_20%,rgba(233,90,11,0.22),transparent_30%),linear-gradient(135deg,#2a1206,#1a0f08)]">
                     <HiOutlineDocumentText className="h-10 w-10 text-lilac-white/80" aria-hidden />
                   </div>
                 )}

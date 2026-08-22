@@ -159,7 +159,7 @@ export function DashboardOverviewView({
       {suggested ? (
         <FadeInView delay={0.06}>
           <section className="cc-profile-home__zone" aria-label="Suggested next step">
-            <AppCard tone="rose" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
+            <AppCard tone="meringue" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
               <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-lg">
                   <AppMono>Suggested next step</AppMono>
@@ -325,7 +325,7 @@ export function DashboardOverviewView({
             </div>
           </div>
           {contentError || !projectsSummary || !researchSummary ? (
-            <AppCard tone="rose" className="!p-5">
+            <AppCard tone="meringue" className="!p-5">
               <p className="text-[15px] text-[var(--app-ink)]">
                 Project and research summaries could not be loaded. Open Projects or Research to
                 continue editing.
@@ -458,7 +458,7 @@ export function DashboardOverviewView({
             </AppButton>
           </div>
           {statsError || !stats ? (
-            <AppCard tone="rose" className="!p-5">
+            <AppCard tone="meringue" className="!p-5">
               <p className="text-[15px] text-[var(--app-ink)]">
                 Reach stats could not be loaded. Try again shortly — profile editing and sharing still
                 work.

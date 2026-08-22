@@ -22,6 +22,8 @@ const BEATS: EditorialResearchBeat[] = [
     index: '01',
     marker: 'Attention window',
     problemTitle: 'Your best work never gets the glance.',
+    problemLead: 'YOUR BEST WORK',
+    problemSub: 'NEVER GETS THE GLANCE.',
     researchBody:
       'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
     solutionBody:
@@ -32,6 +34,8 @@ const BEATS: EditorialResearchBeat[] = [
     index: '02',
     marker: 'Prestige bias',
     problemTitle: 'Your school can decide first.',
+    problemLead: 'YOUR SCHOOL CAN',
+    problemSub: 'DECIDE FIRST.',
     researchBody:
       'Cross-country experiments found school prestige cues still shaped early screening. The education line moved the cut before anyone tested the work.',
     solutionBody:
@@ -42,6 +46,8 @@ const BEATS: EditorialResearchBeat[] = [
     index: '03',
     marker: 'Skills visibility',
     problemTitle: 'Hidden skills get skipped.',
+    problemLead: 'HIDDEN SKILLS',
+    problemSub: 'GET SKIPPED.',
     researchBody:
       'Skills-based hiring research shows pools open much wider when skills are easy to find. Buried work stays out of the match.',
     solutionBody:
@@ -104,7 +110,10 @@ export function EditorialResearchScene() {
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
           <span className="cc-ed__lead" data-research-intro>
-            THEY DO NOT READ YOU.
+            THEY DO NOT
+          </span>
+          <span className="cc-ed__lead" data-research-intro>
+            READ YOU.
           </span>
           <span className="cc-ed__sub" data-research-intro>
             THEY SORT YOU.

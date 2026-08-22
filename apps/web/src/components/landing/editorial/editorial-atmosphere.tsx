@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
-const DARK_CHAPTERS = new Set(['hero', 'finale']);
+const DARK_CHAPTERS = new Set(['finale']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough', 'proof'] as const;
 
@@ -118,7 +118,11 @@ export function EditorialAtmosphere() {
       // Flip when the chapter is the main surface — one solid color until then.
       // Statement starts earlier so cream-panel copy never inherits hero (light) tokens.
       const start =
-        id === 'demo' ? 'top 38%' : id === 'statement' ? 'top 78%' : 'top 55%';
+        id === 'demo'
+          ? 'top 38%'
+          : id === 'statement'
+            ? 'top 52%'
+            : 'top 55%';
       return ScrollTrigger.create({
         id: `editorial-atmosphere-${id}`,
         trigger: section,

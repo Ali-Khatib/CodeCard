@@ -7,8 +7,8 @@
   color: #000;
   font-family: var(--fx-font);
   letter-spacing: -0.02em;
-  /* More runway per chapter = smoother scroll pacing */
-  --fx-section-length: 125vh;
+  /* Scroll-scrubbed chapters — shorter runway, smoother handoff */
+  --fx-section-length: 100vh;
 }
 
 .fx-debug {
@@ -64,10 +64,8 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  /* Photos should read as photos, not a black void */
-  filter: brightness(1) saturate(1.05) contrast(1.02);
   opacity: 0;
-  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .fx-bg-overlay {
@@ -265,7 +263,7 @@
 }
 
 .fx-track {
-  will-change: transform;
+  transform: translateZ(0);
 }
 
 .fx-item {
@@ -276,7 +274,6 @@
   line-height: 1.05;
   margin: calc(var(--fx-row-gap) / 2) 0;
   opacity: 0.35;
-  transition: opacity 0.3s ease, transform 0.3s ease;
   position: relative;
   font-size: clamp(0.95rem, 2.1vw, 1.45rem);
   user-select: none;
@@ -336,11 +333,10 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  transform: translateZ(0);
 }
 
 .fx-featured.active {
-  opacity: 1;
-  visibility: visible;
   pointer-events: auto;
 }
 
@@ -398,7 +394,6 @@
   width: 0%;
   background: var(--fx-accent);
   height: 100%;
-  transition: width 0.3s ease;
 }
 
 .fx-progress-numbers {
@@ -480,9 +475,8 @@
 }
 
 @media (max-width: 900px) {
-  /* More scroll distance per chapter so jumps feel paced, not instant */
   .fx {
-    --fx-section-length: 155vh;
+    --fx-section-length: 120vh;
   }
 
   .fx-header {

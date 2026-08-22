@@ -49,7 +49,7 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
       </FadeInView>
 
       <FadeInView delay={0.04}>
-        <AppCard tone="blush" className="!p-8">
+        <AppCard tone="meringue" className="!p-8">
           <MetricLabel>Profile reach</MetricLabel>
           <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">
             <CountUp key={range} value={data.profileReach} />

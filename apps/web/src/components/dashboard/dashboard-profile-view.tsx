@@ -120,7 +120,7 @@ export function DashboardProfileView({
                 getText={() => getPublicProfileLinkForClipboard(profile.slug) ?? ''}
                 ariaLabel="Copy public link"
                 successLabel="Public link copied"
-                variant="soft"
+                variant="ghost"
               >
                 Copy public link
               </CopyLinkButton>

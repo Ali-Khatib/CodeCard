@@ -6,10 +6,10 @@
 export const HUME_COLORS = {
   page: '#FAFAFA',
   cream: '#FCF1E7',
-  lavenderMist: '#E8E3F1',
-  periwinkle: '#C3C0F2',
+  lavenderMist: '#FFF1E6',
+  periwinkle: '#FFB760',
   peach: '#FADAC1',
-  pink: '#F1C9DD',
+  pink: '#FFE9CF',
   ink: '#232324',
   /** Secondary body text — WCAG AA ≥4.5:1 on cream/white (was #767073). */
   muted: '#5c5856',
@@ -18,7 +18,7 @@ export const HUME_COLORS = {
   /** Charts / demo panels only — not site-wide body */
   surfaceDark: '#202020',
   surfaceBlack: '#0F0F11',
-  chartHume: '#EDC4F1',
+  chartHume: '#FFD4A8',
   chartCompare: '#FEE6C5',
   accentOrange: '#E95A0B',
   iris: '#E95A0B',

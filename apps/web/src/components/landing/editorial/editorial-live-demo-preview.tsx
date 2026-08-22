@@ -1,5 +1,6 @@
 'use client';
 
+import { Monitor, Smartphone } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -11,24 +12,103 @@ const DWELL_MS = 28_000;
 const HOVER_MS = 14_000;
 const PREVIEW_SCROLL_THRESHOLD = 320;
 
+const WEB_VIEW = { width: 1280, height: 820 };
+const MOBILE_VIEW = { width: 390, height: 844 };
+
+type PreviewLayout = {
+  scale: number;
+  width: number;
+  height: number;
+};
+
+function layoutForMode(mode: PreviewMode, viewportWidth: number): PreviewLayout {
+  if (mode === 'web') {
+    const scale = viewportWidth / WEB_VIEW.width;
+    return {
+      scale,
+      width: viewportWidth,
+      height: WEB_VIEW.height * scale,
+    };
+  }
+
+  const phoneWidth = Math.min(viewportWidth * 0.52, 250);
+  const scale = phoneWidth / MOBILE_VIEW.width;
+  return {
+    scale,
+    width: phoneWidth,
+    height: MOBILE_VIEW.height * scale,
+  };
+}
+
+type ModeToggleProps = {
+  mode: PreviewMode;
+  target: PreviewMode;
+  icon: typeof Monitor;
+  label: string;
+  hint: string;
+  onSelect: (mode: PreviewMode) => void;
+};
+
+function ModeToggle({ mode, target, icon: Icon, label, hint, onSelect }: ModeToggleProps) {
+  const active = mode === target;
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      aria-label={label}
+      title={hint}
+      className={
+        active
+          ? 'cc-ed-demo-preview__toggle cc-ed-demo-preview__toggle--active'
+          : 'cc-ed-demo-preview__toggle'
+      }
+      onClick={() => onSelect(target)}
+    >
+      <Icon className="cc-ed-demo-preview__toggle-icon" aria-hidden strokeWidth={1.85} />
+      <span className="cc-ed-demo-preview__toggle-tip">{hint}</span>
+      <span className="sr-only">{label}</span>
+    </button>
+  );
+}
+
 /**
- * Full live demo preview with web/mobile toggle. Invitation appears only after
- * sustained engagement and never covers the embedded interface.
+ * Compact scaled live demo preview with web/mobile toggle. Invitation appears only
+ * after sustained engagement and never covers the embedded interface.
  */
 export function EditorialLiveDemoPreview() {
   const reduced = useReducedMotion();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const hoverStartRef = useRef<number | null>(null);
   const visibleSinceRef = useRef<number | null>(null);
   const scrollAccRef = useRef(0);
   const [mode, setMode] = useState<PreviewMode>('web');
+  const [layout, setLayout] = useState<PreviewLayout>(() =>
+    layoutForMode('web', 680),
+  );
   const [invited, setInvited] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   const markEngaged = useCallback(() => {
     setInvited(true);
   }, []);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const sync = () => {
+      const width = viewport.clientWidth || 680;
+      setLayout(layoutForMode(mode, width));
+    };
+
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(viewport);
+    return () => ro.disconnect();
+  }, [mode]);
 
   useEffect(() => {
     if (reduced) return;
@@ -103,6 +183,7 @@ export function EditorialLiveDemoPreview() {
     mode === 'web'
       ? 'CodeCard live demo workspace preview'
       : 'CodeCard live demo mobile profile preview';
+  const view = mode === 'web' ? WEB_VIEW : MOBILE_VIEW;
 
   return (
     <div
@@ -120,32 +201,22 @@ export function EditorialLiveDemoPreview() {
           role="tablist"
           aria-label="Demo preview mode"
         >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'web'}
-            className={
-              mode === 'web'
-                ? 'cc-ed-demo-preview__toggle cc-ed-demo-preview__toggle--active'
-                : 'cc-ed-demo-preview__toggle'
-            }
-            onClick={() => setMode('web')}
-          >
-            Web app
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'mobile'}
-            className={
-              mode === 'mobile'
-                ? 'cc-ed-demo-preview__toggle cc-ed-demo-preview__toggle--active'
-                : 'cc-ed-demo-preview__toggle'
-            }
-            onClick={() => setMode('mobile')}
-          >
-            Mobile app
-          </button>
+          <ModeToggle
+            mode={mode}
+            target="web"
+            icon={Monitor}
+            label="Web app"
+            hint="Web workspace"
+            onSelect={setMode}
+          />
+          <ModeToggle
+            mode={mode}
+            target="mobile"
+            icon={Smartphone}
+            label="Mobile app"
+            hint="Mobile profile"
+            onSelect={setMode}
+          />
         </div>
 
         <div
@@ -164,27 +235,48 @@ export function EditorialLiveDemoPreview() {
             hoverStartRef.current = null;
           }}
         >
-          {mode === 'mobile' ? (
-            <div className="cc-ed-demo-preview__phone">
-              <iframe
-                key="mobile"
-                src={embedSrc}
-                title={embedTitle}
-                className="cc-ed-demo-preview__embed cc-ed-demo-preview__embed--mobile"
-                loading="lazy"
-                allow="clipboard-write"
-              />
+          <div ref={viewportRef} className="cc-ed-demo-preview__viewport">
+            <div
+              className={
+                mode === 'mobile'
+                  ? 'cc-ed-demo-preview__device cc-ed-demo-preview__device--phone'
+                  : 'cc-ed-demo-preview__device cc-ed-demo-preview__device--web'
+              }
+              style={{ minHeight: `${layout.height}px` }}
+            >
+              <div
+                className="cc-ed-demo-preview__device-shell"
+                style={{
+                  width: `${layout.width}px`,
+                  height: `${layout.height}px`,
+                }}
+              >
+                <div
+                  className="cc-ed-demo-preview__scale"
+                  style={{
+                    width: `${view.width}px`,
+                    height: `${view.height}px`,
+                    transform: `scale(${layout.scale})`,
+                  }}
+                >
+                <iframe
+                  key={mode}
+                  src={embedSrc}
+                  title={embedTitle}
+                  className={
+                    mode === 'mobile'
+                      ? 'cc-ed-demo-preview__embed cc-ed-demo-preview__embed--mobile'
+                      : 'cc-ed-demo-preview__embed'
+                  }
+                  width={view.width}
+                  height={view.height}
+                  loading="lazy"
+                  allow="clipboard-write"
+                />
+              </div>
+              </div>
             </div>
-          ) : (
-            <iframe
-              key="web"
-              src={embedSrc}
-              title={embedTitle}
-              className="cc-ed-demo-preview__embed"
-              loading="lazy"
-              allow="clipboard-write"
-            />
-          )}
+          </div>
         </div>
 
         {showInvitation ? (

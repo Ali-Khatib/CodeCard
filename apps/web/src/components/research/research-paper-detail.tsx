@@ -145,7 +145,7 @@ export function ResearchPaperDetail({
               {paper.coverImageUrl ? (
                 <Image src={paper.coverImageUrl} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 520px" priority />
               ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(147,130,255,0.28),transparent_32%),linear-gradient(135deg,#10093a,#030014)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(233,90,11,0.22),transparent_32%),linear-gradient(135deg,#2a1206,#1a0f08)]" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-void-canvas/70 via-transparent to-transparent" />
               <div className="absolute bottom-5 left-5 right-5 rounded-[18px] border border-white/12 bg-black/30 p-4 backdrop-blur-md">

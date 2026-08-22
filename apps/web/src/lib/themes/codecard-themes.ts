@@ -142,7 +142,7 @@ function theme(
 export const ORIGINAL_THEME = theme(
   'original',
   'Original',
-  '#c094e4',
+  '#e95a0b',
   'Calm light workspace — bone canvas, ink type, iris accents.',
   {
     obsidian: '#fcf1e7',
@@ -150,9 +150,9 @@ export const ORIGINAL_THEME = theme(
     fern: '#fcf1e7',
     bone: '#fcf1e7',
     paper: '#ffffff',
-    accent: '#c094e4',
-    accentBright: '#f7bbe6',
-    accentMuted: '#edc4f1',
+    accent: '#e95a0b',
+    accentBright: '#f97316',
+    accentMuted: '#fff1e6',
     accentSecondary: '#ffb760',
     twilight: '#574853',
     cosmicStart: '#fcf1e7',

@@ -53,7 +53,7 @@ export function ResearchPaperCard({
               sizes="(max-width: 920px) 100vw, 920px"
             />
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(147,130,255,0.28),transparent_30%),linear-gradient(135deg,#10093a,#030014)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(233,90,11,0.22),transparent_30%),linear-gradient(135deg,#2a1206,#1a0f08)]" />
           )}
           <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-lilac-white backdrop-blur-md">
             <HiOutlineDocumentText className="h-4 w-4" aria-hidden />

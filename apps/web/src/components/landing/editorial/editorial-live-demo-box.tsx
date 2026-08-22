@@ -21,9 +21,8 @@ export function EditorialLiveDemoBox() {
           <span className="cc-ed__sub">DEMO WORKSPACE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Switch between the web workspace and mobile profile below — the full
-          demo stays visible while you explore. After a while, we&apos;ll offer
-          the full-screen experience.
+          A compact live preview — switch web workspace or mobile profile. Hover
+          the icons to see each mode, then scroll inside the demo to explore.
         </p>
         <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>

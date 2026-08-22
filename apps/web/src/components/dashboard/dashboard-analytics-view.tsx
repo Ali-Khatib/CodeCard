@@ -100,7 +100,7 @@ export function DashboardAnalyticsView({
       )}
 
       <FadeInView delay={0}>
-        <AppCard tone="blush" className="!p-8">
+        <AppCard tone="meringue" className="!p-8">
           <MetricLabel>Profile views</MetricLabel>
           <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">
             <CountUp value={summary.profileViews} />

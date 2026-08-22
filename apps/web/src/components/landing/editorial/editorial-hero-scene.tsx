@@ -35,9 +35,10 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
 
       const track = trackRef.current;
       const stage = stageRef.current;
+      const scene = rootRef.current;
       const heroContent = heroContentRef.current;
       const statementEl = statementRef.current;
-      if (!track || !stage || !heroContent || !statementEl) return;
+      if (!track || !stage || !scene || !heroContent || !statementEl) return;
 
       const media = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const mobile = window.matchMedia('(max-width: 767px)').matches;
@@ -48,7 +49,7 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
           trigger: track,
           start: 'top top',
           end: `+=${scrollDistance}`,
-          scrub: 0.65,
+          scrub: 0.5,
           pin: stage,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -57,10 +58,23 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       });
 
       tl.to(
+        scene,
+        {
+          paddingTop: 0,
+          paddingRight: 0,
+          paddingBottom: 0,
+          paddingLeft: 0,
+          backgroundColor: 'transparent',
+          ease: MOTION_EASE.inOut,
+        },
+        0,
+      );
+
+      tl.to(
         stage,
         {
-          borderRadius: mobile ? 24 : 32,
-          scale: mobile ? 0.988 : 0.978,
+          borderRadius: 0,
+          boxShadow: '0 0 0 rgba(35, 35, 36, 0)',
           ease: MOTION_EASE.inOut,
         },
         0,
@@ -80,25 +94,23 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       tl.to(
         heroContent,
         {
-          y: mobile ? '-8%' : '-14%',
-          opacity: 0.12,
+          y: mobile ? '-10%' : '-16%',
+          opacity: 0,
           ease: MOTION_EASE.inOut,
         },
         0,
       ).fromTo(
         statementEl,
         {
-          y: mobile ? '28%' : '36%',
+          y: mobile ? '10%' : '14%',
           opacity: 0,
-          clipPath: 'inset(100% 0 0 0)',
         },
         {
           y: '0%',
           opacity: 1,
-          clipPath: 'inset(0% 0 0 0)',
           ease: MOTION_EASE.inOut,
         },
-        0.18,
+        0.12,
       );
     },
     { scope: rootRef, dependencies: [canEnhanceMotion], revertOnUpdate: true },

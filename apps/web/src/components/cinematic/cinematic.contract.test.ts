@@ -77,7 +77,8 @@ describe('Editorial product landing contract', () => {
     const story = read('src/components/ui/editorial-research-story.tsx');
     expect(proof).toContain('EditorialResearchStory');
     expect(story).toContain('EditorialResearchStory');
-    expect(proof).toContain('THEY DO NOT READ YOU.');
+    expect(proof).toContain('THEY DO NOT');
+    expect(proof).toContain('READ YOU.');
     expect(proof).toContain('Your best work never gets the glance.');
     expect(proof).toContain('Your school can decide first.');
     expect(proof).toContain('Hidden skills get skipped.');
@@ -105,7 +106,7 @@ describe('Editorial product landing contract', () => {
     expect(preview).toContain('Open Live Demo →');
     expect(demo).toContain('cc-ed-walk__bridge--out');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
-    expect(css).toMatch(/\.cc-ed-demo-preview__chrome[\s\S]*?min-height:\s*620px/);
+    expect(css).toContain('.cc-ed-demo-preview__device');
     expect(css).toContain('.cc-ed-hero-scene');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');

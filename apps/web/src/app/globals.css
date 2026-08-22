@@ -109,7 +109,7 @@ svg {
   /* Hume AI sampled palette (light-primary marketing) */
   --hume-page: #fafafa;
   --hume-cream: #fcf1e7;
-  --hume-lavender-mist: #e8e3f1;
+  --hume-lavender-mist: #fff1e6;
   --hume-periwinkle: #c3c0f2;
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
@@ -119,7 +119,7 @@ svg {
   --muted: #5c5856;
   --line-soft: #c2bcbb;
   --surface-dark: #202020;
-  --chart-hume: #edc4f1;
+  --chart-hume: #ffd4a8;
   --chart-compare: #fee6c5;
   --accent-orange: #e95a0b;
   --paper: #ffffff;
@@ -134,10 +134,10 @@ svg {
   --tide: #574853;
   --driftwood: #5c5856;
   --cedar: #5c5856;
-  --coral: #f7bbe6;
+  --coral: #ffb760;
   --primary-action-fill: #232324;
-  --blush: #fce0ee;
-  --rose-mist: #fdebf7;
+  --blush: #ffe9cf;
+  --rose-mist: #fff1e6;
   --meringue: #ffe9cf;
   --mint: #daf7ee;
   --seafoam: #cef1e1;
@@ -184,7 +184,7 @@ svg {
 
   --iris: #e95a0b;
   --lavender: #e95a0b;
-  --lavender-mist: #fdebf7;
+  --lavender-mist: #fff1e6;
   --violet: #e95a0b;
   --specter: #f97316;
 
@@ -224,7 +224,7 @@ svg {
   --sidebar-bg: #fff9f3;
   --panel: #ffffff;
   --panel-2: #fff9f3;
-  --panel-3: #fce0ee;
+  --panel-3: #fff1e6;
   --border-strong: rgba(34, 34, 34, 0.52);
   --text: #222222;
   --text-soft: #5c5856;
@@ -287,7 +287,7 @@ html.dark {
   --charcoal: #121114;
   --hume-cream: #121114;
   --lilac-white: #efedeb;
-  --hume-lavender-mist: #2a2630;
+  --hume-lavender-mist: #241c14;
   --graphite-surface: #1a191c;
   --moss: #1a191c;
   --vault: #1a191c;
@@ -335,7 +335,7 @@ select,
   color-scheme: light;
   --hume-page: #fafafa;
   --hume-cream: #fcf1e7;
-  --hume-lavender-mist: #e8e3f1;
+  --hume-lavender-mist: #fff1e6;
   --hume-periwinkle: #c3c0f2;
   --hume-peach: #fadac1;
   --hume-pink: #f1c9dd;
@@ -355,10 +355,10 @@ select,
   --tide: #574853;
   --driftwood: #5c5856;
   --cedar: #5c5856;
-  --coral: #f7bbe6;
+  --coral: #ffb760;
   --primary-action-fill: #232324;
-  --blush: #fce0ee;
-  --rose-mist: #fdebf7;
+  --blush: #ffe9cf;
+  --rose-mist: #fff1e6;
   --meringue: #ffe9cf;
   --mint: #daf7ee;
   --seafoam: #cef1e1;
@@ -396,7 +396,7 @@ select,
   --cream: #fcf1e7;
   --iris: #e95a0b;
   --lavender: #e95a0b;
-  --lavender-mist: #fdebf7;
+  --lavender-mist: #fff1e6;
   --violet: #e95a0b;
   --specter: #f97316;
   --reactor: #e95a0b;
@@ -1156,7 +1156,7 @@ select,
   }
 
   .cc-research-card--lavender .cc-research-card__widget-inner {
-    background: linear-gradient(145deg, #e8e3f1 0%, #f3eef8 55%, #faf7fc 100%);
+    background: linear-gradient(145deg, #fff1e6 0%, #ffe9cf 55%, #fcf1e7 100%);
   }
 
   .cc-research-card--peach .cc-research-card__widget-inner {
@@ -1592,7 +1592,7 @@ select,
     padding: 6px 12px;
     border-radius: 100px;
     border: 1px solid rgba(35, 35, 36, 0.08);
-    background: rgba(252, 224, 238, 0.74);
+    background: rgba(255, 233, 214, 0.74);
   }
 
   .cc-audience-detail__title {
@@ -1717,7 +1717,7 @@ select,
 
   .cc-audience-bounce-card--blush .cc-border-glow__inner,
   .cc-audience-bounce-card--blush.cc-feature-column .cc-border-glow__inner {
-    background: #fce0ee;
+    background: #ffe9cf;
   }
 
   .cc-audience-bounce-card--lavender .cc-border-glow__inner,
@@ -2157,7 +2157,7 @@ select,
     background:
       radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.8), transparent 36%),
       radial-gradient(circle at 90% 18%, rgba(233, 90, 11, 0.34), transparent 34%),
-      radial-gradient(circle at 50% 100%, rgba(252, 224, 238, 0.34), transparent 44%);
+      radial-gradient(circle at 50% 100%, rgba(255, 233, 214, 0.34), transparent 44%);
     filter: blur(2px);
     opacity: 0.9;
   }
@@ -2606,7 +2606,7 @@ select,
     border-radius: 24px;
     background: linear-gradient(
       105deg,
-      rgba(252, 224, 238, 0.75) 0%,
+      rgba(255, 233, 214, 0.75) 0%,
       rgba(247, 187, 230, 0.55) 45%,
       rgba(255, 233, 207, 0.45) 100%
     );
@@ -4029,7 +4029,7 @@ select,
     flex-shrink: 0;
     border-radius: 999px;
     border: 1px solid rgba(233, 90, 11, 0.24);
-    background: rgba(252, 224, 238, 0.66);
+    background: rgba(255, 233, 214, 0.66);
     padding: 5px 8px;
     font-size: 9px;
     color: #574853;
@@ -4152,7 +4152,7 @@ select,
 
   .cc-how-it-works-preview__save-plus {
     border-color: rgba(233, 90, 11, 0.45);
-    background: #fdebf7;
+    background: #fff1e6;
     box-shadow: 0 4px 20px rgba(34, 34, 34, 0.08);
   }
 
@@ -4164,7 +4164,7 @@ select,
     height: 18px;
     border-radius: 999px;
     border: 1px solid rgba(34, 34, 34, 0.1);
-    background: #fce0ee;
+    background: #ffe9cf;
     color: #232324;
     box-shadow: none;
   }
@@ -4891,7 +4891,7 @@ select,
   --smoke: #5c5856;
   --fog: #5c5856;
   --background: #fcf1e7;
-  --chart-hume: #edc4f1;
+  --chart-hume: #ffd4a8;
   --chart-compare: #fee6c5;
   --surface-dark: #202020;
   --line-soft: #c2bcbb;

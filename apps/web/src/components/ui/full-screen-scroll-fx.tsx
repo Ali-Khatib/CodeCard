@@ -81,7 +81,13 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
-const SECTION_EASE = 'power2.inOut';
+const SCRUB_SMOOTH = 0.42;
+
+/** Smoothstep for crossfades tied directly to scroll progress. */
+function smoothCrossfade(t: number) {
+  const x = clamp(t, 0, 1);
+  return x * x * (3 - 2 * x);
+}
 
 function scrollToY(y: number, durationMs: number) {
   if (typeof window === 'undefined') return;
@@ -118,6 +124,11 @@ function indexFromProgress(progress: number, sectionCount: number) {
   return clamp(Math.round(progress * (sectionCount - 1)), 0, sectionCount - 1);
 }
 
+function progressFromIndex(index: number, sectionCount: number) {
+  if (sectionCount <= 1) return 0;
+  return index / (sectionCount - 1);
+}
+
 export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
   (
     {
@@ -134,8 +145,8 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       debug = false,
       durations = { change: 0.7, snap: 800 },
       reduceMotion,
-      bgTransition = 'fade',
-      parallaxAmount = 4,
+      bgTransition: _bgTransition = 'fade',
+      parallaxAmount: _parallaxAmount = 4,
       currentIndex,
       onIndexChange,
       initialIndex = 0,
@@ -173,9 +184,11 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
     const currentNumberRef = useRef<HTMLSpanElement | null>(null);
     const stRef = useRef<ScrollTrigger | null>(null);
     const lastIndexRef = useRef(index);
-    const isAnimatingRef = useRef(false);
+    const lastProgressRef = useRef(0);
     const isSnappingRef = useRef(false);
     const sectionTopRef = useRef<number[]>([]);
+    const railMetricsRef = useRef<{ rowH: number; containerH: number } | null>(null);
+    const applyScrollProgressRef = useRef<(progress: number) => void>(() => undefined);
     const goToRef = useRef<(to: number, withScroll?: boolean) => void>(
       () => undefined,
     );
@@ -227,245 +240,140 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
     const isCompactRail = () =>
       typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
 
-    const measureAndCenterLists = (toIndex = index, animate = true) => {
-      // Mobile uses a fixed equal-width rail — never vertical-center or GSAP-shift it.
+    const measureRailMetrics = () => {
       if (isCompactRail()) {
-        leftItemRefs.current.forEach((el, i) => {
-          if (!el) return;
-          gsap.set(el, { clearProps: 'transform,x,y' });
-          el.classList.toggle('active', i === toIndex);
-        });
+        railMetricsRef.current = null;
         return;
       }
 
-      const centerTrack = (
-        track: HTMLDivElement | null,
-        items: (HTMLDivElement | null)[],
-      ) => {
-        if (!track || items.length === 0 || !items[0]) return;
-        const first = items[0];
-        const second = items[1];
-        const cont = track.parentElement;
-        if (!cont) return;
-        const contRect = cont.getBoundingClientRect();
-        let rowH = first.getBoundingClientRect().height;
-        if (second) {
-          rowH = second.getBoundingClientRect().top - first.getBoundingClientRect().top;
-        }
-        const targetY = contRect.height / 2 - rowH / 2 - toIndex * rowH;
-        const D = (durations.change ?? 0.7) * 0.9;
-        if (animate && !motionOff) {
-          gsap.to(track, { y: targetY, duration: D, ease: 'power3.out' });
-        } else {
-          gsap.set(track, { y: targetY });
-        }
-      };
+      const cont = leftTrackRef.current?.parentElement;
+      const first = leftItemRefs.current[0];
+      const second = leftItemRefs.current[1];
+      if (!cont || !first) return;
 
-      measureRAF(() => {
-        measureRAF(() => {
-          centerTrack(leftTrackRef.current, leftItemRefs.current);
-          centerTrack(rightTrackRef.current, rightItemRefs.current);
-        });
-      });
+      const contRect = cont.getBoundingClientRect();
+      let rowH = first.getBoundingClientRect().height;
+      if (second) {
+        rowH = second.getBoundingClientRect().top - first.getBoundingClientRect().top;
+      }
+      railMetricsRef.current = { rowH, containerH: contRect.height };
     };
 
-    const changeSection = (to: number) => {
-      if (to === lastIndexRef.current) return;
-      const from = lastIndexRef.current;
-      lastIndexRef.current = to;
-      const down = to > from;
-      const skipping = Math.abs(to - from) > 1;
+    const centerRailTrack = (
+      track: HTMLDivElement | null,
+      pos: number,
+    ) => {
+      if (!track || isCompactRail()) return;
+      const metrics = railMetricsRef.current;
+      if (!metrics) return;
+      const targetY =
+        metrics.containerH / 2 - metrics.rowH / 2 - pos * metrics.rowH;
+      gsap.set(track, { y: targetY });
+    };
 
-      featuredRefs.current.forEach((panel) => {
-        if (panel) gsap.killTweensOf(panel);
-      });
-      bgRefs.current.forEach((bg) => {
-        if (bg) gsap.killTweensOf(bg);
-      });
-      wordRefs.current.forEach((words) => {
-        words.filter(Boolean).forEach((word) => gsap.killTweensOf(word));
-      });
-      if (leftTrackRef.current) gsap.killTweensOf(leftTrackRef.current);
-      if (rightTrackRef.current) gsap.killTweensOf(rightTrackRef.current);
-      leftItemRefs.current.forEach((el) => {
-        if (el) gsap.killTweensOf(el);
-      });
-      rightItemRefs.current.forEach((el) => {
-        if (el) gsap.killTweensOf(el);
-      });
+    const applyScrollProgress = (progress: number) => {
+      lastProgressRef.current = progress;
+      const max = Math.max(total - 1, 1);
+      const pos = clamp(progress * max, 0, max);
+      const from = Math.floor(pos);
+      const to = Math.min(from + 1, total - 1);
+      const blend = from === to ? 0 : smoothCrossfade(pos - from);
 
-      isAnimatingRef.current = true;
-
-      if (!isControlled) setLocalIndex(to);
-      onIndexChange?.(to);
-
-      if (currentNumberRef.current) {
-        currentNumberRef.current.textContent = String(to + 1).padStart(2, '0');
-      }
       if (progressFillRef.current) {
-        const p = (to / (total - 1 || 1)) * 100;
-        progressFillRef.current.style.width = `${p}%`;
+        progressFillRef.current.style.width = `${progress * 100}%`;
       }
 
-      const D = motionOff ? 0.01 : (durations.change ?? 0.7);
-
-      if (skipping) {
-        featuredRefs.current.forEach((panel, i) => {
-          if (!panel) return;
-          gsap.set(panel, { opacity: i === to ? 1 : 0, y: 0 });
-        });
-        bgRefs.current.forEach((bg, i) => {
-          if (!bg) return;
-          gsap.set(bg, { opacity: i === to ? 1 : 0, scale: 1, yPercent: 0 });
-        });
-      }
-
-      // Rich story panels: fade the whole block. String titles: word masks.
-      const fromHasContent = sections[from]?.content != null;
-      const toHasContent = sections[to]?.content != null;
-      if (fromHasContent || toHasContent) {
-        const outPanel = featuredRefs.current[from];
-        const inPanel = featuredRefs.current[to];
-        if (outPanel && !skipping) {
-          gsap.to(outPanel, {
-            opacity: 0,
-            y: down ? -10 : 10,
-            duration: D * 0.5,
-            ease: SECTION_EASE,
-          });
-        } else if (outPanel && skipping) {
-          gsap.set(outPanel, { opacity: 0, y: 0 });
+      bgRefs.current.forEach((bg, i) => {
+        if (!bg) return;
+        let opacity = 0;
+        if (from === to) {
+          opacity = i === from ? 1 : 0;
+        } else if (i === from) {
+          opacity = 1 - blend;
+        } else if (i === to) {
+          opacity = blend;
         }
-        if (inPanel) {
-          if (!skipping) {
-            gsap.set(inPanel, { opacity: 0, y: down ? 14 : -14 });
+        gsap.set(bg, { opacity, scale: 1, yPercent: 0 });
+      });
+
+      featuredRefs.current.forEach((panel, i) => {
+        if (!panel) return;
+        let opacity = 0;
+        let y = 0;
+        if (from === to) {
+          opacity = i === from ? 1 : 0;
+        } else if (i === from) {
+          opacity = 1 - blend;
+          y = -blend * 10;
+        } else if (i === to) {
+          opacity = blend;
+          y = (1 - blend) * 12;
+        }
+        const visible = opacity > 0.02;
+        gsap.set(panel, { opacity, y });
+        panel.style.visibility = visible ? 'visible' : 'hidden';
+        panel.style.pointerEvents = visible && i === to ? 'auto' : 'none';
+      });
+
+      wordRefs.current.forEach((words, sIdx) => {
+        if (sections[sIdx]?.content != null) return;
+        words.filter(Boolean).forEach((word) => {
+          let opacity = 0;
+          if (from === to) {
+            opacity = sIdx === from ? 1 : 0;
+          } else if (sIdx === from) {
+            opacity = 1 - blend;
+          } else if (sIdx === to) {
+            opacity = blend;
           }
-          gsap.to(inPanel, {
-            opacity: 1,
-            y: 0,
-            duration: D,
-            ease: SECTION_EASE,
+          gsap.set(word, {
+            opacity,
+            yPercent: sIdx === to ? (1 - blend) * 18 : blend * -18,
           });
-        }
-      } else {
-        const outWords = (wordRefs.current[from] || []).filter(Boolean);
-        const inWords = (wordRefs.current[to] || []).filter(Boolean);
-        if (outWords.length) {
-          gsap.to(outWords, {
-            yPercent: down ? -100 : 100,
-            opacity: 0,
-            duration: D * 0.6,
-            stagger: down ? 0.03 : -0.03,
-            ease: 'power3.out',
-          });
-        }
-        if (inWords.length) {
-          gsap.set(inWords, { yPercent: down ? 100 : -100, opacity: 0 });
-          gsap.to(inWords, {
-            yPercent: 0,
-            opacity: 1,
-            duration: D,
-            stagger: down ? 0.05 : -0.05,
-            ease: 'power3.out',
-          });
+        });
+      });
+
+      const idx = indexFromProgress(progress, total);
+      if (idx !== lastIndexRef.current) {
+        lastIndexRef.current = idx;
+        if (!isControlled) setLocalIndex(idx);
+        onIndexChange?.(idx);
+        if (currentNumberRef.current) {
+          currentNumberRef.current.textContent = String(idx + 1).padStart(2, '0');
         }
       }
-
-      const prevBg = bgRefs.current[from];
-      const newBg = bgRefs.current[to];
-      if (bgTransition === 'fade') {
-        if (newBg) {
-          if (!skipping) {
-            gsap.set(newBg, {
-              opacity: 0,
-              scale: 1.025,
-              yPercent: down ? 0.6 : -0.6,
-            });
-          }
-          gsap.to(newBg, {
-            opacity: 1,
-            scale: 1,
-            yPercent: 0,
-            duration: D * 1.05,
-            ease: SECTION_EASE,
-          });
-        }
-        if (prevBg && !skipping) {
-          gsap.to(prevBg, {
-            opacity: 0,
-            yPercent: down ? -parallaxAmount * 0.65 : parallaxAmount * 0.65,
-            duration: D * 0.95,
-            ease: SECTION_EASE,
-          });
-        } else if (prevBg && skipping) {
-          gsap.set(prevBg, { opacity: 0, yPercent: 0, scale: 1 });
-        }
-      } else {
-        if (newBg) {
-          gsap.set(newBg, {
-            opacity: 1,
-            clipPath: down ? 'inset(100% 0 0 0)' : 'inset(0 0 100% 0)',
-            scale: 1,
-            yPercent: 0,
-          });
-          gsap.to(newBg, {
-            clipPath: 'inset(0 0 0 0)',
-            duration: D,
-            ease: 'power3.out',
-          });
-        }
-        if (prevBg) {
-          gsap.to(prevBg, {
-            opacity: 0,
-            duration: D * 0.8,
-            ease: 'power2.out',
-          });
-        }
-      }
-
-      measureAndCenterLists(to, !motionOff);
 
       const compact = isCompactRail();
       leftItemRefs.current.forEach((el, i) => {
         if (!el) return;
-        el.classList.toggle('active', i === to);
+        const active = i === idx;
+        el.classList.toggle('active', active);
         if (compact) {
-          gsap.set(el, { clearProps: 'transform,x,y', opacity: i === to ? 1 : 0.55 });
+          gsap.set(el, { clearProps: 'transform,x,y', opacity: active ? 1 : 0.55 });
           return;
         }
-        gsap.to(el, {
-          opacity: i === to ? 1 : 0.35,
-          x: i === to ? 10 : 0,
-          duration: D * 0.75,
-          ease: SECTION_EASE,
-        });
+        gsap.set(el, { opacity: active ? 1 : 0.35, x: active ? 10 : 0 });
       });
       rightItemRefs.current.forEach((el, i) => {
         if (!el) return;
-        el.classList.toggle('active', i === to);
+        const active = i === idx;
+        el.classList.toggle('active', active);
         if (compact) {
-          gsap.set(el, { clearProps: 'transform,x,y', opacity: i === to ? 1 : 0.55 });
+          gsap.set(el, { clearProps: 'transform,x,y', opacity: active ? 1 : 0.55 });
           return;
         }
-        gsap.to(el, {
-          opacity: i === to ? 1 : 0.35,
-          x: i === to ? -10 : 0,
-          duration: D * 0.75,
-          ease: SECTION_EASE,
-        });
+        gsap.set(el, { opacity: active ? 1 : 0.35, x: active ? -10 : 0 });
       });
 
-      gsap.delayedCall(D * 0.85, () => {
-        isAnimatingRef.current = false;
-      });
+      centerRailTrack(leftTrackRef.current, pos);
+      centerRailTrack(rightTrackRef.current, pos);
     };
-    const changeSectionRef = useRef(changeSection);
-    changeSectionRef.current = changeSection;
+    applyScrollProgressRef.current = applyScrollProgress;
 
     const goTo = (to: number, withScroll = true) => {
       const clamped = clamp(to, 0, total - 1);
       isSnappingRef.current = true;
-      changeSection(clamped);
+      applyScrollProgress(progressFromIndex(clamped, total));
 
       const pos = sectionTopRef.current[clamped];
       const snapMs = durations.snap ?? 800;
@@ -476,13 +384,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
           isSnappingRef.current = false;
         }, snapMs);
       } else {
-        // Hold the gate long enough that touch momentum cannot skip chapters.
-        const gateMs = motionOff
-          ? 40
-          : Math.max(280, Math.round((durations.change ?? 0.7) * 380));
-        window.setTimeout(() => {
-          isSnappingRef.current = false;
-        }, gateMs);
+        isSnappingRef.current = false;
       }
     };
     goToRef.current = goTo;
@@ -524,7 +426,10 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       }
 
       computePositions();
-      measureAndCenterLists(index, false);
+      measureRAF(() => {
+        measureRailMetrics();
+        applyScrollProgressRef.current(progressFromIndex(index, total));
+      });
 
       if (motionOff) {
         return () => undefined;
@@ -536,26 +441,12 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         end: 'bottom bottom',
         pin: fixed,
         pinSpacing: true,
+        scrub: SCRUB_SMOOTH,
         anticipatePin: 1,
-        snap:
-          total > 1
-            ? {
-                snapTo: 1 / (total - 1),
-                duration: { min: 0.18, max: 0.65 },
-                delay: 0.04,
-                ease: SECTION_EASE,
-                inertia: false,
-              }
-            : undefined,
+        invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (isSnappingRef.current) return;
-          const target = indexFromProgress(self.progress, total);
-          if (target !== lastIndexRef.current) {
-            changeSectionRef.current(target);
-          }
-          if (progressFillRef.current) {
-            progressFillRef.current.style.width = `${self.progress * 100}%`;
-          }
+          applyScrollProgressRef.current(self.progress);
         },
       });
       stRef.current = st;
@@ -564,20 +455,26 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         requestAnimationFrame(() => goToRef.current(initialIndex, false));
       }
 
+      let resizeTimer: ReturnType<typeof setTimeout> | undefined;
       const ro = new ResizeObserver(() => {
-        computePositions();
-        measureAndCenterLists(lastIndexRef.current, false);
-        ScrollTrigger.refresh();
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          computePositions();
+          measureRailMetrics();
+          applyScrollProgressRef.current(lastProgressRef.current);
+          ScrollTrigger.refresh();
+        }, 120);
       });
       ro.observe(fs);
 
       return () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
         ro.disconnect();
         st.kill();
         stRef.current = null;
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/setup for section count + motion mode
-    }, [total, initialIndex, motionOff, bgTransition, parallaxAmount]);
+    }, [total, initialIndex, motionOff]);
 
     useImperativeHandle(apiRef, () => ({
       next: () => goTo(index + 1),
@@ -591,33 +488,20 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       if (motionOff) return;
       leftItemRefs.current.forEach((el, i) => {
         if (!el) return;
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 20 },
-          {
-            opacity: i === index ? 1 : 0.35,
-            y: 0,
-            duration: 0.5,
-            delay: i * 0.06,
-            ease: 'power3.out',
-          },
-        );
+        gsap.set(el, {
+          opacity: i === index ? 1 : 0.35,
+          y: 0,
+        });
       });
       rightItemRefs.current.forEach((el, i) => {
         if (!el) return;
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 20 },
-          {
-            opacity: i === index ? 1 : 0.35,
-            y: 0,
-            duration: 0.5,
-            delay: 0.2 + i * 0.06,
-            ease: 'power3.out',
-          },
-        );
+        gsap.set(el, {
+          opacity: i === index ? 1 : 0.35,
+          y: 0,
+        });
       });
-      measureAndCenterLists(index, false);
+      measureRailMetrics();
+      applyScrollProgressRef.current(progressFromIndex(index, total));
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -337,7 +337,7 @@ function ReaderFallback({
 }) {
   return (
     <div className="mx-auto max-w-2xl px-2 py-8" role="alert" aria-live="assertive">
-      <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[var(--app-iris,#9382ff)]">
+      <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[var(--app-iris,#e95a0b)]">
         Preview unavailable
       </p>
       <h3 className="mt-3 text-[22px] font-semibold leading-snug">{paper.title}</h3>

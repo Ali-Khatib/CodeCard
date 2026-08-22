@@ -7,7 +7,7 @@ import {
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 const U = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=2400&q=80`;
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=75`;
 
 type WalkStory = {
   id: string;
@@ -153,7 +153,7 @@ export function EditorialFeatureWalkthrough() {
           showProgress
           showEnd={false}
           bgTransition="fade"
-          durations={{ change: 0.88, snap: 950 }}
+          durations={{ change: 0.55, snap: 720 }}
           colors={{
             text: 'rgba(245, 243, 240, 0.95)',
             overlay: 'rgba(32, 32, 36, 0.22)',

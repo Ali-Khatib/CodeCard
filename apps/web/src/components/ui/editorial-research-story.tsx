@@ -16,7 +16,10 @@ export type EditorialResearchBeat = {
   id: string;
   index: string;
   marker: string;
+  /** Full phrase for screen readers */
   problemTitle: string;
+  problemLead: string;
+  problemSub: string;
   researchBody: string;
   solutionBody: string;
 };
@@ -97,38 +100,52 @@ function StorySlide({ step }: { step: StoryStep }) {
       data-testid={`editorial-proof-box-${step.beat.id}-${step.phase}`}
       aria-label={`${step.eyebrow}: ${step.beat.marker}`}
     >
-      <p className="cc-ed-research-story__eyebrow" data-research-reveal>
-        {step.eyebrow}
-      </p>
-      <p className="cc-ed-research-story__marker" data-research-reveal>
-        {step.beat.index} · {step.beat.marker}
-      </p>
+      <div className="cc-ed-research-story__panel">
+        <p className="cc-ed-research-story__eyebrow" data-research-reveal>
+          {step.eyebrow}
+        </p>
+        <p className="cc-ed-research-story__marker" data-research-reveal>
+          {step.beat.index} · {step.beat.marker}
+        </p>
 
-      {step.phase === 'problem' ? (
-        <h3 className="cc-ed-research-story__headline" data-research-reveal>
-          {step.beat.problemTitle}
-        </h3>
-      ) : null}
-
-      {step.phase === 'research' ? (
-        <>
-          <h3 className="cc-ed-research-story__headline cc-ed-research-story__headline--research" data-research-reveal>
-            {step.beat.marker}
+        {step.phase === 'problem' ? (
+          <h3
+            className="cc-ed-research-story__headline-stack"
+            data-research-reveal
+            aria-label={step.beat.problemTitle}
+          >
+            <span className="cc-ed-research-story__headline-line">
+              {step.beat.problemLead}
+            </span>
+            <span className="cc-ed-research-story__headline-line cc-ed-research-story__headline-line--accent">
+              {step.beat.problemSub}
+            </span>
           </h3>
-          <p className="cc-ed-research-story__body" data-research-reveal>
-            {step.body}
-          </p>
-        </>
-      ) : null}
+        ) : null}
 
-      {step.phase === 'solution' ? (
-        <>
-          <p className="cc-ed-research-story__solution-kicker" data-research-reveal>
-            The answer
-          </p>
-          <CodeCardSolutionCopy text={step.body} />
-        </>
-      ) : null}
+        {step.phase === 'research' ? (
+          <>
+            <h3
+              className="cc-ed-research-story__headline cc-ed-research-story__headline--research"
+              data-research-reveal
+            >
+              {step.beat.marker}
+            </h3>
+            <p className="cc-ed-research-story__body" data-research-reveal>
+              {step.body}
+            </p>
+          </>
+        ) : null}
+
+        {step.phase === 'solution' ? (
+          <>
+            <p className="cc-ed-research-story__solution-kicker" data-research-reveal>
+              The answer
+            </p>
+            <CodeCardSolutionCopy text={step.body} />
+          </>
+        ) : null}
+      </div>
     </article>
   );
 }
@@ -159,19 +176,19 @@ export function EditorialResearchStory({ beats }: { beats: EditorialResearchBeat
       );
       if (slides.length === 0) return;
 
-      const setStep = (rawIndex: number) => {
+      const setStepVisuals = (rawIndex: number) => {
         const index = Math.max(0, Math.min(slides.length - 1, Math.round(rawIndex)));
-        setActiveStep(index);
 
         slides.forEach((slide, i) => {
           const distance = Math.abs(i - rawIndex);
-          const opacity = Math.max(0, 1 - distance * 0.72);
-          const x = (i - rawIndex) * 108;
+          const opacity = Math.max(0, 1 - distance * 0.85);
+          const y = (i - rawIndex) * 28;
           gsap.set(slide, {
             opacity,
-            x: `${x}%`,
-            scale: i === index ? 1 : 0.94,
-            filter: distance > 0.35 ? 'blur(6px)' : 'blur(0px)',
+            x: 0,
+            y,
+            scale: 1,
+            pointerEvents: distance < 0.35 ? 'auto' : 'none',
           });
         });
 
@@ -183,21 +200,30 @@ export function EditorialResearchStory({ beats }: { beats: EditorialResearchBeat
         if (indexLabel) {
           indexLabel.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
         }
+
+        return index;
       };
 
-      setStep(0);
+      let lastStep = 0;
+      setActiveStep(0);
+      setStepVisuals(0);
 
       const st = ScrollTrigger.create({
         trigger: pin,
         start: 'top top',
-        end: () => `+=${Math.max(window.innerHeight * slides.length * 0.92, slides.length * 640)}`,
+        end: () => `+=${Math.max(window.innerHeight * slides.length * 0.82, slides.length * 580)}`,
         pin: true,
-        scrub: 0.9,
+        scrub: 0.55,
         anticipatePin: 1,
+        invalidateOnRefresh: true,
         markers: gsapMarkersEnabled(),
         onUpdate(self) {
           const raw = self.progress * (slides.length - 1);
-          setStep(raw);
+          const index = setStepVisuals(raw);
+          if (index !== lastStep) {
+            lastStep = index;
+            setActiveStep(index);
+          }
         },
       });
 
@@ -227,16 +253,6 @@ export function EditorialResearchStory({ beats }: { beats: EditorialResearchBeat
       <div ref={pinRef} className="cc-ed-research-story__pin">
         <div className="cc-ed-research-story__bg-index" aria-hidden>
           {bgIndex}
-        </div>
-
-        <div className="cc-ed-research-story__rail" aria-hidden>
-          <span className="cc-ed-research-story__rail-label">Research</span>
-          <div className="cc-ed-research-story__rail-track">
-            <div
-              className="cc-ed-research-story__rail-fill"
-              style={{ height: `${((activeStep + 1) / steps.length) * 100}%` }}
-            />
-          </div>
         </div>
 
         <div className="cc-ed-research-story__viewport">

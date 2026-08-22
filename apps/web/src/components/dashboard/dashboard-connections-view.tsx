@@ -234,7 +234,7 @@ function ConnectionsFollowUps({
   if (followUps.length === 0) return null;
 
   return (
-    <AppCard tone="blush" className="cc-connection-followups !p-6 md:!p-8">
+    <AppCard tone="meringue" className="cc-connection-followups !p-6 md:!p-8">
       <div className="cc-connection-followups__head">
         <div>
           <SectionLabel>Upcoming follow-ups</SectionLabel>
@@ -340,7 +340,7 @@ function ConnectionCard({
           <div className="cc-connection-blob__name-row">
             <p className="cc-connection-blob__name">{connection.name}</p>
             {expanded && (
-              <span className="cc-app-badge cc-app-badge--blush cc-connection-blob__source-badge">
+              <span className="cc-app-badge cc-app-badge--source cc-connection-blob__source-badge">
                 {connection.source}
               </span>
             )}
@@ -359,7 +359,7 @@ function ConnectionCard({
           )}
           <p className="cc-connection-blob__summary-value">{connection.date}</p>
           {!expanded && (
-            <span className="cc-app-badge cc-app-badge--blush cc-connection-blob__source-badge">
+            <span className="cc-app-badge cc-app-badge--source cc-connection-blob__source-badge">
               {connection.source}
             </span>
           )}

@@ -24,7 +24,7 @@ export function LandingShellNav() {
 
   return (
     <div
-      className={`cc-marketing-nav-shell fixed inset-x-0 z-[100] flex justify-center px-3 pt-3 sm:px-5${
+      className={`cc-marketing-nav-shell sticky top-0 inset-x-0 z-[100] flex w-full justify-center px-3 sm:px-5${
         scrolled ? ' cc-marketing-nav-shell--scrolled' : ''
       }`}
       style={{ top: LAYOUT.pillNavTop }}

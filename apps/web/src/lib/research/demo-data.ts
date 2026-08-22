@@ -1,19 +1,19 @@
 import type { ResearchPaper } from './research';
 
-const figure = (title: string, subtitle: string, accent = '#9382ff') =>
+const figure = (title: string, subtitle: string, accent = '#e95a0b') =>
   `data:image/svg+xml,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
-  <rect width="1400" height="900" fill="#030014"/>
+  <rect width="1400" height="900" fill="#1a0f08"/>
   <circle cx="240" cy="210" r="190" fill="${accent}" opacity="0.18"/>
-  <circle cx="1120" cy="680" r="260" fill="#c094e4" opacity="0.13"/>
-  <rect x="90" y="90" width="1220" height="720" rx="34" fill="#0b0618" stroke="rgba(255,255,255,0.14)"/>
-  <text x="150" y="175" fill="#f4f0ff" font-family="system-ui,sans-serif" font-size="42" font-weight="700">${title}</text>
-  <text x="150" y="230" fill="#b9b2ca" font-family="system-ui,sans-serif" font-size="24">${subtitle}</text>
-  <rect x="150" y="310" width="330" height="260" rx="22" fill="rgba(147,130,255,0.22)" stroke="rgba(255,255,255,0.18)"/>
-  <rect x="535" y="260" width="330" height="360" rx="22" fill="rgba(192,148,228,0.18)" stroke="rgba(255,255,255,0.18)"/>
+  <circle cx="1120" cy="680" r="260" fill="#ffb760" opacity="0.13"/>
+  <rect x="90" y="90" width="1220" height="720" rx="34" fill="#24140a" stroke="rgba(255,255,255,0.14)"/>
+  <text x="150" y="175" fill="#fff7ef" font-family="system-ui,sans-serif" font-size="42" font-weight="700">${title}</text>
+  <text x="150" y="230" fill="#d8c4b0" font-family="system-ui,sans-serif" font-size="24">${subtitle}</text>
+  <rect x="150" y="310" width="330" height="260" rx="22" fill="rgba(233,90,11,0.22)" stroke="rgba(255,255,255,0.18)"/>
+  <rect x="535" y="260" width="330" height="360" rx="22" fill="rgba(255,183,96,0.18)" stroke="rgba(255,255,255,0.18)"/>
   <rect x="920" y="360" width="290" height="210" rx="22" fill="rgba(255,250,244,0.1)" stroke="rgba(255,255,255,0.16)"/>
   <path d="M480 440 C520 400, 505 385, 535 378" stroke="${accent}" stroke-width="5" fill="none" opacity="0.8"/>
-  <path d="M865 450 C900 430, 890 425, 920 420" stroke="#c094e4" stroke-width="5" fill="none" opacity="0.8"/>
+  <path d="M865 450 C900 430, 890 425, 920 420" stroke="#ffb760" stroke-width="5" fill="none" opacity="0.8"/>
 </svg>`)}`;
 
 export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
