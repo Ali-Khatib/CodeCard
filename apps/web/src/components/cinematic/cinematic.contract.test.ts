@@ -112,6 +112,27 @@ describe('Editorial product landing contract', () => {
     expect(css).toContain('.cc-ed-research-story');
   });
 
+  it('keeps a floating glass pill nav and photo-backed statement beats', () => {
+    const css = read('src/styles/editorial-landing.css');
+    const statement = read(
+      'src/components/landing/editorial/editorial-statement.tsx',
+    );
+    const scene = read(
+      'src/components/landing/editorial/editorial-hero-scene.tsx',
+    );
+    expect(css).toContain('Floating frosted pill over the hero');
+    expect(css).not.toContain('Dedicated editorial nav strip');
+    expect(css).not.toMatch(
+      /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
+    );
+    expect(statement).toContain('data-statement-beat');
+    expect(statement).toContain(' / 03');
+    expect(statement).toContain('What this is');
+    expect(scene).toContain('clipPath');
+    expect(scene).toContain('scrub:');
+    expect(scene).not.toContain("backgroundColor: 'transparent'");
+  });
+
   it('keeps final CTA without public profile', () => {
     const closing = read('src/components/landing/editorial/editorial-final-cta.tsx');
     expect(closing).toContain('LiveDemoLink');
