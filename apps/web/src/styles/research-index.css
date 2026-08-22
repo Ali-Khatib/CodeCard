@@ -7,7 +7,7 @@
   --ri-cream: var(--hume-cream, #fcf1e7);
   --ri-ink: var(--ink, #232324);
   --ri-mute: var(--smoke, #5c5856);
-  --ri-iris: var(--iris, #c094e4);
+  --ri-iris: var(--iris, #e95a0b);
   --ri-paper: var(--paper, #ffffff);
   --ri-line: color-mix(in srgb, var(--ri-ink) 12%, transparent);
   min-height: 100dvh;

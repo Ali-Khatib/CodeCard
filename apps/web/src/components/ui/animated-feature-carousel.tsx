@@ -96,7 +96,7 @@ function StepsNav({
                 tabIndex={isCurrent ? 0 : -1}
                 className={cn(
                   'group flex min-h-11 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--iris,#c094e4)] focus-visible:ring-offset-2',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--iris,#e95a0b)] focus-visible:ring-offset-2',
                   isCurrent
                     ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
                     : 'border border-[color:var(--line-soft)] bg-transparent text-[color:var(--smoke)] hover:border-[color:color-mix(in_srgb,var(--ink)_25%,transparent)] hover:text-[color:var(--ink)]',
@@ -157,7 +157,7 @@ function StepMedia({
   if (imgs.length === 0) {
     return (
       <div
-        className="aspect-[4/3] w-full min-w-0 rounded-2xl bg-[linear-gradient(145deg,color-mix(in_srgb,var(--iris,#c094e4)_12%,var(--paper)),var(--paper))]"
+        className="aspect-[4/3] w-full min-w-0 rounded-2xl bg-[linear-gradient(145deg,color-mix(in_srgb,var(--iris,#e95a0b)_12%,var(--paper)),var(--paper))]"
         aria-hidden
       />
     );

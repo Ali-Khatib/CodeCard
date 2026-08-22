@@ -115,8 +115,10 @@ export function EditorialAtmosphere() {
 
     const chapterTriggers = sections.map((section) => {
       const id = section.dataset.chapterSection ?? 'hero';
-      // Flip when the chapter is the main surface — one solid color until then
-      const start = id === 'demo' ? 'top 38%' : 'top 55%';
+      // Flip when the chapter is the main surface — one solid color until then.
+      // Statement starts earlier so cream-panel copy never inherits hero (light) tokens.
+      const start =
+        id === 'demo' ? 'top 38%' : id === 'statement' ? 'top 78%' : 'top 55%';
       return ScrollTrigger.create({
         id: `editorial-atmosphere-${id}`,
         trigger: section,

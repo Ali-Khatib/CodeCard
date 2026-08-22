@@ -21,18 +21,18 @@ export const HUME_COLORS = {
   chartHume: '#EDC4F1',
   chartCompare: '#FEE6C5',
   accentOrange: '#E95A0B',
-  iris: '#C094E4',
+  iris: '#E95A0B',
 } as const;
 
 export const HUME_GRADIENTS = {
   warmBrand:
-    'linear-gradient(135deg, #F7D5B8 0%, #FEEBE2 32%, #F3C2D7 68%, #CAC0F1 100%)',
+    'linear-gradient(135deg, #F7D5B8 0%, #FEEBE2 32%, #FADAC1 68%, #FFB760 100%)',
   lavenderTitle:
-    'linear-gradient(135deg, #E2CAED 0%, #E8E3F1 55%, #E9DFF2 100%)',
+    'linear-gradient(135deg, #F5C9A8 0%, #FCE8D8 55%, #FFE9CF 100%)',
   accentText:
-    'linear-gradient(90deg, #C094E4 0%, #F7BBE6 50%, #FFB760 100%)',
+    'linear-gradient(90deg, #E95A0B 0%, #F97316 50%, #FFB760 100%)',
   softBlob:
-    'radial-gradient(circle at 30% 30%, rgba(195,192,242,.45), transparent 45%), radial-gradient(circle at 70% 60%, rgba(241,201,221,.40), transparent 40%), radial-gradient(circle at 55% 20%, rgba(250,218,193,.45), transparent 36%)',
+    'radial-gradient(circle at 30% 30%, rgba(233,90,11,.22), transparent 45%), radial-gradient(circle at 70% 60%, rgba(250,218,193,.40), transparent 40%), radial-gradient(circle at 55% 20%, rgba(255,183,96,.35), transparent 36%)',
 } as const;
 
 export const HUME_SPACING = {
@@ -97,10 +97,10 @@ export const HUME_CSS_VARS: Record<string, string> = {
   '--cosmic-base-start': HUME_COLORS.cream,
   '--cosmic-base-mid': HUME_COLORS.page,
   '--cosmic-base-end': HUME_COLORS.cream,
-  '--cosmic-glow': 'rgba(195, 192, 242, 0.14)',
-  '--cosmic-glow-secondary': 'rgba(241, 201, 221, 0.12)',
-  '--accent-rgb': '192, 148, 228',
-  '--accent-bright-rgb': '247, 187, 230',
-  '--accent-muted-rgb': '237, 196, 241',
+  '--cosmic-glow': 'rgba(233, 90, 11, 0.14)',
+  '--cosmic-glow-secondary': 'rgba(255, 183, 96, 0.12)',
+  '--accent-rgb': '233, 90, 11',
+  '--accent-bright-rgb': '249, 115, 22',
+  '--accent-muted-rgb': '245, 168, 120',
   '--accent-secondary-rgb': '255, 183, 96',
 };

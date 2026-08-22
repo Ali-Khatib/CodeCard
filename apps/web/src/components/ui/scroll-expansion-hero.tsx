@@ -170,7 +170,7 @@ export default function ScrollExpandMedia({
           )}
           <div className="flex flex-col gap-1 font-display text-[clamp(2.5rem,8vw,7rem)] leading-[0.9] tracking-[-0.06em] text-[#232324]">
             <motion.span style={{ x: titleXLeft }}>{firstWord}</motion.span>
-            <motion.span className="text-[#c094e4]" style={{ x: titleXRight }}>
+            <motion.span className="text-[#e95a0b]" style={{ x: titleXRight }}>
               {restOfTitle}
             </motion.span>
           </div>

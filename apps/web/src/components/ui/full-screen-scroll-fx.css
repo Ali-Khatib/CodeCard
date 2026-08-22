@@ -127,6 +127,14 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--fx-accent);
+  -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.55);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.95),
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 2px 10px rgba(0, 0, 0, 0.65),
+    1px 0 1px rgba(0, 0, 0, 0.5),
+    -1px 0 1px rgba(0, 0, 0, 0.5);
 }
 
 .fx-content {
@@ -169,6 +177,14 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--fx-accent);
+  -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.55);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.95),
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 2px 10px rgba(0, 0, 0, 0.65),
+    1px 0 1px rgba(0, 0, 0, 0.5),
+    -1px 0 1px rgba(0, 0, 0, 0.5);
 }
 
 .fx-story__title {

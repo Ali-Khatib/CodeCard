@@ -59,8 +59,8 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       tl.to(
         stage,
         {
-          borderRadius: mobile ? 20 : 40,
-          scale: mobile ? 0.985 : 0.975,
+          borderRadius: mobile ? 24 : 32,
+          scale: mobile ? 0.988 : 0.978,
           ease: MOTION_EASE.inOut,
         },
         0,

@@ -161,7 +161,7 @@ function OverlayCopy({
       style={{ y, opacity }}
       className="absolute left-0 top-0 flex h-screen w-full flex-col items-center justify-center px-6 text-white"
     >
-      <p className="mb-2 text-center font-[family-name:var(--font-eyebrow)] text-sm uppercase tracking-[0.16em] text-[color:var(--ed-iris,#c094e4)] md:mb-4 md:text-base">
+      <p className="mb-2 text-center font-[family-name:var(--font-eyebrow)] text-sm uppercase tracking-[0.16em] text-[color:var(--ed-iris,#e95a0b)] md:mb-4 md:text-base">
         {subheading}
       </p>
       <p className="max-w-4xl text-center font-[family-name:var(--font-display)] text-4xl font-normal leading-[1.05] tracking-[-0.03em] md:text-6xl lg:text-7xl">
@@ -169,7 +169,7 @@ function OverlayCopy({
       </p>
       {research ? (
         <>
-          <p className="mt-8 text-center font-[family-name:var(--font-eyebrow)] text-sm uppercase tracking-[0.16em] text-[color:var(--ed-iris,#c094e4)] md:mt-10 md:text-base">
+          <p className="mt-8 text-center font-[family-name:var(--font-eyebrow)] text-sm uppercase tracking-[0.16em] text-[color:var(--ed-iris,#e95a0b)] md:mt-10 md:text-base">
             The research
           </p>
           <p className="mt-4 max-w-3xl text-center text-xl leading-snug text-white/90 md:text-2xl md:leading-[1.35]">
@@ -179,7 +179,7 @@ function OverlayCopy({
       ) : null}
       {solution ? (
         <>
-          <p className="mt-9 text-center font-[family-name:var(--font-eyebrow)] text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--ed-iris,#c094e4)] md:mt-11 md:text-base">
+          <p className="mt-9 text-center font-[family-name:var(--font-eyebrow)] text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--ed-iris,#e95a0b)] md:mt-11 md:text-base">
             The solution
           </p>
           <p className="mt-4 max-w-4xl text-center font-[family-name:var(--font-display)] text-3xl font-normal leading-[1.08] tracking-[-0.03em] text-white md:text-5xl md:leading-[1.05] lg:text-6xl">

@@ -74,34 +74,41 @@ describe('Editorial product landing contract', () => {
     const proof = read(
       'src/components/landing/editorial/editorial-research-scene.tsx',
     );
-    expect(proof).toContain('EditorialResearchScene');
+    const story = read('src/components/ui/editorial-research-story.tsx');
+    expect(proof).toContain('EditorialResearchStory');
+    expect(story).toContain('EditorialResearchStory');
     expect(proof).toContain('THEY DO NOT READ YOU.');
     expect(proof).toContain('Your best work never gets the glance.');
     expect(proof).toContain('Your school can decide first.');
     expect(proof).toContain('Hidden skills get skipped.');
     expect(proof).toContain('The research');
-    expect(proof).toContain('The solution');
-    expect(proof).toContain('data-research-reveal');
+    expect(story).toContain('The solution');
+    expect(story).toContain('data-research-reveal');
+    expect(story).toContain('cc-ed-research-story__progress');
     expect(proof).not.toContain('TextParallaxContent');
     expect(proof).not.toContain('images.unsplash.com');
     expect(proof).not.toContain('photo-1450101499163-c8848c66ca85');
     expect(proof).toContain('See all research papers');
   });
 
-  it('embeds a square live demo preview with engagement invitation', () => {
+  it('embeds a full live demo preview with web/mobile toggle and delayed invitation', () => {
     const demo = read('src/components/landing/editorial/editorial-live-demo-box.tsx');
     const preview = read('src/components/landing/editorial/editorial-live-demo-preview.tsx');
     const css = read('src/styles/editorial-landing.css');
     expect(demo).toContain('EditorialLiveDemoPreview');
     expect(preview).toContain('iframe');
-    expect(preview).toContain('src="/demo?embed=1"');
+    expect(preview).toContain('/demo?embed=1');
+    expect(preview).toContain('/demo/card?embed=1');
+    expect(preview).toContain('Web app');
+    expect(preview).toContain('Mobile app');
     expect(preview).toContain('EXPLORE THE FULL EXPERIENCE');
     expect(preview).toContain('Open Live Demo →');
     expect(demo).toContain('cc-ed-walk__bridge--out');
     expect(demo).not.toContain('LIVE_DEMO_PROFILE_HREF');
-    expect(css).toMatch(/\.cc-ed-demo-preview__frame[\s\S]*?aspect-ratio:\s*1\s*\/\s*1/);
+    expect(css).toMatch(/\.cc-ed-demo-preview__chrome[\s\S]*?min-height:\s*620px/);
     expect(css).toContain('.cc-ed-hero-scene');
     expect(css).toContain('.cc-ed-research-scene');
+    expect(css).toContain('.cc-ed-research-story');
   });
 
   it('keeps final CTA without public profile', () => {

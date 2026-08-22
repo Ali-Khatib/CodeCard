@@ -10,18 +10,13 @@ import {
 } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { MOTION_EASE, MOTION_LIMITS } from '@/components/motion/motion-tokens';
+import {
+  EditorialResearchStory,
+  type EditorialResearchBeat,
+} from '@/components/ui/editorial-research-story';
 import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
 
-type ResearchBeat = {
-  id: string;
-  index: string;
-  marker: string;
-  problemTitle: string;
-  researchBody: string;
-  solutionBody: string;
-};
-
-const BEATS: ResearchBeat[] = [
+const BEATS: EditorialResearchBeat[] = [
   {
     id: 'attention',
     index: '01',
@@ -53,74 +48,6 @@ const BEATS: ResearchBeat[] = [
       'CodeCard makes your skills and projects easy to see. More people can find you.',
   },
 ];
-
-function ResearchBeatPanel({ beat }: { beat: ResearchBeat }) {
-  const panelRef = useRef<HTMLElement>(null);
-  const { canEnhanceMotion } = useMotionPreferences();
-
-  useGSAP(
-    () => {
-      if (!canEnhanceMotion) return;
-      ensureGsapPlugins();
-      const panel = panelRef.current;
-      if (!panel) return;
-
-      const items = panel.querySelectorAll('[data-research-reveal]');
-      gsap.set(items, { opacity: 0, y: MOTION_LIMITS.revealY * 0.55 });
-
-      gsap.to(items, {
-        opacity: 1,
-        y: 0,
-        duration: 0.85,
-        stagger: 0.12,
-        ease: MOTION_EASE.inOut,
-        scrollTrigger: {
-          trigger: panel,
-          start: 'top 78%',
-          end: 'top 42%',
-          scrub: 0.45,
-          markers: gsapMarkersEnabled(),
-        },
-      });
-    },
-    { scope: panelRef, dependencies: [canEnhanceMotion, beat.id], revertOnUpdate: true },
-  );
-
-  return (
-    <article
-      ref={panelRef}
-      className="cc-ed-research-beat"
-      data-testid={`editorial-proof-box-${beat.id}`}
-    >
-      <div className="cc-ed-research-beat__rail">
-        <span className="cc-ed-research-beat__index" data-research-reveal>
-          {beat.index}
-        </span>
-        <span className="cc-ed-research-beat__marker" data-research-reveal>
-          {beat.marker}
-        </span>
-      </div>
-      <div className="cc-ed-research-beat__body">
-        <p className="cc-ed-research-beat__label" data-research-reveal>
-          The problem
-        </p>
-        <h3 className="cc-ed-research-beat__title" data-research-reveal>
-          {beat.problemTitle}
-        </h3>
-        <div className="cc-ed-research-beat__columns">
-          <div className="cc-ed-research-beat__column" data-research-reveal>
-            <p className="cc-ed-research-beat__column-label">The research</p>
-            <p className="cc-ed-research-beat__copy">{beat.researchBody}</p>
-          </div>
-          <div className="cc-ed-research-beat__column" data-research-reveal>
-            <p className="cc-ed-research-beat__column-label">The solution</p>
-            <p className="cc-ed-research-beat__solution">{beat.solutionBody}</p>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 export function EditorialResearchScene() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -189,11 +116,7 @@ export function EditorialResearchScene() {
         </p>
       </div>
 
-      <div className="cc-ed-research-scene__beats">
-        {BEATS.map((beat) => (
-          <ResearchBeatPanel key={beat.id} beat={beat} />
-        ))}
-      </div>
+      <EditorialResearchStory beats={BEATS} />
 
       <p className="cc-ed-proof__more">
         <Link href="/research" className="cc-ed__link">

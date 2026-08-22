@@ -1,10 +1,9 @@
 'use client';
 
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { EditorialLiveDemoPreview } from './editorial-live-demo-preview';
 
-/** Square workspace preview with engagement-based invitation to the full demo. */
+/** Full live demo preview with web/mobile toggle and delayed full-workspace CTA. */
 export function EditorialLiveDemoBox() {
   return (
     <section
@@ -22,8 +21,9 @@ export function EditorialLiveDemoBox() {
           <span className="cc-ed__sub">DEMO WORKSPACE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Inspect {DEMO_PROFILE.display_name}&apos;s CodeCard here. When you are
-          ready, step into the full workspace.
+          Switch between the web workspace and mobile profile below — the full
+          demo stays visible while you explore. After a while, we&apos;ll offer
+          the full-screen experience.
         </p>
         <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>

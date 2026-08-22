@@ -12,7 +12,7 @@
   --app-bone: #fcf1e7;
   --app-smoke: #5c5856;
   --app-carbon: #000000;
-  --app-iris: #c094e4;
+  --app-iris: #e95a0b;
   --app-error: #b91c1c;
   --app-blush: #fce0ee;
   --app-rose-mist: #fdebf7;
@@ -101,7 +101,7 @@ html.dark .cc-app-sidebar-toggle {
 
 html.dark .cc-app-sidebar-toggle:hover {
   background: var(--app-paper);
-  border-color: rgba(192, 148, 228, 0.55);
+  border-color: rgba(233, 90, 11, 0.55);
 }
 
 html.dark .cc-app-sidebar-toggle__card span {
@@ -110,7 +110,7 @@ html.dark .cc-app-sidebar-toggle__card span {
 }
 
 html.dark .cc-app-sidebar-toggle__card span:last-child {
-  box-shadow: inset 0 4px 0 rgba(192, 148, 228, 0.28);
+  box-shadow: inset 0 4px 0 rgba(233, 90, 11, 0.28);
 }
 
 /* ?? Layout ?? */
@@ -293,7 +293,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-app-sidebar-toggle__card span:last-child {
   right: 0;
   top: 0;
-  box-shadow: inset 0 4px 0 rgba(192, 148, 228, 0.18);
+  box-shadow: inset 0 4px 0 rgba(233, 90, 11, 0.18);
 }
 
 .cc-app-sidebar-toggle__chevron {
@@ -406,7 +406,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   height: 2px;
   width: min(220px, 42%);
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--app-iris), rgba(247, 187, 230, 0.62), transparent);
+  background: linear-gradient(90deg, var(--app-iris), rgba(249, 115, 22, 0.62), transparent);
 }
 
 .cc-app-page-header__copy {
@@ -423,7 +423,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   height: 54px;
   width: 54px;
   border-radius: 999px;
-  background: rgba(192, 148, 228, 0.12);
+  background: rgba(233, 90, 11, 0.12);
   filter: blur(12px);
 }
 
@@ -488,12 +488,12 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-reactive-border.cc-app-card--blush {
   background: var(--app-blush);
-  border-color: rgba(192, 148, 228, 0.22);
+  border-color: rgba(233, 90, 11, 0.22);
 }
 
 .cc-reactive-border.cc-app-card--rose {
   background: var(--app-rose-mist);
-  border-color: rgba(192, 148, 228, 0.22);
+  border-color: rgba(233, 90, 11, 0.22);
 }
 
 .cc-reactive-border.cc-app-card--mint {
@@ -502,8 +502,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-reactive-border.cc-app-card--meringue {
-  background: rgba(192, 148, 228, 0.08);
-  border-color: rgba(192, 148, 228, 0.16);
+  background: rgba(233, 90, 11, 0.08);
+  border-color: rgba(233, 90, 11, 0.16);
 }
 
 .cc-reactive-border.cc-app-card--seafoam {
@@ -527,8 +527,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-card--meringue {
-  background: rgba(192, 148, 228, 0.08);
-  border-color: rgba(192, 148, 228, 0.12);
+  background: rgba(233, 90, 11, 0.08);
+  border-color: rgba(233, 90, 11, 0.12);
 }
 
 .cc-app-card--seafoam {
@@ -594,28 +594,28 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 .cc-app-btn:focus-visible {
   outline: 2px solid var(--app-ink, #232324);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #e95a0b) 42%, transparent);
 }
 
 .cc-app-btn--primary:focus-visible {
   outline-color: var(--app-paper, #fff);
   box-shadow:
     0 0 0 2px var(--app-ink, #232324),
-    0 0 0 5px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
+    0 0 0 5px color-mix(in srgb, var(--app-iris, #e95a0b) 42%, transparent);
 }
 
 .cc-settings-nav-link:focus-visible,
 .cc-app-mobile-nav__link:focus-visible {
   outline: 2px solid var(--app-ink, #232324);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #e95a0b) 42%, transparent);
 }
 
 a.cc-app-nav-link:focus-visible,
 button.cc-app-nav-link:focus-visible {
   outline: 2px solid var(--app-ink, #232324);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #c094e4) 42%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-iris, #e95a0b) 42%, transparent);
 }
 
 /* Async action button ? loading pulse + check morph */
@@ -1108,7 +1108,7 @@ button.cc-app-nav-link:focus-visible {
 }
 
 .cc-app-filter-pill:focus-visible {
-  outline: 3px solid var(--app-iris, #c094e4);
+  outline: 3px solid var(--app-iris, #e95a0b);
   outline-offset: 2px;
   z-index: 1;
 }
@@ -1214,7 +1214,7 @@ button.cc-app-nav-link:focus-visible {
   outline: none;
   box-shadow:
     0 10px 36px rgba(0, 0, 0, 0.28),
-    0 0 0 2px #c094e4,
+    0 0 0 2px #e95a0b,
     0 0 0 4px #ffffff;
 }
 
@@ -1328,7 +1328,7 @@ html.dark .cc-project-nav-btn svg,
   width: 7px;
   border-radius: 999px;
   background: var(--app-iris);
-  box-shadow: 0 0 0 5px rgba(192, 148, 228, 0.12);
+  box-shadow: 0 0 0 5px rgba(233, 90, 11, 0.12);
 }
 
 .cc-app-metric__value {
@@ -1374,7 +1374,7 @@ html.dark .cc-project-nav-btn svg,
   z-index: 80;
   height: 3px;
   overflow: hidden;
-  background: rgba(192, 148, 228, 0.12);
+  background: rgba(233, 90, 11, 0.12);
 }
 
 .cc-app-route-progress::after {
@@ -1384,7 +1384,7 @@ html.dark .cc-project-nav-btn svg,
   left: -35%;
   width: 35%;
   border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--app-iris), rgba(247, 187, 230, 0.9));
+  background: linear-gradient(90deg, transparent, var(--app-iris), rgba(255, 183, 96, 0.9));
   animation: cc-route-progress 0.95s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
@@ -1413,7 +1413,7 @@ html.dark .cc-project-nav-btn svg,
   width: 8px;
   border-radius: 999px;
   background: var(--app-iris);
-  box-shadow: 0 0 0 0 rgba(192, 148, 228, 0.28);
+  box-shadow: 0 0 0 0 rgba(233, 90, 11, 0.28);
   animation: cc-route-dot 0.9s ease-in-out infinite;
 }
 
@@ -1435,7 +1435,7 @@ html.dark .cc-project-nav-btn svg,
 
 @keyframes cc-route-dot {
   50% {
-    box-shadow: 0 0 0 8px rgba(192, 148, 228, 0);
+    box-shadow: 0 0 0 8px rgba(233, 90, 11, 0);
     transform: scale(0.86);
   }
 }
@@ -1471,7 +1471,7 @@ html.dark .cc-project-nav-btn svg,
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--app-iris, #c094e4) 18%, transparent), transparent 42%),
+    radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--app-iris, #e95a0b) 18%, transparent), transparent 42%),
     color-mix(in srgb, var(--app-bone, #fcf1e7) 88%, transparent);
   backdrop-filter: blur(10px);
   pointer-events: all;
@@ -1491,8 +1491,8 @@ html.dark .cc-project-nav-btn svg,
   height: 28px;
   width: 28px;
   border-radius: 999px;
-  border: 2px solid color-mix(in srgb, var(--app-iris, #c094e4) 28%, transparent);
-  border-top-color: var(--app-iris, #c094e4);
+  border: 2px solid color-mix(in srgb, var(--app-iris, #e95a0b) 28%, transparent);
+  border-top-color: var(--app-iris, #e95a0b);
   animation: cc-content-opening-spin 0.8s linear infinite;
 }
 
@@ -1503,9 +1503,9 @@ html.dark .cc-project-nav-btn svg,
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--app-iris, #c094e4) 35%, transparent);
-  background: color-mix(in srgb, var(--app-iris, #c094e4) 12%, transparent);
-  color: var(--app-iris, #c094e4);
+  border: 1px solid color-mix(in srgb, var(--app-iris, #e95a0b) 35%, transparent);
+  background: color-mix(in srgb, var(--app-iris, #e95a0b) 12%, transparent);
+  color: var(--app-iris, #e95a0b);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -1515,7 +1515,7 @@ html.dark .cc-project-nav-btn svg,
   height: 8px;
   width: 8px;
   border-radius: 999px;
-  background: var(--app-iris, #c094e4);
+  background: var(--app-iris, #e95a0b);
 }
 
 .cc-content-opening__headline {
@@ -2158,7 +2158,7 @@ html.dark .cc-project-nav-btn svg,
 }
 
 .cc-connection-followup-card:hover {
-  border-color: rgba(192, 148, 228, 0.45);
+  border-color: rgba(233, 90, 11, 0.45);
   box-shadow: 0 10px 32px rgba(34, 34, 34, 0.07);
   transform: translateY(-2px);
 }
@@ -2449,7 +2449,7 @@ html.dark .cc-project-nav-btn svg,
 }
 
 .cc-connection-grid-card__trigger:hover {
-  background: rgba(192, 148, 228, 0.055);
+  background: rgba(233, 90, 11, 0.055);
 }
 
 .cc-connection-grid-card__trigger:active {
@@ -2806,7 +2806,7 @@ html.dark .cc-project-nav-btn svg,
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.95) 0%,
-      rgba(192, 148, 228, 0.55) 28%,
+      rgba(233, 90, 11, 0.55) 28%,
       rgba(252, 224, 238, 0.65) 58%,
       rgba(218, 247, 238, 0.4) 78%,
       rgba(255, 255, 255, 0.75) 100%
@@ -2829,7 +2829,7 @@ html.dark .cc-app-root .cc-connection-followup-card {
     linear-gradient(
       135deg,
       rgba(244, 239, 232, 0.22) 0%,
-      rgba(192, 148, 228, 0.4) 35%,
+      rgba(233, 90, 11, 0.4) 35%,
       rgba(252, 224, 238, 0.22) 70%,
       rgba(244, 239, 232, 0.12) 100%
     )
@@ -2911,7 +2911,7 @@ html.dark .cc-app-root .cc-connection-followup-card {
 .cc-reactive-border {
   --rx: 50%;
   --ry: 50%;
-  --glow-rgb: 192, 148, 228;
+  --glow-rgb: 233, 90, 11;
   position: relative;
   overflow: hidden;
   border-radius: 28px;
@@ -2921,7 +2921,7 @@ html.dark .cc-app-root .cc-connection-followup-card {
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.95) 0%,
-      rgba(192, 148, 228, 0.5) 32%,
+      rgba(233, 90, 11, 0.5) 32%,
       rgba(252, 224, 238, 0.55) 62%,
       rgba(255, 255, 255, 0.72) 100%
     )
@@ -3405,8 +3405,8 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-share-action--qr-open {
-  border-color: rgba(192, 148, 228, 0.42);
-  box-shadow: 0 0 0 1px rgba(192, 148, 228, 0.12), 0 10px 28px rgba(34, 34, 34, 0.06);
+  border-color: rgba(233, 90, 11, 0.42);
+  box-shadow: 0 0 0 1px rgba(233, 90, 11, 0.12), 0 10px 28px rgba(34, 34, 34, 0.06);
 }
 
 .cc-share-action__glow {
@@ -3428,13 +3428,13 @@ html.dark .cc-reactive-border:hover {
 .cc-share-action__glow--iris {
   top: -36px;
   right: -28px;
-  background: rgba(192, 148, 228, 0.42);
+  background: rgba(233, 90, 11, 0.42);
 }
 
 .cc-share-action__glow--mint {
   bottom: -36px;
   left: -28px;
-  background: rgba(192, 148, 228, 0.28);
+  background: rgba(233, 90, 11, 0.28);
 }
 
 .cc-share-action__shine {
@@ -3510,7 +3510,7 @@ html.dark .cc-reactive-border:hover {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(192, 148, 228, 0.5) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 90, 11, 0.5) 0%, transparent 70%);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -3691,8 +3691,8 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-profile-home__stat-pill--iris {
-  border-color: rgba(192, 148, 228, 0.35);
-  background: rgba(192, 148, 228, 0.12);
+  border-color: rgba(233, 90, 11, 0.35);
+  background: rgba(233, 90, 11, 0.12);
 }
 
 .cc-profile-home__zone {
@@ -3979,9 +3979,9 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-projects-view-toggle__btn--active {
-  background: rgba(192, 148, 228, 0.12);
+  background: rgba(233, 90, 11, 0.12);
   color: var(--app-ink);
-  box-shadow: 0 0 0 1px rgba(192, 148, 228, 0.18);
+  box-shadow: 0 0 0 1px rgba(233, 90, 11, 0.18);
 }
 
 .cc-projects-bubble-grid {
@@ -4011,7 +4011,7 @@ html.dark .cc-reactive-border:hover {
 
 .cc-projects-bubble:hover {
   transform: translateY(-4px) scale(1.02);
-  border-color: rgba(192, 148, 228, 0.35);
+  border-color: rgba(233, 90, 11, 0.35);
   box-shadow: 0 12px 32px rgba(34, 34, 34, 0.1);
 }
 
@@ -4078,8 +4078,8 @@ html.dark .cc-reactive-border:hover {
   max-width: 92px;
   padding: 4px 8px;
   border-radius: var(--app-radius-pill);
-  border: 1px solid rgba(192, 148, 228, 0.18);
-  background: rgba(192, 148, 228, 0.08);
+  border: 1px solid rgba(233, 90, 11, 0.18);
+  background: rgba(233, 90, 11, 0.08);
   color: var(--app-ink);
   font-size: 10px;
   font-weight: 560;
@@ -4120,8 +4120,8 @@ html.dark .cc-reactive-border:hover {
 }
 
 .cc-projects-bubble__tech-chip:hover {
-  border-color: rgba(192, 148, 228, 0.36);
-  background: rgba(192, 148, 228, 0.14);
+  border-color: rgba(233, 90, 11, 0.36);
+  background: rgba(233, 90, 11, 0.14);
   transform: translateY(-2px) scale(1.06);
 }
 
@@ -4147,7 +4147,7 @@ html.dark .cc-share-action--native {
 
 html.dark .cc-share-action--qr {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(192, 148, 228, 0.075)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(233, 90, 11, 0.075)),
     var(--app-paper);
 }
 
@@ -4159,10 +4159,10 @@ html.dark .cc-share-action {
 }
 
 html.dark .cc-share-action--qr-open {
-  border-color: rgba(192, 148, 228, 0.42);
+  border-color: rgba(233, 90, 11, 0.42);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 0 0 1px rgba(192, 148, 228, 0.14),
+    0 0 0 1px rgba(233, 90, 11, 0.14),
     0 18px 48px rgba(0, 0, 0, 0.24);
 }
 
@@ -4188,7 +4188,7 @@ html.dark .cc-share-action__glow {
 }
 
 html.dark .cc-share-action__glow--mint {
-  background: rgba(192, 148, 228, 0.32);
+  background: rgba(233, 90, 11, 0.32);
 }
 
 html.dark .cc-share-action__title {
@@ -4204,7 +4204,7 @@ html.dark .cc-share-action__url {
 }
 
 html.dark .cc-share-action:hover {
-  border-color: rgba(192, 148, 228, 0.28);
+  border-color: rgba(233, 90, 11, 0.28);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 52px rgba(0, 0, 0, 0.28);
@@ -4223,8 +4223,8 @@ html.dark .cc-share-action__qr-corners span {
 }
 
 html.dark .cc-share-qr-pattern__scan {
-  background: linear-gradient(90deg, transparent, rgba(192, 148, 228, 0.92), transparent);
-  box-shadow: 0 0 12px rgba(192, 148, 228, 0.55);
+  background: linear-gradient(90deg, transparent, rgba(233, 90, 11, 0.92), transparent);
+  box-shadow: 0 0 12px rgba(233, 90, 11, 0.55);
 }
 
 /* ?? Project card ? premium hover ?? */
@@ -4252,10 +4252,10 @@ html.dark .cc-share-qr-pattern__scan {
   transform: translateY(-10px) scale(1.014)
     rotateX(calc((var(--my) - 50) * 0.05deg))
     rotateY(calc((var(--mx) - 50) * -0.05deg));
-  border-color: rgba(192, 148, 228, 0.32);
+  border-color: rgba(233, 90, 11, 0.32);
   box-shadow:
     0 28px 64px rgba(34, 34, 34, 0.14),
-    0 12px 32px rgba(192, 148, 228, 0.1);
+    0 12px 32px rgba(233, 90, 11, 0.1);
 }
 
 .cc-project-hover-card__spotlight {
@@ -4267,8 +4267,8 @@ html.dark .cc-share-qr-pattern__scan {
   opacity: 0;
   background: radial-gradient(
     520px circle at var(--mx) var(--my),
-    rgba(192, 148, 228, 0.14),
-    rgba(192, 148, 228, 0.04) 38%,
+    rgba(233, 90, 11, 0.14),
+    rgba(233, 90, 11, 0.04) 38%,
     transparent 62%
   );
   transition: opacity 0.35s ease;
@@ -4515,14 +4515,14 @@ html.dark .cc-share-qr-pattern__scan {
 html.dark .cc-project-hover-card:hover {
   box-shadow:
     0 28px 64px rgba(0, 0, 0, 0.42),
-    0 12px 32px rgba(192, 148, 228, 0.08);
+    0 12px 32px rgba(233, 90, 11, 0.08);
 }
 
 html.dark .cc-project-hover-card:hover .cc-project-hover-card__spotlight {
   background: radial-gradient(
     520px circle at var(--mx) var(--my),
-    rgba(192, 148, 228, 0.1),
-    rgba(192, 148, 228, 0.03) 38%,
+    rgba(233, 90, 11, 0.1),
+    rgba(233, 90, 11, 0.03) 38%,
     transparent 62%
   );
 }
@@ -4624,10 +4624,10 @@ html.dark [class*='uppercase'][class*='tracking'] {
 }
 
 .cc-tech-logo-chip-wrap:hover .cc-tech-logo-chip {
-  border-color: rgba(192, 148, 228, 0.5);
+  border-color: rgba(233, 90, 11, 0.5);
   box-shadow:
     0 14px 32px rgba(34, 34, 34, 0.12),
-    0 6px 20px rgba(192, 148, 228, 0.18);
+    0 6px 20px rgba(233, 90, 11, 0.18);
 }
 
 .cc-tech-logo-tooltip {
@@ -4671,7 +4671,7 @@ html.dark [class*='uppercase'][class*='tracking'] {
   --app-paper: #ffffff;
   --app-bone: #fff9f3;
   --app-smoke: #7a7876;
-  --app-iris: #c094e4;
+  --app-iris: #e95a0b;
   --app-blush: #fce0ee;
   --app-rose-mist: #fdebf7;
   --app-mint: #daf7ee;
@@ -4688,7 +4688,7 @@ html.dark [class*='uppercase'][class*='tracking'] {
   --app-panel-ink: #f7f2eb;
   --app-panel-muted: rgba(247, 242, 235, 0.68);
   --app-hero-panel: #1c1a19;
-  --app-atmosphere-a: rgba(192, 148, 228, 0.42);
+  --app-atmosphere-a: rgba(233, 90, 11, 0.42);
   --app-atmosphere-b: rgba(252, 224, 238, 0.55);
   --app-atmosphere-c: rgba(218, 247, 238, 0.4);
   position: relative;
@@ -4719,7 +4719,7 @@ html.dark .cc-public-profile {
   --app-paper: #171513;
   --app-bone: #0f0e0d;
   --app-smoke: #a8a29e;
-  --app-iris: #d4b3f0;
+  --app-iris: #f97316;
   --app-blush: #3a2430;
   --app-rose-mist: #2a1c24;
   --app-mint: #1a2e28;
@@ -4729,7 +4729,7 @@ html.dark .cc-public-profile {
   --app-panel-ink: #f7f2eb;
   --app-panel-muted: rgba(247, 242, 235, 0.7);
   --app-hero-panel: #12100f;
-  --app-atmosphere-a: rgba(192, 148, 228, 0.28);
+  --app-atmosphere-a: rgba(233, 90, 11, 0.28);
   --app-atmosphere-b: rgba(252, 224, 238, 0.16);
   --app-atmosphere-c: rgba(218, 247, 238, 0.14);
   background: var(--app-bone);
@@ -5286,7 +5286,7 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-overview-row:hover {
   background: var(--app-bone);
-  border-color: rgba(192, 148, 228, 0.35);
+  border-color: rgba(233, 90, 11, 0.35);
 }
 
 .cc-overview-row:focus-visible {
@@ -5295,7 +5295,7 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-workspace-copy-link[data-state='success'] {
-  box-shadow: 0 0 0 2px rgba(192, 148, 228, 0.35);
+  box-shadow: 0 0 0 2px rgba(233, 90, 11, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {

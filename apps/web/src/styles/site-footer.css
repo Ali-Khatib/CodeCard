@@ -1,4 +1,4 @@
-/* New Form–inspired marketing footer: full-bleed dark bar, iris accents. */
+/* New Form–inspired marketing footer: full-bleed dark bar, orange accents. */
 
 .cc-site-footer {
   --sf-cream: #fcf1e7;
@@ -6,7 +6,7 @@
   --sf-mute: #5c5856;
   --sf-dark: #0f0f10;
   --sf-paper: #efedeb;
-  --sf-iris: #c094e4;
+  --sf-iris: var(--accent-orange, #e95a0b);
   position: relative;
   isolation: isolate;
   width: 100%;

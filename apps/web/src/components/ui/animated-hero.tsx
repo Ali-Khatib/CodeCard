@@ -29,6 +29,10 @@ export function HeroRotatingWord({
   const reduced = useReducedMotion();
   const [titleNumber, setTitleNumber] = useState(0);
   const labels = useMemo(() => [...words], [words]);
+  const longestLabel = useMemo(
+    () => labels.reduce((longest, word) => (word.length > longest.length ? word : longest), ''),
+    [labels],
+  );
 
   useEffect(() => {
     if (reduced || labels.length <= 1) return;
@@ -52,6 +56,9 @@ export function HeroRotatingWord({
       aria-live="polite"
       aria-atomic="true"
     >
+      <span className="cc-ed-hero__rotating-measure" aria-hidden="true">
+        {longestLabel}
+      </span>
       {labels.map((title, index) => (
         <motion.span
           key={title}
