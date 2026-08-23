@@ -75,7 +75,7 @@ export function AnalyticsResearchPanel({ summary }: { summary: ResearchAnalytics
           </div>
         </div>
 
-        <div className="mt-6 rounded-[22px] border border-[var(--app-border)] bg-[linear-gradient(135deg,rgba(192,148,228,0.1),rgba(255,249,243,0.86))] p-4">
+        <div className="mt-6 rounded-[22px] border border-[var(--app-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--app-iris)_10%,transparent),rgba(255,249,243,0.86))] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <MetricLabel>Per research paper analytics</MetricLabel>

@@ -152,7 +152,7 @@ export function GlobeBars({
         mapSamples: 16000,
         mapBrightness: 8,
         baseColor: [0.96, 0.94, 0.9],
-        markerColor: [0.75, 0.58, 0.89],
+        markerColor: [0.914, 0.353, 0.043],
         glowColor: [0.98, 0.96, 0.92],
         markerElevation: 0.02,
         markers: markers.map((marker) => ({
@@ -161,7 +161,7 @@ export function GlobeBars({
           id: marker.id,
         })),
         arcs: [],
-        arcColor: [0.75, 0.58, 0.89],
+        arcColor: [0.914, 0.353, 0.043],
         arcWidth: 0.5,
         arcHeight: 0.25,
         opacity: 0.82,
@@ -221,7 +221,7 @@ export function GlobeBars({
             key={marker.id}
             className={`pointer-events-none absolute flex min-w-[60px] -translate-x-1/2 flex-col items-center gap-1 rounded-md border bg-[var(--app-paper)] px-2 py-1.5 transition-[opacity,filter,margin,scale,box-shadow,border-color] duration-300 ${
               active
-                ? 'border-[var(--app-iris)] shadow-[0_10px_28px_rgba(126,87,194,0.28)]'
+                ? 'border-[var(--app-iris)] shadow-[0_10px_28px_rgba(233,90,11,0.28)]'
                 : 'border-[var(--app-border-strong)] shadow-[0_2px_10px_rgba(34,34,34,0.12)]'
             }`}
             style={

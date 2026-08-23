@@ -8,8 +8,10 @@ import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import { profileQuickHistory } from '@/lib/profile/quick-history';
 import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
+import { PublicHeroFlipPanel } from './public-hero-flip-panel';
 import { ProfileSectionHashScroll } from './profile-section-hash-scroll';
 
 /** Below-fold client islands — keep ATF bio free of their hydration cost. */
@@ -69,6 +71,12 @@ export function PublicProfileFocused({
   } | null;
 }) {
   const { role, company } = parseHeadline(headline);
+  const history = profileQuickHistory({
+    profileSlug,
+    headline,
+    location,
+    bio,
+  });
   const safeLinks = toSafeProfileLinkItems(links);
   const intro =
     bio ??
@@ -124,7 +132,19 @@ export function PublicProfileFocused({
               </div>
             </div>
 
-            <div className="cc-public-hero__panel min-w-0">
+            <PublicHeroFlipPanel
+              className="min-w-0"
+              displayName={displayName}
+              history={history}
+              footer={
+                <PublicProfileHeroActions
+                  profileId={profileId}
+                  profileSlug={profileSlug}
+                  displayName={displayName}
+                  connectionControl={connectionControl}
+                />
+              }
+            >
               <p className="cc-app-mono cc-public-hero__eyebrow">CodeCard</p>
               <h1 className="cc-public-hero__title mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em]">
                 {displayName}
@@ -149,15 +169,7 @@ export function PublicProfileFocused({
               <div className="cc-public-hero__social mt-5 [&>nav]:mt-0">
                 <PublicProfileSocialLinks links={safeLinks} profileId={profileId} />
               </div>
-              <div className="mt-6">
-                <PublicProfileHeroActions
-                  profileId={profileId}
-                  profileSlug={profileSlug}
-                  displayName={displayName}
-                  connectionControl={connectionControl}
-                />
-              </div>
-            </div>
+            </PublicHeroFlipPanel>
           </div>
         </header>
 

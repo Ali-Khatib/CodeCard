@@ -12,10 +12,9 @@ const DWELL_MS = 28_000;
 const HOVER_MS = 14_000;
 const PREVIEW_SCROLL_THRESHOLD = 320;
 
-const WEB_VIEW = { width: 1280, height: 820 };
+/** Simulated layout viewport — independent of the preview card's CSS size. */
+const DESKTOP_VIEW = { width: 1440, height: 900 };
 const MOBILE_VIEW = { width: 390, height: 844 };
-const PHONE_WORKSPACE_VIEW = { width: 390, height: 844 };
-const WEB_NARROW_BREAKPOINT = 720;
 
 type PreviewLayout = {
   scale: number;
@@ -24,36 +23,22 @@ type PreviewLayout = {
   inner: { width: number; height: number };
 };
 
-function layoutForMode(mode: PreviewMode, viewportWidth: number): PreviewLayout {
-  if (mode === 'web') {
-    if (viewportWidth < WEB_NARROW_BREAKPOINT) {
-      const inner = PHONE_WORKSPACE_VIEW;
-      const width = Math.min(viewportWidth, inner.width);
-      const scale = width / inner.width;
-      return {
-        scale,
-        width,
-        height: inner.height * scale,
-        inner,
-      };
-    }
-
-    const scale = viewportWidth / WEB_VIEW.width;
-    return {
-      scale,
-      width: viewportWidth,
-      height: WEB_VIEW.height * scale,
-      inner: WEB_VIEW,
-    };
-  }
-
-  const phoneWidth = Math.min(viewportWidth * 0.52, 250);
-  const scale = phoneWidth / MOBILE_VIEW.width;
+function layoutForMode(
+  mode: PreviewMode,
+  previewWidth: number,
+  previewHeight: number,
+): PreviewLayout {
+  const inner = mode === 'web' ? DESKTOP_VIEW : MOBILE_VIEW;
+  const padX = mode === 'mobile' ? 28 : 8;
+  const padY = mode === 'mobile' ? 32 : 8;
+  const availW = Math.max(1, previewWidth - padX);
+  const availH = Math.max(1, previewHeight - padY);
+  const scale = Math.min(availW / inner.width, availH / inner.height, 1);
   return {
     scale,
-    width: phoneWidth,
-    height: MOBILE_VIEW.height * scale,
-    inner: MOBILE_VIEW,
+    width: inner.width * scale,
+    height: inner.height * scale,
+    inner,
   };
 }
 
@@ -83,8 +68,7 @@ function ModeToggle({ mode, target, icon: Icon, label, hint, onSelect }: ModeTog
       onClick={() => onSelect(target)}
     >
       <Icon className="cc-ed-demo-preview__toggle-icon" aria-hidden strokeWidth={1.85} />
-      <span className="cc-ed-demo-preview__toggle-tip">{hint}</span>
-      <span className="sr-only">{label}</span>
+      <span className="cc-ed-demo-preview__toggle-label">{label}</span>
     </button>
   );
 }
@@ -103,7 +87,7 @@ export function EditorialLiveDemoPreview() {
   const scrollAccRef = useRef(0);
   const [mode, setMode] = useState<PreviewMode>('web');
   const [layout, setLayout] = useState<PreviewLayout>(() =>
-    layoutForMode('web', 680),
+    layoutForMode('web', 680, 520),
   );
   const [invited, setInvited] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -117,12 +101,9 @@ export function EditorialLiveDemoPreview() {
     if (!viewport) return;
 
     const sync = () => {
-      const device = viewport.querySelector('.cc-ed-demo-preview__device');
-      const width =
-        (device instanceof HTMLElement && device.clientWidth > 0
-          ? device.clientWidth
-          : viewport.clientWidth) || 680;
-      setLayout(layoutForMode(mode, width));
+      const width = viewport.clientWidth || 680;
+      const height = viewport.clientHeight || 520;
+      setLayout(layoutForMode(mode, width, height));
     };
 
     sync();
@@ -199,11 +180,11 @@ export function EditorialLiveDemoPreview() {
   }, [invited, markEngaged, reduced]);
 
   const showInvitation = invited && !dismissed;
-  const embedSrc = mode === 'web' ? '/demo?embed=1' : '/demo/card?embed=1';
+  const embedSrc = '/demo?embed=1';
   const embedTitle =
     mode === 'web'
-      ? 'CodeCard live demo workspace preview'
-      : 'CodeCard live demo mobile profile preview';
+      ? 'CodeCard live demo desktop workspace preview'
+      : 'CodeCard live demo mobile workspace preview';
   const view = layout.inner;
 
   return (
@@ -226,16 +207,16 @@ export function EditorialLiveDemoPreview() {
             mode={mode}
             target="web"
             icon={Monitor}
-            label="Web app"
-            hint="Web workspace"
+            label="Desktop"
+            hint="Desktop workspace"
             onSelect={setMode}
           />
           <ModeToggle
             mode={mode}
             target="mobile"
             icon={Smartphone}
-            label="Mobile app"
-            hint="Mobile profile"
+            label="Mobile"
+            hint="Mobile workspace"
             onSelect={setMode}
           />
         </div>
@@ -263,7 +244,8 @@ export function EditorialLiveDemoPreview() {
                   ? 'cc-ed-demo-preview__device cc-ed-demo-preview__device--phone'
                   : 'cc-ed-demo-preview__device cc-ed-demo-preview__device--web'
               }
-              style={{ minHeight: `${layout.height}px` }}
+              data-preview-mode={mode}
+              style={{ width: `${layout.width}px`, height: `${layout.height}px` }}
             >
               <div
                 className="cc-ed-demo-preview__device-shell"

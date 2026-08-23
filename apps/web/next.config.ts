@@ -66,6 +66,8 @@ const nextConfig: NextConfig = {
     '@codecard/validation',
     '@codecard/config',
     '@codecard/analytics',
+    '@paper-design/shaders-react',
+    '@paper-design/shaders',
   ],
   webpack: (config) => {
     config.module.rules.push({

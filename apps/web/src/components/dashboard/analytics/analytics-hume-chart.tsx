@@ -2,11 +2,7 @@
 
 import { useMemo } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import {
-  buildEngagementRows,
-  ENGAGEMENT_BAR_COLOR,
-  formatEngagementValue,
-} from '@/lib/dashboard/analytics-chart-data';
+import { buildEngagementRows, formatEngagementValue } from '@/lib/dashboard/analytics-chart-data';
 import type { TimeRange } from '@/lib/dashboard/analytics-data';
 import { SectionLabel } from '../ui/dashboard-ui';
 
@@ -40,7 +36,6 @@ export function AnalyticsHumeChart({ range = '30d' }: { range?: TimeRange }) {
                   initial={reduced ? false : { width: 0 }}
                   animate={{ width: `${pct}%` }}
                   transition={{ duration: 0.5, delay: index * 0.04, ease: EASE }}
-                  style={{ backgroundColor: ENGAGEMENT_BAR_COLOR }}
                 />
               </div>
 

@@ -3,6 +3,7 @@
 import { useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/cn';
+import { COLORS } from '@/lib/design/tokens';
 
 type ReactiveBorderProps = {
   children: ReactNode;
@@ -34,7 +35,7 @@ const HOVER_SPRING = { type: 'spring', stiffness: 400, damping: 28 } as const;
 export function ReactiveBorder({
   children,
   className,
-  glowRgb = '192, 148, 228',
+  glowRgb = COLORS.glowRgb,
   as: Tag = 'div',
   style,
   liftOnHover = true,

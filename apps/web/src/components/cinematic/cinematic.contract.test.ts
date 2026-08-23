@@ -106,11 +106,16 @@ describe('Editorial product landing contract', () => {
     expect(demo).toContain('EditorialLiveDemoPreview');
     expect(preview).toContain('iframe');
     expect(preview).toContain('/demo?embed=1');
-    expect(preview).toContain("querySelector('.cc-ed-demo-preview__device')");
-    expect(preview).toContain('viewportWidth < WEB_NARROW_BREAKPOINT');
-    expect(preview).toContain('PHONE_WORKSPACE_VIEW');
-    expect(preview).toContain('Web app');
-    expect(preview).toContain('Mobile app');
+    expect(preview).not.toContain('/demo/card?embed=1');
+    expect(preview).toContain('DESKTOP_VIEW');
+    expect(preview).toContain('width: 1440');
+    expect(preview).toContain('MOBILE_VIEW');
+    expect(preview).toContain('width: 390');
+    expect(preview).toContain('Math.min(availW / inner.width, availH / inner.height, 1)');
+    expect(preview).not.toContain('WEB_NARROW_BREAKPOINT');
+    expect(preview).not.toContain('PHONE_WORKSPACE_VIEW');
+    expect(preview).toContain('Desktop');
+    expect(preview).toContain('Mobile');
     expect(preview).toContain('EXPLORE THE FULL EXPERIENCE');
     expect(preview).toContain('Open Live Demo →');
     expect(demo).toContain('cc-ed-walk__bridge--out');
@@ -141,7 +146,11 @@ describe('Editorial product landing contract', () => {
     expect(statement).toContain(' / 03');
     expect(statement).toContain('What this is');
     expect(scene).toContain('clipPath');
-    expect(scene).toContain('scrub:');
+    expect(scene).toContain('scrub: 0.75');
+    expect(scene).toContain("end: mobile ? '+=310%' : '+=400%'");
+    expect(scene).toContain('ShaderHeroBackdrop');
+    expect(scene).toContain('data-hero-shader');
+    expect(scene).not.toContain('fastScrollEnd: true');
     expect(scene).not.toContain("backgroundColor: 'transparent'");
   });
 

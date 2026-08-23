@@ -7,8 +7,8 @@
   color: #000;
   font-family: var(--fx-font);
   letter-spacing: -0.02em;
-  /* Scroll-scrubbed chapters — shorter runway, smoother handoff */
-  --fx-section-length: 100vh;
+  /* Scroll-scrubbed chapters — longer runway so one flick does not skip a beat */
+  --fx-section-length: 160vh;
 }
 
 .fx-debug {
@@ -123,6 +123,8 @@
   font-family: var(--font-eyebrow), ui-monospace, monospace;
   font-size: 0.75rem;
   letter-spacing: 0.16em;
+  /* Room for the 48px compact nav (3-line icon) between CRASH and COURSE. */
+  word-spacing: calc(48px + 2.5rem);
   text-transform: uppercase;
   color: var(--fx-accent);
   -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.55);
@@ -477,7 +479,7 @@
 
 @media (max-width: 900px) {
   .fx {
-    --fx-section-length: 120vh;
+    --fx-section-length: 140vh;
   }
 
   .fx-header {
