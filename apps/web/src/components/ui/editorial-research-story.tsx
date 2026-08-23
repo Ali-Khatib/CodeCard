@@ -1,5 +1,15 @@
 'use client';
 
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRef } from 'react';
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react';
+
 export type EditorialResearchBeat = {
   id: string;
   index: string;
@@ -10,118 +20,129 @@ export type EditorialResearchBeat = {
   problemSub: string;
   researchBody: string;
   solutionBody: string;
+  imageSrc: string;
+  imageAlt: string;
 };
 
-type StoryPhase = 'problem' | 'research' | 'solution';
+const CHAPTER_TOTAL = '03';
 
-const PHASE_LABEL: Record<StoryPhase, string> = {
-  problem: 'The problem',
-  research: 'The research',
-  solution: 'The solution',
-};
-
-function CodeCardSolutionCopy({ text }: { text: string }) {
-  const parts = text.split(/(CodeCard)/g);
-  return (
-    <p className="cc-ed-research-story__body" data-research-reveal>
-      {parts.map((part, i) =>
-        part === 'CodeCard' ? (
-          <span key={i} className="cc-ed-research-story__brand">
-            CodeCard
-          </span>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
-    </p>
-  );
-}
-
-function StoryPhaseBlock({
+function ResearchChapter({
   beat,
-  phase,
+  total,
 }: {
   beat: EditorialResearchBeat;
-  phase: StoryPhase;
+  total: string;
 }) {
-  const isSolution = phase === 'solution';
+  const chapterRef = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion() === true;
+  const { scrollYProgress } = useScroll({
+    target: chapterRef,
+    offset: ['start 85%', 'start 35%'],
+  });
+
+  const imageOpacity = useTransform(scrollYProgress, [0, 1], [0.72, 1]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1.03, 1]);
+  const imageY = useTransform(scrollYProgress, [0, 1], [18, 0]);
+  const copyOpacity = useTransform(scrollYProgress, [0.08, 1], [0.55, 1]);
+  const copyY = useTransform(scrollYProgress, [0.08, 1], [16, 0]);
 
   return (
-    <article
-      className={
-        isSolution
-          ? 'cc-ed-research-story__slide cc-ed-research-story__slide--solution'
-          : 'cc-ed-research-story__slide'
-      }
-      data-testid={`editorial-proof-box-${beat.id}-${phase}`}
-      aria-label={`${PHASE_LABEL[phase]}: ${beat.marker}`}
+    <section
+      ref={chapterRef}
+      className="cc-ed-research-story__beat"
+      data-testid={`editorial-proof-box-${beat.id}`}
+      aria-label={`${beat.index} ${beat.marker}`}
     >
-      <div className="cc-ed-research-story__panel">
-        <p className="cc-ed-research-story__eyebrow" data-research-reveal>
-          {PHASE_LABEL[phase]}
-        </p>
-        <p className="cc-ed-research-story__marker" data-research-reveal>
-          {beat.index} · {beat.marker}
+      <div className="cc-ed-research-story__stage">
+        <p className="cc-ed-research-story__pager" aria-live="polite">
+          <span className="cc-ed-research-story__pager-now">{beat.index}</span>
+          <span className="cc-ed-research-story__pager-total"> / {total}</span>
         </p>
 
-        {phase === 'problem' ? (
-          <h3
-            className="cc-ed-research-story__headline-stack"
-            data-research-reveal
-            aria-label={beat.problemTitle}
+        <div className="cc-ed-research-story__grid">
+          <motion.div
+            className="cc-ed-research-story__media"
+            style={
+              reduced
+                ? undefined
+                : { opacity: imageOpacity, scale: imageScale, y: imageY }
+            }
           >
-            <span className="cc-ed-research-story__headline-line">
-              {beat.problemLead}
-            </span>
-            <span className="cc-ed-research-story__headline-line cc-ed-research-story__headline-line--accent">
-              {beat.problemSub}
-            </span>
-          </h3>
-        ) : null}
+            <Image
+              src={beat.imageSrc}
+              alt={beat.imageAlt}
+              fill
+              sizes="(max-width: 900px) 92vw, 46vw"
+              className="cc-ed-research-story__img"
+            />
+          </motion.div>
 
-        {phase === 'research' ? (
-          <>
+          <motion.div
+            className="cc-ed-research-story__copy"
+            style={reduced ? undefined : { opacity: copyOpacity, y: copyY }}
+          >
+            <p className="cc-ed-research-story__marker">{beat.marker}</p>
             <h3
-              className="cc-ed-research-story__headline cc-ed-research-story__headline--research"
+              className="cc-ed-research-story__headline"
+              aria-label={beat.problemTitle}
               data-research-reveal
             >
-              {beat.marker}
+              <span className="cc-ed-research-story__headline-line">
+                {beat.problemLead}
+              </span>
+              <span className="cc-ed-research-story__headline-line cc-ed-research-story__headline-line--accent">
+                {beat.problemSub}
+              </span>
             </h3>
-            <p className="cc-ed-research-story__body" data-research-reveal>
-              {beat.researchBody}
-            </p>
-          </>
-        ) : null}
 
-        {phase === 'solution' ? (
-          <>
-            <p className="cc-ed-research-story__solution-kicker" data-research-reveal>
-              The answer
-            </p>
-            <CodeCardSolutionCopy text={beat.solutionBody} />
-          </>
-        ) : null}
+            <div className="cc-ed-research-story__columns">
+              <p className="cc-ed-research-story__body" data-research-reveal>
+                {beat.researchBody}
+              </p>
+              <p className="cc-ed-research-story__body" data-research-reveal>
+                {beat.solutionBody.split(/(CodeCard)/g).map((part, i) =>
+                  part === 'CodeCard' ? (
+                    <span key={i} className="cc-ed-research-story__brand">
+                      CodeCard
+                    </span>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  ),
+                )}
+              </p>
+            </div>
+
+            <div className="cc-ed-research-story__cta">
+              <Link
+                href="/research"
+                className="cc-ed-research-story__cta-main cc-instant-press"
+              >
+                Learn more about the research
+              </Link>
+              <Link
+                href="/research"
+                className="cc-ed-research-story__cta-arrow cc-instant-press"
+                aria-label="Open research papers"
+              >
+                →
+              </Link>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </article>
+    </section>
   );
 }
 
-export function EditorialResearchStory({ beats }: { beats: EditorialResearchBeat[] }) {
+export function EditorialResearchStory({
+  beats,
+}: {
+  beats: EditorialResearchBeat[];
+}) {
   return (
     <div className="cc-ed-research-story" data-testid="editorial-research-story">
       {beats.map((beat) => (
-        <section
-          key={beat.id}
-          className="cc-ed-research-story__beat"
-          aria-label={`${beat.index} ${beat.marker}`}
-        >
-          <span className="cc-ed-research-story__bg-index" aria-hidden>
-            {beat.index}
-          </span>
-          <StoryPhaseBlock beat={beat} phase="problem" />
-          <StoryPhaseBlock beat={beat} phase="research" />
-          <StoryPhaseBlock beat={beat} phase="solution" />
-        </section>
+        <ResearchChapter key={beat.id} beat={beat} total={CHAPTER_TOTAL} />
       ))}
     </div>
   );

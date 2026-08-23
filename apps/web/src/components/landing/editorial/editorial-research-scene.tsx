@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import {
@@ -28,6 +27,8 @@ const BEATS: EditorialResearchBeat[] = [
       'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
     solutionBody:
       'CodeCard puts your projects up front. The good stuff shows before the glance is over.',
+    imageSrc: '/auth-demo/research.webp',
+    imageAlt: 'Research papers and technical writing on a desk',
   },
   {
     id: 'prestige',
@@ -40,6 +41,8 @@ const BEATS: EditorialResearchBeat[] = [
       'Cross-country experiments found school prestige cues still shaped early screening. The education line moved the cut before anyone tested the work.',
     solutionBody:
       'CodeCard leads with builds and outcomes. Proof shows up before the credential story takes over.',
+    imageSrc: '/auth-collage/desk.jpg',
+    imageAlt: 'Focused workspace with a laptop and notes',
   },
   {
     id: 'proof',
@@ -52,12 +55,14 @@ const BEATS: EditorialResearchBeat[] = [
       'Skills-based hiring research shows pools open much wider when skills are easy to find. Buried work stays out of the match.',
     solutionBody:
       'CodeCard makes your skills and projects easy to see. More people can find you.',
+    imageSrc: '/auth-collage/code.jpg',
+    imageAlt: 'Code editor showing technical work in progress',
   },
 ];
 
 export function EditorialResearchScene() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const introRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion } = useMotionPreferences();
   useScrollTriggerRefresh();
 
@@ -65,23 +70,21 @@ export function EditorialResearchScene() {
     () => {
       if (!canEnhanceMotion) return;
       ensureGsapPlugins();
-      const intro = introRef.current;
-      if (!intro) return;
+      const label = labelRef.current;
+      if (!label) return;
 
-      const lines = intro.querySelectorAll('[data-research-intro]');
       gsap.fromTo(
-        lines,
-        { opacity: 0.35, y: MOTION_LIMITS.revealY * 0.75 },
+        label,
+        { opacity: 0.45, y: MOTION_LIMITS.revealY * 0.4 },
         {
           opacity: 1,
           y: 0,
-          ease: MOTION_EASE.inOut,
-          stagger: 0.08,
+          ease: MOTION_EASE.soft,
           scrollTrigger: {
-            trigger: intro,
-            start: 'top 82%',
-            end: 'top 48%',
-            scrub: 0.5,
+            trigger: label,
+            start: 'top 88%',
+            end: 'top 68%',
+            scrub: 0.4,
             markers: gsapMarkersEnabled(),
           },
         },
@@ -101,37 +104,14 @@ export function EditorialResearchScene() {
       data-motion-pattern="reveal-editorial"
       data-motion-owner="gsap"
     >
-      <div ref={introRef} className="cc-ed-research-scene__intro">
-        <p className="cc-ed__eyebrow" data-research-intro>
+      <div ref={labelRef} className="cc-ed-research-scene__label">
+        <span className="cc-ed-research-scene__label-mark" aria-hidden />
+        <p className="cc-ed__eyebrow" id="editorial-research-proof-heading">
           The research
-        </p>
-        <h2
-          id="editorial-research-proof-heading"
-          className="cc-ed__display cc-ed__display--xl mt-3"
-        >
-          <span className="cc-ed__lead" data-research-intro>
-            THEY DO NOT
-          </span>
-          <span className="cc-ed__lead" data-research-intro>
-            READ YOU.
-          </span>
-          <span className="cc-ed__sub" data-research-intro>
-            THEY SORT YOU.
-          </span>
-        </h2>
-        <p className="cc-ed__lede mx-auto mt-4" data-research-intro>
-          Seconds decide. Prestige steers the gate. Buried skills never enter the pool.
-          CodeCard puts proof where it cannot be ignored.
         </p>
       </div>
 
       <EditorialResearchStory beats={BEATS} />
-
-      <p className="cc-ed-proof__more">
-        <Link href="/research" className="cc-ed__link">
-          See all research papers →
-        </Link>
-      </p>
     </section>
   );
 }

@@ -16,12 +16,24 @@ type EditorialHeroSceneProps = {
 };
 
 const BEAT_COUNT = 3;
+const INTRO_DURATION = 1.2;
+const INTRO_DELAY = 0.12;
 
 /** Modest framed inset — still owns the first viewport. */
 function cardClip(mobile: boolean) {
   const y = mobile ? 10 : 18;
   const x = mobile ? 12 : 22;
   const r = mobile ? 22 : 28;
+  return `inset(${y}px ${x}px ${y}px ${x}px round ${r}px)`;
+}
+
+/** Centered opening panel — cinematic, not a thumbnail. */
+function introClip(mobile: boolean) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const y = Math.round(vh * (mobile ? 0.14 : 0.2));
+  const x = Math.round(vw * (mobile ? 0.08 : 0.22));
+  const r = mobile ? 24 : 36;
   return `inset(${y}px ${x}px ${y}px ${x}px round ${r}px)`;
 }
 
@@ -32,8 +44,8 @@ function beatIndexFromProgress(progress: number) {
 }
 
 /**
- * Inset shader panel → full-bleed, then the three statement beats.
- * Short pin + light scrub so scroll stays quick.
+ * Load: small centered panel grows into the inset hero.
+ * Scroll (after intro): inset shader panel → full-bleed, then statement beats.
  */
 export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -66,8 +78,9 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       const mobile = window.matchMedia('(max-width: 767px)').matches;
       const openClip = 'inset(0px 0px 0px 0px round 0px)';
       const closedClip = cardClip(mobile);
+      const openingClip = introClip(mobile);
 
-      gsap.set(stage, { clipPath: closedClip });
+      gsap.set(stage, { clipPath: openingClip });
       gsap.set(statementEl, { autoAlpha: 0 });
       if (chrome) gsap.set(chrome, { autoAlpha: 0, y: 12 });
       beats.forEach((beat) => {
@@ -89,61 +102,94 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
         });
       };
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: track,
-          start: 'top top',
-          end: mobile ? '+=95%' : '+=115%',
-          scrub: 0.2,
-          pin: stage,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          markers: gsapMarkersEnabled(),
-          onUpdate: (self) => syncPager(self.progress),
-        },
-      });
-
-      tl.fromTo(
-        stage,
-        { clipPath: closedClip },
-        { clipPath: openClip, duration: 0.42 },
-        0,
-      );
-
-      if (heroCopy) {
-        tl.to(
-          heroCopy,
-          { yPercent: mobile ? -6 : -8, autoAlpha: 0, duration: 0.14 },
-          0.28,
-        );
-      }
-
-      tl.to(statementEl, { autoAlpha: 1, duration: 0.1 }, 0.38);
-
-      if (chrome) {
-        tl.to(chrome, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.4);
-      }
-
-      beats.forEach((beat, i) => {
-        const start = 0.4 + i * 0.18;
-        tl.fromTo(
-          beat,
-          { autoAlpha: 0, y: 20, clipPath: 'inset(0% 0% 100% 0%)' },
-          {
-            autoAlpha: 1,
-            y: 0,
-            clipPath: 'inset(0% 0% 0% 0%)',
-            duration: 0.1,
+      const buildScrollCinema = () => {
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: track,
+            start: 'top top',
+            end: mobile ? '+=95%' : '+=115%',
+            scrub: 0.2,
+            pin: stage,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            markers: gsapMarkersEnabled(),
+            onUpdate: (self) => syncPager(self.progress),
           },
-          start,
+        });
+
+        tl.fromTo(
+          stage,
+          { clipPath: closedClip },
+          { clipPath: openClip, duration: 0.42 },
+          0,
         );
-        if (i < BEAT_COUNT - 1) {
-          tl.to(beat, { autoAlpha: 0, y: -12, duration: 0.08 }, start + 0.12);
+
+        if (heroCopy) {
+          tl.to(
+            heroCopy,
+            { yPercent: mobile ? -6 : -8, autoAlpha: 0, duration: 0.14 },
+            0.28,
+          );
         }
+
+        tl.to(statementEl, { autoAlpha: 1, duration: 0.1 }, 0.38);
+
+        if (chrome) {
+          tl.to(chrome, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.4);
+        }
+
+        beats.forEach((beat, i) => {
+          const start = 0.4 + i * 0.18;
+          tl.fromTo(
+            beat,
+            { autoAlpha: 0, y: 20, clipPath: 'inset(0% 0% 100% 0%)' },
+            {
+              autoAlpha: 1,
+              y: 0,
+              clipPath: 'inset(0% 0% 0% 0%)',
+              duration: 0.1,
+            },
+            start,
+          );
+          if (i < BEAT_COUNT - 1) {
+            tl.to(beat, { autoAlpha: 0, y: -12, duration: 0.08 }, start + 0.12);
+          }
+        });
+
+        syncPager(0);
+      };
+
+      const skipIntro = window.scrollY > 8;
+
+      if (skipIntro) {
+        gsap.set(stage, { clipPath: closedClip });
+        buildScrollCinema();
+        return;
+      }
+
+      const intro = gsap.to(stage, {
+        clipPath: closedClip,
+        duration: INTRO_DURATION,
+        delay: INTRO_DELAY,
+        ease: 'power3.out',
+        onComplete: buildScrollCinema,
       });
 
-      syncPager(0);
+      const finishIntro = () => {
+        if (intro.isActive() || intro.progress() < 1) intro.progress(1);
+      };
+
+      window.addEventListener('wheel', finishIntro, { passive: true, once: true });
+      window.addEventListener('touchmove', finishIntro, {
+        passive: true,
+        once: true,
+      });
+
+      return () => {
+        window.removeEventListener('wheel', finishIntro);
+        window.removeEventListener('touchmove', finishIntro);
+      };
     },
     { scope: rootRef, dependencies: [canEnhanceMotion], revertOnUpdate: true },
   );
@@ -151,11 +197,7 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
   return (
     <div
       ref={rootRef}
-      className={
-        canEnhanceMotion
-          ? 'cc-ed-hero-scene cc-ed-hero-scene--enhanced'
-          : 'cc-ed-hero-scene'
-      }
+      className="cc-ed-hero-scene cc-ed-hero-scene--enhanced"
       data-testid="editorial-hero-scene"
       data-motion-pattern="section-enter"
       data-motion-owner="gsap"

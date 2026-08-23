@@ -73,7 +73,7 @@ describe('Editorial product landing contract', () => {
     expect(walk).not.toContain('DashboardConnectionsView');
   });
 
-  it('research proof uses editorial scroll reveal instead of parallax cards', () => {
+  it('research proof uses an editorial image-and-copy composition', () => {
     const proof = read(
       'src/components/landing/editorial/editorial-research-scene.tsx',
     );
@@ -81,25 +81,33 @@ describe('Editorial product landing contract', () => {
     const css = read('src/styles/editorial-landing.css');
     expect(proof).toContain('EditorialResearchStory');
     expect(story).toContain('EditorialResearchStory');
-    expect(proof).toContain('THEY DO NOT');
-    expect(proof).toContain('READ YOU.');
     expect(proof).toContain('Your best work never gets the glance.');
     expect(proof).toContain('Your school can decide first.');
     expect(proof).toContain('Hidden skills get skipped.');
     expect(proof).toContain('The research');
-    expect(story).toContain('The solution');
+    expect(proof).toContain('/auth-demo/research.webp');
+    expect(story).toContain('Learn more about the research');
     expect(story).toContain('data-research-reveal');
     expect(story).toContain('cc-ed-research-story__beat');
+    expect(story).toContain('cc-ed-research-story__media');
+    expect(story).toContain('cc-ed-research-story__columns');
+    expect(story).toContain('useScroll');
+    expect(story).toContain('useTransform');
+    expect(story).toContain(' / {total}');
     expect(story).not.toContain('Keep scrolling');
     expect(story).not.toContain('pin: true');
     expect(story).not.toContain('autoAlpha');
+    expect(story).not.toContain('cc-ed-research-story__word');
     expect(css).toContain('.cc-ed-research-story__beat');
+    expect(css).toContain('.cc-ed-research-story__stage');
+    expect(css).toContain('.cc-ed-research-story__grid');
+    expect(css).toContain('.cc-ed-research-story__media');
     expect(css).not.toContain('.cc-ed-research-story__pin');
     expect(css).not.toContain('Keep scrolling');
     expect(proof).not.toContain('TextParallaxContent');
     expect(proof).not.toContain('images.unsplash.com');
     expect(proof).not.toContain('photo-1450101499163-c8848c66ca85');
-    expect(proof).toContain('See all research papers');
+    expect(proof).not.toContain('THEY DO NOT');
   });
 
   it('embeds a full live demo preview with web/mobile toggle and delayed invitation', () => {
@@ -128,6 +136,7 @@ describe('Editorial product landing contract', () => {
     expect(nextConfig).toContain("source: '/demo/:path*'");
     expect(nextConfig).toContain("frame-ancestors 'self'");
     expect(css).toContain('.cc-ed-hero-scene');
+    expect(css).toContain('inset(20vh 22vw 20vh 22vw round 36px)');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');
   });
@@ -149,6 +158,10 @@ describe('Editorial product landing contract', () => {
     expect(statement).toContain(' / 03');
     expect(statement).toContain('What this is');
     expect(scene).toContain('clipPath');
+    expect(scene).toContain('introClip');
+    expect(scene).toContain('INTRO_DURATION');
+    expect(scene).toContain("ease: 'power3.out'");
+    expect(scene).toContain('onComplete: buildScrollCinema');
     expect(scene).toContain('scrub: 0.2');
     expect(scene).toContain("end: mobile ? '+=95%' : '+=115%'");
     expect(scene).not.toContain('ShaderHeroBackdrop');
