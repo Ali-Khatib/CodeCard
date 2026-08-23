@@ -21,7 +21,10 @@ describe('Editorial product landing contract', () => {
     expect(hero).toContain('cc-ed__lead');
     expect(hero).toContain('EditorialHeroAnimatedHeadline');
     expect(hero).toContain('cc-ed-hero__media');
-    expect(hero).toContain('priority');
+    expect(hero).toContain('ShaderHeroBackdrop');
+    expect(hero).toContain('data-hero-shader');
+    expect(hero).not.toContain('priority');
+    expect(hero).not.toContain('images.unsplash.com');
     expect(hero).not.toContain('LIVE_DEMO_PROFILE_HREF');
     expect(hero).not.toContain('View Public Profile');
   });
@@ -129,7 +132,7 @@ describe('Editorial product landing contract', () => {
     expect(css).toContain('.cc-ed-research-story');
   });
 
-  it('keeps a floating glass pill nav and photo-backed statement beats', () => {
+  it('keeps a floating glass pill nav and shader-backed statement beats', () => {
     const css = read('src/styles/editorial-landing.css');
     const statement = read(
       'src/components/landing/editorial/editorial-statement.tsx',
@@ -146,10 +149,9 @@ describe('Editorial product landing contract', () => {
     expect(statement).toContain(' / 03');
     expect(statement).toContain('What this is');
     expect(scene).toContain('clipPath');
-    expect(scene).toContain('scrub: 0.75');
-    expect(scene).toContain("end: mobile ? '+=310%' : '+=400%'");
-    expect(scene).toContain('ShaderHeroBackdrop');
-    expect(scene).toContain('data-hero-shader');
+    expect(scene).toContain('scrub: 0.2');
+    expect(scene).toContain("end: mobile ? '+=95%' : '+=115%'");
+    expect(scene).not.toContain('ShaderHeroBackdrop');
     expect(scene).not.toContain('fastScrollEnd: true');
     expect(scene).not.toContain("backgroundColor: 'transparent'");
   });

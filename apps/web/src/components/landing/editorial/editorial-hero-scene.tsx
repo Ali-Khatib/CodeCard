@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef, useState, type ReactNode } from 'react';
-import { ShaderHeroBackdrop } from '@/components/ui/shader-hero';
+import { useRef, type ReactNode } from 'react';
 import { useGSAP } from '@gsap/react';
 import {
   ensureGsapPlugins,
@@ -18,22 +17,23 @@ type EditorialHeroSceneProps = {
 
 const BEAT_COUNT = 3;
 
+/** Modest framed inset — still owns the first viewport. */
 function cardClip(mobile: boolean) {
-  const y = mobile ? 10 : 16;
-  const x = mobile ? 12 : 18;
-  const r = mobile ? 26 : 40;
+  const y = mobile ? 10 : 18;
+  const x = mobile ? 12 : 22;
+  const r = mobile ? 22 : 28;
   return `inset(${y}px ${x}px ${y}px ${x}px round ${r}px)`;
 }
 
 function beatIndexFromProgress(progress: number) {
-  if (progress >= 0.7) return 2;
-  if (progress >= 0.44) return 1;
+  if (progress >= 0.78) return 2;
+  if (progress >= 0.55) return 1;
   return 0;
 }
 
 /**
- * Hero card grows into the photo, then three beats load over it
- * (IntegratedBio blend + growth — clip-path + long scrub, no cream wipe).
+ * Inset shader panel → full-bleed, then the three statement beats.
+ * Short pin + light scrub so scroll stays quick.
  */
 export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -41,8 +41,6 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
   const stageRef = useRef<HTMLDivElement>(null);
   const statementRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion } = useMotionPreferences();
-  const [shaderLive, setShaderLive] = useState(false);
-  const shaderStarted = useRef(false);
   useScrollTriggerRefresh();
 
   useGSAP(
@@ -55,7 +53,6 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       const statementEl = statementRef.current;
       if (!track || !stage || !statementEl) return;
 
-      const media = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
       const chrome = statementEl.querySelector<HTMLElement>(
         '.cc-ed-statement__chrome',
@@ -72,11 +69,11 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
 
       gsap.set(stage, { clipPath: closedClip });
       gsap.set(statementEl, { autoAlpha: 0 });
-      if (chrome) gsap.set(chrome, { autoAlpha: 0, y: 18 });
+      if (chrome) gsap.set(chrome, { autoAlpha: 0, y: 12 });
       beats.forEach((beat) => {
         gsap.set(beat, {
           autoAlpha: 0,
-          y: 36,
+          y: 24,
           clipPath: 'inset(0% 0% 100% 0%)',
         });
       });
@@ -97,73 +94,52 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
         scrollTrigger: {
           trigger: track,
           start: 'top top',
-          end: mobile ? '+=310%' : '+=400%',
-          scrub: 0.75,
+          end: mobile ? '+=95%' : '+=115%',
+          scrub: 0.2,
           pin: stage,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           markers: gsapMarkersEnabled(),
-          onUpdate: (self) => {
-            const shouldShow = self.progress > 0.02;
-            if (shouldShow !== shaderStarted.current) {
-              shaderStarted.current = shouldShow;
-              setShaderLive(shouldShow);
-            }
-            syncPager(self.progress);
-          },
+          onUpdate: (self) => syncPager(self.progress),
         },
       });
 
       tl.fromTo(
         stage,
         { clipPath: closedClip },
-        { clipPath: openClip, duration: 0.34 },
+        { clipPath: openClip, duration: 0.42 },
         0,
       );
-
-      if (media) {
-        tl.fromTo(
-          media,
-          { scale: 1.04 },
-          { scale: mobile ? 1.1 : 1.16, duration: 1 },
-          0,
-        );
-        tl.to(media, { autoAlpha: 0, duration: 0.12 }, 0.02);
-      }
 
       if (heroCopy) {
         tl.to(
           heroCopy,
-          { yPercent: mobile ? -8 : -12, autoAlpha: 0, duration: 0.2 },
-          0.08,
+          { yPercent: mobile ? -6 : -8, autoAlpha: 0, duration: 0.14 },
+          0.28,
         );
       }
 
-      tl.to(statementEl, { autoAlpha: 1, duration: 0.12 }, 0.22);
+      tl.to(statementEl, { autoAlpha: 1, duration: 0.1 }, 0.38);
 
       if (chrome) {
-        tl.to(chrome, { autoAlpha: 1, y: 0, duration: 0.1 }, 0.24);
+        tl.to(chrome, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.4);
       }
 
       beats.forEach((beat, i) => {
-        const start = 0.22 + i * 0.26;
+        const start = 0.4 + i * 0.18;
         tl.fromTo(
           beat,
-          { autoAlpha: 0, y: 28, clipPath: 'inset(0% 0% 100% 0%)' },
+          { autoAlpha: 0, y: 20, clipPath: 'inset(0% 0% 100% 0%)' },
           {
             autoAlpha: 1,
             y: 0,
             clipPath: 'inset(0% 0% 0% 0%)',
-            duration: 0.12,
+            duration: 0.1,
           },
           start,
         );
         if (i < BEAT_COUNT - 1) {
-          tl.to(
-            beat,
-            { autoAlpha: 0, y: -16, duration: 0.1 },
-            start + 0.18,
-          );
+          tl.to(beat, { autoAlpha: 0, y: -12, duration: 0.08 }, start + 0.12);
         }
       });
 
@@ -189,19 +165,6 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
           <div className="cc-ed-hero-scene__hero">
             <div className="cc-ed-hero-scene__hero-inner">{hero}</div>
           </div>
-          {canEnhanceMotion ? (
-            <div
-              className={
-                shaderLive
-                  ? 'cc-ed-hero-scene__shader is-live'
-                  : 'cc-ed-hero-scene__shader'
-              }
-              data-hero-shader
-              aria-hidden
-            >
-              {shaderLive ? <ShaderHeroBackdrop /> : null}
-            </div>
-          ) : null}
           <div ref={statementRef} className="cc-ed-hero-scene__statement">
             {statement}
           </div>

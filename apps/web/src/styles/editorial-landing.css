@@ -860,7 +860,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   color: var(--ed-mute);
 }
 
-/* —— Hero (Parloa-scale full-bleed photo) —— */
+/* —— Hero (inset shader panel → full-bleed) —— */
 .cc-ed-hero {
   position: relative;
   isolation: isolate;
@@ -880,13 +880,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   z-index: 0;
   overflow: hidden;
   border-radius: inherit;
-}
-
-.cc-ed-hero__img {
-  object-fit: cover;
-  object-position: center 28%;
-  transform: scale(1.02);
-  border-radius: inherit;
+  background: #101012;
 }
 
 .cc-ed-hero__veil {
@@ -2047,8 +2041,14 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   min-height: 100svh;
   min-height: 100dvh;
   border-radius: 0;
-  clip-path: inset(12px 14px 14px 14px round 36px);
+  clip-path: inset(18px 22px 18px 22px round 28px);
   will-change: clip-path;
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage {
+    clip-path: inset(10px 12px 10px 12px round 22px);
+  }
 }
 
 .cc-ed-hero-scene__hero,
@@ -2057,21 +2057,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   min-height: inherit;
   height: 100%;
   border-radius: inherit;
-}
-
-.cc-ed-hero-scene__shader {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-  background: #050505;
-  opacity: 0;
-}
-
-.cc-ed-hero-scene__shader.is-live {
-  opacity: 1;
-  transition: opacity 0.45s ease;
 }
 
 .cc-shader-hero,
@@ -2184,7 +2169,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
 
 .cc-ed-hero-scene__hero .cc-ed-hero__media {
   transform-origin: center center;
-  will-change: transform;
 }
 
 /* —— Editorial research scene —— */
@@ -2734,7 +2718,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
 @media (prefers-reduced-motion: reduce) {
   .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene__hero .cc-ed-hero__media,
-  .cc-ed-hero-scene__shader,
   .cc-ed-demo-preview__invitation-bar {
     animation: none;
     transform: none;
@@ -2742,7 +2725,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
     will-change: auto;
   }
 
-  .cc-ed-hero-scene__shader {
+  .cc-shader-hero {
     display: none;
   }
 }

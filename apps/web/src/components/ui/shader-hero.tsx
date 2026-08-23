@@ -20,12 +20,6 @@ const FILL = [
   SHADER_HERO_COLORS.ink,
 ] as const;
 
-const GRAIN = [
-  SHADER_HERO_COLORS.ink,
-  SHADER_HERO_COLORS.iris,
-  SHADER_HERO_COLORS.paper,
-] as const;
-
 type ShaderHeroBackdropProps = {
   className?: string;
   paused?: boolean;
@@ -41,20 +35,11 @@ export function ShaderHeroBackdrop({
       <MeshGradient
         className="absolute inset-0 h-full w-full"
         colors={[...FILL]}
-        speed={paused ? 0 : 0.16}
-        distortion={0.45}
-        swirl={0.18}
-        grainMixer={0.08}
-        grainOverlay={0.06}
-      />
-      <MeshGradient
-        className="absolute inset-0 h-full w-full opacity-25"
-        colors={[...GRAIN]}
-        speed={paused ? 0 : 0.08}
-        distortion={0.7}
-        swirl={0.28}
-        grainMixer={0.16}
-        grainOverlay={0.1}
+        speed={paused ? 0 : 0.12}
+        distortion={0.4}
+        swirl={0.16}
+        grainMixer={0.06}
+        grainOverlay={0.05}
       />
     </div>
   );
