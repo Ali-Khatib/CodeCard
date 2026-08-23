@@ -448,19 +448,21 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         return () => undefined;
       }
 
+      // Sticky `.fx-fixed` holds the stage; scrub section scroll only — no GSAP pin
+      // (pin + fast-scroll-end teleported users into mid-chapter after prior sections).
       const st = ScrollTrigger.create({
         trigger: fs,
         start: 'top top',
         end: 'bottom bottom',
-        pin: fixed,
-        pinSpacing: true,
         scrub: SCRUB_SMOOTH,
-        fastScrollEnd: true,
-        anticipatePin: 1,
         invalidateOnRefresh: true,
+        onRefresh: () => {
+          computePositions();
+          measureRailMetrics();
+        },
         onUpdate: (self) => {
           if (isSnappingRef.current) return;
-          applyScrollProgressRef.current(self.progress);
+          applyScrollProgressRef.current(clamp(self.progress, 0, 1));
         },
       });
       stRef.current = st;

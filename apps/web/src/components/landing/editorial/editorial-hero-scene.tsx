@@ -6,6 +6,7 @@ import {
   ensureGsapPlugins,
   gsap,
   gsapMarkersEnabled,
+  refreshScrollTrigger,
 } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
@@ -94,11 +95,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             end: mobile ? '+=85%' : '+=100%',
             scrub: 0.25,
             pin: stage,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
           },
         });
+
+        refreshScrollTrigger({ safe: true });
 
         tl.fromTo(
           stage,

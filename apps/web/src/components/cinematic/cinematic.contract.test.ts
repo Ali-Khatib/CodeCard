@@ -71,6 +71,10 @@ describe('Editorial product landing contract', () => {
     expect(walk).not.toContain('photo-1551288049-bebda4e38f71');
     expect(walk).not.toContain('EditorialProductFrame');
     expect(walk).not.toContain('DashboardConnectionsView');
+    const fx = read('src/components/ui/full-screen-scroll-fx.tsx');
+    expect(fx).not.toContain('fastScrollEnd');
+    expect(fx).not.toContain('pin: fixed');
+    expect(fx).toContain('Sticky `.fx-fixed` holds the stage');
   });
 
   it('research proof uses an editorial image-and-copy composition', () => {
@@ -185,7 +189,8 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('autoAlpha: 0, y: 12');
     expect(scene).not.toContain('data-statement-word');
     expect(scene).not.toContain('ShaderHeroBackdrop');
-    expect(scene).not.toContain('fastScrollEnd: true');
+    expect(scene).toContain('refreshScrollTrigger');
+    expect(scene).not.toContain('anticipatePin');
     expect(scene).not.toContain("backgroundColor: 'transparent'");
   });
 
