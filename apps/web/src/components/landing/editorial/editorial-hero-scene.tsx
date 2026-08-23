@@ -12,46 +12,44 @@ import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
 
 type EditorialHeroSceneProps = {
   hero: ReactNode;
-  statement: ReactNode;
 };
 
-const BEAT_COUNT = 3;
-const INTRO_DURATION = 1.2;
-const INTRO_DELAY = 0.12;
+type HeroInsets = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+  radius: number;
+};
 
-/** Modest framed inset — still owns the first viewport. */
-function cardClip(mobile: boolean) {
-  const y = mobile ? 10 : 18;
-  const x = mobile ? 12 : 22;
-  const r = mobile ? 22 : 28;
-  return `inset(${y}px ${x}px ${y}px ${x}px round ${r}px)`;
+/** Settled inset hero before scroll cinema opens to full-bleed. */
+function settledInsets(mobile: boolean): HeroInsets {
+  return {
+    top: mobile ? 10 : 14,
+    right: mobile ? 10 : 16,
+    bottom: mobile ? 10 : 14,
+    left: mobile ? 10 : 16,
+    radius: mobile ? 22 : 28,
+  };
 }
 
-/** Centered opening panel — cinematic, not a thumbnail. */
-function introClip(mobile: boolean) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const y = Math.round(vh * (mobile ? 0.14 : 0.2));
-  const x = Math.round(vw * (mobile ? 0.08 : 0.22));
-  const r = mobile ? 24 : 36;
-  return `inset(${y}px ${x}px ${y}px ${x}px round ${r}px)`;
+function clipFrom(i: HeroInsets) {
+  return `inset(${i.top}px ${i.right}px ${i.bottom}px ${i.left}px round ${i.radius}px)`;
 }
 
-function beatIndexFromProgress(progress: number) {
-  if (progress >= 0.78) return 2;
-  if (progress >= 0.55) return 1;
-  return 0;
-}
+const INTRO_DURATION = 1.25;
+const INTRO_DELAY = 0.05;
+/** Matches cubic-bezier(0.16, 1, 0.3, 1) — premium ease-out, no overshoot. */
+const INTRO_EASE = 'power3.out';
 
 /**
- * Load: small centered panel grows into the inset hero.
- * Scroll (after intro): inset shader panel → full-bleed, then statement beats.
+ * Load: CSS expands the framed panel on first paint; GSAP staggers copy/nav.
+ * Scroll: settled inset → full-bleed. Statement cinema lives elsewhere.
  */
-export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps) {
+export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const statementRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion } = useMotionPreferences();
   useScrollTriggerRefresh();
 
@@ -60,135 +58,172 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
       if (!canEnhanceMotion) return;
       ensureGsapPlugins();
 
+      const root = rootRef.current;
       const track = trackRef.current;
       const stage = stageRef.current;
-      const statementEl = statementRef.current;
-      if (!track || !stage || !statementEl) return;
+      if (!root || !track || !stage) return;
 
-      const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
-      const chrome = statementEl.querySelector<HTMLElement>(
-        '.cc-ed-statement__chrome',
-      );
-      const beats = Array.from(
-        statementEl.querySelectorAll<HTMLElement>('[data-statement-beat]'),
-      );
-      const indexEl = statementEl.querySelector<HTMLElement>(
-        '[data-statement-index]',
-      );
       const mobile = window.matchMedia('(max-width: 767px)').matches;
       const openClip = 'inset(0px 0px 0px 0px round 0px)';
-      const closedClip = cardClip(mobile);
-      const openingClip = introClip(mobile);
+      const closedClip = clipFrom(settledInsets(mobile));
 
-      gsap.set(stage, { clipPath: openingClip });
-      gsap.set(statementEl, { autoAlpha: 0 });
-      if (chrome) gsap.set(chrome, { autoAlpha: 0, y: 12 });
-      beats.forEach((beat) => {
-        gsap.set(beat, {
-          autoAlpha: 0,
-          y: 24,
-          clipPath: 'inset(0% 0% 100% 0%)',
-        });
-      });
+      const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
+      const media = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
+      const eyebrow = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__eyebrow');
+      const headline = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__display');
+      const lede = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__lede');
+      const actions = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__actions');
+      const navPill = document.querySelector<HTMLElement>(
+        '.cc-marketing-shell .cc-marketing-nav-shell .cc-nav-veil',
+      );
 
-      const syncPager = (progress: number) => {
-        const idx = beatIndexFromProgress(progress);
-        if (indexEl) {
-          indexEl.textContent = String(idx + 1).padStart(2, '0');
-        }
-        beats.forEach((beat, i) => {
-          if (i === idx) beat.removeAttribute('aria-hidden');
-          else beat.setAttribute('aria-hidden', 'true');
-        });
+      const contentBits = [eyebrow, headline, lede, actions].filter(
+        (el): el is HTMLElement => Boolean(el),
+      );
+
+      const settleStageClip = () => {
+        // Hand off from CSS @keyframes to GSAP-owned clip-path for scroll cinema.
+        stage.style.animation = 'none';
+        gsap.set(stage, { clipPath: closedClip });
       };
 
       const buildScrollCinema = () => {
+        settleStageClip();
+        root.dataset.heroIntro = 'done';
+
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: track,
             start: 'top top',
-            end: mobile ? '+=95%' : '+=115%',
-            scrub: 0.2,
+            end: mobile ? '+=85%' : '+=100%',
+            scrub: 0.25,
             pin: stage,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
-            onUpdate: (self) => syncPager(self.progress),
           },
         });
 
         tl.fromTo(
           stage,
           { clipPath: closedClip },
-          { clipPath: openClip, duration: 0.42 },
+          { clipPath: openClip, duration: 0.7 },
           0,
         );
 
         if (heroCopy) {
           tl.to(
             heroCopy,
-            { yPercent: mobile ? -6 : -8, autoAlpha: 0, duration: 0.14 },
-            0.28,
+            { yPercent: mobile ? -4 : -6, autoAlpha: 0.15, duration: 0.3 },
+            0.45,
           );
         }
-
-        tl.to(statementEl, { autoAlpha: 1, duration: 0.1 }, 0.38);
-
-        if (chrome) {
-          tl.to(chrome, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.4);
-        }
-
-        beats.forEach((beat, i) => {
-          const start = 0.4 + i * 0.18;
-          tl.fromTo(
-            beat,
-            { autoAlpha: 0, y: 20, clipPath: 'inset(0% 0% 100% 0%)' },
-            {
-              autoAlpha: 1,
-              y: 0,
-              clipPath: 'inset(0% 0% 0% 0%)',
-              duration: 0.1,
-            },
-            start,
-          );
-          if (i < BEAT_COUNT - 1) {
-            tl.to(beat, { autoAlpha: 0, y: -12, duration: 0.08 }, start + 0.12);
-          }
-        });
-
-        syncPager(0);
       };
 
       const skipIntro = window.scrollY > 8;
 
       if (skipIntro) {
-        gsap.set(stage, { clipPath: closedClip });
+        settleStageClip();
+        gsap.set(contentBits, { clearProps: 'opacity,visibility,transform' });
+        if (media) gsap.set(media, { clearProps: 'opacity,visibility,transform' });
+        if (navPill) gsap.set(navPill, { clearProps: 'opacity,visibility,transform' });
         buildScrollCinema();
         return;
       }
 
-      const intro = gsap.to(stage, {
-        clipPath: closedClip,
-        duration: INTRO_DURATION,
+      root.dataset.heroIntro = 'running';
+
+      // Container expand is CSS-driven (visible before GSAP hydrates).
+      // GSAP only owns content/nav stagger + the later scroll cinema.
+      if (media) gsap.set(media, { autoAlpha: 0.75, scale: 1.015 });
+      if (contentBits.length) {
+        gsap.set(contentBits, { autoAlpha: 0, y: 14 });
+      }
+      if (navPill) gsap.set(navPill, { autoAlpha: 0, y: -8 });
+
+      const intro = gsap.timeline({
         delay: INTRO_DELAY,
-        ease: 'power3.out',
         onComplete: buildScrollCinema,
       });
 
+      // Keep timeline length aligned with CSS expand even though clip is CSS-owned.
+      intro.to({}, { duration: INTRO_DURATION }, 0);
+
+      if (media) {
+        intro.to(
+          media,
+          {
+            autoAlpha: 1,
+            scale: 1,
+            duration: INTRO_DURATION * 0.85,
+            ease: INTRO_EASE,
+          },
+          0.12,
+        );
+      }
+
+      if (navPill) {
+        intro.to(
+          navPill,
+          { autoAlpha: 1, y: 0, duration: 0.55, ease: INTRO_EASE },
+          0.25,
+        );
+      }
+
+      if (eyebrow) {
+        intro.to(
+          eyebrow,
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
+          0.32,
+        );
+      }
+      if (headline) {
+        intro.to(
+          headline,
+          { autoAlpha: 1, y: 0, duration: 0.55, ease: INTRO_EASE },
+          0.4,
+        );
+      }
+      if (lede) {
+        intro.to(
+          lede,
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
+          0.55,
+        );
+      }
+      if (actions) {
+        intro.to(
+          actions,
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
+          0.7,
+        );
+      }
+
+      // Soft skip after expand has started — load-noise wheel events won't cancel it.
+      let skipArmed = false;
+      const armSkip = window.setTimeout(() => {
+        skipArmed = true;
+      }, 420);
+
       const finishIntro = () => {
+        if (!skipArmed) return;
         if (intro.isActive() || intro.progress() < 1) intro.progress(1);
       };
 
-      window.addEventListener('wheel', finishIntro, { passive: true, once: true });
-      window.addEventListener('touchmove', finishIntro, {
-        passive: true,
-        once: true,
-      });
+      window.addEventListener('wheel', finishIntro, { passive: true });
+      window.addEventListener('touchmove', finishIntro, { passive: true });
+      window.addEventListener('keydown', finishIntro, { passive: true });
 
       return () => {
+        window.clearTimeout(armSkip);
         window.removeEventListener('wheel', finishIntro);
         window.removeEventListener('touchmove', finishIntro);
+        window.removeEventListener('keydown', finishIntro);
+        if (navPill) {
+          gsap.set(navPill, { clearProps: 'opacity,visibility,transform' });
+        }
+        delete root.dataset.heroIntro;
       };
     },
     { scope: rootRef, dependencies: [canEnhanceMotion], revertOnUpdate: true },
@@ -206,9 +241,6 @@ export function EditorialHeroScene({ hero, statement }: EditorialHeroSceneProps)
         <div ref={stageRef} className="cc-ed-hero-scene__stage">
           <div className="cc-ed-hero-scene__hero">
             <div className="cc-ed-hero-scene__hero-inner">{hero}</div>
-          </div>
-          <div ref={statementRef} className="cc-ed-hero-scene__statement">
-            {statement}
           </div>
         </div>
       </div>

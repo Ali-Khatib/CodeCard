@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic';
 import { EditorialHero } from './editorial-hero';
-import { EditorialStatement } from './editorial-statement';
 import { EditorialFeatureWalkthrough } from './editorial-feature-walkthrough';
 import { EditorialLiveDemoBox } from './editorial-live-demo-box';
 import { EditorialAudience } from './editorial-audience';
@@ -18,6 +17,12 @@ const EditorialHeroScene = dynamic(
   { ssr: true },
 );
 
+const EditorialStatementScene = dynamic(
+  () =>
+    import('./editorial-statement-scene').then((m) => m.EditorialStatementScene),
+  { ssr: true },
+);
+
 const EditorialResearchScene = dynamic(
   () => import('./editorial-research-scene').then((m) => m.EditorialResearchScene),
   { ssr: true },
@@ -25,13 +30,14 @@ const EditorialResearchScene = dynamic(
 
 /**
  * Marketing `/`
- * Hero scene → walkthrough → live demo preview → audience → research → finale.
+ * Hero → post-hero statement cinema → walkthrough → demo → audience → research → finale.
  */
 export function EditorialLanding() {
   return (
     <div className="cc-ed" data-testid="editorial-landing" data-chapter="hero">
       <EditorialAtmosphere />
-      <EditorialHeroScene hero={<EditorialHero />} statement={<EditorialStatement />} />
+      <EditorialHeroScene hero={<EditorialHero />} />
+      <EditorialStatementScene />
       <EditorialFeatureWalkthrough />
       <EditorialLiveDemoBox />
       <EditorialAudience />

@@ -91,15 +91,16 @@ describe('Editorial product landing contract', () => {
     expect(story).toContain('cc-ed-research-story__beat');
     expect(story).toContain('cc-ed-research-story__media');
     expect(story).toContain('cc-ed-research-story__columns');
+    expect(story).toContain('cc-ed-research-story__frame');
     expect(story).toContain('useScroll');
     expect(story).toContain('useTransform');
-    expect(story).toContain(' / {total}');
+    expect(story).not.toContain('cc-ed-research-story__pager');
     expect(story).not.toContain('Keep scrolling');
     expect(story).not.toContain('pin: true');
     expect(story).not.toContain('autoAlpha');
     expect(story).not.toContain('cc-ed-research-story__word');
     expect(css).toContain('.cc-ed-research-story__beat');
-    expect(css).toContain('.cc-ed-research-story__stage');
+    expect(css).toContain('.cc-ed-research-story__frame');
     expect(css).toContain('.cc-ed-research-story__grid');
     expect(css).toContain('.cc-ed-research-story__media');
     expect(css).not.toContain('.cc-ed-research-story__pin');
@@ -136,15 +137,18 @@ describe('Editorial product landing contract', () => {
     expect(nextConfig).toContain("source: '/demo/:path*'");
     expect(nextConfig).toContain("frame-ancestors 'self'");
     expect(css).toContain('.cc-ed-hero-scene');
-    expect(css).toContain('inset(20vh 22vw 20vh 22vw round 36px)');
+    expect(css).toContain('inset(12.5vh 4vw 12.5vh 4vw round 28px)');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');
   });
 
-  it('keeps a floating glass pill nav and shader-backed statement beats', () => {
+  it('keeps a floating glass pill nav and a post-hero statement word reveal', () => {
     const css = read('src/styles/editorial-landing.css');
+    const landing = read(
+      'src/components/landing/editorial/editorial-landing.tsx',
+    );
     const statement = read(
-      'src/components/landing/editorial/editorial-statement.tsx',
+      'src/components/landing/editorial/editorial-statement-scene.tsx',
     );
     const scene = read(
       'src/components/landing/editorial/editorial-hero-scene.tsx',
@@ -154,16 +158,32 @@ describe('Editorial product landing contract', () => {
     expect(css).not.toMatch(
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
+    expect(css).toContain('.cc-ed-statement-scene');
+    expect(css).toContain('position: sticky');
+    expect(landing).toContain('EditorialStatementScene');
+    expect(landing).not.toContain('statement={<EditorialStatement');
     expect(statement).toContain('data-statement-beat');
+    expect(statement).toContain('data-statement-word');
+    expect(statement).toContain('useScroll');
+    expect(statement).toContain('useTransform');
     expect(statement).toContain(' / 03');
     expect(statement).toContain('What this is');
+    expect(statement).toContain('YOUR BEST WORK SHOULDN’T');
+    expect(statement).toContain("offset: ['start start', 'end end']");
     expect(scene).toContain('clipPath');
-    expect(scene).toContain('introClip');
+    expect(scene).toContain('settledInsets');
     expect(scene).toContain('INTRO_DURATION');
-    expect(scene).toContain("ease: 'power3.out'");
+    expect(scene).toContain('INTRO_EASE');
+    expect(scene).toContain('power3.out');
+    expect(scene).toContain("dataset.heroIntro = 'running'");
     expect(scene).toContain('onComplete: buildScrollCinema');
-    expect(scene).toContain('scrub: 0.2');
-    expect(scene).toContain("end: mobile ? '+=95%' : '+=115%'");
+    expect(scene).toContain('scrub: 0.25');
+    expect(scene).toContain("end: mobile ? '+=85%' : '+=100%'");
+    expect(scene).toContain('navPill');
+    expect(scene).toContain('autoAlpha: 0, y: 14');
+    expect(css).toContain('cc-ed-hero-intro-expand');
+    expect(css).toContain('cubic-bezier(0.16, 1, 0.3, 1)');
+    expect(scene).not.toContain('data-statement-word');
     expect(scene).not.toContain('ShaderHeroBackdrop');
     expect(scene).not.toContain('fastScrollEnd: true');
     expect(scene).not.toContain("backgroundColor: 'transparent'");

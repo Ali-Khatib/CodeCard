@@ -14,7 +14,6 @@ export type EditorialResearchBeat = {
   id: string;
   index: string;
   marker: string;
-  /** Full phrase for screen readers */
   problemTitle: string;
   problemLead: string;
   problemSub: string;
@@ -24,55 +23,51 @@ export type EditorialResearchBeat = {
   imageAlt: string;
 };
 
-const CHAPTER_TOTAL = '03';
-
 function ResearchChapter({
   beat,
-  total,
+  flip,
 }: {
   beat: EditorialResearchBeat;
-  total: string;
+  flip?: boolean;
 }) {
   const chapterRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion() === true;
   const { scrollYProgress } = useScroll({
     target: chapterRef,
-    offset: ['start 85%', 'start 35%'],
+    offset: ['start 90%', 'start 45%'],
   });
 
-  const imageOpacity = useTransform(scrollYProgress, [0, 1], [0.72, 1]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1.03, 1]);
-  const imageY = useTransform(scrollYProgress, [0, 1], [18, 0]);
-  const copyOpacity = useTransform(scrollYProgress, [0.08, 1], [0.55, 1]);
-  const copyY = useTransform(scrollYProgress, [0.08, 1], [16, 0]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 1], [0.78, 1]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1.02, 1]);
+  const copyOpacity = useTransform(scrollYProgress, [0.1, 1], [0.6, 1]);
+  const copyY = useTransform(scrollYProgress, [0.1, 1], [14, 0]);
 
   return (
     <section
       ref={chapterRef}
-      className="cc-ed-research-story__beat"
+      className={
+        flip
+          ? 'cc-ed-research-story__beat cc-ed-research-story__beat--flip'
+          : 'cc-ed-research-story__beat'
+      }
       data-testid={`editorial-proof-box-${beat.id}`}
       aria-label={`${beat.index} ${beat.marker}`}
     >
-      <div className="cc-ed-research-story__stage">
-        <p className="cc-ed-research-story__pager" aria-live="polite">
-          <span className="cc-ed-research-story__pager-now">{beat.index}</span>
-          <span className="cc-ed-research-story__pager-total"> / {total}</span>
-        </p>
-
+      <div className="cc-ed-research-story__frame">
         <div className="cc-ed-research-story__grid">
           <motion.div
             className="cc-ed-research-story__media"
             style={
               reduced
                 ? undefined
-                : { opacity: imageOpacity, scale: imageScale, y: imageY }
+                : { opacity: imageOpacity, scale: imageScale }
             }
           >
             <Image
               src={beat.imageSrc}
               alt={beat.imageAlt}
               fill
-              sizes="(max-width: 900px) 92vw, 46vw"
+              sizes="(max-width: 900px) 92vw, 44vw"
               className="cc-ed-research-story__img"
             />
           </motion.div>
@@ -141,8 +136,8 @@ export function EditorialResearchStory({
 }) {
   return (
     <div className="cc-ed-research-story" data-testid="editorial-research-story">
-      {beats.map((beat) => (
-        <ResearchChapter key={beat.id} beat={beat} total={CHAPTER_TOTAL} />
+      {beats.map((beat, i) => (
+        <ResearchChapter key={beat.id} beat={beat} flip={i % 2 === 1} />
       ))}
     </div>
   );
