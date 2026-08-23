@@ -135,11 +135,24 @@ export function DashboardOverviewView({
           </div>
           <div className="cc-profile-home__stat-pills">
             <span className="cc-profile-home__stat-pill cc-profile-home__stat-pill--iris">
-              Profile <CountUp value={completion.percentage} />% complete
+              {preview ? (
+                `Profile ${completion.percentage}% complete`
+              ) : (
+                <>
+                  Profile <CountUp value={completion.percentage} />% complete
+                </>
+              )}
             </span>
             {!statsError && (
               <span className="cc-profile-home__stat-pill">
-                <CountUp value={views} /> views
+                {preview ? (
+                  `${views.toLocaleString('en-US')} views`
+                ) : (
+                  <>
+                    <CountUp value={views} />
+                    {'\u00a0'}views
+                  </>
+                )}
               </span>
             )}
           </div>
@@ -466,8 +479,20 @@ export function DashboardOverviewView({
             </AppCard>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {reachCards.map((s) => (
-                <MetricCard key={s.key} label={s.label} value={<CountUp value={stats[s.key]} />}>
+              {reachCards.map((s) => {
+                const count = Math.max(0, Math.round(stats[s.key] ?? 0));
+                return (
+                <MetricCard
+                  key={s.key}
+                  label={s.label}
+                  value={
+                    preview ? (
+                      count.toLocaleString('en-US')
+                    ) : (
+                      <CountUp value={count} />
+                    )
+                  }
+                >
                   {preview ? (
                     <Sparkline
                       points={PREVIEW_SPARKS[s.key]}
@@ -475,7 +500,8 @@ export function DashboardOverviewView({
                     />
                   ) : null}
                 </MetricCard>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

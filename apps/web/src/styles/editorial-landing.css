@@ -2585,7 +2585,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
 
 .cc-ed-demo-preview__viewport {
   width: 100%;
-  padding: 0.85rem 0.85rem 1rem;
+  padding: 0;
 }
 
 .cc-ed-demo-preview__device {

@@ -106,7 +106,9 @@ describe('Editorial product landing contract', () => {
     expect(demo).toContain('EditorialLiveDemoPreview');
     expect(preview).toContain('iframe');
     expect(preview).toContain('/demo?embed=1');
-    expect(preview).toContain('/demo/card?embed=1');
+    expect(preview).toContain("querySelector('.cc-ed-demo-preview__device')");
+    expect(preview).toContain('viewportWidth < WEB_NARROW_BREAKPOINT');
+    expect(preview).toContain('PHONE_WORKSPACE_VIEW');
     expect(preview).toContain('Web app');
     expect(preview).toContain('Mobile app');
     expect(preview).toContain('EXPLORE THE FULL EXPERIENCE');

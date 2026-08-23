@@ -104,7 +104,7 @@ export function DashboardShell({
 
   useDashboardSessionGuard();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     try {
       const inIframe = window.self !== window.top;
       const embedParam = new URLSearchParams(window.location.search).get('embed') === '1';
@@ -307,7 +307,7 @@ export function DashboardShell({
 
         <Link
           href={`${basePath}/profile`}
-          className="cc-app-user-card cc-app-user-card--link mt-8 block"
+          className="cc-app-user-card cc-app-user-card--link mt-4 block"
           aria-label="Open profile editor: photo, bio, and links"
         >
           <div className="flex items-center gap-3">
@@ -328,9 +328,11 @@ export function DashboardShell({
               <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
                 @{profileSlug ?? email?.split('@')[0] ?? 'you'}
               </p>
-              <p className="mt-1.5 text-[11px] font-medium text-[var(--app-iris)]">
-                Edit photo, bio, links
-              </p>
+              {preview || embedded ? null : (
+                <p className="mt-1.5 text-[11px] font-medium text-[var(--app-iris)]">
+                  Edit photo, bio, links
+                </p>
+              )}
               {completion != null && (
                 <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
                   {completion}% ready
@@ -340,9 +342,9 @@ export function DashboardShell({
           </div>
         </Link>
 
-        <div className="mt-6 flex-1 overflow-y-auto">{navLinks}</div>
+        <div className="cc-app-sidebar__nav">{navLinks}</div>
 
-        <div className="mt-4 space-y-2 border-t border-[var(--app-border)] pt-4">
+        <div className="cc-app-sidebar__foot">
           {preview && (
             <AppButton variant="primary" block href={DEMO_SIGN_IN_HREF}>
               Sign in
@@ -364,11 +366,9 @@ export function DashboardShell({
 
       <div className="cc-app-main">
         <header className="cc-app-topbar">
-          {!embedded ? (
-            <div className="cc-app-mobile-theme-toggle md:hidden">
-              <ThemeToggle />
-            </div>
-          ) : null}
+          <div className="cc-app-mobile-theme-toggle md:hidden">
+            <ThemeToggle />
+          </div>
           <h1 className="cc-app-topbar-title min-w-0 break-words text-[18px] font-medium text-[var(--app-ink)]">
             {pageTitle}
           </h1>
@@ -469,7 +469,6 @@ export function DashboardShell({
         </main>
       </div>
 
-      {!embedded ? (
       <nav className="cc-app-mobile-nav md:hidden" aria-label="Mobile">
         {NAV_ITEMS.map((item) => {
           const href = hrefFor(item.segment);
@@ -505,7 +504,6 @@ export function DashboardShell({
           );
         })}
       </nav>
-      ) : null}
     </div>
     </MutationFeedbackProvider>
   );

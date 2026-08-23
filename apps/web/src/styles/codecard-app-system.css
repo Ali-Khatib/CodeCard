@@ -126,9 +126,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   border-right: 1px solid color-mix(in srgb, var(--app-ink) 10%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--app-paper) 55%, var(--app-bone)), var(--app-bone));
-  padding: 20px 16px 20px 20px;
+  padding: 16px 12px 16px 12px;
   transition: transform var(--app-slide-duration) var(--app-slide-ease);
-  will-change: transform;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -818,7 +817,7 @@ button.cc-app-nav-link:focus-visible {
   align-items: center;
   gap: 10px;
   border-radius: var(--app-radius-pill);
-  padding: 0 12px;
+  padding: 0 10px;
   font-size: 14px;
   font-weight: 500;
   color: var(--app-ink);
@@ -1683,23 +1682,47 @@ html.dark .cc-app-badge--blush {
   }
 }
 
-/* Marketing live-demo iframe — keep the real workspace chrome (sidebar included) */
+/* Marketing live-demo iframe — desktop sidebar at md+, phone tab bar below. */
 .cc-app-root--embedded {
   position: relative;
   min-height: 100%;
-  overflow: visible;
+  overflow-x: hidden;
+  --app-sidebar-width: 228px;
+}
+
+.cc-app-sidebar__nav {
+  margin-top: 12px;
+}
+
+.cc-app-sidebar__foot {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--app-border);
+}
+
+.cc-app-sidebar-appearance {
+  min-width: 0;
 }
 
 .cc-app-root--embedded .cc-app-sidebar {
   position: absolute;
+  left: 0;
+  top: 0;
+  transform: none;
   height: 100%;
-  display: flex;
+  padding: 12px 10px 14px;
+}
+
+@media (min-width: 768px) {
+  .cc-app-root--embedded .cc-app-sidebar {
+    display: flex;
+  }
 }
 
 .cc-app-root--embedded .cc-app-sidebar-toggle--fixed {
-  position: absolute;
-  z-index: 80;
-  display: inline-flex;
+  display: none;
 }
 
 .cc-app-root--embedded .cc-app-main {
@@ -1708,17 +1731,17 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-root--embedded .cc-app-topbar {
   gap: 10px;
-  padding: 14px 16px 14px 56px;
+  padding: 12px 16px 12px 16px;
 }
 
 .cc-app-root--embedded .cc-app-content {
-  padding: 20px 16px 28px;
+  padding: 16px 16px 24px;
   min-height: 0;
 }
 
-/* Embedded preview is always the desktop product chrome — never the phone dock. */
-.cc-app-root--embedded .cc-app-mobile-nav {
-  display: none !important;
+.cc-app-root--embedded .cc-profile-home__title {
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+  line-height: 1.05;
 }
 
 .cc-app-root--embedded.cc-app-root--sidebar-collapsed .cc-app-main {
@@ -1727,15 +1750,15 @@ html.dark .cc-app-badge--blush {
 
 @media (max-width: 767px) {
   .cc-app-root--embedded .cc-app-sidebar {
-    display: flex;
+    display: none;
   }
 
   .cc-app-root--embedded .cc-app-main {
-    margin-left: var(--app-sidebar-width, 248px);
+    margin-left: 0;
   }
 
-  .cc-app-root--embedded.cc-app-root--sidebar-collapsed .cc-app-main {
-    margin-left: 0;
+  .cc-app-root--embedded .cc-app-mobile-nav {
+    display: grid;
   }
 
   .cc-app-root--embedded .cc-app-topbar-title {
@@ -1750,7 +1773,7 @@ html.dark .cc-app-badge--blush {
   }
 
   .cc-app-root--embedded .cc-app-content {
-    padding-bottom: 28px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
 
@@ -3719,6 +3742,7 @@ html.dark .cc-reactive-border:hover {
 .cc-profile-home__stat-pill {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   border-radius: 999px;
   border: 1px solid var(--app-border);
   background: var(--app-paper);
@@ -3726,6 +3750,7 @@ html.dark .cc-reactive-border:hover {
   font-size: 13px;
   font-weight: 520;
   color: var(--app-ink);
+  white-space: nowrap;
 }
 
 .cc-profile-home__stat-pill--iris {

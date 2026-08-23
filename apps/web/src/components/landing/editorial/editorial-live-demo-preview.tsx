@@ -14,20 +14,36 @@ const PREVIEW_SCROLL_THRESHOLD = 320;
 
 const WEB_VIEW = { width: 1280, height: 820 };
 const MOBILE_VIEW = { width: 390, height: 844 };
+const PHONE_WORKSPACE_VIEW = { width: 390, height: 844 };
+const WEB_NARROW_BREAKPOINT = 720;
 
 type PreviewLayout = {
   scale: number;
   width: number;
   height: number;
+  inner: { width: number; height: number };
 };
 
 function layoutForMode(mode: PreviewMode, viewportWidth: number): PreviewLayout {
   if (mode === 'web') {
+    if (viewportWidth < WEB_NARROW_BREAKPOINT) {
+      const inner = PHONE_WORKSPACE_VIEW;
+      const width = Math.min(viewportWidth, inner.width);
+      const scale = width / inner.width;
+      return {
+        scale,
+        width,
+        height: inner.height * scale,
+        inner,
+      };
+    }
+
     const scale = viewportWidth / WEB_VIEW.width;
     return {
       scale,
       width: viewportWidth,
       height: WEB_VIEW.height * scale,
+      inner: WEB_VIEW,
     };
   }
 
@@ -37,6 +53,7 @@ function layoutForMode(mode: PreviewMode, viewportWidth: number): PreviewLayout 
     scale,
     width: phoneWidth,
     height: MOBILE_VIEW.height * scale,
+    inner: MOBILE_VIEW,
   };
 }
 
@@ -100,7 +117,11 @@ export function EditorialLiveDemoPreview() {
     if (!viewport) return;
 
     const sync = () => {
-      const width = viewport.clientWidth || 680;
+      const device = viewport.querySelector('.cc-ed-demo-preview__device');
+      const width =
+        (device instanceof HTMLElement && device.clientWidth > 0
+          ? device.clientWidth
+          : viewport.clientWidth) || 680;
       setLayout(layoutForMode(mode, width));
     };
 
@@ -183,7 +204,7 @@ export function EditorialLiveDemoPreview() {
     mode === 'web'
       ? 'CodeCard live demo workspace preview'
       : 'CodeCard live demo mobile profile preview';
-  const view = mode === 'web' ? WEB_VIEW : MOBILE_VIEW;
+  const view = layout.inner;
 
   return (
     <div
