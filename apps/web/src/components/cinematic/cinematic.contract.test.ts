@@ -75,6 +75,10 @@ describe('Editorial product landing contract', () => {
     expect(fx).not.toContain('fastScrollEnd');
     expect(fx).not.toContain('pin: fixed');
     expect(fx).toContain('Sticky `.fx-fixed` holds the stage');
+    expect(fx).not.toContain('160vh');
+    const fxCss = read('src/components/ui/full-screen-scroll-fx.css');
+    expect(fxCss).toContain('--fx-section-length: 100dvh');
+    expect(fxCss).not.toContain('160vh');
   });
 
   it('research proof uses an editorial image-and-copy composition', () => {

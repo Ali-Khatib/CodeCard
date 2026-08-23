@@ -121,7 +121,12 @@ function scrollToY(y: number, durationMs: number) {
 
 function indexFromProgress(progress: number, sectionCount: number) {
   if (sectionCount <= 1) return 0;
-  return clamp(Math.round(progress * (sectionCount - 1)), 0, sectionCount - 1);
+  // Floor keeps the pager aligned with scrub position (round jumped to 05 early).
+  return clamp(
+    Math.floor(progress * (sectionCount - 1) + 0.0001),
+    0,
+    sectionCount - 1,
+  );
 }
 
 function progressFromIndex(index: number, sectionCount: number) {
@@ -453,7 +458,11 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       const st = ScrollTrigger.create({
         trigger: fs,
         start: 'top top',
-        end: 'bottom bottom',
+        end: () => {
+          const stage = fixedRef.current;
+          const scrollable = fs.offsetHeight - (stage?.offsetHeight ?? 0);
+          return scrollable > 0 ? `+=${scrollable}` : 'bottom bottom';
+        },
         scrub: SCRUB_SMOOTH,
         invalidateOnRefresh: true,
         onRefresh: () => {

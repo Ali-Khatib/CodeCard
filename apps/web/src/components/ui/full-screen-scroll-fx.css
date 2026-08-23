@@ -7,8 +7,9 @@
   color: #000;
   font-family: var(--fx-font);
   letter-spacing: -0.02em;
-  /* Scroll-scrubbed chapters — longer runway so one flick does not skip a beat */
-  --fx-section-length: 160vh;
+  /* One viewport per chapter — 5 slides = 5×100vh total scroll runway */
+  --fx-section-length: 100vh;
+  --fx-section-length: 100dvh;
 }
 
 .fx-debug {
@@ -31,6 +32,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   width: 100%;
   overflow: hidden;
   background: var(--fx-page-bg);
@@ -479,7 +481,8 @@
 
 @media (max-width: 900px) {
   .fx {
-    --fx-section-length: 140vh;
+    --fx-section-length: 100vh;
+    --fx-section-length: 100svh;
   }
 
   .fx-header {
