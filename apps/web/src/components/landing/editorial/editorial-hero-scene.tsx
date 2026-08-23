@@ -14,37 +14,23 @@ type EditorialHeroSceneProps = {
   hero: ReactNode;
 };
 
-type HeroInsets = {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-  radius: number;
-};
-
-/** Settled inset hero before scroll cinema opens to full-bleed. */
-function settledInsets(mobile: boolean): HeroInsets {
-  return {
-    top: mobile ? 10 : 14,
-    right: mobile ? 10 : 16,
-    bottom: mobile ? 10 : 14,
-    left: mobile ? 10 : 16,
-    radius: mobile ? 22 : 28,
-  };
-}
-
-function clipFrom(i: HeroInsets) {
-  return `inset(${i.top}px ${i.right}px ${i.bottom}px ${i.left}px round ${i.radius}px)`;
-}
-
-const INTRO_DURATION = 1.25;
+const INTRO_DURATION = 1.2;
 const INTRO_DELAY = 0.05;
 /** Matches cubic-bezier(0.16, 1, 0.3, 1) — premium ease-out, no overshoot. */
 const INTRO_EASE = 'power3.out';
 
+function stageRadius(mobile: boolean) {
+  return mobile ? 22 : 32;
+}
+
+function scrollClipClosed(mobile: boolean) {
+  const r = stageRadius(mobile);
+  return `inset(0px 0px 0px 0px round ${r}px)`;
+}
+
 /**
- * Load: CSS expands the framed panel on first paint; GSAP staggers copy/nav.
- * Scroll: settled inset → full-bleed. Statement cinema lives elsewhere.
+ * Load: small inset hero on cream matting expands in place (geometry, not scale).
+ * Scroll: rounded hero → full-bleed. Statement cinema lives elsewhere.
  */
 export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -65,7 +51,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
       const mobile = window.matchMedia('(max-width: 767px)').matches;
       const openClip = 'inset(0px 0px 0px 0px round 0px)';
-      const closedClip = clipFrom(settledInsets(mobile));
+      const closedClip = scrollClipClosed(mobile);
+      const finalRadius = stageRadius(mobile);
 
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
       const media = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
@@ -73,23 +60,31 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const headline = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__display');
       const lede = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__lede');
       const actions = stage.querySelector<HTMLElement>('.cc-ed-hero .cc-ed__actions');
-      const navPill = document.querySelector<HTMLElement>(
-        '.cc-marketing-shell .cc-marketing-nav-shell .cc-nav-veil',
-      );
 
       const contentBits = [eyebrow, headline, lede, actions].filter(
         (el): el is HTMLElement => Boolean(el),
       );
 
-      const settleStageClip = () => {
-        // Hand off from CSS @keyframes to GSAP-owned clip-path for scroll cinema.
+      const trackHeight = () => track.offsetHeight;
+
+      const snapFinalGeometry = () => {
         stage.style.animation = 'none';
-        gsap.set(stage, { clipPath: closedClip });
+        gsap.set(stage, {
+          width: '100%',
+          height: trackHeight(),
+          minHeight: trackHeight(),
+          marginTop: 0,
+          marginLeft: 0,
+          marginRight: 0,
+          borderRadius: finalRadius,
+          clipPath: closedClip,
+        });
       };
 
       const buildScrollCinema = () => {
-        settleStageClip();
+        snapFinalGeometry();
         root.dataset.heroIntro = 'done';
+        document.body.style.overflow = '';
 
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
@@ -124,87 +119,85 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const skipIntro = window.scrollY > 8;
 
       if (skipIntro) {
-        settleStageClip();
+        snapFinalGeometry();
         gsap.set(contentBits, { clearProps: 'opacity,visibility,transform' });
         if (media) gsap.set(media, { clearProps: 'opacity,visibility,transform' });
-        if (navPill) gsap.set(navPill, { clearProps: 'opacity,visibility,transform' });
         buildScrollCinema();
         return;
       }
 
       root.dataset.heroIntro = 'running';
+      document.body.style.overflow = 'hidden';
 
-      // Container expand is CSS-driven (visible before GSAP hydrates).
-      // GSAP only owns content/nav stagger + the later scroll cinema.
-      if (media) gsap.set(media, { autoAlpha: 0.75, scale: 1.015 });
+      // Geometry expansion — hero box grows through intentional cream matting (no scale).
+      stage.style.animation = 'none';
+      if (media) gsap.set(media, { autoAlpha: 0.72 });
       if (contentBits.length) {
-        gsap.set(contentBits, { autoAlpha: 0, y: 14 });
+        gsap.set(contentBits, { autoAlpha: 0, y: 12 });
       }
-      if (navPill) gsap.set(navPill, { autoAlpha: 0, y: -8 });
 
       const intro = gsap.timeline({
         delay: INTRO_DELAY,
         onComplete: buildScrollCinema,
       });
 
-      // Keep timeline length aligned with CSS expand even though clip is CSS-owned.
-      intro.to({}, { duration: INTRO_DURATION }, 0);
+      intro.to(
+        stage,
+        {
+          width: '100%',
+          height: trackHeight,
+          minHeight: trackHeight,
+          marginTop: 0,
+          marginLeft: 0,
+          marginRight: 0,
+          borderRadius: finalRadius,
+          duration: INTRO_DURATION,
+          ease: INTRO_EASE,
+        },
+        0,
+      );
 
       if (media) {
         intro.to(
           media,
-          {
-            autoAlpha: 1,
-            scale: 1,
-            duration: INTRO_DURATION * 0.85,
-            ease: INTRO_EASE,
-          },
-          0.12,
-        );
-      }
-
-      if (navPill) {
-        intro.to(
-          navPill,
-          { autoAlpha: 1, y: 0, duration: 0.55, ease: INTRO_EASE },
-          0.25,
+          { autoAlpha: 1, duration: INTRO_DURATION * 0.85, ease: INTRO_EASE },
+          0.15,
         );
       }
 
       if (eyebrow) {
         intro.to(
           eyebrow,
-          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
-          0.32,
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
+          0.25,
         );
       }
       if (headline) {
         intro.to(
           headline,
-          { autoAlpha: 1, y: 0, duration: 0.55, ease: INTRO_EASE },
-          0.4,
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
+          0.35,
         );
       }
       if (lede) {
         intro.to(
           lede,
-          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
-          0.55,
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
+          0.5,
         );
       }
       if (actions) {
         intro.to(
           actions,
-          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
-          0.7,
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
+          0.65,
         );
       }
 
-      // Soft skip after expand has started — load-noise wheel events won't cancel it.
       let skipArmed = false;
       const armSkip = window.setTimeout(() => {
         skipArmed = true;
-      }, 420);
+      }, 480);
 
       const finishIntro = () => {
         if (!skipArmed) return;
@@ -220,9 +213,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         window.removeEventListener('wheel', finishIntro);
         window.removeEventListener('touchmove', finishIntro);
         window.removeEventListener('keydown', finishIntro);
-        if (navPill) {
-          gsap.set(navPill, { clearProps: 'opacity,visibility,transform' });
-        }
+        document.body.style.overflow = '';
         delete root.dataset.heroIntro;
       };
     },
@@ -236,6 +227,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       data-testid="editorial-hero-scene"
       data-motion-pattern="section-enter"
       data-motion-owner="gsap"
+      data-hero-intro={canEnhanceMotion ? undefined : 'done'}
     >
       <div ref={trackRef} className="cc-ed-hero-scene__track">
         <div ref={stageRef} className="cc-ed-hero-scene__stage">

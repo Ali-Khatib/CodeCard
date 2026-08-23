@@ -132,6 +132,22 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   transition: color 0.45s ease, background-color 0.45s ease, border-color 0.45s ease;
 }
 
+/* Nav wayfinding must not inherit hero --ed-fg or GSAP partial opacity */
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link {
+  color: var(--ed-ink, #232324);
+  opacity: 1;
+}
+
+.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-item {
+  opacity: 1;
+}
+
+.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:hover) .cc-hume-fade-item,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:focus-visible) .cc-hume-fade-item {
+  opacity: 1;
+}
+
 /* Dark chapters — light frosted glass (never solid page color) */
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
@@ -2025,9 +2041,23 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
     clamp(0.75rem, 1.8vw, 1rem);
 }
 
+/* Cream matting is intentional — hero load expands through this space. */
+.cc-ed-hero-scene--enhanced {
+  padding: clamp(0.65rem, 1.6vw, 1rem) clamp(0.75rem, 2vw, 1.15rem)
+    clamp(0.75rem, 1.8vw, 1rem);
+}
+
 .cc-ed-hero-scene__track {
   position: relative;
   background: transparent;
+  /* Final hero height is reserved from first paint — no layout shift during load. */
+  min-height: min(88svh, 920px);
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero-scene__track {
+    min-height: min(86svh, 880px);
+  }
 }
 
 .cc-ed-hero-scene__stage {
@@ -2039,46 +2069,33 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   border-radius: clamp(26px, 3vw, 40px);
   transform-origin: center center;
   background: #101012;
-}
-
-.cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage {
-  min-height: 100svh;
-  min-height: 100dvh;
-  border-radius: 0;
-  /* First paint: ~92% × ~75vh inset on cream. CSS expands; JS owns scroll cinema. */
-  clip-path: inset(12.5vh 4vw 12.5vh 4vw round 28px);
-  will-change: clip-path;
+  width: 100%;
 }
 
 @media (max-width: 767px) {
-  .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage {
-    clip-path: inset(11vh 4vw 11vh 4vw round 24px);
+  .cc-ed-hero-scene__stage {
+    min-height: min(86svh, 880px);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Load open: smaller hero centered in cream — expands to final inset hero. */
+.cc-ed-hero-scene--enhanced:not([data-hero-intro='done']) .cc-ed-hero-scene__stage {
+  width: 88%;
+  height: clamp(50svh, 58svh, 62svh);
+  min-height: clamp(50svh, 58svh, 62svh);
+  margin-inline: auto;
+  margin-top: clamp(1.5rem, 6vh, 4.5rem);
+  border-radius: 28px;
+  will-change: width, height, margin, border-radius;
+}
+
+@media (max-width: 767px) {
   .cc-ed-hero-scene--enhanced:not([data-hero-intro='done']) .cc-ed-hero-scene__stage {
-    animation: cc-ed-hero-intro-expand 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
-  }
-}
-
-@keyframes cc-ed-hero-intro-expand {
-  from {
-    clip-path: inset(12.5vh 4vw 12.5vh 4vw round 28px);
-  }
-  to {
-    clip-path: inset(14px 16px 14px 16px round 28px);
-  }
-}
-
-@media (max-width: 767px) {
-  @keyframes cc-ed-hero-intro-expand {
-    from {
-      clip-path: inset(11vh 4vw 11vh 4vw round 24px);
-    }
-    to {
-      clip-path: inset(10px 10px 10px 10px round 22px);
-    }
+    width: 90%;
+    height: clamp(48svh, 54svh, 58svh);
+    min-height: clamp(48svh, 54svh, 58svh);
+    margin-top: clamp(1rem, 4vh, 2.5rem);
+    border-radius: 24px;
   }
 }
 
@@ -2985,7 +3002,10 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
   }
 
   .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage {
-    clip-path: inset(18px 22px 18px 22px round 28px);
+    width: 100%;
+    margin-top: 0;
+    margin-inline: 0;
+    clip-path: none;
   }
 
   .cc-shader-hero {

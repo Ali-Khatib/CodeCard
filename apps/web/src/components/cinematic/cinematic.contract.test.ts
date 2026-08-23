@@ -137,7 +137,8 @@ describe('Editorial product landing contract', () => {
     expect(nextConfig).toContain("source: '/demo/:path*'");
     expect(nextConfig).toContain("frame-ancestors 'self'");
     expect(css).toContain('.cc-ed-hero-scene');
-    expect(css).toContain('inset(12.5vh 4vw 12.5vh 4vw round 28px)');
+    expect(css).toContain('.cc-ed-hero-scene--enhanced');
+    expect(css).toContain('Cream matting is intentional');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');
   });
@@ -171,7 +172,7 @@ describe('Editorial product landing contract', () => {
     expect(statement).toContain('YOUR BEST WORK SHOULDN’T');
     expect(statement).toContain("offset: ['start start', 'end end']");
     expect(scene).toContain('clipPath');
-    expect(scene).toContain('settledInsets');
+    expect(scene).toContain('scrollClipClosed');
     expect(scene).toContain('INTRO_DURATION');
     expect(scene).toContain('INTRO_EASE');
     expect(scene).toContain('power3.out');
@@ -179,10 +180,9 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('onComplete: buildScrollCinema');
     expect(scene).toContain('scrub: 0.25');
     expect(scene).toContain("end: mobile ? '+=85%' : '+=100%'");
-    expect(scene).toContain('navPill');
-    expect(scene).toContain('autoAlpha: 0, y: 14');
-    expect(css).toContain('cc-ed-hero-intro-expand');
-    expect(css).toContain('cubic-bezier(0.16, 1, 0.3, 1)');
+    expect(scene).toContain('snapFinalGeometry');
+    expect(scene).toContain('marginTop: 0');
+    expect(scene).toContain('autoAlpha: 0, y: 12');
     expect(scene).not.toContain('data-statement-word');
     expect(scene).not.toContain('ShaderHeroBackdrop');
     expect(scene).not.toContain('fastScrollEnd: true');
