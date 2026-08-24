@@ -213,6 +213,11 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
 }
 
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
+  color: var(--ed-ink, #232324);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
 @keyframes cc-nav-gradient-shift {
   0% {
     background-position: 0% 50%;
@@ -1408,6 +1413,19 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   display: block;
   width: 100%;
   color: color-mix(in srgb, #efedeb 88%, var(--ed-accent, #a86f55));
+}
+
+.cc-ed-hero__content .cc-ed__sub.cc-ed-hero__rotating-line {
+  display: inline-flex !important;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  width: auto;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.cc-ed-hero__content .cc-ed__sub.cc-ed-hero__rotating-line .cc-ed-hero__rotating-slot {
+  white-space: nowrap;
 }
 
 .cc-ed-hero__rotating-line {
@@ -2631,20 +2649,26 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* Statement rail + beats — chrome first, copy reveals below the progress line. */
-.cc-ed-hero-scene__statement {
+/* Hero statement cinema (.cc-ed-hero-scene__statement) — rail in stage, beats in __cinema. */
+.cc-ed-hero-scene__statement-rail {
   position: absolute;
-  inset: 0;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: stretch;
-  padding: 0;
-  background: transparent;
-  color: #efedeb;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 4;
   pointer-events: none;
-  overflow: hidden;
+}
+
+.cc-ed-hero-scene__cinema {
+  position: relative;
+  z-index: 1;
+  background: #101012;
+  color: #efedeb;
+  min-height: min(52vh, 34rem);
+  padding-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+
+.cc-ed-hero-scene--enhanced .cc-ed-hero__content {
+  padding-bottom: clamp(5.75rem, 13vh, 8rem);
 }
 
 .cc-ed-hero-scene__statement-chrome {
@@ -2655,7 +2679,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   padding:
     0
     clamp(1.25rem, 4vw, 3.5rem)
-    0;
+    clamp(1.35rem, 3.6vh, 2.15rem);
   justify-items: start;
   will-change: transform, opacity;
 }
@@ -2734,18 +2758,17 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* Beat copy lives under the progress rail — scroll reveals upward from below. */
+/* Beat copy lives under the progress rail in the cinema panel below the hero. */
 .cc-ed-hero-scene__statement-stage {
   position: relative;
   width: min(100%, 48rem);
   max-width: calc(100% - clamp(2rem, 8vw, 6rem));
   margin:
-    clamp(0.85rem, 2.4vh, 1.35rem)
+    clamp(0.35rem, 1vh, 0.65rem)
     clamp(1.25rem, 4vw, 3.5rem)
-    clamp(1.35rem, 4vh, 2.85rem)
+    0
     clamp(1.25rem, 8vw, 12rem);
-  min-height: min(32vh, 20rem);
-  max-height: min(42vh, 26rem);
+  min-height: 0;
   overflow: hidden;
   flex-shrink: 0;
 }

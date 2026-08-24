@@ -32,12 +32,16 @@ const CINEMA_SCRUB = 0.2;
  * ~0.04 × 520vh ≈ 0.21vh — one small scroll finishes the expansion.
  */
 const CINEMA_EXPAND_END = 0.04;
-/** Full-bleed hold — hero + CTAs stay visible while you scroll down. */
+/** Full-bleed hold — hero stays visible while you scroll down. */
 const CINEMA_CHROME_START = 0.11;
-/** Loading rail fully docked under hero; beat copy has not started yet. */
+/** Loading rail visible under hero baseline. */
 const CINEMA_CHROME_END = 0.18;
-/** Hero clears; beats rise in below the progress line. */
+/** Hero headline clears; beats rise in below the progress line. */
 const CINEMA_STATEMENT_START = 0.26;
+
+function cinemaPinMultiplier(mobile: boolean) {
+  return mobile ? 4.6 : 5.2;
+}
 
 /** Per-beat scroll shares: rise ↑, fill words, exit ↑, gap (empty). */
 const BEAT_ENTER_SHARE = 0.1;
@@ -160,6 +164,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const cinemaRef = useRef<HTMLDivElement>(null);
   const statementRef = useRef<HTMLDivElement>(null);
   const pagerRef = useRef<HTMLSpanElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
@@ -173,8 +178,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const root = rootRef.current;
       const track = trackRef.current;
       const stage = stageRef.current;
+      const cinema = cinemaRef.current;
       const statement = statementRef.current;
-      if (!root || !track || !stage || !statement) return;
+      if (!root || !track || !stage || !cinema || !statement) return;
 
       ensureGsapPlugins();
 
@@ -182,18 +188,26 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const openClip = scrollClipOpen();
       const closedClip = scrollClipClosed(mobile);
       const shutClip = introClipShut(mobile);
-      const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
-      const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
+      const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__copy');
+      const heroBaseline = stage.querySelector<HTMLElement>('.cc-ed-hero__baseline');
       const statementChrome = statement.querySelector<HTMLElement>(
         '.cc-ed-hero-scene__statement-chrome',
       );
-      const statementStage = statement.querySelector<HTMLElement>(
+      const statementStage = cinema.querySelector<HTMLElement>(
         '.cc-ed-hero-scene__statement-stage',
       );
+      const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const beatEls = Array.from(
-        statement.querySelectorAll<HTMLElement>('[data-statement-beat]'),
+        cinema.querySelectorAll<HTMLElement>('[data-statement-beat]'),
       );
+      const pinVh = cinemaPinMultiplier(mobile);
       const viewportH = () => window.innerHeight;
+      cinema.style.marginTop = `${viewportH() * pinVh * CINEMA_STATEMENT_START}px`;
+
+      const syncLogoForProgress = (progress: number) => {
+        document.documentElement.dataset.logoTone =
+          progress < CINEMA_EXPAND_END ? 'dark' : 'light';
+      };
       const beatCount = Math.max(beatEls.length, 1);
       const beatSpan = (0.92 - CINEMA_STATEMENT_START) / beatCount;
 
@@ -253,10 +267,16 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         gsap.set(statement, { autoAlpha: 1 });
         if (statementChrome) {
-          gsap.set(statementChrome, { autoAlpha: 0, y: 36 });
+          gsap.set(statementChrome, { autoAlpha: 0, y: 16 });
         }
         if (statementStage) {
-          gsap.set(statementStage, { autoAlpha: 0 });
+          gsap.set(statementStage, { autoAlpha: 0, height: 0, overflow: 'hidden' });
+        }
+        if (heroCopy) {
+          gsap.set(heroCopy, { autoAlpha: 1, yPercent: 0 });
+        }
+        if (heroBaseline) {
+          gsap.set(heroBaseline, { autoAlpha: 1, yPercent: 0 });
         }
         if (progressFillRef.current) {
           progressFillRef.current.style.transform = 'scaleX(0)';
@@ -286,6 +306,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               const p = self.progress;
+              syncLogoForProgress(p);
               if (p < CINEMA_CHROME_START) {
                 root.dataset.cinemaChapter = 'hero';
                 setPager(-1);
@@ -329,24 +350,37 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        /* IB flow: hero stays through expand + scroll-down hold + chrome dock. */
+        /* IB flow: headline clears when chrome docks; lede + CTAs stay until beats. */
         if (heroCopy) {
           scrollTl.to(
             heroCopy,
             {
               autoAlpha: 0,
-              yPercent: -10,
-              duration: 0.055,
+              yPercent: -8,
+              duration: CINEMA_CHROME_END - CINEMA_CHROME_START,
               ease: 'none',
             },
-            CINEMA_STATEMENT_START,
+            CINEMA_CHROME_START,
+          );
+        }
+
+        if (heroBaseline) {
+          scrollTl.to(
+            heroBaseline,
+            {
+              autoAlpha: 0,
+              yPercent: -6,
+              duration: 0.045,
+              ease: 'none',
+            },
+            CINEMA_STATEMENT_START - 0.01,
           );
         }
 
         if (statementChrome) {
           scrollTl.fromTo(
             statementChrome,
-            { autoAlpha: 0, y: 36 },
+            { autoAlpha: 0, y: 16 },
             {
               autoAlpha: 1,
               y: 0,
@@ -358,6 +392,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         }
 
         if (statementStage) {
+          scrollTl.set(
+            statementStage,
+            { height: 'auto', overflow: 'visible' },
+            CINEMA_STATEMENT_START,
+          );
           scrollTl.set(
             statementStage,
             { autoAlpha: 1 },
@@ -439,7 +478,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         lockFinalGeometry(closedClip);
         root.dataset.heroIntro = 'settled';
         document.body.style.overflow = '';
-        document.documentElement.dataset.logoTone = 'light';
+        syncLogoForProgress(0);
         if (scrollTl?.scrollTrigger) {
           scrollTl.scrollTrigger.enable();
           scrollTl.progress(0);
@@ -460,7 +499,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
       if (skipIntro) {
         heroIntroPlayed = true;
-        document.documentElement.dataset.logoTone = 'light';
+        syncLogoForProgress(0);
         buildScrollCinema();
         return () => {
           scrollTl?.scrollTrigger?.kill();
@@ -558,9 +597,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
           <div
             ref={statementRef}
-            className="cc-ed-hero-scene__statement"
-            data-testid="editorial-statement"
-            aria-labelledby="editorial-statement-heading"
+            className="cc-ed-hero-scene__statement-rail"
+            data-testid="editorial-statement-rail"
           >
             <div className="cc-ed-hero-scene__statement-chrome">
               <p className="cc-ed-hero-scene__statement-tag">
@@ -594,57 +632,61 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                 </span>
               </p>
             </div>
+          </div>
+        </div>
 
-            <div className="cc-ed-hero-scene__statement-stage">
-              {STATEMENT_BEATS.map((beat, i) => (
-                <div
-                  key={beat.id}
-                  className="cc-ed-hero-scene__statement-slot"
-                  data-statement-beat={beat.id}
-                  aria-hidden={i !== 0}
+        <div
+          ref={cinemaRef}
+          className="cc-ed-hero-scene__cinema"
+          data-testid="editorial-statement"
+          aria-labelledby="editorial-statement-heading"
+        >
+          <div className="cc-ed-hero-scene__statement-stage">
+            {STATEMENT_BEATS.map((beat, i) => (
+              <div
+                key={beat.id}
+                className="cc-ed-hero-scene__statement-slot"
+                data-statement-beat={beat.id}
+                aria-hidden={i !== 0}
+              >
+                <p
+                  className="cc-ed-hero-scene__statement-body"
+                  aria-label={beat.title}
                 >
-                  <p
-                    className="cc-ed-hero-scene__statement-body"
-                    aria-label={beat.title}
-                  >
+                  <StatementWords
+                    text={beat.lead}
+                    beatId={beat.id}
+                    tone="lead"
+                  />{' '}
+                  <StatementWords
+                    text={beat.sub}
+                    beatId={beat.id}
+                    tone="sub"
+                  />
+                </p>
+                <div className="cc-ed-hero-scene__statement-copy">
+                  <p className="cc-ed-hero-scene__statement-lede">
                     <StatementWords
-                      text={beat.lead}
+                      text={beat.lede}
                       beatId={beat.id}
-                      tone="lead"
-                    />{' '}
-                    <StatementWords
-                      text={beat.sub}
-                      beatId={beat.id}
-                      tone="sub"
+                      tone="lede"
                     />
                   </p>
-                  <div className="cc-ed-hero-scene__statement-copy">
-                    <p className="cc-ed-hero-scene__statement-lede">
-                      <StatementWords
-                        text={beat.lede}
-                        beatId={beat.id}
-                        tone="lede"
-                      />
-                    </p>
-                    <p className="cc-ed-hero-scene__statement-detail">
-                      <StatementWords
-                        text={beat.detail}
-                        beatId={`${beat.id}-detail`}
-                        tone="lede"
-                      />
-                    </p>
-                  </div>
-                  {i === 0 ? (
-                    <span
-                      id="editorial-statement-heading"
-                      className="sr-only"
-                    >
-                      {beat.title}
-                    </span>
-                  ) : null}
+                  <p className="cc-ed-hero-scene__statement-detail">
+                    <StatementWords
+                      text={beat.detail}
+                      beatId={`${beat.id}-detail`}
+                      tone="lede"
+                    />
+                  </p>
                 </div>
-              ))}
-            </div>
+                {i === 0 ? (
+                  <span id="editorial-statement-heading" className="sr-only">
+                    {beat.title}
+                  </span>
+                ) : null}
+              </div>
+            ))}
           </div>
         </div>
       </div>
