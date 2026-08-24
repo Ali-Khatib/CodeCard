@@ -7,8 +7,9 @@ import { useMotionPreferences } from '@/components/motion/motion-preferences-pro
 
 /** Dark chapters — light type on frosted glass nav. Research keeps light nav (opaque pill). */
 const DARK_CHAPTERS = new Set(['finale']);
-/** Full-bleed immersive chapters — nav collapses to a circular expand control. */
-const COMPACT_NAV_CHAPTERS = ['walkthrough', 'proof'] as const;
+/** Full-bleed immersive chapters — nav collapses to a circular expand control.
+ *  Crash Course only — Research keeps the full pill. */
+const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;
 
 function navToneFor(chapter: string): 'dark' | 'light' {
   return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';
@@ -25,7 +26,7 @@ function setNavCompact(active: boolean) {
 /**
  * Sets data-chapter from section visibility. Backgrounds via CSS — no per-frame React color.
  * Also mirrors tone onto <html> so the marketing pill nav can follow chapter colors.
- * Compact nav is driven separately so it snaps only at Crash Course / Research edges.
+ * Compact nav is driven separately so it snaps only at Crash Course edges.
  * ~1 trigger per chapter (bounded).
  */
 export function EditorialAtmosphere() {
@@ -78,7 +79,7 @@ export function EditorialAtmosphere() {
       );
       sections.forEach((section) => chapterObserver.observe(section));
 
-      // Compact only while Crash Course / Research actually occupy the top of the viewport.
+      // Compact only while Crash Course actually occupies the top of the viewport.
       const compactObserver = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
@@ -129,7 +130,7 @@ export function EditorialAtmosphere() {
       });
     });
 
-    // Compact exactly for Crash Course + Research: when the section top hits the
+    // Compact exactly for Crash Course: when the section top hits the
     // viewport top, until the section bottom leaves the viewport top.
     const compactTriggers = compactSections.map((section) => {
       const id = section.dataset.chapterSection ?? '';

@@ -33,27 +33,25 @@ let heroIntroPlayed = false;
 const STATEMENT_BEATS = [
   {
     id: 'problem',
-    lead: 'YOUR BEST WORK SHOULDN’T',
-    sub: 'LIVE IN FIVE PLACES.',
-    title: 'YOUR BEST WORK SHOULDN’T LIVE IN FIVE PLACES.',
+    lead: 'YOUR WORK BELONGS',
+    sub: 'IN ONE PLACE.',
+    title: 'YOUR WORK BELONGS IN ONE PLACE.',
     lede:
-      'Projects, research, Circle, and connections belong in one shareable identity — not five tabs someone never opens.',
+      'Projects, papers, people, and signals live in one CodeCard you can share.',
   },
   {
     id: 'shift',
-    lead: 'DON’T SEND A LINK AND HOPE.',
-    sub: 'SHOW THE WORK ON THE SPOT.',
-    title: 'DON’T SEND A LINK AND HOPE. SHOW THE WORK ON THE SPOT.',
-    lede:
-      'The quickest way to showcase exactly what you do, so people see it clearly right away — not after they guess what a link means.',
+    lead: 'SHOW WHAT YOU BUILD.',
+    sub: 'RIGHT ON THE SPOT.',
+    title: 'SHOW WHAT YOU BUILD. RIGHT ON THE SPOT.',
+    lede: 'Open your card and they see the work clearly, right away.',
   },
   {
     id: 'identity',
-    lead: 'CARRY THE CARD.',
-    sub: 'NOT FIVE TABS.',
-    title: 'CARRY THE CARD. NOT FIVE TABS.',
-    lede:
-      'Hand someone your CodeCard. They see the work, the papers, and the people in one profile — without hunting across tabs.',
+    lead: 'ONE CARD.',
+    sub: 'YOUR WHOLE STORY.',
+    title: 'ONE CARD. YOUR WHOLE STORY.',
+    lede: 'Hand someone your CodeCard. They get the full picture in one place.',
   },
 ] as const;
 
@@ -85,6 +83,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const statementRef = useRef<HTMLDivElement>(null);
   const pagerRef = useRef<HTMLSpanElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion, hydrated } = useMotionPreferences();
   useScrollTriggerRefresh();
 
@@ -122,6 +121,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         root.dataset.cinemaChapter = index < 0 ? 'hero' : 'statement';
       };
 
+      const setStatementProgress = (statementLocal: number) => {
+        if (!progressFillRef.current) return;
+        const t = Math.max(0, Math.min(1, statementLocal));
+        progressFillRef.current.style.transform = `scaleX(${t})`;
+      };
+
       /** After load expand: full width of cream frame, still inset via clip + root pad. */
       const snapSettledGeometry = () => {
         gsap.set(root, {
@@ -152,16 +157,19 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         document.body.style.overflow = '';
 
         gsap.set(statement, { autoAlpha: 0 });
+        if (progressFillRef.current) {
+          progressFillRef.current.style.transform = 'scaleX(0)';
+        }
         beatEls.forEach((beat, i) => {
           gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0 });
           beat.querySelectorAll<HTMLElement>('[data-statement-word]').forEach((w) => {
-            // Dim enough for reveal, bright enough to never read as “missing”
-            gsap.set(w, { opacity: 0.42 });
+            gsap.set(w, { opacity: 0.72 });
           });
           const lede = beat.querySelector<HTMLElement>('[data-statement-lede]');
           if (lede) gsap.set(lede, { autoAlpha: 0, y: 14 });
         });
         setPager(-1);
+        setStatementProgress(0);
 
         scrollTl = gsap.timeline({
           defaults: { ease: 'none' },
@@ -178,13 +186,20 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               const p = self.progress;
               if (p < CINEMA_EXPAND_END * 0.92) {
                 setPager(-1);
+                setStatementProgress(0);
                 return;
               }
-              const beatProgress =
-                (p - CINEMA_EXPAND_END) / (0.92 - CINEMA_EXPAND_END);
-              setPager(
-                Math.min(beatCount - 1, Math.max(0, Math.floor(beatProgress * beatCount))),
+              const statementSpan = 0.92 - CINEMA_EXPAND_END;
+              const local = Math.min(
+                1,
+                Math.max(0, (p - CINEMA_EXPAND_END) / statementSpan),
               );
+              const scaled = local * beatCount;
+              const beatIndex = Math.min(beatCount - 1, Math.floor(scaled));
+              const withinBeat =
+                local >= 1 ? 1 : Math.min(1, Math.max(0, scaled - beatIndex));
+              setPager(beatIndex);
+              setStatementProgress(withinBeat);
             },
           },
         });
@@ -263,8 +278,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               (wi / Math.max(words.length, 1)) * wordRevealSpan;
             scrollTl!.fromTo(
               word,
-              { opacity: 0.42 },
-              { opacity: 1, duration: beatSpan * 0.09 },
+              { opacity: 0.72 },
+              { opacity: 1, duration: beatSpan * 0.08 },
               t,
             );
           });
@@ -447,6 +462,16 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             </div>
 
             <div className="cc-ed-hero-scene__statement-stage">
+              <div
+                className="cc-ed-hero-scene__statement-progress"
+                aria-hidden
+              >
+                <div
+                  ref={progressFillRef}
+                  className="cc-ed-hero-scene__statement-progress-fill"
+                />
+              </div>
+
               {STATEMENT_BEATS.map((beat, i) => {
                 const lead = beat.lead.split(/\s+/).filter(Boolean);
                 const sub = beat.sub.split(/\s+/).filter(Boolean);

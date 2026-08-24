@@ -175,7 +175,15 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('data-statement-word');
     expect(scene).toContain(' / 03');
     expect(scene).toContain('What this is');
-    expect(scene).toContain('YOUR BEST WORK SHOULDN’T');
+    expect(scene).toContain('YOUR WORK BELONGS');
+    expect(scene).toContain('IN ONE PLACE.');
+    expect(scene).toContain('SHOW WHAT YOU BUILD.');
+    expect(scene).toContain('ONE CARD.');
+    expect(scene).not.toContain('YOUR BEST WORK SHOULDN');
+    expect(scene).not.toContain('FIVE PLACES');
+    expect(scene).toContain('progressFillRef');
+    expect(scene).toContain('cc-ed-hero-scene__statement-progress');
+    expect(css).toContain('.cc-ed-hero-scene__statement-progress-fill');
     expect(scene).toContain('clipPath');
     expect(scene).toContain('scrollClipClosed');
     expect(scene).toContain('INTRO_DURATION');

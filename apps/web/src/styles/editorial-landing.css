@@ -2302,9 +2302,42 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   width: min(100%, 52rem);
   margin-top: auto;
   min-height: min(42vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(1rem, 2.5vh, 1.5rem);
+}
+
+/* IB-style loading bar above the statement headline — fills per beat */
+.cc-ed-hero-scene__statement-progress {
+  position: relative;
+  width: min(14rem, 48vw);
+  height: 2px;
+  margin-bottom: 0.35rem;
+  background: color-mix(in srgb, #efedeb 28%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.cc-ed-hero-scene__statement-progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: #efedeb;
+  border-radius: inherit;
+  will-change: transform;
 }
 
 .cc-ed-hero-scene__statement-slot {
+  position: relative;
+  width: 100%;
+}
+
+.cc-ed-hero-scene__statement-slot + .cc-ed-hero-scene__statement-slot {
   position: absolute;
   left: 0;
   right: 0;
@@ -2328,19 +2361,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   line-height: 1.02;
   text-transform: uppercase;
   text-wrap: balance;
-}
-
-.cc-ed-hero-scene__statement-lead {
   color: #efedeb;
-}
-
-.cc-ed-hero-scene__statement-sub {
-  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 78%, #efedeb);
 }
 
 .cc-ed-hero-scene__statement-word {
   display: inline;
-  /* Word reveal dims via GSAP opacity — keep enough contrast on dark wash */
+  /* Word reveal dims via GSAP opacity — both lines stay readable on dark */
   text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
 }
 
