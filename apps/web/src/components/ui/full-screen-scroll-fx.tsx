@@ -81,7 +81,8 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
-const SCRUB_SMOOTH = true;
+/** Sub-second scrub — scroll-linked, but snappy enough that the pager never lags a beat. */
+const SCRUB_SMOOTH = 0.55;
 
 /** Smoothstep for crossfades tied directly to scroll progress. */
 function smoothCrossfade(t: number) {
@@ -279,9 +280,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       const to = Math.min(from + 1, total - 1);
       const rawBlend = from === to ? 0 : pos - from;
       const blend = from === to ? 0 : smoothCrossfade(rawBlend);
-      // Story panels: hard-cut at midpoint so we never hit a both-invisible frame.
-      const storyShowTo = rawBlend >= 0.5;
-      const idx = from === to ? from : storyShowTo ? to : from;
+      const idx = from === to ? from : rawBlend >= 0.5 ? to : from;
 
       if (progressFillRef.current) {
         progressFillRef.current.style.width = `${(idx / max) * 100}%`;
@@ -303,41 +302,41 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       let maxPanelOpacity = 0;
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
-        const isStory = sections[i]?.content != null;
         let opacity = 0;
         let y = 0;
         if (from === to) {
           opacity = i === from ? 1 : 0;
-        } else if (isStory) {
-          // Discrete swap — outgoing stays fully on until incoming takes over.
-          if (i === from) {
-            opacity = storyShowTo ? 0 : 1;
-            y = storyShowTo ? -12 : 0;
-          } else if (i === to) {
-            opacity = storyShowTo ? 1 : 0;
-            y = storyShowTo ? 0 : 12;
-          }
         } else if (i === from) {
+          // Scroll-linked crossfade — never a blank midpoint frame.
           opacity = 1 - blend;
-          y = -blend * 10;
+          y = -blend * 14;
         } else if (i === to) {
           opacity = blend;
-          y = (1 - blend) * 12;
+          y = (1 - blend) * 18;
         }
         maxPanelOpacity = Math.max(maxPanelOpacity, opacity);
+        const show = opacity > 0.45;
+        panel.classList.toggle('active', i === idx);
+        panel.style.pointerEvents = show ? 'auto' : 'none';
+        // Prefer opacity (not autoAlpha) so CSS `.active` can still rescue a blank stage.
         gsap.set(panel, {
-          autoAlpha: opacity,
+          opacity,
+          visibility: opacity > 0.02 ? 'visible' : 'hidden',
           y,
           zIndex: i === idx ? 2 : 1,
         });
-        panel.classList.toggle('active', i === idx);
-        panel.style.pointerEvents = i === idx && opacity > 0.5 ? 'auto' : 'none';
       });
 
       // Safety: never leave the stage empty (blank charcoal + progress only).
       if (maxPanelOpacity < 0.05 && featuredRefs.current[idx]) {
-        gsap.set(featuredRefs.current[idx], { autoAlpha: 1, y: 0, zIndex: 2 });
-        featuredRefs.current[idx]?.classList.add('active');
+        const panel = featuredRefs.current[idx]!;
+        panel.classList.add('active');
+        gsap.set(panel, {
+          opacity: 1,
+          visibility: 'visible',
+          y: 0,
+          zIndex: 2,
+        });
       }
 
       wordRefs.current.forEach((words, sIdx) => {
@@ -431,12 +430,13 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       if (!motionOff) {
         featuredRefs.current.forEach((panel, sIdx) => {
           if (!panel) return;
-          if (sections[sIdx]?.content != null) {
-            gsap.set(panel, {
-              autoAlpha: sIdx === index ? 1 : 0,
-              y: sIdx === index ? 0 : 16,
-            });
-          }
+          const on = sIdx === index;
+          panel.classList.toggle('active', on);
+          gsap.set(panel, {
+            opacity: on ? 1 : 0,
+            visibility: on ? 'visible' : 'hidden',
+            y: on ? 0 : 16,
+          });
         });
         wordRefs.current.forEach((words, sIdx) => {
           if (sections[sIdx]?.content != null) return;

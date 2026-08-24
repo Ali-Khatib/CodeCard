@@ -5,7 +5,7 @@ import { EditorialHeroAnimatedHeadline } from './editorial-hero-animated-headlin
 
 /**
  * Inset shader hero: oversized type + CTAs over the orange/black field.
- * Expansion to full-bleed is owned by EditorialHeroScene.
+ * Framing is owned by EditorialHeroScene (static IB-tight cream pad).
  */
 export function EditorialHero() {
   return (

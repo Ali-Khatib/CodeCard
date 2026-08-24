@@ -2,7 +2,9 @@
 
 .fx {
   width: 100%;
-  overflow: hidden;
+  /* MUST stay visible — overflow:hidden on this ancestor kills position:sticky
+     on .fx-fixed and leaves several empty dark viewports mid Crash Course. */
+  overflow: visible;
   background: var(--fx-page-bg);
   color: #000;
   font-family: var(--fx-font);
@@ -28,6 +30,11 @@
   position: relative;
 }
 
+.fx-scroll {
+  /* Must not clip — sticky lives inside this wrapper */
+  overflow: visible;
+}
+
 .fx-fixed {
   position: sticky;
   top: 0;
@@ -35,7 +42,7 @@
   height: 100dvh;
   width: 100%;
   overflow: hidden;
-  background: var(--fx-page-bg);
+  background: var(--fx-stage-bg, var(--fx-page-bg));
 }
 
 .fx-grid {
@@ -339,11 +346,11 @@
   visibility: hidden;
   pointer-events: none;
   transform: translateZ(0);
+  transition: none;
 }
 
-/* Active story stays readable even if a scrub tick is late */
-.fx-featured.active,
-.fx--story .fx-featured.active {
+/* Active class is the SSR / rescue fallback — scrub owns opacity via inline styles */
+.fx-featured.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
