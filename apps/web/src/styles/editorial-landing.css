@@ -2123,6 +2123,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
     clamp(0.75rem, 1.8vw, 1rem);
 }
 
+/* While statement cinema is active, keep the shell dark — no cream flash at edges */
+.cc-ed-hero-scene[data-cinema-chapter='statement'] {
+  background: #0c0c0e;
+  padding: 0;
+}
+
 .cc-ed-hero-scene__track {
   position: relative;
   background: transparent;
@@ -2214,15 +2220,29 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   justify-content: flex-end;
   padding: clamp(1.25rem, 4vh, 2.5rem) clamp(1.35rem, 5vw, 4.5rem)
     clamp(2.5rem, 7vh, 4.5rem);
-  background: linear-gradient(
-    105deg,
-    rgba(8, 8, 10, 0.55) 0%,
-    rgba(8, 8, 10, 0.28) 48%,
-    rgba(8, 8, 10, 0.12) 100%
-  );
+  /* Even dark wash — kills muddy media glow under type; CodeCard ink, not a rebrand */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 12, 14, 0.42) 0%,
+      rgba(12, 12, 14, 0.62) 42%,
+      rgba(12, 12, 14, 0.88) 100%
+    ),
+    linear-gradient(
+      105deg,
+      rgba(12, 12, 14, 0.72) 0%,
+      rgba(12, 12, 14, 0.35) 55%,
+      rgba(12, 12, 14, 0.22) 100%
+    );
   color: #efedeb;
   pointer-events: none;
   visibility: hidden;
+  transition: background-color 0.55s ease;
+}
+
+/* Full-bleed cinema: no cream side strip showing through the stage */
+.cc-ed-hero-scene[data-cinema-chapter='statement'] .cc-ed-hero-scene__stage {
+  background: #0c0c0e;
 }
 
 .cc-ed-hero-scene__statement-chrome {
@@ -2315,11 +2335,13 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-hero-scene__statement-sub {
-  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 72%, #efedeb);
+  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 78%, #efedeb);
 }
 
 .cc-ed-hero-scene__statement-word {
   display: inline;
+  /* Word reveal dims via GSAP opacity — keep enough contrast on dark wash */
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
 }
 
 .cc-ed-hero-scene__statement-lede {
@@ -2327,18 +2349,21 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   max-width: min(36rem, 94vw);
   font-size: clamp(1.05rem, 1.4vw, 1.28rem);
   line-height: 1.55;
-  color: color-mix(in srgb, #efedeb 74%, transparent);
+  color: color-mix(in srgb, #efedeb 82%, transparent);
 }
 
 .cc-ed-hero-scene__bridge-out {
   width: 100%;
-  height: clamp(3.5rem, 10vh, 7rem);
+  height: clamp(4.5rem, 12vh, 8.5rem);
   margin-top: -1px;
   pointer-events: none;
+  /* Longer soft dark → cream handoff — no hard cream bar mid-frame */
   background: linear-gradient(
     180deg,
     #0c0c0e 0%,
-    color-mix(in srgb, var(--ed-cream, #fcf1e7) 28%, #0c0c0e) 55%,
+    #0c0c0e 28%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 18%, #0c0c0e) 58%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 62%, #0c0c0e) 82%,
     var(--ed-cream, #fcf1e7) 100%
   );
 }

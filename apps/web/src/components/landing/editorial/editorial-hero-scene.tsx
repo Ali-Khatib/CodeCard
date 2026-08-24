@@ -15,14 +15,19 @@ type EditorialHeroSceneProps = {
   hero: ReactNode;
 };
 
-const INTRO_DURATION = 1.15;
+const INTRO_DURATION = 1.2;
 const INTRO_EASE = 'power3.out';
 /** More viewport scroll = slower progress through beats. */
 const CINEMA_SCROLL_END = { desktop: '+=520%', mobile: '+=460%' } as const;
 const CINEMA_SCRUB = 0.55;
-const CINEMA_EXPAND_END = 0.08;
+/** Real share of the runway for cream-frame → full-bleed expand (was 0.08 — invisible). */
+const CINEMA_EXPAND_END = 0.24;
 
-/** Survive React Strict Mode remount so the expand never plays twice. */
+/**
+ * Only true after a successful intro (or intentional skip).
+ * Do NOT set this before the timeline finishes — Strict Mode remount would
+ * kill the first run and skip the second, so expansion never plays.
+ */
 let heroIntroPlayed = false;
 
 const STATEMENT_BEATS = [
@@ -56,9 +61,16 @@ function stageRadius(mobile: boolean) {
   return mobile ? 22 : 32;
 }
 
+/** Settled-but-not-full-bleed: still reads as an inset card on cream. */
 function scrollClipClosed(mobile: boolean) {
   const r = stageRadius(mobile);
-  return `inset(0px 0px 0px 0px round ${r}px)`;
+  return mobile
+    ? `inset(3.5% 3.5% 3.5% 3.5% round ${r}px)`
+    : `inset(4.5% 4% 4.5% 4% round ${r}px)`;
+}
+
+function scrollClipOpen() {
+  return 'inset(0% 0% 0% 0% round 0px)';
 }
 
 /**
@@ -89,7 +101,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       ensureGsapPlugins();
 
       const mobile = window.matchMedia('(max-width: 767px)').matches;
-      const openClip = 'inset(0px 0px 0px 0px round 0px)';
+      const openClip = scrollClipOpen();
       const closedClip = scrollClipClosed(mobile);
       const finalRadius = stageRadius(mobile);
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
@@ -99,6 +111,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const viewportH = () => window.innerHeight;
       const beatCount = Math.max(beatEls.length, 1);
       const beatSpan = (0.92 - CINEMA_EXPAND_END) / beatCount;
+      const pad = mobile
+        ? { top: 10, x: 12, bottom: 10 }
+        : { top: 14, x: 16, bottom: 14 };
 
       const setPager = (index: number) => {
         if (pagerRef.current) {
@@ -107,7 +122,14 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         root.dataset.cinemaChapter = index < 0 ? 'hero' : 'statement';
       };
 
+      /** After load expand: full width of cream frame, still inset via clip + root pad. */
       const snapSettledGeometry = () => {
+        gsap.set(root, {
+          paddingTop: pad.top,
+          paddingLeft: pad.x,
+          paddingRight: pad.x,
+          paddingBottom: pad.bottom,
+        });
         gsap.set(stage, {
           clearProps:
             'width,height,minHeight,marginTop,marginLeft,marginRight,borderRadius',
@@ -133,14 +155,14 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         beatEls.forEach((beat, i) => {
           gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0 });
           beat.querySelectorAll<HTMLElement>('[data-statement-word]').forEach((w) => {
-            gsap.set(w, { opacity: 0.22 });
+            // Dim enough for reveal, bright enough to never read as “missing”
+            gsap.set(w, { opacity: 0.42 });
           });
           const lede = beat.querySelector<HTMLElement>('[data-statement-lede]');
           if (lede) gsap.set(lede, { autoAlpha: 0, y: 14 });
         });
         setPager(-1);
 
-        // Long runway: expand → statement 01 → 02 → 03, then release.
         scrollTl = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
@@ -154,24 +176,27 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               const p = self.progress;
-              if (p < CINEMA_EXPAND_END) {
+              if (p < CINEMA_EXPAND_END * 0.92) {
                 setPager(-1);
                 return;
               }
-              const beatProgress = (p - CINEMA_EXPAND_END) / (0.92 - CINEMA_EXPAND_END);
-              setPager(Math.min(beatCount - 1, Math.floor(beatProgress * beatCount)));
+              const beatProgress =
+                (p - CINEMA_EXPAND_END) / (0.92 - CINEMA_EXPAND_END);
+              setPager(
+                Math.min(beatCount - 1, Math.max(0, Math.floor(beatProgress * beatCount))),
+              );
             },
           },
         });
 
-        // 0 → expandEnd: hero grows full-bleed inside the same frame.
+        // Cream frame → full-bleed (padding + clip + radius). Long enough to feel.
         scrollTl.fromTo(
           root,
           {
-            paddingTop: mobile ? 10 : 14,
-            paddingLeft: mobile ? 12 : 16,
-            paddingRight: mobile ? 12 : 16,
-            paddingBottom: mobile ? 10 : 14,
+            paddingTop: pad.top,
+            paddingLeft: pad.x,
+            paddingRight: pad.x,
+            paddingBottom: pad.bottom,
           },
           {
             paddingTop: 0,
@@ -192,12 +217,21 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (heroCopy) {
           scrollTl.to(
             heroCopy,
-            { autoAlpha: 0, yPercent: -8, duration: CINEMA_EXPAND_END * 0.65 },
-            CINEMA_EXPAND_END * 0.35,
+            {
+              autoAlpha: 0,
+              yPercent: -8,
+              duration: CINEMA_EXPAND_END * 0.45,
+            },
+            CINEMA_EXPAND_END * 0.4,
           );
         }
 
-        scrollTl.to(statement, { autoAlpha: 1, duration: 0.04 }, CINEMA_EXPAND_END - 0.02);
+        // Statement only after expand is essentially done.
+        scrollTl.to(
+          statement,
+          { autoAlpha: 1, duration: CINEMA_EXPAND_END * 0.12 },
+          CINEMA_EXPAND_END * 0.88,
+        );
 
         beatEls.forEach((beat, beatIndex) => {
           const beatStart = CINEMA_EXPAND_END + beatIndex * beatSpan;
@@ -229,8 +263,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               (wi / Math.max(words.length, 1)) * wordRevealSpan;
             scrollTl!.fromTo(
               word,
-              { opacity: 0.22 },
-              { opacity: 1, duration: beatSpan * 0.07 },
+              { opacity: 0.42 },
+              { opacity: 1, duration: beatSpan * 0.09 },
               t,
             );
           });
@@ -248,7 +282,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         refreshScrollTrigger({ safe: true });
       };
 
-      if (!canEnhanceMotion || window.scrollY > 8 || heroIntroPlayed) {
+      const skipIntro = !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
+      if (skipIntro) {
         heroIntroPlayed = true;
         snapSettledGeometry();
         buildScrollCinema();
@@ -260,20 +295,49 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
       let cancelled = false;
       let intro: gsap.core.Timeline | null = null;
+      let introFinished = false;
+
+      const markIntroDoneAndBuild = () => {
+        if (introFinished) return;
+        introFinished = true;
+        heroIntroPlayed = true;
+        buildScrollCinema();
+      };
+
       const raf = window.requestAnimationFrame(() => {
-        if (cancelled || heroIntroPlayed) {
-          if (!cancelled && heroIntroPlayed) {
-            snapSettledGeometry();
-            buildScrollCinema();
-          }
+        if (cancelled) return;
+
+        if (heroIntroPlayed) {
+          snapSettledGeometry();
+          buildScrollCinema();
           return;
         }
 
-        heroIntroPlayed = true;
         root.dataset.heroIntro = 'running';
 
+        // Explicit from → to so CSS pending size is the start, not a snap.
+        const fromW = mobile ? '90%' : '88%';
+        const fromH = mobile
+          ? () => Math.min(window.innerHeight * 0.54, window.innerHeight * 0.58)
+          : () => Math.min(window.innerHeight * 0.58, window.innerHeight * 0.62);
+        const fromRadius = mobile ? 24 : 28;
+        const fromMarginTop = mobile
+          ? () => Math.min(window.innerHeight * 0.04, 40)
+          : () => Math.min(window.innerHeight * 0.06, 72);
+
+        gsap.set(stage, {
+          width: fromW,
+          height: fromH,
+          minHeight: fromH,
+          marginTop: fromMarginTop,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          borderRadius: fromRadius,
+          clipPath: openClip,
+        });
+
         intro = gsap.timeline({
-          onComplete: buildScrollCinema,
+          onComplete: markIntroDoneAndBuild,
         });
 
         intro.to(
@@ -292,12 +356,23 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           0,
         );
 
+        // Land in the settled inset clip so scroll expand has somewhere to go.
+        intro.to(
+          stage,
+          {
+            clipPath: closedClip,
+            duration: INTRO_DURATION * 0.35,
+            ease: INTRO_EASE,
+          },
+          INTRO_DURATION * 0.65,
+        );
+
         if (heroCopy) {
           intro.fromTo(
             heroCopy,
-            { y: 8 },
-            { y: 0, duration: 0.5, ease: INTRO_EASE },
-            0.4,
+            { y: 10, autoAlpha: 0.92 },
+            { y: 0, autoAlpha: 1, duration: 0.55, ease: INTRO_EASE },
+            0.35,
           );
         }
       });
@@ -317,7 +392,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         window.removeEventListener('touchmove', finishIntro);
         window.removeEventListener('keydown', finishIntro);
         document.body.style.overflow = '';
-        intro?.kill();
+        // Interrupted before complete (Strict Mode) — allow remount to replay.
+        if (!introFinished) {
+          intro?.kill();
+        } else {
+          intro?.kill();
+        }
         scrollTl?.scrollTrigger?.kill();
         scrollTl?.kill();
       };

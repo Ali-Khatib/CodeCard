@@ -178,13 +178,15 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('INTRO_EASE');
     expect(scene).toContain('power3.out');
     expect(scene).toContain("dataset.heroIntro = 'running'");
-    expect(scene).toContain('onComplete: buildScrollCinema');
+    expect(scene).toContain('onComplete: markIntroDoneAndBuild');
     expect(scene).toContain('scrub: CINEMA_SCRUB');
     expect(scene).toContain("desktop: '+=520%'");
     expect(scene).toContain("mobile: '+=460%'");
     expect(scene).toContain('snapSettledGeometry');
     expect(scene).toContain('marginTop: 0');
     expect(scene).toContain('heroIntroPlayed');
+    expect(scene).toContain('CINEMA_EXPAND_END = 0.24');
+    expect(scene).toContain('inset(4.5%');
     expect(scene).toContain('revertOnUpdate: false');
     expect(scene).toContain('data-hero-intro="pending"');
     expect(scene).toContain('cc-ed-hero-scene__bridge-out');
