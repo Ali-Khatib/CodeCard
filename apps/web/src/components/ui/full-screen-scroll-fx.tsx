@@ -119,16 +119,6 @@ function scrollToY(y: number, durationMs: number) {
   window.scrollTo({ top: y, behavior: 'smooth' });
 }
 
-function indexFromProgress(progress: number, sectionCount: number) {
-  if (sectionCount <= 1) return 0;
-  // Floor keeps the pager aligned with scrub position (round jumped to 05 early).
-  return clamp(
-    Math.floor(progress * (sectionCount - 1) + 0.0001),
-    0,
-    sectionCount - 1,
-  );
-}
-
 function progressFromIndex(index: number, sectionCount: number) {
   if (sectionCount <= 1) return 0;
   return index / (sectionCount - 1);
@@ -188,7 +178,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
     const progressFillRef = useRef<HTMLDivElement | null>(null);
     const currentNumberRef = useRef<HTMLSpanElement | null>(null);
     const stRef = useRef<ScrollTrigger | null>(null);
-    const lastIndexRef = useRef(index);
+    const lastIndexRef = useRef(-1);
     const lastProgressRef = useRef(0);
     const isSnappingRef = useRef(false);
     const sectionTopRef = useRef<number[]>([]);
@@ -197,6 +187,8 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
     const goToRef = useRef<(to: number, withScroll?: boolean) => void>(
       () => undefined,
     );
+    /** Scroll Y when the section trigger last activated — gates stale progress after hero pin. */
+    const enterScrollYRef = useRef<number | null>(null);
 
     const prefersReduced = useMemo(() => {
       if (typeof window === 'undefined') return false;
@@ -276,16 +268,30 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       gsap.set(track, { y: targetY });
     };
 
+    const resolveProgress = (raw: number) => {
+      let p = clamp(raw, 0, 1);
+      const enterY = enterScrollYRef.current;
+      if (
+        enterY != null &&
+        typeof window !== 'undefined' &&
+        Math.abs(window.scrollY - enterY) < 12
+      ) {
+        p = 0;
+      }
+      return p;
+    };
+
     const applyScrollProgress = (progress: number) => {
+      const p = resolveProgress(progress);
       lastProgressRef.current = progress;
       const max = Math.max(total - 1, 1);
-      const pos = clamp(progress * max, 0, max);
+      const pos = clamp(p * max, 0, max);
       const from = Math.floor(pos);
       const to = Math.min(from + 1, total - 1);
       const blend = from === to ? 0 : smoothCrossfade(pos - from);
 
       if (progressFillRef.current) {
-        progressFillRef.current.style.width = `${progress * 100}%`;
+        progressFillRef.current.style.width = `${p * 100}%`;
       }
 
       bgRefs.current.forEach((bg, i) => {
@@ -308,21 +314,12 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         let y = 0;
         if (from === to) {
           opacity = i === from ? 1 : 0;
-        } else if (isStory) {
-          // Dense story copy cannot stack — outgoing out, then incoming in.
-          if (i === from) {
-            opacity = blend < 0.3 ? 1 - blend / 0.3 : 0;
-            y = -22 * Math.min(1, blend / 0.3);
-          } else if (i === to) {
-            opacity = blend > 0.38 ? (blend - 0.38) / 0.62 : 0;
-            y = 18 * (1 - Math.min(1, Math.max(0, (blend - 0.38) / 0.62)));
-          }
         } else if (i === from) {
           opacity = 1 - blend;
-          y = -blend * 10;
+          y = isStory ? -22 * blend : -blend * 10;
         } else if (i === to) {
           opacity = blend;
-          y = (1 - blend) * 12;
+          y = isStory ? 18 * (1 - blend) : (1 - blend) * 12;
         }
         gsap.set(panel, {
           autoAlpha: opacity,
@@ -351,7 +348,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         });
       });
 
-      const idx = indexFromProgress(progress, total);
+      const idx = clamp(Math.round(pos), 0, total - 1);
       if (idx !== lastIndexRef.current) {
         lastIndexRef.current = idx;
         if (!isControlled) setLocalIndex(idx);
@@ -446,7 +443,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       computePositions();
       measureRAF(() => {
         measureRailMetrics();
-        applyScrollProgressRef.current(progressFromIndex(index, total));
+        applyScrollProgressRef.current(0);
       });
 
       if (motionOff) {
@@ -465,12 +462,23 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         },
         scrub: SCRUB_SMOOTH,
         invalidateOnRefresh: true,
-        onRefresh: () => {
+        onEnter: () => {
+          enterScrollYRef.current =
+            typeof window !== 'undefined' ? window.scrollY : null;
+          applyScrollProgressRef.current(0);
+        },
+        onLeaveBack: () => {
+          enterScrollYRef.current = null;
+          applyScrollProgressRef.current(0);
+        },
+        onRefresh: (self) => {
           computePositions();
           measureRailMetrics();
+          if (!self.isActive) return;
+          applyScrollProgressRef.current(clamp(self.progress, 0, 1));
         },
         onUpdate: (self) => {
-          if (isSnappingRef.current) return;
+          if (isSnappingRef.current || !self.isActive) return;
           applyScrollProgressRef.current(clamp(self.progress, 0, 1));
         },
       });
@@ -486,7 +494,9 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         resizeTimer = setTimeout(() => {
           computePositions();
           measureRailMetrics();
-          applyScrollProgressRef.current(lastProgressRef.current);
+          if (stRef.current?.isActive) {
+            applyScrollProgressRef.current(lastProgressRef.current);
+          }
           ScrollTrigger.refresh();
         }, 120);
       });
@@ -526,7 +536,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         });
       });
       measureRailMetrics();
-      applyScrollProgressRef.current(progressFromIndex(index, total));
+      applyScrollProgressRef.current(0);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

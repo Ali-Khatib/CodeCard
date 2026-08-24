@@ -150,13 +150,10 @@ describe('Editorial product landing contract', () => {
     expect(css).toContain('.cc-ed-research-story');
   });
 
-  it('keeps a floating glass pill nav and a post-hero statement word reveal', () => {
+  it('keeps a floating glass pill nav and a hero cinema statement reveal', () => {
     const css = read('src/styles/editorial-landing.css');
     const landing = read(
       'src/components/landing/editorial/editorial-landing.tsx',
-    );
-    const statement = read(
-      'src/components/landing/editorial/editorial-statement-scene.tsx',
     );
     const scene = read(
       'src/components/landing/editorial/editorial-hero-scene.tsx',
@@ -166,18 +163,15 @@ describe('Editorial product landing contract', () => {
     expect(css).not.toMatch(
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
-    expect(css).toContain('.cc-ed-statement-scene');
-    expect(css).toContain('position: sticky');
-    expect(landing).toContain('EditorialStatementScene');
-    expect(landing).not.toContain('statement={<EditorialStatement');
-    expect(statement).toContain('data-statement-beat');
-    expect(statement).toContain('data-statement-word');
-    expect(statement).toContain('useScroll');
-    expect(statement).toContain('useTransform');
-    expect(statement).toContain(' / 03');
-    expect(statement).toContain('What this is');
-    expect(statement).toContain('YOUR BEST WORK SHOULDN’T');
-    expect(statement).toContain("offset: ['start start', 'end end']");
+    expect(css).toContain('.cc-ed-hero-scene__statement');
+    expect(css).toContain('min-height: 620vh');
+    expect(landing).not.toContain('EditorialStatementScene');
+    expect(landing).toContain('EditorialHeroScene');
+    expect(scene).toContain('data-statement-beat');
+    expect(scene).toContain('data-statement-word');
+    expect(scene).toContain(' / 03');
+    expect(scene).toContain('What this is');
+    expect(scene).toContain('YOUR BEST WORK SHOULDN’T');
     expect(scene).toContain('clipPath');
     expect(scene).toContain('scrollClipClosed');
     expect(scene).toContain('INTRO_DURATION');
@@ -185,18 +179,22 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('power3.out');
     expect(scene).toContain("dataset.heroIntro = 'running'");
     expect(scene).toContain('onComplete: buildScrollCinema');
-    expect(scene).toContain('scrub: 0.25');
-    expect(scene).toContain("end: mobile ? '+=85%' : '+=100%'");
-    expect(scene).toContain('snapFinalGeometry');
+    expect(scene).toContain('scrub: CINEMA_SCRUB');
+    expect(scene).toContain("desktop: '+=520%'");
+    expect(scene).toContain("mobile: '+=460%'");
+    expect(scene).toContain('snapSettledGeometry');
     expect(scene).toContain('marginTop: 0');
-    expect(scene).toContain("clipPath: 'inset(100% 0% 0% 0%)'");
-    expect(statement).toContain('cc-ed-statement-scene__bridge-out');
-    expect(css).toContain('.cc-ed-statement-scene__bridge-out');
-    expect(scene).not.toContain('data-statement-word');
+    expect(scene).toContain('heroIntroPlayed');
+    expect(scene).toContain('revertOnUpdate: false');
+    expect(scene).toContain('data-hero-intro="pending"');
+    expect(scene).toContain('cc-ed-hero-scene__bridge-out');
+    expect(css).toContain('.cc-ed-hero-scene__bridge-out');
+    expect(css).toContain("[data-hero-intro='pending']");
     expect(scene).not.toContain('ShaderHeroBackdrop');
     expect(scene).toContain('refreshScrollTrigger');
     expect(scene).not.toContain('anticipatePin');
     expect(scene).not.toContain("backgroundColor: 'transparent'");
+    expect(landing).toContain("from './editorial-hero-scene'");
   });
 
   it('keeps final CTA without public profile', () => {

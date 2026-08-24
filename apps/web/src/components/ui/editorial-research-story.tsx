@@ -37,7 +37,13 @@ function RedactedWord({
   rangeEnd: number;
   reduced: boolean;
 }) {
-  const maskScale = useTransform(progress, [rangeStart, rangeEnd], [1, 0]);
+  // Masks are decorative only — headline stays readable at rest and after scroll.
+  const maskScale = useTransform(
+    progress,
+    [0, rangeStart, rangeEnd, 1],
+    [0, 0, 0, 0],
+    { clamp: true },
+  );
 
   return (
     <span className="cc-ed-research-redact__word">
@@ -99,7 +105,7 @@ function RedactedLine({
 }
 
 /**
- * Single editorial research composition — scroll-driven headline redaction.
+ * Single editorial research composition — full block visible on entry; subtle image motion on scroll.
  */
 export function EditorialResearchStory() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -107,17 +113,13 @@ export function EditorialResearchStory() {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start 0.85', 'center 0.25'],
+    offset: ['start 0.92', 'end 0.35'],
   });
 
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.18], [0, 1]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.18], [1.03, 1]);
-  const imageClip = useTransform(
-    scrollYProgress,
-    [0, 0.22],
-    ['inset(8% 8% 8% 8% round 18px)', 'inset(0% 0% 0% 0% round 18px)'],
-  );
-  const bodyOpacity = useTransform(scrollYProgress, [0.55, 0.9], [0.72, 1]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.35], [1.02, 1], {
+    clamp: true,
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], [8, -8], { clamp: true });
 
   return (
     <article
@@ -133,9 +135,8 @@ export function EditorialResearchStory() {
             reduced
               ? undefined
               : {
-                  opacity: imageOpacity,
                   scale: imageScale,
-                  clipPath: imageClip,
+                  y: imageY,
                 }
           }
         >
@@ -145,6 +146,7 @@ export function EditorialResearchStory() {
             fill
             sizes="(max-width: 900px) 92vw, 46vw"
             className="cc-ed-research-story__img"
+            priority={false}
           />
         </motion.div>
 
@@ -159,24 +161,21 @@ export function EditorialResearchStory() {
             <RedactedLine
               text={HEADLINE_LINE_1}
               progress={scrollYProgress}
-              rangeStart={0.08}
-              rangeEnd={0.48}
+              rangeStart={0.06}
+              rangeEnd={0.38}
               reduced={reduced}
             />
             <RedactedLine
               text={HEADLINE_LINE_2}
               progress={scrollYProgress}
-              rangeStart={0.32}
-              rangeEnd={0.88}
+              rangeStart={0.28}
+              rangeEnd={0.62}
               reduced={reduced}
               accent
             />
           </h3>
 
-          <motion.div
-            className="cc-ed-research-story__columns"
-            style={reduced ? undefined : { opacity: bodyOpacity }}
-          >
+          <div className="cc-ed-research-story__columns">
             <p className="cc-ed-research-story__body">{RESEARCH_BODY}</p>
             <p className="cc-ed-research-story__body">
               {SOLUTION_BODY.split(/(CodeCard)/g).map((part, i) =>
@@ -189,7 +188,7 @@ export function EditorialResearchStory() {
                 ),
               )}
             </p>
-          </motion.div>
+          </div>
 
           <div className="cc-ed-research-story__cta cc-ed-research-story__cta-group">
             <Link

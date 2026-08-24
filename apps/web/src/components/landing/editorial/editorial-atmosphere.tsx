@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
-/** Black closing chapter — light type on frosted glass. Hero sits on cream, so ink. */
+/** Dark chapters — light type on frosted glass nav. Research keeps light nav (opaque pill). */
 const DARK_CHAPTERS = new Set(['finale']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough', 'proof'] as const;
