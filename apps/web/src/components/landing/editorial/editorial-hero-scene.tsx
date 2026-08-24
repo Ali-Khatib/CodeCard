@@ -259,15 +259,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         gsap.set(statement, { autoAlpha: 1 });
         if (statementChrome) {
-          gsap.set(statementChrome, { autoAlpha: 0, y: 16 });
+          gsap.set(statementChrome, { autoAlpha: 0 });
         }
         if (statementStage) {
-          gsap.set(statementStage, {
-            autoAlpha: 0,
-            height: 0,
-            overflow: 'hidden',
-            marginTop: 0,
-          });
+          gsap.set(statementStage, { autoAlpha: 0, overflow: 'hidden' });
         }
         if (heroCopy) {
           gsap.set(heroCopy, { autoAlpha: 1, yPercent: 0 });
@@ -375,17 +370,16 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               duration: 0.045,
               ease: 'none',
             },
-            CINEMA_STATEMENT_START - 0.01,
+            CINEMA_CHROME_START,
           );
         }
 
         if (statementChrome) {
           scrollTl.fromTo(
             statementChrome,
-            { autoAlpha: 0, y: 16 },
+            { autoAlpha: 0 },
             {
               autoAlpha: 1,
-              y: 0,
               duration: CINEMA_CHROME_END - CINEMA_CHROME_START,
               ease: 'none',
             },
@@ -396,7 +390,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (statementStage) {
           scrollTl.set(
             statementStage,
-            { height: 'auto', overflow: 'visible' },
+            { overflow: 'hidden' },
             CINEMA_STATEMENT_START,
           );
           scrollTl.set(
