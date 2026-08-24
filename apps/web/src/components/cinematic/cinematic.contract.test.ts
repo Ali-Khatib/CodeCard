@@ -168,7 +168,9 @@ describe('Editorial product landing contract', () => {
     expect(css).not.toMatch(
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
-    expect(css).toContain('.cc-ed-hero-scene__statement');
+    expect(css).toContain('.cc-ed-hero-scene__runway');
+    expect(css).toContain('.cc-ed-hero-scene__statement-pin');
+    expect(css).toContain('.cc-ed-hero-scene__statement-panel');
     expect(css).toContain('min-height: 100svh');
     expect(css).not.toContain('min-height: 620vh');
     expect(landing).not.toContain('EditorialStatementScene');
@@ -186,7 +188,7 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('cc-ed-hero-scene__statement-sub');
     expect(scene).not.toContain('YOUR BEST WORK SHOULDN');
     expect(scene).not.toContain('FIVE PLACES');
-    expect(scene).toContain('progressFillRef');
+    expect(scene).toContain('data-statement-progress-fill');
     expect(scene).toContain('cc-ed-hero-scene__statement-progress');
     expect(css).toContain('.cc-ed-hero-scene__statement-progress-fill');
     expect(css).toContain('Instrument Serif');
@@ -203,12 +205,20 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('holdForIntro');
     expect(scene).toContain('codecard:hero-cinema-ready');
     expect(scene).toContain('scrub: CINEMA_SCRUB');
-    expect(scene).toContain("desktop: '+=180%'");
-    expect(scene).toContain("mobile: '+=160%'");
+    expect(scene).toContain('EXPAND_SCROLL_VH');
+    expect(scene).toContain('STATEMENT_PIN_SCROLL');
+    expect(scene).toContain('runwayTotalVh');
+    expect(scene).toContain('pin: panel');
+    expect(scene).toContain('pinSpacing: true');
+    expect(scene).not.toContain('pin: stage');
+    expect(scene).not.toContain('BEAT_EXIT_Y');
+    expect(scene).not.toContain('yPercent: BEAT_ENTER_Y');
     expect(scene).toContain('lockFinalGeometry');
     expect(scene).toContain("marginTop = '0'");
     expect(scene).toContain('heroIntroPlayed');
-    expect(scene).toContain('CINEMA_EXPAND_END = 0.07');
+    expect(scene).toContain('EXPAND_CLIP_END = 0.88');
+    expect(scene).toContain('editorial-hero-statement');
+    expect(scene).toContain('cc-ed-hero-scene__runway');
     expect(scene).toContain('inset(${p}px');
     expect(scene).toContain('inset(50% 50% 50% 50%');
     expect(scene).not.toContain('inset(4.5%');
