@@ -341,7 +341,11 @@
   transform: translateZ(0);
 }
 
-.fx-featured.active {
+/* Active story stays readable even if a scrub tick is late */
+.fx-featured.active,
+.fx--story .fx-featured.active {
+  opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 

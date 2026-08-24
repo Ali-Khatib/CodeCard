@@ -81,7 +81,7 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
-const SCRUB_SMOOTH = 0.28;
+const SCRUB_SMOOTH = true;
 
 /** Smoothstep for crossfades tied directly to scroll progress. */
 function smoothCrossfade(t: number) {
@@ -268,30 +268,23 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       gsap.set(track, { y: targetY });
     };
 
-    const resolveProgress = (raw: number) => {
-      let p = clamp(raw, 0, 1);
-      const enterY = enterScrollYRef.current;
-      if (
-        enterY != null &&
-        typeof window !== 'undefined' &&
-        Math.abs(window.scrollY - enterY) < 12
-      ) {
-        p = 0;
-      }
-      return p;
-    };
-
     const applyScrollProgress = (progress: number) => {
-      const p = resolveProgress(progress);
-      lastProgressRef.current = progress;
+      // Never gate/zero progress here — that desynced the pager from visible slides
+      // and left story panels at autoAlpha 0 (blank Crash Course).
+      const p = clamp(progress, 0, 1);
+      lastProgressRef.current = p;
       const max = Math.max(total - 1, 1);
       const pos = clamp(p * max, 0, max);
       const from = Math.floor(pos);
       const to = Math.min(from + 1, total - 1);
-      const blend = from === to ? 0 : smoothCrossfade(pos - from);
+      const rawBlend = from === to ? 0 : pos - from;
+      const blend = from === to ? 0 : smoothCrossfade(rawBlend);
+      // Story panels: hard-cut at midpoint so we never hit a both-invisible frame.
+      const storyShowTo = rawBlend >= 0.5;
+      const idx = from === to ? from : storyShowTo ? to : from;
 
       if (progressFillRef.current) {
-        progressFillRef.current.style.width = `${p * 100}%`;
+        progressFillRef.current.style.width = `${(idx / max) * 100}%`;
       }
 
       bgRefs.current.forEach((bg, i) => {
@@ -307,6 +300,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.set(bg, { opacity, scale: 1, yPercent: 0 });
       });
 
+      let maxPanelOpacity = 0;
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
         const isStory = sections[i]?.content != null;
@@ -314,21 +308,37 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         let y = 0;
         if (from === to) {
           opacity = i === from ? 1 : 0;
+        } else if (isStory) {
+          // Discrete swap — outgoing stays fully on until incoming takes over.
+          if (i === from) {
+            opacity = storyShowTo ? 0 : 1;
+            y = storyShowTo ? -12 : 0;
+          } else if (i === to) {
+            opacity = storyShowTo ? 1 : 0;
+            y = storyShowTo ? 0 : 12;
+          }
         } else if (i === from) {
           opacity = 1 - blend;
-          y = isStory ? -22 * blend : -blend * 10;
+          y = -blend * 10;
         } else if (i === to) {
           opacity = blend;
-          y = isStory ? 18 * (1 - blend) : (1 - blend) * 12;
+          y = (1 - blend) * 12;
         }
+        maxPanelOpacity = Math.max(maxPanelOpacity, opacity);
         gsap.set(panel, {
           autoAlpha: opacity,
           y,
-          zIndex: i === to || (from === to && i === from) ? 2 : 1,
+          zIndex: i === idx ? 2 : 1,
         });
-        panel.style.pointerEvents =
-          opacity > 0.6 && i === (blend < 0.5 ? from : to) ? 'auto' : 'none';
+        panel.classList.toggle('active', i === idx);
+        panel.style.pointerEvents = i === idx && opacity > 0.5 ? 'auto' : 'none';
       });
+
+      // Safety: never leave the stage empty (blank charcoal + progress only).
+      if (maxPanelOpacity < 0.05 && featuredRefs.current[idx]) {
+        gsap.set(featuredRefs.current[idx], { autoAlpha: 1, y: 0, zIndex: 2 });
+        featuredRefs.current[idx]?.classList.add('active');
+      }
 
       wordRefs.current.forEach((words, sIdx) => {
         if (sections[sIdx]?.content != null) return;
@@ -348,7 +358,6 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         });
       });
 
-      const idx = clamp(Math.round(pos), 0, total - 1);
       if (idx !== lastIndexRef.current) {
         lastIndexRef.current = idx;
         if (!isControlled) setLocalIndex(idx);
@@ -380,8 +389,8 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.set(el, { opacity: active ? 1 : 0.35, x: active ? -10 : 0 });
       });
 
-      centerRailTrack(leftTrackRef.current, pos);
-      centerRailTrack(rightTrackRef.current, pos);
+      centerRailTrack(leftTrackRef.current, idx);
+      centerRailTrack(rightTrackRef.current, idx);
     };
     applyScrollProgressRef.current = applyScrollProgress;
 
@@ -467,6 +476,9 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
             typeof window !== 'undefined' ? window.scrollY : null;
           applyScrollProgressRef.current(0);
         },
+        onEnterBack: () => {
+          applyScrollProgressRef.current(clamp(st.progress, 0, 1));
+        },
         onLeaveBack: () => {
           enterScrollYRef.current = null;
           applyScrollProgressRef.current(0);
@@ -474,15 +486,20 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         onRefresh: (self) => {
           computePositions();
           measureRailMetrics();
-          if (!self.isActive) return;
-          applyScrollProgressRef.current(clamp(self.progress, 0, 1));
+          // Always sync — inactive must show slide 01 so entry is never blank.
+          applyScrollProgressRef.current(
+            self.isActive ? clamp(self.progress, 0, 1) : 0,
+          );
         },
         onUpdate: (self) => {
-          if (isSnappingRef.current || !self.isActive) return;
+          if (isSnappingRef.current) return;
           applyScrollProgressRef.current(clamp(self.progress, 0, 1));
         },
       });
       stRef.current = st;
+
+      // First paint insurance — slide 01 visible before any scrub tick.
+      applyScrollProgressRef.current(st.isActive ? clamp(st.progress, 0, 1) : 0);
 
       if (initialIndex > 0 && initialIndex < total) {
         requestAnimationFrame(() => goToRef.current(initialIndex, false));
