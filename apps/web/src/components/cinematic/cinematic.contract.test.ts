@@ -203,12 +203,12 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('holdForIntro');
     expect(scene).toContain('codecard:hero-cinema-ready');
     expect(scene).toContain('scrub: CINEMA_SCRUB');
-    expect(scene).toContain("desktop: '+=520%'");
-    expect(scene).toContain("mobile: '+=460%'");
+    expect(scene).toContain("desktop: '+=180%'");
+    expect(scene).toContain("mobile: '+=160%'");
     expect(scene).toContain('lockFinalGeometry');
     expect(scene).toContain("marginTop = '0'");
     expect(scene).toContain('heroIntroPlayed');
-    expect(scene).toContain('CINEMA_EXPAND_END = 0.04');
+    expect(scene).toContain('CINEMA_EXPAND_END = 0.07');
     expect(scene).toContain('inset(${p}px');
     expect(scene).toContain('inset(50% 50% 50% 50%');
     expect(scene).not.toContain('inset(4.5%');

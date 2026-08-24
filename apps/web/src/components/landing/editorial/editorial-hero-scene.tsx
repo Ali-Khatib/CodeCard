@@ -21,35 +21,31 @@ const INTRO_DURATION = 1.1;
 const INTRO_EASE = 'expo.out';
 
 /**
- * Pin runway for expand + statement beats.
- * Expand itself is a tiny fraction of this — one small scroll gesture.
+ * Pin runway — IB-style: expand, dock rail, three beats, then release to page scroll.
+ * ~180vh total feels like a normal scroll, not an endless scrub trap.
  */
-const CINEMA_SCROLL_END = { desktop: '+=520%', mobile: '+=460%' } as const;
+const CINEMA_SCROLL_END = { desktop: '+=180%', mobile: '+=160%' } as const;
 /** Snappy scrub so expand tracks the wheel tightly (not a slow lag). */
-const CINEMA_SCRUB = 0.2;
+const CINEMA_SCRUB = 0.45;
 /**
  * Share of the runway for cream inset → full-bleed.
- * ~0.04 × 520vh ≈ 0.21vh — one small scroll finishes the expansion.
  */
-const CINEMA_EXPAND_END = 0.04;
+const CINEMA_EXPAND_END = 0.07;
 /** Full-bleed hold — hero stays visible while you scroll down. */
-const CINEMA_CHROME_START = 0.11;
+const CINEMA_CHROME_START = 0.14;
 /** Loading rail visible under hero baseline. */
-const CINEMA_CHROME_END = 0.18;
+const CINEMA_CHROME_END = 0.22;
 /** Hero headline clears; beats rise in below the progress line. */
-const CINEMA_STATEMENT_START = 0.26;
-
-function cinemaPinMultiplier(mobile: boolean) {
-  return mobile ? 4.6 : 5.2;
-}
+const CINEMA_STATEMENT_START = 0.28;
+const CINEMA_STATEMENT_END = 0.96;
 
 /** Per-beat scroll shares: rise ↑, fill words, exit ↑, gap (empty). */
 const BEAT_ENTER_SHARE = 0.1;
 const BEAT_FILL_SHARE = 0.54;
 const BEAT_EXIT_SHARE = 0.13;
 /** Enter from below the progress rail; exit upward like IB. */
-const BEAT_ENTER_Y = 52;
-const BEAT_EXIT_Y = -38;
+const BEAT_ENTER_Y = 28;
+const BEAT_EXIT_Y = -22;
 
 /**
  * Only true after a successful intro (or intentional skip).
@@ -164,7 +160,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const cinemaRef = useRef<HTMLDivElement>(null);
   const statementRef = useRef<HTMLDivElement>(null);
   const pagerRef = useRef<HTMLSpanElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
@@ -178,9 +173,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const root = rootRef.current;
       const track = trackRef.current;
       const stage = stageRef.current;
-      const cinema = cinemaRef.current;
       const statement = statementRef.current;
-      if (!root || !track || !stage || !cinema || !statement) return;
+      if (!root || !track || !stage || !statement) return;
 
       ensureGsapPlugins();
 
@@ -193,23 +187,21 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const statementChrome = statement.querySelector<HTMLElement>(
         '.cc-ed-hero-scene__statement-chrome',
       );
-      const statementStage = cinema.querySelector<HTMLElement>(
+      const statementStage = stage.querySelector<HTMLElement>(
         '.cc-ed-hero-scene__statement-stage',
       );
       const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const beatEls = Array.from(
-        cinema.querySelectorAll<HTMLElement>('[data-statement-beat]'),
+        stage.querySelectorAll<HTMLElement>('[data-statement-beat]'),
       );
-      const pinVh = cinemaPinMultiplier(mobile);
       const viewportH = () => window.innerHeight;
-      cinema.style.marginTop = `${viewportH() * pinVh * CINEMA_STATEMENT_START}px`;
 
       const syncLogoForProgress = (progress: number) => {
         document.documentElement.dataset.logoTone =
           progress < CINEMA_EXPAND_END ? 'dark' : 'light';
       };
       const beatCount = Math.max(beatEls.length, 1);
-      const beatSpan = (0.92 - CINEMA_STATEMENT_START) / beatCount;
+      const beatSpan = (CINEMA_STATEMENT_END - CINEMA_STATEMENT_START) / beatCount;
 
       const setPager = (index: number) => {
         if (pagerRef.current) {
@@ -270,7 +262,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           gsap.set(statementChrome, { autoAlpha: 0, y: 16 });
         }
         if (statementStage) {
-          gsap.set(statementStage, { autoAlpha: 0, height: 0, overflow: 'hidden' });
+          gsap.set(statementStage, {
+            autoAlpha: 0,
+            height: 0,
+            overflow: 'hidden',
+            marginTop: 0,
+          });
         }
         if (heroCopy) {
           gsap.set(heroCopy, { autoAlpha: 1, yPercent: 0 });
@@ -320,7 +317,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                 return;
               }
               root.dataset.cinemaChapter = 'statement';
-              const statementSpan = 0.92 - CINEMA_STATEMENT_START;
+              const statementSpan = CINEMA_STATEMENT_END - CINEMA_STATEMENT_START;
               const local = Math.min(
                 1,
                 Math.max(0, (p - CINEMA_STATEMENT_START) / statementSpan),
@@ -329,6 +326,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               const beatIndex = Math.min(beatCount - 1, Math.floor(scaled));
               setPager(beatIndex);
               setStatementProgress(local);
+            },
+            onLeave: () => {
+              root.dataset.cinemaChapter = 'statement';
+              setPager(beatCount - 1);
+              setStatementProgress(1);
             },
           },
         });
@@ -633,15 +635,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               </p>
             </div>
           </div>
-        </div>
 
-        <div
-          ref={cinemaRef}
-          className="cc-ed-hero-scene__cinema"
-          data-testid="editorial-statement"
-          aria-labelledby="editorial-statement-heading"
-        >
-          <div className="cc-ed-hero-scene__statement-stage">
+          <div
+            className="cc-ed-hero-scene__statement-stage"
+            data-testid="editorial-statement"
+            aria-labelledby="editorial-statement-heading"
+          >
             {STATEMENT_BEATS.map((beat, i) => (
               <div
                 key={beat.id}
