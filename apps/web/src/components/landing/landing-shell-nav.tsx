@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { LAYOUT } from '@/lib/design/tokens';
-import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import { CodeCardMarkLogo } from './codecard-mark-logo';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
-  { label: 'Overview', href: MARKETING_HOME_HREF, ariaLabel: 'Overview, research and how it works' },
   { label: 'Pricing', href: '/pricing' },
 ];
 

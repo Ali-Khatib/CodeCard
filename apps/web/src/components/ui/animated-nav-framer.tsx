@@ -200,7 +200,7 @@ export function AnimatedNavFramer({
           aria-hidden={expanded}
         >
           <Menu
-            className="h-5 w-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]"
+            className="h-5 w-5"
             aria-hidden
           />
           <span className="sr-only">{collapsedLabel}</span>

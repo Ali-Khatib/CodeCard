@@ -33,22 +33,24 @@ export function EditorialHero() {
             <span className="sr-only">ONE IDENTITY.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
-          <p className="cc-ed__lede mt-6">
+        </div>
+        <div className="cc-ed-hero__baseline">
+          <p className="cc-ed__lede">
             Projects, Research, and Connections, presented through one living
             technical profile.
           </p>
-        </div>
-        <div className="cc-ed__actions cc-ed-hero__actions-corner">
-          <Link
-            href="/sign-up"
-            className="cc-ed__btn-primary cc-instant-press"
-            data-testid="hero-primary-cta"
-          >
-            Create Your CodeCard
-          </Link>
-          <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
-            Open Live Demo
-          </LiveDemoLink>
+          <div className="cc-ed__actions cc-ed-hero__actions-corner">
+            <Link
+              href="/sign-up"
+              className="cc-ed__btn-primary cc-instant-press"
+              data-testid="hero-primary-cta"
+            >
+              Create Your CodeCard
+            </Link>
+            <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
+              Open Live Demo
+            </LiveDemoLink>
+          </div>
         </div>
       </div>
     </section>

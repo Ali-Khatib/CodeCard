@@ -97,8 +97,8 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                   <Link
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
-                    className={`block px-3 py-2.5 text-[15px] ${
-                      active ? 'font-medium text-iris' : 'text-ash'
+                    className={`cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center ${
+                      active ? 'cc-nav-pill-item--active' : ''
                     }`}
                     onClick={(event) => {
                       event.stopPropagation();
@@ -110,27 +110,18 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                 </li>
               );
             })}
-            <li className="mt-2 border-t border-charcoal pt-3">
+            <li>
               <LiveDemoLink
-                className="cc-nav-pill-item mb-3 block w-full py-2.5 text-center"
+                className="cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center"
                 onClick={() => setMobileOpen(false)}
               >
                 Live demo
               </LiveDemoLink>
             </li>
-            <li className="flex gap-2">
-              <Link
-                href="/sign-in"
-                className="cc-nav-pill-item flex-1 py-2 text-center"
-                onClick={(event) => event.stopPropagation()}
-                onMouseEnter={() => router.prefetch('/sign-in')}
-                onFocus={() => router.prefetch('/sign-in')}
-              >
-                Sign in
-              </Link>
+            <li>
               <Link
                 href="/sign-up"
-                className="cc-nav-pill-item flex-1 py-2 text-center"
+                className="cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center"
                 onClick={(event) => event.stopPropagation()}
                 onMouseEnter={() => router.prefetch('/sign-up')}
                 onFocus={() => router.prefetch('/sign-up')}
@@ -156,38 +147,30 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                   onClick={(event) => event.stopPropagation()}
                   onMouseEnter={() => prefetchHref(item.href, router)}
                   onFocus={() => prefetchHref(item.href, router)}
-                  className={`cc-nav-pill-item cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
+                  className={`cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press${active ? ' cc-nav-pill-item--active' : ''}`}
                 >
                   {item.label}
                 </Link>
               </li>
             );
           })}
+          <li>
+            <LiveDemoLink className="cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press">
+              Live demo
+            </LiveDemoLink>
+          </li>
+          <li>
+            <Link
+              href="/sign-up"
+              className="cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press"
+              onClick={(event) => event.stopPropagation()}
+              onMouseEnter={() => router.prefetch('/sign-up')}
+              onFocus={() => router.prefetch('/sign-up')}
+            >
+              Start free
+            </Link>
+          </li>
         </ul>
-      </div>
-
-      <div className="ml-auto hidden items-center gap-2 md:flex cc-nav-desktop-actions">
-        <LiveDemoLink className="cc-nav-pill-item cc-instant-press">
-          Live demo
-        </LiveDemoLink>
-        <Link
-          href="/sign-in"
-          className="cc-nav-pill-item cc-instant-press"
-          onClick={(event) => event.stopPropagation()}
-          onMouseEnter={() => router.prefetch('/sign-in')}
-          onFocus={() => router.prefetch('/sign-in')}
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/sign-up"
-          className="cc-nav-pill-item cc-instant-press"
-          onClick={(event) => event.stopPropagation()}
-          onMouseEnter={() => router.prefetch('/sign-up')}
-          onFocus={() => router.prefetch('/sign-up')}
-        >
-          Start free
-        </Link>
       </div>
 
       <button

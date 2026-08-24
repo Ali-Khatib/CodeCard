@@ -32,10 +32,10 @@ const CINEMA_SCRUB = 0.2;
  * ~0.04 × 520vh ≈ 0.21vh — one small scroll finishes the expansion.
  */
 const CINEMA_EXPAND_END = 0.04;
-/** Full-bleed holds with hero copy still visible — tiny scroll after expand. */
-const CINEMA_CHROME_START = 0.054;
-/** Loading bar visible; hero fades; beats begin revealing below. */
-const CINEMA_STATEMENT_START = 0.078;
+/** Full-bleed hold — hero + CTAs stay visible while you scroll down. */
+const CINEMA_CHROME_START = 0.11;
+/** Progress line + tag dock under hero; beats start after hero clears. */
+const CINEMA_STATEMENT_START = 0.19;
 
 /** Per-beat scroll shares: rise ↑, fill words, exit ↑, gap (empty). */
 const BEAT_ENTER_SHARE = 0.1;
@@ -182,6 +182,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const shutClip = introClipShut(mobile);
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
       const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
+      const statementChrome = statement.querySelector<HTMLElement>(
+        '.cc-ed-hero-scene__statement-chrome',
+      );
+      const statementStage = statement.querySelector<HTMLElement>(
+        '.cc-ed-hero-scene__statement-stage',
+      );
       const beatEls = Array.from(
         statement.querySelectorAll<HTMLElement>('[data-statement-beat]'),
       );
@@ -243,7 +249,13 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           document.body.style.overflow = '';
         }
 
-        gsap.set(statement, { autoAlpha: 0 });
+        gsap.set(statement, { autoAlpha: 1 });
+        if (statementChrome) {
+          gsap.set(statementChrome, { autoAlpha: 0, y: 28 });
+        }
+        if (statementStage) {
+          gsap.set(statementStage, { autoAlpha: 0 });
+        }
         if (progressFillRef.current) {
           progressFillRef.current.style.transform = 'scaleX(0)';
         }
@@ -273,16 +285,18 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             onUpdate: (self) => {
               const p = self.progress;
               if (p < CINEMA_CHROME_START) {
+                root.dataset.cinemaChapter = 'hero';
                 setPager(-1);
                 setStatementProgress(0);
                 return;
               }
               if (p < CINEMA_STATEMENT_START) {
-                root.dataset.cinemaChapter = 'statement';
+                root.dataset.cinemaChapter = 'hero';
                 setPager(-1);
                 setStatementProgress(0);
                 return;
               }
+              root.dataset.cinemaChapter = 'statement';
               const statementSpan = 0.92 - CINEMA_STATEMENT_START;
               const local = Math.min(
                 1,
@@ -313,13 +327,27 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        /* IB flow: hero copy stays through expand + brief full-bleed hold. */
+        /* IB flow: hero stays through expand + scroll-down hold + chrome dock. */
         if (heroCopy) {
           scrollTl.to(
             heroCopy,
             {
               autoAlpha: 0,
-              yPercent: -12,
+              yPercent: -10,
+              duration: 0.055,
+              ease: 'none',
+            },
+            CINEMA_STATEMENT_START,
+          );
+        }
+
+        if (statementChrome) {
+          scrollTl.fromTo(
+            statementChrome,
+            { autoAlpha: 0, y: 28 },
+            {
+              autoAlpha: 1,
+              y: 0,
               duration: CINEMA_STATEMENT_START - CINEMA_CHROME_START,
               ease: 'none',
             },
@@ -327,18 +355,13 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        scrollTl.to(
-          statement,
-          {
-            autoAlpha: 1,
-            duration: Math.min(
-              0.04,
-              (CINEMA_STATEMENT_START - CINEMA_CHROME_START) * 0.85,
-            ),
-            ease: 'none',
-          },
-          CINEMA_CHROME_START,
-        );
+        if (statementStage) {
+          scrollTl.set(
+            statementStage,
+            { autoAlpha: 1 },
+            CINEMA_STATEMENT_START,
+          );
+        }
 
         beatEls.forEach((beat, beatIndex) => {
           const beatStart = CINEMA_STATEMENT_START + beatIndex * beatSpan;
