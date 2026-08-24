@@ -2707,46 +2707,62 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* —— Pinned statement reveals (post-hero) —— */
-.cc-ed-hero-scene__statements {
+/* —— ONE pinned statement section (post-hero) — IB scroll model —— */
+.cc-ed-hero-scene__statement-pin {
   position: relative;
   z-index: 1;
   background: #101012;
 }
 
-.cc-ed-hero-scene__statement-pin {
-  position: relative;
-}
-
 .cc-ed-hero-scene__statement-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
+  gap: clamp(1rem, 2.4vh, 1.75rem);
   width: 100%;
   min-height: 100svh;
   min-height: 100dvh;
   padding:
-    calc(var(--cc-ed-nav-clearance) + 0.5rem)
-    clamp(1.25rem, 4vw, 3.5rem)
-    clamp(1.5rem, 4vh, 2.75rem);
+    calc(var(--cc-ed-nav-clearance) + 2.5rem)
+    0
+    clamp(2rem, 6vh, 4rem);
   box-sizing: border-box;
   background: #141413;
   color: #efedeb;
+  overflow: hidden;
 }
 
-.cc-ed-hero-scene__statement-slot {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1rem, 2.5vh, 1.65rem);
+/* Persistent full-bleed line — fixed in the panel, only fill changes */
+.cc-ed-hero-scene__statement-progress {
+  position: relative;
   width: 100%;
-  max-width: 48rem;
+  height: 1.5px;
+  margin: 0;
+  background: color-mix(in srgb, #efedeb 22%, transparent);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.cc-ed-hero-scene__statement-copy-block {
+.cc-ed-hero-scene__statement-progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: #efedeb;
+  will-change: transform;
+}
+
+/* Tag + pager under the line — left edge, padded */
+.cc-ed-hero-scene__statement-chrome {
   display: flex;
-  flex-direction: column;
-  gap: clamp(0.85rem, 2vh, 1.35rem);
-  max-width: 44rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(0.65rem, 1.5vw, 1.1rem);
+  width: 100%;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+  flex-shrink: 0;
 }
 
 .cc-ed-hero-scene__statement-tag {
@@ -2769,42 +2785,13 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   flex-shrink: 0;
 }
 
-/* Progress line — below headline copy, scrubs with word reveal */
-.cc-ed-hero-scene__statement-progress {
-  position: relative;
-  width: 100%;
-  max-width: 48rem;
-  height: 2px;
-  margin: clamp(0.35rem, 1vh, 0.65rem) 0 0;
-  background: color-mix(in srgb, #efedeb 18%, #5c5856);
-  border-radius: 999px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.cc-ed-hero-scene__statement-progress-fill {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background: linear-gradient(
-    90deg,
-    var(--ed-accent, #e95a0b) 0%,
-    color-mix(in srgb, var(--ed-accent, #e95a0b) 55%, #efedeb) 100%
-  );
-  border-radius: inherit;
-  will-change: transform;
-}
-
 .cc-ed-hero-scene__statement-pager {
   display: inline-flex;
   align-items: baseline;
-  justify-self: start;
   margin: 0;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, #efedeb 24%, #5c5856);
+  border: 1px solid color-mix(in srgb, #efedeb 24%, transparent);
   background: color-mix(in srgb, #141413 42%, transparent);
   backdrop-filter: blur(8px);
   color: #efedeb;
@@ -2816,6 +2803,32 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-pager-total {
   opacity: 0.45;
+}
+
+/* One text position — beats stack absolutely and fade up / fade in here */
+.cc-ed-hero-scene__statement-stage {
+  position: relative;
+  width: 100%;
+  max-width: min(52rem, 92vw);
+  min-height: clamp(11rem, 32vh, 18rem);
+  margin-inline: clamp(1.25rem, 4vw, 3.5rem);
+  overflow: visible;
+}
+
+.cc-ed-hero-scene__statement-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 2vh, 1.35rem);
+  width: 100%;
+  will-change: transform, opacity;
+}
+
+.cc-ed-hero-scene__statement-slot + .cc-ed-hero-scene__statement-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 
 .cc-ed-hero-scene__statement-body {
@@ -2831,17 +2844,9 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   text-wrap: balance;
 }
 
-.cc-ed-hero-scene__statement-copy {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.65rem, 1.6vh, 1rem);
-  max-width: 42rem;
-  width: 100%;
-}
-
 .cc-ed-hero-scene__statement-lede {
   margin: 0;
-  max-width: none;
+  max-width: 42rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.08rem, 1.55vw, 1.35rem);
   font-weight: 500;
@@ -2876,7 +2881,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__statement-panel {
-    padding-bottom: clamp(1.25rem, 5vh, 2rem);
+    padding-top: calc(var(--cc-ed-nav-clearance) + 1.5rem);
+    padding-bottom: clamp(1.5rem, 5vh, 2.5rem);
   }
 
   .cc-ed-hero-scene__statement-body {

@@ -26,10 +26,18 @@ const CINEMA_SCRUB = 0.35;
 /** Share of the expand segment used for the clip-path tween. */
 const EXPAND_CLIP_END = 0.88;
 
-/** Pinned statement reveal — scroll scrubs word fill + progress line. */
-const STATEMENT_PIN_SCROLL = { desktop: '+=220%', mobile: '+=180%' } as const;
+/**
+ * ONE pinned statement runway — scroll scrubs all 3 beats on the same panel.
+ * Per beat: fill text + line → slight fade-up → next fades in muted at same spot.
+ * Line stays fixed; fill resets each beat (progress for current text).
+ */
+const STATEMENT_PIN_SCROLL = { desktop: '+=360%', mobile: '+=300%' } as const;
 const STATEMENT_WORD_DIM = 0.22;
 const STATEMENT_WORD_LIT = 1;
+/** Within each beat third: mostly fill, then short fade-up / next-in overlap. */
+const BEAT_FILL_SHARE = 0.78;
+const BEAT_EXIT_Y = -10;
+const BEAT_ENTER_Y = 6;
 
 let heroIntroPlayed = false;
 
@@ -129,6 +137,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const runwayRef = useRef<HTMLDivElement>(null);
+  const statementPinRef = useRef<HTMLDivElement>(null);
+  const pagerRef = useRef<HTMLSpanElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion, hydrated } = useMotionPreferences();
   useScrollTriggerRefresh();
 
@@ -140,7 +151,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const track = trackRef.current;
       const stage = stageRef.current;
       const runway = runwayRef.current;
-      if (!root || !track || !stage || !runway) return;
+      const statementPin = statementPinRef.current;
+      if (!root || !track || !stage || !runway || !statementPin) return;
 
       ensureGsapPlugins();
 
@@ -153,6 +165,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         : `+=${EXPAND_SCROLL_VH.desktop}%`;
       const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__copy');
+      const panel = statementPin.querySelector<HTMLElement>(
+        '[data-statement-panel]',
+      );
+      const beatEls = Array.from(
+        statementPin.querySelectorAll<HTMLElement>('[data-statement-beat]'),
+      );
       const viewportH = () => window.innerHeight;
 
       runway.style.minHeight = `${runwayTotalVh(mobile)}vh`;
@@ -160,6 +178,15 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const syncLogoForExpand = (expandProgress: number) => {
         document.documentElement.dataset.logoTone =
           expandProgress < EXPAND_CLIP_END * 0.92 ? 'dark' : 'light';
+      };
+
+      const beatCount = Math.max(beatEls.length, 1);
+      const beatSpan = 1 / beatCount;
+
+      const setPager = (index: number) => {
+        if (pagerRef.current) {
+          pagerRef.current.textContent = String(index + 1).padStart(2, '0');
+        }
       };
 
       const lockFinalGeometry = (clip: string) => {
@@ -185,88 +212,138 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       };
 
       let expandTl: gsap.core.Timeline | null = null;
-      const statementTls: gsap.core.Timeline[] = [];
+      let statementTl: gsap.core.Timeline | null = null;
 
       const notifyCinemaReady = () => {
         window.dispatchEvent(new CustomEvent('codecard:hero-cinema-ready'));
       };
 
-      const buildStatementPins = () => {
-        const pinRoots = Array.from(
-          root.querySelectorAll<HTMLElement>('[data-statement-pin]'),
-        );
-        const pinScroll = mobile
-          ? STATEMENT_PIN_SCROLL.mobile
-          : STATEMENT_PIN_SCROLL.desktop;
+      const buildStatementPin = () => {
+        if (!panel || !progressFillRef.current) return;
 
-        pinRoots.forEach((pinRoot, beatIndex) => {
-          const panel = pinRoot.querySelector<HTMLElement>(
-            '[data-statement-panel]',
-          );
-          const words = Array.from(
-            pinRoot.querySelectorAll<HTMLElement>('[data-statement-word]'),
-          );
-          const fillEl = pinRoot.querySelector<HTMLElement>(
-            '[data-statement-progress-fill]',
-          );
-          if (!panel || !words.length) return;
+        const fillEl = progressFillRef.current;
 
+        setPager(0);
+        gsap.set(fillEl, { scaleX: 0, transformOrigin: 'left center' });
+
+        /* Beat 0 starts in place, muted. Others wait off until their enter. */
+        beatEls.forEach((beat, i) => {
+          const words = beat.querySelectorAll<HTMLElement>('[data-statement-word]');
           gsap.set(words, { opacity: STATEMENT_WORD_DIM });
-          if (fillEl) {
-            gsap.set(fillEl, {
-              scaleX: 0,
-              transformOrigin: 'left center',
-            });
+          if (i === 0) {
+            gsap.set(beat, { autoAlpha: 1, yPercent: 0 });
+          } else {
+            gsap.set(beat, { autoAlpha: 0, yPercent: BEAT_ENTER_Y });
+          }
+        });
+
+        statementTl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            id: 'editorial-hero-statement',
+            trigger: statementPin,
+            start: 'top top',
+            end: mobile
+              ? STATEMENT_PIN_SCROLL.mobile
+              : STATEMENT_PIN_SCROLL.desktop,
+            pin: panel,
+            pinSpacing: true,
+            scrub: true,
+            invalidateOnRefresh: true,
+            markers: gsapMarkersEnabled(),
+            onUpdate: (self) => {
+              root.dataset.cinemaChapter = 'statement';
+              document.documentElement.dataset.logoTone = 'light';
+              const beatIndex = Math.min(
+                beatCount - 1,
+                Math.floor(self.progress * beatCount),
+              );
+              setPager(beatIndex);
+            },
+            onLeave: () => {
+              setPager(beatCount - 1);
+            },
+            onLeaveBack: () => {
+              root.dataset.cinemaChapter = 'hero';
+              setPager(0);
+            },
+          },
+        });
+
+        beatEls.forEach((beat, beatIndex) => {
+          const beatStart = beatIndex * beatSpan;
+          const words = Array.from(
+            beat.querySelectorAll<HTMLElement>('[data-statement-word]'),
+          );
+          const isFirst = beatIndex === 0;
+          const isLast = beatIndex === beatCount - 1;
+          const fillDur = beatSpan * BEAT_FILL_SHARE;
+          const transDur = beatSpan * (1 - BEAT_FILL_SHARE);
+          const fillAt = beatStart;
+          const exitAt = fillAt + fillDur;
+
+          /* Enter: first already on-screen muted; later beats fade into same slot during previous exit. */
+          if (isFirst) {
+            statementTl!.set(beat, { autoAlpha: 1, yPercent: 0 }, beatStart);
+            statementTl!.set(words, { opacity: STATEMENT_WORD_DIM }, beatStart);
+            statementTl!.set(fillEl, { scaleX: 0 }, beatStart);
+          } else {
+            const enterAt = beatStart - transDur;
+            statementTl!.set(words, { opacity: STATEMENT_WORD_DIM }, enterAt);
+            statementTl!.fromTo(
+              beat,
+              { autoAlpha: 0, yPercent: BEAT_ENTER_Y },
+              {
+                autoAlpha: 1,
+                yPercent: 0,
+                duration: transDur,
+                ease: 'none',
+              },
+              enterAt,
+            );
+            statementTl!.fromTo(
+              fillEl,
+              { scaleX: 1 },
+              { scaleX: 0, duration: transDur * 0.4, ease: 'none' },
+              enterAt,
+            );
           }
 
-          const tl = gsap.timeline({
-            defaults: { ease: 'none' },
-            scrollTrigger: {
-              id:
-                beatIndex === 0
-                  ? 'editorial-hero-statement'
-                  : `editorial-hero-statement-${beatIndex + 1}`,
-              trigger: pinRoot,
-              start: 'top top',
-              end: pinScroll,
-              pin: panel,
-              pinSpacing: true,
-              scrub: true,
-              invalidateOnRefresh: true,
-              markers: gsapMarkersEnabled(),
-              onToggle: (self) => {
-                if (self.isActive) {
-                  root.dataset.cinemaChapter = 'statement';
-                  document.documentElement.dataset.logoTone = 'light';
-                } else if (beatIndex === 0 && self.direction < 0) {
-                  root.dataset.cinemaChapter = 'hero';
-                }
-              },
-            },
-          });
-
-          const wordCount = words.length;
+          /* Fill: words brighten L→R; line fills in sync for THIS text. */
           words.forEach((word, wi) => {
-            const start = wi / wordCount;
-            const dur = 1 / wordCount;
-            tl.fromTo(
+            const t =
+              fillAt + (wi / Math.max(words.length, 1)) * fillDur * 0.92;
+            statementTl!.fromTo(
               word,
               { opacity: STATEMENT_WORD_DIM },
-              { opacity: STATEMENT_WORD_LIT, duration: dur, ease: 'none' },
-              start,
+              {
+                opacity: STATEMENT_WORD_LIT,
+                duration: Math.max(fillDur * 0.06, 0.01),
+                ease: 'none',
+              },
+              t,
             );
           });
+          statementTl!.fromTo(
+            fillEl,
+            { scaleX: 0 },
+            { scaleX: 1, duration: fillDur, ease: 'none' },
+            fillAt,
+          );
 
-          if (fillEl) {
-            tl.fromTo(
-              fillEl,
-              { scaleX: 0 },
-              { scaleX: 1, duration: 1, ease: 'none' },
-              0,
+          /* Exit: slight fade-up while next fades in (no blank frame). */
+          if (!isLast) {
+            statementTl!.to(
+              beat,
+              {
+                yPercent: BEAT_EXIT_Y,
+                autoAlpha: 0,
+                duration: transDur,
+                ease: 'none',
+              },
+              exitAt,
             );
           }
-
-          statementTls.push(tl);
         });
       };
 
@@ -312,11 +389,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        buildStatementPins();
+        buildStatementPin();
 
         if (holdForIntro) {
           expandTl.scrollTrigger?.disable(false);
-          statementTls.forEach((tl) => tl.scrollTrigger?.disable(false));
+          statementTl?.scrollTrigger?.disable(false);
           lockFinalGeometry(shutClip);
           root.dataset.heroIntro = 'running';
           refreshScrollTrigger({ safe: true });
@@ -334,7 +411,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         document.body.style.overflow = '';
         syncLogoForExpand(0);
         expandTl?.scrollTrigger?.enable();
-        statementTls.forEach((tl) => tl.scrollTrigger?.enable());
+        statementTl?.scrollTrigger?.enable();
         expandTl?.progress(0);
         refreshScrollTrigger({ safe: true });
         notifyCinemaReady();
@@ -343,10 +420,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const killAll = () => {
         expandTl?.scrollTrigger?.kill();
         expandTl?.kill();
-        statementTls.forEach((tl) => {
-          tl.scrollTrigger?.kill();
-          tl.kill();
-        });
+        statementTl?.scrollTrigger?.kill();
+        statementTl?.kill();
       };
 
       if ('scrollRestoration' in history) {
@@ -453,89 +528,91 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       </div>
 
       <div
-        className="cc-ed-hero-scene__statements"
+        ref={statementPinRef}
+        className="cc-ed-hero-scene__statement-pin"
+        data-statement-pin
         data-testid="editorial-statement"
-        aria-label="What CodeCard is"
+        aria-labelledby="editorial-statement-heading"
       >
-        {STATEMENT_BEATS.map((beat, i) => (
+        <div
+          className="cc-ed-hero-scene__statement-panel"
+          data-statement-panel
+        >
+          {/* Persistent full-bleed progress line — never moves, only fills */}
           <div
-            key={beat.id}
-            className="cc-ed-hero-scene__statement-pin"
-            data-statement-pin={beat.id}
+            className="cc-ed-hero-scene__statement-progress"
+            aria-hidden
           >
             <div
-              className="cc-ed-hero-scene__statement-panel"
-              data-statement-panel
+              ref={progressFillRef}
+              className="cc-ed-hero-scene__statement-progress-fill"
+              data-statement-progress-fill
+            />
+          </div>
+
+          <div className="cc-ed-hero-scene__statement-chrome">
+            <p className="cc-ed-hero-scene__statement-tag">
+              <span
+                className="cc-ed-hero-scene__statement-tag-mark"
+                aria-hidden
+              />
+              What this is
+            </p>
+
+            <p
+              className="cc-ed-hero-scene__statement-pager"
+              aria-live="polite"
             >
+              <span ref={pagerRef} data-statement-index>
+                01
+              </span>
+              <span className="cc-ed-hero-scene__statement-pager-total">
+                {' '}
+                / 03
+              </span>
+            </p>
+          </div>
+
+          {/* Single text slot — beats fade up / fade in here, never under the line */}
+          <div className="cc-ed-hero-scene__statement-stage">
+            {STATEMENT_BEATS.map((beat, i) => (
               <div
+                key={beat.id}
                 className="cc-ed-hero-scene__statement-slot"
                 data-statement-beat={beat.id}
-                aria-labelledby={
-                  i === 0 ? 'editorial-statement-heading' : undefined
-                }
+                aria-hidden={i !== 0}
               >
-                <p className="cc-ed-hero-scene__statement-tag">
-                  <span
-                    className="cc-ed-hero-scene__statement-tag-mark"
-                    aria-hidden
-                  />
-                  What this is
-                </p>
-
-                <div className="cc-ed-hero-scene__statement-copy-block">
-                  <p
-                    className="cc-ed-hero-scene__statement-body"
-                    aria-label={beat.title}
-                  >
-                    <StatementWords
-                      text={beat.lead}
-                      beatId={beat.id}
-                      tone="lead"
-                    />{' '}
-                    <StatementWords
-                      text={beat.sub}
-                      beatId={beat.id}
-                      tone="sub"
-                    />
-                  </p>
-                  <p className="cc-ed-hero-scene__statement-lede">
-                    <StatementWords
-                      text={beat.lede}
-                      beatId={beat.id}
-                      tone="lede"
-                    />
-                  </p>
-                </div>
-
-                <div
-                  className="cc-ed-hero-scene__statement-progress"
-                  aria-hidden
+                <p
+                  className="cc-ed-hero-scene__statement-body"
+                  aria-label={beat.title}
                 >
-                  <div
-                    className="cc-ed-hero-scene__statement-progress-fill"
-                    data-statement-progress-fill
+                  <StatementWords
+                    text={beat.lead}
+                    beatId={beat.id}
+                    tone="lead"
+                  />{' '}
+                  <StatementWords
+                    text={beat.sub}
+                    beatId={beat.id}
+                    tone="sub"
                   />
-                </div>
-
-                <p className="cc-ed-hero-scene__statement-pager">
-                  <span data-statement-index>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="cc-ed-hero-scene__statement-pager-total">
-                    {' '}
-                    / 03
-                  </span>
                 </p>
-
+                <p className="cc-ed-hero-scene__statement-lede">
+                  <StatementWords
+                    text={beat.lede}
+                    beatId={beat.id}
+                    tone="lede"
+                  />
+                </p>
                 {i === 0 ? (
                   <span id="editorial-statement-heading" className="sr-only">
                     {beat.title}
                   </span>
                 ) : null}
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
       <div className="cc-ed-hero-scene__bridge-out" aria-hidden />

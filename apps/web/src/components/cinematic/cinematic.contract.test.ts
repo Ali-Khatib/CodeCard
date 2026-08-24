@@ -188,8 +188,10 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('cc-ed-hero-scene__statement-sub');
     expect(scene).not.toContain('YOUR BEST WORK SHOULDN');
     expect(scene).not.toContain('FIVE PLACES');
+    expect(scene).toContain('progressFillRef');
     expect(scene).toContain('data-statement-progress-fill');
     expect(scene).toContain('cc-ed-hero-scene__statement-progress');
+    expect(css).toContain('.cc-ed-hero-scene__statement-stage');
     expect(css).toContain('.cc-ed-hero-scene__statement-progress-fill');
     expect(css).toContain('Instrument Serif');
     expect(css).toContain('--cc-ed-nav-clearance');
@@ -210,9 +212,12 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('runwayTotalVh');
     expect(scene).toContain('pin: panel');
     expect(scene).toContain('pinSpacing: true');
+    expect(scene).toContain('BEAT_EXIT_Y');
+    expect(scene).toContain('yPercent: BEAT_ENTER_Y');
+    expect(scene).toContain('BEAT_FILL_SHARE');
     expect(scene).not.toContain('pin: stage');
-    expect(scene).not.toContain('BEAT_EXIT_Y');
-    expect(scene).not.toContain('yPercent: BEAT_ENTER_Y');
+    expect(scene).not.toContain('statementTls');
+    expect(scene).not.toContain('setStatementProgress');
     expect(scene).toContain('lockFinalGeometry');
     expect(scene).toContain("marginTop = '0'");
     expect(scene).toContain('heroIntroPlayed');
