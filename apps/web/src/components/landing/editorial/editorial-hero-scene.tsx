@@ -109,7 +109,8 @@ function stageRadius(mobile: boolean) {
 }
 
 function creamPad(mobile: boolean) {
-  return mobile ? 8 : 10;
+  /* Visible cream letterbox around minimized hero (was 8/10 — too easy to miss). */
+  return mobile ? 14 : 18;
 }
 
 function introClipShut(mobile: boolean) {

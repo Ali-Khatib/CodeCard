@@ -2607,7 +2607,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   min-height: 100svh;
   min-height: 100dvh;
   overflow: hidden;
-  background: #141413;
+  /* Cream letterbox behind clipped hero — inset clip must reveal cream, not charcoal */
+  background: var(--ed-cream, #fcf1e7);
 }
 
 .cc-ed-hero-scene__cinema-panel .cc-ed-hero-scene__stage {
@@ -2805,14 +2806,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* One text position — beats stack absolutely and fade up / fade in here */
+/* One text position — right side like IB; beats fade up / fade in here */
 .cc-ed-hero-scene__statement-stage {
   position: relative;
   width: 100%;
-  max-width: min(52rem, 92vw);
+  max-width: min(48rem, 88vw);
   min-height: clamp(11rem, 32vh, 18rem);
-  margin-inline: clamp(1.25rem, 4vw, 3.5rem);
+  margin-left: auto;
+  margin-right: clamp(1.25rem, 4vw, 3.5rem);
   overflow: visible;
+  text-align: left;
 }
 
 .cc-ed-hero-scene__statement-slot {
