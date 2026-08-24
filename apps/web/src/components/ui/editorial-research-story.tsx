@@ -11,18 +11,18 @@ import {
   type MotionValue,
 } from 'motion/react';
 
-/** Unique on landing — scientists working on computers in a laboratory. */
-const RESEARCH_IMAGE =
-  'https://images.unsplash.com/photo-1766297247924-6638d54e7c89?auto=format&fit=crop&w=1600&q=75';
-
-const MARKER = 'Attention window';
-const HEADLINE_LINE_1 = 'YOUR BEST WORK';
-const HEADLINE_LINE_2 = 'NEVER GETS THE GLANCE.';
-const HEADLINE_FULL = 'Your best work never gets the glance.';
-const RESEARCH_BODY =
-  'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.';
-const SOLUTION_BODY =
-  'CodeCard puts your projects up front. The good stuff shows before the glance is over.';
+export type EditorialResearchBeat = {
+  id: string;
+  index: string;
+  marker: string;
+  problemTitle: string;
+  problemLead: string;
+  problemSub: string;
+  researchBody: string;
+  solutionBody: string;
+  imageSrc: string;
+  imageAlt: string;
+};
 
 function RedactedWord({
   word,
@@ -37,13 +37,9 @@ function RedactedWord({
   rangeEnd: number;
   reduced: boolean;
 }) {
-  // Masks are decorative only — headline stays readable at rest and after scroll.
-  const maskScale = useTransform(
-    progress,
-    [0, rangeStart, rangeEnd, 1],
-    [0, 0, 0, 0],
-    { clamp: true },
-  );
+  const maskScale = useTransform(progress, [rangeStart, rangeEnd], [1, 0], {
+    clamp: true,
+  });
 
   return (
     <span className="cc-ed-research-redact__word">
@@ -54,8 +50,7 @@ function RedactedWord({
           style={{ scaleX: maskScale }}
           aria-hidden
         />
-      )}
-      {' '}
+      )}{' '}
     </span>
   );
 }
@@ -87,8 +82,8 @@ function RedactedLine({
       }
     >
       {words.map((word, i) => {
-        const start = rangeStart + (i / words.length) * span * 0.88;
-        const end = Math.min(start + span / words.length, rangeEnd);
+        const start = rangeStart + (i / words.length) * span * 0.85;
+        const end = Math.min(start + span / words.length + 0.02, rangeEnd);
         return (
           <RedactedWord
             key={`${word}-${i}`}
@@ -104,109 +99,145 @@ function RedactedLine({
   );
 }
 
-/**
- * Single editorial research composition — full block visible on entry; subtle image motion on scroll.
- */
-export function EditorialResearchStory() {
-  const sectionRef = useRef<HTMLElement>(null);
+function ResearchChapter({
+  beat,
+  flip,
+}: {
+  beat: EditorialResearchBeat;
+  flip?: boolean;
+}) {
+  const chapterRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion() === true;
-
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: chapterRef,
     offset: ['start 0.92', 'end 0.35'],
   });
 
-  const imageScale = useTransform(scrollYProgress, [0, 0.35], [1.02, 1], {
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.22], [0.55, 1], {
     clamp: true,
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], [8, -8], { clamp: true });
+  const imageScale = useTransform(scrollYProgress, [0, 0.28], [1.04, 1], {
+    clamp: true,
+  });
+  const bodyOpacity = useTransform(scrollYProgress, [0.38, 0.72], [0, 1], {
+    clamp: true,
+  });
+  const bodyY = useTransform(scrollYProgress, [0.38, 0.72], [18, 0], {
+    clamp: true,
+  });
 
   return (
-    <article
-      ref={sectionRef}
-      className="cc-ed-research-story"
-      data-testid="editorial-research-story"
-      aria-label={MARKER}
+    <section
+      ref={chapterRef}
+      className={
+        flip
+          ? 'cc-ed-research-story__beat cc-ed-research-story__beat--flip'
+          : 'cc-ed-research-story__beat'
+      }
+      data-testid={`editorial-proof-box-${beat.id}`}
+      aria-label={`${beat.index} ${beat.marker}`}
     >
-      <div className="cc-ed-research-story__grid">
-        <motion.div
-          className="cc-ed-research-story__media"
-          style={
-            reduced
-              ? undefined
-              : {
-                  scale: imageScale,
-                  y: imageY,
-                }
-          }
-        >
-          <Image
-            src={RESEARCH_IMAGE}
-            alt="Two scientists working on computers in a laboratory"
-            fill
-            sizes="(max-width: 900px) 92vw, 46vw"
-            className="cc-ed-research-story__img"
-            priority={false}
-          />
-        </motion.div>
-
-        <div className="cc-ed-research-story__copy">
-          <p className="cc-ed-research-story__marker">{MARKER}</p>
-
-          <h3
-            className="cc-ed-research-story__headline cc-ed-research-redact"
-            aria-label={HEADLINE_FULL}
-            data-research-reveal
+      <div className="cc-ed-research-story__frame">
+        <div className="cc-ed-research-story__grid">
+          <motion.div
+            className="cc-ed-research-story__media"
+            style={
+              reduced
+                ? undefined
+                : { opacity: imageOpacity, scale: imageScale }
+            }
           >
-            <RedactedLine
-              text={HEADLINE_LINE_1}
-              progress={scrollYProgress}
-              rangeStart={0.06}
-              rangeEnd={0.38}
-              reduced={reduced}
+            <Image
+              src={beat.imageSrc}
+              alt={beat.imageAlt}
+              fill
+              sizes="(max-width: 900px) 92vw, 44vw"
+              className="cc-ed-research-story__img"
             />
-            <RedactedLine
-              text={HEADLINE_LINE_2}
-              progress={scrollYProgress}
-              rangeStart={0.28}
-              rangeEnd={0.62}
-              reduced={reduced}
-              accent
-            />
-          </h3>
+          </motion.div>
 
-          <div className="cc-ed-research-story__columns">
-            <p className="cc-ed-research-story__body">{RESEARCH_BODY}</p>
-            <p className="cc-ed-research-story__body">
-              {SOLUTION_BODY.split(/(CodeCard)/g).map((part, i) =>
-                part === 'CodeCard' ? (
-                  <span key={i} className="cc-ed-research-story__brand">
-                    CodeCard
-                  </span>
-                ) : (
-                  <span key={i}>{part}</span>
-                ),
-              )}
+          <div className="cc-ed-research-story__copy">
+            <p className="cc-ed-research-story__marker">
+              <span className="cc-ed-research-story__index">{beat.index}</span>
+              {beat.marker}
             </p>
-          </div>
 
-          <div className="cc-ed-research-story__cta cc-ed-research-story__cta-group">
-            <Link
-              href="/research"
-              className="cc-ed-research-story__cta-main cc-instant-press"
+            <h3
+              className="cc-ed-research-story__headline cc-ed-research-redact"
+              aria-label={beat.problemTitle}
+              data-research-reveal
             >
-              Learn more about the research
-            </Link>
-            <Link
-              href="/research"
-              className="cc-ed-research-story__cta-arrow cc-instant-press"
-              aria-label="Open research papers"
+              <RedactedLine
+                text={beat.problemLead}
+                progress={scrollYProgress}
+                rangeStart={0.05}
+                rangeEnd={0.4}
+                reduced={reduced}
+              />
+              <RedactedLine
+                text={beat.problemSub}
+                progress={scrollYProgress}
+                rangeStart={0.22}
+                rangeEnd={0.62}
+                reduced={reduced}
+                accent
+              />
+            </h3>
+
+            <motion.div
+              className="cc-ed-research-story__columns"
+              style={
+                reduced ? undefined : { opacity: bodyOpacity, y: bodyY }
+              }
             >
-              →
-            </Link>
+              <p className="cc-ed-research-story__body" data-research-reveal>
+                {beat.researchBody}
+              </p>
+              <p className="cc-ed-research-story__body" data-research-reveal>
+                {beat.solutionBody.split(/(CodeCard)/g).map((part, i) =>
+                  part === 'CodeCard' ? (
+                    <span key={i} className="cc-ed-research-story__brand">
+                      CodeCard
+                    </span>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  ),
+                )}
+              </p>
+            </motion.div>
+
+            <div className="cc-ed-research-story__cta cc-ed-research-story__cta-group">
+              <Link
+                href="/research"
+                className="cc-ed-research-story__cta-main cc-instant-press"
+              >
+                Learn more about the research
+              </Link>
+              <Link
+                href="/research"
+                className="cc-ed-research-story__cta-arrow cc-instant-press"
+                aria-label="Open research papers"
+              >
+                →
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </article>
+    </section>
+  );
+}
+
+export function EditorialResearchStory({
+  beats,
+}: {
+  beats: EditorialResearchBeat[];
+}) {
+  return (
+    <div className="cc-ed-research-story" data-testid="editorial-research-story">
+      {beats.map((beat, i) => (
+        <ResearchChapter key={beat.id} beat={beat} flip={i % 2 === 1} />
+      ))}
+    </div>
   );
 }

@@ -69,10 +69,10 @@
   --ed-fg: var(--ed-ink);
 }
 
-/* 4 — research proof (dark wash, light type) */
+/* 4 — research proof stays cream on the page shell; section washes cream → charcoal */
 .cc-ed[data-chapter='proof'] {
-  --ed-bg: var(--ed-dark, #202020);
-  --ed-fg: #efedeb;
+  --ed-bg: var(--ed-cream, #fcf1e7);
+  --ed-fg: var(--ed-ink, #232324);
 }
 
 /* 5 — black closing CTA */
@@ -2005,7 +2005,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 .cc-ed-proof {
   padding: 0 0 clamp(2rem, 5vh, 3.5rem);
   background: transparent;
-  color: var(--ed-fg, #efedeb);
+  color: inherit;
 }
 
 .cc-ed-proof__intro {
@@ -2371,13 +2371,15 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 /* Standalone statement scene removed — lives inside hero cinema now */
 .cc-ed-statement-scene { display: none !important; }
 
-/* —— Editorial research scene (IntegratedBio-style composition) —— */
+/* —— Editorial research scene — cream → charcoal wash + three beats —— */
 .cc-ed-research-scene {
   position: relative;
   padding-top: clamp(2.5rem, 6vh, 4rem);
-  padding-bottom: clamp(2rem, 5vh, 3rem);
-  background: var(--ed-dark, #202020);
+  padding-bottom: clamp(3rem, 8vh, 5.5rem);
+  /* Motion paints cream → charcoal; fallback cream so SSR isn’t flat black */
+  background: var(--ed-cream, #fcf1e7);
   color: #efedeb;
+  transition: background-color 0.01ms linear;
 }
 
 .cc-ed-research-scene__label {
@@ -2398,7 +2400,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-research-scene__label .cc-ed__eyebrow {
   margin: 0;
-  color: color-mix(in srgb, var(--ed-accent) 72%, #efedeb);
+  color: color-mix(in srgb, var(--ed-accent) 70%, #efedeb);
 }
 
 .cc-ed-research-scene__beats {
@@ -2408,27 +2410,46 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   padding-bottom: clamp(1rem, 3vh, 2rem);
 }
 
-/* —— Single editorial research composition —— */
+/* —— Three editorial research beats —— */
 .cc-ed-research-story {
   position: relative;
   width: 100%;
+  display: grid;
+  gap: clamp(4rem, 12vh, 7.5rem);
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  padding-bottom: clamp(0.5rem, 2vh, 1rem);
-  --research-surface: var(--ed-dark, #202020);
+  --research-surface: #202020;
   --research-fg: #efedeb;
   --research-muted: color-mix(in srgb, #efedeb 84%, transparent);
 }
 
+.cc-ed-research-story__beat {
+  position: relative;
+}
+
+.cc-ed-research-story__frame {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 .cc-ed-research-story__grid {
   display: grid;
-  gap: clamp(1.25rem, 3vw, 2rem);
-  align-items: start;
+  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  align-items: center;
 }
 
 @media (min-width: 900px) {
   .cc-ed-research-story__grid {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: clamp(2.25rem, 4.5vw, 3.75rem);
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(2rem, 4vw, 3.25rem);
+  }
+
+  .cc-ed-research-story__beat--flip .cc-ed-research-story__media {
+    order: 2;
+  }
+
+  .cc-ed-research-story__beat--flip .cc-ed-research-story__copy {
+    order: 1;
   }
 }
 
@@ -2439,7 +2460,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   max-height: min(52vh, 28rem);
   overflow: hidden;
   border-radius: clamp(12px, 1.5vw, 18px);
-  background: color-mix(in srgb, var(--ed-ink) 8%, var(--ed-cream));
+  background: color-mix(in srgb, #101012 70%, #202020);
   transform-origin: center center;
 }
 
@@ -2465,11 +2486,19 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-research-story__marker {
   margin: 0 0 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--research-muted);
+}
+
+.cc-ed-research-story__index {
+  color: var(--ed-accent, #e95a0b);
+  font-variant-numeric: tabular-nums;
 }
 
 .cc-ed-research-story__headline {
@@ -2496,7 +2525,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-research-story__headline-line--accent {
-  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 58%, var(--research-fg));
+  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 78%, var(--research-fg));
 }
 
 .cc-ed-research-redact__word {
@@ -2514,11 +2543,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   position: absolute;
   inset: -0.06em -0.02em;
   z-index: 1;
-  background: var(--research-surface, var(--ed-dark, #202020));
+  /* Matches washed charcoal so reveal feels like ink lifting */
+  background: color-mix(in srgb, #202020 92%, #fcf1e7);
   border-radius: 2px;
-  transform: scaleX(0);
   transform-origin: right center;
   pointer-events: none;
+  will-change: transform;
 }
 
 .cc-ed-research-story__columns {
@@ -2579,7 +2609,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   width: 2.75rem;
   min-height: 2.75rem;
   border-radius: 999px;
-  background: var(--ed-ink, #232324);
+  background: #101012;
   color: #efedeb;
   font-size: 1.05rem;
   line-height: 1;
@@ -2592,7 +2622,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-research-story__cta-group:hover .cc-ed-research-story__cta-main,
 .cc-ed-research-story__cta-group:focus-within .cc-ed-research-story__cta-main {
-  background: var(--ed-ink, #232324);
+  background: #101012;
   color: #efedeb;
 }
 
@@ -2606,6 +2636,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 @media (max-width: 899px) {
   .cc-ed-research-story {
     padding-inline: clamp(1rem, 4vw, 1.5rem);
+    gap: clamp(3rem, 10vh, 5rem);
   }
 
   .cc-ed-research-story__media {

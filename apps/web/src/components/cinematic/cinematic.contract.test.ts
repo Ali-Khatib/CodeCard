@@ -81,34 +81,38 @@ describe('Editorial product landing contract', () => {
     expect(fxCss).not.toContain('160vh');
   });
 
-  it('research proof uses an editorial image-and-copy composition', () => {
+  it('research proof uses three editorial beats with redaction reveal and cream wash', () => {
     const proof = read(
       'src/components/landing/editorial/editorial-research-scene.tsx',
     );
     const story = read('src/components/ui/editorial-research-story.tsx');
     const css = read('src/styles/editorial-landing.css');
     expect(proof).toContain('EditorialResearchStory');
+    expect(proof).toContain('beats={BEATS}');
+    expect(proof).toContain('Attention window');
+    expect(proof).toContain('Prestige bias');
+    expect(proof).toContain('Skills visibility');
+    expect(proof).toContain('backgroundColor: wash');
+    expect(proof).toContain('#fcf1e7');
+    expect(proof).toContain('The research');
     expect(story).toContain('EditorialResearchStory');
     expect(story).toContain('Your best work never gets the glance.');
-    expect(story).toContain('Attention window');
-    expect(story).toContain('Eye-tracking research');
-    expect(proof).toContain('The research');
-    expect(story).toContain('photo-1766297247924-6638d54e7c89');
-    expect(story).toContain('Learn more about the research');
-    expect(story).toContain('data-research-reveal');
+    expect(story).toContain('cc-ed-research-story__beat');
     expect(story).toContain('cc-ed-research-redact__mask');
+    expect(story).toContain('data-research-reveal');
     expect(story).toContain('cc-ed-research-story__media');
     expect(story).toContain('cc-ed-research-story__columns');
     expect(story).toContain('cc-ed-research-story__cta-group');
     expect(story).toContain('useScroll');
     expect(story).toContain('useTransform');
-    expect(story).not.toContain('cc-ed-research-story__beat');
-    expect(story).not.toContain('cc-ed-research-story__frame');
+    expect(story).toContain('photo-1766297247924-6638d54e7c89');
+    expect(story).toContain('Learn more about the research');
     expect(story).not.toContain('cc-ed-research-story__pager');
     expect(story).not.toContain('Keep scrolling');
     expect(story).not.toContain('pin: true');
     expect(story).not.toContain('autoAlpha');
     expect(css).toContain('.cc-ed-research-redact__mask');
+    expect(css).toContain('.cc-ed-research-story__beat');
     expect(css).toContain('.cc-ed-research-story__grid');
     expect(css).toContain('.cc-ed-research-story__media');
     expect(css).not.toContain('.cc-ed-research-story__pin');
