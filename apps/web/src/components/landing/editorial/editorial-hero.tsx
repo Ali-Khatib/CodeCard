@@ -22,21 +22,23 @@ export function EditorialHero() {
       </div>
 
       <div className="cc-ed-hero__content" data-testid="hero-section">
-        <p className="cc-ed__eyebrow">CodeCard</p>
-        <h1
-          id="editorial-hero-heading"
-          className="cc-ed__display cc-ed__display--xl mt-4"
-          data-hero-statement
-        >
-          <span className="cc-ed__lead">YOUR WORK.</span>
-          <span className="sr-only">ONE IDENTITY.</span>
-          <EditorialHeroAnimatedHeadline />
-        </h1>
-        <p className="cc-ed__lede mt-6">
-          Projects, research, Circle, and connections, presented through one
-          living technical profile.
-        </p>
-        <div className="cc-ed__actions mt-8">
+        <div className="cc-ed-hero__copy">
+          <p className="cc-ed__eyebrow">CodeCard</p>
+          <h1
+            id="editorial-hero-heading"
+            className="cc-ed__display cc-ed__display--xl mt-4"
+            data-hero-statement
+          >
+            <span className="cc-ed__lead">YOUR WORK.</span>
+            <span className="sr-only">ONE IDENTITY.</span>
+            <EditorialHeroAnimatedHeadline />
+          </h1>
+          <p className="cc-ed__lede mt-6">
+            Projects, Research, and Connections, presented through one living
+            technical profile.
+          </p>
+        </div>
+        <div className="cc-ed__actions cc-ed-hero__actions-corner">
           <Link
             href="/sign-up"
             className="cc-ed__btn-primary cc-instant-press"

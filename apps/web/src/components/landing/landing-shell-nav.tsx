@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { LAYOUT } from '@/lib/design/tokens';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
+import { CodeCardMarkLogo } from './codecard-mark-logo';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
@@ -30,6 +31,7 @@ export function LandingShellNav() {
       style={{ top: LAYOUT.pillNavTop }}
       data-scrolled={scrolled ? 'true' : 'false'}
     >
+      <CodeCardMarkLogo />
       <LandingHeroNav items={MARKETING_NAV_ITEMS} />
     </div>
   );

@@ -143,7 +143,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
             })}
             <li className="mt-2 border-t border-charcoal pt-3">
               <LiveDemoLink
-                className="cc-btn-pill-demo mb-3 block w-full py-2.5 text-center"
+                className="cc-nav-pill-item mb-3 block w-full py-2.5 text-center"
                 onClick={() => setMobileOpen(false)}
               >
                 Live demo
@@ -152,7 +152,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
             <li className="flex gap-2">
               <Link
                 href="/sign-in"
-                className="cc-btn-pill-ghost flex-1 py-2 text-center"
+                className="cc-nav-pill-item flex-1 py-2 text-center"
                 onClick={(event) => event.stopPropagation()}
                 onMouseEnter={() => router.prefetch('/sign-in')}
                 onFocus={() => router.prefetch('/sign-in')}
@@ -161,7 +161,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
               </Link>
               <Link
                 href="/sign-up"
-                className="cc-btn-pill-primary flex-1 py-2 text-center"
+                className="cc-nav-pill-item flex-1 py-2 text-center"
                 onClick={(event) => event.stopPropagation()}
                 onMouseEnter={() => router.prefetch('/sign-up')}
                 onFocus={() => router.prefetch('/sign-up')}
@@ -174,17 +174,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         ) : null
       }
     >
-      <Link
-        href={MARKETING_HOME_HREF}
-        className="font-sans text-[17px] font-medium tracking-[-0.02em] text-ink cc-instant-press cc-nav-brand"
-        aria-label="CodeCard home"
-        onClick={(event) => event.stopPropagation()}
-        onMouseEnter={() => router.prefetch(MARKETING_HOME_HREF)}
-        onFocus={() => router.prefetch(MARKETING_HOME_HREF)}
-      >
-        CodeCard
-      </Link>
-
       <div ref={menuTrackRef} className="relative hidden md:flex cc-nav-desktop-links">
         <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
         <ul className="cc-hume-fade-group flex items-center gap-1">
@@ -206,7 +195,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                   }}
                   onFocus={() => prefetchHref(item.href, router)}
                   onMouseLeave={() => setHovered(null)}
-                  className={`cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
+                  className={`cc-nav-pill-item cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
                 >
                   {item.label}
                 </Link>
@@ -216,13 +205,13 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         </ul>
       </div>
 
-      <div className="ml-auto hidden items-center gap-3 md:flex cc-nav-desktop-actions">
-        <LiveDemoLink className="cc-btn-pill-demo cc-instant-press">
+      <div className="ml-auto hidden items-center gap-2 md:flex cc-nav-desktop-actions">
+        <LiveDemoLink className="cc-nav-pill-item cc-instant-press">
           Live demo
         </LiveDemoLink>
         <Link
           href="/sign-in"
-          className="cc-nav-ghost-link cc-instant-press"
+          className="cc-nav-pill-item cc-instant-press"
           onClick={(event) => event.stopPropagation()}
           onMouseEnter={() => router.prefetch('/sign-in')}
           onFocus={() => router.prefetch('/sign-in')}
@@ -231,7 +220,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         </Link>
         <Link
           href="/sign-up"
-          className="cc-btn-pill-primary cc-instant-press"
+          className="cc-nav-pill-item cc-instant-press"
           onClick={(event) => event.stopPropagation()}
           onMouseEnter={() => router.prefetch('/sign-up')}
           onFocus={() => router.prefetch('/sign-up')}

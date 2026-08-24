@@ -32,6 +32,10 @@ const CINEMA_SCRUB = 0.2;
  * ~0.04 × 520vh ≈ 0.21vh — one small scroll finishes the expansion.
  */
 const CINEMA_EXPAND_END = 0.04;
+/**
+ * Tiny scroll bridge after full-bleed before statement chrome appears.
+ */
+const CINEMA_STATEMENT_START = 0.062;
 
 /**
  * Only true after a successful intro (or intentional skip).
@@ -175,7 +179,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       );
       const viewportH = () => window.innerHeight;
       const beatCount = Math.max(beatEls.length, 1);
-      const beatSpan = (0.92 - CINEMA_EXPAND_END) / beatCount;
+      const beatSpan = (0.92 - CINEMA_STATEMENT_START) / beatCount;
 
       const setPager = (index: number) => {
         if (pagerRef.current) {
@@ -261,15 +265,15 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               const p = self.progress;
-              if (p < CINEMA_EXPAND_END * 0.92) {
+              if (p < CINEMA_STATEMENT_START) {
                 setPager(-1);
                 setStatementProgress(0);
                 return;
               }
-              const statementSpan = 0.92 - CINEMA_EXPAND_END;
+              const statementSpan = 0.92 - CINEMA_STATEMENT_START;
               const local = Math.min(
                 1,
-                Math.max(0, (p - CINEMA_EXPAND_END) / statementSpan),
+                Math.max(0, (p - CINEMA_STATEMENT_START) / statementSpan),
               );
               const scaled = local * beatCount;
               const beatIndex = Math.min(beatCount - 1, Math.floor(scaled));
@@ -310,12 +314,15 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         scrollTl.to(
           statement,
-          { autoAlpha: 1, duration: Math.min(0.04, CINEMA_EXPAND_END * 0.35) },
-          CINEMA_EXPAND_END * 0.85,
+          {
+            autoAlpha: 1,
+            duration: Math.min(0.035, (CINEMA_STATEMENT_START - CINEMA_EXPAND_END) * 0.85),
+          },
+          CINEMA_STATEMENT_START * 0.92,
         );
 
         beatEls.forEach((beat, beatIndex) => {
-          const beatStart = CINEMA_EXPAND_END + beatIndex * beatSpan;
+          const beatStart = CINEMA_STATEMENT_START + beatIndex * beatSpan;
           const words = Array.from(
             beat.querySelectorAll<HTMLElement>('[data-statement-word]'),
           );

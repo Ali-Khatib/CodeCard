@@ -92,6 +92,184 @@
 }
 
 /* Floating frosted pill over the hero — never a full-width cream strip. */
+.cc-marketing-nav-shell {
+  position: relative;
+}
+
+.cc-ed-mark-logo {
+  position: absolute;
+  left: clamp(0.85rem, 2.8vw, 1.75rem);
+  top: calc(0.55rem + env(safe-area-inset-top, 0px));
+  z-index: 101;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--ed-ink, #232324);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    color 0.45s ease,
+    filter 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo:focus-visible {
+  outline: 2px solid var(--ed-accent, #e95a0b);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.cc-ed-mark-logo__glyph {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  transition: gap 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__svg {
+  width: 2.35rem;
+  height: auto;
+  overflow: visible;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__c--left {
+  transform-origin: 18px 18px;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__c--right {
+  transform-origin: 34px 18px;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__word {
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  transition:
+    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.32s ease,
+    margin 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__tail--left,
+.cc-ed-mark-logo__tail--right {
+  display: inline-block;
+  transform: translateX(0);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo:hover,
+.cc-ed-mark-logo:focus-visible {
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ed-accent, #e95a0b) 55%, transparent));
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--left,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--left {
+  transform: translateX(-3px);
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--right,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--right {
+  transform: translateX(3px);
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__word,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__word {
+  max-width: 5.5rem;
+  opacity: 1;
+  margin-left: 0.15rem;
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__tail--left,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__tail--left {
+  transform: translateX(-2px);
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__tail--right,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__tail--right {
+  transform: translateX(2px);
+}
+
+html[data-nav-tone='dark'] .cc-ed-mark-logo {
+  color: #efedeb;
+}
+
+@keyframes cc-nav-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Unified nav pill items — same base; glow only on hover */
+.cc-marketing-shell:has(.cc-ed) .cc-nav-pill-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 560;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  box-shadow: none;
+  transition:
+    color 0.35s ease,
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.25s ease;
+}
+
+.cc-marketing-shell:has(.cc-ed) .cc-nav-pill-item:hover,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-pill-item:focus-visible {
+  border-color: color-mix(in srgb, var(--ed-accent, #e95a0b) 42%, currentColor);
+  background: color-mix(in srgb, var(--ed-accent, #e95a0b) 10%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--ed-accent, #e95a0b) 22%, transparent),
+    0 0 22px color-mix(in srgb, var(--ed-accent, #e95a0b) 38%, transparent),
+    0 0 44px color-mix(in srgb, var(--ed-accent, #e95a0b) 16%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-ed-mark-logo__glyph,
+  .cc-ed-mark-logo__svg,
+  .cc-ed-mark-logo__c--left,
+  .cc-ed-mark-logo__c--right,
+  .cc-ed-mark-logo__word,
+  .cc-ed-mark-logo__tail--left,
+  .cc-ed-mark-logo__tail--right {
+    transition: none;
+  }
+
+  html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
+  html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
+  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before {
+    animation: none;
+  }
+}
+
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
   display: flex;
   justify-content: center;
@@ -153,16 +331,40 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 1 !important;
 }
 
-/* Light chapters — opaque cream pill + ink type (readable over any backdrop bleed) */
+/* Light chapters — animated gradient pill + ink type */
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #ffffff 94%, #fcf1e7);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: color-mix(in srgb, #ffffff 88%, #fcf1e7);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 12%, transparent);
   box-shadow:
     0 12px 32px rgba(35, 35, 36, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    #ffffff 0%,
+    #fcf1e7 22%,
+    #ffe9cf 44%,
+    #fff6ee 66%,
+    #f5ebe0 82%,
+    #ffffff 100%
+  );
+  background-size: 280% 280%;
+  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
+  opacity: 0.92;
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -178,23 +380,23 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href=
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
-  background: var(--ed-dark, #202020);
-  color: #efedeb;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--ed-ink, #232324);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
-  background: color-mix(in srgb, #ffffff 40%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
-  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   box-shadow: none;
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
-  background: color-mix(in srgb, var(--ed-ink, #232324) 5%, #ffffff);
-  border-color: color-mix(in srgb, var(--ed-ink, #232324) 26%, transparent);
+  background: color-mix(in srgb, var(--ed-accent, #e95a0b) 10%, transparent);
+  border-color: color-mix(in srgb, var(--ed-accent, #e95a0b) 42%, transparent);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
@@ -210,16 +412,39 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile
   background: color-mix(in srgb, #ffffff 92%, #fcf1e7);
 }
 
-/* Dark chapters (finale) — opaque charcoal pill + light type */
+/* Dark chapters (finale) — animated charcoal pill + light type */
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #141416 88%, transparent);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: color-mix(in srgb, #141416 82%, transparent);
   border: 1px solid color-mix(in srgb, #efedeb 22%, transparent);
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 color-mix(in srgb, #efedeb 14%, transparent);
   backdrop-filter: blur(20px) saturate(1.15);
   -webkit-backdrop-filter: blur(20px) saturate(1.15);
+}
+
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    #141416 0%,
+    #1c1a18 24%,
+    #2a2018 48%,
+    #181818 72%,
+    #101012 100%
+  );
+  background-size: 280% 280%;
+  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
+  opacity: 0.94;
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -235,24 +460,24 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
-  background: #efedeb;
-  color: var(--ed-dark, #202020);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: #efedeb;
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a.cc-btn-pill-demo,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
-  background: color-mix(in srgb, #efedeb 8%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
   color: #efedeb;
-  border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
+  border: 1px solid color-mix(in srgb, #efedeb 22%, transparent);
   box-shadow: none;
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
-  background: color-mix(in srgb, #efedeb 16%, transparent);
-  border-color: color-mix(in srgb, #efedeb 34%, transparent);
+  background: color-mix(in srgb, var(--ed-accent, #e95a0b) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ed-accent, #e95a0b) 45%, transparent);
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
@@ -268,16 +493,40 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
   background: color-mix(in srgb, #101010 88%, transparent);
 }
 
-/* Fallback when tone attr missing — treat as light ink nav */
+/* Fallback when tone attr missing — animated light pill */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #ffffff 94%, #fcf1e7);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: color-mix(in srgb, #ffffff 88%, #fcf1e7);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 12%, transparent);
   box-shadow:
     0 12px 32px rgba(35, 35, 36, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before,
+.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    #ffffff 0%,
+    #fcf1e7 22%,
+    #ffe9cf 44%,
+    #fff6ee 66%,
+    #f5ebe0 82%,
+    #ffffff 100%
+  );
+  background-size: 280% 280%;
+  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
+  opacity: 0.92;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -287,16 +536,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
-  background: var(--ed-dark, #202020);
-  color: #efedeb;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--ed-ink, #232324);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
-  background: color-mix(in srgb, #ffffff 40%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
-  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   box-shadow: none;
 }
 
@@ -999,16 +1248,38 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 .cc-ed-hero__content {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: min(100% - 2.5rem, 62rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto;
+  align-content: stretch;
+  width: min(100% - 2.5rem, 72rem);
   min-height: 100%;
   margin: 0;
   box-sizing: border-box;
   padding: calc(var(--cc-ed-nav-clearance) + 0.35rem) clamp(1.35rem, 5vw, 4.5rem)
     clamp(2.75rem, 6vh, 4rem);
   text-align: left;
+  gap: clamp(1rem, 3vh, 2rem);
+}
+
+.cc-ed-hero__copy {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  max-width: 46rem;
+}
+
+.cc-ed-hero__actions-corner {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+  min-width: min(100%, 15.5rem);
+  margin: 0;
 }
 
 .cc-ed-hero__content .cc-ed__actions {
@@ -1033,9 +1304,9 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   text-align: left;
   width: 100%;
   max-width: none;
-  font-size: clamp(3.1rem, 7vw + 0.75rem, 7.25rem);
-  line-height: 0.94;
-  letter-spacing: -0.035em;
+  font-size: clamp(3.65rem, 9vw + 0.35rem, 8.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.038em;
 }
 
 .cc-ed-hero__content .cc-ed__lead,
@@ -1123,10 +1394,13 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 .cc-ed-hero .cc-ed__btn-primary {
   background: #efedeb;
   color: #0f0f10;
+  text-align: center;
+  justify-content: center;
 }
 
 .cc-ed-hero .cc-ed__btn-primary:hover {
   opacity: 0.92;
+  box-shadow: 0 0 28px color-mix(in srgb, #efedeb 35%, transparent);
 }
 
 .cc-ed-hero .cc-ed__btn-ghost {
@@ -1134,19 +1408,52 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   color: #efedeb;
   background: color-mix(in srgb, #0c0c0e 28%, transparent);
   backdrop-filter: blur(10px);
+  text-align: center;
+  justify-content: center;
+}
+
+.cc-ed-hero .cc-ed__btn-ghost:hover {
+  border-color: color-mix(in srgb, #efedeb 45%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--ed-accent, #e95a0b) 28%, transparent);
 }
 
 @media (min-width: 960px) {
   .cc-ed-hero__content {
-    width: min(100% - 4rem, 68rem);
+    width: min(100% - 4rem, 76rem);
     padding-left: clamp(2.75rem, 8vw, 6.5rem);
+    padding-right: clamp(2rem, 5vw, 4rem);
+  }
+
+  .cc-ed-hero__actions-corner {
+    min-width: 17.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero__content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .cc-ed-hero__actions-corner {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .cc-ed-hero__actions-corner .cc-ed__btn-primary,
+  .cc-ed-hero__actions-corner .cc-ed__btn-ghost {
+    flex: 1 1 11rem;
   }
 }
 
 @media (max-width: 640px) {
   .cc-ed-hero__content .cc-ed__display,
   .cc-ed-hero__content .cc-ed__display--xl {
-    font-size: clamp(3.1rem, 14vw, 4.5rem);
+    font-size: clamp(3.25rem, 15vw, 4.85rem);
   }
 }
 
