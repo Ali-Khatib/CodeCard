@@ -15,12 +15,15 @@ type EditorialHeroSceneProps = {
   hero: ReactNode;
 };
 
-const INTRO_DURATION = 1.2;
-const INTRO_EASE = 'power3.out';
+/** Page-load entrance only — not scroll-driven. */
+const INTRO_DURATION = 1.25;
+/** Matches cubic-bezier(0.16, 1, 0.3, 1) closely (premium ease-out). */
+const INTRO_EASE = 'expo.out';
+
 /** More viewport scroll = slower progress through beats. */
 const CINEMA_SCROLL_END = { desktop: '+=520%', mobile: '+=460%' } as const;
 const CINEMA_SCRUB = 0.55;
-/** Real share of the runway for cream-frame → full-bleed expand (was 0.08 — invisible). */
+/** Share of the runway for cream-frame → full-bleed (scroll only, after intro). */
 const CINEMA_EXPAND_END = 0.24;
 
 /**
@@ -56,15 +59,24 @@ const STATEMENT_BEATS = [
 ] as const;
 
 function stageRadius(mobile: boolean) {
-  return mobile ? 22 : 32;
+  return mobile ? 22 : 28;
 }
 
-/** Settled-but-not-full-bleed: still reads as an inset card on cream. */
+/** Fully shut — cream page only. Used as intro FROM state. */
+function introClipShut(mobile: boolean) {
+  const r = stageRadius(mobile);
+  return `inset(50% 50% 50% 50% round ${r}px)`;
+}
+
+/**
+ * Settled IB frame after load: thin cream from root padding + tiny clip for radius.
+ * Scroll cinema later opens this to full-bleed.
+ */
 function scrollClipClosed(mobile: boolean) {
   const r = stageRadius(mobile);
   return mobile
-    ? `inset(3.5% 3.5% 3.5% 3.5% round ${r}px)`
-    : `inset(4.5% 4% 4.5% 4% round ${r}px)`;
+    ? `inset(0.35% 0.45% 0.35% 0.45% round ${r}px)`
+    : `inset(0.3% 0.4% 0.3% 0.4% round ${r}px)`;
 }
 
 function scrollClipOpen() {
@@ -72,10 +84,9 @@ function scrollClipOpen() {
 }
 
 /**
- * ONE continuous cinema:
- * 1) Load — visible inset dark hero expands once through cream matting
- * 2) Scroll — same frame grows full-bleed; hero copy exits; statement text
- *    loads word-by-word inside that frame (no second card, no cream gap)
+ * TWO SEPARATE systems (never mixed):
+ * 1) Page-load entrance — ONE clip-path tween on locked final geometry (no scroll).
+ * 2) After complete — scroll cinema (full-bleed + statement beats).
  */
 export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -102,8 +113,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const mobile = window.matchMedia('(max-width: 767px)').matches;
       const openClip = scrollClipOpen();
       const closedClip = scrollClipClosed(mobile);
+      const shutClip = introClipShut(mobile);
       const finalRadius = stageRadius(mobile);
       const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__content');
+      const heroMedia = stage.querySelector<HTMLElement>('.cc-ed-hero__media');
       const beatEls = Array.from(
         statement.querySelectorAll<HTMLElement>('[data-statement-beat]'),
       );
@@ -111,8 +124,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const beatCount = Math.max(beatEls.length, 1);
       const beatSpan = (0.92 - CINEMA_EXPAND_END) / beatCount;
       const pad = mobile
-        ? { top: 10, x: 12, bottom: 10 }
-        : { top: 14, x: 16, bottom: 14 };
+        ? { top: 8, x: 8, bottom: 8 }
+        : { top: 10, x: 10, bottom: 10 };
 
       const setPager = (index: number) => {
         if (pagerRef.current) {
@@ -127,33 +140,38 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         progressFillRef.current.style.transform = `scaleX(${t})`;
       };
 
-      /** After load expand: full width of cream frame, still inset via clip + root pad. */
-      const snapSettledGeometry = () => {
+      /**
+       * Lock final IB geometry once. Intro only animates clip-path on top of this.
+       * No width/height/margin thrashing during the entrance.
+       */
+      const lockFinalGeometry = (clip: string) => {
+        const frameH = Math.max(0, viewportH() - pad.top - pad.bottom);
         gsap.set(root, {
           paddingTop: pad.top,
           paddingLeft: pad.x,
           paddingRight: pad.x,
           paddingBottom: pad.bottom,
         });
+        // Clear any leftover intro layout props from older builds / HMR.
         gsap.set(stage, {
           clearProps:
-            'width,height,minHeight,marginTop,marginLeft,marginRight,borderRadius',
+            'width,height,minHeight,marginTop,marginLeft,marginRight,transform,scale',
         });
         stage.style.width = '100%';
-        stage.style.height = `${viewportH()}px`;
-        stage.style.minHeight = `${viewportH()}px`;
+        stage.style.height = `${frameH}px`;
+        stage.style.minHeight = `${frameH}px`;
         stage.style.marginTop = '0';
         stage.style.marginLeft = '0';
         stage.style.marginRight = '0';
         stage.style.borderRadius = `${finalRadius}px`;
-        stage.style.clipPath = closedClip;
-        root.dataset.heroIntro = 'settled';
+        stage.style.clipPath = clip;
       };
 
       let scrollTl: gsap.core.Timeline | null = null;
 
       const buildScrollCinema = () => {
-        snapSettledGeometry();
+        lockFinalGeometry(closedClip);
+        root.dataset.heroIntro = 'settled';
         document.body.style.overflow = '';
 
         gsap.set(statement, { autoAlpha: 0 });
@@ -162,9 +180,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         }
         beatEls.forEach((beat, i) => {
           gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0 });
-          beat.querySelectorAll<HTMLElement>('[data-statement-word]').forEach((w) => {
-            gsap.set(w, { opacity: 0.72 });
-          });
+          beat
+            .querySelectorAll<HTMLElement>('[data-statement-word]')
+            .forEach((w) => {
+              gsap.set(w, { opacity: 0.72 });
+            });
           const lede = beat.querySelector<HTMLElement>('[data-statement-lede]');
           if (lede) gsap.set(lede, { autoAlpha: 0, y: 14 });
         });
@@ -204,7 +224,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           },
         });
 
-        // Cream frame → full-bleed (padding + clip + radius). Long enough to feel.
+        const settledH = () => Math.max(0, viewportH() - pad.top - pad.bottom);
         scrollTl.fromTo(
           root,
           {
@@ -224,10 +244,30 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         );
         scrollTl.fromTo(
           stage,
-          { clipPath: closedClip, borderRadius: finalRadius },
-          { clipPath: openClip, borderRadius: 0, duration: CINEMA_EXPAND_END },
+          {
+            clipPath: closedClip,
+            borderRadius: finalRadius,
+            height: settledH,
+            minHeight: settledH,
+          },
+          {
+            clipPath: openClip,
+            borderRadius: 0,
+            height: viewportH,
+            minHeight: viewportH,
+            duration: CINEMA_EXPAND_END,
+          },
           0,
         );
+
+        if (heroMedia) {
+          scrollTl.fromTo(
+            heroMedia,
+            { scale: 1 },
+            { scale: 1.06, duration: CINEMA_EXPAND_END, ease: 'none' },
+            0,
+          );
+        }
 
         if (heroCopy) {
           scrollTl.to(
@@ -241,7 +281,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        // Statement only after expand is essentially done.
         scrollTl.to(
           statement,
           { autoAlpha: 1, duration: CINEMA_EXPAND_END * 0.12 },
@@ -294,13 +333,16 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           }
         });
 
+        // Refresh only after cinema exists — never during the entrance tween.
         refreshScrollTrigger({ safe: true });
       };
 
-      const skipIntro = !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
+      const skipIntro =
+        !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
       if (skipIntro) {
         heroIntroPlayed = true;
-        snapSettledGeometry();
+        lockFinalGeometry(closedClip);
+        root.dataset.heroIntro = 'settled';
         buildScrollCinema();
         return () => {
           scrollTl?.scrollTrigger?.kill();
@@ -316,96 +358,57 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (introFinished) return;
         introFinished = true;
         heroIntroPlayed = true;
+        root.dataset.heroIntro = 'settled';
+        document.body.style.overflow = '';
         buildScrollCinema();
       };
 
-      const raf = window.requestAnimationFrame(() => {
-        if (cancelled) return;
+      // Hold scroll during entrance so wheel cannot fight the tween.
+      document.body.style.overflow = 'hidden';
 
-        if (heroIntroPlayed) {
-          snapSettledGeometry();
-          buildScrollCinema();
-          return;
-        }
+      // Final layout first — cream shows because clip is shut.
+      lockFinalGeometry(shutClip);
+      root.dataset.heroIntro = 'running';
 
-        root.dataset.heroIntro = 'running';
+      if (heroCopy) {
+        gsap.set(heroCopy, { autoAlpha: 0, y: 18 });
+      }
 
-        // Explicit from → to so CSS pending size is the start, not a snap.
-        const fromW = mobile ? '90%' : '88%';
-        const fromH = mobile
-          ? () => Math.min(window.innerHeight * 0.54, window.innerHeight * 0.58)
-          : () => Math.min(window.innerHeight * 0.58, window.innerHeight * 0.62);
-        const fromRadius = mobile ? 24 : 28;
-        const fromMarginTop = mobile
-          ? () => Math.min(window.innerHeight * 0.04, 40)
-          : () => Math.min(window.innerHeight * 0.06, 72);
-
-        gsap.set(stage, {
-          width: fromW,
-          height: fromH,
-          minHeight: fromH,
-          marginTop: fromMarginTop,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          borderRadius: fromRadius,
-          clipPath: openClip,
-        });
-
-        intro = gsap.timeline({
-          onComplete: markIntroDoneAndBuild,
-        });
-
-        intro.to(
-          stage,
-          {
-            width: '100%',
-            height: viewportH,
-            minHeight: viewportH,
-            marginTop: 0,
-            marginLeft: 0,
-            marginRight: 0,
-            borderRadius: finalRadius,
-            duration: INTRO_DURATION,
-            ease: INTRO_EASE,
-          },
-          0,
-        );
-
-        // Land in the settled inset clip so scroll expand has somewhere to go.
-        intro.to(
-          stage,
-          {
-            clipPath: closedClip,
-            duration: INTRO_DURATION * 0.35,
-            ease: INTRO_EASE,
-          },
-          INTRO_DURATION * 0.65,
-        );
-
-        if (heroCopy) {
-          intro.fromTo(
-            heroCopy,
-            { y: 10, autoAlpha: 0.92 },
-            { y: 0, autoAlpha: 1, duration: 0.55, ease: INTRO_EASE },
-            0.35,
-          );
-        }
+      // ONE continuous tween: shut cream → settled IB hero. No width/height.
+      intro = gsap.timeline({
+        defaults: { ease: INTRO_EASE },
+        onComplete: markIntroDoneAndBuild,
       });
 
-      const finishIntro = () => {
-        if (intro && intro.progress() < 1) intro.progress(1);
-      };
+      intro.fromTo(
+        stage,
+        { clipPath: shutClip },
+        {
+          clipPath: closedClip,
+          duration: INTRO_DURATION,
+          ease: INTRO_EASE,
+          // Deterministic — do not re-read live layout mid-flight.
+          immediateRender: true,
+        },
+        0,
+      );
 
-      window.addEventListener('wheel', finishIntro, { passive: true });
-      window.addEventListener('touchmove', finishIntro, { passive: true });
-      window.addEventListener('keydown', finishIntro);
+      if (heroCopy) {
+        // Soft content settle on the SAME timeline (opacity/y only — no layout).
+        intro.to(
+          heroCopy,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: INTRO_DURATION * 0.55,
+            ease: INTRO_EASE,
+          },
+          INTRO_DURATION * 0.28,
+        );
+      }
 
       return () => {
         cancelled = true;
-        window.cancelAnimationFrame(raf);
-        window.removeEventListener('wheel', finishIntro);
-        window.removeEventListener('touchmove', finishIntro);
-        window.removeEventListener('keydown', finishIntro);
         document.body.style.overflow = '';
         // Interrupted before complete (Strict Mode) — allow remount to replay.
         if (!introFinished) {
@@ -415,6 +418,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         }
         scrollTl?.scrollTrigger?.kill();
         scrollTl?.kill();
+        void cancelled;
       };
     },
     {
@@ -441,7 +445,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             <div className="cc-ed-hero-scene__hero-inner">{hero}</div>
           </div>
 
-          {/* Same frame — statement loads in as you scroll; not a second card */}
           <div
             ref={statementRef}
             className="cc-ed-hero-scene__statement"

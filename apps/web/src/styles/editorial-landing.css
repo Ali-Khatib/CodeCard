@@ -2113,14 +2113,20 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced) {
-  padding: clamp(0.65rem, 1.6vw, 1rem) clamp(0.75rem, 2vw, 1.15rem)
-    clamp(0.75rem, 1.8vw, 1rem);
+  /* IB-tight cream frame — barely any surround */
+  padding: 10px;
 }
 
-/* Cream matting is intentional — hero load expands through this space. */
+/* Cream matting is intentional — thin IB-style frame (~8–12px). */
 .cc-ed-hero-scene--enhanced {
-  padding: clamp(0.65rem, 1.6vw, 1rem) clamp(0.75rem, 2vw, 1.15rem)
-    clamp(0.75rem, 1.8vw, 1rem);
+  padding: 10px;
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced),
+  .cc-ed-hero-scene--enhanced {
+    padding: 8px;
+  }
 }
 
 /* While statement cinema is active, keep the shell dark — no cream flash at edges */
@@ -2157,27 +2163,33 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   background: #101012;
 }
 
-/* Load open: smaller VISIBLE dark hero centered in cream — expands once. */
+/* Pending / running: final IB geometry already locked — reveal is clip-path only.
+   First paint = cream (clip shut). JS owns the one continuous open tween. */
 .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
 .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
-  width: 88%;
-  height: clamp(50svh, 58svh, 62svh);
-  min-height: clamp(50svh, 58svh, 62svh);
-  margin-inline: auto;
-  margin-top: clamp(1.5rem, 6vh, 4.5rem);
+  width: 100%;
+  height: calc(100svh - 20px);
+  height: calc(100dvh - 20px);
+  min-height: calc(100svh - 20px);
+  min-height: calc(100dvh - 20px);
+  margin-inline: 0;
+  margin-top: 0;
   border-radius: 28px;
   background: #101012;
-  will-change: width, height, margin, border-radius;
+  /* Shut until GSAP opens — cream page shows through */
+  clip-path: inset(50% 50% 50% 50% round 28px);
+  will-change: clip-path;
 }
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
-    width: 90%;
-    height: clamp(48svh, 54svh, 58svh);
-    min-height: clamp(48svh, 54svh, 58svh);
-    margin-top: clamp(1rem, 4vh, 2.5rem);
-    border-radius: 24px;
+    height: calc(100svh - 16px);
+    height: calc(100dvh - 16px);
+    min-height: calc(100svh - 16px);
+    min-height: calc(100dvh - 16px);
+    border-radius: 22px;
+    clip-path: inset(50% 50% 50% 50% round 22px);
   }
 }
 
@@ -2185,10 +2197,20 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   width: 100%;
   margin-top: 0;
   margin-inline: 0;
-  height: 100svh;
-  height: 100dvh;
-  min-height: 100svh;
-  min-height: 100dvh;
+  height: calc(100svh - 20px);
+  height: calc(100dvh - 20px);
+  min-height: calc(100svh - 20px);
+  min-height: calc(100dvh - 20px);
+  will-change: auto;
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero-scene--enhanced[data-hero-intro='settled'] .cc-ed-hero-scene__stage {
+    height: calc(100svh - 16px);
+    height: calc(100dvh - 16px);
+    min-height: calc(100svh - 16px);
+    min-height: calc(100dvh - 16px);
+  }
 }
 
 .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__hero .cc-ed-hero__media {
