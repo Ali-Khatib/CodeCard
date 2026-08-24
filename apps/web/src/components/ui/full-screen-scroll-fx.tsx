@@ -81,8 +81,12 @@ export type FullScreenFXProps = {
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
 
-/** Sub-second scrub — scroll-linked, but snappy enough that the pager never lags a beat. */
-const SCRUB_SMOOTH = 0.55;
+/** Direct scroll link — no scrub lag chasing the wheel. */
+const SCRUB_SMOOTH = true;
+
+/** Story handoff: outgoing fully out before incoming fades in (no ghost stack). */
+const STORY_OUT_END = 0.42;
+const STORY_IN_START = 0.58;
 
 /** Smoothstep for crossfades tied directly to scroll progress. */
 function smoothCrossfade(t: number) {
@@ -283,14 +287,31 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       const idx = from === to ? from : rawBlend >= 0.5 ? to : from;
 
       if (progressFillRef.current) {
-        progressFillRef.current.style.width = `${(idx / max) * 100}%`;
+        progressFillRef.current.style.width = `${(pos / max) * 100}%`;
       }
 
       bgRefs.current.forEach((bg, i) => {
         if (!bg) return;
         let opacity = 0;
+        const fromIsStory = sections[from]?.content != null;
+        const toIsStory = sections[to]?.content != null;
+        const sequentialBg =
+          from !== to && fromIsStory && toIsStory;
+
         if (from === to) {
           opacity = i === from ? 1 : 0;
+        } else if (sequentialBg) {
+          if (i === from) {
+            if (rawBlend <= STORY_OUT_END) {
+              opacity = 1 - smoothCrossfade(rawBlend / STORY_OUT_END);
+            }
+          } else if (i === to) {
+            if (rawBlend >= STORY_IN_START) {
+              opacity = smoothCrossfade(
+                (rawBlend - STORY_IN_START) / (1 - STORY_IN_START),
+              );
+            }
+          }
         } else if (i === from) {
           opacity = 1 - blend;
         } else if (i === to) {
@@ -299,69 +320,55 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.set(bg, { opacity, scale: 1, yPercent: 0 });
       });
 
-      // Story copy: sequential fade (out → in) so text animates but never stacks.
-      const STORY_HANDOFF = 0.5;
+      // Story copy: sequential opacity fade — one surface paints at a time.
       let maxPanelOpacity = 0;
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
         const isStory = sections[i]?.content != null;
         let opacity = 0;
-        let y = 0;
-        let show = i === idx;
-        let visible = show;
+        let visible = false;
 
         if (from === to) {
           opacity = i === from ? 1 : 0;
-          y = 0;
+          visible = i === from;
         } else if (isStory) {
           if (i === from) {
-            if (rawBlend <= STORY_HANDOFF) {
-              const t = rawBlend / STORY_HANDOFF;
-              const eased = smoothCrossfade(t);
-              opacity = 1 - eased;
-              y = -eased * 18;
-            } else {
-              opacity = 0;
-              y = -18;
+            if (rawBlend <= STORY_OUT_END) {
+              const t = rawBlend / STORY_OUT_END;
+              opacity = 1 - smoothCrossfade(t);
             }
           } else if (i === to) {
-            if (rawBlend >= STORY_HANDOFF) {
-              const t = (rawBlend - STORY_HANDOFF) / (1 - STORY_HANDOFF);
-              const eased = smoothCrossfade(t);
-              opacity = eased;
-              y = (1 - eased) * 20;
-            } else {
-              opacity = 0;
-              y = 20;
+            if (rawBlend >= STORY_IN_START) {
+              const t = (rawBlend - STORY_IN_START) / (1 - STORY_IN_START);
+              opacity = smoothCrossfade(t);
             }
           }
-          visible = opacity > 0.01;
-          show = visible;
+          visible = opacity > 0.06;
         } else if (i === from) {
           opacity = 1 - blend;
-          y = -blend * 10;
-          visible = opacity > 0.01;
-          show = visible || i === idx;
+          visible = opacity > 0.06;
         } else if (i === to) {
           opacity = blend;
-          y = (1 - blend) * 12;
-          visible = opacity > 0.01;
-          show = visible || i === idx;
+          visible = opacity > 0.06;
         }
 
         maxPanelOpacity = Math.max(maxPanelOpacity, opacity);
-        panel.classList.toggle('active', show);
+        panel.classList.toggle('active', visible);
         panel.style.pointerEvents = opacity > 0.5 ? 'auto' : 'none';
         gsap.set(panel, {
           opacity,
           visibility: visible ? 'visible' : 'hidden',
-          y,
-          zIndex: visible ? 2 : 1,
+          y: 0,
+          zIndex: visible ? 2 : 0,
         });
       });
 
-      // Safety: never leave the stage empty (blank charcoal + progress only).
-      if (maxPanelOpacity < 0.05 && featuredRefs.current[idx]) {
+      // Safety: only when mid-handoff gap would leave a blank frame on title slides.
+      if (
+        maxPanelOpacity < 0.04 &&
+        featuredRefs.current[idx] &&
+        sections[idx]?.content == null
+      ) {
         const panel = featuredRefs.current[idx]!;
         panel.classList.add('active');
         gsap.set(panel, {
@@ -392,7 +399,6 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
 
       if (idx !== lastIndexRef.current) {
         lastIndexRef.current = idx;
-        if (!isControlled) setLocalIndex(idx);
         onIndexChange?.(idx);
         if (currentNumberRef.current) {
           currentNumberRef.current.textContent = String(idx + 1).padStart(2, '0');
@@ -430,6 +436,7 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       const clamped = clamp(to, 0, total - 1);
       isSnappingRef.current = true;
       applyScrollProgress(progressFromIndex(clamped, total));
+      if (!isControlled) setLocalIndex(clamped);
 
       const pos = sectionTopRef.current[clamped];
       const snapMs = durations.snap ?? 800;
@@ -527,6 +534,11 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         onUpdate: (self) => {
           if (isSnappingRef.current) return;
           applyScrollProgressRef.current(clamp(self.progress, 0, 1));
+        },
+        onScrubComplete: () => {
+          if (!isControlled) {
+            setLocalIndex(lastIndexRef.current);
+          }
         },
       });
       stRef.current = st;

@@ -34,16 +34,18 @@ const CINEMA_SCRUB = 0.2;
 const CINEMA_EXPAND_END = 0.04;
 /** Full-bleed hold — hero + CTAs stay visible while you scroll down. */
 const CINEMA_CHROME_START = 0.11;
-/** Progress line + tag dock under hero; beats start after hero clears. */
-const CINEMA_STATEMENT_START = 0.19;
+/** Loading rail fully docked under hero; beat copy has not started yet. */
+const CINEMA_CHROME_END = 0.18;
+/** Hero clears; beats rise in below the progress line. */
+const CINEMA_STATEMENT_START = 0.26;
 
 /** Per-beat scroll shares: rise ↑, fill words, exit ↑, gap (empty). */
 const BEAT_ENTER_SHARE = 0.1;
 const BEAT_FILL_SHARE = 0.54;
 const BEAT_EXIT_SHARE = 0.13;
-/** Enter from below viewport; exit upward like IB. */
-const BEAT_ENTER_Y = 32;
-const BEAT_EXIT_Y = -34;
+/** Enter from below the progress rail; exit upward like IB. */
+const BEAT_ENTER_Y = 52;
+const BEAT_EXIT_Y = -38;
 
 /**
  * Only true after a successful intro (or intentional skip).
@@ -251,7 +253,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         gsap.set(statement, { autoAlpha: 1 });
         if (statementChrome) {
-          gsap.set(statementChrome, { autoAlpha: 0, y: 28 });
+          gsap.set(statementChrome, { autoAlpha: 0, y: 36 });
         }
         if (statementStage) {
           gsap.set(statementStage, { autoAlpha: 0 });
@@ -344,11 +346,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (statementChrome) {
           scrollTl.fromTo(
             statementChrome,
-            { autoAlpha: 0, y: 28 },
+            { autoAlpha: 0, y: 36 },
             {
               autoAlpha: 1,
               y: 0,
-              duration: CINEMA_STATEMENT_START - CINEMA_CHROME_START,
+              duration: CINEMA_CHROME_END - CINEMA_CHROME_START,
               ease: 'none',
             },
             CINEMA_CHROME_START,
@@ -437,6 +439,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         lockFinalGeometry(closedClip);
         root.dataset.heroIntro = 'settled';
         document.body.style.overflow = '';
+        document.documentElement.dataset.logoTone = 'light';
         if (scrollTl?.scrollTrigger) {
           scrollTl.scrollTrigger.enable();
           scrollTl.progress(0);
@@ -457,6 +460,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
       if (skipIntro) {
         heroIntroPlayed = true;
+        document.documentElement.dataset.logoTone = 'light';
         buildScrollCinema();
         return () => {
           scrollTl?.scrollTrigger?.kill();
@@ -476,6 +480,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       };
 
       document.body.style.overflow = 'hidden';
+      document.documentElement.dataset.logoTone = 'dark';
       // Pin runway exists before Crash Course mounts its ScrollTrigger.
       buildScrollCinema({ holdForIntro: true });
 

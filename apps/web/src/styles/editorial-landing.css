@@ -115,14 +115,14 @@
   padding: 0.35rem 0.1rem;
   border: 0;
   background: transparent;
-  color: #efedeb;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
+  color: var(--ed-ink, #232324);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
   cursor: pointer;
   pointer-events: auto;
   transition:
     color 0.45s ease,
     filter 0.35s ease,
-    text-shadow 0.35s ease;
+    text-shadow 0.45s ease;
 }
 
 .cc-ed-mark-logo:focus-visible {
@@ -208,19 +208,9 @@
   margin-left: 0.04em;
 }
 
-html[data-nav-tone='dark'] .cc-ed-mark-logo {
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
   color: #efedeb;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
-}
-
-html[data-landing-chapter='research'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo,
-html[data-landing-chapter='audience'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo,
-html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo,
-html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo,
-html[data-landing-chapter='network'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo,
-html[data-landing-chapter='analysis'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
-  color: var(--ed-ink, #232324);
-  text-shadow: none;
 }
 
 @keyframes cc-nav-gradient-shift {
@@ -371,19 +361,24 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   opacity: 1 !important;
 }
 
-/* Light chapters — animated gradient pill + ink type */
+/* Light chapters — frosted glass pill + ink type */
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: color-mix(in srgb, #ffffff 88%, #fcf1e7);
-  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 12%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ffffff 30%, transparent),
+      color-mix(in srgb, #fcf1e7 14%, transparent)
+    );
+  border: 1px solid color-mix(in srgb, #ffffff 48%, transparent);
   box-shadow:
-    0 12px 32px rgba(35, 35, 36, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    0 12px 32px rgba(35, 35, 36, 0.1),
+    inset 0 1px 0 color-mix(in srgb, #ffffff 38%, transparent);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
@@ -395,16 +390,16 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-sh
   border-radius: inherit;
   background: linear-gradient(
     120deg,
-    #ffffff 0%,
-    #fcf1e7 22%,
-    #ffe9cf 44%,
-    #fff6ee 66%,
-    #f5ebe0 82%,
-    #ffffff 100%
+    rgba(255, 255, 255, 0) 0%,
+    rgba(252, 241, 231, 0.28) 22%,
+    rgba(255, 233, 207, 0.22) 44%,
+    rgba(255, 246, 238, 0.16) 66%,
+    rgba(245, 235, 224, 0.12) 82%,
+    rgba(255, 255, 255, 0) 100%
   );
   background-size: 280% 280%;
   animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.92;
+  opacity: 0.55;
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -455,22 +450,32 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigg
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background: color-mix(in srgb, #ffffff 92%, #fcf1e7);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ffffff 46%, transparent),
+      color-mix(in srgb, #fcf1e7 22%, transparent)
+    );
 }
 
-/* Dark chapters (finale) — animated charcoal pill + light type */
+/* Dark chapters (finale) — frosted charcoal glass + light type */
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: color-mix(in srgb, #141416 82%, transparent);
-  border: 1px solid color-mix(in srgb, #efedeb 22%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #141416 36%, transparent),
+      color-mix(in srgb, #101012 20%, transparent)
+    );
+  border: 1px solid color-mix(in srgb, #efedeb 24%, transparent);
   box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 color-mix(in srgb, #efedeb 14%, transparent);
-  backdrop-filter: blur(20px) saturate(1.15);
-  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+    0 12px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 color-mix(in srgb, #efedeb 12%, transparent);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
@@ -482,15 +487,15 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   border-radius: inherit;
   background: linear-gradient(
     120deg,
-    #141416 0%,
-    #1c1a18 24%,
-    #2a2018 48%,
-    #181818 72%,
-    #101012 100%
+    rgba(20, 20, 22, 0) 0%,
+    rgba(28, 26, 24, 0.22) 24%,
+    rgba(42, 32, 24, 0.18) 48%,
+    rgba(24, 24, 24, 0.14) 72%,
+    rgba(16, 16, 18, 0) 100%
   );
   background-size: 280% 280%;
   animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.94;
+  opacity: 0.45;
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -532,22 +537,32 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigge
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background: color-mix(in srgb, #101010 88%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #141416 48%, transparent),
+      color-mix(in srgb, #101010 28%, transparent)
+    );
 }
 
-/* Fallback when tone attr missing — animated light pill */
+/* Fallback when tone attr missing — frosted light glass */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: color-mix(in srgb, #ffffff 88%, #fcf1e7);
-  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 12%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ffffff 30%, transparent),
+      color-mix(in srgb, #fcf1e7 14%, transparent)
+    );
+  border: 1px solid color-mix(in srgb, #ffffff 48%, transparent);
   box-shadow:
-    0 12px 32px rgba(35, 35, 36, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    0 12px 32px rgba(35, 35, 36, 0.1),
+    inset 0 1px 0 color-mix(in srgb, #ffffff 38%, transparent);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before,
@@ -559,16 +574,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
   border-radius: inherit;
   background: linear-gradient(
     120deg,
-    #ffffff 0%,
-    #fcf1e7 22%,
-    #ffe9cf 44%,
-    #fff6ee 66%,
-    #f5ebe0 82%,
-    #ffffff 100%
+    rgba(255, 255, 255, 0) 0%,
+    rgba(252, 241, 231, 0.28) 22%,
+    rgba(255, 233, 207, 0.22) 44%,
+    rgba(255, 246, 238, 0.16) 66%,
+    rgba(245, 235, 224, 0.12) 82%,
+    rgba(255, 255, 255, 0) 100%
   );
   background-size: 280% 280%;
   animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.92;
+  opacity: 0.55;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -597,13 +612,23 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
   border-color: color-mix(in srgb, var(--ed-ink, #232324) 26%, transparent);
 }
 
-/* Override marketing scrolled gradient on editorial — tone rules own the pill surface */
+/* Override marketing scrolled gradient on editorial — tone rules own the glass surface */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #ffffff 94%, #fcf1e7);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ffffff 36%, transparent),
+      color-mix(in srgb, #fcf1e7 18%, transparent)
+    );
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
-  background: color-mix(in srgb, #141416 88%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #141416 42%, transparent),
+      color-mix(in srgb, #101012 24%, transparent)
+    );
 }
 
 /* Compact Start Free / Live Demo pills in the marketing nav only */
@@ -621,7 +646,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background: color-mix(in srgb, #ffffff 92%, #fcf1e7);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ffffff 46%, transparent),
+      color-mix(in srgb, #fcf1e7 22%, transparent)
+    );
 }
 
 .cc-ed__section {
@@ -2601,7 +2631,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* Statement chrome docks at the bottom — IB-style, under hero + CTAs (not over headline). */
+/* Statement rail + beats — chrome first, copy reveals below the progress line. */
 .cc-ed-hero-scene__statement {
   position: absolute;
   inset: 0;
@@ -2618,7 +2648,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-hero-scene__statement-chrome {
-  order: 2;
   flex-shrink: 0;
   display: grid;
   gap: clamp(0.55rem, 1.4vh, 0.85rem);
@@ -2626,7 +2655,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   padding:
     0
     clamp(1.25rem, 4vw, 3.5rem)
-    clamp(1.35rem, 4vh, 2.85rem);
+    0;
   justify-items: start;
   will-change: transform, opacity;
 }
@@ -2705,22 +2734,20 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* Body block sits above the progress line — reveals on scroll after hero clears */
+/* Beat copy lives under the progress rail — scroll reveals upward from below. */
 .cc-ed-hero-scene__statement-stage {
-  order: 1;
   position: relative;
   width: min(100%, 48rem);
   max-width: calc(100% - clamp(2rem, 8vw, 6rem));
   margin:
-    0
+    clamp(0.85rem, 2.4vh, 1.35rem)
     clamp(1.25rem, 4vw, 3.5rem)
-    clamp(0.65rem, 1.8vh, 1.1rem)
+    clamp(1.35rem, 4vh, 2.85rem)
     clamp(1.25rem, 8vw, 12rem);
-  min-height: min(28vh, 18rem);
+  min-height: min(32vh, 20rem);
+  max-height: min(42vh, 26rem);
   overflow: hidden;
   flex-shrink: 0;
-  justify-self: start;
-  align-self: stretch;
 }
 
 .cc-ed-hero-scene__statement-slot {

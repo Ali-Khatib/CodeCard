@@ -346,7 +346,12 @@
   visibility: hidden;
   pointer-events: none;
   transform: translateZ(0);
+  backface-visibility: hidden;
   transition: none;
+}
+
+.fx-featured--story {
+  will-change: opacity;
 }
 
 /* Scroll-linked opacity/visibility are driven by GSAP during scrub — no CSS overrides. */

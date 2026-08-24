@@ -7,12 +7,24 @@ import { useMotionPreferences } from '@/components/motion/motion-preferences-pro
 
 /** Dark chapters — light type on frosted glass nav. Research keeps light nav (opaque pill). */
 const DARK_CHAPTERS = new Set(['finale']);
+/** Chapters where the fixed CC mark sits over a dark surface (light logo). */
+const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'finale']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control.
  *  Crash Course only — Research keeps the full pill. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;
 
 function navToneFor(chapter: string): 'dark' | 'light' {
   return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';
+}
+
+function logoToneFor(chapter: string, navCompact: boolean): 'light' | 'dark' {
+  if (navCompact) return 'light';
+  return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
+}
+
+function syncLogoTone(chapter: string) {
+  const compact = document.documentElement.dataset.navCompact === 'true';
+  document.documentElement.dataset.logoTone = logoToneFor(chapter, compact);
 }
 
 function setNavCompact(active: boolean) {
@@ -48,17 +60,22 @@ export function EditorialAtmosphere() {
       root.dataset.chapter = id;
       document.documentElement.dataset.landingChapter = id;
       document.documentElement.dataset.navTone = navToneFor(id);
+      syncLogoTone(id);
     };
 
     apply(sections[0]?.dataset.chapterSection ?? 'hero');
 
     const compactActive = new Set<string>();
-    const syncCompact = () => setNavCompact(compactActive.size > 0);
+    const syncCompact = () => {
+      setNavCompact(compactActive.size > 0);
+      syncLogoTone(activeRef.current);
+    };
 
     const cleanupHtml = () => {
       delete document.documentElement.dataset.landingChapter;
       delete document.documentElement.dataset.navTone;
       delete document.documentElement.dataset.navCompact;
+      delete document.documentElement.dataset.logoTone;
     };
 
     const compactSections = COMPACT_NAV_CHAPTERS.map((id) =>
