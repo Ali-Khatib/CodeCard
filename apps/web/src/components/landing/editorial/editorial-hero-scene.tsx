@@ -44,19 +44,61 @@ const STATEMENT_BEATS = [
   {
     id: 'problem',
     title: 'Your work belongs in one place.',
-    body: 'Your work belongs in one place. Projects, papers, people, and signals live in one CodeCard you can share.',
+    lead: 'Your work belongs',
+    sub: 'in one place.',
+    lede: 'Projects, papers, people, and signals live in one CodeCard you can share.',
   },
   {
     id: 'shift',
     title: 'Show what you build right on the spot.',
-    body: 'Show what you build right on the spot. Open your card and they see the work clearly, right away.',
+    lead: 'Show what you build',
+    sub: 'right on the spot.',
+    lede: 'Open your card and they see the work clearly, right away.',
   },
   {
     id: 'identity',
     title: 'One card. Your whole story.',
-    body: 'One card. Your whole story. Hand someone your CodeCard and they get the full picture in one place.',
+    lead: 'One card.',
+    sub: 'Your whole story.',
+    lede: 'Hand someone your CodeCard and they get the full picture in one place.',
   },
 ] as const;
+
+function wordsOf(text: string) {
+  return text.trim().split(/\s+/).filter(Boolean);
+}
+
+function StatementWords({
+  text,
+  beatId,
+  tone,
+}: {
+  text: string;
+  beatId: string;
+  tone: 'lead' | 'sub' | 'lede';
+}) {
+  const words = wordsOf(text);
+  const toneClass =
+    tone === 'lead'
+      ? 'cc-ed-hero-scene__statement-lead'
+      : tone === 'sub'
+        ? 'cc-ed-hero-scene__statement-sub'
+        : 'cc-ed-hero-scene__statement-lede-run';
+  return (
+    <span className={toneClass}>
+      {words.map((word, wi) => (
+        <span
+          key={`${beatId}-${tone}-${wi}`}
+          className="cc-ed-hero-scene__statement-word"
+          data-statement-word
+        >
+          {word}
+          {wi < words.length - 1 ? ' ' : ''}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 function stageRadius(mobile: boolean) {
   return mobile ? 22 : 28;
@@ -439,57 +481,79 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             data-testid="editorial-statement"
             aria-labelledby="editorial-statement-heading"
           >
-            {/* IB layout: full-width progress at top, pager under it, body center-right */}
-            <div
-              className="cc-ed-hero-scene__statement-progress"
-              aria-hidden
-            >
+            <div className="cc-ed-hero-scene__statement-chrome">
+              <p className="cc-ed-hero-scene__statement-tag">
+                <span
+                  className="cc-ed-hero-scene__statement-tag-mark"
+                  aria-hidden
+                />
+                What this is
+              </p>
+
               <div
-                ref={progressFillRef}
-                className="cc-ed-hero-scene__statement-progress-fill"
-              />
+                className="cc-ed-hero-scene__statement-progress"
+                aria-hidden
+              >
+                <div
+                  ref={progressFillRef}
+                  className="cc-ed-hero-scene__statement-progress-fill"
+                />
+              </div>
+
+              <p
+                className="cc-ed-hero-scene__statement-pager"
+                aria-live="polite"
+              >
+                <span ref={pagerRef} data-statement-index>
+                  01
+                </span>
+                <span className="cc-ed-hero-scene__statement-pager-total">
+                  {' '}
+                  / 03
+                </span>
+              </p>
             </div>
 
-            <p className="cc-ed-hero-scene__statement-pager" aria-live="polite">
-              <span ref={pagerRef} data-statement-index>
-                01
-              </span>
-              <span className="cc-ed-hero-scene__statement-pager-total"> / 03</span>
-            </p>
-
             <div className="cc-ed-hero-scene__statement-stage">
-              {STATEMENT_BEATS.map((beat, i) => {
-                const words = beat.body.split(/\s+/).filter(Boolean);
-                return (
-                  <div
-                    key={beat.id}
-                    className="cc-ed-hero-scene__statement-slot"
-                    data-statement-beat={beat.id}
-                    aria-hidden={i !== 0}
+              {STATEMENT_BEATS.map((beat, i) => (
+                <div
+                  key={beat.id}
+                  className="cc-ed-hero-scene__statement-slot"
+                  data-statement-beat={beat.id}
+                  aria-hidden={i !== 0}
+                >
+                  <p
+                    className="cc-ed-hero-scene__statement-body"
+                    aria-label={beat.title}
                   >
-                    <p
-                      className="cc-ed-hero-scene__statement-body"
-                      aria-label={beat.title}
+                    <StatementWords
+                      text={beat.lead}
+                      beatId={beat.id}
+                      tone="lead"
+                    />{' '}
+                    <StatementWords
+                      text={beat.sub}
+                      beatId={beat.id}
+                      tone="sub"
+                    />
+                  </p>
+                  <p className="cc-ed-hero-scene__statement-lede">
+                    <StatementWords
+                      text={beat.lede}
+                      beatId={beat.id}
+                      tone="lede"
+                    />
+                  </p>
+                  {i === 0 ? (
+                    <span
+                      id="editorial-statement-heading"
+                      className="sr-only"
                     >
-                      {words.map((word, wi) => (
-                        <span
-                          key={`${beat.id}-${wi}`}
-                          className="cc-ed-hero-scene__statement-word"
-                          data-statement-word
-                        >
-                          {word}
-                          {wi < words.length - 1 ? ' ' : ''}
-                        </span>
-                      ))}
-                    </p>
-                    {i === 0 ? (
-                      <span id="editorial-statement-heading" className="sr-only">
-                        {beat.title}
-                      </span>
-                    ) : null}
-                  </div>
-                );
-              })}
+                      {beat.title}
+                    </span>
+                  ) : null}
+                </div>
+              ))}
             </div>
           </div>
         </div>

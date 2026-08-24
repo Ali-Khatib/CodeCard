@@ -2163,7 +2163,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   min-height: 100dvh;
   border-radius: clamp(26px, 3vw, 40px);
   transform-origin: center center;
-  background: #101012;
+  background: #141413;
 }
 
 /* Pending / running: full-viewport stage — cream via shut clip. JS opens once. */
@@ -2177,7 +2177,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   margin-inline: 0;
   margin-top: 0;
   border-radius: 0;
-  background: #101012;
+  background: #141413;
   clip-path: inset(50% 50% 50% 50% round 28px);
   will-change: clip-path;
 }
@@ -2220,47 +2220,76 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* Statement lives INSIDE the hero frame — IB layout: top bar, pager, center-right body */
+/* Statement lives INSIDE the hero frame — chrome clears the floating nav */
 .cc-ed-hero-scene__statement {
   position: absolute;
   inset: 0;
   z-index: 4;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
   align-content: start;
-  padding: clamp(1.1rem, 2.8vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem)
+  padding:
+    calc(var(--cc-ed-nav-clearance, 4.25rem) + 0.85rem)
+    clamp(1.25rem, 4vw, 3.5rem)
     clamp(2rem, 6vh, 4rem);
-  /* Soft wash ??? keep hero media visible like IB behind the reveal */
+  /* Soft wash — keep hero media visible like IB behind the reveal */
   background:
     linear-gradient(
       180deg,
-      rgba(12, 12, 14, 0.18) 0%,
-      rgba(12, 12, 14, 0.28) 45%,
-      rgba(12, 12, 14, 0.55) 100%
+      rgba(12, 12, 14, 0.12) 0%,
+      rgba(40, 39, 37, 0.22) 42%,
+      rgba(12, 12, 14, 0.52) 100%
     ),
     linear-gradient(
       90deg,
-      rgba(12, 12, 14, 0.12) 0%,
-      rgba(12, 12, 14, 0.05) 48%,
-      rgba(12, 12, 14, 0.22) 100%
+      rgba(12, 12, 14, 0.1) 0%,
+      rgba(60, 59, 57, 0.08) 48%,
+      rgba(12, 12, 14, 0.2) 100%
     );
   color: #efedeb;
   pointer-events: none;
   visibility: hidden;
 }
 
-/* Full-bleed cinema: no cream side strip showing through the stage */
+/* Full-bleed cinema: charcoal with gray undertone */
 .cc-ed-hero-scene[data-cinema-chapter='statement'] .cc-ed-hero-scene__stage {
-  background: #101012;
+  background: #141413;
 }
 
-/* One continuous loading bar — top edge, full width (IB) */
+.cc-ed-hero-scene__statement-chrome {
+  display: grid;
+  gap: clamp(0.55rem, 1.4vh, 0.85rem);
+  width: 100%;
+  justify-items: start;
+}
+
+.cc-ed-hero-scene__statement-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--ed-accent, #e95a0b);
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cc-ed-hero-scene__statement-tag-mark {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--ed-accent, #e95a0b);
+  flex-shrink: 0;
+}
+
+/* Loading bar sits under the nav + tag — not under the browser chrome */
 .cc-ed-hero-scene__statement-progress {
   position: relative;
   width: 100%;
-  height: 1.5px;
+  height: 2px;
   margin: 0;
-  background: color-mix(in srgb, #efedeb 22%, transparent);
+  background: color-mix(in srgb, #efedeb 18%, #5c5856);
   border-radius: 999px;
   overflow: hidden;
   flex-shrink: 0;
@@ -2273,21 +2302,24 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   width: 100%;
   transform: scaleX(0);
   transform-origin: left center;
-  background: #efedeb;
+  background: linear-gradient(
+    90deg,
+    var(--ed-accent, #e95a0b) 0%,
+    color-mix(in srgb, var(--ed-accent, #e95a0b) 55%, #efedeb) 100%
+  );
   border-radius: inherit;
   will-change: transform;
 }
 
-/* Pager pill sits under the start of the progress bar */
 .cc-ed-hero-scene__statement-pager {
   display: inline-flex;
   align-items: baseline;
   justify-self: start;
-  margin: clamp(0.65rem, 1.6vh, 1rem) 0 0;
+  margin: 0;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
-  background: color-mix(in srgb, #101012 35%, transparent);
+  border: 1px solid color-mix(in srgb, #efedeb 24%, #5c5856);
+  background: color-mix(in srgb, #141413 42%, transparent);
   backdrop-filter: blur(8px);
   color: #efedeb;
   font-family: var(--font-eyebrow), ui-sans-serif, system-ui, sans-serif;
@@ -2300,14 +2332,14 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* Body block — center-right like IB */
+/* Body block — Instrument Serif cream/orange like the CodeCard statement */
 .cc-ed-hero-scene__statement-stage {
   position: relative;
-  width: min(100%, 38rem);
+  width: min(100%, 42rem);
   max-width: 92vw;
   margin-top: auto;
   margin-bottom: clamp(8vh, 14vh, 18vh);
-  margin-left: clamp(0rem, 18vw, 22rem);
+  margin-left: clamp(0rem, 14vw, 18rem);
   min-height: min(28vh, 16rem);
   justify-self: start;
 }
@@ -2326,20 +2358,47 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-body {
   margin: 0;
+  max-width: 38rem;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(2.1rem, 4.8vw, 3.65rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: pretty;
+}
+
+.cc-ed-hero-scene__statement-lead,
+.cc-ed-hero-scene__statement-sub {
+  display: inline;
+}
+
+.cc-ed-hero-scene__statement-lead .cc-ed-hero-scene__statement-word {
+  color: #efedeb;
+}
+
+.cc-ed-hero-scene__statement-sub .cc-ed-hero-scene__statement-word {
+  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 82%, #efedeb);
+}
+
+.cc-ed-hero-scene__statement-lede {
+  margin: clamp(1rem, 2.2vh, 1.45rem) 0 0;
   max-width: 34rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.35rem, 2.4vw, 2.05rem);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
   font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.28;
+  letter-spacing: -0.015em;
+  line-height: 1.45;
   text-wrap: pretty;
-  color: #efedeb;
+}
+
+.cc-ed-hero-scene__statement-lede .cc-ed-hero-scene__statement-word,
+.cc-ed-hero-scene__statement-lede-run .cc-ed-hero-scene__statement-word {
+  color: color-mix(in srgb, #efedeb 78%, #5c5856);
 }
 
 .cc-ed-hero-scene__statement-word {
   display: inline;
   /* Dim base; GSAP raises opacity word-by-word (IB reveal) */
-  color: #efedeb;
 }
 
 @media (max-width: 767px) {
@@ -2350,7 +2409,11 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   }
 
   .cc-ed-hero-scene__statement-body {
-    font-size: clamp(1.2rem, 5.2vw, 1.55rem);
+    font-size: clamp(1.75rem, 7.5vw, 2.45rem);
+  }
+
+  .cc-ed-hero-scene__statement-lede {
+    font-size: clamp(1rem, 3.8vw, 1.15rem);
   }
 }
 

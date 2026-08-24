@@ -5,9 +5,11 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-/** CodeCard iris + ink + paper — not the stock violet kit. */
+/** CodeCard black + orange + stone gray field. */
 export const SHADER_HERO_COLORS = {
   ink: '#0c0c0e',
+  stone: '#3c3b39',
+  ash: '#5c5856',
   iris: '#e95a0b',
   ember: '#2a1810',
   paper: '#f3e6d8',
@@ -15,8 +17,10 @@ export const SHADER_HERO_COLORS = {
 
 const FILL = [
   SHADER_HERO_COLORS.ink,
+  SHADER_HERO_COLORS.stone,
   SHADER_HERO_COLORS.ember,
   SHADER_HERO_COLORS.iris,
+  SHADER_HERO_COLORS.ash,
   SHADER_HERO_COLORS.ink,
 ] as const;
 
