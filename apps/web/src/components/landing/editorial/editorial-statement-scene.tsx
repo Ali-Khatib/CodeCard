@@ -152,7 +152,7 @@ function ChapterCopy({
  * Separate from Research — Motion owns this section.
  */
 export function EditorialStatementScene() {
-  const trackRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion() === true;
   const { scrollYProgress } = useScroll({
     target: trackRef,
@@ -169,7 +169,6 @@ export function EditorialStatementScene() {
 
   return (
     <section
-      ref={trackRef}
       id="statement"
       className="cc-ed-statement-scene"
       data-chapter-section="statement"
@@ -178,63 +177,66 @@ export function EditorialStatementScene() {
       data-motion-owner="motion"
       aria-labelledby="editorial-statement-heading"
     >
-      <div className="cc-ed-statement-scene__sticky">
-        <div className="cc-ed-statement-scene__frame">
-          <motion.div
-            className="cc-ed-statement-scene__bg"
-            aria-hidden
-            style={reduced ? undefined : { scale: bgScale }}
-          >
-            <ShaderHeroBackdrop />
-            <div className="cc-ed-statement-scene__veil" />
-          </motion.div>
+      <div ref={trackRef} className="cc-ed-statement-scene__track">
+        <div className="cc-ed-statement-scene__sticky">
+          <div className="cc-ed-statement-scene__frame">
+            <motion.div
+              className="cc-ed-statement-scene__bg"
+              aria-hidden
+              style={reduced ? undefined : { scale: bgScale }}
+            >
+              <ShaderHeroBackdrop />
+              <div className="cc-ed-statement-scene__veil" />
+            </motion.div>
 
-          <div className="cc-ed-statement-scene__chrome">
-            <p className="cc-ed-statement-scene__tag">
-              <span className="cc-ed-statement-scene__tag-mark" aria-hidden />
-              What this is
-            </p>
-            <p className="cc-ed-statement-scene__pager" aria-live="polite">
-              <span data-statement-index>
-                {String(chapter + 1).padStart(2, '0')}
-              </span>
-              <span className="cc-ed-statement-scene__pager-total"> / 03</span>
-            </p>
-          </div>
+            <div className="cc-ed-statement-scene__chrome">
+              <p className="cc-ed-statement-scene__tag">
+                <span className="cc-ed-statement-scene__tag-mark" aria-hidden />
+                What this is
+              </p>
+              <p className="cc-ed-statement-scene__pager" aria-live="polite">
+                <span data-statement-index>
+                  {String(chapter + 1).padStart(2, '0')}
+                </span>
+                <span className="cc-ed-statement-scene__pager-total"> / 03</span>
+              </p>
+            </div>
 
-          <div className="cc-ed-statement-scene__stage">
-            {BEATS.map((beat, i) => {
-              const rangeStart = i / TOTAL;
-              const rangeEnd = (i + 1) / TOTAL;
-              const isFirst = i === 0;
-              return (
-                <div
-                  key={beat.id}
-                  className="cc-ed-statement-scene__slot"
-                  style={{
-                    opacity: reduced || chapter === i ? 1 : 0,
-                    pointerEvents: chapter === i ? 'auto' : 'none',
-                  }}
-                >
-                  <ChapterCopy
-                    beat={beat}
-                    progress={scrollYProgress}
-                    rangeStart={rangeStart}
-                    rangeEnd={rangeEnd}
-                    reduced={reduced}
-                    active={chapter === i}
-                  />
-                  {isFirst ? (
-                    <span id="editorial-statement-heading" className="sr-only">
-                      {beat.title}
-                    </span>
-                  ) : null}
-                </div>
-              );
-            })}
+            <div className="cc-ed-statement-scene__stage">
+              {BEATS.map((beat, i) => {
+                const rangeStart = i / TOTAL;
+                const rangeEnd = (i + 1) / TOTAL;
+                const isFirst = i === 0;
+                return (
+                  <div
+                    key={beat.id}
+                    className="cc-ed-statement-scene__slot"
+                    style={{
+                      opacity: reduced || chapter === i ? 1 : 0,
+                      pointerEvents: chapter === i ? 'auto' : 'none',
+                    }}
+                  >
+                    <ChapterCopy
+                      beat={beat}
+                      progress={scrollYProgress}
+                      rangeStart={rangeStart}
+                      rangeEnd={rangeEnd}
+                      reduced={reduced}
+                      active={chapter === i}
+                    />
+                    {isFirst ? (
+                      <span id="editorial-statement-heading" className="sr-only">
+                        {beat.title}
+                      </span>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
+      <div className="cc-ed-statement-scene__bridge-out" aria-hidden />
     </section>
   );
 }

@@ -122,7 +122,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
       if (skipIntro) {
         snapFinalGeometry();
-        gsap.set(contentBits, { clearProps: 'opacity,visibility,transform' });
+        gsap.set(contentBits, { clearProps: 'opacity,visibility,transform,clipPath' });
         if (media) gsap.set(media, { clearProps: 'opacity,visibility,transform' });
         buildScrollCinema();
         return;
@@ -135,7 +135,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       stage.style.animation = 'none';
       if (media) gsap.set(media, { autoAlpha: 0.72 });
       if (contentBits.length) {
-        gsap.set(contentBits, { autoAlpha: 0, y: 12 });
+        gsap.set(contentBits, {
+          autoAlpha: 0,
+          y: 10,
+          clipPath: 'inset(100% 0% 0% 0%)',
+        });
       }
 
       const intro = gsap.timeline({
@@ -170,29 +174,53 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       if (eyebrow) {
         intro.to(
           eyebrow,
-          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
-          0.25,
+          {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 0.55,
+            ease: INTRO_EASE,
+          },
+          0.28,
         );
       }
       if (headline) {
         intro.to(
           headline,
-          { autoAlpha: 1, y: 0, duration: 0.5, ease: INTRO_EASE },
-          0.35,
+          {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 0.6,
+            ease: INTRO_EASE,
+          },
+          0.38,
         );
       }
       if (lede) {
         intro.to(
           lede,
-          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
-          0.5,
+          {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 0.5,
+            ease: INTRO_EASE,
+          },
+          0.52,
         );
       }
       if (actions) {
         intro.to(
           actions,
-          { autoAlpha: 1, y: 0, duration: 0.45, ease: INTRO_EASE },
-          0.65,
+          {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 0.5,
+            ease: INTRO_EASE,
+          },
+          0.66,
         );
       }
 

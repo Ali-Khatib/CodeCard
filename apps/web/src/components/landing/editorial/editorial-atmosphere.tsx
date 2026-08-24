@@ -116,20 +116,16 @@ export function EditorialAtmosphere() {
 
     const chapterTriggers = sections.map((section) => {
       const id = section.dataset.chapterSection ?? 'hero';
-      // Flip when the chapter is the main surface — one solid color until then.
-      const start =
-        id === 'demo'
-          ? 'top 38%'
-          : id === 'statement'
-            ? 'top 40%'
-            : 'top 55%';
+      // One active chapter at a time — flip when the section owns the viewport mid-band.
+      // Avoids jump-scroll leaving the page stuck on finale while Research is visible.
       return ScrollTrigger.create({
         id: `editorial-atmosphere-${id}`,
         trigger: section,
-        start,
+        start: 'top 55%',
         end: 'bottom 45%',
-        onEnter: () => apply(id),
-        onEnterBack: () => apply(id),
+        onToggle: (self) => {
+          if (self.isActive) apply(id);
+        },
       });
     });
 
