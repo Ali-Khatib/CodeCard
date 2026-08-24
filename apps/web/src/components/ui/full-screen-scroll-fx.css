@@ -249,12 +249,12 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 0.55em;
-  width: 0.5rem;
-  height: 0.5rem;
+  top: 0.58em;
+  width: 0.42rem;
+  height: 0.42rem;
   border-radius: 999px;
-  background: var(--fx-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-accent) 28%, transparent);
+  background: var(--fx-accent, #e95a0b);
+  box-shadow: none;
 }
 
 .fx-left,
@@ -349,18 +349,7 @@
   transition: none;
 }
 
-/* Only the active surface paints — prevents ghost stacking during scrub */
-.fx-featured:not(.active) {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-.fx-featured.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
+/* Scroll-linked opacity/visibility are driven by GSAP during scrub — no CSS overrides. */
 
 .fx-featured-title {
   margin: 0;

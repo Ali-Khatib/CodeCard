@@ -299,36 +299,64 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.set(bg, { opacity, scale: 1, yPercent: 0 });
       });
 
-      // Story copy is exclusive — never crossfade two surfaces (stacked ghost text).
-      // Backgrounds still blend above; text swaps at the midpoint with a short slide.
+      // Story copy: sequential fade (out → in) so text animates but never stacks.
+      const STORY_HANDOFF = 0.5;
       let maxPanelOpacity = 0;
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
         const isStory = sections[i]?.content != null;
         let opacity = 0;
         let y = 0;
+        let show = i === idx;
+        let visible = show;
+
         if (from === to) {
           opacity = i === from ? 1 : 0;
+          y = 0;
         } else if (isStory) {
-          // One surface only — backgrounds may blend; copy must not stack.
-          opacity = i === idx ? 1 : 0;
-          y = i === idx ? 0 : i === from ? -14 : 16;
+          if (i === from) {
+            if (rawBlend <= STORY_HANDOFF) {
+              const t = rawBlend / STORY_HANDOFF;
+              const eased = smoothCrossfade(t);
+              opacity = 1 - eased;
+              y = -eased * 18;
+            } else {
+              opacity = 0;
+              y = -18;
+            }
+          } else if (i === to) {
+            if (rawBlend >= STORY_HANDOFF) {
+              const t = (rawBlend - STORY_HANDOFF) / (1 - STORY_HANDOFF);
+              const eased = smoothCrossfade(t);
+              opacity = eased;
+              y = (1 - eased) * 20;
+            } else {
+              opacity = 0;
+              y = 20;
+            }
+          }
+          visible = opacity > 0.01;
+          show = visible;
         } else if (i === from) {
           opacity = 1 - blend;
           y = -blend * 10;
+          visible = opacity > 0.01;
+          show = visible || i === idx;
         } else if (i === to) {
           opacity = blend;
           y = (1 - blend) * 12;
+          visible = opacity > 0.01;
+          show = visible || i === idx;
         }
+
         maxPanelOpacity = Math.max(maxPanelOpacity, opacity);
-        const show = i === idx;
         panel.classList.toggle('active', show);
-        panel.style.pointerEvents = show ? 'auto' : 'none';
+        panel.style.pointerEvents = opacity > 0.5 ? 'auto' : 'none';
         gsap.set(panel, {
           opacity,
-          visibility: show ? 'visible' : 'hidden',
-          y: show ? 0 : y,
-          zIndex: show ? 2 : 1,
+          visibility: visible ? 'visible' : 'hidden',
+          y,
+          zIndex: visible ? 2 : 1,
         });
       });
 
