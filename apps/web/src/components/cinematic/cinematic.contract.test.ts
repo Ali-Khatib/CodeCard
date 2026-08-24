@@ -95,8 +95,9 @@ describe('Editorial product landing contract', () => {
     expect(proof).toContain('backgroundColor: wash');
     expect(proof).toContain('#fcf1e7');
     expect(proof).toContain('The research');
+    expect(proof).toContain('Your best work never gets the glance.');
+    expect(proof).toContain('photo-1766297247924-6638d54e7c89');
     expect(story).toContain('EditorialResearchStory');
-    expect(story).toContain('Your best work never gets the glance.');
     expect(story).toContain('cc-ed-research-story__beat');
     expect(story).toContain('cc-ed-research-redact__mask');
     expect(story).toContain('data-research-reveal');
@@ -105,7 +106,6 @@ describe('Editorial product landing contract', () => {
     expect(story).toContain('cc-ed-research-story__cta-group');
     expect(story).toContain('useScroll');
     expect(story).toContain('useTransform');
-    expect(story).toContain('photo-1766297247924-6638d54e7c89');
     expect(story).toContain('Learn more about the research');
     expect(story).not.toContain('cc-ed-research-story__pager');
     expect(story).not.toContain('Keep scrolling');
