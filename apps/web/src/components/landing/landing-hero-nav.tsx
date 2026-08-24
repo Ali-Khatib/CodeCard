@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
@@ -24,10 +24,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [compact, setCompact] = useState(false);
   const [compactPeek, setCompactPeek] = useState(false);
-  const menuTrackRef = useRef<HTMLDivElement>(null);
-  const hoverLineRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [hovered, setHovered] = useState<number | null>(null);
 
   const isExpanded = !compact || compactPeek || mobileOpen;
 
@@ -48,33 +44,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     },
     [pathname],
   );
-
-  const moveHoverLine = useCallback((index: number | null) => {
-    const line = hoverLineRef.current;
-    const track = menuTrackRef.current;
-    if (!line || !track) return;
-    if (index === null || index < 0) {
-      line.style.opacity = '0';
-      return;
-    }
-    const el = itemRefs.current[index];
-    if (!el) return;
-    const trackRect = track.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
-    line.style.opacity = '1';
-    line.style.left = `${rect.left - trackRect.left}px`;
-    line.style.width = `${rect.width}px`;
-  }, []);
-
-  useEffect(() => {
-    moveHoverLine(hovered);
-  }, [hovered, moveHoverLine]);
-
-  useEffect(() => {
-    const onResize = () => moveHoverLine(hovered);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [hovered, moveHoverLine]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -174,27 +143,19 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
         ) : null
       }
     >
-      <div ref={menuTrackRef} className="relative hidden md:flex cc-nav-desktop-links">
-        <div ref={hoverLineRef} className="cc-nav-hover-underline" aria-hidden />
+      <div className="hidden md:flex cc-nav-desktop-links">
         <ul className="cc-hume-fade-group flex items-center gap-1">
           {items.map((item, i) => {
             const active = isActive(item.href, item.label);
             return (
               <li key={`${item.label}-${i}`}>
                 <Link
-                  ref={(el) => {
-                    itemRefs.current[i] = el;
-                  }}
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   aria-label={item.ariaLabel ?? item.label}
                   onClick={(event) => event.stopPropagation()}
-                  onMouseEnter={() => {
-                    setHovered(i);
-                    prefetchHref(item.href, router);
-                  }}
+                  onMouseEnter={() => prefetchHref(item.href, router)}
                   onFocus={() => prefetchHref(item.href, router)}
-                  onMouseLeave={() => setHovered(null)}
                   className={`cc-nav-pill-item cc-nav-ghost-link cc-hume-fade-item cc-instant-press ${active ? 'cc-nav-ghost-link--active' : ''}`}
                 >
                   {item.label}

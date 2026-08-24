@@ -32,10 +32,18 @@ const CINEMA_SCRUB = 0.2;
  * ~0.04 × 520vh ≈ 0.21vh — one small scroll finishes the expansion.
  */
 const CINEMA_EXPAND_END = 0.04;
-/**
- * Tiny scroll bridge after full-bleed before statement chrome appears.
- */
-const CINEMA_STATEMENT_START = 0.062;
+/** Full-bleed holds with hero copy still visible — tiny scroll after expand. */
+const CINEMA_CHROME_START = 0.054;
+/** Loading bar visible; hero fades; beats begin revealing below. */
+const CINEMA_STATEMENT_START = 0.078;
+
+/** Per-beat scroll shares: rise ↑, fill words, exit ↑, gap (empty). */
+const BEAT_ENTER_SHARE = 0.1;
+const BEAT_FILL_SHARE = 0.54;
+const BEAT_EXIT_SHARE = 0.13;
+/** Enter from below viewport; exit upward like IB. */
+const BEAT_ENTER_Y = 32;
+const BEAT_EXIT_Y = -34;
 
 /**
  * Only true after a successful intro (or intentional skip).
@@ -51,7 +59,7 @@ const STATEMENT_BEATS = [
     lead: 'Your work belongs',
     sub: 'in one place.',
     lede:
-      'Not a link tree. Not a PDF resume. CodeCard is one living profile where your projects, research, connections, and analytics sit together — so people actually understand what you do.',
+      'Not a link tree. Not a PDF resume. CodeCard is one living profile where your projects, research, connections, and analytics sit together. People actually understand what you do.',
     detail:
       'Stop sending people to five tabs. Share one link and they see the full picture.',
   },
@@ -61,7 +69,7 @@ const STATEMENT_BEATS = [
     lead: 'Show what you build',
     sub: 'right on the spot.',
     lede:
-      'When someone asks what you build, open your card. Demos, stack, outcomes, and papers are right there — not buried in GitHub, Notion, or LinkedIn.',
+      'When someone asks what you build, open your card. Demos, stack, outcomes, and papers are right there. Nothing buried in GitHub, Notion, or LinkedIn.',
     detail:
       'They get proof while you are talking, not a promise to look later.',
   },
@@ -71,7 +79,7 @@ const STATEMENT_BEATS = [
     lead: 'One card.',
     sub: 'Your whole story.',
     lede:
-      'Projects, papers, Circle, and connection notes stay on one identity you can hand off at a meetup, interview, or pitch — and carry with you after.',
+      'Projects, papers, and connection notes stay on one identity you can hand off at a meetup, interview, or pitch. You carry it with you after.',
     detail:
       'Hand someone your CodeCard. They leave knowing who you are and what you ship.',
   },
@@ -239,13 +247,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (progressFillRef.current) {
           progressFillRef.current.style.transform = 'scaleX(0)';
         }
-        beatEls.forEach((beat, i) => {
-          gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0 });
+        beatEls.forEach((beat) => {
+          gsap.set(beat, { autoAlpha: 0, yPercent: BEAT_ENTER_Y });
           beat
             .querySelectorAll<HTMLElement>('[data-statement-word]')
             .forEach((w) => {
-              // IB-style: dim until reveal brightens each word
-              gsap.set(w, { opacity: 0.28 });
+              gsap.set(w, { opacity: 0.22 });
             });
         });
         setPager(-1);
@@ -265,7 +272,13 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               const p = self.progress;
+              if (p < CINEMA_CHROME_START) {
+                setPager(-1);
+                setStatementProgress(0);
+                return;
+              }
               if (p < CINEMA_STATEMENT_START) {
+                root.dataset.cinemaChapter = 'statement';
                 setPager(-1);
                 setStatementProgress(0);
                 return;
@@ -300,15 +313,17 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
+        /* IB flow: hero copy stays through expand + brief full-bleed hold. */
         if (heroCopy) {
           scrollTl.to(
             heroCopy,
             {
               autoAlpha: 0,
-              yPercent: -6,
-              duration: CINEMA_EXPAND_END * 0.55,
+              yPercent: -12,
+              duration: CINEMA_STATEMENT_START - CINEMA_CHROME_START,
+              ease: 'none',
             },
-            CINEMA_EXPAND_END * 0.35,
+            CINEMA_CHROME_START,
           );
         }
 
@@ -316,9 +331,13 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           statement,
           {
             autoAlpha: 1,
-            duration: Math.min(0.035, (CINEMA_STATEMENT_START - CINEMA_EXPAND_END) * 0.85),
+            duration: Math.min(
+              0.04,
+              (CINEMA_STATEMENT_START - CINEMA_CHROME_START) * 0.85,
+            ),
+            ease: 'none',
           },
-          CINEMA_STATEMENT_START * 0.92,
+          CINEMA_CHROME_START,
         );
 
         beatEls.forEach((beat, beatIndex) => {
@@ -326,36 +345,54 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           const words = Array.from(
             beat.querySelectorAll<HTMLElement>('[data-statement-word]'),
           );
-          const crossfade = beatSpan * 0.08;
-          // Most of the beat is word reveal — continuous like IB
-          const wordRevealSpan = beatSpan * 0.78;
+          const enterDur = beatSpan * BEAT_ENTER_SHARE;
+          const fillDur = beatSpan * BEAT_FILL_SHARE;
+          const exitDur = beatSpan * BEAT_EXIT_SHARE;
+          const fillAt = beatStart + enterDur;
+          const exitAt = beatStart + enterDur + fillDur;
+          const isLastBeat = beatIndex === beatCount - 1;
 
-          if (beatIndex > 0) {
-            scrollTl!.fromTo(
-              beat,
-              { autoAlpha: 0 },
-              { autoAlpha: 1, duration: crossfade },
-              beatStart,
-            );
-            scrollTl!.to(
-              beatEls[beatIndex - 1]!,
-              { autoAlpha: 0, duration: crossfade },
-              beatStart,
-            );
-          }
+          scrollTl!.set(
+            beat,
+            { yPercent: BEAT_ENTER_Y },
+            beatStart,
+          );
+          words.forEach((word) => {
+            scrollTl!.set(word, { opacity: 0.22 }, beatStart);
+          });
+
+          scrollTl!.set(beat, { autoAlpha: 1 }, beatStart);
+
+          scrollTl!.fromTo(
+            beat,
+            { yPercent: BEAT_ENTER_Y },
+            { yPercent: 0, duration: enterDur, ease: 'none' },
+            beatStart,
+          );
 
           words.forEach((word, wi) => {
             const t =
-              beatStart +
-              beatSpan * 0.06 +
-              (wi / Math.max(words.length, 1)) * wordRevealSpan;
+              fillAt + (wi / Math.max(words.length, 1)) * fillDur * 0.94;
             scrollTl!.fromTo(
               word,
-              { opacity: 0.28 },
-              { opacity: 1, duration: beatSpan * 0.06 },
+              { opacity: 0.22 },
+              { opacity: 1, duration: fillDur * 0.08, ease: 'none' },
               t,
             );
           });
+
+          if (!isLastBeat) {
+            scrollTl!.to(
+              beat,
+              { yPercent: BEAT_EXIT_Y, duration: exitDur, ease: 'none' },
+              exitAt,
+            );
+            scrollTl!.to(
+              beat,
+              { autoAlpha: 0, duration: exitDur * 0.4, ease: 'none' },
+              exitAt + exitDur * 0.55,
+            );
+          }
         });
 
         if (holdForIntro) {
@@ -553,20 +590,22 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                       tone="sub"
                     />
                   </p>
-                  <p className="cc-ed-hero-scene__statement-lede">
-                    <StatementWords
-                      text={beat.lede}
-                      beatId={beat.id}
-                      tone="lede"
-                    />
-                  </p>
-                  <p className="cc-ed-hero-scene__statement-detail">
-                    <StatementWords
-                      text={beat.detail}
-                      beatId={`${beat.id}-detail`}
-                      tone="lede"
-                    />
-                  </p>
+                  <div className="cc-ed-hero-scene__statement-copy">
+                    <p className="cc-ed-hero-scene__statement-lede">
+                      <StatementWords
+                        text={beat.lede}
+                        beatId={beat.id}
+                        tone="lede"
+                      />
+                    </p>
+                    <p className="cc-ed-hero-scene__statement-detail">
+                      <StatementWords
+                        text={beat.detail}
+                        beatId={`${beat.id}-detail`}
+                        tone="lede"
+                      />
+                    </p>
+                  </div>
                   {i === 0 ? (
                     <span
                       id="editorial-statement-heading"
