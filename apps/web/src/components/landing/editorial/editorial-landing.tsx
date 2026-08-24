@@ -20,7 +20,7 @@ const EditorialResearchScene = dynamic(
 
 /**
  * Marketing `/`
- * Static hero → statement → walkthrough → demo → audience → research → finale.
+ * Hero cinema (expand + statement reveal) → walkthrough → demo → audience → research → finale.
  */
 export function EditorialLanding() {
   return (

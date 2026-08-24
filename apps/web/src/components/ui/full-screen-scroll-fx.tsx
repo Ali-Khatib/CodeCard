@@ -299,31 +299,36 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         gsap.set(bg, { opacity, scale: 1, yPercent: 0 });
       });
 
+      // Story copy is exclusive — never crossfade two surfaces (stacked ghost text).
+      // Backgrounds still blend above; text swaps at the midpoint with a short slide.
       let maxPanelOpacity = 0;
       featuredRefs.current.forEach((panel, i) => {
         if (!panel) return;
+        const isStory = sections[i]?.content != null;
         let opacity = 0;
         let y = 0;
         if (from === to) {
           opacity = i === from ? 1 : 0;
+        } else if (isStory) {
+          // One surface only — backgrounds may blend; copy must not stack.
+          opacity = i === idx ? 1 : 0;
+          y = i === idx ? 0 : i === from ? -14 : 16;
         } else if (i === from) {
-          // Scroll-linked crossfade — never a blank midpoint frame.
           opacity = 1 - blend;
-          y = -blend * 14;
+          y = -blend * 10;
         } else if (i === to) {
           opacity = blend;
-          y = (1 - blend) * 18;
+          y = (1 - blend) * 12;
         }
         maxPanelOpacity = Math.max(maxPanelOpacity, opacity);
-        const show = opacity > 0.45;
-        panel.classList.toggle('active', i === idx);
+        const show = i === idx;
+        panel.classList.toggle('active', show);
         panel.style.pointerEvents = show ? 'auto' : 'none';
-        // Prefer opacity (not autoAlpha) so CSS `.active` can still rescue a blank stage.
         gsap.set(panel, {
           opacity,
-          visibility: opacity > 0.02 ? 'visible' : 'hidden',
-          y,
-          zIndex: i === idx ? 2 : 1,
+          visibility: show ? 'visible' : 'hidden',
+          y: show ? 0 : y,
+          zIndex: show ? 2 : 1,
         });
       });
 

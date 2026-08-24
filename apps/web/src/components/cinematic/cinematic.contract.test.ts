@@ -149,13 +149,13 @@ describe('Editorial product landing contract', () => {
     expect(nextConfig).toContain("source: '/demo/:path*'");
     expect(nextConfig).toContain("frame-ancestors 'self'");
     expect(css).toContain('.cc-ed-hero-scene');
-    expect(css).toContain('.cc-ed-hero-scene--static');
-    expect(css).toContain('.cc-ed-statement-static');
+    expect(css).toContain('.cc-ed-hero-scene--enhanced');
+    expect(css).toContain('cream frame is clip-path only');
     expect(css).toContain('.cc-ed-research-scene');
     expect(css).toContain('.cc-ed-research-story');
   });
 
-  it('keeps a floating glass pill nav and a static hero + CodeCard statement', () => {
+  it('keeps a floating glass pill nav and a hero cinema statement reveal', () => {
     const css = read('src/styles/editorial-landing.css');
     const landing = read(
       'src/components/landing/editorial/editorial-landing.tsx',
@@ -168,27 +168,67 @@ describe('Editorial product landing contract', () => {
     expect(css).not.toMatch(
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
-    expect(css).toContain('.cc-ed-statement-static');
-    expect(css).toContain('Instrument Serif');
-    expect(css).toContain('What this is');
+    expect(css).toContain('.cc-ed-hero-scene__statement');
+    expect(css).toContain('min-height: 100svh');
+    expect(css).not.toContain('min-height: 620vh');
     expect(landing).not.toContain('EditorialStatementScene');
     expect(landing).toContain('EditorialHeroScene');
-    expect(scene).toContain('cc-ed-hero-scene--static');
     expect(scene).toContain('data-statement-beat');
-    expect(scene).toContain('What this is');
-    expect(scene).toContain('cc-ed-statement-static__tag-mark');
-    expect(scene).toContain('YOUR WORK BELONGS');
-    expect(scene).toContain('IN ONE PLACE.');
-    expect(scene).toContain('SHOW WHAT YOU BUILD.');
-    expect(scene).toContain('ONE CARD.');
+    expect(scene).toContain('data-statement-word');
+    expect(scene).toContain(' / 03');
+    expect(scene).toContain('Your work belongs in one place.');
+    expect(scene).toContain('Show what you build right on the spot.');
+    expect(scene).toContain('One card. Your whole story.');
+    expect(scene).toContain('cc-ed-hero-scene__statement-body');
+    expect(scene).not.toContain('What this is');
     expect(scene).not.toContain('YOUR BEST WORK SHOULDN');
-    expect(scene).not.toContain('useGSAP');
-    expect(scene).not.toContain('clipPath');
-    expect(scene).not.toContain('CINEMA_EXPAND_END');
-    expect(scene).not.toContain('heroIntroPlayed');
-    expect(css).toContain('padding: 10px');
+    expect(scene).not.toContain('FIVE PLACES');
+    expect(scene).toContain('progressFillRef');
+    expect(scene).toContain('cc-ed-hero-scene__statement-progress');
+    expect(css).toContain('.cc-ed-hero-scene__statement-progress-fill');
+    expect(css).toContain('center-right');
+    expect(scene).toContain('clipPath');
+    expect(scene).toContain('scrollClipClosed');
+    expect(scene).toContain('introClipShut');
+    expect(scene).toContain('INTRO_DURATION');
+    expect(scene).toContain('INTRO_EASE');
+    expect(scene).toContain('expo.out');
+    expect(scene).toContain("dataset.heroIntro = 'running'");
+    expect(scene).toContain('onComplete: markIntroDoneAndBuild');
+    expect(scene).toContain('holdForIntro');
+    expect(scene).toContain('codecard:hero-cinema-ready');
+    expect(scene).toContain('scrub: CINEMA_SCRUB');
+    expect(scene).toContain("desktop: '+=520%'");
+    expect(scene).toContain("mobile: '+=460%'");
+    expect(scene).toContain('lockFinalGeometry');
+    expect(scene).toContain("marginTop = '0'");
+    expect(scene).toContain('heroIntroPlayed');
+    expect(scene).toContain('CINEMA_EXPAND_END = 0.04');
+    expect(scene).toContain('inset(${p}px');
+    expect(scene).toContain('inset(50% 50% 50% 50%');
+    expect(scene).not.toContain('inset(4.5%');
+    expect(scene).not.toContain('finishIntro');
+    expect(css).toContain('padding: 0');
+    expect(css).toContain('inset(50% 50% 50% 50%');
     expect(css).not.toContain('width: 88%');
+    expect(css).not.toContain('width: 96.5%');
+    expect(scene).toContain('revertOnUpdate: false');
+    expect(scene).toContain('data-hero-intro="pending"');
+    expect(scene).toContain('cc-ed-hero-scene__bridge-out');
+    expect(css).toContain('.cc-ed-hero-scene__bridge-out');
+    expect(css).toContain("[data-hero-intro='pending']");
+    expect(scene).not.toContain('ShaderHeroBackdrop');
+    expect(scene).toContain('refreshScrollTrigger');
+    expect(scene).not.toContain('anticipatePin');
+    expect(scene).not.toContain("backgroundColor: 'transparent'");
     expect(landing).toContain("from './editorial-hero-scene'");
+  });
+
+  it('keeps final CTA without public profile', () => {
+    const closing = read('src/components/landing/editorial/editorial-final-cta.tsx');
+    expect(closing).toContain('LiveDemoLink');
+    expect(closing).toContain('/sign-up');
+    expect(closing).not.toContain('LIVE_DEMO_PROFILE_HREF');
   });
 
   it('keeps final CTA without public profile', () => {

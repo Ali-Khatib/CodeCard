@@ -349,7 +349,13 @@
   transition: none;
 }
 
-/* Active class is the SSR / rescue fallback — scrub owns opacity via inline styles */
+/* Only the active surface paints — prevents ghost stacking during scrub */
+.fx-featured:not(.active) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .fx-featured.active {
   opacity: 1;
   visibility: visible;

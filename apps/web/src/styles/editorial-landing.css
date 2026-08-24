@@ -2106,22 +2106,48 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   color: #efedeb;
 }
 
-/* —— Static IB-tight hero + CodeCard statement —— */
+/* —— Hero → statement cinema transition —— */
 .cc-ed-hero-scene {
   position: relative;
   isolation: isolate;
   background: var(--ed-cream, #fcf1e7);
+  padding: 0;
+}
+
+.cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced) {
+  /* Reduced-motion / static: thin cream frame via padding */
   padding: 10px;
 }
 
-.cc-ed-hero-scene--static {
-  padding: 10px;
+/* Enhanced: cream frame is clip-path only — no layout padding thrash */
+.cc-ed-hero-scene--enhanced {
+  padding: 0;
 }
 
 @media (max-width: 767px) {
-  .cc-ed-hero-scene,
-  .cc-ed-hero-scene--static {
+  .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced) {
     padding: 8px;
+  }
+}
+
+/* Statement chapter: full-bleed dark stage — keep warm charcoal, not pure void */
+.cc-ed-hero-scene[data-cinema-chapter='statement'] {
+  background: #101012;
+  padding: 0;
+}
+
+.cc-ed-hero-scene__track {
+  position: relative;
+  background: transparent;
+  /* Stage viewport only — GSAP pinSpacing owns the cinema runway (matches +=520% / +=460%). */
+  min-height: 100svh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 767px) {
+  .cc-ed-hero-scene__track {
+    min-height: 100svh;
+    min-height: 100dvh;
   }
 }
 
@@ -2129,27 +2155,59 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  padding-top: 0;
   width: 100%;
-  height: calc(100svh - 20px);
-  height: calc(100dvh - 20px);
-  min-height: calc(100svh - 20px);
-  min-height: calc(100dvh - 20px);
-  border-radius: 28px;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  border-radius: clamp(26px, 3vw, 40px);
+  transform-origin: center center;
   background: #101012;
 }
 
+/* Pending / running: full-viewport stage — cream via shut clip. JS opens once. */
+.cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
+.cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
+  width: 100%;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  margin-inline: 0;
+  margin-top: 0;
+  border-radius: 0;
+  background: #101012;
+  clip-path: inset(50% 50% 50% 50% round 28px);
+  will-change: clip-path;
+}
+
 @media (max-width: 767px) {
-  .cc-ed-hero-scene__stage {
-    height: calc(100svh - 16px);
-    height: calc(100dvh - 16px);
-    min-height: calc(100svh - 16px);
-    min-height: calc(100dvh - 16px);
-    border-radius: 22px;
+  .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
+    clip-path: inset(50% 50% 50% 50% round 22px);
   }
 }
 
-.cc-ed-hero-scene__stage .cc-ed-hero,
-.cc-ed-hero-scene__stage .cc-ed-hero__media {
+.cc-ed-hero-scene--enhanced[data-hero-intro='settled'] .cc-ed-hero-scene__stage {
+  width: 100%;
+  margin-top: 0;
+  margin-inline: 0;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  border-radius: 0;
+  will-change: clip-path;
+}
+
+.cc-ed-hero-scene--enhanced .cc-ed-hero-scene__hero .cc-ed-hero__media {
+  transform-origin: center center;
+}
+
+.cc-ed-hero-scene__hero,
+.cc-ed-hero-scene__hero-inner,
+.cc-ed-hero-scene__hero .cc-ed-hero {
   min-height: inherit;
   height: 100%;
   border-radius: inherit;
@@ -2162,105 +2220,156 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* CodeCard statement — Instrument Serif, orange accent, What this is mark */
-.cc-ed-statement-static {
-  position: relative;
-  background: #101012;
+/* Statement lives INSIDE the hero frame — IB layout: top bar, pager, center-right body */
+.cc-ed-hero-scene__statement {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  padding: clamp(1.1rem, 2.8vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem)
+    clamp(2rem, 6vh, 4rem);
+  /* Soft wash ??? keep hero media visible like IB behind the reveal */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 12, 14, 0.18) 0%,
+      rgba(12, 12, 14, 0.28) 45%,
+      rgba(12, 12, 14, 0.55) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(12, 12, 14, 0.12) 0%,
+      rgba(12, 12, 14, 0.05) 48%,
+      rgba(12, 12, 14, 0.22) 100%
+    );
   color: #efedeb;
-  padding: clamp(3.5rem, 9vh, 6.5rem) clamp(1.35rem, 5vw, 4.5rem)
-    clamp(4rem, 10vh, 7rem);
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.cc-ed-statement-static__chrome {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.55rem;
-  margin-bottom: clamp(2rem, 5vh, 3.25rem);
+/* Full-bleed cinema: no cream side strip showing through the stage */
+.cc-ed-hero-scene[data-cinema-chapter='statement'] .cc-ed-hero-scene__stage {
+  background: #101012;
 }
 
-.cc-ed-statement-static__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+/* One continuous loading bar — top edge, full width (IB) */
+.cc-ed-hero-scene__statement-progress {
+  position: relative;
+  width: 100%;
+  height: 1.5px;
   margin: 0;
-  color: var(--ed-accent, #e95a0b);
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.cc-ed-statement-static__tag-mark {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 2px;
-  background: var(--ed-accent, #e95a0b);
+  background: color-mix(in srgb, #efedeb 22%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
   flex-shrink: 0;
+  z-index: 2;
 }
 
-.cc-ed-statement-static__pager {
-  margin: 0;
-  color: color-mix(in srgb, #efedeb 55%, transparent);
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+.cc-ed-hero-scene__statement-progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: #efedeb;
+  border-radius: inherit;
+  will-change: transform;
+}
+
+/* Pager pill sits under the start of the progress bar */
+.cc-ed-hero-scene__statement-pager {
+  display: inline-flex;
+  align-items: baseline;
+  justify-self: start;
+  margin: clamp(0.65rem, 1.6vh, 1rem) 0 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
+  background: color-mix(in srgb, #101012 35%, transparent);
+  backdrop-filter: blur(8px);
+  color: #efedeb;
+  font-family: var(--font-eyebrow), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
 }
 
-.cc-ed-statement-static__pager-total {
-  opacity: 0.55;
+.cc-ed-hero-scene__statement-pager-total {
+  opacity: 0.45;
 }
 
-.cc-ed-statement-static__grid {
-  display: grid;
-  gap: clamp(2.75rem, 6vh, 4.5rem);
-  max-width: 52rem;
+/* Body block — center-right like IB */
+.cc-ed-hero-scene__statement-stage {
+  position: relative;
+  width: min(100%, 38rem);
+  max-width: 92vw;
+  margin-top: auto;
+  margin-bottom: clamp(8vh, 14vh, 18vh);
+  margin-left: clamp(0rem, 18vw, 22rem);
+  min-height: min(28vh, 16rem);
+  justify-self: start;
 }
 
-.cc-ed-statement-static__headline {
+.cc-ed-hero-scene__statement-slot {
+  position: relative;
+  width: 100%;
+}
+
+.cc-ed-hero-scene__statement-slot + .cc-ed-hero-scene__statement-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.cc-ed-hero-scene__statement-body {
   margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-}
-
-.cc-ed-statement-static__lead,
-.cc-ed-statement-static__sub {
-  display: block;
-  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.35rem, 5.8vw, 4.5rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  text-transform: uppercase;
-  text-wrap: balance;
-}
-
-.cc-ed-statement-static__lead {
+  max-width: 34rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 2.05rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  text-wrap: pretty;
   color: #efedeb;
 }
 
-.cc-ed-statement-static__sub {
-  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 82%, #efedeb);
-}
-
-.cc-ed-statement-static__lede {
-  margin: clamp(1rem, 2.2vh, 1.5rem) 0 0;
-  max-width: 36rem;
-  font-size: clamp(1.05rem, 1.4vw, 1.28rem);
-  line-height: 1.55;
-  color: color-mix(in srgb, #efedeb 78%, transparent);
+.cc-ed-hero-scene__statement-word {
+  display: inline;
+  /* Dim base; GSAP raises opacity word-by-word (IB reveal) */
+  color: #efedeb;
 }
 
 @media (max-width: 767px) {
-  .cc-ed-statement-static__lead,
-  .cc-ed-statement-static__sub {
-    font-size: clamp(1.85rem, 8vw, 2.6rem);
+  .cc-ed-hero-scene__statement-stage {
+    margin-left: 0;
+    margin-bottom: clamp(5vh, 10vh, 14vh);
+    width: 100%;
+  }
+
+  .cc-ed-hero-scene__statement-body {
+    font-size: clamp(1.2rem, 5.2vw, 1.55rem);
   }
 }
 
-/* Standalone old statement cinema scene — unused */
+.cc-ed-hero-scene__bridge-out {
+  width: 100%;
+  height: clamp(4.5rem, 12vh, 8.5rem);
+  margin-top: -1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #0c0c0e 0%,
+    #0c0c0e 28%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 18%, #0c0c0e) 58%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 62%, #0c0c0e) 82%,
+    var(--ed-cream, #fcf1e7) 100%
+  );
+}
+
+/* Standalone statement scene removed — lives inside hero cinema now */
 .cc-ed-statement-scene { display: none !important; }
 
 /* —— Editorial research scene — cream → charcoal wash + three beats —— */
@@ -2889,7 +2998,9 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
     will-change: auto;
   }
 
-  .cc-ed-hero-scene--static .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene__stage {
     width: 100%;
     margin-top: 0;
