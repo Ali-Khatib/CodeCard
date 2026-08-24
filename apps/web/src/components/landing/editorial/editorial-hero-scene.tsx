@@ -46,21 +46,30 @@ const STATEMENT_BEATS = [
     title: 'Your work belongs in one place.',
     lead: 'Your work belongs',
     sub: 'in one place.',
-    lede: 'Projects, papers, people, and signals live in one CodeCard you can share.',
+    lede:
+      'Not a link tree. Not a PDF resume. CodeCard is one living profile where your projects, research, connections, and analytics sit together — so people actually understand what you do.',
+    detail:
+      'Stop sending people to five tabs. Share one link and they see the full picture.',
   },
   {
     id: 'shift',
     title: 'Show what you build right on the spot.',
     lead: 'Show what you build',
     sub: 'right on the spot.',
-    lede: 'Open your card and they see the work clearly, right away.',
+    lede:
+      'When someone asks what you build, open your card. Demos, stack, outcomes, and papers are right there — not buried in GitHub, Notion, or LinkedIn.',
+    detail:
+      'They get proof while you are talking, not a promise to look later.',
   },
   {
     id: 'identity',
     title: 'One card. Your whole story.',
     lead: 'One card.',
     sub: 'Your whole story.',
-    lede: 'Hand someone your CodeCard and they get the full picture in one place.',
+    lede:
+      'Projects, papers, Circle, and connection notes stay on one identity you can hand off at a meetup, interview, or pitch — and carry with you after.',
+    detail:
+      'Hand someone your CodeCard. They leave knowing who you are and what you ship.',
   },
 ] as const;
 
@@ -541,6 +550,13 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                     <StatementWords
                       text={beat.lede}
                       beatId={beat.id}
+                      tone="lede"
+                    />
+                  </p>
+                  <p className="cc-ed-hero-scene__statement-detail">
+                    <StatementWords
+                      text={beat.detail}
+                      beatId={`${beat.id}-detail`}
                       tone="lede"
                     />
                   </p>

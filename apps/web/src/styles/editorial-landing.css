@@ -2332,16 +2332,17 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* Body block — Instrument Serif cream/orange like the CodeCard statement */
+/* Body block — Instrument Serif cream/orange, fills the stage */
 .cc-ed-hero-scene__statement-stage {
   position: relative;
-  width: min(100%, 42rem);
-  max-width: 92vw;
-  margin-top: auto;
-  margin-bottom: clamp(8vh, 14vh, 18vh);
-  margin-left: clamp(0rem, 14vw, 18rem);
-  min-height: min(28vh, 16rem);
+  width: min(100%, 46rem);
+  max-width: 94vw;
+  margin-top: clamp(1.5rem, 6vh, 4rem);
+  margin-bottom: clamp(6vh, 12vh, 16vh);
+  margin-left: clamp(0rem, 10vw, 14rem);
+  min-height: min(36vh, 22rem);
   justify-self: start;
+  align-self: center;
 }
 
 .cc-ed-hero-scene__statement-slot {
@@ -2358,12 +2359,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-body {
   margin: 0;
-  max-width: 38rem;
+  max-width: 42rem;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
   font-size: clamp(2.1rem, 4.8vw, 3.65rem);
   font-weight: 400;
   letter-spacing: -0.035em;
-  line-height: 1.05;
+  line-height: 1.08;
   text-wrap: pretty;
 }
 
@@ -2381,19 +2382,35 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-hero-scene__statement-lede {
-  margin: clamp(1rem, 2.2vh, 1.45rem) 0 0;
-  max-width: 34rem;
+  margin: clamp(1.1rem, 2.4vh, 1.6rem) 0 0;
+  max-width: 40rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  font-size: clamp(1.08rem, 1.55vw, 1.35rem);
   font-weight: 500;
   letter-spacing: -0.015em;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cc-ed-hero-scene__statement-detail {
+  margin: clamp(0.85rem, 1.8vh, 1.25rem) 0 0;
+  max-width: 38rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1.45;
   text-wrap: pretty;
+  color: color-mix(in srgb, #efedeb 68%, #5c5856);
 }
 
 .cc-ed-hero-scene__statement-lede .cc-ed-hero-scene__statement-word,
 .cc-ed-hero-scene__statement-lede-run .cc-ed-hero-scene__statement-word {
   color: color-mix(in srgb, #efedeb 78%, #5c5856);
+}
+
+.cc-ed-hero-scene__statement-detail .cc-ed-hero-scene__statement-word {
+  color: color-mix(in srgb, #efedeb 68%, #5c5856);
 }
 
 .cc-ed-hero-scene__statement-word {
@@ -2413,7 +2430,11 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   }
 
   .cc-ed-hero-scene__statement-lede {
-    font-size: clamp(1rem, 3.8vw, 1.15rem);
+    font-size: clamp(1rem, 3.8vw, 1.12rem);
+  }
+
+  .cc-ed-hero-scene__statement-detail {
+    font-size: clamp(0.95rem, 3.5vw, 1.05rem);
   }
 }
 
