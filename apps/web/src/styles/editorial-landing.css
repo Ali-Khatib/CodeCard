@@ -2113,38 +2113,39 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced) {
-  /* IB-tight cream frame — barely any surround */
+  /* Reduced-motion / static: thin cream frame via padding */
   padding: 10px;
 }
 
-/* Cream matting is intentional — thin IB-style frame (~8–12px). */
+/* Enhanced: cream frame is clip-path only — no layout padding thrash */
 .cc-ed-hero-scene--enhanced {
-  padding: 10px;
+  padding: 0;
 }
 
 @media (max-width: 767px) {
-  .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced),
-  .cc-ed-hero-scene--enhanced {
+  .cc-ed-hero-scene:not(.cc-ed-hero-scene--enhanced) {
     padding: 8px;
   }
 }
 
-/* While statement cinema is active, keep the shell dark — no cream flash at edges */
+/* Statement chapter: full-bleed dark stage — keep warm charcoal, not pure void */
 .cc-ed-hero-scene[data-cinema-chapter='statement'] {
-  background: #0c0c0e;
+  background: #101012;
   padding: 0;
 }
 
 .cc-ed-hero-scene__track {
   position: relative;
   background: transparent;
-  /* Pin runway — must match CINEMA_SCROLL_END in editorial-hero-scene.tsx */
-  min-height: 620vh;
+  /* Stage viewport only — GSAP pinSpacing owns the cinema runway (matches +=520% / +=460%). */
+  min-height: 100svh;
+  min-height: 100dvh;
 }
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__track {
-    min-height: 560vh;
+    min-height: 100svh;
+    min-height: 100dvh;
   }
 }
 
@@ -2163,20 +2164,18 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   background: #101012;
 }
 
-/* Pending / running: final IB geometry already locked — reveal is clip-path only.
-   First paint = cream (clip shut). JS owns the one continuous open tween. */
+/* Pending / running: full-viewport stage — cream via shut clip. JS opens once. */
 .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
 .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
   width: 100%;
-  height: calc(100svh - 20px);
-  height: calc(100dvh - 20px);
-  min-height: calc(100svh - 20px);
-  min-height: calc(100dvh - 20px);
+  height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
   margin-inline: 0;
   margin-top: 0;
-  border-radius: 28px;
+  border-radius: 0;
   background: #101012;
-  /* Shut until GSAP opens — cream page shows through */
   clip-path: inset(50% 50% 50% 50% round 28px);
   will-change: clip-path;
 }
@@ -2184,11 +2183,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 @media (max-width: 767px) {
   .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage {
-    height: calc(100svh - 16px);
-    height: calc(100dvh - 16px);
-    min-height: calc(100svh - 16px);
-    min-height: calc(100dvh - 16px);
-    border-radius: 22px;
     clip-path: inset(50% 50% 50% 50% round 22px);
   }
 }
@@ -2197,20 +2191,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   width: 100%;
   margin-top: 0;
   margin-inline: 0;
-  height: calc(100svh - 20px);
-  height: calc(100dvh - 20px);
-  min-height: calc(100svh - 20px);
-  min-height: calc(100dvh - 20px);
-  will-change: auto;
-}
-
-@media (max-width: 767px) {
-  .cc-ed-hero-scene--enhanced[data-hero-intro='settled'] .cc-ed-hero-scene__stage {
-    height: calc(100svh - 16px);
-    height: calc(100dvh - 16px);
-    min-height: calc(100svh - 16px);
-    min-height: calc(100dvh - 16px);
-  }
+  height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  border-radius: 0;
+  will-change: clip-path;
 }
 
 .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__hero .cc-ed-hero__media {
@@ -2232,111 +2218,47 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* Statement lives INSIDE the hero frame — scroll loads text, no second card */
+/* Statement lives INSIDE the hero frame — IB layout: top bar, pager, center-right body */
 .cc-ed-hero-scene__statement {
   position: absolute;
   inset: 0;
   z-index: 4;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: clamp(1.25rem, 4vh, 2.5rem) clamp(1.35rem, 5vw, 4.5rem)
-    clamp(2.5rem, 7vh, 4.5rem);
-  /* Even dark wash — kills muddy media glow under type; CodeCard ink, not a rebrand */
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  padding: clamp(1.1rem, 2.8vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem)
+    clamp(2rem, 6vh, 4rem);
+  /* Soft wash — keep hero media visible like IB behind the reveal */
   background:
     linear-gradient(
       180deg,
-      rgba(12, 12, 14, 0.42) 0%,
-      rgba(12, 12, 14, 0.62) 42%,
-      rgba(12, 12, 14, 0.88) 100%
+      rgba(12, 12, 14, 0.18) 0%,
+      rgba(12, 12, 14, 0.28) 45%,
+      rgba(12, 12, 14, 0.55) 100%
     ),
     linear-gradient(
-      105deg,
-      rgba(12, 12, 14, 0.72) 0%,
-      rgba(12, 12, 14, 0.35) 55%,
+      90deg,
+      rgba(12, 12, 14, 0.12) 0%,
+      rgba(12, 12, 14, 0.05) 48%,
       rgba(12, 12, 14, 0.22) 100%
     );
   color: #efedeb;
   pointer-events: none;
   visibility: hidden;
-  transition: background-color 0.55s ease;
 }
 
 /* Full-bleed cinema: no cream side strip showing through the stage */
 .cc-ed-hero-scene[data-cinema-chapter='statement'] .cc-ed-hero-scene__stage {
-  background: #0c0c0e;
+  background: #101012;
 }
 
-.cc-ed-hero-scene__statement-chrome {
-  position: absolute;
-  top: clamp(0.85rem, 2.5vh, 1.5rem);
-  left: clamp(1rem, 3vw, 2rem);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.55rem;
-}
-
-.cc-ed-hero-scene__statement-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0.35rem 0.7rem 0.35rem 0.45rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, #101012 55%, transparent);
-  color: #efedeb;
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.cc-ed-hero-scene__statement-tag-mark {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 2px;
-  background: var(--ed-accent, #e95a0b);
-}
-
-.cc-ed-hero-scene__statement-pager {
-  display: inline-flex;
-  align-items: baseline;
-  margin: 0;
-  padding: 0.3rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, #efedeb 30%, transparent);
-  background: color-mix(in srgb, #101012 40%, transparent);
-  color: #efedeb;
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
-}
-
-.cc-ed-hero-scene__statement-pager-total {
-  opacity: 0.55;
-}
-
-.cc-ed-hero-scene__statement-stage {
-  position: relative;
-  width: min(100%, 52rem);
-  margin-top: auto;
-  min-height: min(42vh, 28rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: clamp(1rem, 2.5vh, 1.5rem);
-}
-
-/* IB-style loading bar above the statement headline — fills per beat */
+/* One continuous loading bar — top edge, full width (IB) */
 .cc-ed-hero-scene__statement-progress {
   position: relative;
-  width: min(14rem, 48vw);
-  height: 2px;
-  margin-bottom: 0.35rem;
-  background: color-mix(in srgb, #efedeb 28%, transparent);
+  width: 100%;
+  height: 1.5px;
+  margin: 0;
+  background: color-mix(in srgb, #efedeb 22%, transparent);
   border-radius: 999px;
   overflow: hidden;
   flex-shrink: 0;
@@ -2354,6 +2276,40 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   will-change: transform;
 }
 
+/* Pager pill sits under the start of the progress bar */
+.cc-ed-hero-scene__statement-pager {
+  display: inline-flex;
+  align-items: baseline;
+  justify-self: start;
+  margin: clamp(0.65rem, 1.6vh, 1rem) 0 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
+  background: color-mix(in srgb, #101012 35%, transparent);
+  backdrop-filter: blur(8px);
+  color: #efedeb;
+  font-family: var(--font-eyebrow), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-ed-hero-scene__statement-pager-total {
+  opacity: 0.45;
+}
+
+/* Body block — center-right like IB */
+.cc-ed-hero-scene__statement-stage {
+  position: relative;
+  width: min(100%, 38rem);
+  max-width: 92vw;
+  margin-top: auto;
+  margin-bottom: clamp(8vh, 14vh, 18vh);
+  margin-left: clamp(0rem, 18vw, 22rem);
+  min-height: min(28vh, 16rem);
+  justify-self: start;
+}
+
 .cc-ed-hero-scene__statement-slot {
   position: relative;
   width: 100%;
@@ -2363,41 +2319,37 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  top: 0;
 }
 
-.cc-ed-hero-scene__statement-headline {
+.cc-ed-hero-scene__statement-body {
   margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-}
-
-.cc-ed-hero-scene__statement-lead,
-.cc-ed-hero-scene__statement-sub {
-  display: block;
-  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.15rem, 5.5vw, 4.25rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  text-transform: uppercase;
-  text-wrap: balance;
+  max-width: 34rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 2.05rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  text-wrap: pretty;
   color: #efedeb;
 }
 
 .cc-ed-hero-scene__statement-word {
   display: inline;
-  /* Word reveal dims via GSAP opacity — both lines stay readable on dark */
-  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
+  /* Dim base; GSAP raises opacity word-by-word (IB reveal) */
+  color: #efedeb;
 }
 
-.cc-ed-hero-scene__statement-lede {
-  margin: clamp(1.1rem, 2.5vh, 1.75rem) 0 0;
-  max-width: min(36rem, 94vw);
-  font-size: clamp(1.05rem, 1.4vw, 1.28rem);
-  line-height: 1.55;
-  color: color-mix(in srgb, #efedeb 82%, transparent);
+@media (max-width: 767px) {
+  .cc-ed-hero-scene__statement-stage {
+    margin-left: 0;
+    margin-bottom: clamp(5vh, 10vh, 14vh);
+    width: 100%;
+  }
+
+  .cc-ed-hero-scene__statement-body {
+    font-size: clamp(1.2rem, 5.2vw, 1.55rem);
+  }
 }
 
 .cc-ed-hero-scene__bridge-out {
@@ -2405,7 +2357,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: clamp(4.5rem, 12vh, 8.5rem);
   margin-top: -1px;
   pointer-events: none;
-  /* Longer soft dark → cream handoff — no hard cream bar mid-frame */
   background: linear-gradient(
     180deg,
     #0c0c0e 0%,

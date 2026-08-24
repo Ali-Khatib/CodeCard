@@ -514,14 +514,32 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
           if (stRef.current?.isActive) {
             applyScrollProgressRef.current(lastProgressRef.current);
           }
-          ScrollTrigger.refresh();
+          // Local refresh only — global ScrollTrigger.refresh remaps the hero pin
+          // and teleports this section mid-chapter.
+          stRef.current?.refresh();
         }, 120);
       });
       ro.observe(fs);
 
+      const onHeroCinemaReady = () => {
+        computePositions();
+        measureRailMetrics();
+        stRef.current?.refresh();
+        if (stRef.current?.isActive) {
+          applyScrollProgressRef.current(clamp(stRef.current.progress, 0, 1));
+        } else {
+          applyScrollProgressRef.current(0);
+        }
+      };
+      window.addEventListener('codecard:hero-cinema-ready', onHeroCinemaReady);
+
       return () => {
         if (resizeTimer) clearTimeout(resizeTimer);
         ro.disconnect();
+        window.removeEventListener(
+          'codecard:hero-cinema-ready',
+          onHeroCinemaReady,
+        );
         st.kill();
         stRef.current = null;
       };
@@ -533,7 +551,10 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
       prev: () => goTo(index - 1),
       goTo,
       getIndex: () => index,
-      refresh: () => ScrollTrigger.refresh(),
+      refresh: () => {
+        computePositions();
+        stRef.current?.refresh();
+      },
     }));
 
     useEffect(() => {
@@ -553,7 +574,8 @@ export const FullScreenScrollFX = forwardRef<HTMLDivElement, FullScreenFXProps>(
         });
       });
       measureRailMetrics();
-      applyScrollProgressRef.current(0);
+      // Do NOT force progress 0 here — ScrollTrigger may already be active after
+      // scroll restore / hero pin refresh (forcing 0 blanked then jumped).
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
