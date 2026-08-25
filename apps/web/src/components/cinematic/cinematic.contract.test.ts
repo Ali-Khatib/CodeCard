@@ -169,8 +169,8 @@ describe('Editorial product landing contract', () => {
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
     expect(css).toContain('.cc-ed-hero-scene__runway');
-    expect(css).toContain('.cc-ed-hero-scene__statement-pin');
-    expect(css).toContain('.cc-ed-hero-scene__statement-panel');
+    expect(css).toContain('.cc-ed-hero-scene__statement-overlay');
+    expect(css).toContain('.cc-ed-hero-scene__statement-veil');
     expect(css).toContain('min-height: 100svh');
     expect(css).not.toContain('min-height: 620vh');
     expect(landing).not.toContain('EditorialStatementScene');
@@ -208,16 +208,17 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('codecard:hero-cinema-ready');
     expect(scene).toContain('scrub: CINEMA_SCRUB');
     expect(scene).toContain('EXPAND_SCROLL_VH');
-    expect(scene).toContain('STATEMENT_PIN_SCROLL');
+    expect(scene).toContain('STATEMENT_SCROLL_VH');
     expect(scene).toContain('runwayTotalVh');
-    expect(scene).toContain('pin: panel');
-    expect(scene).toContain('pinSpacing: true');
+    expect(scene).toContain('buildStatementOverlay');
     expect(scene).toContain('BEAT_EXIT_Y');
     expect(scene).toContain('yPercent: BEAT_ENTER_Y');
     expect(scene).toContain('BEAT_FILL_SHARE');
     expect(scene).not.toContain('pin: stage');
+    expect(scene).not.toContain('pin: panel');
     expect(scene).not.toContain('statementTls');
     expect(scene).not.toContain('setStatementProgress');
+    expect(scene).not.toContain('STATEMENT_PIN_SCROLL');
     expect(scene).toContain('lockFinalGeometry');
     expect(scene).toContain("marginTop = '0'");
     expect(scene).toContain('heroIntroPlayed');

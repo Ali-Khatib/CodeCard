@@ -2591,8 +2591,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__runway {
   position: relative;
-  /* Hero expand only — JS sets expand + 100vh. */
-  min-height: 142vh;
+  /* JS sets expand + statement + 100vh — sticky panel holds hero bg. */
+  min-height: 502vh;
   background: var(--ed-cream, #fcf1e7);
 }
 
@@ -2624,7 +2624,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__runway {
-    min-height: 138vh;
+    min-height: 438vh;
   }
 }
 
@@ -2708,41 +2708,42 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* —— ONE pinned statement section (post-hero) — IB scroll model —— */
-.cc-ed-hero-scene__statement-pin {
-  position: relative;
-  z-index: 1;
-  background: #101012;
-}
-
-.cc-ed-hero-scene__statement-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(1rem, 2.4vh, 1.75rem);
-  width: 100%;
-  min-height: 100svh;
-  min-height: 100dvh;
-  padding:
-    calc(var(--cc-ed-nav-clearance) + 2.5rem)
-    0
-    clamp(2rem, 6vh, 4rem);
-  box-sizing: border-box;
-  background: #141413;
+/* —— Statement OVERLAY on live hero bg (IB model) —— */
+.cc-ed-hero-scene__statement-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
   color: #efedeb;
-  overflow: hidden;
+  opacity: 0;
 }
 
-/* Persistent full-bleed line — fixed in the panel, only fill changes */
+/* Soft veil — keeps shader/glow visible, improves text read */
+.cc-ed-hero-scene__statement-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 12, 14, 0.22) 0%,
+      rgba(12, 12, 14, 0.18) 40%,
+      rgba(12, 12, 14, 0.35) 100%
+    );
+}
+
+/* Full-bleed progress line — top of viewport under nav */
 .cc-ed-hero-scene__statement-progress {
-  position: relative;
-  width: 100%;
+  position: absolute;
+  top: calc(var(--cc-ed-nav-clearance) + 1.15rem);
+  left: 0;
+  right: 0;
+  z-index: 2;
   height: 1.5px;
   margin: 0;
   background: color-mix(in srgb, #efedeb 22%, transparent);
   overflow: hidden;
-  flex-shrink: 0;
 }
 
 .cc-ed-hero-scene__statement-progress-fill {
@@ -2755,15 +2756,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   will-change: transform;
 }
 
-/* Tag + pager under the line — left edge, padded */
+/* Tag + pager — left, just under the line */
 .cc-ed-hero-scene__statement-chrome {
+  position: absolute;
+  top: calc(var(--cc-ed-nav-clearance) + 1.9rem);
+  left: clamp(1.25rem, 4vw, 3.5rem);
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: clamp(0.65rem, 1.5vw, 1.1rem);
-  width: 100%;
-  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  flex-shrink: 0;
 }
 
 .cc-ed-hero-scene__statement-tag {
@@ -2806,14 +2808,15 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* One text position — right side like IB; beats fade up / fade in here */
+/* Text — TOP RIGHT under the line (IB composition) */
 .cc-ed-hero-scene__statement-stage {
-  position: relative;
-  width: 100%;
-  max-width: min(48rem, 88vw);
-  min-height: clamp(11rem, 32vh, 18rem);
-  margin-left: auto;
-  margin-right: clamp(1.25rem, 4vw, 3.5rem);
+  position: absolute;
+  top: calc(var(--cc-ed-nav-clearance) + 3.75rem);
+  right: clamp(1.25rem, 5vw, 4.5rem);
+  left: auto;
+  z-index: 2;
+  width: min(40rem, 52vw);
+  min-height: clamp(10rem, 28vh, 16rem);
   overflow: visible;
   text-align: left;
 }
@@ -2836,10 +2839,10 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-body {
   margin: 0;
-  max-width: 44rem;
+  max-width: 40rem;
   /* Beat copy — Instrument Serif cream/orange */
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.1rem, 4.8vw, 3.65rem);
+  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
   font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1.08;
@@ -2849,9 +2852,9 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-lede {
   margin: 0;
-  max-width: 42rem;
+  max-width: 36rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.08rem, 1.55vw, 1.35rem);
+  font-size: clamp(1.05rem, 1.45vw, 1.28rem);
   font-weight: 500;
   letter-spacing: -0.015em;
   line-height: 1.55;
@@ -2883,9 +2886,11 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 @media (max-width: 767px) {
-  .cc-ed-hero-scene__statement-panel {
-    padding-top: calc(var(--cc-ed-nav-clearance) + 1.5rem);
-    padding-bottom: clamp(1.5rem, 5vh, 2.5rem);
+  .cc-ed-hero-scene__statement-stage {
+    top: calc(var(--cc-ed-nav-clearance) + 4.25rem);
+    right: clamp(1rem, 4vw, 1.5rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    width: auto;
   }
 
   .cc-ed-hero-scene__statement-body {
