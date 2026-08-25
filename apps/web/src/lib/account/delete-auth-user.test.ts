@@ -154,9 +154,11 @@ describe('WS10-T005 Auth user deletion', () => {
   });
 
   it('documents Auth deletion as the last destructive identity step', () => {
+    /* Last destructive step; only best-effort tenant cleanup runs after it. */
     expect(ACCOUNT_DELETION_INTENDED_ORDER.indexOf('delete_supabase_auth_user_last')).toBe(
-      ACCOUNT_DELETION_INTENDED_ORDER.length - 2,
+      ACCOUNT_DELETION_INTENDED_ORDER.length - 3,
     );
+    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-2)).toBe('delete_personal_tenant_shell');
     expect(
       ACCOUNT_DELETION_INTENDED_ORDER.indexOf('cancel_stripe_or_verify_no_subscription'),
     ).toBeLessThan(ACCOUNT_DELETION_INTENDED_ORDER.indexOf('delete_supabase_auth_user_last'));

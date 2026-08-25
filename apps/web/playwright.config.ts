@@ -5,6 +5,13 @@ const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './e2e',
+  /*
+   * `.live.spec.ts` belongs to playwright.e2e.config.ts, which builds against the
+   * isolated Supabase project. Without that config those specs abort in
+   * `loadIsolatedE2EEnv()`, so leaving them in scope here made `test:e2e`
+   * unrunnable rather than reporting on the specs it actually owns.
+   */
+  testIgnore: /\.live\.spec\.ts$/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

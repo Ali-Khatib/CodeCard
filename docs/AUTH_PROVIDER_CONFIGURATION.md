@@ -75,7 +75,7 @@ https://*-<team-slug>.vercel.app/**   # if using Vercel preview deployments
 
 | Flow | App route | Redirect chain |
 |------|-----------|----------------|
-| OAuth (Google/GitHub) | `sign-in`, `sign-up` buttons | Provider → `{APP_URL}/auth/callback?redirect={safePath}` → internal path |
+| OAuth (GitHub) | `sign-in`, `sign-up` buttons | Provider → `{APP_URL}/auth/callback?redirect={safePath}` → internal path |
 | Password recovery | `forgot-password` | Email link → `{APP_URL}/auth/callback?redirect=%2Freset-password` → `/reset-password` |
 | Email confirmation | Sign-up | Email link → `{APP_URL}/auth/callback?redirect=%2Fauth%2Fconfirmed` → `/auth/confirmed` |
 | Email sign-in | `sign-in` | Session in-app → `sanitizeInternalRedirect(?redirect=)` |
@@ -90,10 +90,13 @@ https://*-<team-slug>.vercel.app/**   # if using Vercel preview deployments
 
 | Provider | UI location | Supabase provider id | Status |
 |----------|-------------|----------------------|--------|
-| GitHub | `sign-in/page.tsx` | `github` | Code-verified; **External required** for live login |
-| Google | `sign-in/page.tsx` | `google` | Code-verified; **External required** for live login |
+| GitHub | `sign-in/page.tsx`, `sign-up/page.tsx` | `github` | Code-verified; **External required** for live login |
 
-No other OAuth buttons are rendered in the current auth UI.
+GitHub is the only OAuth button rendered in the current auth UI. Google was removed
+and `apps/web/e2e/auth.spec.ts` asserts the button is absent on both sign-in and
+sign-up, so enabling the Google provider in Supabase would have no entry point.
+Account deletion still recognizes a Google identity for reauthentication so any
+pre-existing Google-linked account can still delete itself.
 
 ### Provider console callbacks (external required)
 
@@ -179,11 +182,10 @@ Use a **staging Supabase project** and test accounts created for QA — not prod
 4. [ ] **Email sign-up** — New user → profile provisioned → dashboard or verification banner. (External)
 5. [ ] **Email sign-in** — Valid credentials → dashboard; `?redirect=/dashboard/projects` honored. (External)
 6. [ ] **GitHub OAuth** — Completes → dashboard; unsafe `redirect` rejected. (External)
-7. [ ] **Google OAuth** — Same as GitHub. (External)
-8. [ ] **OAuth cancel** — Provider denial → `/auth/error`, safe copy, no session. (Code-verified route; External live)
-9. [ ] **Forgot password** — Generic success copy; email received; reset updates password. (External)
-10. [ ] **Expired session** — Clear cookies / wait for expiry → `/sign-in?reason=session_expired`. (External)
-11. [ ] **Sign out** — Settings sign-out → landing (`/`), not “session expired”. (Code-verified)
+7. [ ] **OAuth cancel** — Provider denial → `/auth/error`, safe copy, no session. (Code-verified route; External live)
+8. [ ] **Forgot password** — Generic success copy; email received; reset updates password. (External)
+9. [ ] **Expired session** — Clear cookies / wait for expiry → `/sign-in?reason=session_expired`. (External)
+10. [ ] **Sign out** — Settings sign-out → landing (`/`), not “session expired”. (Code-verified)
 
 Automated coverage: `apps/web/src/lib/auth/*.test.ts`, `apps/web/e2e/auth.spec.ts` (see WS01-T010).
 
@@ -206,7 +208,6 @@ Proxy matcher: `/dashboard/*`, `/admin/*`, auth routes (`proxy.ts`).
 
 ## 10. Items not verified in this task
 
-- Live Google OAuth login end-to-end
 - Live GitHub OAuth login end-to-end
 - Live email delivery (confirmation + password reset)
 - Supabase Dashboard provider secrets and exact redirect URL list for your project ref

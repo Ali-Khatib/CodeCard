@@ -14,7 +14,12 @@ import { createServiceClient } from '@/lib/supabase/server';
 export async function POST(request: Request) {
   return secureJsonRoute(
     request,
-    { schema: dmcaNoticeSchema, rateLimitType: 'dmca', maxBodyBytes: 32 * 1024 },
+    {
+      schema: dmcaNoticeSchema,
+      rateLimitType: 'dmca',
+      maxBodyBytes: 32 * 1024,
+      killSwitch: 'publicReports',
+    },
     async (data) => {
       const supabase = await createServiceClient();
 

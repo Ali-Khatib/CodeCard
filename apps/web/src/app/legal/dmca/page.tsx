@@ -16,14 +16,14 @@ export default function DmcaPage() {
           CodeCard respects intellectual property rights. Our designated DMCA agent can be reached
           at:
         </p>
-        <p className="mt-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+        <p className="mt-4 rounded-lg border border-[rgba(35,35,36,0.12)] bg-[rgba(35,35,36,0.04)] p-4">
           DMCA Agent
           <br />
           CodeCard, Inc.
           <br />
           [Physical address placeholder. Update before launch]
           <br />
-          dmca@codecard.app
+          <a href="mailto:dmca@codecard.app">dmca@codecard.app</a>
         </p>
       </section>
       <section>

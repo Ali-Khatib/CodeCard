@@ -20,9 +20,9 @@ describe('Editorial product landing contract', () => {
     expect(hero).toContain('ONE IDENTITY.');
     expect(hero).toContain('cc-ed__lead');
     expect(hero).toContain('EditorialHeroAnimatedHeadline');
-    expect(hero).toContain('cc-ed-hero__media');
-    expect(hero).toContain('ShaderHeroBackdrop');
-    expect(hero).toContain('data-hero-shader');
+    /* The shader field belongs to the scene now — shared with the statement. */
+    expect(hero).not.toContain('cc-ed-hero__media');
+    expect(hero).not.toContain('ShaderHeroBackdrop');
     expect(hero).not.toContain('priority');
     expect(hero).not.toContain('images.unsplash.com');
     expect(hero).not.toContain('LIVE_DEMO_PROFILE_HREF');
@@ -169,8 +169,11 @@ describe('Editorial product landing contract', () => {
       /\.cc-marketing-nav-shell \.cc-nav-veil \{[\s\S]*?border-radius:\s*0\s*!important/,
     );
     expect(css).toContain('.cc-ed-hero-scene__runway');
-    expect(css).toContain('.cc-ed-hero-scene__statement-overlay');
-    expect(css).toContain('.cc-ed-hero-scene__statement-veil');
+    /* Statement is its own section below the hero with a sticky pin. */
+    expect(css).toContain('.cc-ed-hero-scene__statement {');
+    expect(css).toContain('.cc-ed-hero-scene__statement-pin');
+    expect(css).not.toContain('.cc-ed-hero-scene__statement-overlay');
+    expect(css).not.toContain('.cc-ed-hero-scene__statement-veil');
     expect(css).toContain('min-height: 100svh');
     expect(css).not.toContain('min-height: 620vh');
     expect(landing).not.toContain('EditorialStatementScene');
@@ -210,10 +213,20 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('EXPAND_SCROLL_VH');
     expect(scene).toContain('STATEMENT_SCROLL_VH');
     expect(scene).toContain('runwayTotalVh');
-    expect(scene).toContain('buildStatementOverlay');
-    expect(scene).toContain('BEAT_EXIT_Y');
-    expect(scene).toContain('yPercent: BEAT_ENTER_Y');
+    expect(scene).toContain('buildStatementReveal');
     expect(scene).toContain('BEAT_FILL_SHARE');
+    /* Per-character fill, pure cross-fade, one linear bar. */
+    expect(scene).toContain('data-statement-char');
+    expect(scene).toContain('STATEMENT_CHAR_DIM');
+    expect(scene).toContain('STATEMENT_CHAR_LIT');
+    expect(scene).toContain('statementTotalVh');
+    expect(scene).toContain("start: 'top top'");
+    /* Nothing about the handoff may be faked with transforms. */
+    expect(scene).not.toContain('BEAT_ENTER_Y');
+    expect(scene).not.toContain('BEAT_EXIT_Y');
+    expect(scene).not.toContain('HERO_EXIT_Y');
+    expect(scene).not.toContain('STATEMENT_ENTER_Y');
+    expect(scene).not.toContain('yPercent');
     expect(scene).not.toContain('pin: stage');
     expect(scene).not.toContain('pin: panel');
     expect(scene).not.toContain('statementTls');
@@ -238,7 +251,19 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('cc-ed-hero-scene__bridge-out');
     expect(css).toContain('.cc-ed-hero-scene__bridge-out');
     expect(css).toContain("[data-hero-intro='pending']");
-    expect(scene).not.toContain('ShaderHeroBackdrop');
+    /*
+     * ONE shader field, owned by the scene and shared by the hero and the
+     * statement. Two viewport-sized fields butting together is what seamed.
+     */
+    expect(scene).toContain('ShaderHeroBackdrop');
+    expect(scene.match(/<ShaderHeroBackdrop/g)?.length).toBe(1);
+    expect(scene).toContain('cc-ed-hero-scene__field-inner');
+    expect(scene).toContain('cc-ed-hero-scene__letterbox');
+    expect(scene).toContain('clipped = [stage, field]');
+    expect(css).toContain('.cc-ed-hero-scene__field-inner');
+    expect(css).toContain('.cc-ed-hero-scene__letterbox');
+    /* The statement must not paint its own field. */
+    expect(css).not.toContain('.cc-ed-hero-scene__statement-pin::before');
     expect(scene).toContain('refreshScrollTrigger');
     expect(scene).not.toContain('anticipatePin');
     expect(scene).not.toContain("backgroundColor: 'transparent'");

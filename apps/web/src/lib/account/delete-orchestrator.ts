@@ -29,6 +29,8 @@ import {
   acquireAccountDeletionLock,
   releaseAccountDeletionLock,
 } from '@/lib/account/delete-lock';
+import { deleteTrustedTenantShell } from '@/lib/account/delete-tenant-shell';
+import { logSecurityEvent } from '@/lib/security/security-events';
 import { getStripe } from '@/lib/stripe';
 
 export const ACCOUNT_DELETION_INTENDED_ORDER = [
@@ -42,6 +44,8 @@ export const ACCOUNT_DELETION_INTENDED_ORDER = [
   'anonymize_or_delete_analytics',
   'insert_immutable_deletion_audit',
   'delete_supabase_auth_user_last',
+  /* Best-effort cleanup after the Auth delete; never fails the operation. */
+  'delete_personal_tenant_shell',
   'return_success',
 ] as const;
 
@@ -217,6 +221,34 @@ export async function runAccountDeletionOrchestrator(input: {
     if (!authResult.ok) {
       await releaseAccountDeletionLock(service, lock.operationId, 'failed', 'auth_user_deletion');
       return { ok: false, code: 'ACCOUNT_DELETION_FAILED', mutated: false };
+    }
+
+    /*
+     * Tenant shell last: it holds the signup-derived name/slug, and its removal
+     * depends on the membership cascade from the Auth delete above.
+     *
+     * Non-fatal. The account is already gone at this point, so the caller must
+     * not see a failure it cannot retry — a leftover row is a cleanup task, not
+     * a failed deletion.
+     */
+    try {
+      const tenantShellResult = await deleteTrustedTenantShell(service, {
+        authenticatedUserId: trustedOwnerUserId,
+        trustedOwnerUserId,
+        tenantId,
+        correlationId,
+      });
+      if (!tenantShellResult.ok) {
+        logSecurityEvent('ACCOUNT_TENANT_SHELL_RETAINED', {
+          reason: tenantShellResult.reason,
+          correlationId,
+        });
+      }
+    } catch {
+      logSecurityEvent('ACCOUNT_TENANT_SHELL_RETAINED', {
+        reason: 'unexpected',
+        correlationId,
+      });
     }
 
     await releaseAccountDeletionLock(service, lock.operationId, 'completed');

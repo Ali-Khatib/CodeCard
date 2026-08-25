@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils';
 const SPRING = { type: 'spring' as const, damping: 22, stiffness: 280 };
 /** Collapsed expand-control diameter (matches prior 3rem circle). */
 export const NAV_COLLAPSED_SIZE = 48;
+/** Pill/circle states stay fully rounded; the stacked mobile panel does not. */
+const NAV_PILL_RADIUS = 9999;
+const NAV_PANEL_RADIUS = 28;
 
 export const navContentVariants = {
   expanded: {
@@ -121,6 +124,14 @@ export function AnimatedNavFramer({
     }
   };
 
+  /*
+   * A pill radius on the tall open-menu box renders as an ellipse, so the
+   * radius has to drop once the panel is stacked underneath. Motion writes it
+   * inline, which is the only way to beat the `rounded-full` utility class.
+   */
+  const menuOpen = expanded && phone && Boolean(panel);
+  const radius = menuOpen ? NAV_PANEL_RADIUS : NAV_PILL_RADIUS;
+
   const sizeAnimate = expanded
     ? phone
       ? {
@@ -128,18 +139,21 @@ export function AnimatedNavFramer({
           height: openSize.height,
           minWidth: 0,
           maxWidth: 'calc(100% - 24px)',
+          borderRadius: radius,
         }
       : {
           width: maxOpenWidth,
           height: openSize.height,
           minWidth: 0,
           maxWidth: maxOpenWidth,
+          borderRadius: radius,
         }
     : {
         width: NAV_COLLAPSED_SIZE,
         height: NAV_COLLAPSED_SIZE,
         minWidth: NAV_COLLAPSED_SIZE,
         maxWidth: NAV_COLLAPSED_SIZE,
+        borderRadius: NAV_PILL_RADIUS,
       };
 
   return (

@@ -50,17 +50,26 @@ test.describe('Workspace-first public route alignment', () => {
     await expect(page.getByRole('heading', { name: 'Alex Chen' })).toBeVisible();
   });
 
-  test('Open live demo workspace CTA reaches /demo', async ({ page }) => {
+  /*
+   * The landing used to carry "Open live demo workspace" and "View public
+   * profile" CTAs. Both were removed: the workspace CTA is now "Open Live Demo"
+   * and the public-profile CTA was dropped entirely (cinematic-landing.spec.ts
+   * asserts it stays gone). These cover the surviving routing contract.
+   */
+  test('every "Open Live Demo" CTA on the landing points at /demo', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const workspaceCta = page.getByRole('link', { name: /Open live demo workspace/i }).first();
-    await expect(workspaceCta).toHaveAttribute('href', '/demo');
+    const ctas = page.getByRole('link', { name: /Open Live Demo/i });
+    const count = await ctas.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i += 1) {
+      await expect(ctas.nth(i)).toHaveAttribute('href', /\/demo\/?$/);
+    }
   });
 
-  test('public-profile CTA reaches /demo/card', async ({ page }) => {
+  test('landing does not deep-link into the public demo card', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const profileCta = page.getByRole('link', { name: /View public profile/i }).first();
-    // Attribute assertion needs no scrolling; scrolling here races Lenis + section entrances.
-    await expect(profileCta).toHaveAttribute('href', '/demo/card');
+    /* The demo entry point is the workspace; /demo/card is reached from within it. */
+    await expect(page.locator('a[href="/demo/card"]')).toHaveCount(0);
   });
 
   test('/landing permanently redirects to /', async ({ page }) => {

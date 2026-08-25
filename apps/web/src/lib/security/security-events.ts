@@ -6,6 +6,8 @@ export const SECURITY_EVENTS = [
   'ADMIN_ACCESS_DENIED',
   'STRIPE_WEBHOOK_FAILED',
   'SESSION_REVOKED',
+  /** Account deleted, but its personal tenant row survived — needs cleanup. */
+  'ACCOUNT_TENANT_SHELL_RETAINED',
 ] as const;
 
 export type SecurityEventName = (typeof SECURITY_EVENTS)[number];

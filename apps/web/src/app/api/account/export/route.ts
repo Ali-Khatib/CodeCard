@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       rateLimitType: 'accountExport',
       requireAuth: true,
       strictRateLimit: true,
+      killSwitch: 'accountExport',
       maxBodyBytes: 4 * 1024,
     },
     async (_data, ctx) => {

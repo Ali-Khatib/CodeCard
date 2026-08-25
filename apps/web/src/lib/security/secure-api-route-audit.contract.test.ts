@@ -41,7 +41,6 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
         'auth/complete-password-reset/route.ts',
-        'auth/oauth-preflight/route.ts',
         'dmca/route.ts',
         'internal/rate-limit-verify/route.ts',
         'internal/sentry-verify/route.ts',
@@ -53,7 +52,6 @@ describe('WS11-T005 secure API route audit', () => {
     );
     for (const route of [
       '/api/analytics',
-      '/api/auth/oauth-preflight',
       '/api/dmca',
       '/api/moderation/report',
       '/api/account/export',

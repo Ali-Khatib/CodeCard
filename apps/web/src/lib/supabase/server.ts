@@ -1,3 +1,9 @@
+/**
+ * Server-only Supabase entrypoints, including the service-role client.
+ * The `server-only` guard turns an accidental client import into a build
+ * failure instead of a runtime surprise.
+ */
+import 'server-only';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';

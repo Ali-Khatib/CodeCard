@@ -10,6 +10,25 @@ export function getRedis(): Redis | null {
   return new Redis({ url, token });
 }
 
+/**
+ * Endpoints where losing the limiter is worse than losing the endpoint. These
+ * deny when the limit cannot be evaluated; everything else degrades to allow so
+ * a Redis outage cannot take down public reads.
+ */
+const STRICT_TYPES = new Set<keyof typeof RATE_LIMITS>(['ai', 'upload', 'auth']);
+
+/**
+ * Whether an unevaluable limit should deny. Mirrors the missing-config policy so
+ * "Redis absent" and "Redis unreachable" cannot diverge.
+ *
+ * `CODECARD_E2E=1` marks the isolated E2E backend (server-only, never set in
+ * production), where a production build is served locally without Redis.
+ */
+function failClosed(type: keyof typeof RATE_LIMITS): boolean {
+  const isolatedE2E = process.env.CODECARD_E2E === '1';
+  return isProduction() && !isolatedE2E && STRICT_TYPES.has(type);
+}
+
 export async function rateLimit(
   key: string,
   type: keyof typeof RATE_LIMITS,
@@ -17,11 +36,7 @@ export async function rateLimit(
   const redis = getRedis();
 
   if (!redis) {
-    // Strict endpoints fail closed without Redis in production, except in the
-    // isolated E2E backend mode (CODECARD_E2E=1, server-only, never set in
-    // production) where the app is a production build served locally.
-    const isolatedE2E = process.env.CODECARD_E2E === '1';
-    if (isProduction() && !isolatedE2E && (type === 'ai' || type === 'upload' || type === 'auth')) {
+    if (failClosed(type)) {
       console.error(`[rate-limit] Redis unavailable for strict endpoint: ${type}`);
       return { success: false };
     }
@@ -36,8 +51,19 @@ export async function rateLimit(
     prefix: 'codecard',
   });
 
-  const result = await limiter.limit(key);
-  return { success: result.success, remaining: result.remaining };
+  try {
+    const result = await limiter.limit(key);
+    return { success: result.success, remaining: result.remaining };
+  } catch {
+    /*
+     * Redis is configured but unreachable (outage, DNS failure, rotated
+     * credentials). This used to propagate and turn every rate-limited route
+     * into a 500, including public research PDF reads and analytics ingest.
+     * Never log the error: it can carry the REST URL and token.
+     */
+    console.error(`[rate-limit] limiter unreachable for endpoint: ${type}`);
+    return { success: !failClosed(type) };
+  }
 }
 
 /** Token bucket for burst-sensitive paid AI endpoints */
@@ -58,6 +84,12 @@ export async function rateLimitTokenBucket(
     prefix: 'codecard:ai',
   });
 
-  const result = await limiter.limit(key);
-  return { success: result.success };
+  try {
+    const result = await limiter.limit(key);
+    return { success: result.success };
+  } catch {
+    /* Paid AI spend: an unevaluable bucket always denies in production. */
+    console.error('[rate-limit] token bucket unreachable');
+    return { success: !isProduction() };
+  }
 }

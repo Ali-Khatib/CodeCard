@@ -95,6 +95,13 @@ vi.mock('./delete-auth-user', async () => {
   };
 });
 
+vi.mock('./delete-tenant-shell', () => ({
+  deleteTrustedTenantShell: vi.fn(async () => {
+    stages.push('tenant_shell');
+    return { ok: true, deleted: true };
+  }),
+}));
+
 import {
   ACCOUNT_DELETION_DEFERRED_CAPABILITIES,
   ACCOUNT_DELETION_INTENDED_ORDER,
@@ -105,6 +112,27 @@ import {
 const OWNER_A = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const PROFILE_A = 'paaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const TENANT_A = 'taaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+/** Resolves the owner profile and rejects any other table access. */
+function profileOnlySupabase() {
+  return {
+    from: (table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: { id: PROFILE_A, tenant_id: TENANT_A, owner_user_id: OWNER_A },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }
+      throw new Error(`unexpected ${table}`);
+    },
+  };
+}
 
 describe('WS10-T008 integrated orchestrator order', () => {
   beforeEach(() => {
@@ -122,7 +150,9 @@ describe('WS10-T008 integrated orchestrator order', () => {
   });
 
   it('documents final runtime order with Auth last', () => {
-    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-2)).toBe('delete_supabase_auth_user_last');
+    /* Auth is the last destructive stage; only best-effort cleanup follows. */
+    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-3)).toBe('delete_supabase_auth_user_last');
+    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-2)).toBe('delete_personal_tenant_shell');
     expect(
       ACCOUNT_DELETION_INTENDED_ORDER.indexOf('cancel_stripe_or_verify_no_subscription'),
     ).toBeLessThan(ACCOUNT_DELETION_INTENDED_ORDER.indexOf('delete_approved_local_content'));
@@ -135,33 +165,64 @@ describe('WS10-T008 integrated orchestrator order', () => {
   });
 
   it('executes Stripe → local → analytics → audit → Auth in order', async () => {
-    const supabase = {
-      from: (table: string) => {
-        if (table === 'profiles') {
-          return {
-            select: () => ({
-              eq: () => ({
-                maybeSingle: async () => ({
-                  data: { id: PROFILE_A, tenant_id: TENANT_A, owner_user_id: OWNER_A },
-                  error: null,
-                }),
-              }),
-            }),
-          };
-        }
-        throw new Error(`unexpected ${table}`);
-      },
-    };
-
     const result = await runAccountDeletionOrchestrator({
       user: { id: OWNER_A } as User,
-      supabase: supabase as never,
+      supabase: profileOnlySupabase() as never,
       createServiceClient: async () => ({}) as never,
       getStripeClient: () => ({}) as never,
     });
 
     expect(result).toEqual({ ok: true, mutated: true });
-    expect(stages).toEqual(['lock', 'stripe', 'local', 'analytics', 'audit', 'auth', 'release']);
+    expect(stages).toEqual([
+      'lock',
+      'stripe',
+      'local',
+      'analytics',
+      'audit',
+      'auth',
+      'tenant_shell',
+      'release',
+    ]);
+  });
+
+  /*
+   * The account is already gone by the time the tenant shell is removed, so the
+   * caller must never receive a failure it cannot retry.
+   */
+  it('still reports success when tenant shell cleanup fails', async () => {
+    const { deleteTrustedTenantShell } = await import('./delete-tenant-shell');
+    vi.mocked(deleteTrustedTenantShell).mockImplementationOnce(async () => {
+      stages.push('tenant_shell');
+      return { ok: false, reason: 'delete_failed' };
+    });
+
+    const result = await runAccountDeletionOrchestrator({
+      user: { id: OWNER_A } as User,
+      supabase: profileOnlySupabase() as never,
+      createServiceClient: async () => ({}) as never,
+      getStripeClient: () => ({}) as never,
+    });
+
+    expect(result).toEqual({ ok: true, mutated: true });
+    expect(stages).toContain('auth');
+    expect(stages).toContain('release');
+  });
+
+  it('still reports success when tenant shell cleanup throws', async () => {
+    const { deleteTrustedTenantShell } = await import('./delete-tenant-shell');
+    vi.mocked(deleteTrustedTenantShell).mockImplementationOnce(async () => {
+      throw new Error('connection reset');
+    });
+
+    const result = await runAccountDeletionOrchestrator({
+      user: { id: OWNER_A } as User,
+      supabase: profileOnlySupabase() as never,
+      createServiceClient: async () => ({}) as never,
+      getStripeClient: () => ({}) as never,
+    });
+
+    expect(result).toEqual({ ok: true, mutated: true });
+    expect(stages).toContain('release');
   });
 
   it('stops before Auth when Stripe cancellation fails', async () => {

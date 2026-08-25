@@ -27,7 +27,7 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
             {title}
           </h1>
           <p className="mt-4 text-sm text-smoke">Last updated: {lastUpdated}</p>
-          <div className="mt-12 space-y-8 text-[16px] leading-relaxed text-smoke [&_h2]:font-display [&_h2]:text-[28px] [&_h2]:font-normal [&_h2]:leading-tight [&_h2]:tracking-[-0.03em] [&_h2]:text-ink [&_li]:pl-1 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
+          <div className="mt-12 space-y-8 text-[16px] leading-relaxed text-smoke [&_a:hover]:opacity-70 [&_a]:font-medium [&_a]:text-ink [&_a]:underline [&_a]:decoration-[rgba(35,35,36,0.28)] [&_a]:underline-offset-[3px] [&_a]:transition-opacity [&_h2]:font-display [&_h2]:text-[28px] [&_h2]:font-normal [&_h2]:leading-tight [&_h2]:tracking-[-0.03em] [&_h2]:text-ink [&_li]:pl-1 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
             {children}
           </div>
           <Link

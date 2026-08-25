@@ -222,7 +222,9 @@ describe('WS10-T004 route and boundaries', () => {
 
   it('documents intended final deletion order with Auth last', () => {
     expect(ACCOUNT_DELETION_INTENDED_ORDER[0]).toBe('validate_auth_reauth_confirmation');
-    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-2)).toBe('delete_supabase_auth_user_last');
+    /* Auth is the last destructive step; tenant-shell cleanup is best-effort. */
+    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-3)).toBe('delete_supabase_auth_user_last');
+    expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-2)).toBe('delete_personal_tenant_shell');
     expect(ACCOUNT_DELETION_INTENDED_ORDER.at(-1)).toBe('return_success');
   });
 

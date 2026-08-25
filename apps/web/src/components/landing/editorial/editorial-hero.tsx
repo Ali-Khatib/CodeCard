@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { ShaderHeroBackdrop } from '@/components/ui/shader-hero';
 import { EditorialHeroAnimatedHeadline } from './editorial-hero-animated-headline';
 
 /**
  * Inset shader hero: oversized type + CTAs over the orange/black field.
- * Frame expand + statement reveal are owned by EditorialHeroScene.
+ * Frame expand + statement reveal are owned by EditorialHeroScene, which also
+ * owns the shader field — one element shared with the statement, so the two
+ * sections cannot seam against each other.
  */
 export function EditorialHero() {
   return (
@@ -16,11 +17,6 @@ export function EditorialHero() {
       data-testid="editorial-hero"
       aria-labelledby="editorial-hero-heading"
     >
-      <div className="cc-ed-hero__media" data-hero-shader aria-hidden>
-        <ShaderHeroBackdrop />
-        <div className="cc-ed-hero__veil" />
-      </div>
-
       <div className="cc-ed-hero__content" data-testid="hero-section">
         <div className="cc-ed-hero__copy">
           <p className="cc-ed__eyebrow">CodeCard</p>

@@ -10,6 +10,7 @@ import { getClientIp, rateLimited, unauthorized } from '@/lib/api-utils';
 import { recoverySessionForbiddenResponse } from '@/lib/auth/recovery-session-guard';
 import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
+import { FEATURE_DISABLED_MESSAGE, isFeatureBlocked } from '@/lib/security/kill-switch';
 import { rateLimit } from '@/lib/rate-limit';
 import { assertProjectMediaUploadAllowed } from '@/lib/projects/project-media-core';
 import { assertResearchFigureUploadAllowed } from '@/lib/research/research-figure-core';
@@ -28,6 +29,11 @@ function jsonNoStore(body: unknown, status: number) {
 }
 
 export async function POST(request: Request) {
+  /* Emergency disable before any auth lookup or storage side effect. */
+  if (isFeatureBlocked('uploads')) {
+    return jsonNoStore({ error: FEATURE_DISABLED_MESSAGE }, 503);
+  }
+
   if (!isSameOriginMutation(request)) {
     return jsonNoStore({ error: 'Forbidden' }, 403);
   }

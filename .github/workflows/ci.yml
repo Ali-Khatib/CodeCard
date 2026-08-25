@@ -27,8 +27,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # `mobile` is included so Expo type regressions cannot land unnoticed.
       - name: Typecheck
-        run: npx turbo typecheck --filter=web --filter=@codecard/*
+        run: npx turbo typecheck --filter=web --filter=mobile --filter=@codecard/*
 
       - name: Test
         run: npm run test

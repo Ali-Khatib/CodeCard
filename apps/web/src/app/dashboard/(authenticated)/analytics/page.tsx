@@ -92,6 +92,7 @@ export default async function AnalyticsPage({
       summary={result.summary}
       trends={trendsResult.trends}
       profileSlug={result.summary.profileSlug}
+      entitlement={result.entitlement}
     />
   );
 }

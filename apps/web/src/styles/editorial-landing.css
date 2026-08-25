@@ -136,7 +136,7 @@
   align-items: baseline;
   gap: 0;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: 1.35rem;
+  font-size: clamp(1.9rem, 2.6vw, 2.5rem);
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -163,7 +163,8 @@
   overflow: hidden;
   white-space: nowrap;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.92rem;
+  /* Relative to the mark so the hover reveal scales with it. */
+  font-size: 0.68em;
   font-weight: 560;
   letter-spacing: -0.03em;
   vertical-align: baseline;
@@ -262,6 +263,14 @@ html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
   max-width: 8.25rem;
   padding-inline: 10px;
   white-space: nowrap;
+}
+
+/* Stacked mobile rows fill the panel — the desktop equal-width lock is for
+   aligning the horizontal row only. */
+.cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-menu .cc-nav-pill-item--eq {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-pill-item--active,
@@ -1561,14 +1570,14 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 @media (min-width: 960px) {
+  /*
+   * Full width so the baseline row reaches the hero's right edge — headline
+   * and lede keep their own max-widths, so only the CTAs move outward.
+   */
   .cc-ed-hero__content {
-    width: min(100% - 4rem, 76rem);
+    width: 100%;
     padding-left: clamp(2.75rem, 8vw, 6.5rem);
-    padding-right: clamp(1.25rem, 3vw, 2.25rem);
-  }
-
-  .cc-ed-hero__actions-corner {
-    margin-inline-end: clamp(-0.35rem, -1vw, 0rem);
+    padding-right: clamp(1.75rem, 4vw, 4rem);
   }
 }
 
@@ -2586,14 +2595,69 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__track {
   position: relative;
-  background: transparent;
+  /*
+   * Dark base under the shared field. The cream letterbox only covers the hero
+   * runway, so the statement region never flashes cream behind the field.
+   */
+  background: #101012;
+}
+
+/*
+ * ONE background field for the hero and the statement. Sticky across the whole
+ * track (no flow space, so it does not lengthen the scroll), which means both
+ * sections share a single element and cannot seam against each other.
+ *
+ * Stacking inside .cc-ed-hero-scene__track (which stays z-index: auto so its
+ * descendants interleave here): letterbox 0 < field 1 < hero frame 2 <
+ * statement 3.
+ */
+.cc-ed-hero-scene__field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cc-ed-hero-scene__field-inner {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+  border-radius: clamp(26px, 3vw, 40px);
+  transform-origin: center center;
+  background: #141413;
+  will-change: clip-path;
+}
+
+/*
+ * Resolves the field's bottom rows to the track base so the edge is invisible
+ * when it finally scrolls off into the bridge. Statement chapter only — during
+ * the hero the bottom of the frame carries the lede and CTAs.
+ */
+.cc-ed-hero-scene[data-cinema-chapter='statement'] .cc-ed-hero-scene__field-inner::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(3rem, 9vh, 7rem);
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, #101012 100%);
+}
+
+/* Cream the inset clip reveals. Behind the field, hero runway only. */
+.cc-ed-hero-scene__letterbox {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--ed-cream, #fcf1e7);
 }
 
 .cc-ed-hero-scene__runway {
   position: relative;
-  /* JS sets expand + statement + 100vh — sticky panel holds hero bg. */
-  min-height: 502vh;
-  background: var(--ed-cream, #fcf1e7);
+  /* Expand + open-hero hold + 100vh. JS keeps this in sync with the timeline. */
+  min-height: 200vh;
+  background: transparent;
 }
 
 .cc-ed-hero-scene__cinema-panel {
@@ -2607,8 +2671,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   min-height: 100svh;
   min-height: 100dvh;
   overflow: hidden;
-  /* Cream letterbox behind clipped hero — inset clip must reveal cream, not charcoal */
-  background: var(--ed-cream, #fcf1e7);
+  /* Transparent — the shared field paints behind, the letterbox behind that. */
+  background: transparent;
 }
 
 .cc-ed-hero-scene__cinema-panel .cc-ed-hero-scene__stage {
@@ -2620,11 +2684,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   min-height: 100%;
   margin: 0;
   border-radius: 0;
+  background: transparent;
 }
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__runway {
-    min-height: 438vh;
+    min-height: 180vh;
+  }
+
+  .cc-ed-hero-scene__statement {
+    min-height: 370vh;
   }
 }
 
@@ -2640,7 +2709,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   min-height: 100dvh;
   border-radius: clamp(26px, 3vw, 40px);
   transform-origin: center center;
-  background: #141413;
+  background: transparent;
   will-change: clip-path;
 }
 
@@ -2650,13 +2719,14 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   .cc-ed-hero-scene__stage,
 .cc-ed-hero-scene--enhanced[data-hero-intro='running']
   .cc-ed-hero-scene__cinema-panel
-  .cc-ed-hero-scene__stage {
+  .cc-ed-hero-scene__stage,
+.cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__field-inner,
+.cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__field-inner {
   width: 100%;
   height: 100%;
   min-height: 100%;
   margin: 0;
   border-radius: 0;
-  background: #141413;
   clip-path: inset(50% 50% 50% 50% round 28px);
 }
 
@@ -2666,7 +2736,9 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
     .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene--enhanced[data-hero-intro='running']
     .cc-ed-hero-scene__cinema-panel
-    .cc-ed-hero-scene__stage {
+    .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__field-inner,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__field-inner {
     clip-path: inset(50% 50% 50% 50% round 22px);
   }
 }
@@ -2681,7 +2753,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   border-radius: 0;
 }
 
-.cc-ed-hero-scene--enhanced .cc-ed-hero-scene__hero .cc-ed-hero__media {
+.cc-ed-hero-scene--enhanced .cc-ed-hero-scene__field .cc-ed-hero__media {
   transform-origin: center center;
 }
 
@@ -2708,38 +2780,39 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   height: 100%;
 }
 
-/* —— Statement OVERLAY on live hero bg (IB model) —— */
-.cc-ed-hero-scene__statement-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
+/*
+ * Statement is a real section under the hero. The hero scrolls away on plain
+ * document scroll, this scrolls up into place, then the inner pin sticks and
+ * the scroll scrubs the reveal. JS sets min-height (pin distance + 100vh).
+ */
+.cc-ed-hero-scene__statement {
+  position: relative;
+  z-index: 3;
+  min-height: 400vh;
   color: #efedeb;
-  opacity: 0;
+  /*
+   * Transparent on purpose: the background is the shared field, so the hero and
+   * this section are the same pixels rather than two fields that meet at a line.
+   */
+  background: transparent;
 }
 
-/* Soft veil — keeps shader/glow visible, improves text read */
-.cc-ed-hero-scene__statement-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(12, 12, 14, 0.22) 0%,
-      rgba(12, 12, 14, 0.18) 40%,
-      rgba(12, 12, 14, 0.35) 100%
-    );
+.cc-ed-hero-scene__statement-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-/* Full-bleed progress line — top of viewport under nav */
+/* ONE long loading bar — full-bleed across the top, fills over all 3 groups */
 .cc-ed-hero-scene__statement-progress {
   position: absolute;
-  top: calc(var(--cc-ed-nav-clearance) + 1.15rem);
+  top: calc(var(--cc-ed-nav-clearance) + 1.1rem);
   left: 0;
   right: 0;
   z-index: 2;
+  width: 100%;
   height: 1.5px;
   margin: 0;
   background: color-mix(in srgb, #efedeb 22%, transparent);
@@ -2756,16 +2829,16 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   will-change: transform;
 }
 
-/* Tag + pager — left, just under the line */
+/* Tag + pager — under the bar, on the left */
 .cc-ed-hero-scene__statement-chrome {
   position: absolute;
-  top: calc(var(--cc-ed-nav-clearance) + 1.9rem);
+  top: calc(var(--cc-ed-nav-clearance) + 2.4rem);
   left: clamp(1.25rem, 4vw, 3.5rem);
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: clamp(0.65rem, 1.5vw, 1.1rem);
+  gap: clamp(0.55rem, 1.2vw, 0.9rem);
 }
 
 .cc-ed-hero-scene__statement-tag {
@@ -2808,56 +2881,55 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   opacity: 0.45;
 }
 
-/* Text — TOP RIGHT under the line (IB composition) */
+/* Statement copy — big block on the right, starting just under the bar */
 .cc-ed-hero-scene__statement-stage {
   position: absolute;
-  top: calc(var(--cc-ed-nav-clearance) + 3.75rem);
-  right: clamp(1.25rem, 5vw, 4.5rem);
+  /*
+   * Clear air under the bar — the copy should not hang off the progress line.
+   * All three groups share this top edge, so it cannot be centred per group.
+   */
+  top: calc(var(--cc-ed-nav-clearance) + 12rem);
+  right: clamp(1.5rem, 5vw, 4rem);
   left: auto;
   z-index: 2;
-  width: min(40rem, 52vw);
-  min-height: clamp(10rem, 28vh, 16rem);
+  width: min(70rem, 70vw);
+  min-height: clamp(24rem, 58vh, 44rem);
   overflow: visible;
   text-align: left;
 }
 
+/* All groups share one slot and cross-fade in place — never move vertically. */
 .cc-ed-hero-scene__statement-slot {
-  position: relative;
+  position: absolute;
+  inset: 0 0 auto 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.85rem, 2vh, 1.35rem);
+  gap: clamp(1.6rem, 3.6vh, 2.75rem);
   width: 100%;
-  will-change: transform, opacity;
-}
-
-.cc-ed-hero-scene__statement-slot + .cc-ed-hero-scene__statement-slot {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
+  will-change: opacity, transform;
 }
 
 .cc-ed-hero-scene__statement-body {
   margin: 0;
-  max-width: 40rem;
+  max-width: 100%;
   /* Beat copy — Instrument Serif cream/orange */
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+  font-size: clamp(3.25rem, 7vw, 7.25rem);
   font-weight: 400;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  letter-spacing: -0.034em;
+  line-height: 1.01;
   text-align: left;
   text-wrap: balance;
 }
 
 .cc-ed-hero-scene__statement-lede {
   margin: 0;
-  max-width: 36rem;
+  max-width: 48rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.05rem, 1.45vw, 1.28rem);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1.55;
+  font-size: clamp(1.4rem, 2.2vw, 2.15rem);
+  font-weight: 450;
+  letter-spacing: -0.016em;
+  line-height: 1.42;
   text-align: left;
   text-wrap: pretty;
   hyphens: none;
@@ -2878,27 +2950,39 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero-scene__statement-lede .cc-ed-hero-scene__statement-word,
 .cc-ed-hero-scene__statement-lede-run .cc-ed-hero-scene__statement-word {
-  color: color-mix(in srgb, #efedeb 78%, #5c5856);
+  color: color-mix(in srgb, #efedeb 90%, #5c5856);
 }
 
+/* Inline-block words keep wrapping on real spaces only. */
 .cc-ed-hero-scene__statement-word {
-  display: inline;
+  display: inline-block;
+}
+
+/* Per-character nodes are what the scrub fills. */
+.cc-ed-hero-scene__statement-char {
+  display: inline-block;
+  opacity: 0.4;
+  white-space: pre;
 }
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__statement-stage {
-    top: calc(var(--cc-ed-nav-clearance) + 4.25rem);
+    top: calc(var(--cc-ed-nav-clearance) + 8rem);
     right: clamp(1rem, 4vw, 1.5rem);
     left: clamp(1rem, 4vw, 1.5rem);
     width: auto;
   }
 
+  .cc-ed-hero-scene__statement-slot {
+    gap: clamp(1.25rem, 2.8vh, 1.9rem);
+  }
+
   .cc-ed-hero-scene__statement-body {
-    font-size: clamp(1.75rem, 7.5vw, 2.45rem);
+    font-size: clamp(2.5rem, 11vw, 3.9rem);
   }
 
   .cc-ed-hero-scene__statement-lede {
-    font-size: clamp(1rem, 3.8vw, 1.12rem);
+    font-size: clamp(1.2rem, 4.9vw, 1.5rem);
   }
 }
 
@@ -2909,10 +2993,10 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    #0c0c0e 0%,
-    #0c0c0e 28%,
-    color-mix(in srgb, var(--ed-cream, #fcf1e7) 18%, #0c0c0e) 58%,
-    color-mix(in srgb, var(--ed-cream, #fcf1e7) 62%, #0c0c0e) 82%,
+    #101012 0%,
+    #101012 28%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 18%, #141413) 58%,
+    color-mix(in srgb, var(--ed-cream, #fcf1e7) 62%, #141413) 82%,
     var(--ed-cream, #fcf1e7) 100%
   );
 }
@@ -3538,7 +3622,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 @media (prefers-reduced-motion: reduce) {
   .cc-ed-hero-scene__stage,
-  .cc-ed-hero-scene__hero .cc-ed-hero__media,
+  .cc-ed-hero-scene__field-inner,
+  .cc-ed-hero-scene__field .cc-ed-hero__media,
   .cc-ed-demo-preview__invitation-bar {
     animation: none;
     transform: none;
@@ -3549,6 +3634,8 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   .cc-ed-hero-scene--enhanced .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__stage,
   .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__stage,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='pending'] .cc-ed-hero-scene__field-inner,
+  .cc-ed-hero-scene--enhanced[data-hero-intro='running'] .cc-ed-hero-scene__field-inner,
   .cc-ed-hero-scene__stage {
     width: 100%;
     margin-top: 0;

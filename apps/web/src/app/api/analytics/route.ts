@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   // Public audience telemetry: clients send the *viewed* public profile/project ids.
   // Owner-only events (share/QR) require auth + ownership. View events validate
   // the target is public/published and attribute using server-resolved owner ids.
-  return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics' }, async (data) => {
+  return secureJsonRoute(request, { schema: analyticsEventSchema, rateLimitType: 'analytics', killSwitch: 'analytics' }, async (data) => {
     // After rate-limit + schema validation: ignore obvious automated agents.
     if (isObviousAnalyticsBot(request.headers.get('user-agent'))) {
       return NextResponse.json({ ok: true, status: 'ignored' });

@@ -13,11 +13,11 @@ const BLOCKS = [
   },
   {
     title: 'Remember who you met',
-    body: 'Private notes on connections, where you met, and what to follow up on. LinkedIn keeps your network. CodeCard keeps your context.',
+    body: 'Private notes on connections, where you met, and what to follow up on. A contact list keeps your network. CodeCard keeps your context.',
   },
   {
     title: 'Great tools, wrong moment',
-    body: 'LinkedIn is built for careers and timelines. GitHub is built for repositories. Neither is built for one scroll of your best work when someone is right in front of you.',
+    body: 'Career networks are built for titles and timelines. Code hosts are built for repositories. Neither is built for one scroll of your best work when someone is right in front of you.',
   },
   {
     title: 'The piece that was missing',

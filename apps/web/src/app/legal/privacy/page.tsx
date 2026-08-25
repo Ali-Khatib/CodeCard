@@ -33,6 +33,40 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
+        <h2>Signing in with GitHub</h2>
+        <p>
+          You can create an account or sign in with GitHub instead of a password. When you do,
+          GitHub asks you to authorize CodeCard and then returns basic account information such as
+          your email address and account name to our authentication provider, Supabase. We use it
+          only to identify your account and create your profile.
+        </p>
+        <p>
+          We request no repository, organization, or code access, and we do not read your
+          repositories. We do not store your GitHub access token for later use, and we do not act
+          on GitHub on your behalf. You can revoke CodeCard&apos;s access at any time from your
+          GitHub account settings; revoking it removes the sign-in method, not your CodeCard
+          account, which you can delete separately using the controls described below.
+        </p>
+      </section>
+      <section>
+        <h2>Cookies and local storage</h2>
+        <p>
+          We use cookies that are necessary to run the service. After you sign in, our
+          authentication provider sets a session cookie so you stay signed in between page loads
+          and can reach your dashboard; signing out clears it. During sign-in we also use a
+          short-lived cookie to complete the login exchange securely.
+        </p>
+        <p>
+          Your browser&apos;s local storage holds display preferences such as your selected theme
+          and light or dark appearance, so the page renders correctly before scripts finish
+          loading. These preferences stay on your device.
+        </p>
+        <p>
+          We do not use advertising cookies, cross-site tracking cookies, or third-party
+          advertising networks.
+        </p>
+      </section>
+      <section>
         <h2>Where data is stored</h2>
         <p>
           Data is stored in Supabase (PostgreSQL) and Supabase Storage, hosted in the United
@@ -43,6 +77,7 @@ export default function PrivacyPage() {
         <h2>Third-party processors</h2>
         <ul>
           <li>Supabase: database, auth, file storage</li>
+          <li>GitHub: optional sign-in provider, only if you choose it</li>
           <li>Stripe: payment processing</li>
           <li>Vercel: web hosting and performance monitoring</li>
           <li>Sentry: error monitoring</li>
@@ -110,7 +145,9 @@ export default function PrivacyPage() {
         <h2>Your rights</h2>
         <p>
           You may access, correct, or delete your personal data using the in-app controls described
-          above, or by contacting us at privacy@codecard.app. We will respond within 30 days.
+          above, or by contacting us at{' '}
+          <a href="mailto:privacy@codecard.app">privacy@codecard.app</a>. We will respond within 30
+          days.
         </p>
       </section>
       <section>

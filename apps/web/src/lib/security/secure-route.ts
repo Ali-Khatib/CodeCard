@@ -13,6 +13,11 @@ import { recoverySessionForbiddenResponse } from '@/lib/auth/recovery-session-gu
 import { parseJsonBody } from '@/lib/security/request';
 import { createClient } from '@/lib/supabase/server';
 import { isProduction } from '@/lib/security/env';
+import {
+  FEATURE_DISABLED_MESSAGE,
+  isFeatureBlocked,
+  type KillSwitchFeature,
+} from '@/lib/security/kill-switch';
 import type { RATE_LIMITS } from '@codecard/config';
 
 type RateLimitType = keyof typeof RATE_LIMITS;
@@ -22,6 +27,11 @@ interface SecureRouteOptions<T> {
   rateLimitType: RateLimitType;
   requireAuth?: boolean;
   maxBodyBytes?: number;
+  /**
+   * Emergency kill switch to honour. Checked before auth, parsing, or any
+   * side effect, so a disabled feature does no work at all.
+   */
+  killSwitch?: KillSwitchFeature;
   /** Stricter: fail if Redis unavailable in production */
   strictRateLimit?: boolean;
   /**
@@ -43,6 +53,11 @@ export async function secureJsonRoute<T, R>(
   handler: (data: T, ctx: { userId: string | null; ip: string }) => Promise<R>,
 ): Promise<R | ReturnType<typeof apiError> | NextResponse> {
   try {
+    /* Before any side effect, auth lookup, or body read. */
+    if (options.killSwitch && isFeatureBlocked(options.killSwitch)) {
+      return apiError(FEATURE_DISABLED_MESSAGE, 503);
+    }
+
     const ip = getClientIp(request);
     const rlKey = `${options.rateLimitType}:${ip}`;
 

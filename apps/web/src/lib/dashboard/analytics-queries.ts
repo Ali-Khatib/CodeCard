@@ -14,10 +14,28 @@ import {
   type AnalyticsTrendRange,
   type AnalyticsTrendSeries,
 } from '@/lib/dashboard/analytics-trends';
+import {
+  analyticsEntitlementFor,
+  applyAnalyticsEntitlement,
+  type AnalyticsEntitlement,
+} from '@/lib/dashboard/analytics-entitlement';
+import { resolveTenantPlanId } from '@/lib/projects/project-plan-core';
 
 export type LoadOwnerAnalyticsResult =
-  | { ok: true; summary: OwnerAnalyticsSummary }
+  | { ok: true; summary: OwnerAnalyticsSummary; entitlement: AnalyticsEntitlement }
   | { ok: false; reason: 'unauthenticated' | 'no_profile' | 'query_failed' };
+
+export type LoadOwnerAnalyticsOptions = {
+  /**
+   * Strip Pro-only aggregates when the tenant is on Free. Defaults to true.
+   *
+   * Only the account data export sets this to false: the underlying rows are the
+   * user's own and readable to them under RLS regardless of plan, so withholding
+   * them from a portability export would break the export without adding any
+   * real entitlement enforcement.
+   */
+  applyPlanGate?: boolean;
+};
 
 const EVENT_TYPES = [
   'profile_view',
@@ -39,14 +57,18 @@ const EVENT_TYPES = [
 export async function loadOwnerAnalytics(
   supabase: SupabaseClient,
   userId: string | null | undefined,
+  options: LoadOwnerAnalyticsOptions = {},
 ): Promise<LoadOwnerAnalyticsResult> {
+  /* Gating defaults on. Callers must opt out deliberately. */
+  const applyPlanGate = options.applyPlanGate ?? true;
+
   if (!userId) {
     return { ok: false, reason: 'unauthenticated' };
   }
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, display_name, is_public, slug')
+    .select('id, display_name, is_public, slug, tenant_id')
     .eq('owner_user_id', userId)
     .maybeSingle();
 
@@ -56,6 +78,11 @@ export async function loadOwnerAnalytics(
   if (!profile) {
     return { ok: false, reason: 'no_profile' };
   }
+
+  /* Plan comes from the subscriptions table, never from the caller. */
+  const entitlement = analyticsEntitlementFor(
+    await resolveTenantPlanId(supabase, profile.tenant_id),
+  );
 
   const [eventsResult, sourcesResult, projectsResult, researchResult] = await Promise.all([
     supabase
@@ -96,7 +123,11 @@ export async function loadOwnerAnalytics(
     researchPapers: (researchResult.data ?? []) as OwnedResearchRow[],
   });
 
-  return { ok: true, summary };
+  return {
+    ok: true,
+    summary: applyPlanGate ? applyAnalyticsEntitlement(summary, entitlement) : summary,
+    entitlement,
+  };
 }
 
 export async function loadOwnerAnalyticsTrends(

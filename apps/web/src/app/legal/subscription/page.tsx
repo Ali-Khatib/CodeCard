@@ -58,7 +58,7 @@ export default function SubscriptionTermsPage() {
       <section>
         <h2>Contact</h2>
         <p>
-          Billing questions: billing@codecard.app
+          Billing questions: <a href="mailto:billing@codecard.app">billing@codecard.app</a>
         </p>
       </section>
     </LegalPage>

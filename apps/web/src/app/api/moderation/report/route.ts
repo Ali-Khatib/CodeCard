@@ -18,6 +18,7 @@ export async function POST(request: Request) {
       rateLimitType: 'moderation',
       maxBodyBytes: 4096,
       strictRateLimit: true,
+      killSwitch: 'publicReports',
     },
     async (data, { ip }) => {
       const supabase = await createClient();

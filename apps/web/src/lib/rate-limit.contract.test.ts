@@ -89,3 +89,71 @@ describe('WS14-T016 rateLimit fail-closed behavior', () => {
     await expect(rateLimit('t', 'upload')).resolves.toEqual({ success: true });
   });
 });
+
+/**
+ * Redis configured but unreachable. This previously threw out of `rateLimit`,
+ * so an Upstash outage turned every rate-limited route into a 500 — including
+ * public research PDF reads. The policy must match the no-Redis policy above.
+ */
+describe('rateLimit when Redis is configured but unreachable', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+    vi.doUnmock('@upstash/ratelimit');
+  });
+
+  async function importWithFailingLimiter() {
+    vi.doMock('@upstash/ratelimit', () => ({
+      Ratelimit: class {
+        static slidingWindow = () => ({});
+        static tokenBucket = () => ({});
+        limit() {
+          return Promise.reject(new Error('getaddrinfo ENOTFOUND upstash.example'));
+        }
+      },
+    }));
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'https://unreachable.example');
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', 'placeholder-token');
+    return import('@/lib/rate-limit');
+  }
+
+  it('does not throw, so routes return their normal response', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('CODECARD_E2E', '');
+    const { rateLimit } = await importWithFailingLimiter();
+    await expect(rateLimit('t', 'publicResearchPdf')).resolves.toEqual({ success: true });
+  });
+
+  it('degrades to allow for public read endpoints', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('CODECARD_E2E', '');
+    const { rateLimit } = await importWithFailingLimiter();
+    await expect(rateLimit('t', 'analytics')).resolves.toEqual({ success: true });
+  });
+
+  it('still denies strict endpoints in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('CODECARD_E2E', '');
+    const { rateLimit } = await importWithFailingLimiter();
+    for (const type of ['upload', 'auth', 'ai'] as const) {
+      await expect(rateLimit('t', type)).resolves.toEqual({ success: false });
+    }
+  });
+
+  it('denies the paid AI token bucket in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const { rateLimitTokenBucket } = await importWithFailingLimiter();
+    await expect(rateLimitTokenBucket('t', 5, '1 m')).resolves.toEqual({ success: false });
+  });
+
+  it('never logs the Redis URL or token', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { rateLimit } = await importWithFailingLimiter();
+    await rateLimit('t', 'analytics');
+    for (const call of spy.mock.calls.flat()) {
+      expect(String(call)).not.toMatch(/unreachable\.example|placeholder-token/);
+    }
+    spy.mockRestore();
+  });
+});

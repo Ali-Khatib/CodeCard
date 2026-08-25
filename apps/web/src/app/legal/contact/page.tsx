@@ -9,24 +9,49 @@ export const metadata = buildIndexablePageMetadata({
 
 export default function ContactPage() {
   return (
-    <LegalPage title="Contact" lastUpdated="June 27, 2025">
+    <LegalPage title="Contact" lastUpdated="August 25, 2026">
       <section>
-        <h2>General inquiries</h2>
-        <p>hello@codecard.app</p>
+        <h2>Support and general inquiries</h2>
+        <p>
+          <a href="mailto:hello@codecard.app">hello@codecard.app</a>
+        </p>
+        <p>
+          For account problems, bugs, or questions about how something works. Include the email
+          address on your account so we can find it. We aim to reply within two business days.
+        </p>
       </section>
       <section>
         <h2>Privacy requests</h2>
-        <p>privacy@codecard.app</p>
+        <p>
+          <a href="mailto:privacy@codecard.app">privacy@codecard.app</a>
+        </p>
+        <p>
+          For data access, correction, or deletion requests. You can also export or delete your
+          account yourself from Settings without contacting us. We respond within 30 days.
+        </p>
+      </section>
+      <section>
+        <h2>Billing</h2>
+        <p>
+          <a href="mailto:billing@codecard.app">billing@codecard.app</a>
+        </p>
+        <p>For subscription, invoice, and refund questions.</p>
       </section>
       <section>
         <h2>DMCA / copyright</h2>
-        <p>dmca@codecard.app</p>
+        <p>
+          <a href="mailto:dmca@codecard.app">dmca@codecard.app</a>
+        </p>
+        <p>
+          Our <a href="/legal/dmca">DMCA policy</a> lists everything a valid notice must include.
+        </p>
       </section>
       <section>
         <h2>Mailing address</h2>
         <p>
-          For postal correspondence, email hello@codecard.app and we will provide a current mailing
-          address.
+          For postal correspondence, email{' '}
+          <a href="mailto:hello@codecard.app">hello@codecard.app</a> and we will provide a current
+          mailing address.
         </p>
       </section>
     </LegalPage>

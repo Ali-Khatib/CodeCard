@@ -1,3 +1,4 @@
+import 'server-only';
 import { z } from 'zod';
 
 /** Server-only secrets — never import from client components. */

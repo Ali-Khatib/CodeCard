@@ -18,8 +18,10 @@ test.describe('Editorial product landing', () => {
     await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
     await expect(page.getByText(/ONE LIVING/i).first()).toBeVisible();
     await expect(page.getByText(/TECHNICAL IDENTITY/i).first()).toBeVisible();
-    await expect(page.getByText(/CODING PROJECTS/i).first()).toBeVisible();
-    await expect(page.getByText(/Analytics/i).first()).toBeVisible();
+    /* Walkthrough chapter rail — copy churns, the five chapters do not. */
+    for (const chapter of ['Projects', 'Research', 'Circle', 'Analytics']) {
+      await expect(page.getByText(chapter, { exact: false }).first()).toBeVisible();
+    }
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
     await expect(page.getByTestId('editorial-audience')).toBeVisible();
     await expect(page.getByTestId('editorial-research-proof')).toBeVisible();
@@ -41,7 +43,15 @@ test.describe('Editorial product landing', () => {
 
   test('mobile has no horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/', { waitUntil: 'networkidle' });
+    /*
+     * `networkidle` never settles here: the hero runs a WebGL shader and the
+     * walkthrough streams background imagery. Wait on the element the assertion
+     * actually needs instead.
+     */
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('editorial-feature-walkthrough')).toBeAttached({
+      timeout: 20000,
+    });
     await page.getByTestId('editorial-feature-walkthrough').scrollIntoViewIfNeeded();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -51,8 +61,10 @@ test.describe('Editorial product landing', () => {
 
   test('reduced motion keeps sections readable', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/', { waitUntil: 'networkidle' });
-    await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible();
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({
+      timeout: 20000,
+    });
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
     await expect(page.getByTestId('editorial-finale')).toBeVisible();
   });

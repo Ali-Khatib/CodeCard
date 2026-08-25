@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       rateLimitType: 'accountDelete',
       requireAuth: true,
       strictRateLimit: true,
+      killSwitch: 'accountDeletion',
       maxBodyBytes: 4 * 1024,
     },
     async (data, ctx) => {

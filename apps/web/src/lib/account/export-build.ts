@@ -375,7 +375,8 @@ async function loadExportAnalytics(
   | { ok: false; error: 'query_failed' }
 > {
   const [summaryResult, trends7, trends30] = await Promise.all([
-    loadOwnerAnalytics(supabase, ownerUserId),
+    /* Data portability: export the user's own rows regardless of plan. */
+    loadOwnerAnalytics(supabase, ownerUserId, { applyPlanGate: false }),
     loadOwnerAnalyticsTrends(supabase, ownerUserId, 7),
     loadOwnerAnalyticsTrends(supabase, ownerUserId, 30),
   ]);

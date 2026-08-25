@@ -153,7 +153,56 @@ Evidence for the initial MVP schema cutover: [`WS14_T014_PRODUCTION_MIGRATION.md
 
 ---
 
-## 7. Incident response (short)
+## 7. Emergency kill switches
+
+Server-evaluated feature switches for incidents (abuse, cost runaway, a broken
+downstream). Implemented in `apps/web/src/lib/security/kill-switch.ts` and
+enforced in `secureJsonRoute` plus `/api/upload`, **before** authentication,
+body parsing, or any side effect.
+
+Properties: `server-only` module, never `NEXT_PUBLIC_`, never sent to the
+browser, and not overridable by client state or request replay. A blocked
+feature returns **503** with a generic message that names no switch.
+
+| Env var | Disables |
+|---------|----------|
+| `CODECARD_MAINTENANCE_MODE` | **Everything below at once** (read-only mode) |
+| `CODECARD_DISABLE_UPLOADS` | `/api/upload` — all storage writes |
+| `CODECARD_DISABLE_ANALYTICS` | `/api/analytics` — public telemetry ingest |
+| `CODECARD_DISABLE_ACCOUNT_DELETION` | `/api/account/delete` |
+| `CODECARD_DISABLE_ACCOUNT_EXPORT` | `/api/account/export` |
+| `CODECARD_DISABLE_PUBLIC_REPORTS` | `/api/dmca`, `/api/moderation/report` |
+| `CODECARD_DISABLE_SIGNUPS` | Reserved — see caveat below |
+
+**Only the exact string `1` activates a switch.** `true`, `yes`, `0`, and empty
+are all treated as "enabled", so a malformed value cannot silently take a
+feature offline.
+
+### Applying one
+
+1. Vercel → project → Settings → Environment Variables → add the var with value
+   `1` in the **Production** scope.
+2. Redeploy (or restart) so the runtime picks it up. No code change, no PR.
+3. Verify: the affected endpoint returns `503`; unaffected endpoints still work.
+4. To restore, delete the variable (do not set it to `0` and rely on that) and
+   redeploy.
+
+### Caveats — read before relying on these
+
+- **Signups are not fully server-enforceable from the app.** Sign-up runs
+  through the Supabase browser client, so there is no CodeCard server route to
+  block. To actually stop new accounts, turn off
+  **Authentication → Providers → Email → Enable signup** (and any OAuth
+  provider) in the Supabase Dashboard. `CODECARD_DISABLE_SIGNUPS` exists for
+  UI-level messaging only and must not be treated as the control.
+- These switches stop **new** requests. Work already queued (for example a
+  storage-cleanup job) still runs.
+- Disabling account deletion or export blocks a user-rights flow. Use it only
+  for a genuine incident and restore promptly.
+
+---
+
+## 8. Incident response (short)
 
 | Incident | First actions |
 |----------|---------------|
@@ -162,6 +211,8 @@ Evidence for the initial MVP schema cutover: [`WS14_T014_PRODUCTION_MIGRATION.md
 | App/schema mismatch | Roll back Vercel deploy; freeze migrations |
 | RLS lockout | Service-role diagnosis only by admin; restore policies via forward-fix; never disable RLS in prod as a “fix” |
 | Accidental public exposure | Unpublish content; rotate keys if leaked; Sentry/audit review |
+| Storage abuse / cost runaway | Set `CODECARD_DISABLE_UPLOADS=1` per §7, then investigate |
+| Analytics spam flood | Set `CODECARD_DISABLE_ANALYTICS=1` per §7 |
 | Upload outage | Check Storage RLS + Upstash upload limits + Vercel logs |
 | Rate-limit outage | See [`UPSTASH.md`](./UPSTASH.md); fail-closed vs fail-open by route type |
 | Sentry outage | App continues; fix DSN/quota; no user-facing dependency |
@@ -169,7 +220,7 @@ Evidence for the initial MVP schema cutover: [`WS14_T014_PRODUCTION_MIGRATION.md
 
 ---
 
-## 8. Post-recovery validation
+## 9. Post-recovery validation
 
 Checklist after rollback or restore:
 
@@ -183,10 +234,11 @@ Checklist after rollback or restore:
 - [ ] Stripe webhook returns signature errors on unsigned POST (expected)
 - [ ] Sentry receives a controlled event if monitoring required
 - [ ] Rate limits: verify probe or known 429 path on non-prod
+- [ ] No kill switch left set: none of the §7 env vars remain at `1`
 
 ---
 
-## 9. Evidence template
+## 10. Evidence template
 
 Copy into the ops ticket:
 
@@ -203,7 +255,7 @@ Verification evidence: (links to deploy, checklist ticks)
 
 ---
 
-## 10. Ops drill record (non-production tabletop)
+## 11. Ops drill record (non-production tabletop)
 
 **Date:** 2026-07-20
 **Type:** Tabletop (documentation + procedure walkthrough — **no** production restore, **no** destructive SQL)
@@ -256,6 +308,7 @@ Summary:
 - [`SENTRY.md`](./SENTRY.md)
 - [`UPSTASH.md`](./UPSTASH.md)
 - [`ANALYTICS_RETENTION.md`](./ANALYTICS_RETENTION.md)
+- [`EMAIL_DELIVERABILITY.md`](./EMAIL_DELIVERABILITY.md) (SPF / DKIM / DMARC — external)
 - [`RLS_ACCESS_MATRIX.md`](./RLS_ACCESS_MATRIX.md)
 - [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) (WS14-T018 canonical launch checklist)
 - Privacy Policy (web): `/legal/privacy`

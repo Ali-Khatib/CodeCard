@@ -1,6 +1,12 @@
 import { test, expect, type Page } from '@playwright/test';
 
 const DEMO_RESEARCH = '/demo/card/research/retrieval-evaluation-for-dev-tools';
+/*
+ * Opening the reader must not navigate. Derived from the path above so the two
+ * cannot drift again — the inline assertions previously still expected the
+ * pre-`/demo/card` route and failed on every mobile width.
+ */
+const DEMO_RESEARCH_URL = new RegExp(`${DEMO_RESEARCH}$`);
 
 async function assertNoHorizontalOverflow(page: Page) {
   const metrics = await page.evaluate(() => {
@@ -17,9 +23,24 @@ async function assertNoHorizontalOverflow(page: Page) {
 async function openReader(page: Page) {
   const readBtn = page.getByRole('button', { name: /read paper/i });
   await expect(readBtn).toBeVisible();
-  // Avoid Playwright scrolling the sticky header control into view (resets page scroll).
-  await readBtn.evaluate((el) => (el as HTMLButtonElement).click());
-  await expect(page.locator('[data-research-pdf-reader="true"]')).toBeVisible({ timeout: 10000 });
+  const reader = page.locator('[data-research-pdf-reader="true"]');
+
+  /*
+   * Dispatched through the DOM rather than Playwright's click(): the control
+   * sits in a sticky header, and scroll-into-view would reset the page scroll
+   * the restore assertions depend on.
+   *
+   * Retried because the specs navigate with `domcontentloaded`, which can fire
+   * before React attaches its handler — the first click is then swallowed with
+   * no error and the reader never opens. Guarded on count so a retry cannot
+   * toggle an already-open reader shut.
+   */
+  await expect(async () => {
+    if ((await reader.count()) === 0) {
+      await readBtn.evaluate((el) => (el as HTMLButtonElement).click());
+    }
+    await expect(reader).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 20000 });
 }
 
 test.describe('inline research PDF reader', () => {
@@ -37,7 +58,7 @@ test.describe('inline research PDF reader', () => {
 
       await openReader(page);
 
-      await expect(page).toHaveURL(/\/demo\/research\/retrieval-evaluation-for-dev-tools/);
+      await expect(page).toHaveURL(DEMO_RESEARCH_URL);
       const reader = page.locator('[data-research-pdf-reader="true"]');
       await expect(page.getByRole('dialog')).toBeVisible();
       await expect(reader.getByText(/loading paper/i)).toBeVisible();
@@ -59,7 +80,7 @@ test.describe('inline research PDF reader', () => {
 
       await page.getByRole('button', { name: /close paper reader/i }).first().click();
       await expect(page.locator('[data-research-pdf-reader="true"]')).toHaveCount(0);
-      await expect(page).toHaveURL(/\/demo\/research\/retrieval-evaluation-for-dev-tools/);
+      await expect(page).toHaveURL(DEMO_RESEARCH_URL);
 
       await page.waitForFunction(
         (expectedY) => Math.abs(window.scrollY - expectedY) <= 8,

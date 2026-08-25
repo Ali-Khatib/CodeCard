@@ -38,7 +38,15 @@ export function ResearchPdfPages({
       container.replaceChildren();
 
       try {
-        const pdfjs = await import('pdfjs-dist');
+        /*
+         * Legacy build, not the default modern one. pdfjs-dist 6.2's modern
+         * bundle calls `Map.prototype.getOrInsertComputed`, a very recent
+         * built-in, and throws `getOrInsertComputed is not a function` on any
+         * browser without it — the reader then fell back to "Preview
+         * unavailable" for those visitors. The legacy build ships the polyfill.
+         * `public/pdf.worker.min.mjs` must be the matching legacy worker.
+         */
+        const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
         pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         loadingTask = pdfjs.getDocument({
@@ -89,8 +97,17 @@ export function ResearchPdfPages({
           setStatus('ready');
           onStatusChange?.('ready');
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
+          /*
+           * A silent catch here meant a broken preview produced no signal at
+           * all — no console entry, no Sentry breadcrumb — so failures were
+           * undiagnosable in production. `src` is a same-origin API path and
+           * carries no token, but the raw error can quote PDF bytes, so only
+           * the name and message are reported.
+           */
+          const reason = error instanceof Error ? `${error.name}: ${error.message}` : 'unknown';
+          console.error(`[research-pdf] render failed for ${src} — ${reason}`);
           setStatus('error');
           onStatusChange?.('error');
         }

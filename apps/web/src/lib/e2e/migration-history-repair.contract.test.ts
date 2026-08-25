@@ -102,6 +102,7 @@ describe('WS14 fresh-replayable migration contract', () => {
         '20260719153000_repair_project_research_tenant_ownership_rls.sql',
         '20260818025935_subscription_customers_select_insert_only.sql',
         '20260820194500_subscription_customers_tenant_bound_insert.sql',
+        '20260825030000_research_figure_public_select_policy.sql',
       ]);
     });
 
