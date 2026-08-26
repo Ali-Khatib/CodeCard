@@ -1,21 +1,18 @@
 'use client';
 
-import { useCallback, useState, type MouseEvent, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Briefcase, GraduationCap, MapPin, Sparkles } from 'lucide-react';
-import { FlipCard, isFlipCardInteractiveTarget } from '@/components/ui/flip-card';
+import { FlipCard } from '@/components/ui/flip-card';
 import { cn } from '@/lib/utils';
 import type { ProfileHistoryLine } from '@/lib/profile/quick-history';
 
 const ICONS = [Sparkles, Briefcase, GraduationCap, MapPin];
 
-function isFineHoverDevice(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-}
-
 /**
  * Public identity panel with a 3D flip. Front is the live profile;
  * back is a short history. Copy / QR stay on the charcoal card, below the flip.
+ *
+ * Flip is button-only — hover used to steal clicks from the social row on the front.
  */
 export function PublicHeroFlipPanel({
   children,
@@ -32,27 +29,15 @@ export function PublicHeroFlipPanel({
 }) {
   const [flipped, setFlipped] = useState(false);
 
-  const onPanelClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
-    if (isFineHoverDevice()) return;
-    if (isFlipCardInteractiveTarget(event.target)) return;
-    setFlipped((value) => !value);
-  }, []);
-
   return (
     <div
       className={cn('cc-public-hero__panel cc-public-hero__flip min-w-0', className)}
       data-flipped={flipped ? 'true' : 'false'}
-      onClick={onPanelClick}
-      onMouseEnter={() => {
-        if (isFineHoverDevice()) setFlipped(true);
-      }}
-      onMouseLeave={() => {
-        if (isFineHoverDevice()) setFlipped(false);
-      }}
     >
       <FlipCard
         className="cc-public-hero__flip-scene"
-        hint="Tap to flip"
+        hint="Spin"
+        hintWhenFlipped="Spin"
         flipped={flipped}
         onFlippedChange={setFlipped}
         flipOnHover={false}

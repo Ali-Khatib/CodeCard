@@ -20,7 +20,8 @@ describe('public hero identity flip', () => {
 
     expect(focused).toContain('PublicProfileHeroActions');
     expect(panel).toContain('Quick history');
-    expect(panel).toContain('Tap to flip');
+    expect(panel).toContain('Spin');
+    expect(panel).not.toContain('onMouseEnter');
     expect(flip).toContain('stopPropagation');
 
     expect(flip).toContain("'use client'");
@@ -29,7 +30,8 @@ describe('public hero identity flip', () => {
     expect(flip).not.toContain('Math.random');
 
     expect(css).toContain('.cc-flip-card__hint');
-    expect(css).toContain('(hover: none) and (pointer: coarse)');
+    expect(css).toContain('.cc-public-hero__flip-scene .cc-flip-card__hint');
+    expect(css).not.toContain('.cc-public-hero__panel:hover .cc-flip-card__rotator');
     expect(css).toContain('prefers-reduced-motion: reduce');
   });
 });

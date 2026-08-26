@@ -18,6 +18,8 @@ export type FlipCardProps = {
   flipOnHover?: boolean;
   /** Tap empty areas to toggle on coarse pointers. */
   flipOnClick?: boolean;
+  /** Shown while flipped. Defaults to “Tap to flip back”. */
+  hintWhenFlipped?: string;
 };
 
 function isFineHoverDevice(): boolean {
@@ -47,6 +49,7 @@ export function FlipCard({
   onFlippedChange,
   flipOnHover = true,
   flipOnClick = true,
+  hintWhenFlipped,
 }: FlipCardProps) {
   const [uncontrolled, setUncontrolled] = useState(defaultFlipped);
   const isControlled = flipped !== undefined;
@@ -96,7 +99,7 @@ export function FlipCard({
             setFlipped((value) => !value);
           }}
         >
-          {isFlipped ? 'Tap to flip back' : hint}
+          {isFlipped ? (hintWhenFlipped ?? 'Tap to flip back') : hint}
         </button>
       ) : null}
       <div

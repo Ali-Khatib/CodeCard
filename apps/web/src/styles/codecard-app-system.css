@@ -5059,18 +5059,21 @@ html.dark .cc-public-atmosphere__grain {
   border-radius: 4px;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .cc-public-hero__panel:hover .cc-flip-card__rotator {
-    transform: rotateY(180deg);
-  }
+/* Public hero: flip on “Spin” only — never on hover (social links live on the front). */
+.cc-public-hero__flip-scene .cc-flip-card__hint {
+  opacity: 1;
+  pointer-events: auto;
+  top: 0.4rem;
+  right: 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: color-mix(in srgb, var(--hero-ink, #f7f2eb) 78%, transparent);
+}
 
-  .cc-public-hero__panel:hover .cc-flip-card__face--front {
-    pointer-events: none;
-  }
-
-  .cc-public-hero__panel:hover .cc-flip-card__face--back {
-    pointer-events: auto;
-  }
+.cc-public-hero__flip-scene .cc-flip-card__hint:hover {
+  color: var(--hero-ink, #f7f2eb);
 }
 
 .cc-public-hero__history {
@@ -5333,14 +5336,12 @@ html.dark .cc-public-atmosphere__grain {
     pointer-events: none;
   }
 
-  .cc-flip-card[data-flipped='true'] .cc-flip-card__face--front,
-  .cc-public-hero__panel:hover .cc-flip-card__face--front {
+  .cc-flip-card[data-flipped='true'] .cc-flip-card__face--front {
     opacity: 0;
     pointer-events: none;
   }
 
-  .cc-flip-card[data-flipped='true'] .cc-flip-card__face--back,
-  .cc-public-hero__panel:hover .cc-flip-card__face--back {
+  .cc-flip-card[data-flipped='true'] .cc-flip-card__face--back {
     opacity: 1;
     pointer-events: auto;
   }
