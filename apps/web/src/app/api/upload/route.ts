@@ -17,6 +17,7 @@ import { assertResearchFigureUploadAllowed } from '@/lib/research/research-figur
 import { createSignedUploadIntent } from '@/lib/storage/upload-core';
 import { resolveUploadOwnership } from '@/lib/storage/upload-ownership';
 import { uploadRequestSchema } from '@/lib/storage/upload-request';
+import { validateUploadContentPrefix } from '@/lib/storage/upload-content-prefix';
 import { validateUploadMetadata } from '@/lib/storage/upload-validation';
 
 function jsonNoStore(body: unknown, status: number) {
@@ -145,6 +146,16 @@ export async function POST(request: Request) {
 
   if (!metadata.ok) {
     return jsonNoStore({ error: metadata.message }, metadata.status);
+  }
+
+  // Magic-byte sniff on the content prefix — metadata alone is not enough (CWE-434).
+  // Full-object verification still runs at finalize before DB attach.
+  const content = validateUploadContentPrefix({
+    mimeType: metadata.mimeType,
+    contentPrefixBase64: validated.data.contentPrefixBase64,
+  });
+  if (!content.ok) {
+    return jsonNoStore({ error: content.message }, content.status);
   }
 
   const ownership = await resolveUploadOwnership(

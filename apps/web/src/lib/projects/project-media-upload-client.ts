@@ -17,6 +17,7 @@ import {
   messageForUploadFailure,
   type UploadFailureClass,
 } from '@/lib/storage/upload-failure';
+import { readFileContentPrefixBase64 } from '@/lib/storage/upload-content-prefix';
 import type { UploadStage } from '@/lib/storage/upload-progress';
 
 export const PROJECT_MEDIA_UPLOAD_BUCKET = STORAGE_BUCKETS.projectMedia;
@@ -156,6 +157,7 @@ export async function requestProjectMediaUploadInit(
 
   let response: Response;
   try {
+    const contentPrefixBase64 = await readFileContentPrefixBase64(input.file);
     response = await fetchImpl('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -166,6 +168,7 @@ export async function requestProjectMediaUploadInit(
         filename: input.file.name,
         mimeType: validation.mimeType,
         size: input.file.size,
+        contentPrefixBase64,
       }),
       signal,
     });

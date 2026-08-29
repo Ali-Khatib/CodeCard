@@ -3,16 +3,23 @@
  * Does not claim antivirus / malware scanning.
  */
 
-export type DetectedImageMime = 'image/jpeg' | 'image/png' | 'image/webp';
+export type DetectedImageMime = 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif';
 
 const JPEG = [0xff, 0xd8, 0xff] as const;
 const PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] as const;
 const WEBP_RIFF = [0x52, 0x49, 0x46, 0x46] as const; // RIFF
 const WEBP_WEBP = [0x57, 0x45, 0x42, 0x50] as const; // WEBP at offset 8
+const FTYP = [0x66, 0x74, 0x79, 0x70] as const;
 
 function startsWith(bytes: Uint8Array, sig: readonly number[], offset = 0): boolean {
   if (bytes.length < offset + sig.length) return false;
   return sig.every((b, i) => bytes[offset + i] === b);
+}
+
+function looksLikeAvif(bytes: Uint8Array): boolean {
+  if (bytes.length < 12 || !startsWith(bytes, FTYP, 4)) return false;
+  const brand = String.fromCharCode(bytes[8]!, bytes[9]!, bytes[10]!, bytes[11]!);
+  return brand === 'avif' || brand === 'avis' || brand === 'mif1';
 }
 
 /** Inspect at most the first 16 bytes. */
@@ -20,6 +27,7 @@ export function detectImageMimeFromMagicBytes(bytes: Uint8Array): DetectedImageM
   if (startsWith(bytes, JPEG)) return 'image/jpeg';
   if (startsWith(bytes, PNG)) return 'image/png';
   if (startsWith(bytes, WEBP_RIFF) && startsWith(bytes, WEBP_WEBP, 8)) return 'image/webp';
+  if (looksLikeAvif(bytes)) return 'image/avif';
   return null;
 }
 

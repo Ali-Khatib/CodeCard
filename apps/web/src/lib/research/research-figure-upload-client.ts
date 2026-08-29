@@ -13,6 +13,7 @@ import {
   messageForUploadFailure,
   type UploadFailureClass,
 } from '@/lib/storage/upload-failure';
+import { readFileContentPrefixBase64 } from '@/lib/storage/upload-content-prefix';
 import type { UploadStage } from '@/lib/storage/upload-progress';
 
 export type ResearchFigureUploadPhase = UploadStage | 'validation' | 'preparing' | 'saving' | 'error';
@@ -145,6 +146,7 @@ export async function requestResearchFigureUploadInit(
   }
 
   try {
+    const contentPrefixBase64 = await readFileContentPrefixBase64(input.file);
     const response = await fetchImpl('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -154,6 +156,7 @@ export async function requestResearchFigureUploadInit(
         filename: input.file.name,
         mimeType: validation.mimeType,
         size: input.file.size,
+        contentPrefixBase64,
       }),
       signal,
       credentials: 'same-origin',

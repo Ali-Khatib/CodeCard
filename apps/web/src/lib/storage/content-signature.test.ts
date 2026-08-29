@@ -25,6 +25,11 @@ describe('content-signature', () => {
         ),
       ),
     ).toBe('image/webp');
+    expect(
+      detectImageMimeFromMagicBytes(
+        bytes(0, 0, 0, 0x1c, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66),
+      ),
+    ).toBe('image/avif');
   });
 
   it('rejects HTML/SVG/PDF masquerading as images', () => {

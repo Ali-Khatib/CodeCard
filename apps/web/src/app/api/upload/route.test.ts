@@ -43,7 +43,20 @@ const profile = {
   is_public: false,
 };
 
+function pngPrefixBase64() {
+  // PNG magic bytes
+  return Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).toString('base64');
+}
+
 function makeRequest(body: unknown, headers: Record<string, string> = {}) {
+  const payload =
+    typeof body === 'object' && body !== null && !Array.isArray(body)
+      ? {
+          contentPrefixBase64: pngPrefixBase64(),
+          ...(body as Record<string, unknown>),
+        }
+      : body;
+
   return new Request('https://codecard.app/api/upload', {
     method: 'POST',
     headers: {
@@ -52,7 +65,7 @@ function makeRequest(body: unknown, headers: Record<string, string> = {}) {
       'sec-fetch-site': 'same-origin',
       ...headers,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
 }
 
@@ -126,6 +139,22 @@ describe('POST /api/upload', () => {
         filename: 'avatar.svg',
         mimeType: 'image/svg+xml',
         size: 100,
+      }),
+    );
+
+    expect(response.status).toBe(415);
+    expect(mockCreateSignedUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it('rejects content that fails magic-byte sniff', async () => {
+    const htmlPrefix = Buffer.from('<html><script>').toString('base64');
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 1024,
+        contentPrefixBase64: htmlPrefix,
       }),
     );
 

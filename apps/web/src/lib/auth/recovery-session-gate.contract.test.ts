@@ -21,6 +21,13 @@ describe('P0 recovery session route gate contracts', () => {
     expect(callback).toContain("otpType === 'recovery'");
   });
 
+  it('mark-recovery redirects via configured app origin (no request.url open redirect)', () => {
+    const mark = read('src/app/auth/mark-recovery/route.ts');
+    expect(mark).toContain('getAppOrigin');
+    expect(mark).not.toContain('new URL(request.url)');
+    expect(mark).toContain('stampPasswordRecoveryPrivilege');
+  });
+
   it('dashboard and admin layouts re-check recovery before rendering', () => {
     const dashboard = read('src/app/dashboard/(authenticated)/layout.tsx');
     const adminGate = read('src/lib/security/admin-route-gate.ts');

@@ -80,6 +80,8 @@ describe('requestAvatarUploadInit', () => {
     const body = JSON.parse(String(fetchImpl.mock.calls[0][1].body));
     expect(body.resourceType).toBe('avatar');
     expect(body.filename).toBe('avatar.png');
+    expect(typeof body.contentPrefixBase64).toBe('string');
+    expect(body.contentPrefixBase64.length).toBeGreaterThanOrEqual(8);
   });
 });
 

@@ -103,6 +103,7 @@ describe('WS11-T005 secure API route audit', () => {
 
     expect(upload).toContain('isSameOriginMutation');
     expect(upload).toContain('resolveUploadOwnership');
+    expect(upload).toContain('validateUploadContentPrefix');
     expect(upload).toContain('application/json');
     expect(upload).not.toContain('secureJsonRoute');
 

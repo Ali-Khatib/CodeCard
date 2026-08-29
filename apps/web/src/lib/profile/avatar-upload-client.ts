@@ -16,6 +16,7 @@ import {
   messageForUploadFailure,
   type UploadFailureClass,
 } from '@/lib/storage/upload-failure';
+import { readFileContentPrefixBase64 } from '@/lib/storage/upload-content-prefix';
 import type { UploadStage } from '@/lib/storage/upload-progress';
 
 export const AVATAR_UPLOAD_BUCKET = STORAGE_BUCKETS.avatars;
@@ -112,6 +113,7 @@ export async function requestAvatarUploadInit(
 
   let response: Response;
   try {
+    const contentPrefixBase64 = await readFileContentPrefixBase64(file);
     response = await fetchImpl('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -120,6 +122,7 @@ export async function requestAvatarUploadInit(
         filename: file.name,
         mimeType: validation.mimeType,
         size: file.size,
+        contentPrefixBase64,
       }),
       signal,
     });
