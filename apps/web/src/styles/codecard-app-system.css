@@ -1994,6 +1994,29 @@ html.dark .cc-app-badge--blush {
   gap: 12px;
 }
 
+.cc-connections-toolbar__search {
+  position: relative;
+  max-width: 28rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.cc-connections-toolbar__search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--app-smoke);
+}
+
+/* Beat `.cc-app-input { padding: … }` so the glyph never overlaps placeholder text. */
+.cc-connections-toolbar__search .cc-app-input {
+  padding-left: 2.5rem;
+}
+
 .cc-connection-list {
   display: flex;
   flex-direction: column;

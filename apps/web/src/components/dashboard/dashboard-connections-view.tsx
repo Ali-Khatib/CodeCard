@@ -651,9 +651,9 @@ export function DashboardConnectionsView({
         <FadeInView delay={0}>
           <div className="space-y-4">
             <div className="cc-connections-toolbar">
-              <div className="relative max-w-md flex-1">
+              <div className="cc-connections-toolbar__search">
                 <svg
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--app-smoke)]"
+                  className="cc-connections-toolbar__search-icon"
                   viewBox="0 0 16 16"
                   fill="none"
                   aria-hidden
@@ -671,7 +671,7 @@ export function DashboardConnectionsView({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search connections…"
-                  className="cc-app-input pl-9"
+                  className="cc-app-input"
                   aria-label="Search connections"
                 />
               </div>
