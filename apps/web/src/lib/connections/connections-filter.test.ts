@@ -3,10 +3,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   connectionMatchesCollectionFilter,
+  connectionMatchesLocationFilter,
   connectionMatchesQuery,
   filterAndSortConnections,
   normalizeConnectionsQuery,
   sortConnections,
+  uniqueConnectionLocations,
 } from './connections-filter';
 
 const people = [
@@ -40,6 +42,21 @@ const people = [
     context: null,
     connectedAtIso: '2026-07-01T00:00:00.000Z',
   },
+  {
+    id: 'c3',
+    name: 'Casey NoLoc',
+    role: 'Designer',
+    company: '',
+    metAt: 'Connected',
+    date: 'Jul 3',
+    source: 'Manual' as const,
+    note: 'no city set',
+    followUp: 'none' as const,
+    tags: [],
+    privateNote: null,
+    context: null,
+    connectedAtIso: '2026-07-05T00:00:00.000Z',
+  },
 ];
 
 describe('WS15-T007 connections search filter sort', () => {
@@ -61,23 +78,34 @@ describe('WS15-T007 connections search filter sort', () => {
     expect(connectionMatchesCollectionFilter('c1', 'uncategorized', memberships)).toBe(false);
   });
 
-  it('sorts deterministically with id tie-breaker', () => {
-    const newest = sortConnections(people, 'newest');
-    expect(newest.map((p) => p.id)).toEqual(['c1', 'c2']);
-    const oldest = sortConnections(people, 'oldest');
-    expect(oldest.map((p) => p.id)).toEqual(['c2', 'c1']);
-    const az = sortConnections(people, 'name_asc');
-    expect(az.map((p) => p.name)).toEqual(['Ada Lovelace', 'Bob Smith']);
-    const za = sortConnections(people, 'name_desc');
-    expect(za.map((p) => p.name)).toEqual(['Bob Smith', 'Ada Lovelace']);
+  it('filters by location including unknown', () => {
+    expect(connectionMatchesLocationFilter(people[0], 'all')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], 'Berlin')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], ' berlin ')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], 'London')).toBe(false);
+    expect(connectionMatchesLocationFilter(people[2], 'unknown')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], 'unknown')).toBe(false);
+    expect(uniqueConnectionLocations(people)).toEqual(['Berlin', 'London']);
   });
 
-  it('combines search, collection filter, and sort', () => {
+  it('sorts deterministically with id tie-breaker', () => {
+    const newest = sortConnections(people, 'newest');
+    expect(newest.map((p) => p.id)).toEqual(['c1', 'c3', 'c2']);
+    const oldest = sortConnections(people, 'oldest');
+    expect(oldest.map((p) => p.id)).toEqual(['c2', 'c3', 'c1']);
+    const az = sortConnections(people, 'name_asc');
+    expect(az.map((p) => p.name)).toEqual(['Ada Lovelace', 'Bob Smith', 'Casey NoLoc']);
+    const za = sortConnections(people, 'name_desc');
+    expect(za.map((p) => p.name)).toEqual(['Casey NoLoc', 'Bob Smith', 'Ada Lovelace']);
+  });
+
+  it('combines search, collection filter, location filter, and sort', () => {
     const result = filterAndSortConnections({
       connections: people,
       query: 'research',
       collectionFilter: 'uncategorized',
-      memberships: { c1: ['col-1'], c2: [] },
+      locationFilter: 'London',
+      memberships: { c1: ['col-1'], c2: [], c3: [] },
       sort: 'name_asc',
     });
     expect(result).toHaveLength(1);
@@ -91,6 +119,8 @@ describe('WS15-T007 connections search filter sort', () => {
     );
     expect(view).toContain('filterAndSortConnections');
     expect(view).toContain('Filter by collection');
+    expect(view).toContain('Filter by location');
+    expect(view).toContain('connections-location-filter');
     expect(view).toContain('Sort Connections');
     expect(view).toContain('No Connections match these filters.');
     expect(view).toContain('EMPTY_STATE_COPY.connections');

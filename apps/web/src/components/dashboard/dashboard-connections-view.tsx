@@ -7,7 +7,9 @@ import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
 import {
   filterAndSortConnections,
+  uniqueConnectionLocations,
   type ConnectionsCollectionFilter,
+  type ConnectionsLocationFilter,
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
@@ -547,9 +549,19 @@ export function DashboardConnectionsView({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
   const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
+  const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
+  const locationOptions = useMemo(() => uniqueConnectionLocations(connections), [connections]);
+  const locationOptionKeys = useMemo(
+    () => new Set(locationOptions.map((loc) => loc.toLowerCase())),
+    [locationOptions],
+  );
+  const hasUnknownLocations = useMemo(
+    () => connections.some((c) => !(c.company ?? '').trim()),
+    [connections],
+  );
 
   useEffect(() => {
     if (
@@ -561,12 +573,24 @@ export function DashboardConnectionsView({
     }
   }, [collectionFilter, collectionIds]);
 
+  useEffect(() => {
+    if (locationFilter === 'all') return;
+    if (locationFilter === 'unknown') {
+      if (!hasUnknownLocations) setLocationFilter('all');
+      return;
+    }
+    if (!locationOptionKeys.has(locationFilter.toLowerCase())) {
+      setLocationFilter('all');
+    }
+  }, [locationFilter, locationOptionKeys, hasUnknownLocations]);
+
   const filtered = useMemo(() => {
     if (variant === 'authenticated') {
       return filterAndSortConnections({
         connections,
         query,
         collectionFilter,
+        locationFilter,
         memberships,
         sort,
       });
@@ -582,15 +606,19 @@ export function DashboardConnectionsView({
         c.role.toLowerCase().includes(q)
       );
     });
-  }, [connections, query, source, variant, collectionFilter, memberships, sort]);
+  }, [connections, query, source, variant, collectionFilter, locationFilter, memberships, sort]);
 
   const filtersActive =
     variant === 'authenticated' &&
-    (Boolean(query.trim()) || collectionFilter !== 'all' || sort !== 'newest');
+    (Boolean(query.trim()) ||
+      collectionFilter !== 'all' ||
+      locationFilter !== 'all' ||
+      sort !== 'newest');
 
   const clearFilters = () => {
     setQuery('');
     setCollectionFilter('all');
+    setLocationFilter('all');
     setSort('newest');
   };
 
@@ -666,6 +694,27 @@ export function DashboardConnectionsView({
                     {collections.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="sr-only" htmlFor="connections-location-filter">
+                    Filter by location
+                  </label>
+                  <select
+                    id="connections-location-filter"
+                    className="cc-app-input w-auto min-w-[10rem]"
+                    value={locationFilter}
+                    onChange={(e) =>
+                      setLocationFilter(e.target.value as ConnectionsLocationFilter)
+                    }
+                  >
+                    <option value="all">All locations</option>
+                    {hasUnknownLocations ? (
+                      <option value="unknown">No location</option>
+                    ) : null}
+                    {locationOptions.map((loc) => (
+                      <option key={loc.toLowerCase()} value={loc}>
+                        {loc}
                       </option>
                     ))}
                   </select>

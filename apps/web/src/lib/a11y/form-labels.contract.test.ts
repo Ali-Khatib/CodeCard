@@ -90,6 +90,7 @@ describe('WS12-T002 accessible form labels', () => {
     const source = read('components/dashboard/dashboard-connections-view.tsx');
     expect(source).toContain('aria-label="Search connections"');
     expect(source).toContain('htmlFor="connections-collection-filter"');
+    expect(source).toContain('htmlFor="connections-location-filter"');
   });
 
   it('circle filter tablist has a group accessible name', () => {
