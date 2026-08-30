@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { LegalPage } from '@/components/legal-page';
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
 
@@ -43,7 +44,8 @@ export default function ContactPage() {
           <a href="mailto:dmca@codecard.app">dmca@codecard.app</a>
         </p>
         <p>
-          Our <a href="/legal/dmca">DMCA policy</a> lists everything a valid notice must include.
+          Our <Link href="/legal/dmca">DMCA policy</Link> lists everything a valid notice must
+          include.
         </p>
       </section>
       <section>

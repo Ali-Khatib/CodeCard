@@ -12,7 +12,7 @@ import { getAppOrigin } from '@/lib/auth/redirect';
  * Redirects use the configured app origin only (never request.url) to avoid
  * open redirects via Host / URL spoofing.
  */
-export async function GET(_request: Request) {
+export async function GET() {
   const origin = getAppOrigin();
 
   if (!isAuthConfigured()) {
