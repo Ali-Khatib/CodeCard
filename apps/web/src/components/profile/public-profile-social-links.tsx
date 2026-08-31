@@ -33,7 +33,12 @@ export function PublicProfileSocialLinks({
               });
             }}
           >
-            <Icon className="cc-profile-identity-card__social-icon text-[1.05rem]" aria-hidden />
+            <Icon
+              className="cc-profile-identity-card__social-icon"
+              size={18}
+              color="currentColor"
+              aria-hidden
+            />
           </a>
         );
       })}

@@ -5010,47 +5010,54 @@ html.dark .cc-public-atmosphere__grain {
   color: var(--hero-ink) !important;
 }
 
-/* Social docks on the dark hero panel: solid light chips + near-black logos.
-   Do not inherit panel cream text — that made icons vanish on cream circles. */
+/* Social docks on the dark hero panel.
+   Dark chips + bright white logos — survives cream text inheritance that
+   previously made light logos vanish on light circles. */
 .cc-public-hero__social a,
 .cc-public-hero__social button {
-  color: #0c0b0a;
+  color: #ffffff;
 }
 
 .cc-public-hero__social .cc-profile-identity-card__social {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: #ffffff !important;
-  color: #0c0b0a !important;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  background: #111111 !important;
+  color: #ffffff !important;
   box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(0, 0, 0, 0.08);
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 .cc-public-hero__social .cc-profile-identity-card__social:hover {
-  background: #ffffff !important;
-  color: #0c0b0a !important;
-  border-color: color-mix(in srgb, var(--app-iris, #e95a0b) 55%, #fff);
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #ffffff;
   transform: translateY(-2px);
   box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.45),
-    0 0 0 1px color-mix(in srgb, var(--app-iris, #e95a0b) 35%, transparent);
+    0 6px 18px rgba(0, 0, 0, 0.6),
+    0 0 0 1px color-mix(in srgb, var(--app-iris, #e95a0b) 55%, transparent);
 }
 
-.cc-public-hero__social .cc-profile-identity-card__social svg {
-  width: 1.15rem;
-  height: 1.15rem;
-  color: #0c0b0a !important;
-  fill: currentColor;
+.cc-public-hero__social .cc-profile-identity-card__social svg,
+.cc-public-hero__social .cc-profile-identity-card__social svg path {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #ffffff !important;
+  fill: #ffffff !important;
   opacity: 1 !important;
 }
 
-.cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'] {
-  fill: none;
-  stroke: currentColor;
+.cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'],
+.cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'] path {
+  fill: none !important;
+  stroke: #ffffff !important;
+  stroke-width: 1.75;
 }
 
 .cc-public-hero__social .cc-profile-identity-card__social-icon {
-  color: #0c0b0a !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
 .cc-public-hero__panel .cc-app-btn--primary {
