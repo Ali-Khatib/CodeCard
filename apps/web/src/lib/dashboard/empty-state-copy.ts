@@ -5,12 +5,12 @@
 
 export const EMPTY_STATE_COPY = {
   connections: {
-    title: 'Add people you want to remember',
+    title: 'Meet in person. Scan to connect.',
     description:
-      'Save builders whose work you care about. Open their CodeCard, tap Add connection, and keep a private list only you can see.',
-    body: 'Your list stays private. Only you see who you saved.',
-    primaryCta: 'Find people to add',
-    secondaryCta: 'Share your CodeCard',
+      'CodeCard connections happen through physical QR scans — no searching, usernames, or digital invites.',
+    body: 'Share your CodeCard QR so people you meet can scan it and connect with you.',
+    primaryCta: 'Share your CodeCard',
+    secondaryCta: 'Open your profile',
   },
   projects: {
     title: 'Add your first project',
@@ -27,7 +27,7 @@ export const EMPTY_STATE_COPY = {
   circle: {
     noConnectionsTitle: 'Circle needs people first',
     noConnectionsDescription:
-      'Save people from public CodeCards. Their published work will show up here.',
+      'When someone scans your CodeCard QR in person, they appear in Connections — then their work shows up here.',
     noActivityTitle: 'Nothing new yet',
     noActivityDescription:
       'When your Connections publish projects or research, it shows up here.',

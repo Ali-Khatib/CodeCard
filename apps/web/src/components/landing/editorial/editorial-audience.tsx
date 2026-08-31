@@ -46,7 +46,7 @@ const AUDIENCE: AudienceCard[] = [
     points: [
       'First of all, scan role, stack, and proof without opening five tabs or chasing a PDF.',
       'Second of all, jump straight into projects and papers that show judgment, not just titles.',
-      'Third, save people you meet and keep private notes for the follow up.',
+      'Third, share your CodeCard QR so people you meet in person can scan and connect.',
     ],
   },
   {

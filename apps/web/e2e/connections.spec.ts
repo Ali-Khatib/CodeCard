@@ -16,10 +16,10 @@ test.describe('WS15 Connections management (mocked browser)', () => {
   test('empty authenticated state never shows demo people', async ({ page }) => {
     await openFixture(page);
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
-    await expect(page.getByRole('heading', { name: 'Add people you want to remember' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Meet in person. Scan to connect.' })).toBeVisible();
     await expect(page.getByText('Jordan Lee')).toHaveCount(0);
     await expect(page.getByText('Alex Chen')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Find people to add' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Share your CodeCard' })).toBeVisible();
   });
 
   test('full management: add, collect, note, search, remove collection membership, remove connection', async ({
@@ -27,7 +27,7 @@ test.describe('WS15 Connections management (mocked browser)', () => {
   }) => {
     await openFixture(page);
 
-    await page.getByRole('button', { name: 'Add Bob Smith as a Connection' }).click();
+    await page.getByRole('button', { name: 'Connect with Bob Smith from their CodeCard QR' }).click();
     await expect(page.locator('main')).toHaveAttribute('data-e2e-connected', 'true');
 
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
@@ -88,7 +88,7 @@ test.describe('WS15 Connections management (mocked browser)', () => {
         () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       );
 
-    await page.getByRole('button', { name: 'Add Bob Smith as a Connection' }).click();
+    await page.getByRole('button', { name: 'Connect with Bob Smith from their CodeCard QR' }).click();
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
     await page.getByRole('button', { name: 'Create Recruiters collection' }).click();
     expect(await hasOverflow()).toBe(false);
@@ -101,7 +101,7 @@ test.describe('WS15 Connections management (mocked browser)', () => {
 
   test('target privacy panel never exposes owner note or save relationship', async ({ page }) => {
     await openFixture(page);
-    await page.getByRole('button', { name: 'Add Bob Smith as a Connection' }).click();
+    await page.getByRole('button', { name: 'Connect with Bob Smith from their CodeCard QR' }).click();
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
     await page.getByRole('button', { name: 'Create Recruiters collection' }).click();
     const trigger = page.locator('.cc-connection-blob__trigger').first();

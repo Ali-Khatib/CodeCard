@@ -165,7 +165,7 @@ function createMockSupabase(options: MockOptions = {}) {
                     id: c.id,
                     connected_at: c.connected_at ?? null,
                     created_at: c.created_at ?? '2026-01-01T00:00:00.000Z',
-                    source: c.source ?? 'manual',
+                    source: c.source ?? 'qr',
                     context: null,
                     saved_profile: c.saved_profile ?? publishedTarget,
                   })),
@@ -212,7 +212,7 @@ function createMockSupabase(options: MockOptions = {}) {
             saved_profile_id: payload.saved_profile_id as string,
             connected_at: payload.connected_at as string,
             created_at: '2026-07-17T00:00:00.000Z',
-            source: (payload.source as string) ?? 'manual',
+            source: (payload.source as string) ?? 'qr',
           };
           connections.push({
             id: row.id,
@@ -273,7 +273,7 @@ describe('executeAddConnection', () => {
     const { client } = createMockSupabase();
     const result = await executeAddConnection(
       client,
-      { targetProfileId: TARGET_PROFILE_ID },
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
       { user: null },
     );
     expect(result.success).toBeUndefined();
@@ -286,7 +286,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetProfileId: TARGET_PROFILE_ID },
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.success).toBe(true);
@@ -296,10 +296,23 @@ describe('executeAddConnection', () => {
         owner_user_id: OWNER_USER,
         saved_profile_id: TARGET_PROFILE_ID,
         tenant_id: TENANT_OWNER,
-        source: 'manual',
+        source: 'qr',
       }),
     );
     expect(insert.mock.calls[0][0]).not.toHaveProperty('email');
+  });
+
+  it('rejects non-QR connection sources', async () => {
+    const { client, insert } = createMockSupabase({
+      targetById: { [TARGET_PROFILE_ID]: publishedTarget },
+    });
+    const result = await executeAddConnection(
+      client,
+      { targetProfileId: TARGET_PROFILE_ID, source: 'manual' },
+      { user: { id: OWNER_USER } },
+    );
+    expect(result.code).toBe('QR_REQUIRED');
+    expect(insert).not.toHaveBeenCalled();
   });
 
   it('rejects self-connection by owner user id', async () => {
@@ -313,7 +326,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetProfileId: SELF_PROFILE_ID },
+      { targetProfileId: SELF_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.code).toBe('SELF_CONNECTION');
@@ -331,7 +344,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetProfileId: OWNER_PROFILE_ID },
+      { targetProfileId: OWNER_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.code).toBe('SELF_CONNECTION');
@@ -344,7 +357,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetProfileId: DRAFT_PROFILE_ID },
+      { targetProfileId: DRAFT_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.code).toBe('TARGET_NOT_AVAILABLE');
@@ -364,7 +377,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetProfileId: TARGET_PROFILE_ID },
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.success).toBe(true);
@@ -379,7 +392,7 @@ describe('executeAddConnection', () => {
     });
     const result = await executeAddConnection(
       client,
-      { targetSlug: 'Bob-Smith' },
+      { targetSlug: 'Bob-Smith', source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.success).toBe(true);
@@ -394,6 +407,7 @@ describe('executeAddConnection', () => {
       client,
       {
         targetProfileId: TARGET_PROFILE_ID,
+        source: 'qr',
         owner_user_id: '99999999-9999-4999-8999-999999999999',
         tenant_id: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
       },
@@ -471,7 +485,7 @@ describe('listOwnerConnections', () => {
           owner_user_id: OWNER_USER,
           created_at: '2026-07-01T00:00:00.000Z',
           connected_at: '2026-07-01T00:00:00.000Z',
-          source: 'manual',
+          source: 'qr',
           saved_profile: publishedTarget,
         },
       ],
@@ -525,7 +539,7 @@ describe('executeConnectionStatus', () => {
     });
     const result = await executeConnectionStatus(
       client,
-      { targetProfileId: TARGET_PROFILE_ID },
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.connected).toBe(true);
@@ -544,7 +558,7 @@ describe('executeConnectionStatus', () => {
     });
     const result = await executeConnectionStatus(
       client,
-      { targetProfileId: TARGET_PROFILE_ID },
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
       { user: { id: OWNER_USER } },
     );
     expect(result.connected).toBe(false);

@@ -43,7 +43,7 @@ function revalidateConnectionPaths(targetSlug?: string | null) {
 export async function addConnectionAction(input: {
   targetProfileId?: string;
   targetSlug?: string;
-  source?: 'qr' | 'nfc' | 'direct_link' | 'manual' | 'app';
+  source: 'qr';
 }): Promise<ConnectionMutationState> {
   const supabase = await createClient();
   const {

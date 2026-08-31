@@ -56,11 +56,11 @@ function CircleEmptyNoConnections() {
         {EMPTY_STATE_COPY.circle.noConnectionsDescription}
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-        <AppButton variant="primary" href="/profiles">
-          Find people to add
-        </AppButton>
-        <AppButton variant="ghost" href="/dashboard/connections">
+        <AppButton variant="primary" href="/dashboard/connections">
           Open Connections
+        </AppButton>
+        <AppButton variant="ghost" href="/dashboard/profile">
+          Share your CodeCard
         </AppButton>
       </div>
     </section>

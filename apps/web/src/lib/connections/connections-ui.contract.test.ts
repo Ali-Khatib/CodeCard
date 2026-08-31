@@ -80,7 +80,7 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(nav).toContain("segment: 'circle'");
   });
 
-  it('exposes Add connection on public profiles and never on own profile', () => {
+  it('exposes QR-gated connect on public profiles and never on own profile', () => {
     const control = readFileSync(
       resolve(process.cwd(), 'src/components/profile/public-profile-connection-control.tsx'),
       'utf8',
@@ -91,9 +91,11 @@ describe('WS15-T004 real Connections save flow', () => {
     );
     const page = readFileSync(resolve(process.cwd(), 'src/app/[slug]/page.tsx'), 'utf8');
 
-    expect(control).toContain('Add connection');
+    expect(control).toContain('fromQrScan');
+    expect(control).toContain("source: 'qr'");
+    expect(control).toContain('Connect from QR');
     expect(control).toContain('Remove connection');
-    expect(control).toContain('Sign in to add connection');
+    expect(control).toContain('Sign in to connect');
     expect(control).toContain('if (isOwnProfile)');
     expect(control).toContain('return null');
     const viewer = readFileSync(
@@ -123,21 +125,32 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(preview).toContain('DEMO_CONNECTIONS');
     expect(demo).toContain('Jordan Lee');
     expect(demo).toContain('DEMO_CONNECTIONS');
+    expect(demo).toContain('Scanned your QR');
+    expect(demo).not.toContain('LinkedIn DM');
+    expect(demo).not.toContain("source: 'LinkedIn'");
+    expect(demo).not.toContain("source: 'NFC'");
+    expect(demo).not.toContain("source: 'Manual'");
+    expect(demo).not.toContain("source: 'Conference'");
   });
 
-  it('empty-state copy and Explore CTA are present', () => {
+  it('empty-state copy teaches physical QR connect', () => {
     const view = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/dashboard-connections-view.tsx'),
       'utf8',
     );
+    const copy = readFileSync(
+      resolve(process.cwd(), 'src/lib/dashboard/empty-state-copy.ts'),
+      'utf8',
+    );
     expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('copy.primaryCta');
-    expect(view).toContain('href="/profiles"');
+    expect(view).not.toContain('href="/profiles"');
     expect(view).toContain('ShareYourCodeCardButton');
     expect(view).toContain('getPublicProfileLinkForClipboard');
     expect(view).toContain('href="/dashboard#share"');
-    expect(view).not.toContain('href="/dashboard/profile"');
     expect(view).toContain("variant === 'authenticated'");
+    expect(copy).toContain('physical QR scans');
+    expect(copy).toContain('Share your CodeCard');
   });
 
   it('includes a gated Playwright fixture route', () => {

@@ -32,11 +32,14 @@ describe('WS16-T004 real circle feed experience', () => {
     const view = readWeb('src/components/dashboard/authenticated-circle-view.tsx');
     const empty = readWeb('src/lib/dashboard/empty-state-copy.ts');
     expect(view).toContain('EMPTY_STATE_COPY.circle.noConnectionsTitle');
-    expect(view).toContain('Find people to add');
-    expect(view).toContain('href="/profiles"');
+    expect(view).toContain('Share your CodeCard');
+    expect(view).toContain('Open Connections');
+    expect(view).not.toContain('Find people to add');
+    expect(view).not.toContain('href="/profiles"');
     expect(view).toContain('EMPTY_STATE_COPY.circle.noActivityTitle');
     expect(empty).toContain('noConnectionsTitle');
     expect(empty).toContain('noActivityTitle');
+    expect(empty).toContain('scans your CodeCard QR');
     expect(view).toContain('activitySentence');
     expect(view).toContain('dateTime={item.createdAt}');
     expect(view).toContain('Read paper');

@@ -16,9 +16,10 @@ test.describe('WS16 Circle feed (mocked browser)', () => {
   test('no-connection empty state never shows demo people', async ({ page }) => {
     await openFixture(page);
     await expect(
-      page.getByRole('heading', { name: 'Your Circle starts with your Connections' }),
+      page.getByRole('heading', { name: 'Circle needs people first' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Find people to add' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Share your CodeCard' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Open Connections' })).toBeVisible();
     await expect(page.getByText('Jordan Lee')).toHaveCount(0);
     await expect(page.getByText('Alex Chen')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Like' })).toHaveCount(0);

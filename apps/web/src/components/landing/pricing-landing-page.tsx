@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: 'Do visitors need an account?',
-    a: 'No. Profiles and projects are public. Saving connections requires a visitor account.',
+    a: 'No. Profiles and projects are public. Connections require a visitor account and a physical CodeCard QR scan.',
   },
   {
     q: 'Can I use a custom domain?',

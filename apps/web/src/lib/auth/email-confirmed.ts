@@ -27,7 +27,7 @@ export const NEW_ACCOUNT_SETUP_GUIDE = [
     id: 'connections',
     where: 'Connections',
     href: '/dashboard/connections',
-    what: 'Save people you meet and keep private notes for follow ups.',
+    what: 'Share your CodeCard QR so people you meet in person can scan and connect.',
   },
   {
     id: 'circle',

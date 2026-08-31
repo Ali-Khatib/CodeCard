@@ -39,6 +39,10 @@ export const urlSchema = z
 
 export const connectionSourceSchema = z.enum(['qr', 'nfc', 'direct_link', 'manual', 'app']);
 
+/** Connections may only be created from a physical CodeCard QR scan. */
+export const connectionCreateSourceSchema = z.literal('qr');
+
+
 export const PROFILE_LOCATION_MAX_LENGTH = 120;
 export const PROFILE_SKILLS_MAX_COUNT = 30;
 export const PROFILE_SKILL_MAX_LENGTH = 50;
@@ -452,7 +456,7 @@ export const reorderProjectsSchema = z.object({
 
 export const saveConnectionSchema = z.object({
   saved_profile_id: z.string().uuid(),
-  source: connectionSourceSchema.default('manual'),
+  source: connectionCreateSourceSchema.default('qr'),
   connected_at: z.string().datetime().optional().nullable(),
   met_at: z.string().datetime().optional().nullable(),
 });
@@ -470,12 +474,13 @@ export const connectionTargetSlugSchema = z
  * WS15-T003 — Add Connection input.
  * Client may supply a target profile UUID and/or public slug.
  * Owner identity is never accepted from the client.
+ * Source must be `qr` — physical CodeCard QR scan is the only create path.
  */
 export const addConnectionInputSchema = z
   .object({
     targetProfileId: z.string().uuid().optional(),
     targetSlug: connectionTargetSlugSchema.optional(),
-    source: connectionSourceSchema.default('manual'),
+    source: connectionCreateSourceSchema,
   })
   .refine((data) => Boolean(data.targetProfileId || data.targetSlug), {
     message: 'A target profile id or slug is required',
@@ -549,7 +554,6 @@ export const updateConnectionMetadataInputSchema = z.object({
     .union([z.string().datetime(), z.null()])
     .optional(),
   metAt: z.union([z.string().datetime(), z.null()]).optional(),
-  source: connectionSourceSchema.optional(),
 });
 
 export const connectionMetadataInputSchema = z.object({

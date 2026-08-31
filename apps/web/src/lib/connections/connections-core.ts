@@ -4,13 +4,13 @@ import {
   connectionStatusInputSchema,
   removeConnectionInputSchema,
   slugSchema,
-  type AddConnectionInput,
   type ConnectionStatusInput,
   type RemoveConnectionInput,
 } from '@codecard/validation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   assertConnectionIdentity,
+  CONNECTION_CREATE_SOURCE,
   CONNECTION_DEFAULT_SOURCE,
   CONNECTIONS_TABLE,
   type ConnectionMutationErrorCode,
@@ -68,6 +68,8 @@ const ERROR_MESSAGES: Record<ConnectionMutationErrorCode, string> = {
   ALREADY_CONNECTED: 'This person is already in your Connections.',
   NOT_FOUND: 'Connection not found.',
   RATE_LIMITED: 'Too many Connection requests. Please try again shortly.',
+  QR_REQUIRED:
+    'Connections are created only when you scan a CodeCard QR in person.',
   TEMPORARY_FAILURE: 'Could not update Connections. Please try again.',
 };
 
@@ -200,7 +202,14 @@ export async function executeAddConnection(
 ): Promise<ConnectionMutationState> {
   const parsed = addConnectionInputSchema.safeParse(raw);
   if (!parsed.success) {
-    return fail('INVALID_TARGET');
+    const sourceIssue = parsed.error.issues.some((issue) =>
+      issue.path.includes('source'),
+    );
+    return fail(sourceIssue ? 'QR_REQUIRED' : 'INVALID_TARGET');
+  }
+
+  if (parsed.data.source !== CONNECTION_CREATE_SOURCE) {
+    return fail('QR_REQUIRED');
   }
 
   const user = await getAuthenticatedUser(supabase, options);
@@ -262,7 +271,7 @@ export async function executeAddConnection(
     return fail('RATE_LIMITED');
   }
 
-  const source = (parsed.data as AddConnectionInput).source ?? CONNECTION_DEFAULT_SOURCE;
+  const source = CONNECTION_CREATE_SOURCE;
   const now = new Date().toISOString();
 
   const { data: inserted, error: insertError } = await supabase

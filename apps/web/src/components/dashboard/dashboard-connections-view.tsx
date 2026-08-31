@@ -21,7 +21,7 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
-const SOURCES = ['All', 'NFC', 'QR', 'Conference', 'LinkedIn', 'Manual'] as const;
+const SOURCES = ['All', 'QR'] as const;
 const CONNECTION_VIEW_MODES = [
   { id: 'list' as const, label: 'List view', icon: HiBars3BottomLeft },
   { id: 'grid' as const, label: 'Grid view', icon: HiSquares2X2 },
@@ -497,18 +497,17 @@ function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null 
 
 function ConnectionsEmptyState({ profileSlug }: { profileSlug?: string | null }) {
   const copy = EMPTY_STATE_COPY.connections;
+  const shareHref = profileSlug ? `/${profileSlug}` : '/dashboard/profile';
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader title={copy.title} description={copy.description} />
       <FadeInView delay={0}>
         <div className="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] px-6 py-10 md:px-10 md:py-14">
           <p className="max-w-xl text-[16px] leading-relaxed text-[var(--app-smoke)]">
-            Open a person&apos;s CodeCard and choose{' '}
-            <strong className="font-medium text-[var(--app-ink)]">Add connection</strong>.{' '}
-            {copy.body}
+            {copy.body} Someone meets you, scans your QR, and you are connected.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <AppButton variant="primary" href="/profiles">
+            <AppButton variant="primary" href={shareHref}>
               {copy.primaryCta}
             </AppButton>
             <ShareYourCodeCardButton profileSlug={profileSlug} />

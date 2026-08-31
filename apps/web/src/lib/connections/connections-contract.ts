@@ -20,8 +20,9 @@ export const CONNECTION_NOTES_TABLE = 'connection_notes' as const;
 export const COLLECTIONS_TABLE = 'collections' as const;
 export const COLLECTION_ITEMS_TABLE = 'collection_items' as const;
 
-/** Default source for intentional profile saves from a public CodeCard. */
-export const CONNECTION_DEFAULT_SOURCE = 'manual' as const;
+/** Default (and only allowed) source for new Connections — physical QR scan. */
+export const CONNECTION_DEFAULT_SOURCE = 'qr' as const;
+export const CONNECTION_CREATE_SOURCE = 'qr' as const;
 
 export type ConnectionOwnerId = string;
 export type ConnectionTargetProfileId = string;
@@ -59,6 +60,7 @@ export type ConnectionMutationErrorCode =
   | 'ALREADY_CONNECTED'
   | 'NOT_FOUND'
   | 'RATE_LIMITED'
+  | 'QR_REQUIRED'
   | 'TEMPORARY_FAILURE';
 
 /**

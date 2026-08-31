@@ -57,9 +57,9 @@ const STORIES: WalkStory[] = [
     headline: 'YOUR CARD HOLDER, TOO.',
     lead: 'CodeCard is a card holder as well. Keep who you met, why it mattered, and what to do next.',
     points: [
-      'Save people from events, intros, NFC, and QR opens.',
+      'Connect in person — someone scans your CodeCard QR, and you are connected.',
+      'No searching, usernames, or digital invites — physical QR is the only way.',
       'Attach private notes and follow ups only you can see.',
-      'Carry context forward so warm intros do not go cold.',
     ],
     background: U('photo-1515169067868-5387ec356754'),
   },

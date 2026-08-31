@@ -37,15 +37,19 @@ Export and deletion already cover Connections, notes, collections, and membershi
 
 ## UI surfaces
 
-- Public profile: Add / Remove connection (not on own profile; sign-in CTA for anonymous)
-- Authenticated `/dashboard/connections`: real list, collections, private notes, search/filter/sort
-- Circle remains **out** of authenticated navigation (WS16)
+- Public profile: **Connect from QR** only when the visit carries `?source=qr` (physical CodeCard QR). Otherwise show the in-person principle — never search/add. Remove remains available for existing Connections. Sign-in CTA preserves `?source=qr` after scan.
+- Authenticated `/dashboard/connections`: real list, collections, private notes, search/filter/sort of people already connected via QR
+- Circle (WS16): feed of work from QR Connections
+
+## Create rule (product invariant)
+
+**Physical QR scan is the only way to create a Connection.** No username/email search, invite links, NFC, LinkedIn import, contact sync, or “Add connection” from a normal profile link. Server rejects any create whose `source` is not `qr`.
 
 ## MVP limits
 
 - No contact importing
 - No mutual request/accept
-- No recommendations / AI ranking
+- No recommendations / AI ranking / discoverable people
 - No shared collections
 - No reminders or messaging
 - Client-side search/filter/sort over the owner’s loaded Connections (bounded by `LIMITS.savedConnections`)

@@ -123,10 +123,12 @@ describe('WS15-T001 connections data contract', () => {
     expect(CONNECTION_INVARIANTS).toContain('demo_data_isolated_from_authenticated');
   });
 
-  it('documents the existing validation entry point for saves', () => {
+  it('documents QR-only validation for connection creates', () => {
     const validation = readRepo('packages/validation/src/index.ts');
     expect(validation).toContain('saveConnectionSchema');
     expect(validation).toContain('saved_profile_id');
-    expect(validation).toContain("connectionSourceSchema.default('manual')");
+    expect(validation).toContain('connectionCreateSourceSchema');
+    expect(validation).toContain("z.literal('qr')");
+    expect(validation).not.toContain("connectionSourceSchema.default('manual')");
   });
 });

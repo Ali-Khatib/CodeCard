@@ -174,9 +174,6 @@ export async function executeUpdateConnectionMetadata(
   if (parsed.data.metAt !== undefined) {
     connectionPatch.met_at = parsed.data.metAt;
   }
-  if (parsed.data.source !== undefined) {
-    connectionPatch.source = parsed.data.source;
-  }
 
   if (Object.keys(connectionPatch).length > 0) {
     const { error } = await supabase

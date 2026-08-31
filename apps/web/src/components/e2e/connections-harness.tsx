@@ -33,7 +33,7 @@ export function ConnectionsHarness() {
     company: 'Berlin',
     metAt: 'Connected',
     date: 'Jul 17, 2026',
-    source: 'Manual',
+    source: 'QR',
     note: 'Engineer',
     followUp: 'none',
     tags: [],
@@ -113,17 +113,17 @@ export function ConnectionsHarness() {
                   className="cc-app-btn cc-app-btn--primary !h-10"
                   disabled={pending}
                   aria-busy={pending}
-                  aria-label="Add Bob Smith as a Connection"
+                  aria-label="Connect with Bob Smith from their CodeCard QR"
                   onClick={async () => {
                     setPending(true);
                     await new Promise((r) => setTimeout(r, 40));
                     setConnected(true);
                     setConnections([bobCard]);
-                    setStatus('Added Bob Smith to your Connections.');
+                    setStatus('Connected with Bob Smith from their CodeCard QR.');
                     setPending(false);
                   }}
                 >
-                  {pending ? 'Saving…' : 'Add connection'}
+                  {pending ? 'Saving…' : 'Connect from QR'}
                 </button>
               )}
               <p className="sr-only" role="status" aria-live="polite">

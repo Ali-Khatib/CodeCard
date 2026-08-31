@@ -2,11 +2,11 @@ import type { OwnerConnectionListItem } from '@/lib/connections/connections-cont
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 
 const SOURCE_LABEL: Record<string, WorkspaceConnection['source']> = {
-  manual: 'Manual',
+  manual: 'QR',
   qr: 'QR',
-  nfc: 'NFC',
-  direct_link: 'Manual',
-  app: 'Manual',
+  nfc: 'QR',
+  direct_link: 'QR',
+  app: 'QR',
 };
 
 function formatConnectedDate(iso: string | null | undefined): string {
@@ -45,7 +45,7 @@ export function mapOwnerConnectionToCard(
     company: target.location?.trim() || '',
     metAt: item.context?.trim() || (target.isPublic ? 'Connected' : 'Saved'),
     date: formatConnectedDate(item.connectedAt ?? item.createdAt),
-    source: SOURCE_LABEL[item.source] ?? 'Manual',
+    source: SOURCE_LABEL[item.source] ?? 'QR',
     note: item.privateNote?.trim() || publicPreview,
     followUp: 'none',
     tags: [],

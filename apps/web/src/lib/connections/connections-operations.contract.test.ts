@@ -9,26 +9,41 @@ import {
 } from '@codecard/validation';
 
 describe('WS15-T003 connections validation schemas', () => {
-  it('requires a target id or slug and never accepts owner_user_id', () => {
+  it('requires a target id or slug, requires qr source, and never accepts owner_user_id', () => {
     expect(addConnectionInputSchema.safeParse({}).success).toBe(false);
     expect(
       addConnectionInputSchema.safeParse({
         targetProfileId: '11111111-1111-4111-8111-111111111111',
       }).success,
+    ).toBe(false);
+    expect(
+      addConnectionInputSchema.safeParse({
+        targetProfileId: '11111111-1111-4111-8111-111111111111',
+        source: 'manual',
+      }).success,
+    ).toBe(false);
+    expect(
+      addConnectionInputSchema.safeParse({
+        targetProfileId: '11111111-1111-4111-8111-111111111111',
+        source: 'qr',
+      }).success,
     ).toBe(true);
     expect(
       addConnectionInputSchema.safeParse({
         targetSlug: 'bob-smith',
+        source: 'qr',
       }).success,
     ).toBe(true);
 
     const withOwner = addConnectionInputSchema.safeParse({
       targetProfileId: '11111111-1111-4111-8111-111111111111',
+      source: 'qr',
       owner_user_id: '22222222-2222-4222-8222-222222222222',
     });
     expect(withOwner.success).toBe(true);
     if (withOwner.success) {
       expect(withOwner.data).not.toHaveProperty('owner_user_id');
+      expect(withOwner.data.source).toBe('qr');
     }
   });
 

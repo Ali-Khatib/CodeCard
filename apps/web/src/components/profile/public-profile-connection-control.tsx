@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCallback, useState, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 import {
   addConnectionAction,
   removeConnectionAction,
 } from '@/app/actions/connections';
+import { parseProfileViewSource } from '@/lib/sharing/profile-view-source';
 
 type PublicProfileConnectionControlProps = {
   profileId: string;
@@ -28,22 +29,29 @@ export function PublicProfileConnectionControl({
   initialConnectionId,
 }: PublicProfileConnectionControlProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromQrScan = useMemo(
+    () => parseProfileViewSource(searchParams.get('source')) === 'qr',
+    [searchParams],
+  );
   const [connected, setConnected] = useState(initiallyConnected);
   const [connectionId, setConnectionId] = useState<string | null>(initialConnectionId);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const signInHref = `/sign-in?redirect=${encodeURIComponent(`/${profileSlug}`)}`;
+  const profileReturnPath = fromQrScan ? `/${profileSlug}?source=qr` : `/${profileSlug}`;
+  const signInHref = `/sign-in?redirect=${encodeURIComponent(profileReturnPath)}`;
 
   const onAdd = useCallback(() => {
-    if (pending) return;
+    if (pending || !fromQrScan) return;
     setError(null);
     setStatusMessage(null);
     startTransition(async () => {
       const result = await addConnectionAction({
         targetProfileId: profileId,
         targetSlug: profileSlug,
+        source: 'qr',
       });
       if (!result.success) {
         setError(result.error ?? 'Could not add Connection.');
@@ -57,11 +65,11 @@ export function PublicProfileConnectionControl({
       setStatusMessage(
         result.alreadyConnected
           ? `${displayName} is already in your Connections.`
-          : `Added ${displayName} to your Connections.`,
+          : `Connected with ${displayName} from their CodeCard QR.`,
       );
       router.refresh();
     });
-  }, [pending, profileId, profileSlug, displayName, router]);
+  }, [pending, fromQrScan, profileId, profileSlug, displayName, router]);
 
   const onRemove = useCallback(() => {
     if (pending) return;
@@ -93,25 +101,9 @@ export function PublicProfileConnectionControl({
     return null;
   }
 
-  if (!isAuthenticated) {
+  if (connected) {
     return (
       <div className="flex flex-col gap-2">
-        <Link
-          href={signInHref}
-          className="cc-app-btn cc-app-btn--ghost !h-10 inline-flex items-center justify-center"
-        >
-          Sign in to add connection
-        </Link>
-        <p className="text-[13px] text-[var(--app-smoke)]">
-          Save people whose work matters to you — then find them again in Connections.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      {connected ? (
         <button
           type="button"
           className="cc-app-btn cc-app-btn--ghost !h-10"
@@ -122,18 +114,64 @@ export function PublicProfileConnectionControl({
         >
           {pending ? 'Updating…' : 'Remove connection'}
         </button>
-      ) : (
-        <button
-          type="button"
-          className="cc-app-btn cc-app-btn--primary !h-10"
-          onClick={onAdd}
-          disabled={pending}
-          aria-busy={pending}
-          aria-label={`Add ${displayName} as a Connection`}
+        <p className="sr-only" role="status" aria-live="polite">
+          {pending ? 'Updating connection' : statusMessage ?? ''}
+        </p>
+        {statusMessage && !pending && (
+          <p className="text-[13px] text-[var(--app-smoke)]" aria-live="polite">
+            {statusMessage}
+          </p>
+        )}
+        {error && (
+          <p className="text-[13px] text-[var(--app-danger,#b42318)]" role="alert">
+            {error}
+          </p>
+        )}
+        {!pending && !statusMessage && (
+          <p className="text-[13px] text-[var(--app-smoke)]">Connected</p>
+        )}
+      </div>
+    );
+  }
+
+  if (!fromQrScan) {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-[13px] leading-relaxed text-[var(--app-smoke)]">
+          Connect in person. Scan their CodeCard QR — no searching, usernames, or digital invites.
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Link
+          href={signInHref}
+          className="cc-app-btn cc-app-btn--ghost !h-10 inline-flex items-center justify-center"
         >
-          {pending ? 'Saving…' : 'Add connection'}
-        </button>
-      )}
+          Sign in to connect
+        </Link>
+        <p className="text-[13px] text-[var(--app-smoke)]">
+          You scanned their CodeCard QR. Sign in to save this connection.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        className="cc-app-btn cc-app-btn--primary !h-10"
+        onClick={onAdd}
+        disabled={pending}
+        aria-busy={pending}
+        aria-label={`Connect with ${displayName} from their CodeCard QR`}
+      >
+        {pending ? 'Saving…' : 'Connect from QR'}
+      </button>
       <p className="sr-only" role="status" aria-live="polite">
         {pending ? 'Updating connection' : statusMessage ?? ''}
       </p>
@@ -147,9 +185,9 @@ export function PublicProfileConnectionControl({
           {error}
         </p>
       )}
-      {connected && !pending && !statusMessage && (
-        <p className="text-[13px] text-[var(--app-smoke)]">Connected</p>
-      )}
+      <p className="text-[13px] text-[var(--app-smoke)]">
+        Physical QR scan confirmed. Connect to save them privately.
+      </p>
     </div>
   );
 }
