@@ -210,7 +210,7 @@ export function TechLogoRow({
     return (
       <div
         ref={rowRef}
-        className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible md:gap-3 ${className}`}
+        className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#232324] md:gap-3 ${className}`}
         role="list"
       >
         {technologies.map((tech, i) => (
@@ -237,7 +237,7 @@ export function TechLogoRow({
 
   return (
     <div
-      className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible md:gap-3 ${className}`}
+      className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#232324] md:gap-3 ${className}`}
       role="list"
     >
       {technologies.map((tech, i) => (

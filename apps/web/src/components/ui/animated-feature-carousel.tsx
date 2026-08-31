@@ -59,6 +59,9 @@ const stepVariants: Variants = {
   active: { opacity: 1 },
 };
 
+const CIRCLE_R = 8;
+const CIRCLE_C = 2 * Math.PI * CIRCLE_R;
+
 function StepsNav({
   steps: stepItems,
   current,
@@ -99,11 +102,11 @@ function StepsNav({
                 aria-controls={`case-study-panel-${step.id}`}
                 tabIndex={isCurrent ? 0 : -1}
                 className={cn(
-                  'group relative flex min-h-11 items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--iris,#e95a0b)] focus-visible:ring-offset-2',
+                  'group flex min-h-11 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e95a0b] focus-visible:ring-offset-2',
                   isCurrent
-                    ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
-                    : 'border border-[color:var(--line-soft)] bg-transparent text-[color:var(--smoke)] hover:border-[color:color-mix(in_srgb,var(--ink)_25%,transparent)] hover:text-[color:var(--ink)]',
+                    ? 'bg-[#232324] text-white'
+                    : 'border border-[rgba(35,35,36,0.18)] bg-transparent text-[#5c5856] hover:border-[rgba(35,35,36,0.35)] hover:text-[#232324]',
                 )}
                 onClick={() => onChange(stepIdx)}
                 onFocus={() => onChange(stepIdx)}
@@ -126,31 +129,51 @@ function StepsNav({
                   });
                 }}
               >
-                {isCurrent && progressEnabled ? (
-                  <motion.span
-                    key={`progress-${current}-${step.id}`}
-                    aria-hidden
-                    className="pointer-events-none absolute inset-y-0 left-0 z-0 rounded-full bg-[color:var(--iris,#e95a0b)]/85"
-                    initial={{ width: '0%' }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: interval / 1000, ease: 'linear' }}
-                  />
-                ) : null}
                 <span
                   className={cn(
-                    'relative z-[1] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
+                    'relative flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
                     isCurrent
-                      ? 'bg-white/20 text-[color:var(--paper)]'
+                      ? 'bg-white/15 text-white'
                       : isCompleted
-                        ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
-                        : 'bg-[color:var(--line-soft)] text-[color:var(--smoke)]',
+                        ? 'bg-[#232324] text-white'
+                        : 'bg-[rgba(35,35,36,0.1)] text-[#5c5856]',
                   )}
                 >
-                  {isCompleted ? <IconCheck className="h-3.5 w-3.5" /> : <span>{stepIdx + 1}</span>}
+                  {isCurrent && progressEnabled ? (
+                    <svg
+                      key={`ring-${current}-${step.id}`}
+                      className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
+                      viewBox="0 0 20 20"
+                      aria-hidden
+                    >
+                      <circle
+                        cx="10"
+                        cy="10"
+                        r={CIRCLE_R}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.22)"
+                        strokeWidth="2.25"
+                      />
+                      <motion.circle
+                        cx="10"
+                        cy="10"
+                        r={CIRCLE_R}
+                        fill="none"
+                        stroke="#e95a0b"
+                        strokeWidth="2.25"
+                        strokeLinecap="round"
+                        strokeDasharray={CIRCLE_C}
+                        initial={{ strokeDashoffset: CIRCLE_C }}
+                        animate={{ strokeDashoffset: 0 }}
+                        transition={{ duration: interval / 1000, ease: 'linear' }}
+                      />
+                    </svg>
+                  ) : null}
+                  <span className="relative z-[1]">
+                    {isCompleted ? <IconCheck className="h-3.5 w-3.5" /> : stepIdx + 1}
+                  </span>
                 </span>
-                <span className="relative z-[1] hidden max-w-[12ch] truncate sm:inline-block">
-                  {step.title}
-                </span>
+                <span className="hidden max-w-[12ch] truncate sm:inline-block">{step.title}</span>
               </button>
             </motion.li>
           );
@@ -158,7 +181,7 @@ function StepsNav({
       </ol>
       {progressEnabled ? (
         <span className="sr-only" aria-live="polite">
-          Slides advance automatically. Progress shows time until the next section.
+          Slides advance automatically. The ring on the active step fills until the next section.
         </span>
       ) : null}
     </nav>
@@ -259,7 +282,8 @@ export function FeatureCarousel({
 
   return (
     <div className={cn('mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-7 overflow-x-clip sm:gap-9', className)}>
-      <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[color:var(--line-soft)] bg-[color:var(--paper)] shadow-[0_20px_50px_rgba(35,35,36,0.08)]">
+      {/* Locked light paper palette — never inherit dark-mode cream washout. */}
+      <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[rgba(35,35,36,0.12)] bg-white shadow-[0_20px_50px_rgba(35,35,36,0.08)]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active.id}
@@ -272,21 +296,19 @@ export function FeatureCarousel({
             exit={{ opacity: 0 }}
             transition={{ duration: reducedMotion ? 0.12 : 0.35 }}
           >
-            {/* Copy — always on solid paper, never over photos */}
-            <div className="relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-[color:var(--paper)] px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
-              <p className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--smoke)]">
+            <div className="relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-white px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
+              <p className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em] text-[#5c5856]">
                 {active.name}
               </p>
-              <h2 className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words text-[color:var(--ink)]">
+              <h2 className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words text-[#232324]">
                 {active.title}
               </h2>
-              <p className="max-w-[36ch] break-words text-[15px] leading-[1.65] text-[color:var(--smoke)] sm:text-[16px]">
+              <p className="max-w-[36ch] break-words text-[15px] leading-[1.65] text-[#5c5856] sm:text-[16px]">
                 {active.description}
               </p>
             </div>
 
-            {/* Media — separate column, no overlap with text */}
-            <div className="min-w-0 border-t border-[color:var(--line-soft)] bg-[color:var(--page,#f7f1ea)] px-4 py-5 sm:px-7 sm:py-8 md:border-l md:border-t-0 md:px-8 md:py-10 dark:bg-[color:color-mix(in_srgb,var(--paper)_88%,#000)]">
+            <div className="min-w-0 border-t border-[rgba(35,35,36,0.1)] bg-[#f7f1ea] px-4 py-5 sm:px-7 sm:py-8 md:border-l md:border-t-0 md:px-8 md:py-10">
               <StepMedia
                 images={active.images}
                 title={active.title}
