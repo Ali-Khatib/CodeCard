@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 
-/** Dark chapters — light type on frosted glass nav. Research keeps light nav (opaque pill). */
-const DARK_CHAPTERS = new Set(['finale']);
+/** Dark chapters — light type on frosted glass nav (matches cinema / finale fields). */
+const DARK_CHAPTERS = new Set(['hero', 'statement', 'finale']);
 /** Chapters where the fixed CC mark sits over a dark surface (light logo). */
-const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'finale']);
+const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'finale']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control.
  *  Crash Course only — Research keeps the full pill. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;
@@ -44,6 +44,13 @@ function setNavCompact(active: boolean) {
 export function EditorialAtmosphere() {
   const { canEnhanceMotion } = useMotionPreferences();
   const activeRef = useRef('');
+
+  useLayoutEffect(() => {
+    /* First paint: hero cinema needs light nav type before scroll observers run. */
+    document.documentElement.dataset.navTone = navToneFor('hero');
+    document.documentElement.dataset.landingChapter = 'hero';
+    syncLogoTone('hero');
+  }, []);
 
   useEffect(() => {
     const root = document.querySelector<HTMLElement>('.cc-ed');
