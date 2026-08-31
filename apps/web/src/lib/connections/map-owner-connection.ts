@@ -38,12 +38,17 @@ export function mapOwnerConnectionToCard(
     ? target.headline?.trim() || target.location?.trim() || 'Saved from their public CodeCard.'
     : 'This CodeCard is no longer public. Your Connection is still saved privately.';
 
+  const meetingPoint = item.context?.trim() || '';
+  const location = target.location?.trim() || '';
+
   return {
     id: item.connectionId,
     name: target.displayName,
     role: target.headline?.trim() || (target.isPublic ? 'CodeCard member' : 'Unavailable'),
-    company: target.location?.trim() || '',
-    metAt: item.context?.trim() || (target.isPublic ? 'Connected' : 'Saved'),
+    company: location,
+    meetingPoint,
+    country: location,
+    metAt: meetingPoint || (target.isPublic ? 'Connected' : 'Saved'),
     date: formatConnectedDate(item.connectedAt ?? item.createdAt),
     source: SOURCE_LABEL[item.source] ?? 'QR',
     note: item.privateNote?.trim() || publicPreview,

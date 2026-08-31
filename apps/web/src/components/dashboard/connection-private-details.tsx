@@ -10,6 +10,8 @@ type ConnectionPrivateDetailsProps = {
   initialNote: string | null;
   initialContext: string | null;
   initialConnectedAt: string | null;
+  /** Existing meeting-point names for pick-or-create. */
+  meetingPointSuggestions?: string[];
   open: boolean;
   onClose: () => void;
   onSaved?: (next: { privateNote: string | null; context: string | null }) => void;
@@ -21,6 +23,7 @@ export function ConnectionPrivateDetails({
   initialNote,
   initialContext,
   initialConnectedAt,
+  meetingPointSuggestions = [],
   open,
   onClose,
   onSaved,
@@ -124,7 +127,7 @@ export function ConnectionPrivateDetails({
               htmlFor={`context-${connectionId}`}
               className="mb-1 block text-[13px] text-[var(--app-smoke)]"
             >
-              How you know them
+              Meeting point
             </label>
             <input
               id={`context-${connectionId}`}
@@ -132,8 +135,20 @@ export function ConnectionPrivateDetails({
               value={context}
               onChange={(e) => setContext(e.target.value)}
               maxLength={500}
-              placeholder="Conference, intro, collaborator…"
+              list={`meeting-points-${connectionId}`}
+              placeholder="DevConf SF, meetup, café…"
+              autoComplete="off"
             />
+            {meetingPointSuggestions.length > 0 ? (
+              <datalist id={`meeting-points-${connectionId}`}>
+                {meetingPointSuggestions.map((point) => (
+                  <option key={point} value={point} />
+                ))}
+              </datalist>
+            ) : null}
+            <p className="mt-1.5 text-[12px] text-[var(--app-smoke)]">
+              Pick an existing place or type a new event / location name.
+            </p>
           </div>
 
           <div>

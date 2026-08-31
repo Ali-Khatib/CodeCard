@@ -165,7 +165,7 @@ function MiniPreview({ id, compact }: { id: WorkspaceShowcaseTab; compact?: bool
               )}
             </div>
             <p className="min-w-0 flex-1 break-words text-[8px] leading-tight text-lichen">{c.name}</p>
-            <span className="shrink-0 text-[7px] text-graphite">{c.source}</span>
+            <span className="shrink-0 text-[7px] text-graphite">{c.meetingPoint}</span>
           </div>
         ))}
       </div>

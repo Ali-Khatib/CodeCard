@@ -21,6 +21,8 @@ describe('WS12-T008 touch interaction fallbacks', () => {
     expect(carousel).toContain('onFocus={() => onChange(stepIdx)}');
     expect(carousel).toContain('ArrowRight');
     expect(carousel).toContain('min-h-11');
+    expect(carousel).toContain('progressEnabled');
+    expect(carousel).toContain("animate={{ width: '100%' }}");
   });
 
   it('image accordion activates by click and focus, not hover-only', () => {

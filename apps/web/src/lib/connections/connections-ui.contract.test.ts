@@ -122,15 +122,27 @@ describe('WS15-T004 real Connections save flow', () => {
       resolve(process.cwd(), 'src/lib/dashboard/workspace-demo.ts'),
       'utf8',
     );
+    const view = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/dashboard-connections-view.tsx'),
+      'utf8',
+    );
     expect(preview).toContain('DEMO_CONNECTIONS');
     expect(demo).toContain('Jordan Lee');
     expect(demo).toContain('DEMO_CONNECTIONS');
-    expect(demo).toContain('Scanned your QR');
+    expect(demo).toContain('DevConf SF');
+    expect(demo).toContain('meetingPoint');
+    expect(demo).toContain('country');
+    expect(demo).not.toContain('Scanned your QR');
     expect(demo).not.toContain('LinkedIn DM');
     expect(demo).not.toContain("source: 'LinkedIn'");
     expect(demo).not.toContain("source: 'NFC'");
     expect(demo).not.toContain("source: 'Manual'");
     expect(demo).not.toContain("source: 'Conference'");
+    expect(view).not.toContain('DashFilterBar');
+    expect(view).not.toContain("SOURCES = ['All', 'QR']");
+    expect(view).toContain('All meeting points');
+    expect(view).toContain('All countries / locations');
+    expect(view).not.toContain('cc-connection-blob__source-badge');
   });
 
   it('empty-state copy teaches physical QR connect', () => {

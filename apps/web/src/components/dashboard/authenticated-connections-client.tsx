@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { removeConnectionAction } from '@/app/actions/connections';
 import {
@@ -12,6 +12,7 @@ import { ConnectionsCollectionsPanel } from '@/components/dashboard/connections-
 import { ConnectionPrivateDetails } from '@/components/dashboard/connection-private-details';
 import type { AuthenticatedConnectionCard } from '@/lib/connections/map-owner-connection';
 import type { OwnerCollection } from '@/lib/connections/collections-core';
+import { uniqueConnectionMeetingPoints } from '@/lib/connections/connections-filter';
 
 export function AuthenticatedConnectionsClient({
   initialConnections,
@@ -46,6 +47,11 @@ export function AuthenticatedConnectionsClient({
   const detailsConnection = detailsId
     ? connections.find((c) => c.id === detailsId) ?? null
     : null;
+
+  const meetingPointSuggestions = useMemo(
+    () => uniqueConnectionMeetingPoints(connections),
+    [connections],
+  );
 
   const onRemove = useCallback(
     async (connectionId: string) => {
@@ -164,9 +170,11 @@ export function AuthenticatedConnectionsClient({
           initialNote={detailsConnection.privateNote}
           initialContext={detailsConnection.context}
           initialConnectedAt={detailsConnection.connectedAtIso}
+          meetingPointSuggestions={meetingPointSuggestions}
           open
           onClose={() => setDetailsId(null)}
           onSaved={({ privateNote, context }) => {
+            const meetingPoint = context?.trim() || '';
             setConnections((prev) =>
               prev.map((c) =>
                 c.id === detailsConnection.id
@@ -175,7 +183,8 @@ export function AuthenticatedConnectionsClient({
                       privateNote,
                       context,
                       note: privateNote?.trim() || c.note,
-                      metAt: context?.trim() || c.metAt,
+                      meetingPoint,
+                      metAt: meetingPoint || c.metAt,
                     }
                   : c,
               ),

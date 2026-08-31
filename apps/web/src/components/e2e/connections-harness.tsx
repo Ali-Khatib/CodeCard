@@ -31,6 +31,8 @@ export function ConnectionsHarness() {
     name: 'Bob Smith',
     role: 'Engineer',
     company: 'Berlin',
+    meetingPoint: '',
+    country: 'Germany',
     metAt: 'Connected',
     date: 'Jul 17, 2026',
     source: 'QR',

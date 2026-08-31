@@ -63,10 +63,14 @@ function StepsNav({
   steps: stepItems,
   current,
   onChange,
+  interval,
+  progressEnabled,
 }: {
   steps: readonly FeatureCarouselStep[];
   current: number;
   onChange: (index: number) => void;
+  interval: number;
+  progressEnabled: boolean;
 }) {
   return (
     <nav aria-label="Showcase sections" className="flex justify-center px-1">
@@ -95,7 +99,7 @@ function StepsNav({
                 aria-controls={`case-study-panel-${step.id}`}
                 tabIndex={isCurrent ? 0 : -1}
                 className={cn(
-                  'group flex min-h-11 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
+                  'group relative flex min-h-11 items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--iris,#e95a0b)] focus-visible:ring-offset-2',
                   isCurrent
                     ? 'bg-[color:var(--ink)] text-[color:var(--paper)]'
@@ -122,9 +126,19 @@ function StepsNav({
                   });
                 }}
               >
+                {isCurrent && progressEnabled ? (
+                  <motion.span
+                    key={`progress-${current}-${step.id}`}
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 left-0 z-0 rounded-full bg-[color:var(--iris,#e95a0b)]/85"
+                    initial={{ width: '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: interval / 1000, ease: 'linear' }}
+                  />
+                ) : null}
                 <span
                   className={cn(
-                    'flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
+                    'relative z-[1] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
                     isCurrent
                       ? 'bg-white/20 text-[color:var(--paper)]'
                       : isCompleted
@@ -134,12 +148,19 @@ function StepsNav({
                 >
                   {isCompleted ? <IconCheck className="h-3.5 w-3.5" /> : <span>{stepIdx + 1}</span>}
                 </span>
-                <span className="hidden max-w-[12ch] truncate sm:inline-block">{step.title}</span>
+                <span className="relative z-[1] hidden max-w-[12ch] truncate sm:inline-block">
+                  {step.title}
+                </span>
               </button>
             </motion.li>
           );
         })}
       </ol>
+      {progressEnabled ? (
+        <span className="sr-only" aria-live="polite">
+          Slides advance automatically. Progress shows time until the next section.
+        </span>
+      ) : null}
     </nav>
   );
 }
@@ -219,10 +240,12 @@ export function FeatureCarousel({
   onStepChange?: (step: FeatureCarouselStep, index: number) => void;
   className?: string;
 }) {
+  const progressEnabled = autoPlay && !reducedMotion && steps.length > 1;
+
   const { currentNumber: step, setStep } = useNumberCycler(
     steps.length,
     interval,
-    autoPlay && !reducedMotion && steps.length > 1,
+    progressEnabled,
   );
 
   useEffect(() => {
@@ -274,7 +297,13 @@ export function FeatureCarousel({
         </AnimatePresence>
       </div>
 
-      <StepsNav current={step} onChange={setStep} steps={steps} />
+      <StepsNav
+        current={step}
+        onChange={setStep}
+        steps={steps}
+        interval={interval}
+        progressEnabled={progressEnabled}
+      />
     </div>
   );
 }

@@ -135,7 +135,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       }
     >
       <div className="hidden md:flex cc-nav-desktop-links">
-        <ul className="cc-hume-fade-group flex items-center gap-1">
+        <ul className="cc-hume-fade-group flex items-center gap-2">
           {items.map((item, i) => {
             const active = isActive(item.href, item.label);
             return (

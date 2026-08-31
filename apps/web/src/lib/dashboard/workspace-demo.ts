@@ -11,7 +11,13 @@ export type WorkspaceConnection = {
   id: string;
   name: string;
   role: string;
+  /** City / region shown on the role line when useful. */
   company: string;
+  /** Meeting point display name (event / place where the QR scan happened). */
+  meetingPoint: string;
+  /** Country (or location) used for filtering. */
+  country: string;
+  /** Alias of meetingPoint for older call sites; prefer meetingPoint. */
   metAt: string;
   date: string;
   source: 'QR';
@@ -47,7 +53,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Jordan Lee',
     role: 'Staff Engineer',
     company: 'San Francisco',
-    metAt: 'Scanned your QR at DevConf SF',
+    meetingPoint: 'DevConf SF',
+    country: 'United States',
+    metAt: 'DevConf SF',
     date: 'Jun 12, 2026',
     source: 'QR',
     note: 'Met at the booth — interested in DevFlow CI story. Send case study.',
@@ -62,7 +70,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Samira Okonkwo',
     role: 'Technical Recruiter',
     company: 'New York',
-    metAt: 'Scanned your QR after the talk',
+    meetingPoint: 'Platform Talk Q&A',
+    country: 'United States',
+    metAt: 'Platform Talk Q&A',
     date: 'Jun 8, 2026',
     source: 'QR',
     note: 'Warm intro for platform team. Follow up after Pulse launch.',
@@ -76,7 +86,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Chris Park',
     role: 'Founder',
     company: 'Austin',
-    metAt: 'Scanned your QR at the meetup',
+    meetingPoint: 'Austin Observability Meetup',
+    country: 'United States',
+    metAt: 'Austin Observability Meetup',
     date: 'May 28, 2026',
     source: 'QR',
     note: 'In-person chat about observability tooling — wants to collaborate.',
@@ -90,7 +102,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Elena Vasquez',
     role: 'Engineering Manager',
     company: 'Seattle',
-    metAt: 'QR scan at the booth',
+    meetingPoint: 'SchemaSync Booth',
+    country: 'United States',
+    metAt: 'SchemaSync Booth',
     date: 'May 20, 2026',
     source: 'QR',
     note: 'Asked about SchemaSync migration story after scanning your card.',
@@ -104,7 +118,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Priya Shah',
     role: 'Product Designer',
     company: 'London',
-    metAt: 'Scanned your QR over coffee',
+    meetingPoint: 'London Coffee',
+    country: 'United Kingdom',
+    metAt: 'London Coffee',
     date: 'Jul 1, 2026',
     source: 'QR',
     note: 'Met in person — interested in portfolio layout ideas.',
@@ -118,7 +134,9 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     name: 'Marcus Webb',
     role: 'VP Engineering',
     company: 'Boston',
-    metAt: 'Scanned your QR in the hallway',
+    meetingPoint: 'Boston Hallway',
+    country: 'United States',
+    metAt: 'Boston Hallway',
     date: 'Jun 22, 2026',
     source: 'QR',
     note: 'Wants observability case study for platform team.',

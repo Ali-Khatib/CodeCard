@@ -89,7 +89,11 @@ function TechLogoItem({
     </motion.span>
   );
 
-  const tooltip = <span className="cc-tech-logo-tooltip">{label}</span>;
+  const tooltip = (
+    <span className="cc-tech-logo-tooltip" role="tooltip">
+      {label}
+    </span>
+  );
 
   const content = (
     <>
@@ -206,7 +210,7 @@ export function TechLogoRow({
     return (
       <div
         ref={rowRef}
-        className={`flex flex-wrap items-center gap-2 md:gap-3 ${className}`}
+        className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible md:gap-3 ${className}`}
         role="list"
       >
         {technologies.map((tech, i) => (
@@ -232,7 +236,10 @@ export function TechLogoRow({
   }
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 md:gap-3 ${className}`} role="list">
+    <div
+      className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible md:gap-3 ${className}`}
+      role="list"
+    >
       {technologies.map((tech, i) => (
         <TechLogoItem
           key={tech}

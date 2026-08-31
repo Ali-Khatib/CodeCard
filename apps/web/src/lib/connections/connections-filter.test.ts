@@ -4,11 +4,14 @@ import { resolve } from 'node:path';
 import {
   connectionMatchesCollectionFilter,
   connectionMatchesLocationFilter,
+  connectionMatchesMeetingPointFilter,
   connectionMatchesQuery,
+  connectionMeetingPointValue,
   filterAndSortConnections,
   normalizeConnectionsQuery,
   sortConnections,
   uniqueConnectionLocations,
+  uniqueConnectionMeetingPoints,
 } from './connections-filter';
 
 const people = [
@@ -17,7 +20,9 @@ const people = [
     name: 'Bob Smith',
     role: 'Engineer',
     company: 'Berlin',
-    metAt: 'Conference',
+    meetingPoint: 'DevConf',
+    country: 'Germany',
+    metAt: 'DevConf',
     date: 'Jul 1',
     source: 'QR' as const,
     note: 'public preview',
@@ -32,6 +37,8 @@ const people = [
     name: 'Ada Lovelace',
     role: 'Researcher',
     company: 'London',
+    meetingPoint: '',
+    country: 'United Kingdom',
     metAt: 'Connected',
     date: 'Jul 2',
     source: 'QR' as const,
@@ -47,14 +54,16 @@ const people = [
     name: 'Casey NoLoc',
     role: 'Designer',
     company: '',
-    metAt: 'Connected',
+    meetingPoint: 'London Coffee',
+    country: '',
+    metAt: 'London Coffee',
     date: 'Jul 3',
     source: 'QR' as const,
     note: 'no city set',
     followUp: 'none' as const,
     tags: [],
     privateNote: null,
-    context: null,
+    context: 'London Coffee',
     connectedAtIso: '2026-07-05T00:00:00.000Z',
   },
 ];
@@ -80,12 +89,23 @@ describe('WS15-T007 connections search filter sort', () => {
 
   it('filters by location including unknown', () => {
     expect(connectionMatchesLocationFilter(people[0], 'all')).toBe(true);
-    expect(connectionMatchesLocationFilter(people[0], 'Berlin')).toBe(true);
-    expect(connectionMatchesLocationFilter(people[0], ' berlin ')).toBe(true);
-    expect(connectionMatchesLocationFilter(people[0], 'London')).toBe(false);
+    expect(connectionMatchesLocationFilter(people[0], 'Germany')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], ' germany ')).toBe(true);
+    expect(connectionMatchesLocationFilter(people[0], 'United Kingdom')).toBe(false);
     expect(connectionMatchesLocationFilter(people[2], 'unknown')).toBe(true);
     expect(connectionMatchesLocationFilter(people[0], 'unknown')).toBe(false);
-    expect(uniqueConnectionLocations(people)).toEqual(['Berlin', 'London']);
+    expect(uniqueConnectionLocations(people)).toEqual(['Germany', 'United Kingdom']);
+  });
+
+  it('filters by meeting point including unassigned', () => {
+    expect(connectionMeetingPointValue(people[0])).toBe('DevConf');
+    expect(connectionMeetingPointValue(people[1])).toBe('');
+    expect(connectionMatchesMeetingPointFilter(people[0], 'all')).toBe(true);
+    expect(connectionMatchesMeetingPointFilter(people[0], 'DevConf')).toBe(true);
+    expect(connectionMatchesMeetingPointFilter(people[0], 'devconf')).toBe(true);
+    expect(connectionMatchesMeetingPointFilter(people[1], 'unassigned')).toBe(true);
+    expect(connectionMatchesMeetingPointFilter(people[0], 'unassigned')).toBe(false);
+    expect(uniqueConnectionMeetingPoints(people)).toEqual(['DevConf', 'London Coffee']);
   });
 
   it('sorts deterministically with id tie-breaker', () => {
@@ -99,12 +119,13 @@ describe('WS15-T007 connections search filter sort', () => {
     expect(za.map((p) => p.name)).toEqual(['Casey NoLoc', 'Bob Smith', 'Ada Lovelace']);
   });
 
-  it('combines search, collection filter, location filter, and sort', () => {
+  it('combines search, collection filter, location filter, meeting point, and sort', () => {
     const result = filterAndSortConnections({
       connections: people,
       query: 'research',
       collectionFilter: 'uncategorized',
-      locationFilter: 'London',
+      locationFilter: 'United Kingdom',
+      meetingPointFilter: 'unassigned',
       memberships: { c1: ['col-1'], c2: [], c3: [] },
       sort: 'name_asc',
     });
@@ -119,12 +140,15 @@ describe('WS15-T007 connections search filter sort', () => {
     );
     expect(view).toContain('filterAndSortConnections');
     expect(view).toContain('Filter by collection');
-    expect(view).toContain('Filter by location');
+    expect(view).toContain('Filter by meeting point');
+    expect(view).toContain('Filter by country or location');
     expect(view).toContain('connections-location-filter');
+    expect(view).toContain('connections-meeting-point-filter');
     expect(view).toContain('Sort Connections');
     expect(view).toContain('No Connections match these filters.');
     expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('Clear filters');
     expect(view).toContain('uncategorized');
+    expect(view).not.toContain('DashFilterBar');
   });
 });
