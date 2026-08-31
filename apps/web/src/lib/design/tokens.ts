@@ -86,7 +86,7 @@ export const TYPE = {
   profileRole: 'font-sans text-[18px] leading-[1.3] text-smoke',
   projectTitle:
     'font-display text-[36px] font-normal tracking-[-1.33px] md:text-[46px]',
-  eyebrow: 'font-eyebrow text-[11px] font-normal uppercase tracking-[0.08em] leading-[0.9] text-smoke',
+  eyebrow: 'font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-smoke',
   subheading: 'font-sans text-[18px] font-normal leading-[1.3] text-smoke',
 } as const;
 

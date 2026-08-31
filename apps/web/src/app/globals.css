@@ -3418,14 +3418,22 @@ select,
     background: var(--void-canvas);
   }
 
-  /* Cream scroll bodies — lock ink type (fixes white/lilac-white on void-canvas) */
+  /* Cream scroll bodies — always dark ink on light paper.
+     Do not flip to light text under html.dark: themes often keep cream
+     backgrounds, and light-on-cream titles/body become invisible. */
   .cc-on-cream-surface {
     --ink: #232324;
-    --smoke: #5c5856;
-    --ash: #5c5856;
+    --smoke: #3f3c3a;
+    --ash: #3f3c3a;
+    --lichen: #3f3c3a;
+    --graphite: #3f3c3a;
+    --fog: #3f3c3a;
     --text-primary: #232324;
-    --text-secondary: #5c5856;
+    --text-secondary: #3f3c3a;
+    --vellum: #232324;
+    --phosphor: #232324;
     color: #232324;
+    background-color: #fcf1e7;
     max-width: 100%;
     overflow-x: clip;
   }
@@ -3439,25 +3447,18 @@ select,
     color: #232324;
   }
 
+  .cc-on-cream-surface :where(.text-smoke, .text-ash, .text-lichen, .text-graphite, .text-fog) {
+    color: #3f3c3a;
+  }
+
+  .cc-on-cream-surface :where(.text-ink, .text-vellum, .text-phosphor) {
+    color: #232324;
+  }
+
   .cc-on-cream-surface img,
   .cc-on-cream-surface video {
     max-width: 100%;
     height: auto;
-  }
-
-  /* Night mode flips the cream surfaces dark, so the locked ink must flip light
-     too — otherwise case-study/story text renders dark-on-dark and disappears. */
-  html.dark .cc-on-cream-surface {
-    --ink: #efedeb;
-    --smoke: #b5b1b6;
-    --ash: #b5b1b6;
-    --text-primary: #efedeb;
-    --text-secondary: #b5b1b6;
-    color: #efedeb;
-  }
-
-  html.dark .cc-on-cream-surface :where(h1, h2, h3, h4) {
-    color: #efedeb;
   }
 
   .cc-project-atmosphere__particles {

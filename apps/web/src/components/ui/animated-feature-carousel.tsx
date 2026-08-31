@@ -296,14 +296,24 @@ export function FeatureCarousel({
             exit={{ opacity: 0 }}
             transition={{ duration: reducedMotion ? 0.12 : 0.35 }}
           >
-            <div className="relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-white px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
-              <p className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em] text-[#5c5856]">
+            {/* Locked dark ink — cream surfaces stay light paper. */}
+            <div className="cc-paper-lock relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-white px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
+              <p
+                className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em]"
+                style={{ color: '#3f3c3a' }}
+              >
                 {active.name}
               </p>
-              <h2 className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words text-[#232324]">
+              <h2
+                className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words"
+                style={{ color: '#232324' }}
+              >
                 {active.title}
               </h2>
-              <p className="max-w-[36ch] break-words text-[15px] leading-[1.65] text-[#5c5856] sm:text-[16px]">
+              <p
+                className="max-w-[36ch] break-words text-[15px] leading-[1.65] sm:text-[16px]"
+                style={{ color: '#3f3c3a' }}
+              >
                 {active.description}
               </p>
             </div>
