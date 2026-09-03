@@ -35,5 +35,9 @@ export const EMPTY_STATE_COPY = {
   home: {
     noProjects: 'No projects yet. Create one to feature on your card.',
     noResearch: 'No papers yet. Add one when you have something to show.',
+    noCircleWorks: 'When your Connections publish projects or research, the latest three show up here.',
+    noCircleConnections:
+      'Save people from in-person QR scans — then their public work appears here.',
+    circleWorksError: 'Circle highlights could not be loaded. Open Circle to try again.',
   },
 } as const;

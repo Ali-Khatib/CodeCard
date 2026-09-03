@@ -1,10 +1,11 @@
 import { DashboardOverviewView } from '@/components/dashboard/dashboard-overview-view';
 import {
-  DEMO_OVERVIEW_ACTIVITY,
   DEMO_PROFILE_LINKS,
   DEMO_SUGGESTED_STEP,
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
+import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
+import { overviewCircleWorksFromDemoFeed } from '@/lib/dashboard/overview-circle-works';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
 import { calculateProfileCompletion, deriveProfileCompletionInput } from '@/lib/profile/completion';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
@@ -106,7 +107,7 @@ export default function DemoWorkspaceOverviewPage() {
           },
         ],
       }}
-      activity={DEMO_OVERVIEW_ACTIVITY}
+      circleWorks={overviewCircleWorksFromDemoFeed(DEMO_CIRCLE_FEED, 3)}
       suggested={{
         ...DEMO_SUGGESTED_STEP,
         href: `${basePath}/work`,

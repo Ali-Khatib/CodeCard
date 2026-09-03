@@ -14,12 +14,14 @@ describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
 
     expect(page).toContain('loadOwnerAnalytics');
     expect(page).toContain('loadOwnerOverviewContent');
+    expect(page).toContain('listCircleFeed');
     expect(page).not.toContain('DEMO_OVERVIEW_ACTIVITY');
+    expect(page).not.toContain('DEMO_CIRCLE_FEED');
     expect(page).not.toContain('1284');
     expect(page).not.toContain('128');
     expect(page).not.toContain('47');
     expect(page).not.toContain('342');
-    expect(page).toContain('activity={[]}');
+    expect(page).toContain('circleWorks');
     expect(page).toContain('statsError');
     expect(page).toContain('contentError');
     expect(page).toContain('projectsSummary');
@@ -33,11 +35,15 @@ describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
     expect(view).toContain('projectsSummary');
     expect(view).toContain('Add project');
     expect(view).toContain('Add paper');
-    expect(view).toContain('Activity will appear here');
+    expect(view).toContain('From your Circle');
+    expect(view).toContain('Latest work nearby');
+    expect(view).not.toContain('Activity will appear here');
+    expect(view).toContain("sm:grid-cols-2");
 
     // Workspace demo keeps deterministic sample stats only on the live-demo route.
-    expect(preview).toContain('DEMO_OVERVIEW_ACTIVITY');
+    expect(preview).toContain('DEMO_CIRCLE_FEED');
     expect(preview).toContain('1284');
     expect(preview).toContain('preview');
+    expect(preview).toContain('circleWorks');
   });
 });

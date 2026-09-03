@@ -5,11 +5,12 @@ import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
 import {
   DEMO_CONNECTIONS,
-  DEMO_OVERVIEW_ACTIVITY,
   DEMO_PROFILE_LINKS,
   DEMO_SUGGESTED_STEP,
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
+import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
+import { overviewCircleWorksFromDemoFeed } from '@/lib/dashboard/overview-circle-works';
 import {
   featuredToPortfolioProject,
   profileToPortfolioCreator,
@@ -245,7 +246,7 @@ export function EditorialProductFrame({
                   },
                 ],
               }}
-              activity={DEMO_OVERVIEW_ACTIVITY}
+              circleWorks={overviewCircleWorksFromDemoFeed(DEMO_CIRCLE_FEED, 3)}
               suggested={{
                 ...DEMO_SUGGESTED_STEP,
                 href: `${LIVE_DEMO_WORKSPACE_HREF}/projects`,

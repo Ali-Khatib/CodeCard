@@ -7,6 +7,9 @@ import {
 } from '@/components/dashboard/dashboard-overview-route-states';
 import { loadOwnerAnalytics } from '@/lib/dashboard/analytics-queries';
 import { loadOwnerOverviewContent } from '@/lib/dashboard/overview-queries';
+import { overviewCircleWorksFromAuthFeed } from '@/lib/dashboard/overview-circle-works';
+import type { OverviewCircleWorksEmpty } from '@/lib/dashboard/overview-circle-works';
+import { listCircleFeed } from '@/lib/circle/circle-feed-core';
 import { getProfileCompletionNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
@@ -30,10 +33,11 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult, contentResult] = await Promise.all([
+  const [completionResult, analyticsResult, contentResult, circleFeed] = await Promise.all([
     loadProfileCompletion(supabase, profile),
     loadOwnerAnalytics(supabase, user!.id),
     loadOwnerOverviewContent(supabase, user!.id),
+    listCircleFeed(supabase, { limit: 3, filter: 'all' }),
   ]);
 
   if (!completionResult.ok) {
@@ -73,6 +77,23 @@ export default async function DashboardHomePage() {
   const projectsSummary = contentResult.ok ? contentResult.projects : null;
   const researchSummary = contentResult.ok ? contentResult.research : null;
 
+  let circleWorks = overviewCircleWorksFromAuthFeed(
+    circleFeed.status === 'feed' ? circleFeed.items : [],
+    3,
+  );
+  let circleWorksEmpty: OverviewCircleWorksEmpty = 'none';
+  if (circleWorks.length === 0) {
+    if (circleFeed.status === 'no_connections') {
+      circleWorksEmpty = 'no_connections';
+    } else if (
+      circleFeed.status === 'temporary_failure' ||
+      circleFeed.status === 'unauthenticated' ||
+      circleFeed.status === 'invalid_cursor'
+    ) {
+      circleWorksEmpty = 'error';
+    }
+  }
+
   return (
     <DashboardOverviewView
       greeting={greetingForHour()}
@@ -91,7 +112,8 @@ export default async function DashboardHomePage() {
       projectsSummary={projectsSummary}
       researchSummary={researchSummary}
       contentError={contentError}
-      activity={[]}
+      circleWorks={circleWorks}
+      circleWorksEmpty={circleWorksEmpty}
       suggested={suggested}
     />
   );

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { CountUp } from '@/components/landing/count-up';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
@@ -9,8 +11,11 @@ import { Sparkline } from './sparkline';
 import { FadeInView } from './fade-in-view';
 import { HomeIdentitySection } from './home-identity-section';
 import { ProfileShareHero } from './profile-share-hero';
-import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
 import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
+import type {
+  OverviewCircleWork,
+  OverviewCircleWorksEmpty,
+} from '@/lib/dashboard/overview-circle-works';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
@@ -59,16 +64,17 @@ export type OverviewProps = {
   researchSummary: OverviewContentSummary | null;
   /** True when project/research inventory could not be loaded. */
   contentError?: boolean;
-  activity: WorkspaceActivity[];
+  /** Up to three latest Circle works for the Home glance. */
+  circleWorks?: OverviewCircleWork[];
+  /** Empty / error reason when circleWorks is empty. */
+  circleWorksEmpty?: OverviewCircleWorksEmpty;
   suggested: { title: string; detail: string; href: string } | null;
   basePath?: string;
 };
 
-const PREVIEW_SPARKS: Record<keyof OverviewReachStats, number[]> = {
+const PREVIEW_SPARKS: Record<'profileViews' | 'projectOpens', number[]> = {
   profileViews: [8, 12, 10, 16, 14, 18],
   projectOpens: [3, 6, 5, 9, 7, 11],
-  linkClicks: [1, 2, 2, 4, 3, 5],
-  qrDownloads: [2, 4, 3, 6, 5, 7],
 };
 
 export function DashboardOverviewView({
@@ -86,7 +92,8 @@ export function DashboardOverviewView({
   projectsSummary,
   researchSummary,
   contentError = false,
-  activity,
+  circleWorks = [],
+  circleWorksEmpty = 'none',
   suggested,
   basePath = '/dashboard',
 }: OverviewProps) {
@@ -95,12 +102,11 @@ export function DashboardOverviewView({
   const isProfilePublic = profile?.is_public === true;
   const views =
     typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
-  const reachCards: { key: keyof OverviewReachStats; label: string }[] = [
+  const reachCards: { key: 'profileViews' | 'projectOpens'; label: string }[] = [
     { key: 'profileViews', label: 'Profile views' },
     { key: 'projectOpens', label: 'Project opens' },
-    { key: 'linkClicks', label: 'Link clicks' },
-    { key: 'qrDownloads', label: 'QR downloads' },
   ];
+  const circleHref = `${basePath}/circle`;
 
   useEffect(() => {
     const flag = sessionStorage.getItem(SHARE_LINK_COPIED_FLAG);
@@ -343,7 +349,7 @@ export function DashboardOverviewView({
         </section>
       </FadeInView>
 
-      {/* ── Zone 6: Reach snapshot ── */}
+      {/* ── Zone 6: Quick glance (2 metrics) + Circle highlights ── */}
       <FadeInView delay={0.2}>
         <section className="cc-profile-home__zone" aria-label="Audience reach">
           <div className="cc-profile-home__zone-head">
@@ -365,7 +371,7 @@ export function DashboardOverviewView({
               </p>
             </AppCard>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2">
               {reachCards.map((s) => {
                 const count = Math.max(0, Math.round(stats[s.key] ?? 0));
                 return (
@@ -394,20 +400,76 @@ export function DashboardOverviewView({
         </section>
       </FadeInView>
 
-      {/* ── Zone 7: Activity ── */}
       <FadeInView delay={0.24}>
-        <section className="cc-profile-home__zone" aria-label="Recent activity">
-          <AppMono>Recent activity</AppMono>
-          {activity.length === 0 ? (
-            <p className="mt-4 text-[14px] text-[var(--app-smoke)]">
-              Activity will appear here as people engage with your public CodeCard.
-            </p>
+        <section className="cc-profile-home__zone cc-home-circle-glance" aria-label="From your Circle">
+          <div className="cc-profile-home__zone-head">
+            <div>
+              <p className="cc-workspace-section__eyebrow">From your Circle</p>
+              <h2 className="cc-workspace-section__title">Latest work nearby</h2>
+            </div>
+            <AppButton variant="ghost" href={circleHref}>
+              Open Circle →
+            </AppButton>
+          </div>
+
+          {circleWorks.length === 0 ? (
+            <AppCard tone="meringue" className="!p-5">
+              <p className="text-[15px] text-[var(--app-ink)]">
+                {circleWorksEmpty === 'no_connections'
+                  ? EMPTY_STATE_COPY.home.noCircleConnections
+                  : circleWorksEmpty === 'error'
+                    ? EMPTY_STATE_COPY.home.circleWorksError
+                    : EMPTY_STATE_COPY.home.noCircleWorks}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {circleWorksEmpty === 'no_connections' ? (
+                  <AppButton variant="primary" href={`${basePath}/connections`}>
+                    Open Connections
+                  </AppButton>
+                ) : (
+                  <AppButton variant="primary" href={circleHref}>
+                    Open Circle
+                  </AppButton>
+                )}
+              </div>
+            </AppCard>
           ) : (
-            <ul className="cc-profile-activity-list mt-4">
-              {activity.slice(0, 5).map((item) => (
-                <li key={item.id} className="cc-profile-activity-list__item">
-                  <span>{item.text}</span>
-                  <time>{item.time}</time>
+            <ul className="cc-home-circle-glance__list">
+              {circleWorks.slice(0, 3).map((item) => (
+                <li key={item.id}>
+                  <Link href={item.href} className="cc-home-circle-glance__card">
+                    <div className="cc-home-circle-glance__avatar">
+                      {item.avatarUrl ? (
+                        <Image
+                          src={item.avatarUrl}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                        />
+                      ) : (
+                        <span aria-hidden>{item.personName[0]}</span>
+                      )}
+                    </div>
+                    <div className="cc-home-circle-glance__copy min-w-0">
+                      <p className="cc-home-circle-glance__person">
+                        <span className="truncate">{item.personName}</span>
+                        <span className="cc-home-circle-glance__when">{item.when}</span>
+                      </p>
+                      {item.personRole ? (
+                        <p className="cc-home-circle-glance__role truncate">{item.personRole}</p>
+                      ) : null}
+                      <p className="cc-home-circle-glance__title truncate">
+                        <span className="cc-home-circle-glance__kind">
+                          {item.kind === 'research' ? 'Research' : 'Project'}
+                        </span>
+                        {item.title}
+                      </p>
+                      {item.tagline ? (
+                        <p className="cc-home-circle-glance__tagline truncate">{item.tagline}</p>
+                      ) : null}
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>

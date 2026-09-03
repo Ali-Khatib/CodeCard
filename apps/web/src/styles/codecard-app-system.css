@@ -1874,14 +1874,17 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-sidebar__nav {
   margin-top: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .cc-app-sidebar__foot {
-  margin-top: 12px;
+  margin-top: auto;
   display: grid;
   gap: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--app-border);
+  flex-shrink: 0;
 }
 
 .cc-app-sidebar-appearance {
@@ -4815,6 +4818,124 @@ html.dark .cc-profile-home__zone-title {
   flex-shrink: 0;
   font-size: var(--app-type-meta);
   color: var(--app-muted);
+}
+
+.cc-home-circle-glance__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cc-home-circle-glance__card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--app-radius-large);
+  border: 1px solid var(--app-border);
+  background: var(--app-paper);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.cc-home-circle-glance__card:hover {
+  border-color: color-mix(in srgb, var(--app-iris) 35%, var(--app-border));
+  background: color-mix(in srgb, var(--app-meringue) 55%, var(--app-paper));
+}
+
+.cc-home-circle-glance__card:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: 2px;
+}
+
+.cc-home-circle-glance__avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bone);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-ink);
+}
+
+.cc-home-circle-glance__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.cc-home-circle-glance__person {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--app-ink);
+}
+
+.cc-home-circle-glance__when {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--app-smoke);
+}
+
+.cc-home-circle-glance__role,
+.cc-home-circle-glance__tagline {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--app-smoke);
+}
+
+.cc-home-circle-glance__title {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-ink);
+}
+
+.cc-home-circle-glance__kind {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bone);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--app-smoke);
+  vertical-align: 1px;
+}
+
+html.dark .cc-home-circle-glance__card:hover {
+  background: color-mix(in srgb, var(--app-paper) 88%, var(--app-iris));
+}
+
+@media (max-width: 640px) {
+  .cc-home-circle-glance__card {
+    padding: 12px 14px;
+  }
+
+  .cc-home-circle-glance__person {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
 }
 
 /* ?? Projects page ? profile ribbon + stack ?? */
