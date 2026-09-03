@@ -8,6 +8,7 @@ import type { Profile } from '@codecard/types';
 import { Sparkline } from './sparkline';
 import { FadeInView } from './fade-in-view';
 import { HomeIdentitySection } from './home-identity-section';
+import { ProfileShareHero } from './profile-share-hero';
 import type { WorkspaceActivity } from '@/lib/dashboard/workspace-demo';
 import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
@@ -74,6 +75,7 @@ export function DashboardOverviewView({
   greeting,
   displayName,
   completion,
+  profileSlug,
   profileViews,
   links = [],
   profileLinks = [],
@@ -113,7 +115,7 @@ export function DashboardOverviewView({
     } else {
       notifyError(MUTATION_FEEDBACK.share.linkCopyFailed);
     }
-    document.getElementById('profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('share')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [notifySuccess, notifyError, isProfilePublic]);
 
   return (
@@ -188,8 +190,19 @@ export function DashboardOverviewView({
         </FadeInView>
       ) : null}
 
+      <FadeInView delay={0.08}>
+        <section id="share" aria-label="Share your CodeCard" className="scroll-mt-24">
+          <ProfileShareHero
+            profileSlug={profileSlug}
+            profileId={profile?.id}
+            isPublic={isProfilePublic}
+            displayName={displayName}
+          />
+        </section>
+      </FadeInView>
+
       {profile ? (
-        <FadeInView delay={0.08}>
+        <FadeInView delay={0.12}>
           <HomeIdentitySection
             profile={profile}
             profileLinks={profileLinks}

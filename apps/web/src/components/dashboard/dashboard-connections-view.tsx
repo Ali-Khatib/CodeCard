@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import Image from 'next/image';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
@@ -245,7 +245,7 @@ function ConnectionsFollowUps({
   onSelect,
 }: {
   followUps: WorkspaceConnection[];
-  onSelect: (id: string) => void;
+  onSelect: (event: MouseEvent<HTMLButtonElement>, id: string) => void;
 }) {
   if (followUps.length === 0) return null;
 
@@ -267,7 +267,7 @@ function ConnectionsFollowUps({
             <button
               type="button"
               className="cc-connection-followup-card"
-              onClick={() => onSelect(c.id)}
+              onClick={(event) => onSelect(event, c.id)}
             >
               <div className="cc-connection-followup-card__avatar">
                 {c.avatarUrl ? (
@@ -336,6 +336,7 @@ function ConnectionCard({
     <ReactiveBorder
       as="article"
       id={`connection-${connection.id}`}
+      data-connection-id={connection.id}
       className={`cc-connection-blob${expanded ? ' cc-connection-blob--open' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
@@ -432,6 +433,7 @@ function ConnectionGridCard({
     <ReactiveBorder
       as="article"
       id={`connection-${connection.id}`}
+      data-connection-id={connection.id}
       className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
@@ -558,69 +560,46 @@ export function DashboardConnectionsView({
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
   const listGlueTokenRef = useRef(0);
-  const followUpScrollTargetRef = useRef<string | null>(null);
 
-  const openConnection = useCallback((id: string) => {
-    // Cancel any in-flight list scroll-gluing so it can't fight this scroll.
-    listGlueTokenRef.current += 1;
-    followUpScrollTargetRef.current = id;
-    setSelectedId(id);
-  }, []);
+  const openConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-  useLayoutEffect(() => {
-    const targetId = followUpScrollTargetRef.current;
-    if (!targetId) return;
-    if (selectedId !== targetId) {
-      followUpScrollTargetRef.current = null;
+    const target = document.querySelector<HTMLElement>(`[data-connection-id="${id}"]`);
+    if (!target) {
+      setSelectedId(id);
       return;
     }
 
-    followUpScrollTargetRef.current = null;
-
-    const el = document.getElementById(`connection-${targetId}`);
-    if (!el) return;
-
+    // Bring the exact card into view before any expand/collapse state change can
+    // reflow the list and pull the viewport upward.
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({
+      behavior: reduceMotion ? 'instant' : 'smooth',
+      block: 'center',
+    });
 
-    const scroll = () => {
-      el.scrollIntoView({
-        behavior: reduceMotion ? 'instant' : 'smooth',
-        block: 'center',
-      });
-    };
+    const beforeDocTop = target.getBoundingClientRect().top + window.scrollY;
+    const token = ++listGlueTokenRef.current;
+    setSelectedId(id);
 
-    // Wait until the target card's top position stops moving due to expand/collapse
-    // layout transitions, then perform a single deterministic scroll.
-    let cancelled = false;
-    let lastTop = el.getBoundingClientRect().top;
-    let stableFrames = 0;
+    // Keep the requested card fixed in document space while another expanded
+    // card above collapses and this one opens.
     let frames = 0;
-
     const tick = () => {
-      if (cancelled) return;
+      if (token !== listGlueTokenRef.current) return;
+      const after = document.querySelector<HTMLElement>(`[data-connection-id="${id}"]`);
+      if (!after) return;
+      const afterDocTop = after.getBoundingClientRect().top + window.scrollY;
+      const delta = afterDocTop - beforeDocTop;
+      if (Math.abs(delta) > 0.5) {
+        window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+      }
       frames += 1;
-
-      const top = el.getBoundingClientRect().top;
-      if (Math.abs(top - lastTop) < 0.5) {
-        stableFrames += 1;
-      } else {
-        stableFrames = 0;
-      }
-      lastTop = top;
-
-      if (stableFrames >= 2 || frames >= 60) {
-        scroll();
-        return;
-      }
-      requestAnimationFrame(tick);
+      if (frames < 30) requestAnimationFrame(tick);
     };
-
-    const rafId = requestAnimationFrame(tick);
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(rafId);
-    };
-  }, [selectedId]);
+    requestAnimationFrame(tick);
+  }, []);
 
   const toggleConnection = useCallback((id: string) => {
     const el = document.getElementById(`connection-${id}`);
