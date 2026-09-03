@@ -3658,6 +3658,272 @@ html.dark .cc-analytics-project-metric {
   border-color: var(--app-border);
 }
 
+/* Research analytics — clear summary + real table */
+.cc-analytics-research-panel .cc-app-section-label {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+
+.cc-analytics-research-panel .cc-app-section-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(120px, 50%);
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--app-iris), rgba(94, 214, 200, 0.85));
+}
+
+.cc-analytics-research-card {
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(233, 90, 11, 0.45) 30%,
+      rgba(94, 214, 200, 0.4) 70%,
+      rgba(255, 255, 255, 0.7) 100%
+    )
+      border-box !important;
+}
+
+html.dark .cc-analytics-research-card {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(244, 239, 232, 0.16) 0%,
+      rgba(233, 90, 11, 0.55) 32%,
+      rgba(80, 200, 255, 0.35) 68%,
+      rgba(244, 239, 232, 0.1) 100%
+    )
+      border-box !important;
+}
+
+.cc-analytics-research-summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .cc-analytics-research-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.cc-analytics-research-summary .cc-analytics-stat-block {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  background: color-mix(in srgb, var(--app-bone) 55%, var(--app-paper));
+}
+
+.cc-analytics-research-summary__value {
+  margin-top: 6px;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-ink);
+}
+
+.cc-analytics-research-highlights {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--app-border);
+}
+
+@media (min-width: 768px) {
+  .cc-analytics-research-highlights {
+    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 0.8fr));
+    gap: 20px;
+  }
+}
+
+.cc-analytics-research-highlights__text {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--app-ink);
+}
+
+.cc-analytics-paper-table-wrap {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--app-border);
+}
+
+.cc-analytics-paper-table__intro {
+  margin-bottom: 14px;
+}
+
+.cc-analytics-paper-table__heading {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--app-ink);
+}
+
+.cc-analytics-paper-table__sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+
+.cc-analytics-paper-table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: var(--app-paper);
+}
+
+.cc-analytics-paper-table__head,
+.cc-analytics-paper-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(64px, 0.55fr)) minmax(88px, 0.7fr);
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+}
+
+.cc-analytics-paper-table__head {
+  background: color-mix(in srgb, var(--app-bone) 70%, var(--app-paper));
+  border-bottom: 1px solid var(--app-border);
+}
+
+.cc-analytics-paper-table__head span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--app-muted);
+  text-transform: none;
+}
+
+.cc-analytics-paper-table__row {
+  border-bottom: 1px solid var(--app-border);
+}
+
+.cc-analytics-paper-table__row:last-child {
+  border-bottom: none;
+}
+
+.cc-analytics-paper-table__row:nth-child(even) {
+  background: color-mix(in srgb, var(--app-bone) 35%, var(--app-paper));
+}
+
+.cc-analytics-paper-table__title {
+  margin: 0;
+  font-family: var(--app-font);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: var(--app-ink);
+  overflow-wrap: anywhere;
+}
+
+.cc-analytics-paper-table__metric {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-ink);
+  text-align: right;
+}
+
+.cc-analytics-paper-table__head span:nth-child(n + 2) {
+  text-align: right;
+}
+
+.cc-analytics-paper-table__head span:last-child,
+.cc-analytics-paper-table__signal {
+  text-align: left;
+}
+
+.cc-analytics-paper-table__signal-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--app-iris) 30%, var(--app-border));
+  background: color-mix(in srgb, var(--app-iris) 12%, var(--app-paper));
+  color: var(--app-ink);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.dark .cc-analytics-paper-table__signal-chip {
+  border-color: color-mix(in srgb, var(--app-iris) 40%, var(--app-border));
+  background: color-mix(in srgb, var(--app-iris) 18%, var(--app-paper));
+  color: #efedeb;
+}
+
+/* Phone: stacked cards that still read as rows, not floating labels */
+@media (max-width: 767px) {
+  .cc-analytics-paper-table__head {
+    display: none;
+  }
+
+  .cc-analytics-paper-table__row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .cc-analytics-paper-table__title {
+    font-size: 15px;
+  }
+
+  .cc-analytics-paper-table__metric,
+  .cc-analytics-paper-table__signal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .cc-analytics-paper-table__metric::before,
+  .cc-analytics-paper-table__signal::before {
+    content: attr(data-label);
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--app-muted);
+  }
+
+  .cc-analytics-paper-table__metric {
+    padding-top: 8px;
+    border-top: 1px solid var(--app-border);
+  }
+
+  .cc-analytics-paper-table__signal {
+    padding-top: 8px;
+    border-top: 1px solid var(--app-border);
+  }
+}
+
 .cc-analytics-visitor-bar {
   display: flex;
   height: 8px;
