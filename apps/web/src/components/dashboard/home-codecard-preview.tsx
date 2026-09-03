@@ -1,14 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useState } from 'react';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
-import { generateProfileQrPreview } from '@/lib/sharing/qr';
 import { PublicProfileSocialLinks } from '@/components/profile/public-profile-social-links';
 import { AppButton } from './ui/dashboard-ui';
 
@@ -42,37 +40,6 @@ export function HomeCodeCardPreview({
   const { role, company } = parseHeadline(headline ?? null);
   const safeLinks = toSafeProfileLinkItems(links);
   const intro = bio?.trim() || 'Add a short bio so visitors know who you are.';
-  const qrPanelId = useId();
-  const [qrOpen, setQrOpen] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [qrError, setQrError] = useState<string | null>(null);
-  const [qrLoading, setQrLoading] = useState(false);
-
-  useEffect(() => {
-    if (!qrOpen) return;
-    let cancelled = false;
-    setQrLoading(true);
-    setQrError(null);
-
-    void generateProfileQrPreview(slug).then((result) => {
-      if (cancelled) return;
-      setQrLoading(false);
-      if (!result.ok) {
-        setQrDataUrl(null);
-        setQrUrl(null);
-        setQrError(result.error);
-        return;
-      }
-      setQrDataUrl(result.pngDataUrl);
-      setQrUrl(result.url);
-      setQrError(null);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [qrOpen, slug]);
 
   return (
     <aside className="cc-home-codecard" aria-labelledby="home-codecard-heading">
@@ -145,48 +112,7 @@ export function HomeCodeCardPreview({
         <AppButton variant="primary" href={viewHref}>
           View CodeCard ↗
         </AppButton>
-        <button
-          type="button"
-          className="cc-app-btn cc-app-btn--ghost"
-          aria-expanded={qrOpen}
-          aria-controls={qrPanelId}
-          onClick={() => setQrOpen((open) => !open)}
-        >
-          QR Code
-        </button>
       </div>
-
-      {qrOpen ? (
-        <div
-          id={qrPanelId}
-          className="mt-4 rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-4"
-          role="region"
-          aria-label="Profile QR code"
-        >
-          <p className="cc-app-mono">Scan to open</p>
-          <div className="mt-3 flex flex-col items-start gap-3">
-            {qrLoading ? (
-              <p className="text-[13px] text-[var(--app-smoke)]">Generating QR…</p>
-            ) : qrDataUrl && qrUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- runtime data URL from qrcode
-              <img
-                src={qrDataUrl}
-                alt={`QR code for ${displayName}`}
-                width={160}
-                height={160}
-                className="rounded-md border border-[var(--app-border)] bg-white"
-              />
-            ) : (
-              <p className="text-[13px] text-[var(--app-smoke)]">
-                {qrError ?? 'QR preview unavailable.'}
-              </p>
-            )}
-            {qrUrl ? (
-              <p className="max-w-full break-all text-[12px] text-[var(--app-smoke)]">{qrUrl}</p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
     </aside>
   );
 }

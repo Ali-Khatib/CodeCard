@@ -40,8 +40,8 @@ describe('WS07-T009 remove wallet NFC stubs', () => {
     expect(identity).not.toContain('Open Home share tools');
     expect(identity).not.toContain('Share tools');
     expect(preview).toContain('View CodeCard');
-    expect(preview).toContain('QR Code');
-    expect(preview).toContain('generateProfileQrPreview');
+    expect(preview).not.toContain('QR Code');
+    expect(preview).not.toContain('generateProfileQrPreview');
     expect(preview).not.toContain('Download QR');
     expect(preview).not.toMatch(/grid-cols-5 grid-rows-5/);
     expect(identity).not.toMatch(/Add to wallet/i);

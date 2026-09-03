@@ -7,22 +7,22 @@ function read(rel: string) {
 }
 
 describe('WS09-T007 overview share controls', () => {
-  it('Overview hosts identity editing and a live CodeCard preview instead of share tools', () => {
+  it('Overview hosts share tools plus identity editing with a live CodeCard preview', () => {
     const overview = read('src/components/dashboard/dashboard-overview-view.tsx');
     const preview = read('src/components/dashboard/home-codecard-preview.tsx');
     const hero = read('src/components/dashboard/profile-share-hero.tsx');
 
     expect(overview).toContain('HomeIdentitySection');
-    expect(overview).not.toContain("import { ProfileShareHero } from './profile-share-hero'");
-    expect(overview).not.toContain('<ProfileShareHero');
+    expect(overview).toContain("import { ProfileShareHero } from './profile-share-hero'");
+    expect(overview).toContain('<ProfileShareHero');
     expect(overview).not.toContain('navigator.share');
     expect(overview).not.toContain('buildCanonicalPublicProfileUrl');
     expect(overview).not.toMatch(/\bwallet\b/i);
     expect(overview).not.toMatch(/\bnfc\b/i);
 
     expect(preview).toContain('View CodeCard');
-    expect(preview).toContain('QR Code');
-    expect(preview).toContain('generateProfileQrPreview');
+    expect(preview).not.toContain('QR Code');
+    expect(preview).not.toContain('generateProfileQrPreview');
     expect(preview).not.toContain('Copy link');
 
     expect(hero).toContain('buildCanonicalPublicProfileUrl');

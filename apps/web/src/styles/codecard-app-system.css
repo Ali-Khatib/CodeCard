@@ -2510,6 +2510,7 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-blob {
+  scroll-margin-top: 112px;
   overflow: hidden;
   overflow-anchor: none;
   border-radius: var(--app-radius-large);
@@ -2671,6 +2672,7 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-grid-card {
+  scroll-margin-top: 112px;
   overflow: hidden;
   height: 100%;
   border-radius: var(--app-radius-large);

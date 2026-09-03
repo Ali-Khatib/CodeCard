@@ -559,78 +559,38 @@ export function DashboardConnectionsView({
   const [meetingPointFilter, setMeetingPointFilter] =
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
-  const listGlueTokenRef = useRef(0);
-
   const openConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.blur();
 
-    const target = document.querySelector<HTMLElement>(`[data-connection-id="${id}"]`);
-    if (!target) {
-      setSelectedId(id);
-      return;
-    }
-
-    // Bring the exact card into view before any expand/collapse state change can
-    // reflow the list and pull the viewport upward.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    target.scrollIntoView({
-      behavior: reduceMotion ? 'instant' : 'smooth',
-      block: 'center',
-    });
-
-    const beforeDocTop = target.getBoundingClientRect().top + window.scrollY;
-    const token = ++listGlueTokenRef.current;
+    // Expand the matching list card first; do not touch scroll yet.
     setSelectedId(id);
 
-    // Keep the requested card fixed in document space while another expanded
-    // card above collapses and this one opens.
-    let frames = 0;
-    const tick = () => {
-      if (token !== listGlueTokenRef.current) return;
-      const after = document.querySelector<HTMLElement>(`[data-connection-id="${id}"]`);
-      if (!after) return;
-      const afterDocTop = after.getBoundingClientRect().top + window.scrollY;
-      const delta = afterDocTop - beforeDocTop;
-      if (Math.abs(delta) > 0.5) {
-        window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
-      }
-      frames += 1;
-      if (frames < 30) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+    // After paint, scroll DOWN only to that exact connection. Never scroll up —
+    // earlier "glue" scrollBy(delta) fought expand/collapse and yanked the page up.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const headerOffset = 112;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`);
+        if (!target) return;
+
+        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+        if (top <= window.scrollY + 1) return;
+
+        window.scrollTo({
+          top,
+          behavior: reduceMotion ? 'instant' : 'smooth',
+        });
+      });
+    });
   }, []);
 
   const toggleConnection = useCallback((id: string) => {
-    const el = document.getElementById(`connection-${id}`);
-    const beforeTop = el?.getBoundingClientRect().top ?? null;
-    const beforeDocTop =
-      beforeTop == null ? null : beforeTop + window.scrollY;
-
+    // List/grid expand only — no auto-scroll in either direction.
     setSelectedId((current) => (current === id ? null : id));
-
-    // Keep the clicked card glued in place for the whole expand/collapse
-    // animation. Closing another open card above would otherwise pull this
-    // row toward the top of the viewport.
-    if (beforeDocTop == null || typeof window === 'undefined') return;
-
-    const token = ++listGlueTokenRef.current;
-    const started = performance.now();
-    const tick = () => {
-      if (token !== listGlueTokenRef.current) return;
-      const after = document.getElementById(`connection-${id}`);
-      if (!after) return;
-      const afterDocTop = after.getBoundingClientRect().top + window.scrollY;
-      const delta = afterDocTop - beforeDocTop;
-      if (Math.abs(delta) > 0.5) {
-        window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
-      }
-      if (performance.now() - started < 420) {
-        requestAnimationFrame(tick);
-      }
-    };
-    requestAnimationFrame(tick);
   }, []);
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
