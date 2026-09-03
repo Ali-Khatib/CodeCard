@@ -557,20 +557,53 @@ export function DashboardConnectionsView({
   const [meetingPointFilter, setMeetingPointFilter] =
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
+  const listGlueTokenRef = useRef(0);
 
   const openConnection = useCallback((id: string) => {
+    // Cancel any in-flight list scroll-gluing so it can't fight this scroll.
+    listGlueTokenRef.current += 1;
     setSelectedId(id);
-    // Follow-up box only — scroll the list card into view after expand
+    // Follow-up box only — bring the matching list card into view after expand.
     window.setTimeout(() => {
-      document.getElementById(`connection-${id}`)?.scrollIntoView({
-        behavior: 'smooth',
+      const el = document.getElementById(`connection-${id}`);
+      if (!el) return;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({
+        behavior: reduceMotion ? 'instant' : 'smooth',
         block: 'center',
       });
-    }, 120);
+    }, 180);
   }, []);
 
   const toggleConnection = useCallback((id: string) => {
+    const el = document.getElementById(`connection-${id}`);
+    const beforeTop = el?.getBoundingClientRect().top ?? null;
+    const beforeDocTop =
+      beforeTop == null ? null : beforeTop + window.scrollY;
+
     setSelectedId((current) => (current === id ? null : id));
+
+    // Keep the clicked card glued in place for the whole expand/collapse
+    // animation. Closing another open card above would otherwise pull this
+    // row toward the top of the viewport.
+    if (beforeDocTop == null || typeof window === 'undefined') return;
+
+    const token = ++listGlueTokenRef.current;
+    const started = performance.now();
+    const tick = () => {
+      if (token !== listGlueTokenRef.current) return;
+      const after = document.getElementById(`connection-${id}`);
+      if (!after) return;
+      const afterDocTop = after.getBoundingClientRect().top + window.scrollY;
+      const delta = afterDocTop - beforeDocTop;
+      if (Math.abs(delta) > 0.5) {
+        window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+      }
+      if (performance.now() - started < 420) {
+        requestAnimationFrame(tick);
+      }
+    };
+    requestAnimationFrame(tick);
   }, []);
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);

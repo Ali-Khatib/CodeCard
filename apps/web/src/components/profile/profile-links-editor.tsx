@@ -189,8 +189,8 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                 className="flex flex-col gap-3 rounded-[12px] border border-[var(--app-border)] bg-[var(--app-bone)]/35 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--app-paper)] text-[var(--app-ink)] ring-1 ring-[var(--app-border)]">
-                    <Icon className="text-sm" aria-hidden />
+                  <span className="cc-public-social-chip flex h-9 w-9 items-center justify-center !shadow-none">
+                    <Icon className="cc-public-social-chip__icon text-sm" aria-hidden />
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-[var(--app-ink)]">

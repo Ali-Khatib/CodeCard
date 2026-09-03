@@ -19,6 +19,7 @@ import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedba
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
+import { CodeCardMarkLink } from '@/components/brand/codecard-mark-link';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
@@ -300,9 +301,12 @@ export function DashboardShell({
 
       <aside className={`cc-app-sidebar ${sidebarOpen ? 'cc-app-sidebar--open' : ''}`}>
         <div className="cc-app-sidebar__head">
-          <Link href={basePath} className="cc-app-sidebar__brand">
-            CodeCard
-          </Link>
+          <CodeCardMarkLink
+            href={basePath}
+            className="cc-app-sidebar__brand"
+            aria-label="CodeCard home"
+            testId="dashboard-sidebar-brand"
+          />
         </div>
 
         <Link

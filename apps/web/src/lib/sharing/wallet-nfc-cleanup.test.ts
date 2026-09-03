@@ -33,12 +33,17 @@ describe('WS07-T009 remove wallet NFC stubs', () => {
     expect(settings).not.toContain("'Add to Apple Wallet': 'Added'");
   });
 
-  it('profile editor points share tools at Home and has no fake QR/wallet stubs', () => {
+  it('profile editor keeps live CodeCard preview and has no fake QR/wallet stubs', () => {
     const profile = read('src/components/dashboard/dashboard-profile-view.tsx');
-    expect(profile).toContain('Open Home share tools');
-    expect(profile).toContain('QR preview, PNG download, and Share profile live on Home');
-    expect(profile).not.toContain('Download QR');
-    expect(profile).not.toMatch(/grid-cols-5 grid-rows-5/);
+    const preview = read('src/components/dashboard/profile-visitor-preview.tsx');
+    expect(profile).toContain('ProfileVisitorPreview');
+    expect(profile).not.toContain('Open Home share tools');
+    expect(profile).not.toContain('Share tools');
+    expect(preview).toContain('View CodeCard');
+    expect(preview).toContain('QR Code');
+    expect(preview).toContain('generateProfileQrPreview');
+    expect(preview).not.toContain('Download QR');
+    expect(preview).not.toMatch(/grid-cols-5 grid-rows-5/);
     expect(profile).not.toMatch(/Add to wallet/i);
     expect(profile).not.toMatch(/NDEFReader/);
   });

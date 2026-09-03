@@ -70,7 +70,7 @@ export function ResearchPaperCard({
                 itemTitle={paper.title}
                 className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
               >
-                <h3 className="cc-fit-title cc-work-title cc-work-title--compact">
+                <h3 className="cc-fit-title cc-work-title cc-research-paper-card__title">
                   {paper.title}
                 </h3>
               </ContentOpeningLink>

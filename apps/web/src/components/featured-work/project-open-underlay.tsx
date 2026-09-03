@@ -148,9 +148,11 @@ export function ProjectOpenUnderlay({
         <ProjectDetailView
           project={project}
           profileSlug={meta.profileSlug}
+          profileId={meta.profileId}
           displayName={meta.displayName}
           accentColor={meta.accentColor}
           projects={meta.projects}
+          resumeUrl={meta.resumeUrl}
           transitionHandoff
         />
       </div>

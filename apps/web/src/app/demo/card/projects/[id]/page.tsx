@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
+import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE, DEMO_RESUME_URL } from '@/lib/projects/demo-data';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
 
@@ -23,6 +23,7 @@ export default async function DemoProjectPage({ params }: PageProps) {
           displayName={DEMO_PROFILE.display_name}
           accentColor={DEMO_PROFILE.accentColor}
           projects={DEMO_FEATURED_PROJECTS}
+          resumeUrl={DEMO_RESUME_URL}
         />
       </Suspense>
     </>

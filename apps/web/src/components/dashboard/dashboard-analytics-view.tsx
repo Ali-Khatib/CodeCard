@@ -220,11 +220,11 @@ export function DashboardAnalyticsView({
         <section>
           <SectionLabel>Research</SectionLabel>
           <p className="cc-app-section-subtitle">
-            Paper views, PDFs, citations, and read time
+            Paper opens, PDF downloads, citation copies, and time spent reading
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <AppCard className="!p-4">
-              <MetricLabel>Views</MetricLabel>
+              <MetricLabel>Paper opens</MetricLabel>
               <p className="mt-1 text-[22px] font-medium">
                 <CountUp value={summary.researchViews} />
               </p>
@@ -236,7 +236,7 @@ export function DashboardAnalyticsView({
               </p>
             </AppCard>
             <AppCard className="!p-4">
-              <MetricLabel>Citation copies</MetricLabel>
+              <MetricLabel>Cite copies</MetricLabel>
               <p className="mt-1 text-[22px] font-medium">
                 <CountUp value={summary.citationCopies} />
               </p>
@@ -251,7 +251,7 @@ export function DashboardAnalyticsView({
           {!entitlement.perResearchPaper ? (
             <ProUpgradeCard
               title="Per research paper analytics"
-              body="Break these totals down paper by paper — views, PDF downloads, citations, and average read time."
+              body="Break these totals down paper by paper — opens, PDF downloads, citation copies, and average read time."
             />
           ) : summary.topResearch.length === 0 ? (
             <AppCard className="mt-4 !p-5">
@@ -267,8 +267,9 @@ export function DashboardAnalyticsView({
                     {paper.title}
                   </h3>
                   <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-                    {paper.views} views · {paper.pdfDownloads} PDFs · {paper.citationCopies}{' '}
-                    citations · avg {formatDuration(paper.avgReadTimeSec)}
+                    {paper.views} opens · {paper.pdfDownloads} PDF downloads ·{' '}
+                    {paper.citationCopies} cite copies · avg{' '}
+                    {formatDuration(paper.avgReadTimeSec)}
                   </p>
                 </AppCard>
               ))}

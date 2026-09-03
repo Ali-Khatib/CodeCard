@@ -56,6 +56,7 @@ export function ProfilesPage({
               onActiveChange={setActiveProjectId}
               variant="dark"
               hideHeader
+              resumeUrl={links.find((link) => link.type === 'resume')?.url ?? null}
             />
           ) : (
             <p className="py-16 text-center text-graphite">No published projects yet.</p>

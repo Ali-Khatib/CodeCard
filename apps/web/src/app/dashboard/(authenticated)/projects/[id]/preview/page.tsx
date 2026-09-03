@@ -54,19 +54,29 @@ export default async function OwnerProjectPreviewPage({
     notFound();
   }
 
-  const { data: projectRows } = await supabase
-    .from('projects')
-    .select(
-      `
+  const [{ data: projectRows }, { data: resumeLink }] = await Promise.all([
+    supabase
+      .from('projects')
+      .select(
+        `
       id, title, tagline, description, technologies, case_study_sections, sort_order, created_at, is_published,
       project_domains(name),
       project_focus_areas(name),
       project_media_assets(type, storage_path, sort_order),
       project_links(type, label, url, sort_order)
     `,
-    )
-    .eq('profile_id', profile.id)
-    .eq('owner_user_id', user.id);
+      )
+      .eq('profile_id', profile.id)
+      .eq('owner_user_id', user.id),
+    supabase
+      .from('profile_links')
+      .select('url')
+      .eq('profile_id', profile.id)
+      .eq('type', 'resume')
+      .order('sort_order', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   const orderings = await loadProfileProjectOrderings(supabase, profile.id);
   const orderedRows = sortProjectsByEffectiveOrder(projectRows ?? [], orderings);
@@ -111,6 +121,7 @@ export default async function OwnerProjectPreviewPage({
         displayName={profileRow?.display_name ?? 'You'}
         projects={[featured]}
         backHref="/dashboard/projects"
+        resumeUrl={resumeLink?.url ?? null}
       />
     </>
   );

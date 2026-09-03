@@ -10,7 +10,7 @@
   padding: 0.35rem 0.1rem;
   border: 0;
   background: transparent;
-  color: #17171a;
+  color: inherit;
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -67,27 +67,32 @@
 }
 
 .cc-ed-mark-logo:hover,
+.cc-ed-mark-logo:focus,
 .cc-ed-mark-logo:focus-visible {
   filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent-orange, #e95a0b) 55%, transparent));
 }
 
 .cc-ed-mark-logo:hover .cc-ed-mark-logo__inner,
+.cc-ed-mark-logo:focus .cc-ed-mark-logo__inner,
 .cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__inner {
   gap: 0.02em;
 }
 
 .cc-ed-mark-logo:hover .cc-ed-mark-logo__c--first,
+.cc-ed-mark-logo:focus .cc-ed-mark-logo__c--first,
 .cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--first {
   transform: translateX(-2px);
 }
 
 .cc-ed-mark-logo:hover .cc-ed-mark-logo__c--second,
+.cc-ed-mark-logo:focus .cc-ed-mark-logo__c--second,
 .cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--second {
   margin-left: 0.02em;
   transform: translateX(2px);
 }
 
 .cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--left,
+.cc-ed-mark-logo:focus .cc-ed-mark-logo__fill--left,
 .cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--left {
   max-width: 2.1em;
   opacity: 1;
@@ -95,20 +100,27 @@
 }
 
 .cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--right,
+.cc-ed-mark-logo:focus .cc-ed-mark-logo__fill--right,
 .cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--right {
   max-width: 2em;
   opacity: 1;
   margin-left: 0.04em;
 }
 
-/* Auth / inline — not fixed to the viewport corner */
+/* Auth / inline — not fixed to the viewport corner; inherit ink from parent */
 .cc-auth-mark.cc-ed-mark-logo {
   position: relative;
   left: auto;
   top: auto;
   z-index: auto;
-  color: #17171a;
+  color: inherit;
   text-shadow: none;
+}
+
+/* Auth pages are cream — force dark ink for the mark */
+.cc-auth-wordmark.cc-ed-mark-logo,
+.cc-marketing-shell .cc-auth-mark.cc-ed-mark-logo {
+  color: #17171a;
 }
 
 @media (prefers-reduced-motion: reduce) {

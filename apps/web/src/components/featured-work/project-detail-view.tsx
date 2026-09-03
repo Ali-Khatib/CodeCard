@@ -29,6 +29,7 @@ import {
   projectCoverAlt,
   projectScreenshotAlt,
 } from '@/lib/a11y/uploaded-image-alt';
+import { ProjectDetailActions } from './project-detail-actions';
 
 const PROJECT_NAV_BTN = 'cc-project-nav-btn cc-instant-press group';
 
@@ -39,6 +40,8 @@ interface ProjectDetailViewProps {
   displayName: string;
   accentColor?: string;
   projects?: FeaturedProject[];
+  /** Profile resume PDF/URL for download tracking on the project page. */
+  resumeUrl?: string | null;
   /** Override the default public profile projects back link (owner preview). */
   backHref?: string;
   /** Override back button label when `backHref` is set. */
@@ -54,6 +57,7 @@ export function ProjectDetailView({
   displayName: _displayName,
   accentColor = COLORS.accent,
   projects,
+  resumeUrl = null,
   backHref: backHrefProp,
   backLabel: backLabelProp,
   transitionHandoff = false,
@@ -280,6 +284,12 @@ export function ProjectDetailView({
                     ))}
                   </div>
                 )}
+                <ProjectDetailActions
+                  project={project}
+                  profileId={profileId}
+                  resumeUrl={resumeUrl}
+                  variant="hero"
+                />
               </div>
             </div>
           </div>
@@ -314,6 +324,13 @@ export function ProjectDetailView({
               )}
             </nav>
           )}
+
+          <ProjectDetailActions
+            project={project}
+            profileId={profileId}
+            resumeUrl={resumeUrl}
+            variant="panel"
+          />
 
           <ProjectCaseStudyTabs
             project={project}

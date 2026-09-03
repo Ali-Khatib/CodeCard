@@ -25,6 +25,8 @@ interface FeaturedWorkStackProps {
   onActiveChange?: (id: string) => void;
   variant?: 'light' | 'dark';
   hideHeader?: boolean;
+  profileId?: string;
+  resumeUrl?: string | null;
 }
 
 export function FeaturedWorkStack({
@@ -36,6 +38,8 @@ export function FeaturedWorkStack({
   onActiveChange,
   variant = 'dark',
   hideHeader = false,
+  profileId,
+  resumeUrl = null,
 }: FeaturedWorkStackProps) {
   const isLight = variant === 'light';
   const reducedMotion = useReducedMotion();
@@ -183,6 +187,8 @@ export function FeaturedWorkStack({
                             displayName,
                             accentColor,
                             projects: filtered,
+                            profileId,
+                            resumeUrl,
                           })
                   }
                 />

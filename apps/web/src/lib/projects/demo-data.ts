@@ -32,8 +32,17 @@ export const DEMO_PROFILE = {
     { type: 'linkedin', label: null, url: 'https://linkedin.com' },
     { type: 'website', label: null, url: 'https://example.com' },
     { type: 'twitter', label: null, url: 'https://x.com' },
+    {
+      type: 'resume',
+      label: 'Resume',
+      url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    },
   ],
 };
+
+/** Demo resume URL used on project detail CTAs. */
+export const DEMO_RESUME_URL =
+  DEMO_PROFILE.links.find((link) => link.type === 'resume')?.url ?? null;
 
 export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
   {

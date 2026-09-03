@@ -31,6 +31,8 @@ export interface ProjectOpenMeta {
   displayName: string;
   accentColor?: string;
   projects?: FeaturedProject[];
+  profileId?: string;
+  resumeUrl?: string | null;
 }
 
 interface OpeningState {

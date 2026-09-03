@@ -294,9 +294,8 @@ export function DashboardOverviewView({
                           rel="noopener noreferrer"
                           aria-label={getProfileLinkAria(link.type, link.label)}
                           className="cc-profile-identity-card__social"
-                          style={{ color: '#000000', backgroundColor: '#ffffff' }}
                         >
-                          <Icon className="text-sm" color="#000000" style={{ color: '#000000', fill: '#000000' }} aria-hidden />
+                          <Icon className="text-sm" aria-hidden />
                         </a>
                       );
                     })}

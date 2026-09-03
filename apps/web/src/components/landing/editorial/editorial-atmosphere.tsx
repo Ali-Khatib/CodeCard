@@ -4,26 +4,26 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
+import {
+  applyLandingChromeInk,
+  createChromeToneRafScheduler,
+  syncLandingChromeFromCinema,
+  type LandingChromeInk,
+} from '@/components/landing/editorial/landing-chrome-tone';
 
-/** Dark chapters — light type on frosted glass nav (matches cinema / finale fields). */
-const DARK_CHAPTERS = new Set(['hero', 'statement', 'finale']);
 /** Chapters where the fixed CC mark sits over a dark surface (light logo). */
 const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'finale']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control.
  *  Crash Course only — Research keeps the full pill. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;
 
-function navToneFor(chapter: string): 'dark' | 'light' {
-  return DARK_CHAPTERS.has(chapter) ? 'dark' : 'light';
-}
-
-function logoToneFor(chapter: string, navCompact: boolean): 'light' | 'dark' {
+function chapterInk(chapter: string, navCompact: boolean): LandingChromeInk {
   if (navCompact) return 'light';
   return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
 }
 
 /** Returns a tone only when the fixed CC sits over the footer; otherwise null. */
-function logoToneFromFooterOnly(): 'light' | 'dark' | null {
+function logoToneFromFooterOnly(): LandingChromeInk | null {
   const logoY = 56;
   const covers = (el: Element | null) => {
     if (!el) return false;
@@ -58,14 +58,19 @@ function logoToneFromFooterOnly(): 'light' | 'dark' | null {
   return null;
 }
 
-function syncLogoTone(chapter: string) {
+/**
+ * Single owner for logo + nav ink.
+ * Priority: footer surface → hero cinema clip geometry → chapter fallback.
+ */
+function syncChromeTone(chapter: string) {
   const footerTone = logoToneFromFooterOnly();
   if (footerTone) {
-    document.documentElement.dataset.logoTone = footerTone;
+    applyLandingChromeInk(footerTone);
     return;
   }
+  if (syncLandingChromeFromCinema()) return;
   const compact = document.documentElement.dataset.navCompact === 'true';
-  document.documentElement.dataset.logoTone = logoToneFor(chapter, compact);
+  applyLandingChromeInk(chapterInk(chapter, compact));
 }
 
 function setNavCompact(active: boolean) {
@@ -87,10 +92,10 @@ export function EditorialAtmosphere() {
   const activeRef = useRef('');
 
   useLayoutEffect(() => {
-    /* First paint: hero cinema needs light nav type before scroll observers run. */
-    document.documentElement.dataset.navTone = navToneFor('hero');
+    /* Cream letterbox under chrome on first paint — black ink until cinema owns it. */
     document.documentElement.dataset.landingChapter = 'hero';
-    syncLogoTone('hero');
+    applyLandingChromeInk('dark');
+    syncChromeTone('hero');
   }, []);
 
   useEffect(() => {
@@ -107,8 +112,7 @@ export function EditorialAtmosphere() {
       activeRef.current = id;
       root.dataset.chapter = id;
       document.documentElement.dataset.landingChapter = id;
-      document.documentElement.dataset.navTone = navToneFor(id);
-      syncLogoTone(id);
+      syncChromeTone(id);
     };
 
     apply(sections[0]?.dataset.chapterSection ?? 'hero');
@@ -116,7 +120,7 @@ export function EditorialAtmosphere() {
     const compactActive = new Set<string>();
     const syncCompact = () => {
       setNavCompact(compactActive.size > 0);
-      syncLogoTone(activeRef.current);
+      syncChromeTone(activeRef.current || 'hero');
     };
 
     const cleanupHtml = () => {
@@ -131,34 +135,18 @@ export function EditorialAtmosphere() {
       document.querySelector<HTMLElement>('.cc-site-footer__bar'),
     ].filter((el): el is HTMLElement => Boolean(el));
 
-    // Only override while the logo sits on the footer — don’t fight hero cinema tones.
-    let overFooter = false;
-    const resyncLogoFromScroll = () => {
-      const footerTone = logoToneFromFooterOnly();
-      if (footerTone) {
-        overFooter = true;
-        document.documentElement.dataset.logoTone = footerTone;
-        // Match nav type to the same surface (cream → ink, dark bar → cream).
-        document.documentElement.dataset.navTone =
-          footerTone === 'dark' ? 'light' : 'dark';
-        return;
-      }
-      if (overFooter) {
-        overFooter = false;
-        const chapter = activeRef.current || 'hero';
-        document.documentElement.dataset.navTone = navToneFor(chapter);
-        syncLogoTone(chapter);
-      }
-    };
+    const scheduler = createChromeToneRafScheduler(() => {
+      syncChromeTone(activeRef.current || 'hero');
+    });
 
-    const footerObserver = new IntersectionObserver(resyncLogoFromScroll, {
+    const footerObserver = new IntersectionObserver(() => scheduler.request(), {
       root: null,
       rootMargin: '0px 0px -70% 0px',
       threshold: [0, 0.05, 0.25, 0.5, 1],
     });
     footerRoots.forEach((el) => footerObserver.observe(el));
-    window.addEventListener('scroll', resyncLogoFromScroll, { passive: true });
-    resyncLogoFromScroll();
+    window.addEventListener('scroll', scheduler.request, { passive: true });
+    scheduler.request();
 
     const compactSections = COMPACT_NAV_CHAPTERS.map((id) =>
       sections.find((section) => section.dataset.chapterSection === id),
@@ -209,7 +197,8 @@ export function EditorialAtmosphere() {
         chapterObserver.disconnect();
         compactObserver.disconnect();
         footerObserver.disconnect();
-        window.removeEventListener('scroll', resyncLogoFromScroll);
+        window.removeEventListener('scroll', scheduler.request);
+        scheduler.cancel();
         cleanupHtml();
       };
     }
@@ -252,7 +241,8 @@ export function EditorialAtmosphere() {
       chapterTriggers.forEach((t) => t.kill());
       compactTriggers.forEach((t) => t.kill());
       footerObserver.disconnect();
-      window.removeEventListener('scroll', resyncLogoFromScroll);
+      window.removeEventListener('scroll', scheduler.request);
+      scheduler.cancel();
       cleanupHtml();
     };
   }, [canEnhanceMotion]);

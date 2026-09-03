@@ -16,9 +16,9 @@
   --app-canvas: #f7f0e8; /* page wash — not another white */
   --app-paper: #ffffff; /* elevated cards / panels */
   --app-bone: #fcf1e7; /* secondary / inset surface */
-  --app-ink: #232324; /* primary text */
+  --app-ink: #232324; /* primary text / icon */
   --app-muted: #5c5856; /* secondary text — AA on paper */
-  --app-smoke: #5c5856; /* alias → muted */
+  --app-smoke: #5c5856; /* alias → muted / secondary icon */
   --app-carbon: #000000;
   --app-iris: #e95a0b; /* accent — use sparingly */
   --app-error: #b91c1c;
@@ -30,6 +30,15 @@
   --app-slate-plum: #6b5348;
   --app-border: rgba(34, 34, 34, 0.1);
   --app-border-strong: rgba(34, 34, 34, 0.42);
+
+  /* Social / icon chips — high-contrast discs (light: white+black, dark: elevated+bright) */
+  --app-icon-chip-bg: #ffffff;
+  --app-icon-chip-fg: #000000;
+  --app-icon-chip-border: rgba(34, 34, 34, 0.14);
+  --app-icon-chip-hover-bg: #f3eee8;
+  --app-icon-chip-hover-fg: #000000;
+  --app-icon-chip-hover-border: rgba(34, 34, 34, 0.22);
+  --app-icon-chip-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
   /* —— Radius / layout —— */
   --app-radius-input: 8px;
@@ -90,6 +99,13 @@ html.dark .cc-app-root {
   --app-slate-plum: #c9a88a;
   --app-border: rgba(255, 255, 255, 0.1);
   --app-border-strong: rgba(255, 255, 255, 0.38);
+  --app-icon-chip-bg: #2a2a30;
+  --app-icon-chip-fg: #ffffff;
+  --app-icon-chip-border: rgba(255, 255, 255, 0.18);
+  --app-icon-chip-hover-bg: #35353c;
+  --app-icon-chip-hover-fg: #ffffff;
+  --app-icon-chip-hover-border: rgba(255, 255, 255, 0.32);
+  --app-icon-chip-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
   background: var(--app-canvas);
 }
@@ -174,19 +190,66 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 
 .cc-app-sidebar__head {
   position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   min-height: 36px;
   padding-right: 8px;
+  overflow: visible;
 }
 
 .cc-app-sidebar__brand {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--app-ink);
+  display: inline-flex !important;
+  align-items: center;
+  color: var(--app-ink) !important;
+  -webkit-text-fill-color: var(--app-ink) !important;
+  text-decoration: none;
+}
+
+.cc-app-sidebar__brand.cc-ed-mark-logo,
+.cc-app-sidebar__brand.cc-auth-mark {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 2 !important;
+  padding: 0.15rem 0;
+  color: var(--app-ink) !important;
+  -webkit-text-fill-color: var(--app-ink) !important;
+  text-shadow: none !important;
+  filter: none;
+}
+
+.cc-app-sidebar__brand .cc-ed-mark-logo__inner,
+.cc-app-sidebar__brand .cc-ed-mark-logo__c,
+.cc-app-sidebar__brand .cc-ed-mark-logo__fill {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+.cc-app-sidebar__brand .cc-ed-mark-logo__inner {
+  font-size: 1.85rem;
+}
+
+html.dark .cc-app-sidebar__brand.cc-ed-mark-logo,
+html.dark .cc-app-sidebar__brand.cc-auth-mark {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.cc-app-sidebar__brand:hover,
+.cc-app-sidebar__brand:focus-visible {
+  z-index: 5 !important;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--app-iris) 45%, transparent));
+  color: var(--app-ink) !important;
+  -webkit-text-fill-color: var(--app-ink) !important;
+}
+
+html.dark .cc-app-sidebar__brand:hover,
+html.dark .cc-app-sidebar__brand:focus-visible {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .cc-app-sidebar-appearance {
@@ -1356,33 +1419,46 @@ html.dark .cc-project-nav-btn svg,
 }
 
 .cc-profile-link-dock .cc-animated-dock__item {
-  border: 2px solid #ffffff !important;
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(0, 0, 0, 0.28);
+  border: 1.5px solid var(--app-icon-chip-border, rgba(34, 34, 34, 0.14)) !important;
+  background: var(--app-icon-chip-bg, #ffffff) !important;
+  background-color: var(--app-icon-chip-bg, #ffffff) !important;
+  color: var(--app-icon-chip-fg, #000000) !important;
+  box-shadow: var(--app-icon-chip-shadow, 0 4px 12px rgba(0, 0, 0, 0.12));
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cc-profile-link-dock .cc-animated-dock__item:hover,
+.cc-profile-link-dock .cc-animated-dock__item:focus-visible {
+  border-color: var(--app-icon-chip-hover-border, rgba(34, 34, 34, 0.22)) !important;
+  background: var(--app-icon-chip-hover-bg, #f3eee8) !important;
+  background-color: var(--app-icon-chip-hover-bg, #f3eee8) !important;
+  color: var(--app-icon-chip-hover-fg, #000000) !important;
+  transform: translateY(-1px);
 }
 
 .cc-profile-link-dock .cc-animated-dock__item[data-active='true'] {
-  border-color: #ffffff !important;
-  background: #ffffff !important;
-  color: #000000 !important;
+  border-color: var(--app-icon-chip-hover-border, rgba(34, 34, 34, 0.22)) !important;
+  background: var(--app-icon-chip-hover-bg, #f3eee8) !important;
+  color: var(--app-icon-chip-hover-fg, #000000) !important;
 }
 
 .cc-profile-link-dock .cc-animated-dock__item svg,
 .cc-profile-link-dock .cc-animated-dock__item svg path {
-  color: #000000 !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
+  color: var(--app-icon-chip-fg, #000000) !important;
+  fill: var(--app-icon-chip-fg, #000000) !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   opacity: 1 !important;
 }
 
 .cc-profile-link-dock .cc-animated-dock__item svg[fill='none'],
 .cc-profile-link-dock .cc-animated-dock__item svg[fill='none'] path {
   fill: none !important;
-  stroke: #000000 !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   stroke-width: 2 !important;
 }
 
@@ -2138,6 +2214,8 @@ html.dark .cc-app-badge--blush {
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Prevent browser scroll-anchoring from yanking the page when a card above collapses. */
+  overflow-anchor: none;
 }
 
 @media (max-width: 767px) {
@@ -2240,6 +2318,7 @@ html.dark .cc-app-badge--blush {
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow-anchor: none;
 }
 
 .cc-connection-grid > li {
@@ -2432,6 +2511,7 @@ html.dark .cc-app-badge--blush {
 
 .cc-connection-blob {
   overflow: hidden;
+  overflow-anchor: none;
   border-radius: var(--app-radius-large);
   background: var(--app-paper);
 }
@@ -3116,6 +3196,14 @@ html.dark .cc-app-root .cc-connection-blob:hover {
   line-height: 1.02;
 }
 
+/* Research paper titles need clear hierarchy over authors/abstract. */
+.cc-app-project-card .cc-research-paper-card__title {
+  font-size: clamp(1.7rem, 3.6vw, 2.55rem);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
 .cc-app-project-card__drag {
   position: absolute;
   left: 16px;
@@ -3743,7 +3831,7 @@ html.dark .cc-analytics-research-card {
 
 @media (min-width: 768px) {
   .cc-analytics-research-highlights {
-    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 0.8fr));
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 0.75fr));
     gap: 20px;
   }
 }
@@ -3754,6 +3842,13 @@ html.dark .cc-analytics-research-card {
   font-weight: 600;
   line-height: 1.4;
   color: var(--app-ink);
+}
+
+.cc-analytics-stat-block__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--app-muted);
 }
 
 .cc-analytics-paper-table-wrap {
@@ -3792,7 +3887,7 @@ html.dark .cc-analytics-research-card {
 .cc-analytics-paper-table__head,
 .cc-analytics-paper-table__row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(64px, 0.55fr)) minmax(88px, 0.7fr);
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(72px, 0.7fr));
   gap: 10px;
   align-items: center;
   padding: 12px 14px;
@@ -3846,11 +3941,6 @@ html.dark .cc-analytics-research-card {
 
 .cc-analytics-paper-table__head span:nth-child(n + 2) {
   text-align: right;
-}
-
-.cc-analytics-paper-table__head span:last-child,
-.cc-analytics-paper-table__signal {
-  text-align: left;
 }
 
 .cc-analytics-paper-table__signal-chip {
@@ -4549,32 +4639,39 @@ html.dark .cc-analytics-paper-table__signal-chip {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  background: #ffffff;
-  background-color: #ffffff;
-  color: #000000;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  border: 1.5px solid var(--app-icon-chip-border, rgba(34, 34, 34, 0.14));
+  background: var(--app-icon-chip-bg, #ffffff);
+  background-color: var(--app-icon-chip-bg, #ffffff);
+  color: var(--app-icon-chip-fg, #000000);
+  box-shadow: var(--app-icon-chip-shadow, 0 4px 12px rgba(0, 0, 0, 0.12));
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.cc-profile-identity-card__social:hover {
-  transform: none;
-  border-color: #fcf1e7;
-  background: #fcf1e7;
-  color: #000000;
+.cc-profile-identity-card__social:hover,
+.cc-profile-identity-card__social:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--app-icon-chip-hover-border, rgba(34, 34, 34, 0.22));
+  background: var(--app-icon-chip-hover-bg, #f3eee8);
+  color: var(--app-icon-chip-hover-fg, #000000);
 }
 
 .cc-profile-identity-card__social svg,
 .cc-profile-identity-card__social svg path {
-  color: #000000 !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
+  color: var(--app-icon-chip-fg, #000000) !important;
+  fill: var(--app-icon-chip-fg, #000000) !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   opacity: 1 !important;
 }
 
 .cc-profile-identity-card__social svg[fill='none'],
 .cc-profile-identity-card__social svg[fill='none'] path {
   fill: none !important;
-  stroke: #000000 !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   stroke-width: 2 !important;
 }
 
@@ -5822,68 +5919,26 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 /*
-  Public profile social chips — ALWAYS white disc + pure black glyph.
-  Never inherit hero cream text color; never use light-on-light.
+  Hero panel is always a dark elevated surface (even when the page is light).
+  Force chip tokens here so icons never become dark-on-dark when html is light.
 */
-.cc-public-social-chip {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 44px !important;
-  height: 44px !important;
-  flex-shrink: 0;
-  border-radius: 999px !important;
-  border: 2px solid #ffffff !important;
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(0, 0, 0, 0.35);
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  text-decoration: none !important;
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s ease,
-    border-color 0.2s ease;
+.cc-public-hero__panel,
+.cc-public-hero__social {
+  --app-icon-chip-bg: #2a2a30;
+  --app-icon-chip-fg: #ffffff;
+  --app-icon-chip-border: rgba(255, 255, 255, 0.22);
+  --app-icon-chip-hover-bg: #3a3a42;
+  --app-icon-chip-hover-fg: #ffffff;
+  --app-icon-chip-hover-border: rgba(255, 255, 255, 0.38);
+  --app-icon-chip-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
-.cc-public-social-chip:hover {
-  background: #fcf1e7 !important;
-  background-color: #fcf1e7 !important;
-  border-color: #fcf1e7 !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  transform: translateY(-2px);
-}
-
-.cc-public-social-chip svg,
-.cc-public-social-chip svg path,
-.cc-public-social-chip svg g,
-.cc-public-social-chip__icon {
-  width: 1.3rem !important;
-  height: 1.3rem !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-.cc-public-social-chip svg[fill='none'],
-.cc-public-social-chip svg[fill='none'] path,
-.cc-public-social-chip svg[fill='none'] g {
-  fill: none !important;
-  stroke: #000000 !important;
-  stroke-width: 2 !important;
-}
-
-/* Keep legacy class path forced to the same high-contrast recipe */
+/*
+  Social icon chips — tokenized for light + dark.
+  Light: white disc + black glyph. Dark: elevated #2a2a30 disc + bright white glyph.
+  Never light-on-light or dark-on-dark.
+*/
+.cc-public-social-chip,
 .cc-public-hero__panel .cc-public-social-chip,
 .cc-public-hero__social .cc-public-social-chip,
 .cc-public-hero__social .cc-profile-identity-card__social,
@@ -5894,37 +5949,53 @@ html.dark .cc-public-atmosphere__grain {
   justify-content: center;
   width: 44px !important;
   height: 44px !important;
+  flex-shrink: 0;
   border-radius: 999px !important;
-  border: 2px solid #ffffff !important;
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid var(--app-icon-chip-border, rgba(34, 34, 34, 0.14)) !important;
+  background: var(--app-icon-chip-bg, #ffffff) !important;
+  background-color: var(--app-icon-chip-bg, #ffffff) !important;
+  color: var(--app-icon-chip-fg, #000000) !important;
+  -webkit-text-fill-color: var(--app-icon-chip-fg, #000000) !important;
+  box-shadow: var(--app-icon-chip-shadow, 0 4px 12px rgba(0, 0, 0, 0.12));
   opacity: 1 !important;
   filter: none !important;
   mix-blend-mode: normal !important;
   text-decoration: none !important;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.cc-public-social-chip:hover,
+.cc-public-social-chip:focus-visible,
 .cc-public-hero__panel .cc-public-social-chip:hover,
+.cc-public-hero__panel .cc-public-social-chip:focus-visible,
 .cc-public-hero__social .cc-public-social-chip:hover,
+.cc-public-hero__social .cc-public-social-chip:focus-visible,
 .cc-public-hero__social .cc-profile-identity-card__social:hover,
+.cc-public-hero__social .cc-profile-identity-card__social:focus-visible,
 .cc-public-profile .cc-profile-identity-card__social:hover,
-.cc-app-root .cc-profile-identity-card__social:hover {
-  background: #fcf1e7 !important;
-  background-color: #fcf1e7 !important;
-  border-color: #fcf1e7 !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+.cc-public-profile .cc-profile-identity-card__social:focus-visible,
+.cc-app-root .cc-profile-identity-card__social:hover,
+.cc-app-root .cc-profile-identity-card__social:focus-visible {
+  background: var(--app-icon-chip-hover-bg, #f3eee8) !important;
+  background-color: var(--app-icon-chip-hover-bg, #f3eee8) !important;
+  border-color: var(--app-icon-chip-hover-border, rgba(34, 34, 34, 0.22)) !important;
+  color: var(--app-icon-chip-hover-fg, #000000) !important;
+  -webkit-text-fill-color: var(--app-icon-chip-hover-fg, #000000) !important;
   transform: translateY(-2px);
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.4);
+    var(--app-icon-chip-shadow, 0 4px 12px rgba(0, 0, 0, 0.12)),
+    0 0 0 1px var(--app-icon-chip-hover-border, rgba(34, 34, 34, 0.22));
 }
 
+.cc-public-social-chip svg,
+.cc-public-social-chip svg path,
+.cc-public-social-chip svg g,
+.cc-public-social-chip__icon,
 .cc-public-hero__panel .cc-public-social-chip svg,
 .cc-public-hero__panel .cc-public-social-chip svg path,
 .cc-public-hero__panel .cc-public-social-chip svg g,
@@ -5941,15 +6012,32 @@ html.dark .cc-public-atmosphere__grain {
 .cc-app-root .cc-profile-identity-card__social svg path {
   width: 1.3rem !important;
   height: 1.3rem !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
+  color: var(--app-icon-chip-fg, #000000) !important;
+  -webkit-text-fill-color: var(--app-icon-chip-fg, #000000) !important;
+  fill: var(--app-icon-chip-fg, #000000) !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   opacity: 1 !important;
   filter: none !important;
   mix-blend-mode: normal !important;
 }
 
+.cc-public-social-chip:hover svg,
+.cc-public-social-chip:hover svg path,
+.cc-public-social-chip:hover svg g,
+.cc-public-social-chip:hover .cc-public-social-chip__icon,
+.cc-public-social-chip:focus-visible svg,
+.cc-public-social-chip:focus-visible svg path,
+.cc-app-root .cc-profile-identity-card__social:hover svg,
+.cc-app-root .cc-profile-identity-card__social:hover svg path {
+  color: var(--app-icon-chip-hover-fg, #000000) !important;
+  -webkit-text-fill-color: var(--app-icon-chip-hover-fg, #000000) !important;
+  fill: var(--app-icon-chip-hover-fg, #000000) !important;
+  stroke: var(--app-icon-chip-hover-fg, #000000) !important;
+}
+
+.cc-public-social-chip svg[fill='none'],
+.cc-public-social-chip svg[fill='none'] path,
+.cc-public-social-chip svg[fill='none'] g,
 .cc-public-hero__panel .cc-public-social-chip svg[fill='none'],
 .cc-public-hero__panel .cc-public-social-chip svg[fill='none'] path,
 .cc-public-hero__social .cc-public-social-chip svg[fill='none'],
@@ -5959,7 +6047,7 @@ html.dark .cc-public-atmosphere__grain {
 .cc-app-root .cc-profile-identity-card__social svg[fill='none'],
 .cc-app-root .cc-profile-identity-card__social svg[fill='none'] path {
   fill: none !important;
-  stroke: #000000 !important;
+  stroke: var(--app-icon-chip-fg, #000000) !important;
   stroke-width: 2 !important;
 }
 

@@ -11,6 +11,10 @@ import {
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { ShaderHeroBackdrop } from '@/components/ui/shader-hero';
 import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
+import {
+  applyLandingChromeInk,
+  syncLandingChromeFromCinema,
+} from '@/components/landing/editorial/landing-chrome-tone';
 
 type EditorialHeroSceneProps = {
   hero: ReactNode;
@@ -221,9 +225,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       statement.style.minHeight = `${statementTotalVh(mobile)}vh`;
 
       const syncLogoForExpand = (_expandProgress: number) => {
-        /* Sticky dark field sits under the transparent nav for nearly the whole
-         * expand — cream letterbox is only a thin pad. Keep the CC light. */
-        document.documentElement.dataset.logoTone = 'light';
+        /* Clip geometry owns chrome ink: cream letterbox → black, dark cinema → white. */
+        if (!syncLandingChromeFromCinema()) {
+          applyLandingChromeInk('dark');
+        }
       };
 
       const beatCount = Math.max(beatEls.length, 1);
@@ -302,7 +307,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               root.dataset.cinemaChapter = 'statement';
-              document.documentElement.dataset.logoTone = 'light';
+              /* Statement is full-bleed dark — white chrome. */
+              applyLandingChromeInk('light');
               /*
                * Count from the crossover, not the segment edge — the incoming
                * group owns the slot a fade early, so the pager flips with it.
@@ -419,7 +425,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => syncLogoForExpand(self.progress),
             onLeave: () => {
-              document.documentElement.dataset.logoTone = 'light';
+              applyLandingChromeInk('light');
             },
           },
         });
@@ -503,7 +509,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       };
 
       document.body.style.overflow = 'hidden';
-      document.documentElement.dataset.logoTone = 'light';
+      /* Intro starts shut over cream — black chrome until clip expands under it. */
+      applyLandingChromeInk('dark');
       buildScrollCinema({ holdForIntro: true });
 
       if (heroCopy) {
@@ -512,6 +519,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
       intro = gsap.timeline({
         defaults: { ease: INTRO_EASE },
+        onUpdate: () => {
+          if (!syncLandingChromeFromCinema()) applyLandingChromeInk('dark');
+        },
         onComplete: markIntroDoneAndBuild,
       });
 
@@ -523,6 +533,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           duration: INTRO_DURATION,
           ease: INTRO_EASE,
           immediateRender: true,
+          onUpdate: () => {
+            if (!syncLandingChromeFromCinema()) applyLandingChromeInk('dark');
+          },
         },
         0,
       );

@@ -189,6 +189,13 @@ svg {
   --app-ink: #232324;
   --app-muted: #5c5856;
   --app-border: rgba(35, 35, 36, 0.12);
+  --app-icon-chip-bg: #ffffff;
+  --app-icon-chip-fg: #000000;
+  --app-icon-chip-border: rgba(34, 34, 34, 0.14);
+  --app-icon-chip-hover-bg: #f3eee8;
+  --app-icon-chip-hover-fg: #000000;
+  --app-icon-chip-hover-border: rgba(34, 34, 34, 0.22);
+  --app-icon-chip-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
   --iris: #e95a0b;
   --lavender: #e95a0b;
@@ -316,6 +323,13 @@ html.dark {
   --app-ink: #efedeb;
   --app-muted: #c8c4c0;
   --app-border: rgba(255, 255, 255, 0.1);
+  --app-icon-chip-bg: #2a2a30;
+  --app-icon-chip-fg: #ffffff;
+  --app-icon-chip-border: rgba(255, 255, 255, 0.18);
+  --app-icon-chip-hover-bg: #35353c;
+  --app-icon-chip-hover-fg: #ffffff;
+  --app-icon-chip-hover-border: rgba(255, 255, 255, 0.32);
+  --app-icon-chip-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
 html {
