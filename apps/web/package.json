@@ -78,7 +78,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.3.0",
     "postcss": "8.5.26",
     "tailwindcss": "^3.4.1",
