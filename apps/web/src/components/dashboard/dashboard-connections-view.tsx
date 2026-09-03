@@ -564,6 +564,7 @@ export function DashboardConnectionsView({
   const openConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
     event.preventDefault();
     event.stopPropagation();
+    event.currentTarget.blur();
 
     const target = document.querySelector<HTMLElement>(`[data-connection-id="${id}"]`);
     if (!target) {
