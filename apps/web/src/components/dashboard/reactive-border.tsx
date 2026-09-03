@@ -12,6 +12,8 @@ type ReactiveBorderProps = {
   as?: 'div' | 'article' | 'section';
   id?: string;
   style?: CSSProperties;
+  /** Stable connection target for follow-up scroll mapping. */
+  'data-connection-id'?: string;
   /** Subtle lift on hover — disable on click-heavy cards to avoid flash */
   liftOnHover?: boolean;
   /** Scale-down on tap — disable when nested buttons handle press feedback */
@@ -40,6 +42,7 @@ export function ReactiveBorder({
   as: Tag = 'div',
   id,
   style,
+  'data-connection-id': dataConnectionId,
   liftOnHover = true,
   pressOnTap = true,
   onMouseEnter,
@@ -73,6 +76,7 @@ export function ReactiveBorder({
     <MotionTag
       ref={ref as React.Ref<HTMLDivElement>}
       id={id}
+      data-connection-id={dataConnectionId}
       className={cn('cc-reactive-border', className)}
       style={{ '--glow-rgb': glowRgb, ...style } as CSSProperties}
       onPointerMove={onMove}

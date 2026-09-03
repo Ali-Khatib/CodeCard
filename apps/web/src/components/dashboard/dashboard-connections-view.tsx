@@ -41,6 +41,31 @@ function displayMeetingPoint(connection: ViewConnection): string {
   return connectionMeetingPointValue(connection) || 'Unassigned';
 }
 
+/** Nearest scrollable ancestor, or the window. */
+function getScrollParent(el: HTMLElement | null): HTMLElement | Window {
+  let node = el?.parentElement ?? null;
+  while (node) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+      node.scrollHeight > node.clientHeight + 1
+    ) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return window;
+}
+
+function scrollByDelta(scroller: HTMLElement | Window, delta: number) {
+  if (Math.abs(delta) < 0.5) return;
+  if (scroller === window) {
+    window.scrollBy({ top: delta, left: 0, behavior: 'instant' });
+    return;
+  }
+  (scroller as HTMLElement).scrollTop += delta;
+}
+
 const SORT_OPTIONS: Array<{ id: ConnectionsSortId; label: string }> = [
   { id: 'newest', label: 'Newest connected' },
   { id: 'oldest', label: 'Oldest connected' },
@@ -311,7 +336,7 @@ function ConnectionCard({
 }: {
   connection: ViewConnection;
   expanded: boolean;
-  onToggle: () => void;
+  onToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
   collections?: Array<{ id: string; name: string }>;
@@ -343,6 +368,10 @@ function ConnectionCard({
     >
       <button
         type="button"
+        onMouseDown={(event) => {
+          // Keep the click, skip focus — focus scroll is what yanks the page upward.
+          event.preventDefault();
+        }}
         onClick={onToggle}
         aria-expanded={expanded}
         className="cc-connection-blob__trigger"
@@ -408,7 +437,7 @@ function ConnectionGridCard({
 }: {
   connection: ViewConnection;
   expanded: boolean;
-  onToggle: () => void;
+  onToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
   collections?: Array<{ id: string; name: string }>;
@@ -440,6 +469,10 @@ function ConnectionGridCard({
     >
       <button
         type="button"
+        onMouseDown={(event) => {
+          // Keep the click, skip focus — focus scroll is what yanks the page upward.
+          event.preventDefault();
+        }}
         onClick={onToggle}
         aria-expanded={expanded}
         className="cc-connection-grid-card__trigger"
@@ -559,22 +592,28 @@ export function DashboardConnectionsView({
   const [meetingPointFilter, setMeetingPointFilter] =
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
+  const listPinTokenRef = useRef(0);
+  const pendingListPinRef = useRef<{ id: string; top: number } | null>(null);
+
   const openConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.blur();
 
-    // Expand the matching list card first; do not touch scroll yet.
+    // Cancel any list pin loop so it cannot fight this follow-up scroll.
+    listPinTokenRef.current += 1;
+    pendingListPinRef.current = null;
     setSelectedId(id);
 
-    // After paint, scroll DOWN only to that exact connection. Never scroll up —
-    // earlier "glue" scrollBy(delta) fought expand/collapse and yanked the page up.
+    // Follow-ups only: scroll DOWN to the matching card. Never scroll upward.
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const headerOffset = 112;
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        const target = document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`);
+        const target =
+          document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`) ??
+          document.getElementById(`connection-${id}`);
         if (!target) return;
 
         const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
@@ -588,10 +627,51 @@ export function DashboardConnectionsView({
     });
   }, []);
 
-  const toggleConnection = useCallback((id: string) => {
-    // List/grid expand only — no auto-scroll in either direction.
+  const toggleConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Capture where the card sits before expand/collapse reflow.
+    const el =
+      document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`) ??
+      document.getElementById(`connection-${id}`);
+    if (el) {
+      pendingListPinRef.current = { id, top: el.getBoundingClientRect().top };
+    } else {
+      pendingListPinRef.current = null;
+    }
+    event.currentTarget.blur();
     setSelectedId((current) => (current === id ? null : id));
   }, []);
+
+  // After expand/collapse commits, glue the clicked card in the viewport so
+  // collapsing a card above cannot yank you to the top of the page.
+  useLayoutEffect(() => {
+    const pending = pendingListPinRef.current;
+    if (!pending) return;
+    pendingListPinRef.current = null;
+
+    const { id, top: beforeTop } = pending;
+    const token = ++listPinTokenRef.current;
+
+    const apply = () => {
+      if (token !== listPinTokenRef.current) return;
+      const after =
+        document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`) ??
+        document.getElementById(`connection-${id}`);
+      if (!after) return;
+      scrollByDelta(getScrollParent(after), after.getBoundingClientRect().top - beforeTop);
+    };
+
+    apply();
+    const endAt = performance.now() + 500;
+    const loop = () => {
+      if (token !== listPinTokenRef.current) return;
+      apply();
+      if (performance.now() < endAt) requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }, [selectedId]);
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
   const locationOptions = useMemo(() => uniqueConnectionLocations(connections), [connections]);
@@ -904,7 +984,7 @@ export function DashboardConnectionsView({
                   <ConnectionCard
                     connection={c}
                     expanded={selectedId === c.id}
-                    onToggle={() => toggleConnection(c.id)}
+                    onToggle={(event) => toggleConnection(event, c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
                     collections={collections}
@@ -925,7 +1005,7 @@ export function DashboardConnectionsView({
                   <ConnectionGridCard
                     connection={c}
                     expanded={selectedId === c.id}
-                    onToggle={() => toggleConnection(c.id)}
+                    onToggle={(event) => toggleConnection(event, c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
                     collections={collections}
