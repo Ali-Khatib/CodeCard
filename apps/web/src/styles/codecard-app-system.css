@@ -2463,11 +2463,18 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-blob--open.cc-reactive-border::before {
-  opacity: 0;
+  opacity: 0.55;
+}
+
+.cc-connection-blob--open.cc-reactive-border:hover::before,
+.cc-connection-blob--open.cc-reactive-border:focus-within::before {
+  opacity: 1;
 }
 
 .cc-connection-blob--open.cc-reactive-border:hover {
-  box-shadow: 0 8px 28px rgba(34, 34, 34, 0.06);
+  box-shadow:
+    0 18px 44px -20px rgba(233, 90, 11, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .cc-connection-blob:not(.cc-connection-blob--open).cc-reactive-border:focus-within::before {
@@ -2604,7 +2611,12 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-grid-card--open.cc-reactive-border::before {
-  opacity: 0;
+  opacity: 0.55;
+}
+
+.cc-connection-grid-card--open.cc-reactive-border:hover::before,
+.cc-connection-grid-card--open.cc-reactive-border:focus-within::before {
+  opacity: 1;
 }
 
 .cc-connection-grid-card__trigger {
@@ -2787,18 +2799,18 @@ html.dark .cc-app-badge--blush {
 
 .cc-connection-meta__label {
   font-family: var(--app-font);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   text-transform: none;
   line-height: 1.35;
-  color: var(--app-smoke);
+  color: var(--app-muted);
 }
 
 .cc-connection-meta__value {
   font-size: 15px;
   line-height: 1.45;
-  font-weight: 480;
+  font-weight: 600;
   color: var(--app-ink);
   overflow-wrap: break-word;
 }
@@ -2814,7 +2826,7 @@ html.dark .cc-app-badge--blush {
   margin: 0;
   font-size: 15px;
   line-height: 1.55;
-  color: var(--app-smoke);
+  color: var(--app-ink);
 }
 
 .cc-connection-tags {
@@ -2825,8 +2837,26 @@ html.dark .cc-app-badge--blush {
 
 .cc-connection-tag {
   padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 520;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--app-iris) 28%, var(--app-border));
+  background: color-mix(in srgb, var(--app-iris) 12%, var(--app-paper));
+  color: var(--app-ink);
+}
+
+.cc-connection-tag.cc-app-badge--mint {
+  border-color: color-mix(in srgb, #34d399 40%, var(--app-border));
+  background: color-mix(in srgb, #34d399 18%, var(--app-paper));
+  color: var(--app-ink);
+}
+
+html.dark .cc-connection-tag,
+html.dark .cc-connection-tag.cc-app-badge--mint {
+  border-color: color-mix(in srgb, #6ee7b7 45%, var(--app-border));
+  background: color-mix(in srgb, #6ee7b7 22%, var(--app-paper));
+  color: #efedeb;
 }
 
 .cc-connection-actions {
@@ -2979,13 +3009,10 @@ html.dark .cc-app-badge--blush {
   padding: 28px;
 }
 
-/* Elevated cards — projects, research, connections, public */
+/* Elevated cards — projects, research, public (flat). Connections keep neon edges below. */
 .cc-glass-card,
 .cc-public-profile .cc-app-project-card,
-.cc-public-profile .cc-app-card,
-.cc-app-root .cc-connection-blob,
-.cc-app-root .cc-connection-grid-card,
-.cc-app-root .cc-connection-followup-card {
+.cc-public-profile .cc-app-card {
   border-radius: var(--app-radius-large) !important;
   border: 1px solid var(--app-border) !important;
   background: var(--app-paper) !important;
@@ -2995,20 +3022,74 @@ html.dark .cc-app-badge--blush {
 
 html.dark .cc-glass-card,
 html.dark .cc-public-profile .cc-app-project-card,
-html.dark .cc-public-profile .cc-app-card,
-html.dark .cc-app-root .cc-connection-blob,
-html.dark .cc-app-root .cc-connection-grid-card,
-html.dark .cc-app-root .cc-connection-followup-card {
+html.dark .cc-public-profile .cc-app-card {
   border-color: var(--app-border) !important;
   background: var(--app-paper) !important;
   box-shadow: none;
 }
 
 .cc-glass-card:hover,
-.cc-public-profile .cc-app-project-card:hover,
-.cc-app-root .cc-connection-grid-card:hover,
-.cc-app-root .cc-connection-followup-card:hover {
+.cc-public-profile .cc-app-project-card:hover {
   border-color: var(--app-border-strong) !important;
+}
+
+/* Connections — gradient neon edge + live pointer glow */
+.cc-app-root .cc-connection-blob,
+.cc-app-root .cc-connection-grid-card,
+.cc-app-root .cc-connection-followup-card {
+  --glass-radius: 22px;
+  border-radius: var(--glass-radius) !important;
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(233, 90, 11, 0.65) 26%,
+      rgba(255, 183, 96, 0.55) 48%,
+      rgba(94, 214, 200, 0.45) 72%,
+      rgba(255, 255, 255, 0.8) 100%
+    )
+      border-box !important;
+  box-shadow:
+    0 14px 36px -24px rgba(34, 34, 34, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  overflow: hidden;
+}
+
+html.dark .cc-app-root .cc-connection-blob,
+html.dark .cc-app-root .cc-connection-grid-card,
+html.dark .cc-app-root .cc-connection-followup-card {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(244, 239, 232, 0.28) 0%,
+      rgba(233, 90, 11, 0.7) 28%,
+      rgba(255, 183, 96, 0.45) 52%,
+      rgba(80, 200, 255, 0.35) 74%,
+      rgba(244, 239, 232, 0.14) 100%
+    )
+      border-box !important;
+  box-shadow:
+    0 16px 40px -22px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.cc-app-root .cc-connection-grid-card:hover,
+.cc-app-root .cc-connection-followup-card:hover,
+.cc-app-root .cc-connection-blob:hover {
+  box-shadow:
+    0 18px 44px -20px rgba(233, 90, 11, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+html.dark .cc-app-root .cc-connection-grid-card:hover,
+html.dark .cc-app-root .cc-connection-followup-card:hover,
+html.dark .cc-app-root .cc-connection-blob:hover {
+  box-shadow:
+    0 20px 48px -18px rgba(233, 90, 11, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 
 .cc-work-title {
@@ -3096,7 +3177,7 @@ html.dark .cc-app-tech-tag {
   border-radius: var(--app-radius-large);
   border: 1px solid var(--app-border);
   background: var(--app-paper);
-  transition: border-color 0.28s ease;
+  transition: border-color 0.28s ease, box-shadow 0.28s ease;
   transform-origin: center center;
 }
 
@@ -3111,38 +3192,55 @@ html.dark .cc-app-tech-tag {
   inset: -1px;
   z-index: 2;
   border-radius: inherit;
-  padding: 1px;
+  padding: 1.5px;
   background: radial-gradient(
-    420px circle at var(--rx) var(--ry),
-    rgba(var(--glow-rgb), 0.32),
-    rgba(var(--glow-rgb), 0.06) 48%,
+    460px circle at var(--rx) var(--ry),
+    rgba(var(--glow-rgb), 0.85),
+    rgba(255, 183, 96, 0.45) 28%,
+    rgba(80, 200, 255, 0.28) 52%,
     transparent 72%
   );
   mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
+  -webkit-mask-composite: xor;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.35s ease;
 }
 
-.cc-reactive-border:hover::before {
+.cc-reactive-border:hover::before,
+.cc-reactive-border:focus-within::before {
   opacity: 1;
 }
 
 .cc-reactive-border:hover {
-  border-color: var(--app-border-strong);
-  box-shadow: none;
+  border-color: color-mix(in srgb, var(--app-iris) 35%, var(--app-border-strong));
 }
 
-html.dark .cc-reactive-border::before {
+/* Connections keep the pointer glow in dark mode */
+html.dark .cc-reactive-border:not(.cc-connection-blob):not(.cc-connection-grid-card)::before {
   opacity: 0 !important;
 }
 
-html.dark .cc-reactive-border:hover {
+html.dark .cc-reactive-border:not(.cc-connection-blob):not(.cc-connection-grid-card):hover {
   border-color: var(--app-border-strong);
   box-shadow: none;
+}
+
+html.dark .cc-connection-blob.cc-reactive-border::before,
+html.dark .cc-connection-grid-card.cc-reactive-border::before {
+  opacity: 0;
+}
+
+html.dark .cc-connection-blob.cc-reactive-border:hover::before,
+html.dark .cc-connection-blob.cc-reactive-border:focus-within::before,
+html.dark .cc-connection-grid-card.cc-reactive-border:hover::before,
+html.dark .cc-connection-grid-card.cc-reactive-border:focus-within::before,
+html.dark .cc-connection-blob--open.cc-reactive-border::before,
+html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
+  opacity: 1 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

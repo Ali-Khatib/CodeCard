@@ -560,7 +560,7 @@ export function DashboardConnectionsView({
 
   const openConnection = useCallback((id: string) => {
     setSelectedId(id);
-    // Always scroll for follow-up CTAs, even if this card is already open
+    // Follow-up box only — scroll the list card into view after expand
     window.setTimeout(() => {
       document.getElementById(`connection-${id}`)?.scrollIntoView({
         behavior: 'smooth',
@@ -572,17 +572,6 @@ export function DashboardConnectionsView({
   const toggleConnection = useCallback((id: string) => {
     setSelectedId((current) => (current === id ? null : id));
   }, []);
-
-  useEffect(() => {
-    if (!selectedId) return;
-    const timer = window.setTimeout(() => {
-      document.getElementById(`connection-${selectedId}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }, 120);
-    return () => window.clearTimeout(timer);
-  }, [selectedId]);
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
   const locationOptions = useMemo(() => uniqueConnectionLocations(connections), [connections]);
