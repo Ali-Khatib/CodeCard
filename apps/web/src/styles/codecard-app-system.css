@@ -1356,16 +1356,34 @@ html.dark .cc-project-nav-btn svg,
 }
 
 .cc-profile-link-dock .cc-animated-dock__item {
-  border-color: var(--app-border-strong);
-  background: var(--app-ink);
-  color: var(--app-paper);
-  box-shadow: 0 8px 18px rgba(34, 34, 34, 0.1);
+  border: 2px solid #ffffff !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.28);
 }
 
 .cc-profile-link-dock .cc-animated-dock__item[data-active='true'] {
-  border-color: var(--app-ink);
-  background: var(--app-ink);
-  color: var(--app-paper);
+  border-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.cc-profile-link-dock .cc-animated-dock__item svg,
+.cc-profile-link-dock .cc-animated-dock__item svg path {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
+  opacity: 1 !important;
+}
+
+.cc-profile-link-dock .cc-animated-dock__item svg[fill='none'],
+.cc-profile-link-dock .cc-animated-dock__item svg[fill='none'] path {
+  fill: none !important;
+  stroke: #000000 !important;
+  stroke-width: 2 !important;
 }
 
 .cc-project-link-dock {
@@ -4029,20 +4047,38 @@ html.dark .cc-analytics-project-metric {
 
 .cc-profile-identity-card__social {
   display: flex;
-  height: 36px;
-  width: 36px;
+  height: 40px;
+  width: 40px;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid var(--app-border);
-  background: var(--app-bone);
-  color: var(--app-ink);
-  transition: border-color 0.2s ease;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  background-color: #ffffff;
+  color: #000000;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .cc-profile-identity-card__social:hover {
   transform: none;
-  border-color: var(--app-border-strong);
+  border-color: #fcf1e7;
+  background: #fcf1e7;
+  color: #000000;
+}
+
+.cc-profile-identity-card__social svg,
+.cc-profile-identity-card__social svg path {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
+  opacity: 1 !important;
+}
+
+.cc-profile-identity-card__social svg[fill='none'],
+.cc-profile-identity-card__social svg[fill='none'] path {
+  fill: none !important;
+  stroke: #000000 !important;
+  stroke-width: 2 !important;
 }
 
 .cc-profile-visitor-preview__card {
@@ -5289,8 +5325,8 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 /*
-  Public profile social chips — cream disc + solid black glyph.
-  Standalone so contrast never depends on parent/theme inheritance.
+  Public profile social chips — ALWAYS white disc + pure black glyph.
+  Never inherit hero cream text color; never use light-on-light.
 */
 .cc-public-social-chip {
   display: inline-flex !important;
@@ -5300,13 +5336,17 @@ html.dark .cc-public-atmosphere__grain {
   height: 44px !important;
   flex-shrink: 0;
   border-radius: 999px !important;
-  border: 2px solid #fcf1e7 !important;
-  background: #fcf1e7 !important;
-  color: #111111 !important;
+  border: 2px solid #ffffff !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(0, 0, 0, 0.2);
+    0 6px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
   opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
   text-decoration: none !important;
   transition:
     transform 0.2s ease,
@@ -5315,87 +5355,115 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-public-social-chip:hover {
-  background: #ffffff !important;
-  border-color: #ffffff !important;
-  color: #111111 !important;
+  background: #fcf1e7 !important;
+  background-color: #fcf1e7 !important;
+  border-color: #fcf1e7 !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
   transform: translateY(-2px);
 }
 
 .cc-public-social-chip svg,
-.cc-public-social-chip svg *,
+.cc-public-social-chip svg path,
+.cc-public-social-chip svg g,
 .cc-public-social-chip__icon {
-  width: 1.25rem !important;
-  height: 1.25rem !important;
-  color: #111111 !important;
-  fill: #111111 !important;
-  stroke: #111111 !important;
+  width: 1.3rem !important;
+  height: 1.3rem !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
   opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }
 
 .cc-public-social-chip svg[fill='none'],
-.cc-public-social-chip svg[fill='none'] * {
+.cc-public-social-chip svg[fill='none'] path,
+.cc-public-social-chip svg[fill='none'] g {
   fill: none !important;
-  stroke: #111111 !important;
-  stroke-width: 1.75 !important;
+  stroke: #000000 !important;
+  stroke-width: 2 !important;
 }
 
 /* Keep legacy class path forced to the same high-contrast recipe */
 .cc-public-hero__panel .cc-public-social-chip,
 .cc-public-hero__social .cc-public-social-chip,
-.cc-public-hero__social .cc-profile-identity-card__social {
+.cc-public-hero__social .cc-profile-identity-card__social,
+.cc-public-profile .cc-profile-identity-card__social,
+.cc-app-root .cc-profile-identity-card__social {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
   width: 44px !important;
   height: 44px !important;
   border-radius: 999px !important;
-  border: 2px solid #fcf1e7 !important;
-  background: #fcf1e7 !important;
-  color: #111111 !important;
+  border: 2px solid #ffffff !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(0, 0, 0, 0.2);
+    0 6px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
   opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
   text-decoration: none !important;
 }
 
 .cc-public-hero__panel .cc-public-social-chip:hover,
 .cc-public-hero__social .cc-public-social-chip:hover,
-.cc-public-hero__social .cc-profile-identity-card__social:hover {
-  background: #ffffff !important;
-  border-color: #ffffff !important;
-  color: #111111 !important;
+.cc-public-hero__social .cc-profile-identity-card__social:hover,
+.cc-public-profile .cc-profile-identity-card__social:hover,
+.cc-app-root .cc-profile-identity-card__social:hover {
+  background: #fcf1e7 !important;
+  background-color: #fcf1e7 !important;
+  border-color: #fcf1e7 !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
   transform: translateY(-2px);
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.5),
-    0 0 0 1px color-mix(in srgb, var(--app-iris, #e95a0b) 50%, transparent);
+    0 8px 20px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
 }
 
 .cc-public-hero__panel .cc-public-social-chip svg,
-.cc-public-hero__panel .cc-public-social-chip svg *,
+.cc-public-hero__panel .cc-public-social-chip svg path,
+.cc-public-hero__panel .cc-public-social-chip svg g,
 .cc-public-hero__panel .cc-public-social-chip__icon,
 .cc-public-hero__social .cc-public-social-chip svg,
-.cc-public-hero__social .cc-public-social-chip svg *,
+.cc-public-hero__social .cc-public-social-chip svg path,
+.cc-public-hero__social .cc-public-social-chip svg g,
 .cc-public-hero__social .cc-profile-identity-card__social svg,
-.cc-public-hero__social .cc-profile-identity-card__social svg *,
-.cc-public-hero__social .cc-profile-identity-card__social-icon {
-  width: 1.25rem !important;
-  height: 1.25rem !important;
-  color: #111111 !important;
-  fill: #111111 !important;
-  stroke: #111111 !important;
+.cc-public-hero__social .cc-profile-identity-card__social svg path,
+.cc-public-hero__social .cc-profile-identity-card__social svg g,
+.cc-public-profile .cc-profile-identity-card__social svg,
+.cc-public-profile .cc-profile-identity-card__social svg path,
+.cc-app-root .cc-profile-identity-card__social svg,
+.cc-app-root .cc-profile-identity-card__social svg path {
+  width: 1.3rem !important;
+  height: 1.3rem !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
   opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }
 
 .cc-public-hero__panel .cc-public-social-chip svg[fill='none'],
-.cc-public-hero__panel .cc-public-social-chip svg[fill='none'] *,
+.cc-public-hero__panel .cc-public-social-chip svg[fill='none'] path,
 .cc-public-hero__social .cc-public-social-chip svg[fill='none'],
-.cc-public-hero__social .cc-public-social-chip svg[fill='none'] *,
+.cc-public-hero__social .cc-public-social-chip svg[fill='none'] path,
 .cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'],
-.cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'] * {
+.cc-public-hero__social .cc-profile-identity-card__social svg[fill='none'] path,
+.cc-app-root .cc-profile-identity-card__social svg[fill='none'],
+.cc-app-root .cc-profile-identity-card__social svg[fill='none'] path {
   fill: none !important;
-  stroke: #111111 !important;
-  stroke-width: 1.75 !important;
+  stroke: #000000 !important;
+  stroke-width: 2 !important;
 }
 
 .cc-public-hero__panel .cc-app-btn--primary {

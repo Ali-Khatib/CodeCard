@@ -4,8 +4,8 @@ import { trackLinkClick } from '@/lib/analytics/link-click';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
-/** Solid cream chip + black glyph — readable on the dark hero panel. */
-const ICON_INK = '#111111';
+/** Pure black glyph on white chip — never inherit hero cream text. */
+const ICON_INK = '#000000';
 
 export function PublicProfileSocialLinks({
   links,
@@ -28,6 +28,7 @@ export function PublicProfileSocialLinks({
             rel="noopener noreferrer"
             aria-label={getProfileLinkAria(link.type, link.label)}
             className="cc-public-social-chip"
+            style={{ color: ICON_INK, backgroundColor: '#ffffff' }}
             onClick={() => {
               trackLinkClick({
                 profileId,
@@ -38,8 +39,9 @@ export function PublicProfileSocialLinks({
           >
             <Icon
               className="cc-public-social-chip__icon"
-              size={20}
+              size={22}
               color={ICON_INK}
+              style={{ color: ICON_INK, fill: ICON_INK }}
               aria-hidden
             />
           </a>

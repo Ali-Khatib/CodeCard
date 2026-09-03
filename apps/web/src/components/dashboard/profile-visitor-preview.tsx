@@ -120,9 +120,10 @@ export function ProfileVisitorPreview({
                 <span
                   key={`${link.type}-${link.url}`}
                   className="cc-profile-identity-card__social"
+                  style={{ color: '#000000', backgroundColor: '#ffffff' }}
                   title={getProfileLinkAria(link.type, link.label)}
                 >
-                  <Icon className="text-sm" aria-hidden />
+                  <Icon className="text-sm" color="#000000" style={{ color: '#000000', fill: '#000000' }} aria-hidden />
                 </span>
               );
             })}
