@@ -328,7 +328,7 @@ export function ProjectDetailView({
               onMouseEnter={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
               onFocus={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
             >
-              <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-[#232324]">
+              <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-ink">
                 Stack
               </p>
               <TechLogoRow technologies={project.technologies} isActive pop size="lg" className="mt-5" />
@@ -341,16 +341,16 @@ export function ProjectDetailView({
               onMouseEnter={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
               onFocus={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
             >
-              <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-[#232324]">
+              <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-ink">
                 Overview
               </p>
-              <div className="mt-5 w-full max-w-none space-y-4 font-sans text-[20px] font-normal leading-[1.65] text-[#232324] md:mt-6 md:space-y-5 md:text-[22px] md:leading-[1.6]">
+              <div className="mt-5 w-full max-w-none space-y-4 font-sans text-[18px] font-normal leading-[1.65] text-ink md:mt-6 md:space-y-5 md:text-[20px] md:leading-[1.6]">
                 {project.description
                   .split(/\n\n+/)
                   .map((paragraph) => paragraph.trim())
                   .filter(Boolean)
                   .map((paragraph) => (
-                    <p key={paragraph} className="break-words text-pretty text-[#232324]">
+                    <p key={paragraph} className="break-words text-pretty text-ink">
                       {paragraph}
                     </p>
                   ))}
@@ -366,14 +366,14 @@ export function ProjectDetailView({
             >
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-[#232324]">
+                  <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] leading-[0.9] text-ink">
                     Product flow
                   </p>
-                  <h2 className="mt-2 font-display text-[32px] font-normal leading-[1.1] tracking-[-0.02em] text-[#232324] md:text-[46px]">
+                  <h2 className="mt-2 font-display text-[clamp(28px,4vw,40px)] font-normal leading-[1.1] tracking-[-0.02em] text-ink">
                     Screens &amp; interfaces
                   </h2>
                 </div>
-                <p className="text-[17px] text-[#3f3c3a] md:text-[18px]">
+                <p className="text-[16px] text-smoke md:text-[17px]">
                   {screenshots.length} {screenshots.length === 1 ? 'screen' : 'screens'}
                 </p>
               </div>

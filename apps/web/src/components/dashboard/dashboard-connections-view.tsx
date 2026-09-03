@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
@@ -109,7 +109,7 @@ function ConnectionExpandedBody({
               <legend className="text-[13px] font-medium text-[var(--app-ink)]">
                 Add to collection
               </legend>
-              <p className="text-[12px] text-[var(--app-smoke)]">Only you can see these folders.</p>
+              <p className="text-[14px] text-[var(--app-muted)]">Only you can see these folders.</p>
               <ul className="space-y-1.5">
                 {collections.map((collection) => {
                   const assigned = membershipIds.includes(collection.id);
@@ -335,6 +335,7 @@ function ConnectionCard({
   return (
     <ReactiveBorder
       as="article"
+      id={`connection-${connection.id}`}
       className={`cc-connection-blob${expanded ? ' cc-connection-blob--open' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
@@ -430,6 +431,7 @@ function ConnectionGridCard({
   return (
     <ReactiveBorder
       as="article"
+      id={`connection-${connection.id}`}
       className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
@@ -555,6 +557,32 @@ export function DashboardConnectionsView({
   const [meetingPointFilter, setMeetingPointFilter] =
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
+
+  const openConnection = useCallback((id: string) => {
+    setSelectedId(id);
+    // Always scroll for follow-up CTAs, even if this card is already open
+    window.setTimeout(() => {
+      document.getElementById(`connection-${id}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 120);
+  }, []);
+
+  const toggleConnection = useCallback((id: string) => {
+    setSelectedId((current) => (current === id ? null : id));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById(`connection-${selectedId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [selectedId]);
 
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
   const locationOptions = useMemo(() => uniqueConnectionLocations(connections), [connections]);
@@ -854,7 +882,7 @@ export function DashboardConnectionsView({
           <FadeInView delay={0.08} className="cc-connections-followups-section">
             <ConnectionsFollowUps
               followUps={upcomingFollowUps}
-              onSelect={(id) => setSelectedId(id)}
+              onSelect={openConnection}
             />
           </FadeInView>
         ) : null}
@@ -867,7 +895,7 @@ export function DashboardConnectionsView({
                   <ConnectionCard
                     connection={c}
                     expanded={selectedId === c.id}
-                    onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                    onToggle={() => toggleConnection(c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
                     collections={collections}
@@ -888,7 +916,7 @@ export function DashboardConnectionsView({
                   <ConnectionGridCard
                     connection={c}
                     expanded={selectedId === c.id}
-                    onToggle={() => setSelectedId(selectedId === c.id ? null : c.id)}
+                    onToggle={() => toggleConnection(c.id)}
                     variant={variant}
                     onRemove={onRemoveConnection}
                     collections={collections}

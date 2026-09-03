@@ -1,7 +1,7 @@
 'use client';
 
 import type { AudienceSlice } from '@/lib/dashboard/analytics-data';
-import { AppCard, SectionLabel } from '../ui/dashboard-ui';
+import { AppCard, SectionLabel, SectionSubtitle } from '../ui/dashboard-ui';
 
 function SliceBars({ title, slices }: { title: string; slices: AudienceSlice[] }) {
   return (
@@ -30,9 +30,9 @@ export function AnalyticsAudiencePanel({ roles }: { roles: AudienceSlice[] }) {
   return (
     <AppCard className="!p-6">
       <SectionLabel>Who is viewing</SectionLabel>
-      <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+      <SectionSubtitle>
         Inferred from profile signals, referrer context, and session behavior
-      </p>
+      </SectionSubtitle>
 
       <div className="mt-6 w-full">
         <SliceBars title="Roles" slices={roles} />

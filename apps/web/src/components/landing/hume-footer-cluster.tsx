@@ -52,41 +52,6 @@ export function HumeFooterCluster() {
           </div>
         </div>
 
-        {/* Cream tab hangs into the dark bar — continuous with statement, not a floating black chip */}
-        <div className="cc-site-footer__to-top">
-          <button
-            type="button"
-            className="cc-site-footer__top-tab"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            aria-label="Top of page"
-          >
-            <span>Top of page</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
-              <path
-                d="M12 19V5M5 12l7-7 7 7"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="cc-site-footer__seam" aria-hidden>
-          <svg
-            className="cc-site-footer__wave"
-            viewBox="0 0 1440 160"
-            preserveAspectRatio="none"
-          >
-            {/* Gentle cream edge; flatter on the right so the tab reads as one surface */}
-            <path
-              d="M0,0 L1440,0 L1440,88 C1280,88 1180,118 980,64 C720,8 420,108 0,52 Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
       </section>
 
       <footer className="cc-site-footer__bar">
@@ -142,6 +107,13 @@ export function HumeFooterCluster() {
 
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
+            <button
+              type="button"
+              className="cc-site-footer__top-link"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              Top of page
+            </button>
             <p className="cc-site-footer__meta-note">
               Projects, papers, Circle, and analysis in one profile.
             </p>

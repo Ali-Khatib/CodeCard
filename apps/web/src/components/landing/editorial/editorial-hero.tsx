@@ -31,17 +31,17 @@ export function EditorialHero() {
           </h1>
         </div>
         <div className="cc-ed-hero__baseline">
-          <p className="cc-ed__lede">
-            Projects, Research, and Connections, presented through one living
-            technical profile.
-          </p>
-          <p className="cc-ed__connect-principle mt-4 max-w-xl text-[15px] leading-relaxed tracking-[-0.01em] text-[color-mix(in_srgb,var(--ed-fg,#efedeb)_88%,transparent)]">
-            <strong className="font-semibold text-[var(--ed-fg,#efedeb)]">
-              Connect in person. Scan their CodeCard QR.
-            </strong>{' '}
-            CodeCard connections happen through physical QR scans — no searching,
-            usernames, or digital invites.
-          </p>
+          <div className="cc-ed-hero__baseline-copy">
+            <p className="cc-ed__lede">
+              Projects, Research, and Connections, presented through one living
+              technical profile.
+            </p>
+            <p className="cc-ed__connect-principle">
+              <strong>Connect in person. Scan their CodeCard QR.</strong>{' '}
+              CodeCard connections happen through physical QR scans — no searching,
+              usernames, or digital invites.
+            </p>
+          </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">
             <Link
               href="/sign-up"

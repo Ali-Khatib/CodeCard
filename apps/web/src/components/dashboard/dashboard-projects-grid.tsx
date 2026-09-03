@@ -25,24 +25,26 @@ export function DashboardProjectsGrid({
     return (
       <div className="space-y-6">
         <div>
-          <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">Projects</p>
-          <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">
+          <p className="cc-app-mono">Projects</p>
+          <h1 className="cc-app-title mt-2 !text-[clamp(28px,4vw,36px)]">
             {EMPTY_STATE_COPY.projects.title}
           </h1>
-          <p className="mt-2 max-w-lg text-[15px] text-lichen">
+          <p className="cc-app-subtitle mt-2">
             {EMPTY_STATE_COPY.projects.description}
           </p>
         </div>
 
-        <div className="cc-workspace-tile rounded-[14px] border border-border/40 p-8 text-center md:p-12">
-          <p className="font-display text-[22px] text-phosphor">Empty for now</p>
-          <p className="mx-auto mt-2 max-w-sm text-[15px] text-lichen">
+        <div className="cc-app-card p-8 text-center md:p-12">
+          <p className="font-display text-[clamp(20px,3vw,24px)] font-medium text-[var(--app-ink)]">
+            Empty for now
+          </p>
+          <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-[var(--app-muted)]">
             Create a project card with a title, tagline, hero image, and links. Same format visitors
             see on your CodeCard.
           </p>
           <Link
             href="/dashboard/projects/new"
-            className="cc-btn-pill-primary mt-8 inline-flex h-11 items-center px-6 text-[15px]"
+            className="cc-app-btn cc-app-btn--primary mt-8 inline-flex"
           >
             {EMPTY_STATE_COPY.projects.cta}
           </Link>
@@ -55,19 +57,19 @@ export function DashboardProjectsGrid({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">Projects</p>
+          <p className="cc-app-mono">Projects</p>
           {!hasProjects && (
             <>
-              <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">Featured work</h1>
-              <p className="mt-2 max-w-lg text-[15px] text-lichen">
+              <h1 className="cc-app-title mt-2 !text-[clamp(28px,4vw,36px)]">Featured work</h1>
+              <p className="cc-app-subtitle mt-2">
                 Example projects — sign up to publish your own work.
               </p>
             </>
           )}
           {hasProjects && (
             <>
-              <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">Featured work</h1>
-              <p className="mt-2 max-w-lg text-[15px] text-lichen">
+              <h1 className="cc-app-title mt-2 !text-[clamp(28px,4vw,36px)]">Featured work</h1>
+              <p className="cc-app-subtitle mt-2">
                 Reorder and publish the projects visitors see first.
               </p>
             </>
@@ -76,36 +78,37 @@ export function DashboardProjectsGrid({
         {showNewButton && hasProjects && (
           <Link
             href="/dashboard/projects/new"
-            className="cc-btn-pill-primary inline-flex h-10 items-center px-5 text-[14px]"
+            className="cc-app-btn cc-app-btn--primary"
           >
             New project
           </Link>
         )}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {cards.map((card, i) => (
+      <div className="grid gap-4 sm:grid-cols-2">
+        {cards.map((card) => (
           <Link
             key={card.key}
             href={card.href}
-            className="cc-workspace-tile group overflow-hidden rounded-[10px] border border-border/40 transition-colors hover:border-reactor/30"
-            style={{ animationDelay: `${i * 80}ms` }}
+            className="cc-app-card group block overflow-hidden !p-0 transition-colors hover:border-[var(--app-border-strong)]"
           >
-            <div className="p-4">
-              <p className="font-display text-[18px] text-phosphor group-hover:text-vellum">{card.title}</p>
-              <p className="mt-1 text-[13px] text-lichen">{card.subtitle}</p>
+            <div className="p-5">
+              <p className="font-display text-[clamp(17px,1.6vw,20px)] font-medium leading-tight tracking-[-0.03em] text-[var(--app-ink)]">
+                {card.title}
+              </p>
+              <p className="mt-1.5 text-[14px] leading-snug text-[var(--app-muted)]">{card.subtitle}</p>
             </div>
-            <div className="relative mx-4 mb-4 h-28 overflow-hidden rounded-[8px] bg-gradient-to-br from-reactor/25 via-midnight to-void-canvas">
+            <div className="relative mx-5 mb-5 h-28 overflow-hidden rounded-[12px] bg-[var(--app-bone)]">
               {card.posterUrl ? (
                 <Image
                   src={card.posterUrl}
                   alt=""
                   fill
-                  className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
+                  className="object-cover opacity-95 transition-opacity group-hover:opacity-100"
                   sizes="(max-width: 640px) 100vw, 320px"
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-reactor/20 to-transparent" />
+                <div className="absolute inset-0 bg-[color-mix(in_srgb,var(--app-iris)_12%,transparent)]" />
               )}
             </div>
           </Link>

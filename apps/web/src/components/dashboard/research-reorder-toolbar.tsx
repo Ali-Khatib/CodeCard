@@ -53,12 +53,12 @@ export function ResearchReorderToolbar({
       onKeyDown={(event) => event.stopPropagation()}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[12px] text-[var(--app-smoke)]" aria-live="polite">
+        <span className="text-[12px] font-medium text-[var(--app-ink)]" aria-live="polite">
           Position {index + 1} of {total}
         </span>
         <button
           type="button"
-          className="cc-app-btn cc-app-btn--ghost min-h-11 px-3 text-[12px] disabled:opacity-50"
+          className="cc-project-reorder-btn min-h-11"
           disabled={pending || disabled || index === 0}
           aria-label={`Move research paper ${paperTitle} up from position ${index + 1}`}
           onClick={() => move('up')}
@@ -67,7 +67,7 @@ export function ResearchReorderToolbar({
         </button>
         <button
           type="button"
-          className="cc-app-btn cc-app-btn--ghost min-h-11 px-3 text-[12px] disabled:opacity-50"
+          className="cc-project-reorder-btn min-h-11"
           disabled={pending || disabled || index === total - 1}
           aria-label={`Move research paper ${paperTitle} down from position ${index + 1}`}
           onClick={() => move('down')}

@@ -110,19 +110,16 @@ function ResearchChapter({
   const reduced = useReducedMotion() === true;
   const { scrollYProgress } = useScroll({
     target: chapterRef,
-    offset: ['start 0.92', 'end 0.35'],
+    offset: ['start 0.85', 'center 0.35'],
   });
 
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.22], [0.55, 1], {
+  const imageScale = useTransform(scrollYProgress, [0, 0.45], [1.06, 1], {
     clamp: true,
   });
-  const imageScale = useTransform(scrollYProgress, [0, 0.28], [1.04, 1], {
+  const bodyOpacity = useTransform(scrollYProgress, [0, 0.28], [0.7, 1], {
     clamp: true,
   });
-  const bodyOpacity = useTransform(scrollYProgress, [0.38, 0.72], [0, 1], {
-    clamp: true,
-  });
-  const bodyY = useTransform(scrollYProgress, [0.38, 0.72], [18, 0], {
+  const bodyY = useTransform(scrollYProgress, [0, 0.28], [14, 0], {
     clamp: true,
   });
 
@@ -141,16 +138,13 @@ function ResearchChapter({
         <div className="cc-ed-research-story__grid">
           <motion.div
             className="cc-ed-research-story__media"
-            style={
-              reduced
-                ? undefined
-                : { opacity: imageOpacity, scale: imageScale }
-            }
+            style={reduced ? undefined : { scale: imageScale }}
           >
             <Image
               src={beat.imageSrc}
               alt={beat.imageAlt}
               fill
+              priority={beat.id === 'attention'}
               sizes="(max-width: 900px) 92vw, 44vw"
               className="cc-ed-research-story__img"
             />
@@ -170,15 +164,15 @@ function ResearchChapter({
               <RedactedLine
                 text={beat.problemLead}
                 progress={scrollYProgress}
-                rangeStart={0.05}
-                rangeEnd={0.4}
+                rangeStart={0}
+                rangeEnd={0.32}
                 reduced={reduced}
               />
               <RedactedLine
                 text={beat.problemSub}
                 progress={scrollYProgress}
-                rangeStart={0.22}
-                rangeEnd={0.62}
+                rangeStart={0.12}
+                rangeEnd={0.48}
                 reduced={reduced}
                 accent
               />

@@ -13,15 +13,15 @@ export function DashboardProjectsMasonry({
 }) {
   if (emptyState) {
     return (
-      <div className="cc-dash-glass cc-dash-empty-hero rounded-[16px] p-10 text-center md:p-14">
-        <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-reactor">Projects</p>
-        <h2 className="mt-3 font-display text-[32px] text-vellum md:text-[40px]">
+      <div className="cc-app-card p-10 text-center md:p-14">
+        <p className="cc-app-mono">Projects</p>
+        <h2 className="cc-app-title mt-3 !text-[clamp(28px,4vw,40px)]">
           {EMPTY_STATE_COPY.projects.title}
         </h2>
-        <p className="mx-auto mt-3 max-w-md text-[15px] text-lichen">
+        <p className="cc-app-subtitle mx-auto mt-3">
           {EMPTY_STATE_COPY.projects.description}
         </p>
-        <Link href="/dashboard/projects/new" className="cc-btn-pill-primary mt-8 inline-flex h-11 items-center px-7">
+        <Link href="/dashboard/projects/new" className="cc-app-btn cc-app-btn--primary mt-8 inline-flex">
           {EMPTY_STATE_COPY.projects.cta}
         </Link>
       </div>

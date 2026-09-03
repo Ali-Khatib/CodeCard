@@ -134,8 +134,8 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
         },
         {
           label: 'Custom domain',
-          hint: plan === 'pro' ? 'Pro feature' : 'Upgrade to Pro to claim a custom domain',
-          value: plan === 'pro' ? 'Not configured' : 'Pro only',
+          hint: plan === 'pro' ? 'Available on your plan' : 'Included with Pro — claim a custom domain',
+          value: plan === 'pro' ? 'Not configured' : 'Available on Pro',
           action: plan === 'pro' ? 'Set up' : 'Upgrade',
           href: billingHref,
           control: 'value-edit',
@@ -231,7 +231,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
         },
         {
           label: 'Remove CodeCard branding',
-          hint: plan === 'pro' ? 'Hide the small footer mark' : 'Pro feature',
+          hint: plan === 'pro' ? 'Hide the small footer mark' : 'Included with Pro',
           control: 'toggle',
           enabled: false,
           comingSoon: true,

@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
 import { PLANS } from '@codecard/config';
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@codecard/ui';
 import { grantsProEntitlement } from '@/lib/billing/pro-price';
 
 export default async function BillingPage() {
@@ -120,49 +119,67 @@ export default async function BillingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <p className="font-eyebrow text-[12px] uppercase tracking-[0.08em] text-graphite">Billing</p>
-        <h1 className="mt-2 font-display text-[28px] font-medium text-phosphor">Subscription</h1>
-      </div>
+    <div className="cc-app-page cc-app-page--1040">
+      <header className="cc-app-page-header">
+        <div className="cc-app-page-header__copy">
+          <p className="cc-app-mono">Billing</p>
+          <h1 className="cc-app-title">Subscription</h1>
+          <p className="cc-app-subtitle">
+            Manage your plan. Pro unlocks deeper analytics and advanced workspace tools.
+          </p>
+        </div>
+      </header>
 
-      <Card className="border-border/40 bg-midnight/50">
-        <CardHeader>
-          <CardTitle className="font-display text-phosphor">Plan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <section className="cc-app-card space-y-5">
+        <div>
+          <p className="cc-app-metric__label">Current plan</p>
           {isPro && subscription ? (
             <>
-              <p className="text-reactor">Pro (Active)</p>
-              <p className="text-sm text-lichen">
-                Renews{' '}
+              <p className="mt-2 text-[clamp(24px,3vw,32px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+                Pro
+              </p>
+              <p className="mt-2 text-[15px] text-[var(--app-muted)]">
+                Active · renews{' '}
                 {subscription.current_period_end
                   ? new Date(subscription.current_period_end).toLocaleDateString()
                   : 'N/A'}
               </p>
-              <form action={openPortal}>
-                <Button type="submit" variant="outline">
-                  Manage subscription
-                </Button>
-              </form>
             </>
           ) : (
             <>
-              <p className="text-lichen">You&apos;re on the Free plan.</p>
-              <form action={createCheckout}>
-                <Button type="submit">Upgrade to Pro (${PLANS.pro.priceMonthly}/mo)</Button>
-              </form>
+              <p className="mt-2 text-[clamp(24px,3vw,32px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+                Free
+              </p>
+              <p className="mt-2 text-[15px] text-[var(--app-muted)]">
+                Upgrade for ${PLANS.pro.priceMonthly}/mo when you need the full analytics suite.
+              </p>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <p className="text-xs text-graphite">
-        Cancel anytime via the customer portal. You will retain access through the end of your billing
-        period.
+        {isPro && subscription ? (
+          <form action={openPortal}>
+            <button type="submit" className="cc-app-btn cc-app-btn--ghost">
+              Manage subscription
+            </button>
+          </form>
+        ) : (
+          <form action={createCheckout}>
+            <button type="submit" className="cc-app-btn cc-app-btn--primary">
+              Upgrade · ${PLANS.pro.priceMonthly}/mo
+            </button>
+          </form>
+        )}
+      </section>
+
+      <p className="text-[14px] leading-relaxed text-[var(--app-muted)]">
+        Cancel anytime via the customer portal. You keep access through the end of your billing period.
       </p>
 
-      <Link href="/dashboard/settings" className="text-[14px] text-graphite hover:text-phosphor">
+      <Link
+        href="/dashboard/settings"
+        className="inline-flex text-[14px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
+      >
         ← Back to settings
       </Link>
     </div>

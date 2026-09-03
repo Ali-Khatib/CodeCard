@@ -17,6 +17,10 @@ export function SectionLabel({ children }: { children: ReactNode }) {
   return <p className="cc-app-section-label">{children}</p>;
 }
 
+export function SectionSubtitle({ children }: { children: ReactNode }) {
+  return <p className="cc-app-section-subtitle">{children}</p>;
+}
+
 export function AppCard({
   children,
   className = '',

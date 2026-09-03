@@ -60,7 +60,7 @@ export function AuthField({
       <label
         htmlFor={inputId}
         className={`text-[13px] font-medium transition-colors duration-150 ${
-          error ? 'text-[#b45353]' : focused ? 'text-[rgba(120,70,170,0.95)]' : 'text-ink'
+          error ? 'text-[#b45353]' : focused ? 'text-iris' : 'text-ink'
         }`}
       >
         {label}

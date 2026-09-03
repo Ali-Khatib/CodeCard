@@ -96,27 +96,6 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
       </FadeInView>
 
       <FadeInView delay={0.2}>
-        <section>
-          <SectionLabel>How people reach you</SectionLabel>
-          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">Traffic sources to your CodeCard</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {data.sources.map((s, i) => {
-              const tones = ['blush', 'meringue', 'mint', 'seafoam', 'rose'] as const;
-              return (
-                <AppCard key={s.label} tone={tones[i % tones.length]} className="!p-4">
-                  <p className="text-[14px] font-medium text-[var(--app-ink)]">{s.label}</p>
-                  <p className="mt-2 text-[24px] font-medium tabular-nums">{s.pct}%</p>
-                  <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
-                    {s.value.toLocaleString()} visits
-                  </p>
-                </AppCard>
-              );
-            })}
-          </div>
-        </section>
-      </FadeInView>
-
-      <FadeInView delay={0.24}>
         <AnalyticsProjectPanel projects={data.projectDetails} />
       </FadeInView>
 

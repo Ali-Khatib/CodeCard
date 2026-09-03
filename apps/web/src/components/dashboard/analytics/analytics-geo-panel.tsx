@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { CountUp } from '@/components/landing/count-up';
 import { GlobeBars } from '@/components/ui/cobe-globe-bars';
 import type { AnalyticsBundle } from '@/lib/dashboard/analytics-data';
-import { AppCard, SectionLabel } from '../ui/dashboard-ui';
+import { AppCard, SectionLabel, SectionSubtitle } from '../ui/dashboard-ui';
 import { buildGeoMarkers } from './analytics-geo-markers';
 
 export function AnalyticsGeoPanel({
@@ -22,7 +22,7 @@ export function AnalyticsGeoPanel({
   return (
     <AppCard className="!p-6">
       <SectionLabel>Global visits</SectionLabel>
-      <p className="mt-2 text-[14px] text-[var(--app-smoke)]">Where people open your CodeCard</p>
+      <SectionSubtitle>Where people open your CodeCard</SectionSubtitle>
 
       <div className="mt-5">
         {markers.length > 0 ? (

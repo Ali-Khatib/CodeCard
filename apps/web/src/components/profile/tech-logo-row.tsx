@@ -71,6 +71,16 @@ function TechLogoItem({
       ? `cc-tech-logo-chip ${CHIP_SIZE[size]}`
       : `inline-flex items-center justify-center ${iconSize}`;
 
+  const chipStyle: CSSProperties =
+    variant === 'chip'
+      ? {
+          ...style,
+          backgroundColor: '#fcf1e7',
+          color: '#111111',
+          borderColor: 'rgba(17, 17, 17, 0.28)',
+        }
+      : { ...style, color: '#111111' };
+
   const chip = (
     <motion.span
       className="cc-tech-logo-chip-lift"
@@ -82,7 +92,7 @@ function TechLogoItem({
     >
       <span
         className={`${chipClass}${popItem ? ' cc-tech-logo-pop-item' : ''}${hoverPopItem ? ' cc-tech-logo-hover-pop-item' : ''}`}
-        style={style}
+        style={chipStyle}
       >
         {inner}
       </span>
@@ -142,7 +152,7 @@ export function TechLogoRow({
   pop = false,
   hoverPop = false,
   hoverActive = false,
-  variant = 'plain',
+  variant = 'chip',
 }: TechLogoRowProps) {
   const reducedMotion = useReducedMotion();
   const rowRef = useRef<HTMLDivElement>(null);
@@ -161,13 +171,13 @@ export function TechLogoRow({
       gsap.killTweensOf(items);
       gsap.fromTo(
         items,
-        { scale: 0, opacity: 0 },
+        { scale: 0 },
         {
           scale: 1,
-          opacity: 1,
           stagger: 0.08,
           ease: POP_EASE,
           duration: 0.85,
+          clearProps: 'opacity',
         },
       );
     }, rowRef);
@@ -210,7 +220,7 @@ export function TechLogoRow({
     return (
       <div
         ref={rowRef}
-        className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#232324] md:gap-3 ${className}`}
+        className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#111111] md:gap-3 ${className}`}
         role="list"
       >
         {technologies.map((tech, i) => (
@@ -237,7 +247,7 @@ export function TechLogoRow({
 
   return (
     <div
-      className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#232324] md:gap-3 ${className}`}
+      className={`cc-tech-logo-row flex flex-wrap items-center gap-2 overflow-visible text-[#111111] md:gap-3 ${className}`}
       role="list"
     >
       {technologies.map((tech, i) => (

@@ -37,16 +37,11 @@ type DashboardAnalyticsViewProps = {
 /** Shown where a Pro-only section would be. The data is never sent on Free. */
 function ProUpgradeCard({ title, body }: { title: string; body: string }) {
   return (
-    <AppCard className="mt-4 !p-5" data-analytics-pro-locked>
-      <div className="flex items-center gap-2">
-        <p className="text-[14px] font-medium text-[var(--app-ink)]">{title}</p>
-        <span className="rounded-full bg-[var(--app-iris)]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--app-iris)]">
-          Pro
-        </span>
-      </div>
-      <p className="mt-2 max-w-xl text-[14px] text-[var(--app-smoke)]">{body}</p>
-      <AppButton variant="ghost" href="/dashboard/billing" className="mt-3">
-        Upgrade to Pro
+    <AppCard className="mt-4 !border-[var(--app-border-strong)] !p-6" data-analytics-pro-locked>
+      <p className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--app-ink)]">{title}</p>
+      <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-muted)]">{body}</p>
+      <AppButton variant="soft" href="/dashboard/billing" className="mt-4">
+        Upgrade to unlock
       </AppButton>
     </AppCard>
   );
@@ -177,44 +172,8 @@ export function DashboardAnalyticsView({
 
       <FadeInView delay={0.12}>
         <section>
-          <SectionLabel>How people reach you</SectionLabel>
-          {!entitlement.visitorInsights ? (
-            <ProUpgradeCard
-              title="Visitor insights"
-              body="See which channels bring people to your CodeCard — search, social, direct, and referrals."
-            />
-          ) : summary.sources.length > 0 ? (
-            <>
-              <p className="mt-2 text-[14px] text-[var(--app-smoke)]">Profile visit sources</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {summary.sources.map((s, i) => {
-                  const tones = ['blush', 'meringue', 'mint', 'seafoam', 'rose'] as const;
-                  return (
-                    <AppCard key={s.label} tone={tones[i % tones.length]} className="!p-4">
-                      <p className="text-[14px] font-medium text-[var(--app-ink)]">{s.label}</p>
-                      <p className="mt-2 text-[24px] font-medium tabular-nums">{s.pct}%</p>
-                      <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
-                        {s.value.toLocaleString()} visits
-                      </p>
-                    </AppCard>
-                  );
-                })}
-              </div>
-            </>
-          ) : (
-            <AppCard className="mt-4 !p-5">
-              <p className="text-[14px] text-[var(--app-smoke)]">
-                Traffic sources appear after public profile visits are recorded.
-              </p>
-            </AppCard>
-          )}
-        </section>
-      </FadeInView>
-
-      <FadeInView delay={0.16}>
-        <section>
           <SectionLabel>Top projects</SectionLabel>
-          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+          <p className="cc-app-section-subtitle">
             Views, link clicks, and active time
           </p>
           {summary.topProjects.length === 0 ? (
@@ -226,26 +185,26 @@ export function DashboardAnalyticsView({
           ) : (
             <div className="mt-4 space-y-3">
               {summary.topProjects.map((project) => (
-                <AppCard key={project.id} className="!p-5">
-                  <h3 className="text-[17px] font-semibold text-[var(--app-ink)]">
+                <AppCard key={project.id} className="cc-analytics-project-card !p-5">
+                  <h3 className="cc-analytics-project-card__title !text-[clamp(20px,2.4vw,24px)]">
                     {project.title}
                   </h3>
                   <div className="mt-4 grid grid-cols-3 gap-3">
-                    <div>
+                    <div className="cc-analytics-project-metric">
                       <MetricLabel>Views</MetricLabel>
-                      <p className="mt-1 text-[20px] font-medium">
+                      <p className="cc-analytics-project-metric__value !text-[22px]">
                         <CountUp value={project.views} />
                       </p>
                     </div>
-                    <div>
+                    <div className="cc-analytics-project-metric">
                       <MetricLabel>Link clicks</MetricLabel>
-                      <p className="mt-1 text-[20px] font-medium">
+                      <p className="cc-analytics-project-metric__value !text-[22px]">
                         <CountUp value={project.linkClicks} />
                       </p>
                     </div>
-                    <div>
+                    <div className="cc-analytics-project-metric">
                       <MetricLabel>Time</MetricLabel>
-                      <p className="mt-1 text-[20px] font-medium">
+                      <p className="cc-analytics-project-metric__value !text-[22px]">
                         {formatDuration(project.timeSpentSec)}
                       </p>
                     </div>
@@ -260,7 +219,7 @@ export function DashboardAnalyticsView({
       <FadeInView delay={0.2}>
         <section>
           <SectionLabel>Research</SectionLabel>
-          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+          <p className="cc-app-section-subtitle">
             Paper views, PDFs, citations, and read time
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -337,10 +296,10 @@ export function DashboardAnalyticsView({
         <p className="text-[14px] font-medium text-[var(--app-ink)]">
           {ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE}
         </p>
-        <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-[var(--app-smoke)]">
+        <p className="mt-2 max-w-3xl text-[14px] leading-relaxed text-[var(--app-muted)]">
           {ANALYTICS_ACCURACY_DISCLOSURE_BODY}
         </p>
-        <p className="mt-2 max-w-3xl text-[12px] leading-relaxed text-[var(--app-smoke)]">
+        <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-[var(--app-muted)]">
           {ANALYTICS_ACCURACY_DISCLOSURE_DETAILS}
         </p>
       </footer>

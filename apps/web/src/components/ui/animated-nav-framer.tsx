@@ -133,21 +133,13 @@ export function AnimatedNavFramer({
   const radius = menuOpen ? NAV_PANEL_RADIUS : NAV_PILL_RADIUS;
 
   const sizeAnimate = expanded
-    ? phone
-      ? {
-          width: 'calc(100% - 24px)',
-          height: openSize.height,
-          minWidth: 0,
-          maxWidth: 'calc(100% - 24px)',
-          borderRadius: radius,
-        }
-      : {
-          width: maxOpenWidth,
-          height: openSize.height,
-          minWidth: 0,
-          maxWidth: maxOpenWidth,
-          borderRadius: radius,
-        }
+    ? {
+        width: maxOpenWidth,
+        height: openSize.height,
+        minWidth: 0,
+        maxWidth: maxOpenWidth,
+        borderRadius: radius,
+      }
     : {
         width: NAV_COLLAPSED_SIZE,
         height: NAV_COLLAPSED_SIZE,

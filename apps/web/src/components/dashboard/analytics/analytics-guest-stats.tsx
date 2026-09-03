@@ -2,13 +2,13 @@
 
 import { CountUp } from '@/components/landing/count-up';
 import type { GuestStats } from '@/lib/dashboard/analytics-data';
-import { AppCard, MetricLabel, SectionLabel } from '../ui/dashboard-ui';
+import { AppCard, MetricLabel, SectionLabel, SectionSubtitle } from '../ui/dashboard-ui';
 
 export function AnalyticsGuestStats({ stats }: { stats: GuestStats }) {
   return (
     <AppCard className="!p-6">
       <SectionLabel>Visitors</SectionLabel>
-      <p className="mt-2 text-[14px] text-[var(--app-smoke)]">Signed-in vs guest traffic on your CodeCard</p>
+      <SectionSubtitle>Signed-in vs guest traffic on your CodeCard</SectionSubtitle>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="cc-analytics-stat-block">

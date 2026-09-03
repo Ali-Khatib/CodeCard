@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { buildEngagementRows, formatEngagementValue } from '@/lib/dashboard/analytics-chart-data';
 import type { TimeRange } from '@/lib/dashboard/analytics-data';
-import { SectionLabel } from '../ui/dashboard-ui';
+import { SectionLabel, SectionSubtitle } from '../ui/dashboard-ui';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -17,7 +17,7 @@ export function AnalyticsHumeChart({ range = '30d' }: { range?: TimeRange }) {
     <div className="cc-metric-chart">
       <div className="cc-metric-chart__head">
         <SectionLabel>Engagement</SectionLabel>
-        <p className="cc-metric-chart__unit">Top actions</p>
+        <SectionSubtitle>Top actions</SectionSubtitle>
       </div>
 
       <ul className="cc-metric-chart__rows" aria-label="Engagement by action">

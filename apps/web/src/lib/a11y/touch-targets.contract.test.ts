@@ -32,10 +32,13 @@ describe('WS12-T007 mobile touch targets', () => {
     expect(css).toContain('min-height: 44px');
   });
 
-  it('enlarges icon-only mobile menu and user-menu triggers', () => {
-    expect(read('components/landing/landing-hero-nav.tsx')).toContain(
-      'cc-nav-mobile-trigger',
-    );
+  it('keeps marketing nav as a horizontal pill row (no hamburger drawer)', () => {
+    const nav = read('components/landing/landing-hero-nav.tsx');
+    expect(nav).toContain('cc-nav-desktop-links');
+    expect(nav).toContain('Start free');
+    expect(nav).toContain('Live demo');
+    expect(nav).not.toContain('cc-nav-mobile-menu');
+    expect(nav).not.toContain('cc-nav-mobile-trigger');
     expect(read('app/globals.css')).toContain('.cc-nav-mobile-trigger');
     expect(read('components/dashboard/dashboard-shell.tsx')).toContain(
       'min-h-11 min-w-11',

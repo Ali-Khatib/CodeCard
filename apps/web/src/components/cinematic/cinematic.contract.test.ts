@@ -97,7 +97,10 @@ describe('Editorial product landing contract', () => {
     expect(proof).toContain('#fcf1e7');
     expect(proof).toContain('The research');
     expect(proof).toContain('Your best work never gets the glance.');
-    expect(proof).toContain('photo-1766297247924-6638d54e7c89');
+    expect(proof).toContain('/auth-collage/team.jpg');
+    expect(proof).toContain('/auth-collage/desk.jpg');
+    expect(proof).toContain('/auth-collage/code.jpg');
+    expect(proof).not.toContain('images.unsplash.com');
     expect(story).toContain('EditorialResearchStory');
     expect(story).toContain('cc-ed-research-story__beat');
     expect(story).toContain('cc-ed-research-redact__mask');

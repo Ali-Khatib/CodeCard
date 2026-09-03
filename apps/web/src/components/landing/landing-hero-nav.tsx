@@ -21,14 +21,13 @@ interface LandingHeroNavProps {
 export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [compact, setCompact] = useState(false);
   const [compactPeek, setCompactPeek] = useState(false);
 
-  const isExpanded = !compact || compactPeek || mobileOpen;
+  const isExpanded = !compact || compactPeek;
 
   const isActive = useCallback(
-    (href: string, _label: string) => {
+    (href: string) => {
       if (href === MARKETING_HOME_HREF) {
         return (
           pathname === MARKETING_HOME_HREF ||
@@ -50,10 +49,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     const syncCompact = () => {
       const next = root.dataset.navCompact === 'true';
       setCompact(next);
-      if (!next) {
-        setCompactPeek(false);
-        setMobileOpen(false);
-      }
+      if (!next) setCompactPeek(false);
     };
     syncCompact();
     const observer = new MutationObserver(syncCompact);
@@ -68,7 +64,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       const nav = document.querySelector('.cc-nav-veil');
       if (nav && target && !nav.contains(target)) {
         setCompactPeek(false);
-        setMobileOpen(false);
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -78,66 +73,13 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
   return (
     <AnimatedNavFramer
       isExpanded={isExpanded}
-      onCollapsedClick={() => {
-        setCompactPeek(true);
-        if (window.matchMedia('(max-width: 767px)').matches) {
-          setMobileOpen(true);
-        }
-      }}
-      className={mobileOpen ? 'cc-nav-veil--mobile-open' : undefined}
+      onCollapsedClick={() => setCompactPeek(true)}
       collapsedLabel="Expand navigation"
-      panel={
-        mobileOpen ? (
-        <div className="cc-nav-mobile-menu md:hidden">
-          <ul className="flex flex-col gap-1">
-            {items.map((item, i) => {
-              const active = isActive(item.href, item.label);
-              return (
-                <li key={`m-${item.label}-${i}`}>
-                  <Link
-                    href={item.href}
-                    aria-current={active ? 'page' : undefined}
-                    className={`cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center ${
-                      active ? 'cc-nav-pill-item--active' : ''
-                    }`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setMobileOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-            <li>
-              <LiveDemoLink
-                className="cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center"
-                onClick={() => setMobileOpen(false)}
-              >
-                Live demo
-              </LiveDemoLink>
-            </li>
-            <li>
-              <Link
-                href="/sign-up"
-                className="cc-nav-pill-item cc-nav-pill-item--eq block w-full py-2.5 text-center"
-                onClick={(event) => event.stopPropagation()}
-                onMouseEnter={() => router.prefetch('/sign-up')}
-                onFocus={() => router.prefetch('/sign-up')}
-              >
-                Start free
-              </Link>
-            </li>
-          </ul>
-        </div>
-        ) : null
-      }
     >
-      <div className="hidden md:flex cc-nav-desktop-links">
-        <ul className="cc-hume-fade-group flex items-center gap-2">
+      <div className="cc-nav-desktop-links">
+        <ul className="cc-hume-fade-group flex items-center gap-1 sm:gap-2">
           {items.map((item, i) => {
-            const active = isActive(item.href, item.label);
+            const active = isActive(item.href);
             return (
               <li key={`${item.label}-${i}`}>
                 <Link
@@ -172,22 +114,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
           </li>
         </ul>
       </div>
-
-      <button
-        type="button"
-        className="cc-nav-mobile-trigger ml-auto flex items-center justify-center rounded-full border border-[var(--line-soft)] text-ink md:hidden"
-        aria-expanded={mobileOpen}
-        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-        onClick={(event) => {
-          event.stopPropagation();
-          setMobileOpen((open) => !open);
-          setCompactPeek(true);
-        }}
-      >
-        <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden>
-          <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
-      </button>
     </AnimatedNavFramer>
   );
 }

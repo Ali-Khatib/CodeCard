@@ -4,6 +4,9 @@ import { trackLinkClick } from '@/lib/analytics/link-click';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
+/** Solid cream chip + black glyph — readable on the dark hero panel. */
+const ICON_INK = '#111111';
+
 export function PublicProfileSocialLinks({
   links,
   profileId,
@@ -14,7 +17,7 @@ export function PublicProfileSocialLinks({
   if (links.length === 0) return null;
 
   return (
-    <nav className="mt-4 flex flex-wrap gap-2" aria-label="Profile links">
+    <nav className="cc-public-social-row mt-4 flex flex-wrap gap-2.5" aria-label="Profile links">
       {links.map((link) => {
         const Icon = resolveProfileLinkIcon(link.type);
         return (
@@ -24,7 +27,7 @@ export function PublicProfileSocialLinks({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={getProfileLinkAria(link.type, link.label)}
-            className="cc-profile-identity-card__social"
+            className="cc-public-social-chip"
             onClick={() => {
               trackLinkClick({
                 profileId,
@@ -34,9 +37,9 @@ export function PublicProfileSocialLinks({
             }}
           >
             <Icon
-              className="cc-profile-identity-card__social-icon"
-              size={18}
-              color="currentColor"
+              className="cc-public-social-chip__icon"
+              size={20}
+              color={ICON_INK}
               aria-hidden
             />
           </a>

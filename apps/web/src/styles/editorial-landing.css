@@ -279,12 +279,16 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item,
   white-space: nowrap;
 }
 
-/* Stacked mobile rows fill the panel — the desktop equal-width lock is for
-   aligning the horizontal row only. */
-.cc-marketing-shell .cc-nav-mobile-menu .cc-nav-pill-item--eq {
-  width: 100%;
-  min-width: 0;
-  max-width: none;
+@media (max-width: 767px) {
+  .cc-marketing-shell .cc-nav-pill-item--eq {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    min-height: 44px;
+    padding-inline: 0.7rem;
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+  }
 }
 
 .cc-marketing-shell .cc-nav-pill-item--active,
@@ -387,45 +391,22 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   opacity: 1 !important;
 }
 
-/* Light chapters — frosted glass pill + ink type */
+/* Light chapters — clear transparent pill + ink type */
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #ffffff 30%, transparent),
-      color-mix(in srgb, #fcf1e7 14%, transparent)
-    );
-  border: 1px solid color-mix(in srgb, #ffffff 48%, transparent);
-  box-shadow:
-    0 12px 32px rgba(35, 35, 36, 0.1),
-    inset 0 1px 0 color-mix(in srgb, #ffffff 38%, transparent);
-  backdrop-filter: blur(20px) saturate(1.35);
-  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  background: color-mix(in srgb, #ffffff 10%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 28%, transparent);
+  box-shadow: none;
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(252, 241, 231, 0.28) 22%,
-    rgba(255, 233, 207, 0.22) 44%,
-    rgba(255, 246, 238, 0.16) 66%,
-    rgba(245, 235, 224, 0.12) 82%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 280% 280%;
-  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.55;
+  display: none;
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -476,52 +457,25 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigg
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #ffffff 46%, transparent),
-      color-mix(in srgb, #fcf1e7 22%, transparent)
-    );
+  background: transparent;
 }
 
-/* Dark chapters (finale) — frosted charcoal glass + light type */
+/* Dark chapters — transparent charcoal pill + light type */
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #141416 36%, transparent),
-      color-mix(in srgb, #101012 20%, transparent)
-    );
-  border: 1px solid color-mix(in srgb, #efedeb 24%, transparent);
-  box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 color-mix(in srgb, #efedeb 12%, transparent);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: color-mix(in srgb, #101012 18%, transparent);
+  border: 1px solid color-mix(in srgb, #efedeb 18%, transparent);
+  box-shadow: none;
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(
-    120deg,
-    rgba(20, 20, 22, 0) 0%,
-    rgba(28, 26, 24, 0.22) 24%,
-    rgba(42, 32, 24, 0.18) 48%,
-    rgba(24, 24, 24, 0.14) 72%,
-    rgba(16, 16, 18, 0) 100%
-  );
-  background-size: 280% 280%;
-  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.45;
+  display: none;
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -563,53 +517,25 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigge
 }
 
 html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #141416 48%, transparent),
-      color-mix(in srgb, #101010 28%, transparent)
-    );
+  background: transparent;
 }
 
-/* Fallback when tone attr missing — frosted light glass */
+/* Fallback when tone attr missing — transparent pill */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #ffffff 30%, transparent),
-      color-mix(in srgb, #fcf1e7 14%, transparent)
-    );
-  border: 1px solid color-mix(in srgb, #ffffff 48%, transparent);
-  box-shadow:
-    0 12px 32px rgba(35, 35, 36, 0.1),
-    inset 0 1px 0 color-mix(in srgb, #ffffff 38%, transparent);
-  backdrop-filter: blur(20px) saturate(1.35);
-  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  background: color-mix(in srgb, #ffffff 10%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 28%, transparent);
+  box-shadow: none;
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before,
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(252, 241, 231, 0.28) 22%,
-    rgba(255, 233, 207, 0.22) 44%,
-    rgba(255, 246, 238, 0.16) 66%,
-    rgba(245, 235, 224, 0.12) 82%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 280% 280%;
-  animation: cc-nav-gradient-shift 10s ease-in-out infinite;
-  opacity: 0.55;
+  display: none;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
@@ -667,17 +593,11 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
-  border-color: color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
-  color: var(--ed-ink, #232324);
+  display: none;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, #ffffff 46%, transparent),
-      color-mix(in srgb, #fcf1e7 22%, transparent)
-    );
+  background: transparent;
 }
 
 .cc-ed__section {
@@ -1367,15 +1287,37 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  gap: clamp(1rem, 3vw, 2.5rem);
+  gap: clamp(1.25rem, 3vw, 2.75rem);
   width: 100%;
   min-width: 0;
 }
 
+.cc-ed-hero__baseline-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+  max-width: min(44rem, 100%);
+}
+
 .cc-ed-hero__baseline .cc-ed__lede {
   margin: 0;
-  flex: 1 1 auto;
   min-width: 0;
+}
+
+.cc-ed-hero__baseline .cc-ed__connect-principle {
+  margin: 0;
+  max-width: 40rem;
+  font-size: clamp(1.05rem, 0.35vw + 0.95rem, 1.2rem);
+  font-weight: 450;
+  line-height: 1.55;
+  letter-spacing: -0.012em;
+  color: color-mix(in srgb, #efedeb 86%, transparent);
+}
+
+.cc-ed-hero__baseline .cc-ed__connect-principle strong {
+  font-weight: 650;
+  color: #efedeb;
 }
 
 .cc-ed-hero__actions-corner {
@@ -1402,12 +1344,13 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 .cc-ed-hero__content .cc-ed__lede {
   margin-inline: 0;
-  max-width: 38rem;
-  font-size: clamp(1.2rem, 0.55vw + 1.05rem, 1.45rem);
+  max-width: none;
+  font-size: clamp(1.35rem, 0.7vw + 1.1rem, 1.7rem);
   font-weight: 560;
-  line-height: 1.45;
-  letter-spacing: -0.015em;
-  color: color-mix(in srgb, #efedeb 90%, transparent);
+  line-height: 1.4;
+  letter-spacing: -0.018em;
+  color: color-mix(in srgb, #efedeb 94%, transparent);
+  text-wrap: pretty;
 }
 
 .cc-ed-hero__content .cc-ed__display,
@@ -1595,15 +1538,22 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 
 @media (max-width: 767px) {
   .cc-ed-hero__baseline {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: stretch;
-    gap: 1.25rem;
+    gap: 1.35rem;
+  }
+
+  .cc-ed-hero__baseline-copy {
+    max-width: none;
   }
 
   .cc-ed-hero__actions-corner {
+    grid-column: 1;
+    justify-self: stretch;
     justify-content: stretch;
     flex-wrap: wrap;
     width: 100%;
+    margin-inline-start: 0;
   }
 
   .cc-ed-hero__actions-corner .cc-ed__btn-primary,
@@ -2528,6 +2478,48 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   text-align: center;
 }
 
+/* —— Sticky mobile CTA (matches hero cream chip on dark) —— */
+.cc-ed-sticky-cta {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  padding: 0.65rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, #0c0c0e 72%, transparent) 42%,
+    color-mix(in srgb, #0c0c0e 92%, transparent) 100%
+  );
+}
+
+.cc-ed-sticky-cta__btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 22rem);
+  min-height: 2.85rem;
+  padding: 0.7rem 1.35rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #efedeb;
+  color: #0f0f10;
+  font-size: 0.9375rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.cc-ed-sticky-cta__btn:hover {
+  background: #ffffff;
+  color: #0f0f10;
+}
+
 /* —— Finale —— */
 .cc-ed-finale {
   padding: clamp(1.75rem, 4vh, 2.75rem) clamp(1.25rem, 4vw, 3.5rem)
@@ -3102,6 +3094,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 5;
+  min-height: clamp(14rem, 42vw, 22rem);
   max-height: min(52vh, 28rem);
   overflow: hidden;
   border-radius: clamp(12px, 1.5vw, 18px);
@@ -3112,6 +3105,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 @media (min-width: 900px) {
   .cc-ed-research-story__media {
     aspect-ratio: 3 / 4;
+    min-height: clamp(18rem, 36vh, 26rem);
     max-height: min(58vh, 32rem);
   }
 }
@@ -3119,6 +3113,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 .cc-ed-research-story__img {
   object-fit: cover;
   object-position: center;
+  opacity: 1;
 }
 
 .cc-ed-research-story__copy {

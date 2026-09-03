@@ -24,9 +24,8 @@ const BEATS: EditorialResearchBeat[] = [
       'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
     solutionBody:
       'CodeCard puts your projects up front. The good stuff shows before the glance is over.',
-    imageSrc:
-      'https://images.unsplash.com/photo-1766297247924-6638d54e7c89?auto=format&fit=crop&w=1600&q=75',
-    imageAlt: 'Two scientists working on computers in a laboratory',
+    imageSrc: '/auth-collage/team.jpg',
+    imageAlt: 'Two people collaborating at a shared workspace',
   },
   {
     id: 'prestige',

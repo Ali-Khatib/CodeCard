@@ -46,12 +46,12 @@ export function ProjectReorderToolbar({
   return (
     <div className="flex flex-col gap-2" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[12px] text-[var(--app-smoke)]" aria-live="polite">
+        <span className="text-[12px] font-medium text-[var(--app-ink)]" aria-live="polite">
           Position {index + 1} of {total}
         </span>
         <button
           type="button"
-          className="cc-btn-pill-ghost min-h-11 px-3 text-[12px]"
+          className="cc-project-reorder-btn min-h-11"
           disabled={pending || disabled || index === 0}
           aria-label={`Move project up from position ${index + 1}`}
           onClick={() => move('up')}
@@ -60,7 +60,7 @@ export function ProjectReorderToolbar({
         </button>
         <button
           type="button"
-          className="cc-btn-pill-ghost min-h-11 px-3 text-[12px]"
+          className="cc-project-reorder-btn min-h-11"
           disabled={pending || disabled || index === total - 1}
           aria-label={`Move project down from position ${index + 1}`}
           onClick={() => move('down')}

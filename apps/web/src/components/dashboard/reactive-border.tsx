@@ -10,6 +10,7 @@ type ReactiveBorderProps = {
   className?: string;
   glowRgb?: string;
   as?: 'div' | 'article' | 'section';
+  id?: string;
   style?: CSSProperties;
   /** Subtle lift on hover — disable on click-heavy cards to avoid flash */
   liftOnHover?: boolean;
@@ -37,6 +38,7 @@ export function ReactiveBorder({
   className,
   glowRgb = COLORS.glowRgb,
   as: Tag = 'div',
+  id,
   style,
   liftOnHover = true,
   pressOnTap = true,
@@ -70,6 +72,7 @@ export function ReactiveBorder({
   return (
     <MotionTag
       ref={ref as React.Ref<HTMLDivElement>}
+      id={id}
       className={cn('cc-reactive-border', className)}
       style={{ '--glow-rgb': glowRgb, ...style } as CSSProperties}
       onPointerMove={onMove}

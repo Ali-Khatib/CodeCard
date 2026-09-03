@@ -33,7 +33,7 @@
   z-index: 2;
   background: var(--sf-cream);
   color: var(--sf-ink);
-  padding: clamp(2.5rem, 6vh, 4.5rem) 0 0;
+  padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(2.75rem, 6vh, 4rem);
 }
 
 .cc-site-footer__statement-grid {
@@ -69,76 +69,41 @@
   color: color-mix(in srgb, var(--sf-iris) 58%, var(--sf-ink));
 }
 
-/* Cream tab continues the statement surface into the dark bar */
-.cc-site-footer__to-top {
+/* Cream tab removed — clean edge into the dark bar */
+.cc-site-footer__seam {
   position: relative;
-  z-index: 3;
-  display: flex;
-  justify-content: flex-end;
-  padding-inline: clamp(1.25rem, 5vw, 4rem);
-  margin-top: clamp(1.75rem, 4vh, 3rem);
-  margin-bottom: -3.75rem;
+  z-index: 1;
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
 }
 
-.cc-site-footer__top-tab {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 5.5rem;
-  padding: 0.95rem 1.15rem 1.15rem;
+.cc-site-footer__top-link {
+  appearance: none;
   border: 0;
-  border-radius: 0 0 1.15rem 1.15rem;
-  background: var(--sf-cream);
-  color: var(--sf-ink);
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  color: color-mix(in srgb, var(--sf-paper) 62%, transparent);
   font: inherit;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 0.8125rem;
+  font-weight: 560;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
-.cc-site-footer__top-tab svg {
-  color: var(--sf-iris);
-  transition: transform 0.25s ease, color 0.2s ease;
+.cc-site-footer__top-link:hover,
+.cc-site-footer__top-link:focus-visible {
+  color: var(--sf-paper);
 }
 
-.cc-site-footer__top-tab:hover {
-  color: color-mix(in srgb, var(--sf-iris) 40%, var(--sf-ink));
-}
-
-.cc-site-footer__top-tab:hover svg {
-  color: var(--sf-iris);
-  transform: translateY(-3px);
-}
-
-.cc-site-footer__top-tab:focus-visible {
+.cc-site-footer__top-link:focus-visible {
   outline: 2px solid var(--sf-iris);
   outline-offset: 3px;
-}
-
-/* Full-bleed dark seam edge to edge */
-.cc-site-footer__seam {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  margin-top: 0;
-  height: clamp(5.75rem, 12vw, 8.75rem);
-  background: var(--sf-dark);
-  color: var(--sf-dark);
-  overflow: hidden;
-}
-
-.cc-site-footer__wave {
-  display: block;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  color: var(--sf-cream);
-  pointer-events: none;
 }
 
 .cc-site-footer__bar {
@@ -368,7 +333,6 @@
     animation: none;
   }
 
-  .cc-site-footer__top-tab svg,
   .cc-site-footer__email-line,
   .cc-site-footer__link::after,
   .cc-site-footer__btn {

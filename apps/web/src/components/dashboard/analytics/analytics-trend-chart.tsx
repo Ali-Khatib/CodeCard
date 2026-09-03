@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { AnalyticsTrendSeries } from '@/lib/dashboard/analytics-trends';
-import { AppCard, SectionLabel } from '../ui/dashboard-ui';
+import { AppCard, SectionLabel, SectionSubtitle } from '../ui/dashboard-ui';
 
 function periodActivityTotal(trends: AnalyticsTrendSeries) {
   return (
@@ -38,9 +38,9 @@ export function AnalyticsTrendChart({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <SectionLabel>Daily activity</SectionLabel>
-          <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
+          <SectionSubtitle>
             UTC calendar days · profile views, project views, and link clicks
-          </p>
+          </SectionSubtitle>
         </div>
         <div className="flex gap-2" role="tablist" aria-label="Trend range">
           {([7, 30] as const).map((days) => {

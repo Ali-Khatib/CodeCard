@@ -52,7 +52,7 @@ export function DashboardProfileView({
 
       <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
         <AppCard className="space-y-6">
-          <h2 className="text-[20px] font-medium text-[var(--app-ink)]">Profile details</h2>
+          <h2 className="cc-app-section-label !text-[clamp(20px,2.4vw,24px)]">Profile details</h2>
 
           {!preview ? (
             <AvatarUpload

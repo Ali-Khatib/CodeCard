@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 /**
  * Mobile-only sticky conversion CTA for the long editorial landing.
- * Hidden while the hero primary CTA is still in view; respects iOS safe-area.
+ * Matches hero/finale primary (cream chip on dark) — not a cream tray strip.
  */
 export function EditorialStickyMobileCta() {
   const [visible, setVisible] = useState(false);
@@ -28,20 +28,15 @@ export function EditorialStickyMobileCta() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden"
+      className="cc-ed-sticky-cta md:hidden"
       data-testid="sticky-mobile-cta"
     >
-      <div
-        className="pointer-events-auto border-t border-[color-mix(in_srgb,var(--app-ink)_12%,transparent)] bg-[color-mix(in_srgb,var(--app-canvas)_92%,transparent)] px-4 pt-3 backdrop-blur-md"
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      <Link
+        href="/sign-up"
+        className="cc-ed-sticky-cta__btn cc-instant-press"
       >
-        <Link
-          href="/sign-up"
-          className="cc-ed__btn-primary cc-instant-press flex min-h-11 w-full items-center justify-center"
-        >
-          Create Your CodeCard
-        </Link>
-      </div>
+        Create Your CodeCard
+      </Link>
     </div>
   );
 }
