@@ -43,7 +43,7 @@ const METRICS = [
 
 export function AnalyticsProjectPanel({ projects }: { projects: ProjectAnalyticsDetail[] }) {
   return (
-    <section>
+    <section className="cc-analytics-project-panel">
       <SectionLabel>Per-project analytics</SectionLabel>
       <SectionSubtitle>
         Time on page, downloads, GitHub clicks, and how people found each project

@@ -3358,34 +3358,157 @@ html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
   background: transparent;
 }
 
+.cc-analytics-project-panel {
+  position: relative;
+}
+
+.cc-analytics-project-panel .cc-app-section-label {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+
+.cc-analytics-project-panel .cc-app-section-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(140px, 55%);
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--app-iris),
+    rgba(255, 183, 96, 0.95),
+    rgba(80, 200, 255, 0.75)
+  );
+}
+
+.cc-analytics-project-panel .cc-app-section-subtitle {
+  color: color-mix(in srgb, var(--app-ink) 72%, var(--app-muted));
+  max-width: 40rem;
+}
+
+html.dark .cc-analytics-project-panel .cc-app-section-subtitle {
+  color: color-mix(in srgb, var(--app-ink) 88%, var(--app-muted));
+}
+
+/* Static neon edge — no pointer-tracking JS (smooth on phones) */
 .cc-analytics-project-card {
   position: relative;
   isolation: isolate;
-  border-color: var(--app-border) !important;
-  background: var(--app-paper) !important;
-  box-shadow: none;
-  transition: border-color 0.28s ease;
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(233, 90, 11, 0.7) 28%,
+      rgba(255, 183, 96, 0.55) 52%,
+      rgba(94, 214, 200, 0.4) 74%,
+      rgba(255, 255, 255, 0.75) 100%
+    )
+      border-box !important;
+  box-shadow:
+    0 14px 36px -26px rgba(34, 34, 34, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  transition:
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+  will-change: auto;
 }
 
-.cc-analytics-project-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--app-iris);
-  border-radius: inherit 0 0 inherit;
-  z-index: 1;
-  opacity: 0.9;
+.cc-analytics-project-card--warm {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(233, 90, 11, 0.78) 24%,
+      rgba(255, 140, 66, 0.55) 48%,
+      rgba(255, 214, 160, 0.45) 72%,
+      rgba(255, 255, 255, 0.7) 100%
+    )
+      border-box !important;
 }
 
 .cc-analytics-project-card--cool {
-  background: var(--app-paper) !important;
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.88) 0%,
+      rgba(80, 200, 255, 0.55) 22%,
+      rgba(94, 214, 200, 0.5) 48%,
+      rgba(233, 90, 11, 0.45) 74%,
+      rgba(255, 255, 255, 0.7) 100%
+    )
+      border-box !important;
 }
 
-.cc-analytics-project-card:hover {
-  border-color: var(--app-border-strong) !important;
-  box-shadow: none;
-  transform: none;
+html.dark .cc-analytics-project-card,
+html.dark .cc-analytics-project-card--warm,
+html.dark .cc-analytics-project-card--cool {
+  box-shadow:
+    0 16px 40px -22px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+html.dark .cc-analytics-project-card--warm {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      145deg,
+      rgba(244, 239, 232, 0.22) 0%,
+      rgba(233, 90, 11, 0.85) 26%,
+      rgba(255, 183, 96, 0.5) 52%,
+      rgba(255, 120, 80, 0.35) 74%,
+      rgba(244, 239, 232, 0.12) 100%
+    )
+      border-box !important;
+}
+
+html.dark .cc-analytics-project-card--cool {
+  background:
+    linear-gradient(var(--app-paper), var(--app-paper)) padding-box,
+    linear-gradient(
+      145deg,
+      rgba(244, 239, 232, 0.18) 0%,
+      rgba(80, 200, 255, 0.55) 24%,
+      rgba(94, 214, 200, 0.4) 50%,
+      rgba(233, 90, 11, 0.55) 76%,
+      rgba(244, 239, 232, 0.1) 100%
+    )
+      border-box !important;
+}
+
+/* Drop the old flat orange rail — neon edge replaces it */
+.cc-analytics-project-card::before {
+  display: none;
+}
+
+/* Hover lift only on real pointers — never continuous motion */
+@media (hover: hover) and (pointer: fine) {
+  .cc-analytics-project-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 20px 44px -20px rgba(233, 90, 11, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  }
+
+  html.dark .cc-analytics-project-card:hover {
+    box-shadow:
+      0 22px 48px -18px rgba(233, 90, 11, 0.38),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-analytics-project-card,
+  .cc-analytics-project-card:hover {
+    transition: none;
+    transform: none !important;
+  }
 }
 
 .cc-analytics-project-card__head {
@@ -3395,6 +3518,21 @@ html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
   gap: 18px;
   padding: 22px 22px 18px;
   border-bottom: 1px solid var(--app-border);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-iris) 6%, transparent) 0%,
+      transparent 70%
+    );
+}
+
+html.dark .cc-analytics-project-card__head {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-iris) 10%, transparent) 0%,
+      transparent 72%
+    );
 }
 
 .cc-analytics-project-card__poster {
@@ -3404,9 +3542,9 @@ html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 12px;
-  border: 1px solid var(--app-border);
+  border: 1px solid var(--app-border-strong);
   background: var(--app-bone);
-  box-shadow: none;
+  box-shadow: 0 8px 20px -14px rgba(233, 90, 11, 0.45);
 }
 
 .cc-analytics-project-card__title {
@@ -3507,11 +3645,6 @@ html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--app-ink);
-}
-
-html.dark .cc-analytics-project-card,
-html.dark .cc-analytics-project-card--cool {
-  background: var(--app-paper) !important;
 }
 
 html.dark .cc-analytics-project-card__source-chip {
