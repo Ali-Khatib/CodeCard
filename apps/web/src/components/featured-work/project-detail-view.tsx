@@ -168,11 +168,11 @@ export function ProjectDetailView({
 
       <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative z-[1]">
         <header className="cc-container sticky top-0 z-20 max-w-full py-3 sm:py-4 backdrop-blur-md">
-          <div className="flex min-w-0 items-center justify-between gap-3 rounded-full border border-border/40 bg-midnight/75 px-3 py-2.5 shadow-rim sm:px-4">
+          <div className="flex min-w-0 items-center justify-between gap-3 rounded-full border border-[color-mix(in_srgb,var(--app-ink,#232324)_14%,transparent)] bg-[color-mix(in_srgb,var(--app-paper,#ffffff)_88%,transparent)] px-3 py-2.5 shadow-rim backdrop-blur-md sm:px-4">
             <Link
               href={backHref}
               scroll={false}
-              className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-text-secondary transition-colors hover:text-text-primary active:opacity-80"
+              className="cc-instant-press flex items-center gap-2 rounded-full px-2 py-1 text-[15px] text-[var(--app-muted,#5c5856)] transition-colors hover:text-[var(--app-ink,#232324)] active:opacity-80"
               aria-label={`Back to ${backLabel.toLowerCase()}`}
             >
               <HiOutlineArrowLeft className="text-lg" aria-hidden />
@@ -286,7 +286,7 @@ export function ProjectDetailView({
         </div>
 
         <article
-          className={`cc-container cc-content cc-on-cream-surface pb-24 ${showcaseExtras ? 'pt-10 md:pt-14' : 'pt-4 md:pt-6'}`}
+          className={`cc-container cc-content cc-project-detail-body pb-24 ${showcaseExtras ? 'pt-10 md:pt-14' : 'pt-4 md:pt-6'}`}
         >
           {(previousProject || nextProject) && (
             <nav className="mb-8 grid grid-cols-2 gap-3 md:hidden" aria-label="Project navigation">
@@ -324,7 +324,7 @@ export function ProjectDetailView({
 
           {project.technologies.length > 0 && (
             <section
-              className="rounded-card border border-border/40 bg-midnight/50 p-8 shadow-rim md:p-10"
+              className="rounded-card border border-[color-mix(in_srgb,var(--app-ink,#232324)_12%,transparent)] bg-[var(--app-paper,#ffffff)] p-8 shadow-rim md:p-10"
               onMouseEnter={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
               onFocus={() => trackProjectSection('Tech Stack', 'project_section_hover_or_click')}
             >
@@ -337,7 +337,7 @@ export function ProjectDetailView({
 
           {project.description && (
             <section
-              className="mt-12 border-t border-[rgba(35,35,36,0.14)] pt-12 md:mt-14 md:pt-14"
+              className="mt-12 border-t border-[color-mix(in_srgb,var(--app-ink,#232324)_14%,transparent)] pt-12 md:mt-14 md:pt-14"
               onMouseEnter={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
               onFocus={() => trackProjectSection('Overview', 'project_section_hover_or_click')}
             >
@@ -360,7 +360,7 @@ export function ProjectDetailView({
 
           {screenshots.length > 0 && (
             <section
-              className="mt-16 border-t border-[rgba(35,35,36,0.14)] pt-14 md:mt-20 md:pt-16"
+              className="mt-16 border-t border-[color-mix(in_srgb,var(--app-ink,#232324)_14%,transparent)] pt-14 md:mt-20 md:pt-16"
               onMouseEnter={() => trackProjectSection('Product flow', 'project_section_hover_or_click')}
               onFocus={() => trackProjectSection('Product flow', 'project_section_hover_or_click')}
             >

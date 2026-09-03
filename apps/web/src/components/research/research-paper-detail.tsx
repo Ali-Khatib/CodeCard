@@ -121,7 +121,7 @@ export function ResearchPaperDetail({
           </div>
         </header>
 
-        <section className="cc-container cc-on-cream-surface pb-12 pt-10 md:pb-16 md:pt-14">
+        <section className="cc-container cc-project-detail-body pb-12 pt-10 md:pb-16 md:pt-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <p className={TYPE.eyebrow}>Research paper</p>
@@ -158,7 +158,7 @@ export function ResearchPaperDetail({
           </div>
         </section>
 
-        <article className="cc-container cc-content cc-on-cream-surface pb-24">
+        <article className="cc-container cc-content cc-project-detail-body pb-24">
           <section className="rounded-card border border-border/40 bg-midnight/50 p-8 shadow-rim md:p-10">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <p className={TYPE.eyebrow}>Abstract</p>

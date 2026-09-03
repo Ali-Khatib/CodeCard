@@ -103,10 +103,10 @@ function StepsNav({
                 tabIndex={isCurrent ? 0 : -1}
                 className={cn(
                   'group flex min-h-11 items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-300',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e95a0b] focus-visible:ring-offset-2',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e95a0b] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-canvas,#fcf1e7)]',
                   isCurrent
-                    ? 'bg-[#232324] text-white'
-                    : 'border border-[rgba(35,35,36,0.18)] bg-transparent text-[#5c5856] hover:border-[rgba(35,35,36,0.35)] hover:text-[#232324]',
+                    ? 'bg-[var(--app-ink,#232324)] text-[var(--app-paper,#ffffff)]'
+                    : 'border border-[color-mix(in_srgb,var(--app-ink,#232324)_18%,transparent)] bg-transparent text-[var(--app-muted,#5c5856)] hover:border-[color-mix(in_srgb,var(--app-ink,#232324)_35%,transparent)] hover:text-[var(--app-ink,#232324)]',
                 )}
                 onClick={() => onChange(stepIdx)}
                 onFocus={() => onChange(stepIdx)}
@@ -133,10 +133,10 @@ function StepsNav({
                   className={cn(
                     'relative flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] transition-all duration-300',
                     isCurrent
-                      ? 'bg-white/15 text-white'
+                      ? 'bg-white/15 text-[var(--app-paper,#ffffff)]'
                       : isCompleted
-                        ? 'bg-[#232324] text-white'
-                        : 'bg-[rgba(35,35,36,0.1)] text-[#5c5856]',
+                        ? 'bg-[var(--app-ink,#232324)] text-[var(--app-paper,#ffffff)]'
+                        : 'bg-[color-mix(in_srgb,var(--app-ink,#232324)_10%,transparent)] text-[var(--app-muted,#5c5856)]',
                   )}
                 >
                   {isCurrent && progressEnabled ? (
@@ -210,7 +210,7 @@ function StepMedia({
   if (imgs.length === 1 || imgs[0] === imgs[1]) {
     return (
       <motion.div
-        className="relative aspect-[4/3] w-full min-w-0 overflow-hidden rounded-2xl bg-[color:var(--charcoal,#ece7df)]"
+        className="relative aspect-[4/3] w-full min-w-0 overflow-hidden rounded-2xl bg-[var(--app-bone,var(--charcoal,#ece7df))]"
         initial={reducedMotion ? false : { opacity: 0.6 }}
         animate={{ opacity: 1 }}
         transition={{ duration: reducedMotion ? 0.12 : 0.45 }}
@@ -232,7 +232,7 @@ function StepMedia({
         <motion.div
           key={`${src}-${index}`}
           className={cn(
-            'relative min-w-0 overflow-hidden rounded-2xl bg-[color:var(--charcoal,#ece7df)]',
+            'relative min-w-0 overflow-hidden rounded-2xl bg-[var(--app-bone,var(--charcoal,#ece7df))]',
             index === 0 ? 'aspect-[3/4]' : 'aspect-[3/4] mt-4 sm:mt-10',
           )}
           initial={reducedMotion ? false : { opacity: 0.55 }}
@@ -282,8 +282,7 @@ export function FeatureCarousel({
 
   return (
     <div className={cn('mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-7 overflow-x-clip sm:gap-9', className)}>
-      {/* Locked light paper palette — never inherit dark-mode cream washout. */}
-      <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[rgba(35,35,36,0.12)] bg-white shadow-[0_20px_50px_rgba(35,35,36,0.08)]">
+      <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-[color-mix(in_srgb,var(--app-ink,#232324)_12%,transparent)] bg-[var(--app-paper,#ffffff)] shadow-[0_20px_50px_color-mix(in_srgb,var(--app-ink,#232324)_10%,transparent)]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active.id}
@@ -296,29 +295,19 @@ export function FeatureCarousel({
             exit={{ opacity: 0 }}
             transition={{ duration: reducedMotion ? 0.12 : 0.35 }}
           >
-            {/* Locked dark ink — cream surfaces stay light paper. */}
-            <div className="cc-paper-lock relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-white px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
-              <p
-                className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em]"
-                style={{ color: '#3f3c3a' }}
-              >
+            <div className="relative z-[1] flex min-w-0 flex-col justify-center gap-4 bg-[var(--app-paper,#ffffff)] px-5 py-7 sm:px-8 sm:py-10 md:px-10 md:py-12">
+              <p className="font-eyebrow text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--app-muted,#5c5856)]">
                 {active.name}
               </p>
-              <h2
-                className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words"
-                style={{ color: '#232324' }}
-              >
+              <h2 className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-medium leading-[1.05] tracking-[-0.03em] break-words text-[var(--app-ink,#232324)]">
                 {active.title}
               </h2>
-              <p
-                className="max-w-[36ch] break-words text-[15px] leading-[1.65] sm:text-[16px]"
-                style={{ color: '#3f3c3a' }}
-              >
+              <p className="max-w-[36ch] break-words text-[15px] leading-[1.65] text-[var(--app-muted,#5c5856)] sm:text-[16px]">
                 {active.description}
               </p>
             </div>
 
-            <div className="min-w-0 border-t border-[rgba(35,35,36,0.1)] bg-[#f7f1ea] px-4 py-5 sm:px-7 sm:py-8 md:border-l md:border-t-0 md:px-8 md:py-10">
+            <div className="min-w-0 border-t border-[color-mix(in_srgb,var(--app-ink,#232324)_10%,transparent)] bg-[var(--app-bone,#f7f1ea)] px-4 py-5 sm:px-7 sm:py-8 md:border-l md:border-t-0 md:px-8 md:py-10">
               <StepMedia
                 images={active.images}
                 title={active.title}

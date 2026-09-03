@@ -8,7 +8,7 @@ interface ProjectWorkAtmosphereProps {
 }
 
 /**
- * Flat black canvas with subtle purple particle drift — Modal phosphor aesthetic.
+ * Flat canvas with subtle particle drift — follows light/dark page tokens.
  */
 export function ProjectWorkAtmosphere({ variant = 'section' }: ProjectWorkAtmosphereProps) {
   const reducedMotion = useReducedMotion();

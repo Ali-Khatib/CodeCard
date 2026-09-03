@@ -7,6 +7,8 @@
   --sf-dark: #0f0f10;
   --sf-paper: #efedeb;
   --sf-iris: var(--accent-orange, #e95a0b);
+  /* Shared so the cream tab sits on the wave edge, not under the seam */
+  --sf-seam-h: clamp(4.75rem, 16vw, 7.25rem);
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -33,7 +35,9 @@
   z-index: 2;
   background: var(--sf-cream);
   color: var(--sf-ink);
-  padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(2.75rem, 6vh, 4rem);
+  /* Bottom padding lives in the seam — keeps the cream tab flush without negative-margin thrash */
+  padding: clamp(2.5rem, 6vh, 4.5rem) 0 0;
+  overflow: visible;
 }
 
 .cc-site-footer__statement-grid {
@@ -43,6 +47,8 @@
   max-width: 78rem;
   margin: 0 auto;
   padding-inline: clamp(1.25rem, 5vw, 4rem);
+  /* Room above the wave so oversized type doesn’t collide with the seam */
+  padding-bottom: clamp(2.25rem, 5vh, 3.5rem);
 }
 
 .cc-site-footer__eyebrow {
@@ -69,41 +75,85 @@
   color: color-mix(in srgb, var(--sf-iris) 58%, var(--sf-ink));
 }
 
-/* Cream tab removed — clean edge into the dark bar */
+/* Cream tab — sits on the cream→wave edge (not the bottom of the dark seam) */
+.cc-site-footer__to-top {
+  position: absolute;
+  z-index: 4;
+  right: clamp(1.25rem, 5vw, 4rem);
+  bottom: var(--sf-seam-h);
+  transform: translateY(48%);
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.cc-site-footer__top-tab {
+  pointer-events: auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 5.25rem;
+  padding: 0.85rem 1.05rem 1.05rem;
+  border: 0;
+  border-radius: 0 0 1.05rem 1.05rem;
+  background: var(--sf-cream);
+  color: var(--sf-ink);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  /* Isolate paint so the hanging tab doesn’t tear against the dark bar on mobile */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: color 0.2s ease;
+}
+
+.cc-site-footer__top-tab svg {
+  color: var(--sf-iris);
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.cc-site-footer__top-tab:hover {
+  color: color-mix(in srgb, var(--sf-iris) 40%, var(--sf-ink));
+}
+
+.cc-site-footer__top-tab:hover svg {
+  color: var(--sf-iris);
+  transform: translateY(-3px);
+}
+
+.cc-site-footer__top-tab:focus-visible {
+  outline: 2px solid var(--sf-iris);
+  outline-offset: 3px;
+}
+
+/* Full-bleed dark seam — cream SVG wave sits on top */
 .cc-site-footer__seam {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 0;
+  height: var(--sf-seam-h);
   margin: 0;
-  border: 0;
-  background: transparent;
+  background: var(--sf-dark);
+  color: var(--sf-cream);
+  overflow: hidden;
+  /* Avoid subpixel gaps between cream statement and seam on some phones */
+  margin-top: -1px;
 }
 
-.cc-site-footer__top-link {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  color: color-mix(in srgb, var(--sf-paper) 62%, transparent);
-  font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 560;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.cc-site-footer__top-link:hover,
-.cc-site-footer__top-link:focus-visible {
-  color: var(--sf-paper);
-}
-
-.cc-site-footer__top-link:focus-visible {
-  outline: 2px solid var(--sf-iris);
-  outline-offset: 3px;
+.cc-site-footer__wave {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--sf-cream);
+  pointer-events: none;
+  /* Prefer crisp edges when the SVG is stretched full-bleed */
+  shape-rendering: geometricPrecision;
 }
 
 .cc-site-footer__bar {
@@ -317,6 +367,22 @@
 }
 
 @media (max-width: 720px) {
+  .cc-site-footer {
+    --sf-seam-h: clamp(5.25rem, 22vw, 6.5rem);
+  }
+
+  .cc-site-footer__to-top {
+    right: clamp(1rem, 4vw, 1.5rem);
+    transform: translateY(42%);
+  }
+
+  .cc-site-footer__top-tab {
+    min-width: 4.85rem;
+    padding: 0.75rem 0.9rem 0.95rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+  }
+
   .cc-site-footer__ghost {
     opacity: 0.55;
     font-size: clamp(3.5rem, 22vw, 6rem);
@@ -333,6 +399,7 @@
     animation: none;
   }
 
+  .cc-site-footer__top-tab svg,
   .cc-site-footer__email-line,
   .cc-site-footer__link::after,
   .cc-site-footer__btn {

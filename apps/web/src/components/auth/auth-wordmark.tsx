@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
+import '@/styles/codecard-mark.css';
 
+/** Auth brand mark — overlapping CC (same as landing), links home. */
 export function AuthWordmark({ delay = 0 }: { delay?: number }) {
   const reduced = useReducedMotion();
 
@@ -14,11 +16,16 @@ export function AuthWordmark({ delay = 0 }: { delay?: number }) {
     >
       <Link
         href="/"
-        className="inline-block text-[21px] font-semibold tracking-[-0.04em] text-[#17171a] outline-none transition-opacity hover:opacity-75 focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-rgb),0.45)] focus-visible:ring-offset-2"
+        className="cc-ed-mark-logo cc-auth-mark cc-instant-press"
         aria-label="CodeCard home"
         data-testid="auth-wordmark"
       >
-        CodeCard
+        <span className="cc-ed-mark-logo__inner" aria-hidden>
+          <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--first">C</span>
+          <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--left">ode</span>
+          <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--second">C</span>
+          <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--right">ard</span>
+        </span>
       </Link>
     </motion.div>
   );

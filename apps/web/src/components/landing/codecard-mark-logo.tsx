@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
+import '@/styles/codecard-mark.css';
 
 function scrollToTop(durationMs = 1400) {
   if (typeof window === 'undefined') return;

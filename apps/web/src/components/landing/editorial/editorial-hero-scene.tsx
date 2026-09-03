@@ -220,9 +220,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       runway.style.minHeight = `${runwayTotalVh(mobile)}vh`;
       statement.style.minHeight = `${statementTotalVh(mobile)}vh`;
 
-      const syncLogoForExpand = (expandProgress: number) => {
-        document.documentElement.dataset.logoTone =
-          expandProgress < EXPAND_CLIP_END * 0.92 ? 'dark' : 'light';
+      const syncLogoForExpand = (_expandProgress: number) => {
+        /* Sticky dark field sits under the transparent nav for nearly the whole
+         * expand — cream letterbox is only a thin pad. Keep the CC light. */
+        document.documentElement.dataset.logoTone = 'light';
       };
 
       const beatCount = Math.max(beatEls.length, 1);
@@ -502,7 +503,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       };
 
       document.body.style.overflow = 'hidden';
-      document.documentElement.dataset.logoTone = 'dark';
+      document.documentElement.dataset.logoTone = 'light';
       buildScrollCinema({ holdForIntro: true });
 
       if (heroCopy) {

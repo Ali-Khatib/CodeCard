@@ -78,15 +78,15 @@ export function ProjectCaseStudyTabs({
       aria-label="Project showcase"
     >
       <div className="mb-6 px-1 md:mb-8">
-        <p className="font-eyebrow text-[10px] font-semibold uppercase tracking-[0.18em] text-[#232324] md:text-[11px]">
+        <p className="font-eyebrow text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--app-ink,#232324)] md:text-[11px]">
           Extra showcase
         </p>
         {project.tagline ? (
-          <p className="mt-2 max-w-2xl font-display text-[clamp(1.35rem,2.8vw,1.75rem)] font-medium leading-snug tracking-[-0.02em] text-[#232324]">
+          <p className="mt-2 max-w-2xl font-display text-[clamp(1.35rem,2.8vw,1.75rem)] font-medium leading-snug tracking-[-0.02em] text-[var(--app-ink,#232324)]">
             {project.tagline}
           </p>
         ) : (
-          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[#3f3c3a] md:text-[15px]">
+          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[var(--app-muted,#5c5856)] md:text-[15px]">
             Optional story beats — tap through each section of the work.
           </p>
         )}

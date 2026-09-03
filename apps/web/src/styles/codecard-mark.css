@@ -1,0 +1,120 @@
+/**
+ * Shared overlapping CC mark — used by landing (fixed) and auth (inline).
+ * Landing tone/position overrides live in editorial-landing.css.
+ */
+
+.cc-ed-mark-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.1rem;
+  border: 0;
+  background: transparent;
+  color: #17171a;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 0.45s ease,
+    filter 0.35s ease,
+    text-shadow 0.45s ease;
+}
+
+.cc-ed-mark-logo:focus-visible {
+  outline: 2px solid var(--accent-orange, #e95a0b);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.cc-ed-mark-logo__inner {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.9rem, 2.6vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  transition: gap 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__c {
+  display: inline-block;
+  flex-shrink: 0;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo__c--second {
+  margin-left: -0.24em;
+}
+
+.cc-ed-mark-logo__fill {
+  display: inline-block;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.68em;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  vertical-align: baseline;
+  transition:
+    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease,
+    margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-mark-logo:hover,
+.cc-ed-mark-logo:focus-visible {
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent-orange, #e95a0b) 55%, transparent));
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__inner,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__inner {
+  gap: 0.02em;
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--first,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--first {
+  transform: translateX(-2px);
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--second,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--second {
+  margin-left: 0.02em;
+  transform: translateX(2px);
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--left,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--left {
+  max-width: 2.1em;
+  opacity: 1;
+  margin-right: 0.04em;
+}
+
+.cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--right,
+.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--right {
+  max-width: 2em;
+  opacity: 1;
+  margin-left: 0.04em;
+}
+
+/* Auth / inline — not fixed to the viewport corner */
+.cc-auth-mark.cc-ed-mark-logo {
+  position: relative;
+  left: auto;
+  top: auto;
+  z-index: auto;
+  color: #17171a;
+  text-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-ed-mark-logo__inner,
+  .cc-ed-mark-logo__c,
+  .cc-ed-mark-logo__fill {
+    transition: none;
+  }
+}

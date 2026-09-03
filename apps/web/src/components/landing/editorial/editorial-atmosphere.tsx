@@ -22,7 +22,48 @@ function logoToneFor(chapter: string, navCompact: boolean): 'light' | 'dark' {
   return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
 }
 
+/** Returns a tone only when the fixed CC sits over the footer; otherwise null. */
+function logoToneFromFooterOnly(): 'light' | 'dark' | null {
+  const logoY = 56;
+  const covers = (el: Element | null) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return r.top <= logoY && r.bottom >= logoY;
+  };
+
+  const bar = document.querySelector('.cc-site-footer__bar');
+  if (covers(bar)) return 'light';
+
+  const seam = document.querySelector('.cc-site-footer__seam');
+  if (covers(seam)) {
+    const r = seam!.getBoundingClientRect();
+    // Upper band is the cream wave; lower band is the dark field.
+    return logoY < r.top + r.height * 0.42 ? 'dark' : 'light';
+  }
+
+  if (
+    covers(document.querySelector('.cc-site-footer__statement-grid')) ||
+    covers(document.querySelector('.cc-site-footer__from-finale'))
+  ) {
+    return 'dark';
+  }
+
+  const statement = document.querySelector('.cc-site-footer__statement');
+  if (statement && seam) {
+    const sr = seam.getBoundingClientRect();
+    const st = statement.getBoundingClientRect();
+    if (st.top <= logoY && logoY < sr.top) return 'dark';
+  }
+
+  return null;
+}
+
 function syncLogoTone(chapter: string) {
+  const footerTone = logoToneFromFooterOnly();
+  if (footerTone) {
+    document.documentElement.dataset.logoTone = footerTone;
+    return;
+  }
   const compact = document.documentElement.dataset.navCompact === 'true';
   document.documentElement.dataset.logoTone = logoToneFor(chapter, compact);
 }
@@ -85,6 +126,40 @@ export function EditorialAtmosphere() {
       delete document.documentElement.dataset.logoTone;
     };
 
+    const footerRoots = [
+      document.querySelector<HTMLElement>('.cc-site-footer__statement'),
+      document.querySelector<HTMLElement>('.cc-site-footer__bar'),
+    ].filter((el): el is HTMLElement => Boolean(el));
+
+    // Only override while the logo sits on the footer — don’t fight hero cinema tones.
+    let overFooter = false;
+    const resyncLogoFromScroll = () => {
+      const footerTone = logoToneFromFooterOnly();
+      if (footerTone) {
+        overFooter = true;
+        document.documentElement.dataset.logoTone = footerTone;
+        // Match nav type to the same surface (cream → ink, dark bar → cream).
+        document.documentElement.dataset.navTone =
+          footerTone === 'dark' ? 'light' : 'dark';
+        return;
+      }
+      if (overFooter) {
+        overFooter = false;
+        const chapter = activeRef.current || 'hero';
+        document.documentElement.dataset.navTone = navToneFor(chapter);
+        syncLogoTone(chapter);
+      }
+    };
+
+    const footerObserver = new IntersectionObserver(resyncLogoFromScroll, {
+      root: null,
+      rootMargin: '0px 0px -70% 0px',
+      threshold: [0, 0.05, 0.25, 0.5, 1],
+    });
+    footerRoots.forEach((el) => footerObserver.observe(el));
+    window.addEventListener('scroll', resyncLogoFromScroll, { passive: true });
+    resyncLogoFromScroll();
+
     const compactSections = COMPACT_NAV_CHAPTERS.map((id) =>
       sections.find((section) => section.dataset.chapterSection === id),
     ).filter((section): section is HTMLElement => Boolean(section));
@@ -133,6 +208,8 @@ export function EditorialAtmosphere() {
       return () => {
         chapterObserver.disconnect();
         compactObserver.disconnect();
+        footerObserver.disconnect();
+        window.removeEventListener('scroll', resyncLogoFromScroll);
         cleanupHtml();
       };
     }
@@ -174,6 +251,8 @@ export function EditorialAtmosphere() {
     return () => {
       chapterTriggers.forEach((t) => t.kill());
       compactTriggers.forEach((t) => t.kill());
+      footerObserver.disconnect();
+      window.removeEventListener('scroll', resyncLogoFromScroll);
       cleanupHtml();
     };
   }, [canEnhanceMotion]);

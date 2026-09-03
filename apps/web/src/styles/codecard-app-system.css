@@ -6378,10 +6378,12 @@ html.dark .cc-public-atmosphere__grain {
   word-break: break-word;
 }
 
-/* Project / research detail — no horizontal scroll, theme-safe type */
+/* Project / research detail — full-bleed theme canvas, no black gutter strip */
 .cc-project-detail-shell {
   max-width: 100%;
   overflow-x: clip;
+  background: var(--app-canvas, var(--canvas, #fcf1e7));
+  color: var(--app-ink, var(--ink, #232324));
 }
 
 .cc-project-detail-shell img,

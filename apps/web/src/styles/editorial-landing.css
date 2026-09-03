@@ -104,117 +104,24 @@
   box-shadow: none;
 }
 
-.cc-ed-mark-logo {
+/* Landing fixed mark — base mark styles live in codecard-mark.css */
+.cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
   position: fixed;
   left: clamp(0.85rem, 2.8vw, 1.75rem);
   top: calc(0.55rem + env(safe-area-inset-top, 0px));
   z-index: 101;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.35rem 0.1rem;
-  border: 0;
-  background: transparent;
-  color: var(--ed-ink, #232324);
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
-  cursor: pointer;
   pointer-events: auto;
-  transition:
-    color 0.45s ease,
-    filter 0.35s ease,
-    text-shadow 0.45s ease;
-}
-
-.cc-ed-mark-logo:focus-visible {
-  outline: 2px solid var(--ed-accent, #e95a0b);
-  outline-offset: 4px;
-  border-radius: 6px;
-}
-
-.cc-ed-mark-logo__inner {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0;
-  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.9rem, 2.6vw, 2.5rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  transition: gap 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cc-ed-mark-logo__c {
-  display: inline-block;
-  flex-shrink: 0;
-  transition:
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Overlapping CC at rest — both letters stay visible */
-.cc-ed-mark-logo__c--second {
-  margin-left: -0.24em;
-}
-
-.cc-ed-mark-logo__fill {
-  display: inline-block;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  /* Relative to the mark so the hover reveal scales with it. */
-  font-size: 0.68em;
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  vertical-align: baseline;
-  transition:
-    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.35s ease,
-    margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cc-ed-mark-logo:hover,
-.cc-ed-mark-logo:focus-visible {
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ed-accent, #e95a0b) 55%, transparent));
-}
-
-.cc-ed-mark-logo:hover .cc-ed-mark-logo__inner,
-.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__inner {
-  gap: 0.02em;
-}
-
-.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--first,
-.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--first {
-  transform: translateX(-2px);
-}
-
-.cc-ed-mark-logo:hover .cc-ed-mark-logo__c--second,
-.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__c--second {
-  margin-left: 0.02em;
-  transform: translateX(2px);
-}
-
-.cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--left,
-.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--left {
-  max-width: 2.1em;
-  opacity: 1;
-  margin-right: 0.04em;
-}
-
-.cc-ed-mark-logo:hover .cc-ed-mark-logo__fill--right,
-.cc-ed-mark-logo:focus-visible .cc-ed-mark-logo__fill--right {
-  max-width: 2em;
-  opacity: 1;
-  margin-left: 0.04em;
-}
-
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
+  /* Default cream — hero cinema is dark under the mark; tone attrs refine */
   color: #efedeb;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
 }
 
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
+  color: #efedeb;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
+}
+
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: var(--ed-ink, #232324);
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
 }
@@ -261,11 +168,13 @@ html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo {
     transform 0.25s ease;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell .cc-nav-pill-item {
+html[data-nav-tone='dark'] .cc-marketing-shell .cc-nav-pill-item,
+html[data-nav-tone='dark'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item {
   color: #efedeb;
 }
 
 html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item,
+html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item,
 .cc-marketing-shell:not(:has(.cc-ed)) .cc-nav-pill-item {
   color: var(--ed-ink, #232324);
 }
@@ -414,6 +323,8 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
@@ -520,17 +431,17 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
   background: transparent;
 }
 
-/* Fallback when tone attr missing — transparent pill */
+/* Fallback when tone attr missing — cream type over dark cinema (hero first paint) */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: color-mix(in srgb, #ffffff 10%, transparent);
-  border: 1px solid color-mix(in srgb, #ffffff 28%, transparent);
+  background: color-mix(in srgb, #101012 18%, transparent);
+  border: 1px solid color-mix(in srgb, #efedeb 18%, transparent);
   box-shadow: none;
-  backdrop-filter: blur(12px) saturate(1.15);
-  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before,
@@ -540,20 +451,22 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
-  color: var(--ed-ink, #232324);
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
+.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item {
+  color: #efedeb;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
-  color: var(--ed-ink, #232324);
+  color: #efedeb;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
   background: transparent;
-  color: var(--ed-ink, #232324);
+  color: #efedeb;
   border: 0;
   box-shadow: none;
 }
@@ -562,6 +475,26 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, var(--ed-accent, #e95a0b) 12%, transparent);
   border: 0;
+}
+
+/* Cream mid-chapters — must beat the cinema cream defaults above */
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'] {
+  color: var(--ed-ink, #232324);
+}
+
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--ed-ink, #232324);
 }
 
 /* Override marketing scrolled gradient on editorial — tone rules own the glass surface */
@@ -581,6 +514,55 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
       color-mix(in srgb, #141416 42%, transparent),
       color-mix(in srgb, #101012 24%, transparent)
     );
+}
+
+/* Keep nav type locked to the CC mark — same surface, same ink/cream */
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'],
+html[data-logo-tone='dark'] .cc-marketing-shell .cc-nav-pill-item,
+html[data-logo-tone='dark'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item {
+  color: var(--ed-ink, #232324);
+}
+
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--ed-ink, #232324);
+}
+
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+  background: color-mix(in srgb, #ffffff 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
+}
+
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'],
+html[data-logo-tone='light'] .cc-marketing-shell .cc-nav-pill-item,
+html[data-logo-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item {
+  color: #efedeb;
+}
+
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: #efedeb;
 }
 
 /* Compact Start Free / Live Demo pills in the marketing nav only */
@@ -2476,48 +2458,6 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   margin-top: clamp(1.25rem, 3vh, 2rem);
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
   text-align: center;
-}
-
-/* —— Sticky mobile CTA (matches hero cream chip on dark) —— */
-.cc-ed-sticky-cta {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 40;
-  display: flex;
-  justify-content: center;
-  padding: 0.65rem 1rem max(0.75rem, env(safe-area-inset-bottom));
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, #0c0c0e 72%, transparent) 42%,
-    color-mix(in srgb, #0c0c0e 92%, transparent) 100%
-  );
-}
-
-.cc-ed-sticky-cta__btn {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: min(100%, 22rem);
-  min-height: 2.85rem;
-  padding: 0.7rem 1.35rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: #efedeb;
-  color: #0f0f10;
-  font-size: 0.9375rem;
-  font-weight: 560;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-}
-
-.cc-ed-sticky-cta__btn:hover {
-  background: #ffffff;
-  color: #0f0f10;
 }
 
 /* —— Finale —— */
