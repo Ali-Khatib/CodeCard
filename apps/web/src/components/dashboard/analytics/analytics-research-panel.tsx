@@ -13,7 +13,7 @@ function formatTime(sec: number) {
 
 export function AnalyticsResearchPanel({ summary }: { summary: ResearchAnalyticsSummary }) {
   return (
-    <section>
+    <section className="cc-analytics-research-panel">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <SectionLabel>Research analytics</SectionLabel>
@@ -23,95 +23,96 @@ export function AnalyticsResearchPanel({ summary }: { summary: ResearchAnalytics
         </div>
       </div>
 
-      <AppCard className="mt-5 !p-5 md:!p-6">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <AppCard className="cc-analytics-research-card mt-5 !p-5 md:!p-6">
+        <div className="cc-analytics-research-summary">
           <div className="cc-analytics-stat-block">
             <MetricLabel>Research views</MetricLabel>
-            <p className="mt-1 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               <CountUp value={summary.views} />
             </p>
           </div>
           <div className="cc-analytics-stat-block">
             <MetricLabel>PDF downloads</MetricLabel>
-            <p className="mt-1 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               <CountUp value={summary.pdfDownloads} />
             </p>
           </div>
           <div className="cc-analytics-stat-block">
             <MetricLabel>Citation copies</MetricLabel>
-            <p className="mt-1 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               <CountUp value={summary.citationCopies} />
             </p>
           </div>
           <div className="cc-analytics-stat-block">
             <MetricLabel>Avg read time</MetricLabel>
-            <p className="mt-1 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               {formatTime(summary.avgReadTimeSec)}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-5 border-t border-[var(--app-border)] pt-5 md:grid-cols-3">
+        <div className="cc-analytics-research-highlights">
           <div>
             <MetricLabel>Most viewed paper</MetricLabel>
-            <p className="mt-2 text-[15px] font-medium leading-snug text-[var(--app-ink)]">
-              {summary.mostViewedTitle}
-            </p>
+            <p className="cc-analytics-research-highlights__text">{summary.mostViewedTitle}</p>
           </div>
           <div>
             <MetricLabel>Time spent per project</MetricLabel>
-            <p className="mt-2 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               {formatTime(summary.projectTimeSpentSec)}
             </p>
           </div>
           <div>
             <MetricLabel>Most engaged section</MetricLabel>
-            <p className="mt-2 text-[clamp(22px,2.4vw,28px)] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+            <p className="cc-analytics-research-summary__value">
               {summary.mostEngagedProjectSection}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 border-t border-[var(--app-border)] pt-5">
-          <div>
-            <MetricLabel>Per research paper</MetricLabel>
-            <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-[var(--app-muted)]">
-              Reads, PDF intent, citation intent, and strongest engagement signal for each paper.
+        <div className="cc-analytics-paper-table-wrap">
+          <div className="cc-analytics-paper-table__intro">
+            <p className="cc-analytics-paper-table__heading">Per research paper</p>
+            <p className="cc-analytics-paper-table__sub">
+              One row per paper — scan metrics left to right.
             </p>
           </div>
 
-          <div className="mt-4 grid gap-3">
+          <div className="cc-analytics-paper-table" role="table" aria-label="Per research paper analytics">
+            <div className="cc-analytics-paper-table__head" role="row">
+              <span role="columnheader">Paper</span>
+              <span role="columnheader">Views</span>
+              <span role="columnheader">PDFs</span>
+              <span role="columnheader">Citations</span>
+              <span role="columnheader">Avg read</span>
+              <span role="columnheader">Signal</span>
+            </div>
+
             {summary.perPaper.map((paper) => (
-              <article
-                key={paper.id}
-                className="grid gap-3 border-b border-[var(--app-border)] py-4 last:border-b-0 md:grid-cols-[minmax(0,1.35fr)_repeat(4,minmax(92px,0.55fr))]"
-              >
-                <div className="min-w-0">
-                  <p className="cc-fit-title cc-work-title cc-work-title--compact !text-[clamp(1.25rem,2vw,1.7rem)]">
-                    {paper.title}
-                  </p>
-                  <p className="mt-1 text-[13px] text-[var(--app-muted)]">
-                    Top signal: {paper.topSignal}
-                  </p>
+              <div key={paper.id} className="cc-analytics-paper-table__row" role="row">
+                <div className="cc-analytics-paper-table__paper" role="cell">
+                  <p className="cc-analytics-paper-table__title">{paper.title}</p>
                 </div>
-                <MiniPaperMetric label="Views" value={paper.views.toLocaleString()} />
-                <MiniPaperMetric label="PDFs" value={paper.pdfDownloads.toLocaleString()} />
-                <MiniPaperMetric label="Citations" value={paper.citationCopies.toLocaleString()} />
-                <MiniPaperMetric label="Avg read" value={formatTime(paper.avgReadTimeSec)} />
-              </article>
+                <p className="cc-analytics-paper-table__metric" role="cell" data-label="Views">
+                  {paper.views.toLocaleString()}
+                </p>
+                <p className="cc-analytics-paper-table__metric" role="cell" data-label="PDFs">
+                  {paper.pdfDownloads.toLocaleString()}
+                </p>
+                <p className="cc-analytics-paper-table__metric" role="cell" data-label="Citations">
+                  {paper.citationCopies.toLocaleString()}
+                </p>
+                <p className="cc-analytics-paper-table__metric" role="cell" data-label="Avg read">
+                  {formatTime(paper.avgReadTimeSec)}
+                </p>
+                <div className="cc-analytics-paper-table__signal" role="cell" data-label="Signal">
+                  <span className="cc-analytics-paper-table__signal-chip">{paper.topSignal}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </AppCard>
     </section>
-  );
-}
-
-function MiniPaperMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 px-1 py-1">
-      <p className="text-[12px] font-semibold tracking-[-0.01em] text-[var(--app-muted)]">{label}</p>
-      <p className="mt-1 text-[18px] font-semibold tracking-[-0.02em] text-[var(--app-ink)]">{value}</p>
-    </div>
   );
 }
