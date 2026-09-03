@@ -34,25 +34,25 @@ describe('WS07-T009 remove wallet NFC stubs', () => {
   });
 
   it('profile editor keeps live CodeCard preview and has no fake QR/wallet stubs', () => {
-    const profile = read('src/components/dashboard/dashboard-profile-view.tsx');
-    const preview = read('src/components/dashboard/profile-visitor-preview.tsx');
-    expect(profile).toContain('ProfileVisitorPreview');
-    expect(profile).not.toContain('Open Home share tools');
-    expect(profile).not.toContain('Share tools');
+    const identity = read('src/components/dashboard/home-identity-section.tsx');
+    const preview = read('src/components/dashboard/home-codecard-preview.tsx');
+    expect(identity).toContain('HomeCodeCardPreview');
+    expect(identity).not.toContain('Open Home share tools');
+    expect(identity).not.toContain('Share tools');
     expect(preview).toContain('View CodeCard');
     expect(preview).toContain('QR Code');
     expect(preview).toContain('generateProfileQrPreview');
     expect(preview).not.toContain('Download QR');
     expect(preview).not.toMatch(/grid-cols-5 grid-rows-5/);
-    expect(profile).not.toMatch(/Add to wallet/i);
-    expect(profile).not.toMatch(/NDEFReader/);
+    expect(identity).not.toMatch(/Add to wallet/i);
+    expect(identity).not.toMatch(/NDEFReader/);
   });
 
   it('repository has no NDEFReader or enabled wallet/NFC handlers in web source', () => {
     const files = [
       'src/components/dashboard/profile-share-hero.tsx',
       'src/components/dashboard/dashboard-settings-view.tsx',
-      'src/components/dashboard/dashboard-profile-view.tsx',
+      'src/components/dashboard/home-identity-section.tsx',
       'src/lib/sharing/native-share.ts',
       'src/lib/sharing/qr.ts',
     ];

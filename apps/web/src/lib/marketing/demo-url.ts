@@ -46,7 +46,7 @@ export function parseDetailFrom(value: string | null | undefined): PublicDetailF
  * (e.g. `/dashboard/projects`).
  */
 export function publicDemoProfileProjectsHref(profileSlug: string): string {
-  if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/projects`;
+  if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/work#projects`;
   // Prefer the public profile projects section for visitor browsing.
   return `${publicDemoProfileBasePath(profileSlug)}#projects`;
 }
@@ -56,7 +56,7 @@ export function publicDemoProfileProjectsHref(profileSlug: string): string {
  * Demo persona returns to the workspace research list.
  */
 export function publicDemoProfileResearchSectionHref(profileSlug: string): string {
-  if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/research`;
+  if (profileSlug === 'demo') return `${LIVE_DEMO_WORKSPACE_HREF}/work#research`;
   return `${publicDemoProfileBasePath(profileSlug)}#research`;
 }
 
@@ -137,10 +137,17 @@ export function workspaceCreateResearchHref(basePath: string): string {
   return `${basePath}/research/new`;
 }
 
-/** Profile section CTA — stays inside the demo workspace; auth dashboard otherwise. */
+/** Profile section CTA — Home now hosts the editor. */
 export function workspaceProfileHref(basePath: string, hash?: string): string {
   const root = isDemoWorkspacePath(basePath) ? LIVE_DEMO_WORKSPACE_HREF : basePath;
-  return hash ? `${root}/profile#${hash}` : `${root}/profile`;
+  return hash ? `${root}#${hash}` : `${root}#profile`;
+}
+
+/** Combined Projects + Research destination. */
+export function workspaceWorkHref(basePath: string, hash?: 'projects' | 'research'): string {
+  const root = isDemoWorkspacePath(basePath) ? LIVE_DEMO_WORKSPACE_HREF : basePath;
+  const path = `${root}/work`;
+  return hash ? `${path}#${hash}` : path;
 }
 
 /** Project edit CTA; demo has no edit routes. */

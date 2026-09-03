@@ -107,6 +107,7 @@ export function DashIconBack() {
 
 export const DASH_NAV_ICONS = {
   home: DashIconHome,
+  work: DashIconProjects,
   projects: DashIconProjects,
   research: DashIconResearch,
   analytics: DashIconAnalytics,

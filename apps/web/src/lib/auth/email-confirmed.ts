@@ -7,13 +7,13 @@ export const EMAIL_CONFIRMED_SUBTITLE =
 export const NEW_ACCOUNT_SETUP_GUIDE = [
   {
     id: 'profile',
-    where: 'Profile',
-    href: '/dashboard/profile',
+    where: 'Home',
+    href: '/dashboard#profile',
     what: 'Add your photo, headline, bio, and links so your card looks finished.',
   },
   {
     id: 'projects',
-    where: 'Projects',
+    where: 'Your Work',
     href: '/dashboard/projects/new',
     what: 'Create your first project with demo, stack, and outcome up front.',
   },

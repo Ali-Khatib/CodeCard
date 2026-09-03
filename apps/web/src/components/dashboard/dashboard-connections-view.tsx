@@ -558,22 +558,69 @@ export function DashboardConnectionsView({
     useState<ConnectionsMeetingPointFilter>('all');
   const [sort, setSort] = useState<ConnectionsSortId>('newest');
   const listGlueTokenRef = useRef(0);
+  const followUpScrollTargetRef = useRef<string | null>(null);
 
   const openConnection = useCallback((id: string) => {
     // Cancel any in-flight list scroll-gluing so it can't fight this scroll.
     listGlueTokenRef.current += 1;
+    followUpScrollTargetRef.current = id;
     setSelectedId(id);
-    // Follow-up box only — bring the matching list card into view after expand.
-    window.setTimeout(() => {
-      const el = document.getElementById(`connection-${id}`);
-      if (!el) return;
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  useLayoutEffect(() => {
+    const targetId = followUpScrollTargetRef.current;
+    if (!targetId) return;
+    if (selectedId !== targetId) {
+      followUpScrollTargetRef.current = null;
+      return;
+    }
+
+    followUpScrollTargetRef.current = null;
+
+    const el = document.getElementById(`connection-${targetId}`);
+    if (!el) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const scroll = () => {
       el.scrollIntoView({
         behavior: reduceMotion ? 'instant' : 'smooth',
         block: 'center',
       });
-    }, 180);
-  }, []);
+    };
+
+    // Wait until the target card's top position stops moving due to expand/collapse
+    // layout transitions, then perform a single deterministic scroll.
+    let cancelled = false;
+    let lastTop = el.getBoundingClientRect().top;
+    let stableFrames = 0;
+    let frames = 0;
+
+    const tick = () => {
+      if (cancelled) return;
+      frames += 1;
+
+      const top = el.getBoundingClientRect().top;
+      if (Math.abs(top - lastTop) < 0.5) {
+        stableFrames += 1;
+      } else {
+        stableFrames = 0;
+      }
+      lastTop = top;
+
+      if (stableFrames >= 2 || frames >= 60) {
+        scroll();
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+
+    const rafId = requestAnimationFrame(tick);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+    };
+  }, [selectedId]);
 
   const toggleConnection = useCallback((id: string) => {
     const el = document.getElementById(`connection-${id}`);

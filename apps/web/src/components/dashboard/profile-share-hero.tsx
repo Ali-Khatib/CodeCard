@@ -417,7 +417,7 @@ export function ProfileShareHero({
           Your profile is still private, so{' '}
           <span className="font-medium">{displayUrl}</span> shows as page not found for everyone
           else. Publish it first:{' '}
-          <Link href="/dashboard/profile" className="font-medium underline underline-offset-2">
+          <Link href="/dashboard#profile" className="font-medium underline underline-offset-2">
             Profile → Publish profile
           </Link>
           .
@@ -427,7 +427,7 @@ export function ProfileShareHero({
       {!canShare ? (
         <p className="mt-4 text-[14px] leading-relaxed text-[var(--app-smoke)]" role="status">
           Add a valid profile slug before sharing.{' '}
-          <Link href="/dashboard/profile" className="underline underline-offset-2">
+          <Link href="/dashboard#profile" className="underline underline-offset-2">
             Edit profile
           </Link>
         </p>

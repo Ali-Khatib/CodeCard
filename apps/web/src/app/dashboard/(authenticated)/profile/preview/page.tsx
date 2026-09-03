@@ -94,7 +94,7 @@ export default async function OwnerProfilePreviewPage() {
               ? 'Showing your saved published profile.'
               : 'Only you can see this unpublished preview.'}
           </p>
-          <Link href="/dashboard/profile" className="text-sm font-medium text-[var(--app-ink)] underline">
+          <Link href="/dashboard#profile" className="text-sm font-medium text-[var(--app-ink)] underline">
             Back to profile editor
           </Link>
         </div>

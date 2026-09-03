@@ -84,6 +84,7 @@ export default async function DashboardHomePage() {
       bio={profile.bio}
       profileViews={stats?.profileViews}
       links={links}
+      profileLinks={profileLinks}
       profile={profile}
       stats={stats}
       statsError={statsError}

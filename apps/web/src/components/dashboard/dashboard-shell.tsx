@@ -23,9 +23,7 @@ import { CodeCardMarkLink } from '@/components/brand/codecard-mark-link';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
-  { segment: 'profile', label: 'Profile', short: 'Profile', icon: 'profile' as const },
-  { segment: 'projects', label: 'Projects', short: 'Projects', icon: 'projects' as const },
-  { segment: 'research', label: 'Research', short: 'Research', icon: 'research' as const },
+  { segment: 'work', label: 'Your Work', short: 'Work', icon: 'work' as const },
   { segment: 'connections', label: 'Connections', short: 'Connect', icon: 'connections' as const },
   { segment: 'circle', label: 'Circle', short: 'Circle', icon: 'circle' as const },
   { segment: 'analytics', label: 'Analytics', short: 'Analytics', icon: 'analytics' as const },
@@ -36,9 +34,10 @@ const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}
 
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
-  profile: 'Profile',
-  projects: 'Projects',
-  research: 'Research',
+  work: 'Your Work',
+  profile: 'Home',
+  projects: 'Your Work',
+  research: 'Your Work',
   circle: 'Circle',
   analytics: 'Analytics',
   connections: 'Connections',
@@ -227,6 +226,14 @@ export function DashboardShell({
   const isActive = (segment: string) => {
     const href = hrefFor(segment);
     if (!segment) return pathname === basePath;
+    if (segment === 'work') {
+      return (
+        pathname === href ||
+        pathname.startsWith(`${href}/`) ||
+        pathname.startsWith(`${basePath}/projects`) ||
+        pathname.startsWith(`${basePath}/research`)
+      );
+    }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
@@ -310,7 +317,7 @@ export function DashboardShell({
         </div>
 
         <Link
-          href={`${basePath}/profile`}
+          href={`${basePath}#profile`}
           className="cc-app-user-card cc-app-user-card--link mt-4 block"
           aria-label="Open profile editor: photo, bio, and links"
         >
@@ -407,7 +414,7 @@ export function DashboardShell({
                   {email}
                 </p>
                 <Link
-                  href={`${basePath}/profile`}
+                  href={`${basePath}#profile`}
                   className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
                   onClick={() => setUserMenuOpen(false)}
                 >

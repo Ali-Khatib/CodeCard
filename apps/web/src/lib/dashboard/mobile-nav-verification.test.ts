@@ -21,9 +21,10 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(cssNorm).toContain('.cc-app-root--embedded .cc-app-sidebar {\n    display: none;');
     expect(shell).toContain('aria-label="Mobile"');
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Profile'");
-    expect(shell).toContain("label: 'Projects'");
-    expect(shell).toContain("label: 'Research'");
+    expect(shell).toContain("label: 'Your Work'");
+    expect(shell).not.toContain("label: 'Profile'");
+    expect(shell).not.toContain("label: 'Projects'");
+    expect(shell).not.toContain("label: 'Research'");
     expect(shell).toContain("label: 'Analytics'");
     expect(shell).toContain("label: 'Settings'");
     expect(shell).toContain("label: 'Connections'");
@@ -44,7 +45,7 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(css).toContain('min-height: 44px');
     expect(css).toContain('white-space: nowrap');
     expect(css).toContain('min-width: 0');
-    expect(css).toContain('grid-template-columns: repeat(8, minmax(0, 1fr))');
+    expect(css).toContain('grid-template-columns: repeat(6, minmax(0, 1fr))');
     expect(css).toContain('flex: 1 1 0');
   });
 

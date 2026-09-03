@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { HiSquares2X2, HiBars3BottomLeft } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
@@ -14,7 +14,7 @@ import {
   workspaceResearchEditHref,
 } from '@/lib/marketing/demo-url';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
-import { AppButton, AppCard, PageHeader } from './ui/dashboard-ui';
+import { AppButton, AppCard, FilterBar, PageHeader } from './ui/dashboard-ui';
 
 const VIEW_MODES = [
   { id: 'list' as const, label: 'List', icon: HiBars3BottomLeft },
@@ -22,6 +22,18 @@ const VIEW_MODES = [
 ];
 
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
+
+const ALL_RESEARCH_FILTER = 'All';
+
+function getResearchFilterOptions(papers: ResearchPaper[]): string[] {
+  const tags = new Set<string>();
+  papers.forEach((paper) => {
+    paper.tags.forEach((tag) => {
+      if (tag.trim()) tags.add(tag.trim());
+    });
+  });
+  return [ALL_RESEARCH_FILTER, ...Array.from(tags)];
+}
 
 function paperPublicHref(
   paper: ResearchPaper,
@@ -40,21 +52,52 @@ export function DashboardResearchView({
   profileId,
   isProfilePublic = false,
   basePath = '/dashboard',
+  embedded = false,
+  viewMode: viewModeProp,
 }: {
   papers: ResearchPaper[];
   profileSlug?: string | null;
   profileId?: string;
   isProfilePublic?: boolean;
   basePath?: string;
+  embedded?: boolean;
+  viewMode?: ViewMode;
 }) {
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [internalViewMode, setInternalViewMode] = useState<ViewMode>('list');
+  const [filter, setFilter] = useState(ALL_RESEARCH_FILTER);
+  const viewMode = viewModeProp ?? internalViewMode;
+  const researchFilters = useMemo(() => getResearchFilterOptions(papers), [papers]);
+  const visiblePapers = useMemo(
+    () =>
+      filter === ALL_RESEARCH_FILTER
+        ? papers
+        : papers.filter((paper) => paper.tags.some((tag) => tag.trim() === filter)),
+    [papers, filter],
+  );
   const orderedPaperIds = papers.map((paper) => paper.id);
   const isDemoWorkspace = isDemoWorkspacePath(basePath);
   const createHref = workspaceCreateResearchHref(basePath);
   const createLabel = isDemoWorkspace ? 'Sign in to add research' : 'Add research';
 
   return (
-    <div className="cc-app-page cc-app-page--1040 space-y-8">
+    <div className={embedded ? 'space-y-8' : 'cc-app-page cc-app-page--1040 space-y-8'}>
+      {embedded ? (
+        <div className="cc-projects-toolbar">
+          <div className="flex flex-wrap items-center gap-3">
+            {researchFilters.length > 1 ? (
+              <FilterBar
+                options={researchFilters}
+                value={filter}
+                onChange={setFilter}
+                ariaLabel="Research filters"
+              />
+            ) : null}
+          </div>
+          <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+            {isDemoWorkspace ? 'Sign in to add' : 'Add research'}
+          </AppButton>
+        </div>
+      ) : (
       <PageHeader
         eyebrow="Research"
         title="Papers & publications"
@@ -67,7 +110,7 @@ export function DashboardResearchView({
                   <button
                     key={id}
                     type="button"
-                    onClick={() => setViewMode(id)}
+                    onClick={() => setInternalViewMode(id)}
                     className={`cc-projects-view-toggle__btn ${viewMode === id ? 'cc-projects-view-toggle__btn--active' : ''}`}
                     aria-pressed={viewMode === id}
                     aria-label={label}
@@ -84,13 +127,14 @@ export function DashboardResearchView({
           </div>
         }
       />
+      )}
 
-      {papers.length > 0 ? (
+      {visiblePapers.length > 0 ? (
         viewMode === 'grid' ? (
-          <ResearchBubbleGrid papers={papers} basePath={basePath} readOnly={isDemoWorkspace} />
+          <ResearchBubbleGrid papers={visiblePapers} basePath={basePath} readOnly={isDemoWorkspace} />
         ) : (
           <div className="flex flex-col gap-8">
-            {papers.map((paper, index) => {
+            {visiblePapers.map((paper, index) => {
               const editHref = workspaceResearchEditHref(basePath, paper.id);
               const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
               return (
@@ -147,7 +191,7 @@ export function DashboardResearchView({
         <AppCard className="!p-8 text-center">
           <p className="cc-app-mono">Research</p>
           <h2 className="cc-work-title cc-work-title--compact mt-3">
-            {EMPTY_STATE_COPY.research.title}
+            {papers.length > 0 ? 'No papers match this filter.' : EMPTY_STATE_COPY.research.title}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
             {EMPTY_STATE_COPY.research.description}

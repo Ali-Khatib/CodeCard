@@ -2119,7 +2119,7 @@ html.dark .cc-app-badge--blush {
     right: 0;
     z-index: 50;
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0;
     width: 100%;
     max-width: 100vw;
@@ -4617,9 +4617,107 @@ html.dark .cc-analytics-paper-table__signal-chip {
 
 .cc-profile-home__zone-title {
   margin-top: 6px;
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  color: var(--app-ink);
+}
+
+.cc-workspace-section__eyebrow {
+  font-family: var(--app-font);
+  font-size: clamp(12px, 1.2vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--app-iris);
+}
+
+.cc-workspace-section__title {
+  margin-top: 8px;
+  font-family: var(--app-display);
+  font-size: clamp(1.85rem, 4.2vw, 2.65rem);
+  font-weight: 560;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  color: var(--app-ink);
+}
+
+.cc-workspace-section__copy {
+  margin-top: 10px;
+  max-width: 36rem;
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.55;
+  color: var(--app-smoke);
+}
+
+.cc-home-identity__intro {
+  margin-bottom: 22px;
+}
+
+.cc-home-identity__layout {
+  display: grid;
+  gap: 22px;
+}
+
+@media (min-width: 1080px) {
+  .cc-home-identity__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+    align-items: start;
+  }
+
+  .cc-home-identity__preview {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+.cc-home-identity__editor {
+  min-width: 0;
+}
+
+.cc-home-codecard__stage {
+  margin-top: 16px;
+}
+
+.cc-home-codecard .cc-public-hero__portrait-frame {
+  max-width: 280px;
+  border-radius: 22px;
+}
+
+.cc-home-codecard__panel {
+  margin-top: -2.4rem;
+  padding: 1.05rem 1rem 1.15rem;
+}
+
+.cc-your-work__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.cc-your-work__section {
+  padding-top: 12px;
+}
+
+.cc-your-work__section + .cc-your-work__section {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid var(--app-border);
+}
+
+.cc-your-work__section-head {
+  margin-bottom: 20px;
+}
+
+html.dark .cc-workspace-section__eyebrow {
+  color: color-mix(in srgb, var(--app-iris) 82%, white);
+}
+
+html.dark .cc-workspace-section__title,
+html.dark .cc-profile-home__zone-title {
   color: var(--app-ink);
 }
 

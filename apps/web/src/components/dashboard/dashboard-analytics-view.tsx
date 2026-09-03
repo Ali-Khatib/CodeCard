@@ -86,7 +86,7 @@ export function DashboardAnalyticsView({
             <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
               Public audience analytics stay at zero until you publish your CodeCard.
             </p>
-            <AppButton variant="ghost" href="/dashboard/profile" className="mt-3">
+            <AppButton variant="ghost" href="/dashboard#profile" className="mt-3">
               Open profile settings
             </AppButton>
           </AppCard>

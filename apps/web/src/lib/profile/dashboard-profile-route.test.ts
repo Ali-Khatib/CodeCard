@@ -3,20 +3,19 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 describe('canonical dashboard profile route', () => {
-  it('loads the owner profile at /dashboard/profile instead of redirecting away', () => {
+  it('folds the old profile destination into Home while preserving hash', () => {
     const src = readFileSync(
       resolve(process.cwd(), 'src/app/dashboard/(authenticated)/profile/page.tsx'),
       'utf8',
     );
 
-    expect(src).not.toContain("redirect('/dashboard')");
-    expect(src).toContain("eq('owner_user_id', user!.id)");
-    expect(src).toContain('DashboardProfileView');
-    expect(src).toContain("select('id, type, label, url, sort_order')");
+    expect(src).toContain('WorkspaceHashRedirect');
+    expect(src).toContain('to="/dashboard"');
+    expect(src).not.toContain('DashboardProfileView');
     expect(src).not.toContain('notFound()');
   });
 
-  it('exposes Profile in primary nav and Home edit CTAs', () => {
+  it('keeps profile editing on Home instead of a Profile nav item', () => {
     const shell = readFileSync(resolve(process.cwd(), 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
     const overview = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/dashboard-overview-view.tsx'),
@@ -26,35 +25,38 @@ describe('canonical dashboard profile route', () => {
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
     const navBlock = navMatch![1];
-    expect(navBlock).toContain("segment: 'profile'");
-    expect(navBlock).toContain("label: 'Profile'");
+    expect(navBlock).not.toContain("segment: 'profile'");
+    expect(navBlock).not.toContain("label: 'Profile'");
+    expect(navBlock).toContain("segment: 'work'");
     expect(shell).toContain('cc-app-user-card--link');
     expect(shell).toContain('Edit photo, bio, links');
-    expect(overview).toContain('workspaceProfileHref(basePath)');
-    expect(overview).toContain('Edit profile');
-    expect(overview).toContain("workspaceProfileHref(basePath, 'photo')");
+    expect(overview).toContain('HomeIdentitySection');
     expect(overview).toContain('How people see you');
   });
 
-  it('does not keep a second full profile editor on the dashboard overview', () => {
+  it('hosts the full profile editor on the dashboard overview', () => {
     const overview = readFileSync(
       resolve(process.cwd(), 'src/components/dashboard/dashboard-overview-view.tsx'),
       'utf8',
     );
+    const identity = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/home-identity-section.tsx'),
+      'utf8',
+    );
 
-    expect(overview).not.toContain('ProfileEditor');
-    expect(overview).not.toContain('profile-edit');
+    expect(overview).toContain('HomeIdentitySection');
+    expect(identity).toContain('ProfileEditor');
+    expect(identity).toContain('HomeCodeCardPreview');
   });
 
-  it('renders a working Alex Chen profile section on /demo/profile', () => {
+  it('redirects /demo/profile into the demo Home identity section', () => {
     const src = readFileSync(
       resolve(process.cwd(), 'src/app/demo/(workspace)/profile/page.tsx'),
       'utf8',
     );
 
-    expect(src).toContain('DashboardProfileView');
-    expect(src).toContain('preview');
-    expect(src).toContain('DEMO_PROFILE');
-    expect(src).not.toContain('redirect(');
+    expect(src).toContain('WorkspaceHashRedirect');
+    expect(src).toContain('LIVE_DEMO_WORKSPACE_HREF');
+    expect(src).not.toContain('DashboardProfileView');
   });
 });

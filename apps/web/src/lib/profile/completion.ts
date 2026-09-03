@@ -79,9 +79,13 @@ function criterionHref(
   options: { hasAnyProject: boolean },
 ): string {
   if (id === 'publishedProject') {
-    return options.hasAnyProject ? '/dashboard/projects' : '/dashboard/projects/new';
+    return options.hasAnyProject ? '/dashboard/work#projects' : '/dashboard/projects/new';
   }
-  return '/dashboard/profile';
+  if (id === 'headline') return '/dashboard#headline';
+  if (id === 'bio') return '/dashboard#bio';
+  if (id === 'avatar') return '/dashboard#photo';
+  if (id === 'profileLink') return '/dashboard#links';
+  return '/dashboard#profile';
 }
 
 export function calculateProfileCompletion(

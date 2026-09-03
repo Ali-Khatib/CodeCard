@@ -12,8 +12,10 @@ describe('content opening wiring', () => {
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
     expect(navMatch![1]).not.toMatch(/My profile|My Profile/);
-    expect(navMatch![1]).toContain("segment: 'profile'");
-    expect(navMatch![1]).toContain("label: 'Profile'");
+    expect(navMatch![1]).toContain("segment: 'work'");
+    expect(navMatch![1]).toContain("label: 'Your Work'");
+    expect(navMatch![1]).not.toContain("segment: 'profile'");
+    expect(navMatch![1]).not.toContain("label: 'Profile'");
   });
 
   it('wires the shared opening transition into project and research entry points', () => {

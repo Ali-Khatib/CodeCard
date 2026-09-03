@@ -56,7 +56,7 @@ export type SettingsSnapshot = {
 };
 
 function profileEditorHref(hash?: string, live = true) {
-  const path = hash ? `/dashboard/profile#${hash}` : '/dashboard/profile';
+  const path = hash ? `/dashboard#${hash}` : '/dashboard#profile';
   if (!live) return `/sign-in?redirect=${encodeURIComponent(path)}`;
   return path;
 }

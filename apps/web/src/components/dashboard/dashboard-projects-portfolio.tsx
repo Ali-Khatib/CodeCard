@@ -103,6 +103,8 @@ export function DashboardProjectsPortfolio({
   emptyState = false,
   basePath = '/dashboard',
   openTransition,
+  embedded = false,
+  viewMode: viewModeProp,
 }: {
   creator: PortfolioCreator;
   projects: PortfolioProject[];
@@ -110,10 +112,13 @@ export function DashboardProjectsPortfolio({
   basePath?: string;
   /** When set, cards open via the smooth expand overlay (demo/public detail). */
   openTransition?: PortfolioOpenTransition;
+  embedded?: boolean;
+  viewMode?: ViewMode;
 }) {
   const [filter, setFilter] = useState<string>(ALL_PROJECTS_FILTER);
   const [sort, setSort] = useState<ProjectSort>('Visitor order');
-  const [viewMode, setViewMode] = useState<ViewMode>('stack');
+  const [internalViewMode, setInternalViewMode] = useState<ViewMode>('stack');
+  const viewMode = viewModeProp ?? internalViewMode;
   const projectFilters = useMemo(() => getProjectFilterOptions(projects), [projects]);
   const filteredProjects = useMemo(() => {
     const filtered = projects.filter((p) => matchesFilter(p, filter));
@@ -122,11 +127,13 @@ export function DashboardProjectsPortfolio({
 
   if (emptyState) {
     return (
-      <div className="cc-app-page cc-app-page--1040 space-y-10">
+      <div className={embedded ? 'space-y-10' : 'cc-app-page cc-app-page--1040 space-y-10'}>
+        {embedded ? null : (
         <ProjectsProfileStrip
           creator={creator}
-          editHref={basePath.startsWith('/dashboard') ? `${basePath}/profile` : undefined}
+          editHref={basePath.startsWith('/dashboard') ? `${basePath}#profile` : undefined}
         />
+        )}
         <div className="mx-auto max-w-xl space-y-3 text-center">
           <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
             {EMPTY_STATE_COPY.projects.title}
@@ -145,23 +152,26 @@ export function DashboardProjectsPortfolio({
   }
 
   return (
-    <div className="cc-app-page cc-app-page--1040">
+    <div className={embedded ? 'space-y-6' : 'cc-app-page cc-app-page--1040'}>
+      {embedded ? null : (
       <ProjectsProfileStrip
         creator={creator}
-        editHref={basePath.startsWith('/dashboard') ? `${basePath}/profile` : undefined}
+        editHref={basePath.startsWith('/dashboard') ? `${basePath}#profile` : undefined}
       />
+      )}
 
       <FadeInView delay={0.05}>
         <div className="cc-projects-toolbar">
           <div className="flex flex-wrap items-center gap-3">
-            <FilterBar options={projectFilters} value={filter} onChange={setFilter} />
-            <FilterBar options={SORT_OPTIONS} value={sort} onChange={setSort} />
+            <FilterBar options={projectFilters} value={filter} onChange={setFilter} ariaLabel="Project filters" />
+            <FilterBar options={SORT_OPTIONS} value={sort} onChange={setSort} ariaLabel="Project sort" />
+            {embedded ? null : (
             <div className="cc-projects-view-toggle" role="group" aria-label="Project layout">
               {VIEW_MODES.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setViewMode(id)}
+                  onClick={() => setInternalViewMode(id)}
                   className={`cc-projects-view-toggle__btn ${viewMode === id ? 'cc-projects-view-toggle__btn--active' : ''}`}
                   aria-pressed={viewMode === id}
                   aria-label={label}
@@ -171,6 +181,7 @@ export function DashboardProjectsPortfolio({
                 </button>
               ))}
             </div>
+            )}
           </div>
           <AppButton variant="primary" href={workspaceCreateProjectHref(basePath)} ariaLabel="Create project">
             Create project

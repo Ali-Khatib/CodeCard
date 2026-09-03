@@ -7,34 +7,26 @@ function read(rel: string) {
 }
 
 describe('WS09-T007 overview share controls', () => {
-  it('Overview reuses ProfileShareHero with trusted profile props only', () => {
+  it('Overview hosts identity editing and a live CodeCard preview instead of share tools', () => {
     const overview = read('src/components/dashboard/dashboard-overview-view.tsx');
+    const preview = read('src/components/dashboard/home-codecard-preview.tsx');
     const hero = read('src/components/dashboard/profile-share-hero.tsx');
 
-    expect(overview).toContain("import { ProfileShareHero } from './profile-share-hero'");
-    expect(overview).toContain('<ProfileShareHero');
-    expect(overview).toContain('profileSlug={profileSlug}');
-    expect(overview).toContain('profileId={profile?.id}');
-    expect(overview).toContain('isPublic={isProfilePublic}');
-    expect(overview).toContain('displayName={displayName}');
-    expect(overview).toContain('const isProfilePublic = profile?.is_public === true');
-
-    expect(overview).not.toContain('generateProfileQrPreview');
+    expect(overview).toContain('HomeIdentitySection');
+    expect(overview).not.toContain("import { ProfileShareHero } from './profile-share-hero'");
+    expect(overview).not.toContain('<ProfileShareHero');
     expect(overview).not.toContain('navigator.share');
     expect(overview).not.toContain('buildCanonicalPublicProfileUrl');
     expect(overview).not.toMatch(/\bwallet\b/i);
     expect(overview).not.toMatch(/\bnfc\b/i);
 
+    expect(preview).toContain('View CodeCard');
+    expect(preview).toContain('QR Code');
+    expect(preview).toContain('generateProfileQrPreview');
+    expect(preview).not.toContain('Copy link');
+
     expect(hero).toContain('buildCanonicalPublicProfileUrl');
     expect(hero).toContain('generateProfileQrPreview');
-    expect(hero).toContain('generateProfileQrDownload');
-    expect(hero).toContain('downloadProfileQrPng');
-    expect(hero).toContain('shareProfileNative');
-    expect(hero).toContain('getPublicProfileLinkForClipboard');
-    expect(hero).toContain('trackProfileShareEvent');
-    expect(hero).toContain('trackQrDownloadEvent');
-    expect(hero).toContain('isPublic');
-    expect(hero).toContain('publish your profile');
     expect(hero).not.toMatch(/\bwallet\b/i);
     expect(hero).not.toMatch(/\bnfc\b/i);
   });

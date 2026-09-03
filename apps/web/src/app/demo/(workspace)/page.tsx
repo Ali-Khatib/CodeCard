@@ -9,7 +9,7 @@ import { greetingForHour } from '@/lib/dashboard/profile-completion';
 import { calculateProfileCompletion, deriveProfileCompletionInput } from '@/lib/profile/completion';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
-import type { Profile } from '@codecard/types';
+import type { Profile, ProfileLinkType } from '@codecard/types';
 
 const demoProfile: Profile = {
   id: 'demo-profile',
@@ -49,6 +49,13 @@ export default function DemoWorkspaceOverviewPage() {
       bio={DEMO_PROFILE.bio}
       profileViews={DEMO_WORKSPACE.profileReach}
       links={DEMO_PROFILE_LINKS}
+      profileLinks={DEMO_PROFILE_LINKS.map((link, index) => ({
+        id: `demo-link-${index + 1}`,
+        type: link.type as ProfileLinkType,
+        label: link.label,
+        url: link.url,
+        sort_order: index,
+      }))}
       profile={demoProfile}
       preview
       stats={{
@@ -65,19 +72,19 @@ export default function DemoWorkspaceOverviewPage() {
             id: 'demo-p1',
             title: 'DevFlow',
             isPublished: true,
-            href: `${basePath}/projects`,
+            href: `${basePath}/work`,
           },
           {
             id: 'demo-p2',
             title: 'SchemaSync',
             isPublished: true,
-            href: `${basePath}/projects`,
+            href: `${basePath}/work`,
           },
           {
             id: 'demo-p3',
             title: 'Pulse',
             isPublished: false,
-            href: `${basePath}/projects`,
+            href: `${basePath}/work`,
           },
         ],
       }}
@@ -89,20 +96,20 @@ export default function DemoWorkspaceOverviewPage() {
             id: 'demo-r1',
             title: 'Sample research paper',
             isPublished: true,
-            href: `${basePath}/research`,
+            href: `${basePath}/work#research`,
           },
           {
             id: 'demo-r2',
             title: 'Draft paper',
             isPublished: false,
-            href: `${basePath}/research`,
+            href: `${basePath}/work#research`,
           },
         ],
       }}
       activity={DEMO_OVERVIEW_ACTIVITY}
       suggested={{
         ...DEMO_SUGGESTED_STEP,
-        href: `${basePath}/projects`,
+        href: `${basePath}/work`,
       }}
       basePath={basePath}
     />

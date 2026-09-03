@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { ProfileLinksEditor } from '@/components/profile/profile-links-editor';
-import { parseProfileUpdate, profileToFormState } from '@/lib/profile/profile-form';
+import {
+  parseProfileUpdate,
+  profileToFormState,
+  type ProfileFormState,
+} from '@/lib/profile/profile-form';
 import { buildProfileFormData } from '@/lib/profile/profile-update-core';
 import { ProfilePublishControls } from '@/components/profile/profile-publish-controls';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
@@ -19,6 +23,7 @@ import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 interface ProfileEditorProps {
   profile: Profile;
   links?: ProfileLinkRow[];
+  onDraftChange?: (form: ProfileFormState) => void;
 }
 
 const PROFILE_FIELD_IDS: Record<string, string> = {
@@ -47,7 +52,7 @@ function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.Re
   );
 }
 
-export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
+export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEditorProps) {
   const router = useRouter();
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [form, setForm] = useState(() => profileToFormState(profile));
@@ -58,6 +63,8 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
   } | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const notifiedErrorRef = useRef<string | null>(null);
+  const onDraftChangeRef = useRef(onDraftChange);
+  onDraftChangeRef.current = onDraftChange;
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
 
   useEffect(() => {
@@ -89,6 +96,10 @@ export function ProfileEditor({ profile, links = [] }: ProfileEditorProps) {
     const firstKey = Object.keys(errors)[0];
     if (firstKey) focusProfileField(firstKey);
   }, [state.fieldErrors]);
+
+  useEffect(() => {
+    onDraftChangeRef.current?.(form);
+  }, [form]);
 
   const fieldErrors = {
     ...(state.fieldErrors ?? {}),

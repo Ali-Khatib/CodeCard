@@ -59,7 +59,7 @@ function CircleEmptyNoConnections() {
         <AppButton variant="primary" href="/dashboard/connections">
           Open Connections
         </AppButton>
-        <AppButton variant="ghost" href="/dashboard/profile">
+        <AppButton variant="ghost" href="/dashboard#profile">
           Share your CodeCard
         </AppButton>
       </div>

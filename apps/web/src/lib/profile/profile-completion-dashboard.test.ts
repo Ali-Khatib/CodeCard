@@ -28,8 +28,9 @@ describe('dashboard profile completion integration', () => {
   });
 
   it('loads real completion data on the profile editor route', () => {
-    const page = read('src/app/dashboard/(authenticated)/profile/page.tsx');
+    const page = read('src/app/dashboard/(authenticated)/page.tsx');
     expect(page).toContain('loadProfileCompletion');
+    expect(page).toContain('profileLinks');
     expect(page).not.toContain('profileCompletion(');
     expect(page).not.toContain('projectCount');
   });
@@ -48,7 +49,7 @@ describe('dashboard profile completion integration', () => {
     expect(indicator).toContain('Complete');
     expect(indicator).toContain('Incomplete');
     expect(indicator).toContain('href={item.href}');
-    expect(completion).toContain("'/dashboard/profile'");
+    expect(completion).toContain("'/dashboard#profile'");
     expect(completion).toContain("'/dashboard/projects/new'");
   });
 

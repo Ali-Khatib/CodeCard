@@ -14,7 +14,7 @@ describe('email confirmed setup guide', () => {
     expect(NEW_ACCOUNT_SETUP_GUIDE.length).toBeGreaterThanOrEqual(5);
     expect(NEW_ACCOUNT_SETUP_GUIDE.map((s) => s.href)).toEqual(
       expect.arrayContaining([
-        '/dashboard/profile',
+        '/dashboard#profile',
         '/dashboard/projects/new',
         '/dashboard/connections',
         '/dashboard/circle',

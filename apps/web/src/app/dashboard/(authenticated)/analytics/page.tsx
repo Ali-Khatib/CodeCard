@@ -46,7 +46,7 @@ export default async function AnalyticsPage({
               Set up your profile first, then share it to start collecting analytics.
             </p>
             <Link
-              href="/dashboard/profile"
+              href="/dashboard#profile"
               className="mt-4 inline-flex text-[14px] font-medium text-[var(--app-iris)] underline-offset-2 hover:underline"
             >
               Go to profile
