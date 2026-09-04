@@ -104,8 +104,9 @@
   box-shadow: none;
 }
 
-/* Landing fixed mark — base mark styles live in codecard-mark.css */
-.cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
+/* Fixed top-left mark on ALL marketing pages (landing + pricing + etc.).
+   Without this, pricing keeps the mark in the centered pill row and it overlaps. */
+.cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-mark) {
   position: fixed;
   left: clamp(0.85rem, 2.8vw, 1.75rem);
   top: calc(0.55rem + env(safe-area-inset-top, 0px));
@@ -117,12 +118,12 @@
   transition: color 0.22s ease, text-shadow 0.22s ease, filter 0.35s ease;
 }
 
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
+html[data-logo-tone='light'] .cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: #efedeb;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
 }
 
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
+html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: var(--ed-ink, #232324);
   text-shadow: none;
 }
