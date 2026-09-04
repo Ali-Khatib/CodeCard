@@ -276,7 +276,8 @@ html.dark .cc-app-sidebar__brand:focus-visible {
 .cc-app-main {
   margin-left: 0;
   min-height: 100dvh;
-  background: var(--app-paper);
+  /* Match page canvas — paper white only belongs on elevated cards */
+  background: var(--app-canvas);
   transition: margin-left var(--app-slide-duration) var(--app-slide-ease);
 }
 
