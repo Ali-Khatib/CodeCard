@@ -6,7 +6,7 @@ import {
   moderationNoteUpdateSchema,
   updateModerationNote,
 } from '@/lib/admin/moderation-notes';
-import { requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
+import { enforceAdminRateLimit, requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
 import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 
@@ -23,6 +23,9 @@ type RouteContext = { params: Promise<{ id: string }> };
 export async function PUT(request: Request, context: RouteContext) {
   const authorization = await requireGlobalAdminApiAccess();
   if (!authorization.ok) return authorization.response;
+
+  const limited = await enforceAdminRateLimit(request, authorization.userId);
+  if (limited) return limited;
 
   if (!isSameOriginMutation(request)) {
     return apiError('Forbidden', 403);

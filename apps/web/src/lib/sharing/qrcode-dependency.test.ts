@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import QRCode from 'qrcode';
 
 /**
@@ -26,5 +28,14 @@ describe('WS07-T001 qrcode dependency', () => {
       return Array.from(data as Uint8Array | number[]);
     });
     expect(new TextDecoder().decode(Uint8Array.from(bytes))).toBe(url);
+  });
+
+  it('does not send profile URLs to api.qrserver.com', () => {
+    const web = resolve(process.cwd());
+    const lanyard = readFileSync(resolve(web, 'src/lib/profile/lanyard-badge-images.ts'), 'utf8');
+    const nextConfig = readFileSync(resolve(web, 'next.config.ts'), 'utf8');
+    expect(lanyard).toContain("from 'qrcode'");
+    expect(lanyard).not.toContain('api.qrserver.com');
+    expect(nextConfig).not.toContain('api.qrserver.com');
   });
 });

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AccountExportAction } from '@/components/dashboard/account-export-action';
+import { GithubConnectionAction } from '@/components/dashboard/github-connection-action';
 import {
   AccountDeletionDialog,
   type AccountDeletionAuthMode,
@@ -22,7 +23,8 @@ type SettingControl =
   | 'status'
   | 'value-edit'
   | 'account-export'
-  | 'account-delete';
+  | 'account-delete'
+  | 'github-connection';
 
 type SettingRow = {
   label: string;
@@ -108,11 +110,11 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
         },
         {
           label: 'GitHub',
-          hint: 'Sign in with GitHub',
+          hint: snapshot.githubConnected
+            ? 'Used only to identify your account — no repository access'
+            : 'Optional sign-in. CodeCard requests your GitHub profile and email only.',
           value: snapshot.githubConnected ? 'Connected' : 'Not connected',
-          action: snapshot.githubConnected ? 'Manage' : 'Connect',
-          href: '/sign-in',
-          control: 'value-edit',
+          control: 'github-connection',
         },
       ],
     },
@@ -318,15 +320,28 @@ function RowActions({
   email,
   deletionAuth,
   openDeletionOnMount,
+  githubConnected,
+  githubCanDisconnect,
 }: {
   row: SettingRow;
   live: boolean;
   email?: string;
   deletionAuth: AccountDeletionAuthMode;
   openDeletionOnMount: boolean;
+  githubConnected: boolean;
+  githubCanDisconnect: boolean;
 }) {
   if (row.control === 'account-export') {
     return <AccountExportAction live={live} />;
+  }
+  if (row.control === 'github-connection') {
+    return (
+      <GithubConnectionAction
+        live={live}
+        connected={githubConnected}
+        canDisconnect={githubCanDisconnect}
+      />
+    );
   }
   if (row.control === 'account-delete') {
     return (
@@ -452,6 +467,9 @@ export function DashboardSettingsView({
     openDeletionOnMount ? 'security' : 'account',
   );
   const live = accountControls === 'live';
+  const githubCanDisconnect = Boolean(
+    (hasPassword || googleConnected) && githubConnected,
+  );
 
   const sections = buildSections(
     {
@@ -534,6 +552,8 @@ export function DashboardSettingsView({
                                 email={email}
                                 deletionAuth={deletionAuth}
                                 openDeletionOnMount={openDeletionOnMount}
+                                githubConnected={githubConnected}
+                                githubCanDisconnect={githubCanDisconnect}
                               />
                             </li>
                           ))}
@@ -587,6 +607,8 @@ export function DashboardSettingsView({
                     email={email}
                     deletionAuth={deletionAuth}
                     openDeletionOnMount={openDeletionOnMount}
+                    githubConnected={githubConnected}
+                    githubCanDisconnect={githubCanDisconnect}
                   />
                 </li>
               ))}

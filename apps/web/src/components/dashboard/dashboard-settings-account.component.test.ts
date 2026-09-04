@@ -20,7 +20,9 @@ describe('WS09-T008 Settings account controls wiring', () => {
     expect(view).toContain('AccountDeletionDialog');
     expect(view).toContain("accountControls === 'live'");
     expect(view).toContain('formatCurrentPlanLabel(plan)');
-    expect(view).toContain("control: 'value-edit'");
+    expect(view).toContain('GithubConnectionAction');
+    expect(view).toContain("control: 'github-connection'");
+    expect(view).not.toContain("action: snapshot.githubConnected ? 'Manage' : 'Connect'");
     expect(view).toContain("href: profileEditorHref('slug', live)");
     expect(view).not.toContain('pro.codecard.app');
     expect(view).not.toContain('Pro · $');

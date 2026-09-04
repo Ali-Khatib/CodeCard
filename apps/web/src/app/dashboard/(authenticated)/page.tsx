@@ -21,7 +21,9 @@ export default async function DashboardHomePage() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('*')
+    .select(
+      'id, tenant_id, owner_user_id, slug, display_name, headline, bio, avatar_url, location, skills, is_public, created_at, updated_at',
+    )
     .eq('owner_user_id', user!.id)
     .single();
 

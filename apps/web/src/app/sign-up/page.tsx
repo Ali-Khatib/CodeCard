@@ -23,6 +23,8 @@ import {
   signupConfirmationBody,
 } from '@/lib/auth/signup-result';
 import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
+import { AuthSignupConsent } from '@/components/auth/auth-signup-consent';
+import { MINIMUM_ACCOUNT_AGE_YEARS } from '@/lib/legal/constants';
 
 const SETUP_MSG =
   'Sign-up needs Supabase. Copy apps/web/.env.example to .env.local and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.';
@@ -42,6 +44,8 @@ function SignUpForm() {
   const [oauthLoading, setOauthLoading] = useState<'github' | null>(null);
   const [fadingOut, setFadingOut] = useState(false);
   const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [consentError, setConsentError] = useState('');
   const submitLock = useRef(false);
   const oauthLock = useRef(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -68,12 +72,20 @@ function SignUpForm() {
     if (fieldError[field]) {
       setFieldError((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (consentError) setConsentError('');
   }
 
   async function oauthGithub() {
     if (oauthLock.current || authBusy) return;
 
     setError('');
+    setConsentError('');
+    if (!acceptedTerms) {
+      setConsentError(
+        `Confirm you are at least ${MINIMUM_ACCOUNT_AGE_YEARS} and agree to the Terms and Privacy Policy.`,
+      );
+      return;
+    }
     if (!authConfigured) {
       setError(SETUP_MSG);
       return;
@@ -109,8 +121,16 @@ function SignUpForm() {
     e.preventDefault();
     setError('');
     setFieldError({});
+    setConsentError('');
 
     if (submitLock.current || authBusy) return;
+
+    if (!acceptedTerms) {
+      setConsentError(
+        `Confirm you are at least ${MINIMUM_ACCOUNT_AGE_YEARS} and agree to the Terms and Privacy Policy.`,
+      );
+      return;
+    }
 
     if (!authConfigured) {
       setError(SETUP_MSG);
@@ -278,6 +298,16 @@ function SignUpForm() {
             <AuthBusyNotice>Creating your account…</AuthBusyNotice>
           ) : null}
 
+          <AuthSignupConsent
+            checked={acceptedTerms}
+            onChange={(next) => {
+              setAcceptedTerms(next);
+              if (consentError) setConsentError('');
+            }}
+            error={consentError}
+            disabled={authBusy}
+          />
+
           <AuthPrimaryButton
             pending={loading || fadingOut}
             pendingLabel="Creating your account…"
@@ -300,6 +330,11 @@ function SignUpForm() {
             pending={oauthLoading === 'github'}
           />
         </div>
+
+        <p className="mt-3 text-center text-[12px] leading-relaxed text-smoke">
+          GitHub is used only to identify your account. CodeCard does not request repository or
+          organization access.
+        </p>
 
         <p className="mt-6 text-center text-[14px] text-smoke">
           Already have an account?{' '}

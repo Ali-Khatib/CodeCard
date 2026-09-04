@@ -206,9 +206,10 @@ describe('public rendering XSS contracts', () => {
     expect(social).toContain('rel="noopener noreferrer"');
   });
 
-  it('documents trusted non-UGC dangerouslySetInnerHTML exceptions', () => {
+  it('documents trusted non-UGC theme boot as a same-origin script', () => {
     const layout = readFileSync(resolve(process.cwd(), 'src/app/layout.tsx'), 'utf8');
-    expect(layout).toContain('dangerouslySetInnerHTML');
-    expect(layout).toContain('THEME_BOOT_SCRIPT');
+    expect(layout).toContain('THEME_BOOT_SRC');
+    expect(layout).toContain('/theme-boot.js');
+    expect(layout).not.toContain('dangerouslySetInnerHTML');
   });
 });

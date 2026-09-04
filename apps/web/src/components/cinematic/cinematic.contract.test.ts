@@ -150,7 +150,9 @@ describe('Editorial product landing contract', () => {
     expect(css).toContain('.cc-ed-demo-preview__device');
     const nextConfig = read('next.config.ts');
     expect(nextConfig).toContain("source: '/demo/:path*'");
-    expect(nextConfig).toContain("frame-ancestors 'self'");
+    expect(nextConfig).toContain("frame-ancestors ${frameAncestors}");
+    expect(nextConfig).toContain("source: '/((?!demo(?:/|$)|dashboard/preview(?:/|$)).*)'");
+    expect(nextConfig).not.toContain("source: '/(.*)'");
     expect(css).toContain('.cc-ed-hero-scene');
     expect(css).toContain('.cc-ed-hero-scene--enhanced');
     expect(css).toContain('cream frame is clip-path only');

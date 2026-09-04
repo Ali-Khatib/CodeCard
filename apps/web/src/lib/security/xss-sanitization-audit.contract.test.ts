@@ -93,8 +93,9 @@ describe('WS11-T006 XSS sanitization audit', () => {
     expect(validationTest).toMatch(/svg|image\/svg/);
 
     const layout = readWeb('src/app/layout.tsx');
-    expect(layout).toContain('THEME_BOOT_SCRIPT');
-    expect(layout).toContain('dangerouslySetInnerHTML');
+    expect(layout).toContain("src={THEME_BOOT_SRC}");
+    expect(layout).toContain("strategy=\"beforeInteractive\"");
+    expect(layout).not.toContain('dangerouslySetInnerHTML');
 
     const chart = readWeb('src/components/ui/chart.tsx');
     expect(chart).toContain('dangerouslySetInnerHTML');

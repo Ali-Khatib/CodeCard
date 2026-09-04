@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
 import { SkipToContentLink } from '@/components/a11y/skip-to-content';
 import { AuthHashRecoveryCatcher } from '@/components/auth/auth-hash-recovery-catcher';
@@ -68,7 +69,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const THEME_BOOT_SCRIPT = `(function(){try{var r=document.documentElement;r.setAttribute('data-theme','original');localStorage.setItem('codecard-theme','original');if(localStorage.getItem('cc-app-appearance')==='dark')r.classList.add('dark');var v={'--bone':'#fcf1e7','--paper':'#ffffff','--ink':'#232324','--canvas':'#fcf1e7','--void-canvas':'#fcf1e7','--background':'#fcf1e7','--obsidian':'#fcf1e7','--cosmic-base-start':'#fcf1e7','--cosmic-base-mid':'#fafafa','--cosmic-base-end':'#fcf1e7','--text-primary':'#232324','--vellum':'#232324','--phosphor':'#232324','--text-secondary':'#767073','--smoke':'#767073','--iris':'#e95a0b','--accent':'#e95a0b','--accent-rgb':'233, 90, 11','--cosmic-glow':'rgba(233, 90, 11, 0.14)','--cosmic-glow-secondary':'rgba(255, 183, 96, 0.12)'};for(var k in v)r.style.setProperty(k,v[k]);}catch(e){}})();`;
+/** Same-origin theme tokens. Kept as a static file so CSP need not hash this boot. */
+const THEME_BOOT_SRC = '/theme-boot.js';
 
 /**
  * Root layout stays free of ThemeRoot / ProjectOpenProvider / conversion prompt
@@ -79,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-theme="original" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <Script src={THEME_BOOT_SRC} strategy="beforeInteractive" />
       </head>
       <body
         className={`${inter.variable} ${instrumentSerif.variable} ${spaceMono.variable} ${orbitron.variable} ${shareTechMono.variable} min-h-screen bg-bone font-sans text-ink antialiased`}

@@ -31,6 +31,8 @@ describe('Auth experience polish contracts', () => {
     expect(signUp).toContain('showGuidance');
     expect(signUp).toContain('signUpSchema');
     expect(signUp).toContain('autoComplete="new-password"');
+    expect(signUp).toContain('AuthSignupConsent');
+    expect(signUp).toContain('acceptedTerms');
     expect(signUp).not.toContain('Continue with Google');
     expect(signUp).not.toMatch(/password\s*=\s*searchParams|searchParams\.get\(['"]password/);
   });

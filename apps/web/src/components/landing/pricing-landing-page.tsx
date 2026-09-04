@@ -17,15 +17,15 @@ const PRO_YEARLY_PER_MONTH = (PRO_YEARLY / 12).toFixed(2);
 const FAQ = [
   {
     q: 'Can I start for free?',
-    a: 'Yes. Free is built to help you create and share a CodeCard fast: up to five projects, basic media, GitHub import, QR and link sharing, and basic analytics.',
+    a: 'Yes. Free is built to help you create and share a CodeCard fast: up to five projects, basic media, QR and link sharing, and basic analytics.',
   },
   {
     q: 'What do I get with Pro?',
-    a: 'Pro is for when you want to use CodeCard seriously: look more professional, track more deeply, and customize more. You get unlimited projects, no CodeCard branding, a custom domain, premium analytics, per research paper analytics, visitor insights, AI insights, AI project polishing, guided project creation, and early access to new features.',
+    a: 'Pro is for when you want to use CodeCard seriously: look more professional and track more deeply. You get unlimited projects, premium analytics, per research paper analytics, and visitor insights.',
   },
   {
     q: 'How does billing work?',
-    a: `Pro is $${PRO_MONTHLY}/month or $${PRO_YEARLY}/year. Pay with Stripe where available, or Paddle in 190+ countries where Stripe is limited. Manage your subscription anytime from the dashboard.`,
+    a: `Pro is $${PRO_MONTHLY}/month or $${PRO_YEARLY}/year. Pay with Stripe. Manage your subscription anytime from the dashboard.`,
   },
   {
     q: 'Do visitors need an account?',
@@ -33,7 +33,7 @@ const FAQ = [
   },
   {
     q: 'Can I use a custom domain?',
-    a: 'Custom domains are included on Pro.',
+    a: 'Not yet. Custom domains are a planned Pro option shown in Settings; they are not available to claim today.',
   },
 ] as const;
 

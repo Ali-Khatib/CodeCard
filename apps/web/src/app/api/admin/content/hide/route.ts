@@ -4,7 +4,7 @@ import {
   hideReportedContent,
   hideReportedContentSchema,
 } from '@/lib/admin/content-hiding';
-import { requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
+import { enforceAdminRateLimit, requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
 import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 import {
@@ -23,6 +23,9 @@ const PRIVATE_HEADERS = {
 export async function POST(request: Request) {
   const authorization = await requireGlobalAdminApiAccess();
   if (!authorization.ok) return authorization.response;
+
+  const limited = await enforceAdminRateLimit(request, authorization.userId);
+  if (limited) return limited;
 
   if (!isSameOriginMutation(request)) {
     return apiError('Forbidden', 403);

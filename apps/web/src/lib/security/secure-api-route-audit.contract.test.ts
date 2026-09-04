@@ -65,6 +65,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/upload',
       '/api/public/research/[paperId]/pdf',
       '/api/webhooks/stripe',
+      '/api/auth/complete-password-reset',
       '/api/internal/rate-limit-verify',
       '/api/internal/sentry-verify',
     ]) {
@@ -131,6 +132,7 @@ describe('WS11-T005 secure API route audit', () => {
 
     for (const source of [reports, dmca, mutation, note, hide, suspend]) {
       expect(source).toContain('requireGlobalAdminApiAccess');
+      expect(source).toContain('enforceAdminRateLimit');
       expect(source).toContain('no-store');
     }
     expect(mutation).toContain('isSameOriginMutation');

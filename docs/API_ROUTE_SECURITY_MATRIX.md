@@ -15,17 +15,18 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/moderation/report` | POST | Public (optional verified user) | Strict profile/project UUID + reason allowlist + optional 1,500-char plain text | N/A (public submission) | `moderation` strict per source | Constant accepted JSON | Public-state RPC validation; private HMAC source dedupe; no moderation oracle/admin audit |
 | `/api/account/export` | POST (GET→405) | Required | Strict Zod | **same-origin** | `accountExport` strict | JSON download | Session identity only; no-store |
 | `/api/account/delete` | POST (GET→405) | Required | Zod + confirmation | **same-origin** | `accountDelete` strict | JSON | Reauth required |
-| `/api/admin/reports` | GET | Canonical global admin | Allowlisted pagination/status/target filters | N/A (read-only) | None | Private no-store JSON | Authorization before T002 service-role reader |
-| `/api/admin/dmca` | GET | Canonical global admin | Allowlisted pagination/status filters | N/A (read-only) | None | Private no-store JSON | Privacy-minimized DMCA list DTO |
-| `/api/admin/reports/[id]` | PATCH | Canonical global admin | UUID + resolve/dismiss allowlist | **same-origin** | None | Private no-store JSON | Atomic status + audit RPC; conflict-safe |
-| `/api/admin/reports/[id]/note` | PUT | Canonical global admin | UUID + nullable plain-text note (max 4,000) + optimistic timestamp | **same-origin** | None | Private no-store JSON without note body | Atomic private note + audit metadata only; conflict-safe |
-| `/api/admin/content/hide` | POST | Canonical global admin | Strict report/target UUID + profile/project allowlist | **same-origin** | None | Private no-store JSON | Atomic hold + unpublish + audit; public cache invalidation |
-| `/api/admin/users/[id]/suspend` | POST | Canonical global admin | Path user UUID + optional report UUID | **same-origin** | None | Private no-store JSON | Durable suspension + Auth ban; partial-failure retryable; no Stripe changes |
+| `/api/admin/reports` | GET | Canonical global admin | Allowlisted pagination/status/target filters | N/A (read-only) | `admin` | Private no-store JSON | Authorization before T002 service-role reader |
+| `/api/admin/dmca` | GET | Canonical global admin | Allowlisted pagination/status filters | N/A (read-only) | `admin` | Private no-store JSON | Privacy-minimized DMCA list DTO |
+| `/api/admin/reports/[id]` | PATCH | Canonical global admin | UUID + resolve/dismiss allowlist | **same-origin** | `admin` | Private no-store JSON | Atomic status + audit RPC; conflict-safe |
+| `/api/admin/reports/[id]/note` | PUT | Canonical global admin | UUID + nullable plain-text note (max 4,000) + optimistic timestamp | **same-origin** | `admin` | Private no-store JSON without note body | Atomic private note + audit metadata only; conflict-safe |
+| `/api/admin/content/hide` | POST | Canonical global admin | Strict report/target UUID + profile/project allowlist | **same-origin** | `admin` | Private no-store JSON | Atomic hold + unpublish + audit; public cache invalidation |
+| `/api/admin/users/[id]/suspend` | POST | Canonical global admin | Path user UUID + optional report UUID | **same-origin** | `admin` | Private no-store JSON | Durable suspension + Auth ban; partial-failure retryable; no Stripe changes |
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |
-| `/api/internal/rate-limit-verify` | POST | Internal verify token | Zod | N/A | None | JSON | Staging/ops verification only |
-| `/api/internal/sentry-verify` | POST | Internal verify token | Zod | N/A | None | JSON | Staging/ops verification only |
+| `/api/auth/complete-password-reset` | POST | Recovery session | Zod password | **same-origin** | `auth` fail-closed | JSON | Clears recovery privilege then global sign-out |
+| `/api/internal/rate-limit-verify` | GET | Env flag `CODECARD_RATE_LIMIT_VERIFY=1` | None | N/A | Dedicated 3/1m probe | JSON | Publicly callable while the flag is set; unset in production |
+| `/api/internal/sentry-verify` | GET | Env flag `CODECARD_SENTRY_VERIFY=1` | None | N/A | None | JSON | Publicly callable while the flag is set; unset in production |
 
 No Connections/Circle JSON API routes exist — those use server actions with session ownership.
 

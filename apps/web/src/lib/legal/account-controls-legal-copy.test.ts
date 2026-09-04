@@ -62,8 +62,8 @@ describe('WS10-T009 account controls legal copy', () => {
   });
 
   it('keeps legal navigation links and accessible headings', () => {
-    expect(privacy).toContain('<h2>');
-    expect(terms).toContain('<h2>');
+    expect(privacy).toMatch(/<h2\b/);
+    expect(terms).toMatch(/<h2\b/);
     expect(privacy).toContain("title: 'Privacy Policy'");
     expect(terms).toContain("title: 'Terms of Service'");
     expect(legalPage).toContain('<h1');

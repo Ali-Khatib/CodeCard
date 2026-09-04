@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { LegalPage } from '@/components/legal-page';
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
+import { LEGAL_LAST_UPDATED } from '@/lib/legal/constants';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/legal/acceptable-use',
@@ -9,7 +11,7 @@ export const metadata = buildIndexablePageMetadata({
 
 export default function AcceptableUsePage() {
   return (
-    <LegalPage title="Acceptable Use Policy" lastUpdated="June 27, 2025">
+    <LegalPage title="Acceptable Use Policy" lastUpdated={LEGAL_LAST_UPDATED}>
       <section>
         <h2>Prohibited content</h2>
         <p>You may not use CodeCard to host or distribute:</p>
@@ -34,7 +36,7 @@ export default function AcceptableUsePage() {
         <h2>Enforcement</h2>
         <p>
           We may remove content, suspend accounts, or report activity to authorities as appropriate.
-          Report violations via our moderation tools or contact page.
+          Report violations via our moderation tools or the <Link href="/legal/contact">contact page</Link>.
         </p>
       </section>
     </LegalPage>

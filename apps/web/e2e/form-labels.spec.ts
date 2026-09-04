@@ -12,6 +12,7 @@ test.describe('WS12-T002 accessible form labels (browser)', () => {
     await page.goto('/sign-up', { waitUntil: 'domcontentloaded' });
     await expect(page.getByLabel(/email/i)).toBeVisible();
     await expect(page.getByLabel(/password/i).first()).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: /at least 13/i })).toBeVisible();
   });
 
   test('forgot-password email is labelled', async ({ page }) => {

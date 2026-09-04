@@ -93,6 +93,7 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     await page.getByLabel('Profile URL').fill(slug);
     await page.getByLabel('Email', { exact: true }).fill(email);
     await page.locator('#password').fill(env.testPassword);
+    await page.getByRole('checkbox', { name: /at least 13/i }).check();
 
     const submit = page.getByRole('button', { name: /Create account/i });
     // Two synchronous clicks: the second lands while the first submission is
@@ -174,6 +175,7 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     await page.getByLabel('Profile URL').fill('-invalid-');
     await page.getByLabel('Email', { exact: true }).fill('bad-slug@codecard-e2e.example.com');
     await page.locator('#password').fill('ValidPass123!');
+    await page.getByRole('checkbox', { name: /at least 13/i }).check();
     await page.getByRole('button', { name: /Create account/i }).click();
 
     // A field-level validation error is shown and no signup request is made.

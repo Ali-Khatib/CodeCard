@@ -250,6 +250,11 @@ function SignInForm() {
           />
         </div>
 
+        <p className="mt-3 text-center text-[12px] leading-relaxed text-smoke">
+          GitHub sign-in requests your public profile and email only. CodeCard does not request
+          repository access.
+        </p>
+
         <div className="mt-8 border-t border-[rgba(34,34,34,0.08)] pt-6">
           <Link
             href={LIVE_DEMO_HREF}

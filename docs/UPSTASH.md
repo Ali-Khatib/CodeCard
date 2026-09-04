@@ -14,7 +14,9 @@ Canonical setup for durable rate limits on CodeCard sensitive routes.
 | JSON route wrapper | `apps/web/src/lib/security/secure-route.ts` |
 | Bounded verify probe | `GET /api/internal/rate-limit-verify` (gated) |
 
-Sensitive types (`ai`, `upload`, `auth`) **fail closed** in production when Redis is missing (except isolated `CODECARD_E2E=1`). Other types fail open without Redis. Routes with `strictRateLimit: true` return 503 when `UPSTASH_REDIS_REST_URL` is absent.
+Sensitive types (`ai`, `upload`, `auth`) **fail closed** in production when Redis is missing (except isolated `CODECARD_E2E=1`). Other types (including `admin`) fail open without Redis. Routes with `strictRateLimit: true` return 503 when `UPSTASH_REDIS_REST_URL` is absent.
+
+`RATE_LIMITS.auth` is wired to `POST /api/auth/complete-password-reset`. Browser sign-in and sign-up call Supabase Auth directly and are not Next.js-rate-limited.
 
 Do not put complete emails, tokens, or raw cookies in Redis keys. Prefer opaque user ids / hashed IPs already used by route wrappers.
 

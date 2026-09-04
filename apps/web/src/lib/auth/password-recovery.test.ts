@@ -80,6 +80,7 @@ describe('recovery UX helpers', () => {
     );
     expect(page).toContain('/api/auth/complete-password-reset');
     expect(api).toContain("signOut({ scope: 'global' })");
+    expect(api).toContain("rateLimit(`auth:reset:${ip}`, 'auth')");
   });
 
   it('maps client errors to generic messages', () => {

@@ -17,6 +17,13 @@ describe('WS12-T010 accessible dialogs contracts', () => {
     expect(hook).toContain('triggerRef');
   });
 
+  it('editorial audience detail traps Tab while open', () => {
+    const source = read('components/landing/editorial/editorial-audience.tsx');
+    expect(source).toContain('role="dialog"');
+    expect(source).toContain("e.key === 'Tab'");
+    expect(source).toContain("e.key === 'Escape'");
+  });
+
   it('project delete uses alertdialog with cancel-first focus', () => {
     const source = read('components/dashboard/project-delete-dialog.tsx');
     expect(source).toContain('role="alertdialog"');
@@ -61,6 +68,17 @@ describe('WS12-T010 accessible dialogs contracts', () => {
     const report = read('components/moderation/public-report-dialog.tsx');
     expect(report).toContain('<dialog');
     expect(report).toContain('showModal');
+  });
+
+  it('connection private details and project lightbox trap focus', () => {
+    const details = read('components/dashboard/connection-private-details.tsx');
+    expect(details).toContain('useConfirmPanelA11y');
+    expect(details).toContain('panelRef');
+    expect(details).toContain('data-confirm-cancel');
+    const lightbox = read('components/featured-work/project-detail-view.tsx');
+    expect(lightbox).toContain('useConfirmPanelA11y');
+    expect(lightbox).toContain('lightboxRef');
+    expect(lightbox).toContain('Close viewer');
   });
 
   it('admin destructive actions keep window.confirm confirmations', () => {

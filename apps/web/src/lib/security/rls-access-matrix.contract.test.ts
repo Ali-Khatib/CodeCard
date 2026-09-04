@@ -157,9 +157,16 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
     }
   });
 
-  it('documents deliberate DMCA public INSERT and denies client jobs/billing/deletion ops', () => {
-    expect(sql).toMatch(/CREATE POLICY dmca_notices_insert[\s\S]*WITH CHECK\s*\(\s*true\s*\)/);
-    expect(matrix).toContain('Deliberate public legal intake');
+  it('documents DMCA and moderation intake as service-role only, not client INSERT', () => {
+    expect(sql).toContain('DROP POLICY IF EXISTS dmca_notices_insert');
+    expect(sql).toContain(
+      'REVOKE INSERT ON TABLE public.dmca_notices FROM anon, authenticated',
+    );
+    expect(sql).toContain('DROP POLICY IF EXISTS moderation_reports_insert');
+    expect(sql).toContain(
+      'REVOKE INSERT ON TABLE public.moderation_reports FROM anon, authenticated',
+    );
+    expect(matrix).toContain('Service-role insert only');
     const dmcaRoute = read('apps/web/src/app/api/dmca/route.ts');
     expect(dmcaRoute).toMatch(/Public DMCA notice intake \(intentional\)/);
     expect(dmcaRoute).toContain("rateLimitType: 'dmca'");

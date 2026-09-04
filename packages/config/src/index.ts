@@ -67,6 +67,8 @@ export const RATE_LIMITS = {
   publicResearchPdf: { requests: 60, window: '1 m' as const },
   /** Authenticated Connections add/remove mutations. */
   connections: { requests: 60, window: '1 m' as const },
+  /** Canonical global-admin APIs — fail-open if Redis is down. */
+  admin: { requests: 60, window: '1 m' as const },
 } as const;
 
 export const STORAGE_BUCKETS = {
@@ -100,7 +102,6 @@ export const PLANS = {
     features: [
       'Up to 5 projects',
       'Basic project media',
-      'GitHub import',
       'QR + link sharing',
       'Basic analytics',
     ],
@@ -112,22 +113,16 @@ export const PLANS = {
     priceMonthly: 8,
     priceYearly: 76,
     stripePriceEnvKey: 'STRIPE_PRO_PRICE_ID',
-    /** Global checkout where Stripe is unavailable — Paddle acts as merchant of record */
+    /** Reserved for a future merchant-of-record path. Not live checkout. */
     paddlePriceEnvKey: 'PADDLE_PRO_PRICE_ID',
     limits: {
       projects: null,
     },
     features: [
       'Unlimited projects',
-      'Remove CodeCard branding',
-      'Custom domain',
       'Premium analytics',
       'Per research paper analytics',
       'Visitor insights',
-      'AI insights',
-      'AI project polishing',
-      'Guided project creation',
-      'Early access',
     ],
   },
 } as const;

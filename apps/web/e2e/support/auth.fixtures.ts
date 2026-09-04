@@ -144,6 +144,10 @@ export { expect };
 
 // ── UI helpers ───────────────────────────────────────────────────────────────
 
+export async function acceptSignUpTerms(page: Page): Promise<void> {
+  await page.getByRole('checkbox', { name: /at least 13/i }).check();
+}
+
 export async function signUpViaUI(
   page: Page,
   fields: { displayName: string; slug: string; email: string; password: string },
@@ -154,6 +158,7 @@ export async function signUpViaUI(
   await page.getByLabel('Profile URL').fill(fields.slug);
   await page.getByLabel('Email', { exact: true }).fill(fields.email);
   await page.locator('#password').fill(fields.password);
+  await acceptSignUpTerms(page);
   await page.getByRole('button', { name: /Create account/i }).click();
 }
 

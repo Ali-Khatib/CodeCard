@@ -18,6 +18,11 @@ const FOOTER_NAV = [
 const FOOTER_LEGAL = [
   { label: 'Privacy', href: '/legal/privacy' },
   { label: 'Terms', href: '/legal/terms' },
+  { label: 'Cookies', href: '/legal/cookies' },
+  { label: 'Acceptable Use', href: '/legal/acceptable-use' },
+  { label: 'Copyright', href: '/legal/dmca' },
+  { label: 'Security', href: '/legal/security' },
+  { label: 'Billing', href: '/legal/subscription' },
   { label: 'Contact', href: '/legal/contact' },
   { label: 'Sign in', href: '/sign-in' },
 ] as const;

@@ -1,4 +1,5 @@
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import QRCode from 'qrcode';
 
 const W = 512;
 const H = 768;
@@ -132,9 +133,13 @@ export async function createLanyardBackImage(opts: {
   roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
   ctx.fill();
 
-  const qrImg = await loadImage(
-    `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(opts.profileUrl)}&bgcolor=ffffff&color=0a0a0a`,
-  );
+  const qrDataUrl = await QRCode.toDataURL(opts.profileUrl, {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: qrSize,
+    color: { dark: '#0a0a0a', light: '#ffffff' },
+  });
+  const qrImg = await loadImage(qrDataUrl);
   if (qrImg) ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
   ctx.fillStyle = '#71717a';

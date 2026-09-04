@@ -11,8 +11,10 @@ const links = {
   legal: [
     { href: '/legal/privacy', label: 'Privacy' },
     { href: '/legal/terms', label: 'Terms' },
+    { href: '/legal/cookies', label: 'Cookies' },
     { href: '/legal/acceptable-use', label: 'Acceptable Use' },
-    { href: '/legal/dmca', label: 'DMCA' },
+    { href: '/legal/dmca', label: 'Copyright' },
+    { href: '/legal/security', label: 'Security' },
     { href: '/legal/subscription', label: 'Billing' },
     { href: '/legal/contact', label: 'Contact' },
   ],
@@ -62,7 +64,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-zinc-800 px-6 py-6 text-center text-xs text-zinc-500">
+      <div className="border-t border-zinc-800 px-6 py-6 text-center text-xs text-zinc-400">
         © {new Date().getFullYear()} CodeCard. All rights reserved.
       </div>
     </footer>

@@ -26,6 +26,7 @@ describe('privacy policy discloses implemented data practices', () => {
 
   it('states that no repository or code access is requested', () => {
     expect(privacy).toMatch(/repositor/i);
+    expect(privacy).toMatch(/disconnect GitHub from Settings/i);
   });
 
   it('discloses cookies and local storage', () => {

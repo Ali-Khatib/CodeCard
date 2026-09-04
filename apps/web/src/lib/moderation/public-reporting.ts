@@ -16,7 +16,8 @@ type PrivilegedClient = Awaited<ReturnType<typeof createServiceClient>>;
 
 export function createReportSourceFingerprint(
   input: { ip: string; reporterUserId: string | null },
-  secret = requireServerSecret('SUPABASE_SERVICE_ROLE_KEY'),
+  secret = process.env.MODERATION_FINGERPRINT_SECRET?.trim() ||
+    requireServerSecret('SUPABASE_SERVICE_ROLE_KEY'),
 ): string {
   const source = input.reporterUserId
     ? `user:${input.reporterUserId}`

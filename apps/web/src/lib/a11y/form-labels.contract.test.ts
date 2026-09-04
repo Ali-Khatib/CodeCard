@@ -22,6 +22,15 @@ describe('WS12-T002 accessible form labels', () => {
     expect(source).not.toMatch(/placeholder=\{?["'][^"']+["']\}?\s*\n\s*\/>/);
   });
 
+  it('AuthSignupConsent uses a visible label tied to the checkbox', () => {
+    const source = read('components/auth/auth-signup-consent.tsx');
+    expect(source).toContain('htmlFor={id}');
+    expect(source).toContain('id={id}');
+    expect(source).toContain('type="checkbox"');
+    expect(source).not.toContain('defaultChecked');
+    expect(source).toContain('checked={checked}');
+  });
+
   it('AuthPasswordField labels the input and names the show/hide control', () => {
     const source = read('components/auth/auth-password-field.tsx');
     expect(source).toContain('htmlFor={inputId}');

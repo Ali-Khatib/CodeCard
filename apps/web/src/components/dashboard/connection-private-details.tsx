@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
+import { useConfirmPanelA11y } from '@/lib/a11y/use-confirm-panel-a11y';
 
 type ConnectionPrivateDetailsProps = {
   connectionId: string;
@@ -33,6 +34,23 @@ export function ConnectionPrivateDetails({
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const dirtyRef = useRef(false);
+  dirtyRef.current =
+    note !== (initialNote ?? '') || context !== (initialContext ?? '');
+
+  const requestClose = useCallback(() => {
+    if (dirtyRef.current && !window.confirm('Discard unsaved private details?')) {
+      return;
+    }
+    onClose();
+  }, [onClose]);
+
+  const { panelRef, cancelRef } = useConfirmPanelA11y({
+    open,
+    locked: pending,
+    initialFocus: 'first',
+    onClose: requestClose,
+  });
 
   useEffect(() => {
     if (open) {
@@ -43,19 +61,7 @@ export function ConnectionPrivateDetails({
     }
   }, [open, initialNote, initialContext, connectionId]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
   if (!open) return null;
-
-  const dirty =
-    note !== (initialNote ?? '') || context !== (initialContext ?? '');
 
   const save = (opts?: { clearNote?: boolean }) => {
     if (pending) return;
@@ -80,10 +86,7 @@ export function ConnectionPrivateDetails({
     });
   };
 
-  const attemptClose = () => {
-    if (dirty && !window.confirm('Discard unsaved private details?')) return;
-    onClose();
-  };
+  const attemptClose = requestClose;
 
   const connectedLabel = initialConnectedAt
     ? new Date(initialConnectedAt).toLocaleDateString(undefined, {
@@ -102,6 +105,7 @@ export function ConnectionPrivateDetails({
       }}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`private-details-${connectionId}`}
@@ -185,9 +189,15 @@ export function ConnectionPrivateDetails({
           >
             Clear note
           </AppButton>
-          <AppButton variant="ghost" onClick={attemptClose}>
+          <button
+            ref={cancelRef}
+            type="button"
+            data-confirm-cancel
+            className="cc-app-btn cc-app-btn--ghost"
+            onClick={attemptClose}
+          >
             Cancel
-          </AppButton>
+          </button>
         </div>
 
         <p className="sr-only" role="status" aria-live="polite">

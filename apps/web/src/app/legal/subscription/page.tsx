@@ -1,5 +1,6 @@
 import { LegalPage } from '@/components/legal-page';
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
+import { BILLING_INBOX, LEGAL_LAST_UPDATED } from '@/lib/legal/constants';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/legal/subscription',
@@ -9,7 +10,7 @@ export const metadata = buildIndexablePageMetadata({
 
 export default function SubscriptionTermsPage() {
   return (
-    <LegalPage title="Subscription & Billing Terms" lastUpdated="June 27, 2025">
+    <LegalPage title="Subscription & Billing Terms" lastUpdated={LEGAL_LAST_UPDATED}>
       <section>
         <h2>Pricing</h2>
         <p>
@@ -58,7 +59,7 @@ export default function SubscriptionTermsPage() {
       <section>
         <h2>Contact</h2>
         <p>
-          Billing questions: <a href="mailto:billing@codecard.app">billing@codecard.app</a>
+          Billing questions: <a href={`mailto:${BILLING_INBOX}`}>{BILLING_INBOX}</a>
         </p>
       </section>
     </LegalPage>

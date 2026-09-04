@@ -5,18 +5,31 @@ import { withSentryConfig } from '@sentry/nextjs';
 const sentryConnect =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io';
 
-const previewEmbedCsp = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://api.qrserver.com",
-  "media-src 'self' blob: https://cdn.coverr.co",
-  "font-src 'self' data:",
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://api.qrserver.com ${sentryConnect}`,
-  "frame-ancestors 'self'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join('; ');
+/**
+ * CSP exceptions (do not tighten blindly — these are required for current dependencies):
+ * - 'unsafe-inline' on script-src: REQUIRED — Next.js hydration / bootstrap; Vercel insights
+ * - 'unsafe-eval' on script-src: REQUIRED today — Three.js/WebGL shader compile + animation
+ *   (GSAP is used on marketing/profile). Do not drop without a production browser pass.
+ * - Theme boot is `/theme-boot.js` (same-origin), not an inline script.
+ * - va.vercel-scripts.com / vitals.vercel-insights.com: Vercel Analytics + Speed Insights
+ * - *.supabase.co: Auth, DB, Storage, Realtime
+ * - ingest.sentry.io: error monitoring (also tunneled via /monitoring)
+ * QR images are generated locally (`qrcode`); do not allow a third-party QR image host.
+ */
+function contentSecurityPolicy(frameAncestors: "'none'" | "'self'"): string {
+  return [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com",
+    "media-src 'self' blob: https://cdn.coverr.co",
+    "font-src 'self' data:",
+    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com ${sentryConnect}`,
+    `frame-ancestors ${frameAncestors}`,
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ');
+}
 
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
@@ -24,23 +37,23 @@ const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), browsing-topics=()' },
   {
     key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://api.qrserver.com",
-      "media-src 'self' blob: https://cdn.coverr.co",
-      "font-src 'self' data:",
-      `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com https://api.qrserver.com ${sentryConnect}`,
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join('; '),
+    value: contentSecurityPolicy("'none'"),
   },
 ];
+
+const previewSecurityHeaders = securityHeaders.map((header) => {
+  if (header.key === 'X-Frame-Options') {
+    return { key: 'X-Frame-Options', value: 'SAMEORIGIN' };
+  }
+  if (header.key === 'Content-Security-Policy') {
+    return { key: 'Content-Security-Policy', value: contentSecurityPolicy("'self'") };
+  }
+  return header;
+});
 
 const nextConfig: NextConfig = {
   // Tests may isolate build artifacts from a concurrently running local dev server.
@@ -86,16 +99,17 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
   async headers() {
-    const previewEmbedHeaders = [
-      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-      { key: 'Content-Security-Policy', value: previewEmbedCsp },
-    ];
     return [
-      { source: '/(.*)', headers: securityHeaders },
-      { source: '/demo', headers: previewEmbedHeaders },
-      { source: '/demo/:path*', headers: previewEmbedHeaders },
-      { source: '/dashboard/preview', headers: previewEmbedHeaders },
-      { source: '/dashboard/preview/:path*', headers: previewEmbedHeaders },
+      {
+        // Matching header sources merge. Two CSPs AND together, so preview
+        // routes must be excluded from the global DENY / frame-ancestors none set.
+        source: '/((?!demo(?:/|$)|dashboard/preview(?:/|$)).*)',
+        headers: securityHeaders,
+      },
+      { source: '/demo', headers: previewSecurityHeaders },
+      { source: '/demo/:path*', headers: previewSecurityHeaders },
+      { source: '/dashboard/preview', headers: previewSecurityHeaders },
+      { source: '/dashboard/preview/:path*', headers: previewSecurityHeaders },
     ];
   },
   async redirects() {
@@ -109,6 +123,31 @@ const nextConfig: NextConfig = {
       {
         source: '/demo/research/:slug((?!new$)[^/]+)',
         destination: '/demo/card/research/:slug',
+        permanent: true,
+      },
+      {
+        source: '/privacy',
+        destination: '/legal/privacy',
+        permanent: true,
+      },
+      {
+        source: '/terms',
+        destination: '/legal/terms',
+        permanent: true,
+      },
+      {
+        source: '/copyright',
+        destination: '/legal/dmca',
+        permanent: true,
+      },
+      {
+        source: '/cookies',
+        destination: '/legal/cookies',
+        permanent: true,
+      },
+      {
+        source: '/security',
+        destination: '/legal/security',
         permanent: true,
       },
     ];

@@ -183,9 +183,10 @@ Full narrative assessment: [`WS04_T013_UPLOAD_SECURITY_DECISION.md`](./WS04_T013
 
 ## Rate limiting (general)
 
-- [ ] Auth endpoints rate limited
-- [ ] Analytics endpoints rate limited
-- [ ] Upload endpoints rate limited (per user and IP)
+- [x] Analytics endpoints rate limited
+- [x] Upload endpoints rate limited (per user and IP)
+- [ ] Browser GoTrue sign-in/sign-up not wrapped by `RATE_LIMITS.auth` (Supabase Auth limits only)
+- [x] `POST /api/auth/complete-password-reset` uses `RATE_LIMITS.auth` (fail-closed)
 
 ## Payments
 

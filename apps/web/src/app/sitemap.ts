@@ -22,8 +22,10 @@ const STATIC_PATHS = [
   '/sign-up',
   '/legal/privacy',
   '/legal/terms',
+  '/legal/cookies',
   '/legal/acceptable-use',
   '/legal/dmca',
+  '/legal/security',
   '/legal/subscription',
   '/legal/contact',
 ] as const;

@@ -38,7 +38,7 @@ export function DashboardNav({ profileSlug }: { profileSlug?: string }) {
 
         <div className="ml-auto flex items-center gap-4">
           {profileSlug && (
-            <Link href={`/${profileSlug}`} target="_blank" className="cc-btn-ghost hidden h-9 px-3 sm:inline-flex">
+            <Link href={`/${profileSlug}`} target="_blank" rel="noopener noreferrer" className="cc-btn-ghost hidden h-9 px-3 sm:inline-flex">
               /{profileSlug}
             </Link>
           )}

@@ -4,7 +4,7 @@ import {
   listModerationReports,
   moderationReportListQuerySchema,
 } from '@/lib/admin/moderation-data';
-import { requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
+import { enforceAdminRateLimit, requireGlobalAdminApiAccess } from '@/lib/security/admin-api-authorization';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +17,9 @@ const PRIVATE_HEADERS = {
 export async function GET(request: Request) {
   const authorization = await requireGlobalAdminApiAccess();
   if (!authorization.ok) return authorization.response;
+
+  const limited = await enforceAdminRateLimit(request, authorization.userId);
+  if (limited) return limited;
 
   const url = new URL(request.url);
   const parsed = moderationReportListQuerySchema.safeParse({

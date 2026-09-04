@@ -33,14 +33,22 @@ const PUBLISHED_INBOXES: Record<string, string[]> = {
 
 describe('public support contact mechanism', () => {
   it('publishes a general support inbox', () => {
-    expect(contact).toContain('hello@codecard.app');
+    expect(readWeb('src/lib/legal/constants.ts')).toContain('hello@codecard.app');
+    expect(contact).toMatch(/SUPPORT_INBOX|hello@codecard\.app/);
     expect(contact).toMatch(/support/i);
   });
 
   it('renders every published address as a clickable mailto link', () => {
+    const constants = readWeb('src/lib/legal/constants.ts');
     for (const [address, files] of Object.entries(PUBLISHED_INBOXES)) {
+      expect(constants, address).toContain(`'${address}'`);
       for (const file of files) {
-        expect(readWeb(file), `${address} in ${file}`).toContain(`mailto:${address}`);
+        const src = readWeb(file);
+        const literal = src.includes(`mailto:${address}`);
+        const viaConstant =
+          /mailto:\$\{(SUPPORT|PRIVACY|BILLING|COPYRIGHT)_INBOX\}/.test(src) &&
+          constants.includes(`'${address}'`);
+        expect(literal || viaConstant, `${address} in ${file}`).toBe(true);
       }
     }
   });

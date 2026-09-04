@@ -51,5 +51,6 @@ describe('P0 recovery session route gate contracts', () => {
     expect(api).toContain('clearPasswordRecoveryPrivilege');
     expect(api).toContain("scope: 'global'");
     expect(api).toContain('userHasPasswordRecoveryPrivilege');
+    expect(api).toContain("rateLimit(`auth:reset:${ip}`, 'auth')");
   });
 });

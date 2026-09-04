@@ -206,9 +206,9 @@ Run against staging first, with a test mailbox.
        | `dmca@codecard.app` | `/legal/contact`, `/legal/dmca` |
        | `dmarc@codecard.app` | DMARC `rua` (§3.3) |
 
-9. [ ] Replace the physical address placeholder on `/legal/dmca`
-       (`[Physical address placeholder. Update before launch]`). A DMCA agent
-       designation is incomplete without it.
+9. [ ] Replace the physical-address and designated-agent placeholders on `/legal/dmca`
+       only after a real DMCA agent is registered. Until then the page must not claim
+       a registered agent or invent a legal entity such as “CodeCard, Inc.”
 
 ---
 

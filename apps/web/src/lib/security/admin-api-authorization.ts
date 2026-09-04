@@ -1,8 +1,9 @@
 import 'server-only';
 
-import { apiError, internalError, unauthorized } from '@/lib/api-utils';
+import { apiError, getClientIp, internalError, rateLimited, unauthorized } from '@/lib/api-utils';
 import { resolveGlobalAdminAuthorization } from '@/lib/security/admin-authorization';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 type AdminApiAuthorization =
   | { ok: true; userId: string }
@@ -37,4 +38,17 @@ export async function requireGlobalAdminApiAccess(): Promise<AdminApiAuthorizati
   } catch {
     return { ok: false, response: internalError() };
   }
+}
+
+/** Non-strict budget — Redis outages must not lock operators out. */
+export async function enforceAdminRateLimit(
+  request: Request,
+  userId: string,
+): Promise<ReturnType<typeof rateLimited> | null> {
+  const ip = getClientIp(request);
+  const ipLimit = await rateLimit(`admin:ip:${ip}`, 'admin');
+  if (!ipLimit.success) return rateLimited();
+  const userLimit = await rateLimit(`admin:user:${userId}`, 'admin');
+  if (!userLimit.success) return rateLimited();
+  return null;
 }

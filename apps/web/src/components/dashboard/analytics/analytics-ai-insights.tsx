@@ -6,7 +6,7 @@ import { AppCard, SectionLabel } from '../ui/dashboard-ui';
 export function AnalyticsAiInsights({ insights }: { insights: AnalyticsBundle['insights'] }) {
   return (
     <AppCard tone="meringue" className="!p-6 md:!p-8">
-      <SectionLabel>AI insight</SectionLabel>
+      <SectionLabel>Sample insight</SectionLabel>
       <p className="mt-3 text-[17px] font-medium leading-snug text-[var(--app-ink)] md:text-[18px]">
         {insights.highlight}
       </p>

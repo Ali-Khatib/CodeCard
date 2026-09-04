@@ -25,6 +25,7 @@ import { trackProjectEngagementEvent, canTrackId } from '@/components/research/r
 import { useActiveTimeTracking } from '@/hooks/use-active-time-tracking';
 import { PublicReportDialog } from '@/components/moderation/public-report-dialog';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
+import { useConfirmPanelA11y } from '@/lib/a11y/use-confirm-panel-a11y';
 import {
   projectCoverAlt,
   projectScreenshotAlt,
@@ -67,6 +68,12 @@ export function ProjectDetailView({
   const openCtx = useProjectOpenOptional();
   const reducedMotion = useReducedMotion();
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const closeLightbox = useCallback(() => setLightbox(null), []);
+  const { panelRef: lightboxRef } = useConfirmPanelA11y({
+    open: Boolean(lightbox),
+    initialFocus: 'first',
+    onClose: closeLightbox,
+  });
   const [videoFailed, setVideoFailed] = useState(false);
   const viewedSections = useRef<Set<string>>(new Set());
   const [fromTransition] = useState(
@@ -425,6 +432,7 @@ export function ProjectDetailView({
 
       {lightbox && (
         <div
+          ref={lightboxRef}
           className="fixed inset-0 z-[200] flex items-center justify-center bg-void-canvas/95 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
@@ -434,7 +442,7 @@ export function ProjectDetailView({
             type="button"
             className="absolute inset-0"
             aria-label="Close viewer"
-            onClick={() => setLightbox(null)}
+            onClick={closeLightbox}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
