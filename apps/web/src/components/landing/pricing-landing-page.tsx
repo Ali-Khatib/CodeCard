@@ -21,7 +21,7 @@ const FAQ = [
   },
   {
     q: 'What do I get with Pro?',
-    a: 'Pro is for when you want to use CodeCard seriously: look more professional and track more deeply. You get unlimited projects, premium analytics, per research paper analytics, and visitor insights.',
+    a: 'Pro includes unlimited projects, custom domains, AI assistance for creating projects, AI-generated presentation and writing inside projects, per-project peer research analysis, per-project peer project analysis, premium analytics, per-research-paper analytics, and visitor insights.',
   },
   {
     q: 'How does billing work?',
@@ -33,7 +33,7 @@ const FAQ = [
   },
   {
     q: 'Can I use a custom domain?',
-    a: 'Not yet. Custom domains are a planned Pro option shown in Settings; they are not available to claim today.',
+    a: 'Yes. Custom domains are included with Pro. Set one up from Settings once you upgrade.',
   },
 ] as const;
 

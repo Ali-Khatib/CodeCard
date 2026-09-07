@@ -136,12 +136,11 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
         },
         {
           label: 'Custom domain',
-          hint: plan === 'pro' ? 'Available on your plan' : 'Included with Pro — claim a custom domain',
+          hint: plan === 'pro' ? 'Included with Pro' : 'Included with Pro — claim a custom domain',
           value: plan === 'pro' ? 'Not configured' : 'Available on Pro',
           action: plan === 'pro' ? 'Set up' : 'Upgrade',
           href: billingHref,
           control: 'value-edit',
-          comingSoon: plan === 'pro',
         },
         {
           label: 'Profile visibility',
