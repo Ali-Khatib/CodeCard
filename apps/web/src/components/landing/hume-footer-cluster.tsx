@@ -8,23 +8,36 @@ import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import '@/styles/site-footer.css';
 import '@/styles/editorial-landing.css';
 
-const FOOTER_NAV = [
+const FOOTER_COL_PRODUCT = [
   { label: 'Home', href: MARKETING_HOME_HREF },
   { label: 'Live demo', href: LIVE_DEMO_HREF },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Research', href: '/research' },
 ] as const;
 
-const FOOTER_LEGAL = [
+const FOOTER_COL_LEGAL_A = [
   { label: 'Privacy', href: '/legal/privacy' },
   { label: 'Terms', href: '/legal/terms' },
   { label: 'Cookies', href: '/legal/cookies' },
+] as const;
+
+const FOOTER_COL_LEGAL_B = [
   { label: 'Acceptable Use', href: '/legal/acceptable-use' },
   { label: 'Copyright', href: '/legal/dmca' },
   { label: 'Security', href: '/legal/security' },
+] as const;
+
+const FOOTER_COL_ACCOUNT = [
   { label: 'Billing', href: '/legal/subscription' },
   { label: 'Contact', href: '/legal/contact' },
   { label: 'Sign in', href: '/sign-in' },
+] as const;
+
+const FOOTER_COLUMNS = [
+  FOOTER_COL_PRODUCT,
+  FOOTER_COL_LEGAL_A,
+  FOOTER_COL_LEGAL_B,
+  FOOTER_COL_ACCOUNT,
 ] as const;
 
 /**
@@ -113,9 +126,12 @@ export function HumeFooterCluster() {
                 Open Live Demo
               </LiveDemoLink>
             </div>
-            <div className="cc-site-footer__cols">
-              <ul>
-                {FOOTER_NAV.map((link) => (
+          </div>
+
+          <nav className="cc-site-footer__cols" aria-label="Footer">
+            {FOOTER_COLUMNS.map((column) => (
+              <ul key={column[0].label}>
+                {column.map((link) => (
                   <li key={link.label}>
                     {link.href === LIVE_DEMO_HREF ? (
                       <LiveDemoLink className="cc-site-footer__link">
@@ -129,17 +145,8 @@ export function HumeFooterCluster() {
                   </li>
                 ))}
               </ul>
-              <ul>
-                {FOOTER_LEGAL.map((link) => (
-                  <li key={link.label}>
-                    <Link href={link.href} className="cc-site-footer__link">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+            ))}
+          </nav>
 
           <p className="cc-site-footer__ghost" aria-hidden>
             <span>Get</span>
