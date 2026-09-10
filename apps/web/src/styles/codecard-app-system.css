@@ -61,11 +61,12 @@
   --app-mono: var(--font-eyebrow), ui-monospace, monospace;
 
   /* —— Type scale (roles) —— */
-  --app-type-display: clamp(34px, 5.8vw, 52px);
-  --app-type-page: clamp(28px, 4vw, 40px);
-  --app-type-section: clamp(24px, 3.2vw, 32px);
-  --app-type-work: clamp(1.55rem, 3.2vw, 2.35rem); /* project / research titles */
-  --app-type-work-compact: clamp(1.35rem, 2.6vw, 1.85rem);
+  --app-type-display: clamp(40px, 6.4vw, 60px);
+  --app-type-page: clamp(32px, 4.6vw, 46px);
+  --app-type-section: clamp(26px, 3.5vw, 36px);
+  --app-display-tracking: -0.012em;
+  --app-type-work: clamp(1.7rem, 3.4vw, 2.5rem); /* project / research titles */
+  --app-type-work-compact: clamp(1.45rem, 2.8vw, 2rem);
   --app-type-card-title: clamp(17px, 1.6vw, 20px);
   --app-type-body: 15px;
   --app-type-subtitle: clamp(16px, 2vw, 18px);
@@ -506,12 +507,12 @@ html.dark .cc-app-sidebar__brand:focus-visible {
 }
 
 .cc-app-title {
-  max-width: 760px;
+  max-width: min(100%, 46rem);
   font-family: var(--app-display);
   font-size: var(--app-type-display);
   font-weight: 500;
-  line-height: 1.04;
-  letter-spacing: -0.055em;
+  line-height: 1.14;
+  letter-spacing: var(--app-display-tracking);
   color: var(--app-ink);
   text-wrap: balance;
 }
@@ -538,8 +539,8 @@ html.dark .cc-app-sidebar__brand:focus-visible {
   font-family: var(--app-display);
   font-size: var(--app-type-page);
   font-weight: 520;
-  line-height: 1.15;
-  letter-spacing: -0.055em;
+  line-height: 1.18;
+  letter-spacing: var(--app-display-tracking);
   color: var(--app-ink);
 }
 
@@ -1507,8 +1508,8 @@ html.dark .cc-project-nav-btn svg,
   font-family: var(--app-display);
   font-size: var(--app-type-section);
   font-weight: 520;
-  letter-spacing: -0.05em;
-  line-height: 1.08;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.16;
   color: var(--app-ink);
 }
 
@@ -1992,8 +1993,8 @@ html.dark .cc-app-badge--blush {
   }
 
   .cc-app-title {
-    font-size: clamp(30px, 9vw, 44px);
-    line-height: 1.04;
+    font-size: clamp(34px, 8.5vw, 48px);
+    line-height: 1.16;
   }
 
   .cc-app-subtitle {
@@ -3183,8 +3184,8 @@ html.dark .cc-app-root .cc-connection-blob:hover {
   font-family: var(--app-display);
   font-size: var(--app-type-work);
   font-weight: 520;
-  line-height: 1.05;
-  letter-spacing: -0.055em;
+  line-height: 1.16;
+  letter-spacing: var(--app-display-tracking);
   overflow-wrap: anywhere;
   text-wrap: balance;
   color: var(--app-ink);
@@ -3192,8 +3193,8 @@ html.dark .cc-app-root .cc-connection-blob:hover {
 
 .cc-work-title--compact {
   font-size: var(--app-type-work-compact);
-  line-height: 1.1;
-  letter-spacing: -0.05em;
+  line-height: 1.18;
+  letter-spacing: var(--app-display-tracking);
 }
 
 .cc-work-title--hero {
@@ -3205,8 +3206,8 @@ html.dark .cc-app-root .cc-connection-blob:hover {
 .cc-app-project-card .cc-research-paper-card__title {
   font-size: clamp(1.7rem, 3.6vw, 2.55rem);
   font-weight: 650;
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  line-height: 1.18;
+  letter-spacing: var(--app-display-tracking);
 }
 
 .cc-app-project-card__drag {
@@ -3458,8 +3459,8 @@ html.dark .cc-connection-grid-card--open.cc-reactive-border::before {
 .cc-analytics-project-panel .cc-app-section-label {
   display: block;
   font-size: clamp(30px, 4.2vw, 40px);
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  line-height: 1.16;
+  letter-spacing: var(--app-display-tracking);
 }
 
 .cc-analytics-project-panel .cc-app-section-subtitle {
@@ -3632,8 +3633,8 @@ html.dark .cc-analytics-project-card__head {
   font-family: var(--app-display);
   font-size: clamp(22px, 2.8vw, 28px);
   font-weight: 520;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.18;
   color: var(--app-ink);
 }
 
@@ -3743,8 +3744,8 @@ html.dark .cc-analytics-project-metric {
 .cc-analytics-research-panel .cc-app-section-label {
   display: block;
   font-size: clamp(30px, 4.2vw, 40px);
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  line-height: 1.16;
+  letter-spacing: var(--app-display-tracking);
 }
 
 .cc-analytics-research-panel .cc-app-section-subtitle {
@@ -4559,8 +4560,8 @@ html.dark .cc-analytics-paper-table__signal-chip {
   font-family: var(--app-display);
   font-size: var(--app-type-display);
   font-weight: 500;
-  letter-spacing: -0.055em;
-  line-height: 1.02;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.14;
   color: var(--app-ink);
   text-wrap: balance;
 }
@@ -4599,7 +4600,7 @@ html.dark .cc-analytics-paper-table__signal-chip {
 .cc-profile-home__zone-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -4624,17 +4625,18 @@ html.dark .cc-analytics-paper-table__signal-chip {
 .cc-workspace-section__title {
   margin-top: 8px;
   font-family: var(--app-display);
-  font-size: clamp(1.85rem, 4.2vw, 2.65rem);
-  font-weight: 560;
-  letter-spacing: -0.045em;
-  line-height: 1.08;
+  font-size: var(--app-type-page);
+  font-weight: 500;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.16;
   color: var(--app-ink);
+  text-wrap: balance;
 }
 
 .cc-workspace-section__copy {
   margin-top: 10px;
-  max-width: 36rem;
-  font-size: clamp(14px, 1.6vw, 16px);
+  max-width: 42rem;
+  font-size: clamp(15px, 1.7vw, 17px);
   line-height: 1.55;
   color: var(--app-smoke);
 }
@@ -5004,8 +5006,8 @@ html.dark .cc-home-circle-glance__card:hover {
   font-family: var(--app-display);
   font-size: var(--app-type-section);
   font-weight: 520;
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  line-height: 1.16;
+  letter-spacing: var(--app-display-tracking);
   color: var(--app-ink);
 }
 
@@ -5167,8 +5169,8 @@ html.dark .cc-home-circle-glance__card:hover {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: clamp(16px, 1.75vw, 20px);
   font-weight: 520;
-  letter-spacing: -0.055em;
-  line-height: 1.08;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.2;
   color: var(--app-ink);
   display: block;
   overflow: visible;
