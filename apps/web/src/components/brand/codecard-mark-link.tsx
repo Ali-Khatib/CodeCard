@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CodeCardMark } from '@/components/brand/codecard-mark';
+import { CodeCardExpandingMark } from '@/components/brand/codecard-mark';
 import '@/styles/codecard-mark.css';
 
 /** CodeCard brand mark as a home link. */
@@ -23,9 +23,7 @@ export function CodeCardMarkLink({
       aria-label={ariaLabel}
       data-testid={testId}
     >
-      <span className="cc-ed-mark-logo__inner" aria-hidden>
-        <CodeCardMark />
-      </span>
+      <CodeCardExpandingMark />
     </Link>
   );
 }

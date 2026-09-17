@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { CodeCardMark } from '@/components/brand/codecard-mark';
+import { CodeCardExpandingMark } from '@/components/brand/codecard-mark';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import '@/styles/codecard-mark.css';
 
@@ -43,9 +43,7 @@ export function CodeCardMarkLogo() {
       aria-label="CodeCard home — scroll to top"
       onClick={handleClick}
     >
-      <span className="cc-ed-mark-logo__inner" aria-hidden>
-        <CodeCardMark />
-      </span>
+      <CodeCardExpandingMark />
     </button>
   );
 }

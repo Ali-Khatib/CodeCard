@@ -20,3 +20,15 @@ export function CodeCardMark({
     </svg>
   );
 }
+
+/** Overlapping CC that expands into CodeCard on hover/focus. */
+export function CodeCardExpandingMark() {
+  return (
+    <span className="cc-ed-mark-logo__inner" aria-hidden>
+      <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--first">C</span>
+      <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--left">ode</span>
+      <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--second">C</span>
+      <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--right">ard</span>
+    </span>
+  );
+}

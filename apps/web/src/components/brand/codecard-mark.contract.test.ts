@@ -17,18 +17,19 @@ describe('CodeCard brand mark assets', () => {
     expect(read('src/app/layout.tsx')).toContain('/brand/apple-touch-icon.png');
   });
 
-  it('uses the overlapping SVG mark in chrome, not two text C letters', () => {
+  it('expands the overlapping CC into CodeCard on hover', () => {
     const mark = read('src/components/brand/codecard-mark.tsx');
+    const css = read('src/styles/codecard-mark.css');
     const landing = read('src/components/landing/codecard-mark-logo.tsx');
     const link = read('src/components/brand/codecard-mark-link.tsx');
     expect(mark).toContain('<svg');
-    expect(mark).toContain('fillRule="evenodd"');
-    expect(mark).not.toMatch(/>C</);
-    expect(landing).toContain('CodeCardMark');
-    expect(landing).not.toContain('cc-ed-mark-logo__c');
-    expect(link).toContain('CodeCardMark');
-    expect(link).not.toContain('cc-ed-mark-logo__c');
-    expect(link).not.toContain('cc-ed-mark-logo__fill');
+    expect(mark).toContain('CodeCardExpandingMark');
+    expect(mark).toContain('ode');
+    expect(mark).toContain('ard');
+    expect(css).toContain('.cc-ed-mark-logo__fill');
+    expect(css).toContain('max-width: 0');
+    expect(landing).toContain('CodeCardExpandingMark');
+    expect(link).toContain('CodeCardExpandingMark');
   });
 
   it('embeds the mark in Open Graph cards', () => {

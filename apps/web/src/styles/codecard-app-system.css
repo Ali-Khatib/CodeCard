@@ -227,9 +227,8 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   color: inherit !important;
 }
 
-.cc-app-sidebar__brand .cc-ed-mark-logo__mark {
-  width: 1.85rem;
-  height: 1.85rem;
+.cc-app-sidebar__brand .cc-ed-mark-logo__inner {
+  font-size: 1.85rem;
 }
 
 html.dark .cc-app-sidebar__brand.cc-ed-mark-logo,
