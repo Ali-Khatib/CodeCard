@@ -122,11 +122,13 @@ export function EditorialWaitlist() {
               exit={reduceMotion ? undefined : { opacity: 0 }}
               transition={transition}
             >
+              <p className="cc-ed-waitlist__eyebrow">Confirmed</p>
               <h2
                 id="editorial-waitlist-heading"
                 className="cc-ed-waitlist__title"
               >
-                YOU&apos;RE IN.
+                <span className="cc-ed-waitlist__lead">YOU&apos;RE</span>
+                <span className="cc-ed-waitlist__accent">IN.</span>
               </h2>
               <p className="cc-ed-waitlist__lede">
                 {result.status === 'already'
@@ -143,11 +145,13 @@ export function EditorialWaitlist() {
               exit={reduceMotion ? undefined : { opacity: 0 }}
               transition={transition}
             >
+              <p className="cc-ed-waitlist__eyebrow">Waitlist</p>
               <h2
                 id="editorial-waitlist-heading"
                 className="cc-ed-waitlist__title"
               >
-                GET EARLY ACCESS
+                <span className="cc-ed-waitlist__lead">GET EARLY</span>
+                <span className="cc-ed-waitlist__accent">ACCESS</span>
               </h2>
               <p id={hintId} className="cc-ed-waitlist__lede">
                 Be the first to know when CodeCard is ready.
