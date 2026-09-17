@@ -20,6 +20,10 @@ import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { CodeCardMarkLink } from '@/components/brand/codecard-mark-link';
+import {
+  shellCreateProjectEmphasis,
+  type HomeLoopState,
+} from '@/lib/profile/completion';
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
@@ -57,6 +61,8 @@ type DashboardShellProps = {
   emailVerificationRequired?: boolean;
   /** Private Circle freshness badge ("1"…"9" or "9+"); never demo values. */
   circleUnreadBadge?: string | null;
+  /** Home loop state; Create project is primary only in create_project. */
+  homeLoopState?: HomeLoopState | null;
 };
 
 function CopyProfileLinkButton({ slug }: { slug: string }) {
@@ -91,6 +97,7 @@ export function DashboardShell({
   preview = false,
   emailVerificationRequired = false,
   circleUnreadBadge = null,
+  homeLoopState = null,
 }: DashboardShellProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -369,9 +376,11 @@ export function DashboardShell({
             <ThemeToggle />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
-          <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
-            ← Back to landing
-          </AppButton>
+          {preview ? (
+            <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
+              ← Back to landing
+            </AppButton>
+          ) : null}
         </div>
       </aside>
 
@@ -386,7 +395,7 @@ export function DashboardShell({
           <div className="flex-1" />
           {!embedded ? <DashboardNotifications basePath={basePath} /> : null}
           <AppButton
-            variant="primary"
+            variant={shellCreateProjectEmphasis(homeLoopState)}
             className="cc-app-topbar-cta shrink-0"
             href={workspaceCreateProjectHref(basePath)}
             ariaLabel="Create project"

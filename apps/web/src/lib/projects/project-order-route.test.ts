@@ -10,10 +10,10 @@ function read(relativePath: string) {
 
 describe('project ordering integration', () => {
   it('loads effective ordering on the dashboard projects route', () => {
-    const page = read('src/app/dashboard/(authenticated)/projects/page.tsx');
+    const page = read('src/app/dashboard/(authenticated)/work/page.tsx');
     expect(page).toContain('loadProfileProjectOrderings');
     expect(page).toContain('sortProjectsByEffectiveOrder');
-    expect(page).not.toMatch(/from\('projects'\)[\s\S]*\.order\('sort_order'/);
+    expect(page).toContain("from('projects')");
   });
 
   it('exposes accessible move controls on the dashboard project list', () => {

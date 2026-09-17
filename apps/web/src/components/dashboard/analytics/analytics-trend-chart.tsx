@@ -69,37 +69,40 @@ export function AnalyticsTrendChart({
       {rangeEmpty ? (
         <p className="mt-6 text-[14px] text-[var(--app-smoke)]" role="status">
           {hasLifetimeEvents
-            ? `No recorded activity in the last ${trends.range} UTC days. Lifetime totals above are unchanged.`
+            ? `No recorded activity in the last ${trends.range} UTC days. Totals above still reflect retained events.`
             : `No activity in the last ${trends.range} UTC days yet.`}
         </p>
       ) : null}
 
-      <ul className="mt-6 space-y-2" aria-label={`${trends.range}-day activity`}>
-        {trends.buckets.map((bucket) => {
-          const value = bucket.profileViews + bucket.projectViews + bucket.linkClicks;
-          const pct = (value / max) * 100;
-          return (
-            <li key={bucket.day} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-3">
-              <span className="text-[12px] tabular-nums text-[var(--app-smoke)]">{bucket.label}</span>
-              <div className="h-2 overflow-hidden rounded-full bg-[var(--app-bone)]" aria-hidden>
-                <div
-                  className="h-full rounded-full bg-[var(--app-iris)]"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              <span className="text-right text-[12px] tabular-nums text-[var(--app-ink)]">
-                {value}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+      {!rangeEmpty ? (
+        <ul className="mt-6 space-y-2" aria-label={`${trends.range}-day activity`}>
+          {trends.buckets.map((bucket) => {
+            const value = bucket.profileViews + bucket.projectViews + bucket.linkClicks;
+            const pct = (value / max) * 100;
+            return (
+              <li key={bucket.day} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-3">
+                <span className="text-[12px] tabular-nums text-[var(--app-smoke)]">{bucket.label}</span>
+                <div className="h-2 overflow-hidden rounded-full bg-[var(--app-bone)]" aria-hidden>
+                  <div
+                    className="h-full rounded-full bg-[var(--app-iris)]"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="text-right text-[12px] tabular-nums text-[var(--app-ink)]">
+                  {value}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
 
-      <p className="mt-4 text-[13px] text-[var(--app-smoke)]">
-        Period totals · {trends.totals.profileViews} profile · {trends.totals.projectViews}{' '}
-        project · {trends.totals.linkClicks} links · {trends.totals.profileShares} shares ·{' '}
-        {trends.totals.qrDownloads} QR downloads
-      </p>
+      {!rangeEmpty ? (
+        <p className="mt-4 text-[13px] text-[var(--app-smoke)]">
+          Period totals · {trends.totals.profileViews} CodeCard views ·{' '}
+          {trends.totals.projectViews} project · {trends.totals.linkClicks} links
+        </p>
+      ) : null}
     </AppCard>
   );
 }

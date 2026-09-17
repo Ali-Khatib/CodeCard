@@ -54,6 +54,13 @@ export const metadata: Metadata = {
   description:
     "The fastest way to show someone what you're capable of. Your best work, ready to share by link, QR, or from your phone.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  icons: {
+    icon: [
+      { url: '/brand/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/codecard-mark.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/brand/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
   openGraph: {
     type: 'website',
     siteName: 'CodeCard',

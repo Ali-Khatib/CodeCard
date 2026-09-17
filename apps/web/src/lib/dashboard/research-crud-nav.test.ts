@@ -35,7 +35,7 @@ describe('WS09-T005 research CRUD navigation', () => {
   });
 
   it('wires Research tab create/edit/public actions without href="#"', () => {
-    const page = read('src/app/dashboard/(authenticated)/research/page.tsx');
+    const page = read('src/app/dashboard/(authenticated)/work/page.tsx');
     const view = read('src/components/dashboard/dashboard-research-view.tsx');
 
     expect(page).toContain('isProfilePublic');

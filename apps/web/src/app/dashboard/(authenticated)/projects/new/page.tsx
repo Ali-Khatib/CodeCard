@@ -1,5 +1,6 @@
 import { ProjectCreateForm } from '@/components/dashboard/project-create-form';
 import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
 import {
   countOwnedProjects,
   getProjectLimitForPlan,
@@ -39,7 +40,16 @@ export default async function NewProjectPage() {
           Create a project card
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Start with showcase images, fill in the project details, then create at the bottom.
+          Start with showcase images, fill in the project details, then create at the bottom. You
+          will land on the editor next — then return to Home to publish your CodeCard.
+        </p>
+        <p className="mt-4">
+          <Link
+            href="/dashboard"
+            className="text-[14px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
+          >
+            ← Back to Home
+          </Link>
         </p>
       </div>
       <ProjectCreateForm usage={usage} />

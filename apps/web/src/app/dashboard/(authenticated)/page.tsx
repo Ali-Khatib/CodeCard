@@ -10,7 +10,7 @@ import { loadOwnerOverviewContent } from '@/lib/dashboard/overview-queries';
 import { overviewCircleWorksFromAuthFeed } from '@/lib/dashboard/overview-circle-works';
 import type { OverviewCircleWorksEmpty } from '@/lib/dashboard/overview-circle-works';
 import { listCircleFeed } from '@/lib/circle/circle-feed-core';
-import { getProfileCompletionNextStep } from '@/lib/profile/completion';
+import { getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 
 export default async function DashboardHomePage() {
@@ -60,8 +60,9 @@ export default async function DashboardHomePage() {
   }));
 
   const completion = completionResult.completion;
-  const suggested = getProfileCompletionNextStep(completion, {
+  const suggested = getHomeWorkspaceNextStep(completion, {
     hasAnyProject: completionResult.hasAnyProject,
+    isPublic: profile.is_public === true,
   });
   const displayName = profile.display_name ?? user?.email?.split('@')[0] ?? 'there';
 
@@ -117,6 +118,7 @@ export default async function DashboardHomePage() {
       circleWorks={circleWorks}
       circleWorksEmpty={circleWorksEmpty}
       suggested={suggested}
+      hasAnyProject={completionResult.hasAnyProject}
     />
   );
 }

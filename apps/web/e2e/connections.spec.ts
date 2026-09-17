@@ -16,7 +16,7 @@ test.describe('WS15 Connections management (mocked browser)', () => {
   test('empty authenticated state never shows demo people', async ({ page }) => {
     await openFixture(page);
     await page.getByRole('button', { name: 'Connections dashboard' }).click();
-    await expect(page.getByRole('heading', { name: 'Meet in person. Scan to connect.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your connections will appear here' })).toBeVisible();
     await expect(page.getByText('Jordan Lee')).toHaveCount(0);
     await expect(page.getByText('Alex Chen')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Share your CodeCard' })).toBeVisible();

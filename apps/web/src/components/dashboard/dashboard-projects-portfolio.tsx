@@ -30,6 +30,7 @@ type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
 
 const SORT_OPTIONS = ['Visitor order', 'Most views', 'Recently updated'] as const;
 type ProjectSort = (typeof SORT_OPTIONS)[number];
+const SORT_WITHOUT_VIEWS: ProjectSort[] = ['Visitor order', 'Recently updated'];
 
 const VIEW_MODES = [
   { id: 'stack' as const, label: 'Stack', icon: HiBars3BottomLeft },
@@ -92,7 +93,11 @@ function sortProjects(projects: PortfolioProject[], sort: ProjectSort): Portfoli
     return list.sort((a, b) => (b.views ?? 0) - (a.views ?? 0));
   }
   if (sort === 'Recently updated') {
-    return list.reverse();
+    return list.sort((a, b) => {
+      const aTime = a.updatedAt ? Date.parse(a.updatedAt) : 0;
+      const bTime = b.updatedAt ? Date.parse(b.updatedAt) : 0;
+      return bTime - aTime;
+    });
   }
   return list;
 }
@@ -119,11 +124,14 @@ export function DashboardProjectsPortfolio({
   const [sort, setSort] = useState<ProjectSort>('Visitor order');
   const [internalViewMode, setInternalViewMode] = useState<ViewMode>('stack');
   const viewMode = viewModeProp ?? internalViewMode;
+  const hasViewCounts = projects.some((project) => typeof project.views === 'number');
+  const sortOptions: readonly ProjectSort[] = hasViewCounts ? SORT_OPTIONS : SORT_WITHOUT_VIEWS;
+  const activeSort = sortOptions.includes(sort) ? sort : 'Visitor order';
   const projectFilters = useMemo(() => getProjectFilterOptions(projects), [projects]);
   const filteredProjects = useMemo(() => {
     const filtered = projects.filter((p) => matchesFilter(p, filter));
-    return sortProjects(filtered, sort);
-  }, [projects, filter, sort]);
+    return sortProjects(filtered, activeSort);
+  }, [projects, filter, activeSort]);
 
   if (emptyState) {
     return (
@@ -164,7 +172,7 @@ export function DashboardProjectsPortfolio({
         <div className="cc-projects-toolbar">
           <div className="flex flex-wrap items-center gap-3">
             <FilterBar options={projectFilters} value={filter} onChange={setFilter} ariaLabel="Project filters" />
-            <FilterBar options={SORT_OPTIONS} value={sort} onChange={setSort} ariaLabel="Project sort" />
+            <FilterBar options={sortOptions} value={activeSort} onChange={setSort} ariaLabel="Project sort" />
             {embedded ? null : (
             <div className="cc-projects-view-toggle" role="group" aria-label="Project layout">
               {VIEW_MODES.map(({ id, label, icon: Icon }) => (
@@ -201,7 +209,7 @@ export function DashboardProjectsPortfolio({
             projects={filteredProjects}
             basePath={basePath}
             orderedProjectIds={projects.map((project) => project.id)}
-            canReorder={sort === 'Visitor order'}
+            canReorder={activeSort === 'Visitor order'}
             openTransition={openTransition}
           />
         )

@@ -1,13 +1,12 @@
 import { DashboardOverviewView } from '@/components/dashboard/dashboard-overview-view';
 import {
   DEMO_PROFILE_LINKS,
-  DEMO_SUGGESTED_STEP,
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
 import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
 import { overviewCircleWorksFromDemoFeed } from '@/lib/dashboard/overview-circle-works';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
-import { calculateProfileCompletion, deriveProfileCompletionInput } from '@/lib/profile/completion';
+import { calculateProfileCompletion, deriveProfileCompletionInput, getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import type { Profile, ProfileLinkType } from '@codecard/types';
@@ -108,10 +107,12 @@ export default function DemoWorkspaceOverviewPage() {
         ],
       }}
       circleWorks={overviewCircleWorksFromDemoFeed(DEMO_CIRCLE_FEED, 3)}
-      suggested={{
-        ...DEMO_SUGGESTED_STEP,
-        href: `${basePath}/work`,
-      }}
+      suggested={getHomeWorkspaceNextStep(completion, {
+        hasAnyProject: true,
+        isPublic: true,
+        basePath,
+      })}
+      hasAnyProject
       basePath={basePath}
     />
   );

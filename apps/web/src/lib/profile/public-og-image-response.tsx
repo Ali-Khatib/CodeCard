@@ -1,4 +1,6 @@
 import { ImageResponse } from 'next/og';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   buildGenericPublicOgCard,
   buildPublicProfileOgCard,
@@ -8,6 +10,10 @@ import {
   safeOgLine,
   type PublicOgCard,
 } from '@/lib/profile/public-og-image';
+
+const MARK_SRC = `data:image/png;base64,${readFileSync(
+  join(process.cwd(), 'src/assets/brand/codecard-mark-512.png'),
+).toString('base64')}`;
 
 export {
   PUBLIC_OG_IMAGE_ALT,
@@ -112,7 +118,9 @@ export function renderPublicOgImage(card: PublicOgCard): ImageResponse {
           }}
         >
           <div style={{ display: 'flex' }}>{handle || 'codecard.app'}</div>
-          <div style={{ display: 'flex', color: '#232324', fontWeight: 600 }}>CodeCard</div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={MARK_SRC} width={72} height={72} alt="CodeCard" />
+          </div>
         </div>
       </div>
     ),

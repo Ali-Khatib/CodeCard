@@ -82,6 +82,7 @@ export function DashboardResearchView({
   return (
     <div className={embedded ? 'space-y-8' : 'cc-app-page cc-app-page--1040 space-y-8'}>
       {embedded ? (
+        papers.length > 0 ? (
         <div className="cc-projects-toolbar">
           <div className="flex flex-wrap items-center gap-3">
             {researchFilters.length > 1 ? (
@@ -93,10 +94,11 @@ export function DashboardResearchView({
               />
             ) : null}
           </div>
-          <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+          <AppButton variant="ghost" href={createHref} ariaLabel={createLabel}>
             {isDemoWorkspace ? 'Sign in to add' : 'Add research'}
           </AppButton>
         </div>
+        ) : null
       ) : (
       <PageHeader
         eyebrow="Research"
@@ -153,7 +155,17 @@ export function DashboardResearchView({
                         Sign in to reorder and edit research.
                       </p>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`cc-app-badge text-[11px] ${paper.isPublished ? 'cc-app-badge--mint' : 'cc-app-badge--blush'}`}
+                      >
+                        {paper.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                      {publicHref ? (
+                        <span className="text-[12px] text-[var(--app-smoke)]">
+                          On your public CodeCard
+                        </span>
+                      ) : null}
                       <Link
                         href={editHref}
                         className="cc-app-btn cc-app-btn--ghost text-[13px]"
@@ -197,7 +209,7 @@ export function DashboardResearchView({
             {EMPTY_STATE_COPY.research.description}
           </p>
           <div className="mt-6 flex justify-center">
-            <AppButton variant="primary" href={createHref} ariaLabel={createLabel}>
+            <AppButton variant={embedded ? 'ghost' : 'primary'} href={createHref} ariaLabel={createLabel}>
               {isDemoWorkspace ? 'Sign in to add research' : EMPTY_STATE_COPY.research.cta}
             </AppButton>
           </div>

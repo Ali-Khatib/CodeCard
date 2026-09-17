@@ -45,6 +45,10 @@ export type PortfolioProject = {
   repoUrl?: string;
   screenshots?: string[];
   isPublished?: boolean;
+  /** Project lifecycle from `projects.status` when loaded. */
+  status?: string | null;
+  /** ISO timestamp from `projects.updated_at` when loaded. */
+  updatedAt?: string | null;
   /** Full featured payload when available — enables the card → page open transition. */
   featured?: FeaturedProject;
 };
@@ -63,6 +67,8 @@ type DbProject = {
   tagline: string | null;
   description?: string | null;
   is_published: boolean;
+  status?: string | null;
+  updated_at?: string | null;
   technologies?: string[] | null;
   case_study_sections?: unknown;
   project_media_assets?: { type: string; storage_path: string; sort_order?: number }[];
@@ -134,6 +140,8 @@ export function dbProjectToPortfolioProject(
     repoUrl: repo?.url,
     screenshots: featured.screenshots,
     isPublished: project.is_published,
+    status: project.status ?? null,
+    updatedAt: project.updated_at ?? null,
   };
 }
 

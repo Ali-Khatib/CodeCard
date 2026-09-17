@@ -25,6 +25,7 @@ export async function reorderProjectsAction(
     if (user) {
       const profileResult = await resolveOwnedProfile(supabase, user.id);
       revalidatePath('/dashboard/projects');
+      revalidatePath('/dashboard/work');
       if (!('error' in profileResult) && profileResult.profile.slug) {
         revalidatePublicProjectNavigation({
           profileSlug: profileResult.profile.slug,

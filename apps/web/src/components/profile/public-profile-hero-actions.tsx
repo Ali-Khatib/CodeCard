@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCopySuccessFlash } from '@/components/interactions/glow-press';
+import { PublicCodeCardQr } from './public-code-card-qr';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MOTION_FEEDBACK } from '@/components/motion/motion-tokens';
 
 const PublicProfileViewerChrome = dynamic(
@@ -108,7 +110,10 @@ export function PublicProfileHeroActions({
 
   const copyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/${profileSlug}`);
+      const url =
+        getPublicProfileLinkForClipboard(profileSlug) ??
+        `${window.location.origin}/${profileSlug}`;
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       flashCopy(copyBtnRef.current);
       window.setTimeout(() => setCopied(false), MOTION_FEEDBACK.successMs);
@@ -163,7 +168,7 @@ export function PublicProfileHeroActions({
           data-testid="profile-qr-modal"
         >
           <div className="mb-3 flex w-full items-center justify-between gap-3">
-            <p className="cc-app-mono">Scan to open</p>
+            <p className="cc-app-mono">Scan to open this CodeCard</p>
             <button
               ref={qrCloseRef}
               type="button"
@@ -175,17 +180,7 @@ export function PublicProfileHeroActions({
               ×
             </button>
           </div>
-          <div className="grid h-40 w-40 max-w-full grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
-            {Array.from({ length: 25 }).map((_, i) => (
-              <div
-                key={i}
-                className={i % 2 === 0 ? 'bg-[var(--app-ink)]' : 'bg-transparent'}
-              />
-            ))}
-          </div>
-          <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-smoke)]">
-            codecard.app/{profileSlug}
-          </p>
+          <PublicCodeCardQr profileSlug={profileSlug} />
         </div>
       ) : null}
     </>

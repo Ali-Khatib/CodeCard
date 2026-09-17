@@ -15,6 +15,7 @@ export function revalidateOwnedResearchPaths(input: {
 }) {
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/research');
+  revalidatePath('/dashboard/work');
   revalidatePath(`/dashboard/research/${input.researchPaperId}/edit`);
   revalidatePath('/dashboard/profile/preview');
 
@@ -45,6 +46,7 @@ export function revalidateDeletedResearchPaths(input: {
 }) {
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/research');
+  revalidatePath('/dashboard/work');
   revalidatePath(`/dashboard/research/${input.researchPaperId}/edit`);
   revalidatePath('/dashboard/profile/preview');
 
@@ -59,6 +61,7 @@ export function revalidateDeletedResearchPaths(input: {
 
 export function revalidateResearchOrderPaths(input: { profileSlug?: string | null }) {
   revalidatePath('/dashboard/research');
+  revalidatePath('/dashboard/work');
   revalidatePath('/dashboard/profile/preview');
   if (input.profileSlug) {
     revalidatePublicProfile(input.profileSlug);

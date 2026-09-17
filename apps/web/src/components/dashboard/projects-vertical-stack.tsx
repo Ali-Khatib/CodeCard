@@ -17,6 +17,20 @@ import { ProjectReorderToolbar } from './project-reorder-toolbar';
 const FALLBACK =
   'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80';
 
+const PROJECT_STATUS_LABELS: Record<string, string> = {
+  draft: 'Draft',
+  active: 'Active',
+  completed: 'Completed',
+  on_hold: 'On hold',
+};
+
+function formatProjectUpdatedAt(value?: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function ProjectRow({
   project,
   index,
@@ -30,7 +44,12 @@ function ProjectRow({
   canReorder: boolean;
   openTransition?: PortfolioOpenTransition;
 }) {
-  const isPublished = project.isPublished !== false;
+  const isPublished = project.isPublished === true;
+  const statusLabel =
+    project.status && project.status !== 'draft'
+      ? PROJECT_STATUS_LABELS[project.status] ?? project.status
+      : null;
+  const updatedLabel = formatProjectUpdatedAt(project.updatedAt);
   const reduced = useReducedMotion();
   const router = useRouter();
   const opening = useContentOpeningOptional();
@@ -101,6 +120,22 @@ function ProjectRow({
                 {project.tagline}
               </p>
             )}
+
+            {statusLabel || updatedLabel ? (
+              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+                {[statusLabel, updatedLabel ? `Updated ${updatedLabel}` : null]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+            ) : null}
+
+            {project.publicHref ? (
+              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">Appears on your public CodeCard</p>
+            ) : isPublished ? (
+              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+                Published — visitors see it after your CodeCard is public
+              </p>
+            ) : null}
 
             {typeof project.views === 'number' || typeof project.saves === 'number' ? (
               <p className="cc-project-hover-card__stats mt-3 text-[13px] text-[var(--app-smoke)]">

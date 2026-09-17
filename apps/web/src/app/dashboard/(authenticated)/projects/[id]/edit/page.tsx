@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { ProjectForm } from '@/components/dashboard/project-form';
 import { ProjectLinksEditor } from '@/components/dashboard/project-links-editor';
 import { ProjectMediaUpload } from '@/components/dashboard/project-media-upload';
@@ -13,10 +14,14 @@ import { createClient } from '@/lib/supabase/server';
 
 export default async function EditProjectPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
+  const fromFirstProject = from === 'first-project';
   const supabase = await createClient();
   const {
     data: { user },
@@ -70,7 +75,17 @@ export default async function EditProjectPage({
           {loaded.project.title}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Start with cover art and screenshots, then update the details and save at the bottom.
+          {fromFirstProject
+            ? 'This is your first project. Finish the details here, then go Home — publishing your CodeCard is the next step.'
+            : 'Start with cover art and screenshots, then update the details and save at the bottom. When you are ready, go Home to publish and share your CodeCard.'}
+        </p>
+        <p className="mt-4">
+          <Link
+            href="/dashboard"
+            className="text-[14px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
+          >
+            ← Back to Home
+          </Link>
         </p>
       </div>
       <ProjectMediaUpload

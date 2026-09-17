@@ -67,5 +67,6 @@ test.describe('Editorial product landing', () => {
     });
     await expect(page.getByTestId('editorial-live-demo-box')).toBeVisible();
     await expect(page.getByTestId('editorial-finale')).toBeVisible();
+    await expect(page.getByTestId('editorial-waitlist')).toBeVisible();
   });
 });

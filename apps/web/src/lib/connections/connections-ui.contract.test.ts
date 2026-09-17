@@ -95,7 +95,7 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(control).toContain("source: 'qr'");
     expect(control).toContain('Connect from QR');
     expect(control).toContain('Remove connection');
-    expect(control).toContain('Sign in to connect');
+    expect(control).toContain('View in Connections');
     expect(control).toContain('if (isOwnProfile)');
     expect(control).toContain('return null');
     const viewer = readFileSync(
@@ -155,13 +155,13 @@ describe('WS15-T004 real Connections save flow', () => {
       'utf8',
     );
     expect(view).toContain('EMPTY_STATE_COPY.connections');
-    expect(view).toContain('copy.primaryCta');
+    expect(view).toContain('EMPTY_STATE_COPY.connections.primaryCta');
     expect(view).not.toContain('href="/profiles"');
     expect(view).toContain('ShareYourCodeCardButton');
     expect(view).toContain('getPublicProfileLinkForClipboard');
     expect(view).toContain('href="/dashboard#share"');
     expect(view).toContain("variant === 'authenticated'");
-    expect(copy).toContain('physical QR scans');
+    expect(copy).toContain('Scan a CodeCard QR');
     expect(copy).toContain('Share your CodeCard');
   });
 

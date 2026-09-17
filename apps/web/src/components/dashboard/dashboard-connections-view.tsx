@@ -20,7 +20,6 @@ import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
-import { CopyLinkButton } from '@/components/ui/copy-link-button';
 import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
 const CONNECTION_VIEW_MODES = [
@@ -73,10 +72,36 @@ const SORT_OPTIONS: Array<{ id: ConnectionsSortId; label: string }> = [
   { id: 'name_desc', label: 'Name Z–A' },
 ];
 
-function connectionEmail(connection: WorkspaceConnection) {
-  const local = connection.name.toLowerCase().replace(/\s+/g, '.');
-  const domain = connection.company.toLowerCase().replace(/[^a-z0-9]/g, '') || 'mail';
-  return `${local}@${domain}.com`;
+function connectionCodeCardHref(
+  connection: ViewConnection,
+  variant: 'demo' | 'authenticated',
+): string | null {
+  if (variant === 'authenticated') {
+    return connection.profileSlug && connection.isPublicTarget !== false
+      ? `/${connection.profileSlug}`
+      : null;
+  }
+  return '/demo/card';
+}
+
+function ConnectionOpenCodeCardButton({
+  href,
+  name,
+}: {
+  href: string;
+  name: string;
+}) {
+  return (
+    <span
+      className="cc-connection-blob__open"
+      onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
+    >
+      <AppButton variant="primary" href={href} ariaLabel={`Open ${name}'s CodeCard`}>
+        Open CodeCard
+      </AppButton>
+    </span>
+  );
 }
 
 function ConnectionExpandedBody({
@@ -101,10 +126,7 @@ function ConnectionExpandedBody({
   onOpenPrivateDetails?: (connectionId: string) => void;
 }) {
   if (variant === 'authenticated') {
-    const href =
-      connection.profileSlug && connection.isPublicTarget !== false
-        ? `/${connection.profileSlug}`
-        : null;
+    const href = connectionCodeCardHref(connection, 'authenticated');
 
     return (
       <div className="cc-connection-expand__grid">
@@ -246,19 +268,6 @@ function ConnectionExpandedBody({
       <div className="cc-connection-actions">
         <AppButton variant="primary" href="/demo/card">
           Open CodeCard
-        </AppButton>
-        <CopyLinkButton
-          getText={() => connectionEmail(connection)}
-          variant="ghost"
-          successLabel="Copied"
-        >
-          Copy email
-        </CopyLinkButton>
-        <AppButton
-          variant="ghost"
-          href={`/sign-in?redirect=${encodeURIComponent('/dashboard/connections')}`}
-        >
-          Sign in to schedule follow-up
         </AppButton>
       </div>
     </div>
@@ -402,6 +411,14 @@ function ConnectionCard({
           <p className="cc-connection-blob__summary-value">{connection.date}</p>
         </div>
       </button>
+      {connectionCodeCardHref(connection, variant) ? (
+        <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
+          <ConnectionOpenCodeCardButton
+            href={connectionCodeCardHref(connection, variant)!}
+            name={connection.name}
+          />
+        </div>
+      ) : null}
 
       <div
         className="cc-connection-blob__expand-slot"
@@ -487,6 +504,14 @@ function ConnectionGridCard({
         <p className="cc-connection-grid-card__name">{connection.name}</p>
         <p className="cc-connection-grid-card__role">{connection.role}</p>
       </button>
+      {connectionCodeCardHref(connection, variant) ? (
+        <div className="flex justify-center px-4 pb-4">
+          <ConnectionOpenCodeCardButton
+            href={connectionCodeCardHref(connection, variant)!}
+            name={connection.name}
+          />
+        </div>
+      ) : null}
 
       <div
         className="cc-connection-grid-card__expand-slot"
@@ -514,7 +539,7 @@ const SHARE_LINK_COPIED_FLAG = 'cc-share-link-copied';
 function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null }) {
   return (
     <AppButton
-      variant="ghost"
+      variant="primary"
       href="/dashboard#share"
       ariaLabel="Share your CodeCard"
       onClick={() => {
@@ -531,27 +556,27 @@ function ShareYourCodeCardButton({ profileSlug }: { profileSlug?: string | null 
         }
       }}
     >
-      {EMPTY_STATE_COPY.connections.secondaryCta}
+      {EMPTY_STATE_COPY.connections.primaryCta}
     </AppButton>
   );
 }
 
 function ConnectionsEmptyState({ profileSlug }: { profileSlug?: string | null }) {
   const copy = EMPTY_STATE_COPY.connections;
-  const shareHref = profileSlug ? `/${profileSlug}` : '/dashboard/profile';
+  const publicHref = profileSlug ? `/${profileSlug}` : '/dashboard#profile';
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader title={copy.title} description={copy.description} />
       <FadeInView delay={0}>
         <div className="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-paper)] px-6 py-10 md:px-10 md:py-14">
           <p className="max-w-xl text-[16px] leading-relaxed text-[var(--app-smoke)]">
-            {copy.body} Someone meets you, scans your QR, and you are connected.
+            {copy.body}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <AppButton variant="primary" href={shareHref}>
-              {copy.primaryCta}
-            </AppButton>
             <ShareYourCodeCardButton profileSlug={profileSlug} />
+            <AppButton variant="ghost" href={publicHref}>
+              {copy.secondaryCta}
+            </AppButton>
           </div>
         </div>
       </FadeInView>
@@ -781,11 +806,11 @@ export function DashboardConnectionsView({
         title={variant === 'authenticated' ? 'Your Connections' : 'People you saved'}
         description={
           variant === 'authenticated'
-            ? 'People whose work you saved from their public CodeCard.'
-            : 'Private context for everyone you meet.'
+            ? 'People you met. Open their CodeCard anytime.'
+            : 'Sample people from in-person QR scans.'
         }
         actions={
-          <AppButton variant="primary" href={`${basePath}/profile`}>
+          <AppButton variant="primary" href={`${basePath}#share`}>
             Share CodeCard
           </AppButton>
         }

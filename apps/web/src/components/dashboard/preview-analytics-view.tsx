@@ -37,8 +37,8 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader
-        title="How your work is performing"
-        description="Sample reach, engagement, and audience layout for the preview workspace."
+        title="Sample analytics"
+        description="Preview workspace fixtures — not live visitor data."
         actions={
           <FilterBar options={RANGES} value={range} onChange={setRange} labels={rangeLabels} />
         }

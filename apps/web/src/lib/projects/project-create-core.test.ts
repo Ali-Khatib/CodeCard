@@ -246,6 +246,17 @@ describe('executeCreateProject persistence', () => {
     expect(result.projectId).toBe('project-new');
     expect(result.redirectTo).toBe('/dashboard/projects/project-new/edit');
 
+    const first = await executeCreateProject(
+      createMockSupabase({
+        user: { id: 'user-1' },
+        profile: ownedProfile,
+        projectCount: 0,
+      }).supabase,
+      makeFormData(validEntries),
+      { user: { id: 'user-1' } },
+    );
+    expect(first.redirectTo).toBe('/dashboard/projects/project-new/edit?from=first-project');
+
     const insertCall = insertedProjectPayload();
     expect(insertCall).toMatchObject({
       tenant_id: 'tenant-1',

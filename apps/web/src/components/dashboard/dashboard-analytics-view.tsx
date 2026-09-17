@@ -9,6 +9,7 @@ import {
   ANALYTICS_ACCURACY_DISCLOSURE_DETAILS,
   ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE,
 } from '@/lib/dashboard/analytics-accuracy-disclosure';
+import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
@@ -57,25 +58,18 @@ export function DashboardAnalyticsView({
   profileSlug,
   entitlement,
 }: DashboardAnalyticsViewProps) {
-  const kpis = [
-    { id: 'profile-views', label: 'Profile views', value: summary.profileViews },
-    { id: 'project-views', label: 'Project views', value: summary.projectViews },
-    { id: 'link-clicks', label: 'Link clicks', value: summary.linkClicks },
-    { id: 'qr-downloads', label: 'QR downloads', value: summary.qrDownloads },
-    { id: 'shares', label: 'Profile shares', value: summary.profileShares },
-    { id: 'research-views', label: 'Research views', value: summary.researchViews },
-  ];
   const isZeroState = !summary.hasAnyEvents;
   const publicHref = profileSlug ? `/${profileSlug}` : null;
+  const copy = EMPTY_STATE_COPY.analytics;
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
       <PageHeader
-        title="How your work is performing"
+        title="Analytics"
         description={
           isZeroState
-            ? 'Analytics appear after people engage with your public CodeCard.'
-            : 'Audience engagement from your public CodeCard — profile views, projects, research, shares, and time spent.'
+            ? copy.description
+            : 'How much attention your CodeCard is getting, and what people are opening.'
         }
       />
 
@@ -93,190 +87,205 @@ export function DashboardAnalyticsView({
         </div>
       )}
 
-      {isZeroState && summary.isPublic && (
+      {isZeroState && summary.isPublic ? (
         <div role="status">
           <AppCard tone="seafoam" className="!p-6">
-            <h2 className="text-[18px] font-medium text-[var(--app-ink)]">No audience activity yet</h2>
+            <h2 className="text-[18px] font-medium text-[var(--app-ink)]">{copy.title}</h2>
             <p className="mt-2 max-w-xl text-[15px] text-[var(--app-smoke)]">
-              Totals below are real zeros — not sample data. They update when visitors view your
-              profile, open projects, click links, share, or download your QR code.
+              {copy.description}
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               {publicHref ? (
                 <AppButton variant="primary" href={publicHref}>
-                  View public profile
+                  {copy.viewCta}
                 </AppButton>
               ) : null}
-              <AppButton variant="ghost" href="/dashboard">
-                Share from home
+              <AppButton variant="ghost" href="/dashboard#share">
+                {copy.shareCta}
               </AppButton>
             </div>
           </AppCard>
         </div>
-      )}
+      ) : null}
 
-      <FadeInView delay={0}>
-        <AppCard tone="meringue" className="!p-8">
-          <MetricLabel>Profile views</MetricLabel>
-          <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">
-            <CountUp value={summary.profileViews} />
-          </p>
-          <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
-            Lifetime public profile views
-          </p>
-        </AppCard>
-      </FadeInView>
-
-      <FadeInView delay={0.04}>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {kpis.map((kpi) => (
-            <MetricCard
-              key={kpi.id}
-              label={kpi.label}
-              value={<CountUp value={kpi.value} />}
-            />
-          ))}
-        </div>
-      </FadeInView>
-
-      <FadeInView delay={0.06}>
-        <AnalyticsTrendChart
-          trends={trends}
-          activeRange={trends.range}
-          hasLifetimeEvents={summary.hasAnyEvents}
-        />
-      </FadeInView>
-
-      <FadeInView delay={0.08}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <AppCard className="!p-6">
-            <MetricLabel>Project time spent</MetricLabel>
-            <p className="mt-3 text-[28px] font-medium text-[var(--app-ink)]">
-              {formatDuration(summary.projectTimeSpentSec)}
-            </p>
-            <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-              Total active seconds recorded on published projects
-            </p>
-          </AppCard>
-          <AppCard className="!p-6">
-            <MetricLabel>Research time spent</MetricLabel>
-            <p className="mt-3 text-[28px] font-medium text-[var(--app-ink)]">
-              {formatDuration(summary.researchTimeSpentSec)}
-            </p>
-            <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-              Total active seconds recorded on published papers
-            </p>
-          </AppCard>
-        </div>
-      </FadeInView>
-
-      <FadeInView delay={0.12}>
-        <section>
-          <SectionLabel>Top projects</SectionLabel>
-          <p className="cc-app-section-subtitle">
-            Views, link clicks, and active time
-          </p>
-          {summary.topProjects.length === 0 ? (
-            <AppCard className="mt-4 !p-5">
-              <p className="text-[14px] text-[var(--app-smoke)]">
-                No project engagement recorded yet.
+      {!isZeroState ? (
+        <>
+          <FadeInView delay={0}>
+            <AppCard tone="meringue" className="!p-8">
+              <MetricLabel>CodeCard views</MetricLabel>
+              <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">
+                <CountUp value={summary.profileViews} />
+              </p>
+              <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
+                Recorded public CodeCard views in the retained event window
               </p>
             </AppCard>
-          ) : (
-            <div className="mt-4 space-y-3">
-              {summary.topProjects.map((project) => (
-                <AppCard key={project.id} className="cc-analytics-project-card !p-5">
-                  <h3 className="cc-analytics-project-card__title !text-[clamp(20px,2.4vw,24px)]">
-                    {project.title}
-                  </h3>
-                  <div className="mt-4 grid grid-cols-3 gap-3">
-                    <div className="cc-analytics-project-metric">
-                      <MetricLabel>Views</MetricLabel>
-                      <p className="cc-analytics-project-metric__value !text-[22px]">
-                        <CountUp value={project.views} />
-                      </p>
-                    </div>
-                    <div className="cc-analytics-project-metric">
-                      <MetricLabel>Link clicks</MetricLabel>
-                      <p className="cc-analytics-project-metric__value !text-[22px]">
-                        <CountUp value={project.linkClicks} />
-                      </p>
-                    </div>
-                    <div className="cc-analytics-project-metric">
-                      <MetricLabel>Time</MetricLabel>
-                      <p className="cc-analytics-project-metric__value !text-[22px]">
-                        {formatDuration(project.timeSpentSec)}
-                      </p>
-                    </div>
-                  </div>
-                </AppCard>
-              ))}
+          </FadeInView>
+
+          <FadeInView delay={0.04}>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <MetricCard
+                label="Project views"
+                value={<CountUp value={summary.projectViews} />}
+              />
+              <MetricCard
+                label="Research views"
+                value={<CountUp value={summary.researchViews} />}
+              />
+              <MetricCard
+                label="Link clicks"
+                value={<CountUp value={summary.linkClicks} />}
+              />
             </div>
-          )}
-        </section>
-      </FadeInView>
+          </FadeInView>
 
-      <FadeInView delay={0.2}>
-        <section>
-          <SectionLabel>Research</SectionLabel>
-          <p className="cc-app-section-subtitle">
-            Paper opens, PDF downloads, citation copies, and time spent reading
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <AppCard className="!p-4">
-              <MetricLabel>Paper opens</MetricLabel>
-              <p className="mt-1 text-[22px] font-medium">
-                <CountUp value={summary.researchViews} />
-              </p>
-            </AppCard>
-            <AppCard className="!p-4">
-              <MetricLabel>PDF downloads</MetricLabel>
-              <p className="mt-1 text-[22px] font-medium">
-                <CountUp value={summary.pdfDownloads} />
-              </p>
-            </AppCard>
-            <AppCard className="!p-4">
-              <MetricLabel>Cite copies</MetricLabel>
-              <p className="mt-1 text-[22px] font-medium">
-                <CountUp value={summary.citationCopies} />
-              </p>
-            </AppCard>
-            <AppCard className="!p-4">
-              <MetricLabel>Time spent</MetricLabel>
-              <p className="mt-1 text-[22px] font-medium">
-                {formatDuration(summary.researchTimeSpentSec)}
-              </p>
-            </AppCard>
-          </div>
-          {!entitlement.perResearchPaper ? (
-            <ProUpgradeCard
-              title="Per research paper analytics"
-              body="Break these totals down paper by paper — opens, PDF downloads, citation copies, and average read time."
+          <FadeInView delay={0.06}>
+            <AnalyticsTrendChart
+              trends={trends}
+              activeRange={trends.range}
+              hasLifetimeEvents={summary.hasAnyEvents}
             />
-          ) : summary.topResearch.length === 0 ? (
-            <AppCard className="mt-4 !p-5">
-              <p className="text-[14px] text-[var(--app-smoke)]">
-                No research engagement recorded yet.
-              </p>
-            </AppCard>
-          ) : (
-            <div className="mt-4 space-y-3">
-              {summary.topResearch.map((paper) => (
-                <AppCard key={paper.id} className="!p-5">
-                  <h3 className="text-[16px] font-semibold text-[var(--app-ink)]">
-                    {paper.title}
-                  </h3>
-                  <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-                    {paper.views} opens · {paper.pdfDownloads} PDF downloads ·{' '}
-                    {paper.citationCopies} cite copies · avg{' '}
-                    {formatDuration(paper.avgReadTimeSec)}
+          </FadeInView>
+
+          <FadeInView delay={0.12}>
+            <section>
+              <SectionLabel>What people open</SectionLabel>
+              <p className="cc-app-section-subtitle">Most viewed projects from recorded events</p>
+              {summary.topProjects.length === 0 ? (
+                <AppCard className="mt-4 !p-5">
+                  <p className="text-[14px] text-[var(--app-smoke)]">
+                    No project engagement recorded yet.
                   </p>
                 </AppCard>
-              ))}
-            </div>
-          )}
-        </section>
-      </FadeInView>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {summary.topProjects.map((project) => (
+                    <AppCard key={project.id} className="cc-analytics-project-card !p-5">
+                      <h3 className="cc-analytics-project-card__title !text-[clamp(20px,2.4vw,24px)]">
+                        {project.title}
+                      </h3>
+                      <div className="mt-4 grid grid-cols-3 gap-3">
+                        <div className="cc-analytics-project-metric">
+                          <MetricLabel>Views</MetricLabel>
+                          <p className="cc-analytics-project-metric__value !text-[22px]">
+                            <CountUp value={project.views} />
+                          </p>
+                        </div>
+                        <div className="cc-analytics-project-metric">
+                          <MetricLabel>Link clicks</MetricLabel>
+                          <p className="cc-analytics-project-metric__value !text-[22px]">
+                            <CountUp value={project.linkClicks} />
+                          </p>
+                        </div>
+                        <div className="cc-analytics-project-metric">
+                          <MetricLabel>Time</MetricLabel>
+                          <p className="cc-analytics-project-metric__value !text-[22px]">
+                            {formatDuration(project.timeSpentSec)}
+                          </p>
+                        </div>
+                      </div>
+                    </AppCard>
+                  ))}
+                </div>
+              )}
+            </section>
+          </FadeInView>
+
+          <FadeInView delay={0.2}>
+            <section>
+              <SectionLabel>Research</SectionLabel>
+              <p className="cc-app-section-subtitle">
+                Paper opens, PDF downloads, and citation copies
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <AppCard className="!p-4">
+                  <MetricLabel>Paper opens</MetricLabel>
+                  <p className="mt-1 text-[22px] font-medium">
+                    <CountUp value={summary.researchViews} />
+                  </p>
+                </AppCard>
+                <AppCard className="!p-4">
+                  <MetricLabel>PDF downloads</MetricLabel>
+                  <p className="mt-1 text-[22px] font-medium">
+                    <CountUp value={summary.pdfDownloads} />
+                  </p>
+                </AppCard>
+                <AppCard className="!p-4">
+                  <MetricLabel>Cite copies</MetricLabel>
+                  <p className="mt-1 text-[22px] font-medium">
+                    <CountUp value={summary.citationCopies} />
+                  </p>
+                </AppCard>
+              </div>
+              {!entitlement.perResearchPaper ? (
+                <ProUpgradeCard
+                  title="Per research paper analytics"
+                  body="Break these totals down paper by paper — opens, PDF downloads, citation copies, and average read time."
+                />
+              ) : summary.topResearch.length === 0 ? (
+                <AppCard className="mt-4 !p-5">
+                  <p className="text-[14px] text-[var(--app-smoke)]">
+                    No research engagement recorded yet.
+                  </p>
+                </AppCard>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {summary.topResearch.map((paper) => (
+                    <AppCard key={paper.id} className="!p-5">
+                      <h3 className="text-[16px] font-semibold text-[var(--app-ink)]">
+                        {paper.title}
+                      </h3>
+                      <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
+                        {paper.views} opens · {paper.pdfDownloads} PDF downloads ·{' '}
+                        {paper.citationCopies} cite copies · avg{' '}
+                        {formatDuration(paper.avgReadTimeSec)}
+                      </p>
+                    </AppCard>
+                  ))}
+                </div>
+              )}
+            </section>
+          </FadeInView>
+
+          <FadeInView delay={0.24}>
+            <section>
+              <SectionLabel>How people reach you</SectionLabel>
+              <p className="cc-app-section-subtitle">
+                Recorded open sources from your public CodeCard
+              </p>
+              {!entitlement.visitorInsights ? (
+                <ProUpgradeCard
+                  title="How people reach you"
+                  body="See whether visitors arrived from a QR scan, a direct link, or another recorded source."
+                />
+              ) : summary.sources.length === 0 ? (
+                <AppCard className="mt-4 !p-5">
+                  <p className="text-[14px] text-[var(--app-smoke)]">
+                    No source breakdown recorded yet.
+                  </p>
+                </AppCard>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {summary.sources.map((source) => (
+                    <li key={source.label}>
+                      <AppCard className="flex items-center justify-between gap-4 !p-5">
+                        <div>
+                          <p className="text-[16px] font-medium text-[var(--app-ink)]">
+                            {source.label}
+                          </p>
+                          <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
+                            {source.value} opens · {source.pct}%
+                          </p>
+                        </div>
+                      </AppCard>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </FadeInView>
+        </>
+      ) : null}
 
       {profileSlug && summary.isPublic && (
         <p className="text-[13px] text-[var(--app-smoke)]">

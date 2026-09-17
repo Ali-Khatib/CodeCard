@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { CodeCardMark } from '@/components/brand/codecard-mark';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import '@/styles/codecard-mark.css';
 
@@ -27,7 +28,7 @@ function scrollToTop(durationMs = 1400) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/** Top-left mark — overlapping CC expands into CodeCard on hover. */
+/** Top-left CodeCard brand mark — scroll home. */
 export function CodeCardMarkLogo() {
   const { canEnhanceMotion } = useMotionPreferences();
 
@@ -43,14 +44,7 @@ export function CodeCardMarkLogo() {
       onClick={handleClick}
     >
       <span className="cc-ed-mark-logo__inner" aria-hidden>
-        <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--first">C</span>
-        <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--left">
-          ode
-        </span>
-        <span className="cc-ed-mark-logo__c cc-ed-mark-logo__c--second">C</span>
-        <span className="cc-ed-mark-logo__fill cc-ed-mark-logo__fill--right">
-          ard
-        </span>
+        <CodeCardMark />
       </span>
     </button>
   );

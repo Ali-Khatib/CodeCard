@@ -223,14 +223,13 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
 }
 
 .cc-app-sidebar__brand .cc-ed-mark-logo__inner,
-.cc-app-sidebar__brand .cc-ed-mark-logo__c,
-.cc-app-sidebar__brand .cc-ed-mark-logo__fill {
+.cc-app-sidebar__brand .cc-ed-mark-logo__mark {
   color: inherit !important;
-  -webkit-text-fill-color: inherit !important;
 }
 
-.cc-app-sidebar__brand .cc-ed-mark-logo__inner {
-  font-size: 1.85rem;
+.cc-app-sidebar__brand .cc-ed-mark-logo__mark {
+  width: 1.85rem;
+  height: 1.85rem;
 }
 
 html.dark .cc-app-sidebar__brand.cc-ed-mark-logo,

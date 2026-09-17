@@ -9,20 +9,25 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@codecard/types": "*",
     "@codecard/validation": "*",
     "@supabase/supabase-js": "^2.47.10",
     "expo": "~56.0.12",
+    "expo-camera": "~56.0.8",
     "expo-secure-store": "~15.0.3",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
-    "react-native": "0.85.3"
+    "react-native": "0.85.3",
+    "react-native-qrcode-svg": "^6.3.23",
+    "react-native-svg": "^15.15.5"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.11"
   }
 }

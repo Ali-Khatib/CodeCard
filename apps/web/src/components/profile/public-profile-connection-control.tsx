@@ -130,6 +130,12 @@ export function PublicProfileConnectionControl({
         {!pending && !statusMessage && (
           <p className="text-[13px] text-[var(--app-smoke)]">Connected</p>
         )}
+        <Link
+          href="/dashboard/connections"
+          className="text-[13px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
+        >
+          View in Connections
+        </Link>
       </div>
     );
   }

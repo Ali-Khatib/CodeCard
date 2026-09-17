@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { PublicCodeCardQr } from './public-code-card-qr';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 
 /** Bottom CTA — independent copy / QR (keeps hero actions out of the LCP path). */
 export function PublicProfileSaveCard({
@@ -16,7 +18,10 @@ export function PublicProfileSaveCard({
 
   const copyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/${profileSlug}`);
+      const url =
+        getPublicProfileLinkForClipboard(profileSlug) ??
+        `${window.location.origin}/${profileSlug}`;
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -32,7 +37,8 @@ export function PublicProfileSaveCard({
           Keep {firstName}&apos;s work handy
         </h2>
         <p className="mx-auto mt-2 max-w-md text-[15px] text-[var(--app-smoke)]">
-          Copy the link, scan the QR, or save the contact for your next conversation.
+          Copy the public link or show the QR that opens this CodeCard. Connecting happens after a
+          scan, on this page.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
@@ -55,18 +61,8 @@ export function PublicProfileSaveCard({
       </div>
       {qrOpen ? (
         <div className="mx-auto flex max-w-sm flex-col items-center rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5">
-          <p className="cc-app-mono mb-3">Scan to open</p>
-          <div className="grid h-40 w-40 max-w-full grid-cols-5 grid-rows-5 gap-px bg-[var(--app-bone)] p-2">
-            {Array.from({ length: 25 }).map((_, i) => (
-              <div
-                key={i}
-                className={i % 2 === 0 ? 'bg-[var(--app-ink)]' : 'bg-transparent'}
-              />
-            ))}
-          </div>
-          <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-smoke)]">
-            codecard.app/{profileSlug}
-          </p>
+          <p className="cc-app-mono mb-3">Scan to open this CodeCard</p>
+          <PublicCodeCardQr profileSlug={profileSlug} />
         </div>
       ) : null}
     </div>

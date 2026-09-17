@@ -21,6 +21,10 @@ describe('canonical dashboard profile route', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-overview-view.tsx'),
       'utf8',
     );
+    const identity = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/home-identity-section.tsx'),
+      'utf8',
+    );
 
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
@@ -31,7 +35,7 @@ describe('canonical dashboard profile route', () => {
     expect(shell).toContain('cc-app-user-card--link');
     expect(shell).toContain('Edit photo, bio, links');
     expect(overview).toContain('HomeIdentitySection');
-    expect(overview).toContain('How people see you');
+    expect(identity).toContain('How people see you');
   });
 
   it('hosts the full profile editor on the dashboard overview', () => {

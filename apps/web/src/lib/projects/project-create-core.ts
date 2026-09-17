@@ -275,9 +275,11 @@ export async function executeCreateProject(
     }
   }
 
+  const isFirstProject = quota.usage.count === 0;
+
   return {
     success: true,
     projectId,
-    redirectTo: `/dashboard/projects/${projectId}/edit`,
+    redirectTo: `/dashboard/projects/${projectId}/edit${isFirstProject ? '?from=first-project' : ''}`,
   };
 }

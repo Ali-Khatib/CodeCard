@@ -23,7 +23,7 @@ describe('dashboard profile completion integration', () => {
     expect(page).not.toContain('profileCompletion(');
     expect(page).toContain('DashboardOverviewLoadErrorState');
     expect(page).toContain('DashboardOverviewMissingState');
-    expect(page).toContain('getProfileCompletionNextStep');
+    expect(page).toContain('getHomeWorkspaceNextStep');
     expect(page).not.toContain('projectCount ?? 0');
   });
 
@@ -49,8 +49,8 @@ describe('dashboard profile completion integration', () => {
     expect(indicator).toContain('Complete');
     expect(indicator).toContain('Incomplete');
     expect(indicator).toContain('href={item.href}');
-    expect(completion).toContain("'/dashboard#profile'");
-    expect(completion).toContain("'/dashboard/projects/new'");
+    expect(completion).toContain("workspacePath(basePath, '#profile')");
+    expect(completion).toContain("workspacePath(basePath, 'projects/new')");
   });
 
   it('keeps completion details collapsed until the top-right control expands them', () => {

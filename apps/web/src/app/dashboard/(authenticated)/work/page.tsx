@@ -42,7 +42,7 @@ export default async function YourWorkPage() {
       .from('projects')
       .select(
         `
-      id, title, tagline, description, is_published, technologies, updated_at, sort_order, created_at, case_study_sections,
+      id, title, tagline, description, is_published, status, technologies, updated_at, sort_order, created_at, case_study_sections,
       project_media_assets(*),
       project_links(*)
     `,

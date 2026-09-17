@@ -14,6 +14,7 @@ export function revalidateOwnedProjectPaths(input: {
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/profile');
   revalidatePath('/dashboard/projects');
+  revalidatePath('/dashboard/work');
   revalidatePath(`/dashboard/projects/${input.projectId}/edit`);
   revalidatePath('/dashboard/profile/preview');
 
@@ -37,6 +38,7 @@ export function revalidateDeletedProjectPaths(input: {
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/profile');
   revalidatePath('/dashboard/projects');
+  revalidatePath('/dashboard/work');
   revalidatePath(`/dashboard/projects/${input.projectId}/edit`);
   revalidatePath('/dashboard/profile/preview');
 
@@ -52,6 +54,7 @@ export function revalidateCreatedProjectPaths(input: {
   isPublished?: boolean;
 }) {
   revalidatePath('/dashboard/projects');
+  revalidatePath('/dashboard/work');
   if (input.profileSlug && input.isPublished) {
     revalidatePublicProject(input.profileSlug, input.projectId);
   } else if (input.profileSlug) {

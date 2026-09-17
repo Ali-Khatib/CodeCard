@@ -84,16 +84,23 @@ export async function loadOwnerAnalytics(
     await resolveTenantPlanId(supabase, profile.tenant_id),
   );
 
+  /* Lifetime owner totals still scan retained `analytics_events` rows (no third
+   * aggregate table). Skip the source breakdown query on Free when the plan gate
+   * is on — those rows are stripped before the response anyway. */
+  const loadSources = !applyPlanGate || entitlement.visitorInsights;
+
   const [eventsResult, sourcesResult, projectsResult, researchResult] = await Promise.all([
     supabase
       .from('analytics_events')
       .select('event_type, target_id, target_type, metadata, created_at')
       .eq('profile_id', profile.id)
       .in('event_type', [...EVENT_TYPES]),
-    supabase
-      .from('public_profile_events')
-      .select('source')
-      .eq('profile_id', profile.id),
+    loadSources
+      ? supabase
+          .from('public_profile_events')
+          .select('source')
+          .eq('profile_id', profile.id)
+      : Promise.resolve({ data: [] as ProfileSourceRow[], error: null }),
     supabase
       .from('projects')
       .select('id, title')

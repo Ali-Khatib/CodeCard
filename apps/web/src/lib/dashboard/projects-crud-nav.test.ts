@@ -29,6 +29,22 @@ describe('WS09-T004 projects CRUD navigation', () => {
     expect(draft.href).toBe('/dashboard/projects/p-draft/preview');
     expect(draft.views).toBeUndefined();
     expect(draft.saves).toBeUndefined();
+    expect(draft.updatedAt).toBeNull();
+
+    const withMeta = dbProjectToPortfolioProject(
+      {
+        id: 'p-meta',
+        title: 'Meta',
+        tagline: 'Short',
+        is_published: false,
+        status: 'active',
+        updated_at: '2026-04-02T12:00:00.000Z',
+        technologies: [],
+      },
+      { basePath: '/dashboard' },
+    );
+    expect(withMeta.status).toBe('active');
+    expect(withMeta.updatedAt).toBe('2026-04-02T12:00:00.000Z');
 
     const live = dbProjectToPortfolioProject(
       {
@@ -68,7 +84,7 @@ describe('WS09-T004 projects CRUD navigation', () => {
   });
 
   it('wires Projects tab create/edit actions to real routes', () => {
-    const page = read('src/app/dashboard/(authenticated)/projects/page.tsx');
+    const page = read('src/app/dashboard/(authenticated)/work/page.tsx');
     const portfolio = read('src/components/dashboard/dashboard-projects-portfolio.tsx');
     const stack = read('src/components/dashboard/projects-vertical-stack.tsx');
 

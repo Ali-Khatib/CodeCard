@@ -5,6 +5,10 @@ import {
   calculateProfileCompletion,
   deriveProfileCompletionInput,
   getProfileCompletionNextStep,
+  getHomeWorkspaceNextStep,
+  getHomeLoopState,
+  shellCreateProjectEmphasis,
+  isIdentityComplete,
   hasPersistedAvatar,
   hasPersistedBio,
   hasPersistedHeadline,
@@ -134,7 +138,7 @@ describe('getProfileCompletionNextStep', () => {
       hasProfileLink: true,
     });
     const step = getProfileCompletionNextStep(completion, { hasAnyProject: true });
-    expect(step?.href).toBe('/dashboard/projects');
+    expect(step?.href).toBe('/dashboard/work#projects');
   });
 
   it('returns null when profile is complete', () => {
@@ -146,5 +150,88 @@ describe('getProfileCompletionNextStep', () => {
       hasPublishedProject: true,
     });
     expect(getProfileCompletionNextStep(completion, { hasAnyProject: true })).toBeNull();
+  });
+});
+
+describe('getHomeLoopState', () => {
+  const identityReady = calculateProfileCompletion({
+    hasHeadline: true,
+    hasBio: true,
+    hasAvatar: true,
+    hasProfileLink: true,
+    hasPublishedProject: false,
+  });
+  const fullyComplete = calculateProfileCompletion({
+    hasHeadline: true,
+    hasBio: true,
+    hasAvatar: true,
+    hasProfileLink: true,
+    hasPublishedProject: true,
+  });
+
+  it('is complete_identity until headline, bio, avatar, and a link exist', () => {
+    const incomplete = calculateProfileCompletion(emptyInput);
+    expect(isIdentityComplete(incomplete)).toBe(false);
+    expect(getHomeLoopState(incomplete, { hasAnyProject: false, isPublic: false })).toBe(
+      'complete_identity',
+    );
+  });
+
+  it('asks for a first project after identity, even with no published project', () => {
+    expect(isIdentityComplete(identityReady)).toBe(true);
+    expect(getHomeLoopState(identityReady, { hasAnyProject: false, isPublic: false })).toBe(
+      'create_project',
+    );
+    expect(
+      getHomeWorkspaceNextStep(identityReady, { hasAnyProject: false, isPublic: false }).href,
+    ).toBe('/dashboard/projects/new');
+  });
+
+  it('asks to publish the CodeCard once any project exists and the card is private', () => {
+    expect(getHomeLoopState(identityReady, { hasAnyProject: true, isPublic: false })).toBe(
+      'publish_card',
+    );
+    expect(
+      getHomeWorkspaceNextStep(identityReady, { hasAnyProject: true, isPublic: false }).title,
+    ).toBe('Publish your CodeCard');
+  });
+
+  it('asks to share once the card is public', () => {
+    expect(getHomeLoopState(fullyComplete, { hasAnyProject: true, isPublic: true })).toBe(
+      'share_card',
+    );
+    expect(
+      getHomeWorkspaceNextStep(fullyComplete, { hasAnyProject: true, isPublic: true }).href,
+    ).toBe('/dashboard#share');
+  });
+});
+
+describe('shellCreateProjectEmphasis', () => {
+  it('is primary only when the Home loop is create_project', () => {
+    expect(shellCreateProjectEmphasis('complete_identity')).toBe('ghost');
+    expect(shellCreateProjectEmphasis('create_project')).toBe('primary');
+    expect(shellCreateProjectEmphasis('publish_card')).toBe('ghost');
+    expect(shellCreateProjectEmphasis('share_card')).toBe('ghost');
+    expect(shellCreateProjectEmphasis(null)).toBe('ghost');
+  });
+});
+
+describe('getHomeWorkspaceNextStep', () => {
+  it('keeps identity steps ahead of publishing', () => {
+    const incomplete = calculateProfileCompletion(emptyInput);
+    const step = getHomeWorkspaceNextStep(incomplete, { hasAnyProject: false, isPublic: false });
+    expect(step.title).toBe('Add a headline');
+  });
+
+  it('does not send a draft-only user to publish-a-project instead of publish-the-card', () => {
+    const identityReady = calculateProfileCompletion({
+      hasHeadline: true,
+      hasBio: true,
+      hasAvatar: true,
+      hasProfileLink: true,
+      hasPublishedProject: false,
+    });
+    const step = getHomeWorkspaceNextStep(identityReady, { hasAnyProject: true, isPublic: false });
+    expect(step.href).toBe('/dashboard#visibility');
   });
 });

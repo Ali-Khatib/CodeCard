@@ -3,7 +3,7 @@
 import { CodeCardMarkLink } from '@/components/brand/codecard-mark-link';
 import { motion, useReducedMotion } from 'motion/react';
 
-/** Auth brand mark — overlapping CC (same as landing), links home. */
+/** Auth brand mark — CodeCard overlapping-C logo, links home. */
 export function AuthWordmark({ delay = 0 }: { delay?: number }) {
   const reduced = useReducedMotion();
 

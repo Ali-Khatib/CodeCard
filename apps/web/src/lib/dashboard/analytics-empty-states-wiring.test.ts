@@ -17,16 +17,16 @@ describe('WS08-T010 analytics empty states', () => {
     expect(page).toContain('Trend queries failed');
     expect(page).not.toContain('buildAnalyticsData');
 
-    expect(view).toContain('No audience activity yet');
-    expect(view).toContain('not sample data');
+    expect(view).toContain('EMPTY_STATE_COPY.analytics');
     expect(view).toContain('Profile is private');
     expect(view).toContain('hasAnyEvents');
-    expect(view).toContain('View public profile');
+    expect(view).toContain('copy.viewCta');
+    expect(view).toContain('copy.shareCta');
     expect(view).not.toContain('buildAnalyticsData');
     expect(view).not.toContain('1284');
 
     expect(chart).toContain('hasLifetimeEvents');
     expect(chart).toContain('No recorded activity in the last');
-    expect(chart).toContain('Lifetime totals above are unchanged');
+    expect(chart).toContain('Totals above still reflect retained events');
   });
 });

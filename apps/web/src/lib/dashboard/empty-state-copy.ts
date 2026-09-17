@@ -5,10 +5,9 @@
 
 export const EMPTY_STATE_COPY = {
   connections: {
-    title: 'Meet in person. Scan to connect.',
-    description:
-      'CodeCard connections happen through physical QR scans — no searching, usernames, or digital invites.',
-    body: 'Share your CodeCard QR so people you meet can scan it and connect with you.',
+    title: 'Your connections will appear here',
+    description: 'Scan a CodeCard QR to connect with someone.',
+    body: 'Meet in person. They scan your QR, see your public CodeCard, and connect. You can find them here later.',
     primaryCta: 'Share your CodeCard',
     secondaryCta: 'Open your profile',
   },
@@ -19,10 +18,16 @@ export const EMPTY_STATE_COPY = {
     cta: 'Create your first project',
   },
   research: {
-    title: 'Add a research paper',
+    title: 'Add research when you have it',
     description:
-      'Title, authors, venue, PDF, and links. Publish when you are ready.',
-    cta: 'Create paper',
+      'Papers are optional. Published research can appear on your public CodeCard.',
+    cta: 'Add research',
+  },
+  work: {
+    title: 'Build your CodeCard',
+    description: 'Create a project or add your research. Published items appear on your public CodeCard.',
+    projectCta: 'Create project',
+    researchCta: 'Add research',
   },
   circle: {
     noConnectionsTitle: 'Circle needs people first',
@@ -32,9 +37,15 @@ export const EMPTY_STATE_COPY = {
     noActivityDescription:
       'When your Connections publish projects or research, it shows up here.',
   },
+  analytics: {
+    title: 'Your analytics will appear here once people start viewing your CodeCard.',
+    description: 'Share your CodeCard so people can open it. Views and project interest show up here.',
+    viewCta: 'View CodeCard',
+    shareCta: 'Share CodeCard',
+  },
   home: {
-    noProjects: 'No projects yet. Create one to feature on your card.',
-    noResearch: 'No papers yet. Add one when you have something to show.',
+    noProjects: 'No projects yet. Create one so visitors have work to open on your card.',
+    noResearch: 'Papers are optional. Add one when you have something to cite.',
     noCircleWorks: 'When your Connections publish projects or research, the latest three show up here.',
     noCircleConnections:
       'Save people from in-person QR scans — then their public work appears here.',

@@ -76,7 +76,8 @@
 }
 
 /* 5 — black closing CTA */
-.cc-ed[data-chapter='finale'] {
+.cc-ed[data-chapter='finale'],
+.cc-ed[data-chapter='waitlist'] {
   --ed-bg: #0f0f10;
   --ed-fg: #efedeb;
 }
@@ -222,9 +223,9 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cc-ed-mark-logo,
   .cc-ed-mark-logo__inner,
-  .cc-ed-mark-logo__c,
-  .cc-ed-mark-logo__fill {
+  .cc-ed-mark-logo__mark {
     transition: none;
   }
 
@@ -659,7 +660,8 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
 }
 
 .cc-ed[data-chapter='hero'] .cc-ed__sub,
-.cc-ed[data-chapter='finale'] .cc-ed__sub {
+.cc-ed[data-chapter='finale'] .cc-ed__sub,
+.cc-ed[data-chapter='waitlist'] .cc-ed__sub {
   color: var(--ed-iris);
 }
 
@@ -2508,6 +2510,157 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
 .cc-ed-finale .cc-ed__btn-ghost {
   border-color: color-mix(in srgb, #efedeb 28%, transparent);
   color: #efedeb;
+}
+
+/* —— Waitlist coda (after finale; composition zoom only) —— */
+.cc-ed-waitlist {
+  overflow-x: clip;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3.5rem)
+    clamp(5rem, 14vh, 9rem);
+  background: transparent;
+  color: var(--ed-fg, #efedeb);
+}
+
+.cc-ed-waitlist__stage {
+  width: min(28.5rem, 100%);
+  transform-origin: 50% 48%;
+}
+
+.cc-ed-waitlist__stage[data-waitlist-zoomed='true'] {
+  will-change: transform;
+}
+
+.cc-ed-waitlist__stage[data-waitlist-zoomed='true'] .cc-ed-waitlist__lede {
+  opacity: 0.82;
+}
+
+.cc-ed-waitlist__stage[data-waitlist-zoomed='true'] .cc-ed-waitlist__input {
+  font-size: 1.1875rem;
+}
+
+.cc-ed-waitlist__copy {
+  text-align: center;
+}
+
+.cc-ed-waitlist__title {
+  margin: 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.35rem, 1.1vw + 1.1rem, 2.05rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: #efedeb;
+}
+
+.cc-ed-waitlist__lede {
+  margin: 0.7rem auto 0;
+  max-width: 22rem;
+  font-size: clamp(0.95rem, 0.2vw + 0.9rem, 1.0625rem);
+  line-height: 1.5;
+  color: color-mix(in srgb, #efedeb 68%, transparent);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-waitlist__form {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.65rem;
+  text-align: left;
+}
+
+.cc-ed-waitlist__label {
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ed-iris, #e95a0b) 70%, #efedeb);
+}
+
+.cc-ed-waitlist__input {
+  width: 100%;
+  min-height: 3.15rem;
+  padding: 0.85rem 0.15rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, #efedeb 28%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: #efedeb;
+  font-size: 1.0625rem;
+  letter-spacing: -0.015em;
+  outline: none;
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    font-size 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-ed-waitlist__input::placeholder {
+  color: color-mix(in srgb, #efedeb 38%, transparent);
+}
+
+.cc-ed-waitlist__input:hover {
+  border-bottom-color: color-mix(in srgb, #efedeb 48%, transparent);
+}
+
+.cc-ed-waitlist__input:focus,
+.cc-ed-waitlist__input:focus-visible {
+  border-bottom-color: #efedeb;
+  box-shadow: 0 1px 0 #efedeb;
+}
+
+.cc-ed-waitlist__input[aria-invalid='true'] {
+  border-bottom-color: color-mix(in srgb, #e95a0b 70%, #efedeb);
+}
+
+.cc-ed-waitlist__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, #e95a0b 55%, #efedeb);
+}
+
+.cc-ed-waitlist__submit {
+  width: 100%;
+  margin-top: 0.35rem;
+  background: #efedeb;
+  color: #0f0f10;
+}
+
+.cc-ed-waitlist__submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.cc-ed-waitlist__submit:focus-visible {
+  outline: 2px solid #efedeb;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .cc-ed-waitlist {
+    min-height: 100svh;
+    padding-block: clamp(3.25rem, 8vh, 5.5rem);
+  }
+
+  .cc-ed-waitlist__input {
+    scroll-margin-bottom: 6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-ed-waitlist__stage {
+    will-change: auto;
+  }
+
+  .cc-ed-waitlist__stage[data-waitlist-zoomed='true'] .cc-ed-waitlist__input {
+    font-size: 1.0625rem;
+  }
 }
 
 /* —— Hero → statement cinema transition —— */

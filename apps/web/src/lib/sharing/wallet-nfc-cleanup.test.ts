@@ -21,11 +21,10 @@ describe('WS07-T009 remove wallet NFC stubs', () => {
     expect(hero).not.toMatch(/Configure tag/i);
   });
 
-  it('settings expose wallet/NFC as Coming later status only', () => {
+  it('settings do not restore wallet/NFC actions', () => {
     const settings = read('src/components/dashboard/dashboard-settings-view.tsx');
-    expect(settings).toContain('QR & profile sharing');
-    expect(settings).toContain('Coming later');
-    expect(settings).toContain('Wallet and NFC come later');
+    expect(settings).not.toContain('QR & profile sharing');
+    expect(settings).not.toContain('Wallet and NFC come later');
     expect(settings).not.toContain('Add to Apple Wallet');
     expect(settings).not.toContain('Configure tag');
     expect(settings).not.toContain("'Download QR': 'Saved'");

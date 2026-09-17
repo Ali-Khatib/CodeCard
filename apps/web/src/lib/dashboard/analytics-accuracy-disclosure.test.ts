@@ -42,7 +42,7 @@ describe('WS10-T010 analytics accuracy disclosure', () => {
     expect(view).toContain('aria-label="Analytics accuracy"');
     expect(view).toContain('<footer');
     expect(view).toContain('hasAnyEvents');
-    expect(view).toContain('No audience activity yet');
+    expect(view).toContain('EMPTY_STATE_COPY.analytics');
 
     expect(page).toContain('DashboardAnalyticsView');
     expect(page).not.toContain('ANALYTICS_ACCURACY_DISCLOSURE');

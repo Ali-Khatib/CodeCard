@@ -16,7 +16,7 @@ export default function DemoWorkspaceLayout({ children }: { children: React.Reac
           email={DEMO_WORKSPACE.email}
           avatarUrl={DEMO_WORKSPACE.avatarUrl}
           completion={DEMO_WORKSPACE.completion}
-          preview
+          homeLoopState="share_card"
         >
           {children}
         </DashboardShell>

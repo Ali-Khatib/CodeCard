@@ -12,7 +12,7 @@ import {
 } from '@/components/landing/editorial/landing-chrome-tone';
 
 /** Chapters where the fixed CC mark sits over a dark surface (light logo). */
-const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'finale']);
+const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'finale', 'waitlist']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control.
  *  Crash Course only — Research keeps the full pill. */
 const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;

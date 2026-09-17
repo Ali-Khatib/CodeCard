@@ -1,17 +1,52 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from './src/hooks/useAuth';
 import { SignInScreen } from './src/screens/SignInScreen';
-import { SavedConnectionsScreen } from './src/screens/SavedConnectionsScreen';
+import { CardScreen } from './src/screens/CardScreen';
+import { ConnectionsScreen } from './src/screens/ConnectionsScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
+import { ScanScreen } from './src/screens/ScanScreen';
+import { ScannedProfileScreen } from './src/screens/ScannedProfileScreen';
 import { supabase } from './src/lib/supabase';
+import { colors } from './src/theme';
 
-type Tab = 'connections' | 'collections' | 'settings';
+type Tab = 'card' | 'connections';
+type Overlay =
+  | { name: 'none' }
+  | { name: 'settings' }
+  | { name: 'scan' }
+  | { name: 'scanned'; slug: string; fromQr: boolean };
+
+type OwnerProfileIds = {
+  id: string;
+  tenant_id: string;
+};
 
 export default function App() {
   const { user, loading } = useAuth();
-  const [tab, setTab] = useState<Tab>('connections');
-  const [, setRefresh] = useState(0);
+  const [tab, setTab] = useState<Tab>('card');
+  const [overlay, setOverlay] = useState<Overlay>({ name: 'none' });
+  const [owner, setOwner] = useState<OwnerProfileIds | null>(null);
+
+  const loadOwner = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, tenant_id')
+      .eq('owner_user_id', userId)
+      .maybeSingle();
+    setOwner((data as OwnerProfileIds | null) ?? null);
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setOwner(null);
+      setOverlay({ name: 'none' });
+      setTab('card');
+      return;
+    }
+    void loadOwner(user.id);
+  }, [user, loadOwner]);
 
   if (loading) {
     return (
@@ -27,7 +62,7 @@ export default function App() {
     return (
       <>
         <StatusBar style="light" />
-        <SignInScreen onSuccess={() => setRefresh((n) => n + 1)} />
+        <SignInScreen onSuccess={() => undefined} />
       </>
     );
   }
@@ -35,71 +70,82 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <View style={styles.header}>
-        <Text style={styles.logo}>
-          Code<Text style={styles.accent}>Card</Text>
-        </Text>
-        <TouchableOpacity onPress={() => supabase.auth.signOut()}>
-          <Text style={styles.signOut}>Sign out</Text>
-        </TouchableOpacity>
-      </View>
 
-      {tab === 'connections' && (
-        <SavedConnectionsScreen userId={user.id} onSelect={() => {}} />
-      )}
-      {tab === 'collections' && (
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>Collections: organize saved profiles</Text>
-        </View>
-      )}
-      {tab === 'settings' && (
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderTitle}>Settings</Text>
-          <Text style={styles.placeholderText}>
-            Manage your account on the web.{'\n'}
-            Subscriptions are not purchased in this app.
-          </Text>
-        </View>
-      )}
-
-      <View style={styles.tabBar}>
-        {(['connections', 'collections', 'settings'] as Tab[]).map((t) => (
-          <TouchableOpacity key={t} style={styles.tab} onPress={() => setTab(t)}>
-            <Text style={[styles.tabText, tab === t && styles.tabActive]}>
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </Text>
+      {overlay.name === 'settings' ? (
+        <SettingsScreen email={user.email} onBack={() => setOverlay({ name: 'none' })} />
+      ) : overlay.name === 'scan' ? (
+        <ScanScreen
+          onCancel={() => setOverlay({ name: 'none' })}
+          onDetected={(slug, fromQr) => setOverlay({ name: 'scanned', slug, fromQr })}
+        />
+      ) : overlay.name === 'scanned' && owner ? (
+        <ScannedProfileScreen
+          slug={overlay.slug}
+          fromQr={overlay.fromQr}
+          ownerUserId={user.id}
+          ownerProfileId={owner.id}
+          ownerTenantId={owner.tenant_id}
+          onDone={() => {
+            setOverlay({ name: 'none' });
+            setTab('connections');
+          }}
+        />
+      ) : overlay.name === 'scanned' ? (
+        <View style={styles.loading}>
+          <Text style={styles.muted}>Finish your CodeCard on the web before connecting.</Text>
+          <TouchableOpacity onPress={() => setOverlay({ name: 'none' })}>
+            <Text style={styles.accent}>Back</Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
+      ) : (
+        <>
+          {tab === 'card' ? (
+            <CardScreen
+              userId={user.id}
+              onScan={() => setOverlay({ name: 'scan' })}
+              onOpenSettings={() => setOverlay({ name: 'settings' })}
+            />
+          ) : (
+            <ConnectionsScreen userId={user.id} />
+          )}
+
+          <View style={styles.tabBar}>
+            {([
+              { id: 'card' as const, label: 'Card' },
+              { id: 'connections' as const, label: 'Connections' },
+            ]).map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.tab}
+                onPress={() => setTab(item.id)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: tab === item.id }}
+              >
+                <Text style={[styles.tabText, tab === item.id && styles.tabActive]}>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#09090b' },
-  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#09090b' },
-  logo: { fontSize: 24, fontWeight: '700', color: '#fafafa' },
-  accent: { color: '#a78bfa' },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#27272a',
-  },
-  signOut: { color: '#a78bfa', fontSize: 14 },
-  placeholder: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  placeholderTitle: { fontSize: 20, fontWeight: '600', color: '#fafafa', marginBottom: 8 },
-  placeholderText: { color: '#71717a', textAlign: 'center', lineHeight: 22 },
+  container: { flex: 1, backgroundColor: colors.bg },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg, padding: 24 },
+  logo: { fontSize: 28, fontWeight: '700', color: colors.ink },
+  accent: { color: colors.accent },
+  muted: { color: colors.smoke, textAlign: 'center', marginBottom: 16 },
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: '#27272a',
+    borderTopColor: colors.border,
     paddingBottom: 8,
   },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 12 },
-  tabText: { color: '#71717a', fontSize: 12, fontWeight: '500' },
-  tabActive: { color: '#a78bfa' },
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 14, minHeight: 52 },
+  tabText: { color: colors.smoke, fontSize: 14, fontWeight: '600' },
+  tabActive: { color: colors.accent },
 });

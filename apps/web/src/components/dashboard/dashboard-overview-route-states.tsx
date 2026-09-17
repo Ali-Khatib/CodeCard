@@ -20,7 +20,11 @@ function DashboardOverviewRouteState({
 
   return (
     <div className="cc-app-page cc-app-page--1120">
-      <PageHeader eyebrow="Home" title="Dashboard" description="Your CodeCard workspace overview." />
+      <PageHeader
+        eyebrow="Your CodeCard"
+        title="Home"
+        description="The state of your CodeCard and what to do next."
+      />
       <AppCard className="max-w-2xl space-y-4">
         <h2 className="text-[20px] font-medium text-[var(--app-ink)]">{title}</h2>
         <p className="text-[15px] leading-relaxed text-[var(--app-smoke)]">{description}</p>

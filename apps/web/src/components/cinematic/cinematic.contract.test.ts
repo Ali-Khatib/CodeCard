@@ -35,6 +35,7 @@ describe('Editorial product landing contract', () => {
     expect(landing).toContain('EditorialLiveDemoBox');
     expect(landing).toContain('EditorialAudience');
     expect(landing).toContain('EditorialResearchScene');
+    expect(landing).toContain('EditorialWaitlist');
     expect(landing).not.toContain('ProductStory');
     expect(landing).not.toContain('ProductAnalysisSection');
     expect(landing).not.toContain('EditorialNetworkBridge');

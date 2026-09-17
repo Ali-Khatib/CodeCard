@@ -19,7 +19,8 @@ import type {
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
-import type { ProfileCompletionResult } from '@/lib/profile/completion';
+import type { HomeLoopState, ProfileCompletionResult } from '@/lib/profile/completion';
+import { getHomeLoopState } from '@/lib/profile/completion';
 import {
   workspaceCreateProjectHref,
   workspaceCreateResearchHref,
@@ -69,6 +70,8 @@ export type OverviewProps = {
   /** Empty / error reason when circleWorks is empty. */
   circleWorksEmpty?: OverviewCircleWorksEmpty;
   suggested: { title: string; detail: string; href: string } | null;
+  /** Owner project inventory exists (including drafts). */
+  hasAnyProject?: boolean;
   basePath?: string;
 };
 
@@ -95,11 +98,30 @@ export function DashboardOverviewView({
   circleWorks = [],
   circleWorksEmpty = 'none',
   suggested,
+  hasAnyProject = false,
   basePath = '/dashboard',
 }: OverviewProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const firstName = displayName.split(' ')[0];
   const isProfilePublic = profile?.is_public === true;
+  const loopState: HomeLoopState = getHomeLoopState(completion, {
+    hasAnyProject,
+    isPublic: isProfilePublic,
+  });
+  const showShare = loopState === 'publish_card' || loopState === 'share_card';
+  const showWork = loopState !== 'complete_identity';
+  const showLaterSurfaces = loopState === 'share_card';
+  const showCompletion = loopState === 'complete_identity';
+  const loopStatusCopy =
+    loopState === 'complete_identity'
+      ? isProfilePublic
+        ? 'Start with who you are. Visitors will see this on your public card.'
+        : 'Your CodeCard is private. First, fill in the identity visitors will see.'
+      : loopState === 'create_project'
+        ? 'Your identity is ready. Add one project so the card has work to show.'
+        : loopState === 'publish_card'
+          ? 'You have work. Publish the card so shared links and QR codes work for visitors.'
+          : `Your CodeCard is public${profileSlug ? ` at /${profileSlug}` : ''}. Visitors can open it from your link or QR.`;
   const views =
     typeof profileViews === 'number' ? profileViews : (stats?.profileViews ?? 0);
   const reachCards: { key: 'profileViews' | 'projectOpens'; label: string }[] = [
@@ -130,22 +152,30 @@ export function DashboardOverviewView({
       <FadeInView delay={0}>
         <header className="cc-profile-home__greeting">
           <div>
-            <p className="cc-app-mono">Home</p>
+            <p className="cc-app-mono">Your CodeCard</p>
             <h1 className="cc-profile-home__title">
               {greeting}, {firstName}.
             </h1>
+            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
+              {loopStatusCopy}
+            </p>
           </div>
           <div className="cc-profile-home__stat-pills">
-            <span className="cc-profile-home__stat-pill cc-profile-home__stat-pill--iris">
-              {preview ? (
-                `Profile ${completion.percentage}% complete`
-              ) : (
-                <>
-                  Profile <CountUp value={completion.percentage} />% complete
-                </>
-              )}
+            <span className="cc-profile-home__stat-pill">
+              {isProfilePublic ? 'Public' : 'Private'}
             </span>
-            {!statsError && (
+            {showCompletion ? (
+              <span className="cc-profile-home__stat-pill cc-profile-home__stat-pill--iris">
+                {preview ? (
+                  `Profile ${completion.percentage}% complete`
+                ) : (
+                  <>
+                    Profile <CountUp value={completion.percentage} />% complete
+                  </>
+                )}
+              </span>
+            ) : null}
+            {showLaterSurfaces && !statsError ? (
               <span className="cc-profile-home__stat-pill">
                 {preview ? (
                   `${views.toLocaleString('en-US')} views`
@@ -156,13 +186,13 @@ export function DashboardOverviewView({
                   </>
                 )}
               </span>
-            )}
+            ) : null}
           </div>
         </header>
       </FadeInView>
 
       {/* ── Zone 2: Profile completion (hidden at 100%) ── */}
-      {completion.percentage < 100 ? (
+      {showCompletion && completion.percentage < 100 ? (
         <FadeInView delay={0.04}>
           <section aria-label="Profile completion">
             <ProfileCompletionIndicator completion={completion} />
@@ -177,7 +207,7 @@ export function DashboardOverviewView({
             <AppCard tone="meringue" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
               <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-lg">
-                  <AppMono>Suggested next step</AppMono>
+                  <AppMono>Next</AppMono>
                   <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
                     {suggested.title}
                   </h2>
@@ -187,8 +217,16 @@ export function DashboardOverviewView({
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <AppButton variant="primary" href={suggested.href} className="cc-btn-pop-icon">
-                    Do this now <span className="cc-btn-pop-icon__glyph" aria-hidden>→</span>
+                    {suggested.title}{' '}
+                    <span className="cc-btn-pop-icon__glyph" aria-hidden>
+                      →
+                    </span>
                   </AppButton>
+                  {loopState === 'share_card' ? (
+                    <AppButton variant="ghost" href={workspaceWorkHref(basePath)}>
+                      Continue building
+                    </AppButton>
+                  ) : null}
                 </div>
               </div>
             </AppCard>
@@ -196,6 +234,7 @@ export function DashboardOverviewView({
         </FadeInView>
       ) : null}
 
+      {showShare ? (
       <FadeInView delay={0.08}>
         <section id="share" aria-label="Share your CodeCard" className="scroll-mt-24">
           <ProfileShareHero
@@ -206,6 +245,7 @@ export function DashboardOverviewView({
           />
         </section>
       </FadeInView>
+      ) : null}
 
       {profile ? (
         <FadeInView delay={0.12}>
@@ -218,13 +258,16 @@ export function DashboardOverviewView({
         </FadeInView>
       ) : null}
 
-      {/* ── Zone 5b: Real projects & research inventory ── */}
+      {showWork ? (
       <FadeInView delay={0.18}>
         <section className="cc-profile-home__zone" aria-label="Your work">
           <div className="cc-profile-home__zone-head">
             <div>
               <p className="cc-workspace-section__eyebrow">Your work</p>
               <h2 className="cc-workspace-section__title">Projects and research</h2>
+              <p className="cc-workspace-section__copy">
+                One place for everything you ship — projects first, then papers.
+              </p>
             </div>
             <AppButton variant="ghost" href={workspaceWorkHref(basePath)}>
               Open Your Work →
@@ -262,9 +305,11 @@ export function DashboardOverviewView({
                     <p className="text-[14px] text-[var(--app-smoke)]">
                       {EMPTY_STATE_COPY.home.noProjects}
                     </p>
+                    {loopState === 'create_project' ? null : (
                     <AppButton variant="primary" href={workspaceCreateProjectHref(basePath)} className="mt-3">
                       Add project
                     </AppButton>
+                    )}
                   </div>
                 ) : (
                   <ul className="mt-4 space-y-2">
@@ -315,9 +360,11 @@ export function DashboardOverviewView({
                     <p className="text-[14px] text-[var(--app-smoke)]">
                       {EMPTY_STATE_COPY.home.noResearch}
                     </p>
+                    {showLaterSurfaces ? (
                     <AppButton variant="primary" href={workspaceCreateResearchHref(basePath)} className="mt-3">
                       Add paper
                     </AppButton>
+                    ) : null}
                   </div>
                 ) : (
                   <ul className="mt-4 space-y-2">
@@ -348,8 +395,10 @@ export function DashboardOverviewView({
           )}
         </section>
       </FadeInView>
+      ) : null}
 
-      {/* ── Zone 6: Quick glance (2 metrics) + Circle highlights ── */}
+      {showLaterSurfaces ? (
+        <>
       <FadeInView delay={0.2}>
         <section className="cc-profile-home__zone" aria-label="Audience reach">
           <div className="cc-profile-home__zone-head">
@@ -358,6 +407,9 @@ export function DashboardOverviewView({
               <h2 className="cc-workspace-section__title">
                 {preview ? 'This week at a glance' : 'Audience at a glance'}
               </h2>
+              <p className="cc-workspace-section__copy">
+                How people are finding your CodeCard and opening the work on it.
+              </p>
             </div>
             <AppButton variant="ghost" href={`${basePath}/analytics`}>
               Full analytics →
@@ -406,6 +458,9 @@ export function DashboardOverviewView({
             <div>
               <p className="cc-workspace-section__eyebrow">From your Circle</p>
               <h2 className="cc-workspace-section__title">Latest work nearby</h2>
+              <p className="cc-workspace-section__copy">
+                New projects and papers from people you have connected with.
+              </p>
             </div>
             <AppButton variant="ghost" href={circleHref}>
               Open Circle →
@@ -476,6 +531,8 @@ export function DashboardOverviewView({
           )}
         </section>
       </FadeInView>
+        </>
+      ) : null}
     </div>
   );
 }

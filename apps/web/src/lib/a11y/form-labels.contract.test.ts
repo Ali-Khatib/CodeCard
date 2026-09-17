@@ -38,11 +38,11 @@ describe('WS12-T002 accessible form labels', () => {
     expect(source).toContain('aria-pressed');
   });
 
-  it('settings branding switch exposes an accessible name', () => {
+  it('settings planned rows stay status-only, not pretend switches', () => {
     const source = read('components/dashboard/dashboard-settings-view.tsx');
-    expect(source).toContain('role="switch"');
-    expect(source).toContain('aria-label={row.label}');
-    expect(source).toContain('aria-checked={row.enabled}');
+    expect(source).toContain("label: 'Custom domain'");
+    expect(source).toContain('Coming later');
+    expect(source).not.toContain('role="switch"');
   });
 
   it('project form uses a visible Technologies label and group legends', () => {
@@ -124,6 +124,15 @@ describe('WS12-T002 accessible form labels', () => {
     expect(note).toContain('Private internal moderation note');
   });
 
+  it('landing waitlist pairs a visible email label with the input', () => {
+    const source = read('components/landing/editorial/editorial-waitlist.tsx');
+    expect(source).toContain('htmlFor={fieldId}');
+    expect(source).toContain('id={fieldId}');
+    expect(source).toContain("type=\"email\"");
+    expect(source).toContain('joinDescribedBy');
+    expect(source).toContain("placeholder=\"Enter your email\"");
+  });
+
   it('footer keeps labeled contact without placeholder-only fields', () => {
     const source = read('components/landing/hume-footer-cluster.tsx');
     expect(source).toContain('Get in touch');
@@ -140,6 +149,7 @@ describe('WS12-T002 accessible form labels', () => {
       'components/dashboard/research-form.tsx',
       'components/landing/hume-footer-cluster.tsx',
       'components/landing/morph-signup-cta.tsx',
+      'components/landing/editorial/editorial-waitlist.tsx',
     ];
     for (const file of files) {
       const source = read(file);

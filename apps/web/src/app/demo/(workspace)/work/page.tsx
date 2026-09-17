@@ -28,9 +28,13 @@ const creator = profileToPortfolioCreator(
 
 const projects = DEMO_FEATURED_PROJECTS.filter((p) =>
   DEMO_NAMES.includes(p.title as (typeof DEMO_NAMES)[number]),
-).map((p) =>
-  featuredToPortfolioProject(p, publicDemoProjectHref(DEMO_WORKSPACE.profileSlug, p.id, 'projects')),
-);
+).map((p) => {
+  const project = featuredToPortfolioProject(
+    p,
+    publicDemoProjectHref(DEMO_WORKSPACE.profileSlug, p.id, 'projects'),
+  );
+  return { ...project, views: undefined, saves: undefined };
+});
 
 export default function DemoWorkspaceWorkPage() {
   return (

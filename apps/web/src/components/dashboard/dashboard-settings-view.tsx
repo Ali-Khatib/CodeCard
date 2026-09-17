@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AccountExportAction } from '@/components/dashboard/account-export-action';
 import { GithubConnectionAction } from '@/components/dashboard/github-connection-action';
 import {
@@ -19,7 +18,6 @@ import { AppButton, AppCard, AppMono, PageHeader } from './ui/dashboard-ui';
 
 type SettingControl =
   | 'button'
-  | 'toggle'
   | 'status'
   | 'value-edit'
   | 'account-export'
@@ -33,7 +31,6 @@ type SettingRow = {
   action?: string;
   href?: string;
   control: SettingControl;
-  enabled?: boolean;
   /** Shown instead of a working edit control. */
   comingSoon?: boolean;
 };
@@ -72,18 +69,66 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
   const billingHref = live
     ? '/dashboard/billing'
     : `/sign-in?redirect=${encodeURIComponent('/dashboard/billing')}`;
-  const shareHref = live
-    ? '/dashboard#share'
-    : `/sign-in?redirect=${encodeURIComponent('/dashboard#share')}`;
 
   return [
     {
+      id: 'profile',
+      eyebrow: 'Profile',
+      title: 'CodeCard identity',
+      navHint: 'Username, visibility, public card',
+      description:
+        'What visitors see on your public CodeCard. Edit identity on Home — Settings does not duplicate that editor.',
+      rows: [
+        {
+          label: 'Username',
+          hint: 'Public address: codecard.app/your-name',
+          value: username,
+          action: 'Edit',
+          href: profileEditorHref('slug', live),
+          control: 'value-edit',
+        },
+        {
+          label: 'Visibility',
+          hint: isPublic
+            ? 'Published — people can open your public CodeCard'
+            : 'Private — only you are building it',
+          value: isPublic ? 'Published' : 'Private',
+          action: 'Edit',
+          href: profileEditorHref('visibility', live),
+          control: 'value-edit',
+        },
+        {
+          label: 'Photo, bio & links',
+          hint: 'Public identity fields. Opens the existing Home editor.',
+          value: 'Edit on Home',
+          action: 'Open editor',
+          href: profileEditorHref('photo', live),
+          control: 'value-edit',
+        },
+        {
+          label: 'Public CodeCard',
+          hint: 'See the live page visitors get',
+          value: slug ? `/${slug}` : 'Publish first',
+          action: slug ? 'View' : 'Edit profile',
+          href: slug ? `/${slug}` : profileEditorHref(),
+          control: 'value-edit',
+        },
+        {
+          label: 'Custom domain',
+          hint: 'A personal hostname for your public CodeCard is planned — not available yet',
+          value: 'Coming later',
+          control: 'status',
+          comingSoon: true,
+        },
+      ],
+    },
+    {
       id: 'account',
       eyebrow: 'Account',
-      title: 'Sign-in & email',
-      navHint: 'Password & GitHub',
+      title: 'Sign-in',
+      navHint: 'Email, password, GitHub',
       description:
-        'The email and providers you use to sign in. Changes here affect how you access your workspace.',
+        'How you access this account. These controls do not change what visitors see on your CodeCard.',
       rows: [
         {
           label: 'Email',
@@ -94,19 +139,12 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
         {
           label: 'Password',
           hint: snapshot.hasPassword
-            ? 'We will email you a reset link'
-            : 'Add a password via email reset if you signed up with OAuth',
+            ? 'Email a reset link to change it'
+            : 'Add a password via email reset if you signed up with GitHub',
           action: 'Email reset link',
           href: '/forgot-password',
           control: 'value-edit',
           value: snapshot.hasPassword ? 'Set' : 'Not set',
-        },
-        {
-          label: 'Google',
-          hint: 'Not available in MVP yet',
-          value: 'Coming later',
-          control: 'status',
-          comingSoon: true,
         },
         {
           label: 'GitHub',
@@ -119,188 +157,34 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
       ],
     },
     {
-      id: 'public',
-      eyebrow: 'Profile',
-      title: 'Public URL & visibility',
-      navHint: 'Username, domain & search',
-      description:
-        'How people find your CodeCard on the web: your handle, whether the card is public, and Pro domain options.',
-      rows: [
-        {
-          label: 'Username',
-          hint: 'codecard.app/your-name',
-          value: username,
-          action: 'Edit',
-          href: profileEditorHref('slug', live),
-          control: 'value-edit',
-        },
-        {
-          label: 'Custom domain',
-          hint: plan === 'pro' ? 'Included with Pro' : 'Included with Pro — claim a custom domain',
-          value: plan === 'pro' ? 'Not configured' : 'Available on Pro',
-          action: plan === 'pro' ? 'Set up' : 'Upgrade',
-          href: billingHref,
-          control: 'value-edit',
-        },
-        {
-          label: 'Profile visibility',
-          hint: 'Who can open your card',
-          value: isPublic ? 'Public' : 'Private',
-          action: 'Edit',
-          href: profileEditorHref('visibility', live),
-          control: 'value-edit',
-        },
-        {
-          label: 'Photo, bio & links',
-          hint: 'Everything visitors see on your card',
-          value: 'Edit on Profile',
-          action: 'Open Profile',
-          href: profileEditorHref('photo', live),
-          control: 'value-edit',
-        },
-        {
-          label: 'Search indexing',
-          hint: 'Show up on Google when public',
-          value: isPublic ? 'Follows public status' : 'Off while private',
-          action: 'Edit visibility',
-          href: profileEditorHref('visibility', live),
-          control: 'value-edit',
-        },
-      ],
-    },
-    {
-      id: 'sharing',
-      eyebrow: 'Share',
-      title: 'QR & profile sharing',
-      navHint: 'Home share tools',
-      description:
-        'Share from Home with Copy public link, Share profile, QR preview, and Download QR. Wallet and NFC come later.',
-      rows: [
-        {
-          label: 'Share tools',
-          hint: 'Copy link, native share, QR preview, and PNG download',
-          value: 'On Home',
-          action: 'Open',
-          href: shareHref,
-          control: 'value-edit',
-        },
-        {
-          label: 'Public card preview',
-          hint: 'See your live page like visitors do',
-          value: slug ? `/${slug}` : 'Publish first',
-          action: slug ? 'View' : 'Edit profile',
-          href: slug ? `/${slug}` : profileEditorHref(),
-          control: 'value-edit',
-        },
-        {
-          label: 'Wallet passes',
-          hint: 'Apple Wallet and Google Wallet',
-          value: 'Coming later',
-          control: 'status',
-          comingSoon: true,
-        },
-        {
-          label: 'NFC tags',
-          hint: 'Programmable tap-to-open tags',
-          value: 'Coming later',
-          control: 'status',
-          comingSoon: true,
-        },
-      ],
-    },
-    {
-      id: 'branding',
-      eyebrow: 'Appearance',
-      title: 'Theme, logo & accent',
-      navHint: 'Colors and CodeCard watermark',
-      description:
-        'Public card branding controls. Theme and logo ship after MVP; remove-branding is a Pro toggle when available.',
-      rows: [
-        {
-          label: 'Color theme',
-          hint: 'Card layout and palette',
-          value: 'Default',
-          control: 'status',
-          comingSoon: true,
-        },
-        {
-          label: 'Accent color',
-          hint: 'Buttons, links and highlights',
-          value: 'Default',
-          control: 'status',
-          comingSoon: true,
-        },
-        {
-          label: 'Remove CodeCard branding',
-          hint: plan === 'pro' ? 'Hide the small footer mark' : 'Included with Pro',
-          control: 'toggle',
-          enabled: false,
-          comingSoon: true,
-        },
-        {
-          label: 'Custom logo',
-          hint: 'Replaces the default mark',
-          value: 'Coming later',
-          control: 'status',
-          comingSoon: true,
-        },
-      ],
-    },
-    {
       id: 'billing',
       eyebrow: 'Billing',
-      title: 'Plan & invoices',
-      navHint: 'Subscription and payment history',
-      description: 'Your current plan, renewal, and invoices. Upgrade or manage anytime.',
+      title: 'Plan',
+      navHint: 'Free or Pro',
+      description:
+        'Pro currently unlocks unlimited projects and premium analytics. Custom domains, AI, and presentations are planned and are not included yet.',
       rows: [
         {
           label: 'Current plan',
           hint: currentPlanHint(plan),
           value: formatCurrentPlanLabel(plan),
-          action: plan === 'pro' ? 'Manage' : 'Upgrade',
+          action: plan === 'pro' ? 'Manage billing' : 'Upgrade',
           href: billingHref,
           control: 'value-edit',
-        },
-        {
-          label: 'Manage subscription',
-          hint: 'Change plan or cancel',
-          href: billingHref,
-          control: 'button',
-          action: 'Manage subscription',
-        },
-        {
-          label: 'Invoices',
-          hint: 'PDF receipts for expenses',
-          href: billingHref,
-          control: 'button',
-          action: 'View invoices',
         },
       ],
     },
     {
-      id: 'security',
-      eyebrow: 'Security',
-      title: 'Sessions & data',
-      navHint: '2FA, export & deletion',
+      id: 'danger',
+      eyebrow: 'Danger zone',
+      title: 'Export & delete',
+      navHint: 'Data export and account deletion',
       description:
-        'Keep your account secure. Export your data or delete your account. Sign out ends this device session.',
+        'Export a JSON copy of approved account data, or permanently delete this account. Deletion cannot be undone.',
       rows: [
         {
-          label: 'This device session',
-          hint: 'Use Sign out below to end it',
-          value: 'Signed in here',
-          control: 'status',
-        },
-        {
-          label: 'Two-factor authentication',
-          hint: 'Authenticator app or SMS',
-          value: 'Coming later',
-          control: 'status',
-          comingSoon: true,
-        },
-        {
           label: 'Export data',
-          hint: 'JSON download of approved account data (profile, projects, research, and related records)',
+          hint: 'JSON download of profile, projects, research, and related records',
           control: 'account-export',
         },
         {
@@ -353,32 +237,6 @@ function RowActions({
     );
   }
 
-  if (row.control === 'toggle') {
-    return (
-      <div className="flex flex-wrap items-center gap-3">
-        {row.comingSoon ? (
-          <span className="text-[12px] text-[var(--app-smoke)]">Coming later</span>
-        ) : null}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={row.enabled}
-          aria-label={row.label}
-          disabled={row.comingSoon || !live}
-          className={`h-6 w-11 rounded-full p-0.5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)] disabled:cursor-not-allowed disabled:opacity-50 ${
-            row.enabled ? 'bg-[var(--app-iris)]' : 'bg-[var(--app-border-strong)]'
-          }`}
-        >
-          <span
-            className={`block h-5 w-5 rounded-full bg-white transition-transform ${
-              row.enabled ? 'translate-x-5' : 'translate-x-0'
-            }`}
-          />
-        </button>
-      </div>
-    );
-  }
-
   if (row.comingSoon && row.control === 'status') {
     return (
       <span className="rounded-full border border-[var(--app-border)] px-3 py-1 text-[12px] text-[var(--app-smoke)]">
@@ -420,20 +278,6 @@ function RowActions({
     );
   }
 
-  if (row.control === 'button' && row.action) {
-    return (
-      <AsyncActionButton
-        variant="ghost"
-        successLabel="Done"
-        onAction={async () => {
-          await new Promise((r) => setTimeout(r, 420));
-        }}
-      >
-        {row.action}
-      </AsyncActionButton>
-    );
-  }
-
   return null;
 }
 
@@ -463,7 +307,7 @@ export function DashboardSettingsView({
   openDeletionOnMount?: boolean;
 }) {
   const [openId, setOpenId] = useState<string>(
-    openDeletionOnMount ? 'security' : 'account',
+    openDeletionOnMount ? 'danger' : 'profile',
   );
   const live = accountControls === 'live';
   const githubCanDisconnect = Boolean(
@@ -490,7 +334,11 @@ export function DashboardSettingsView({
     <div className="cc-app-page cc-app-page--1040">
       <PageHeader
         title="Settings"
-        description="Workspace preferences: sign-in, how you share, how your card looks, billing, and security."
+        description={
+          live
+            ? 'Manage your account, CodeCard visibility, and plan. Identity editing stays on Home.'
+            : 'Sample settings — fixture workspace, not a live account.'
+        }
       />
 
       <FadeInView delay={0}>
@@ -613,7 +461,7 @@ export function DashboardSettingsView({
               ))}
             </ul>
 
-            {signOutAction ? (
+            {signOutAction && active.id === 'account' ? (
               <form
                 action={signOutAction}
                 className="mt-6 border-t border-[var(--app-border)] pt-6"

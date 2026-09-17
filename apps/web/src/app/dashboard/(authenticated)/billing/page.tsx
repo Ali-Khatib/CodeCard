@@ -125,7 +125,7 @@ export default async function BillingPage() {
           <p className="cc-app-mono">Billing</p>
           <h1 className="cc-app-title">Subscription</h1>
           <p className="cc-app-subtitle">
-            Manage your plan. Pro unlocks deeper analytics and advanced workspace tools.
+            Manage your plan. Pro currently unlocks unlimited projects and premium analytics.
           </p>
         </div>
       </header>
@@ -143,6 +143,8 @@ export default async function BillingPage() {
                 {subscription.current_period_end
                   ? new Date(subscription.current_period_end).toLocaleDateString()
                   : 'N/A'}
+                . Includes unlimited projects and premium analytics. Custom domains, AI assistance,
+                and presentations are still planned.
               </p>
             </>
           ) : (
@@ -151,8 +153,9 @@ export default async function BillingPage() {
                 Free
               </p>
               <p className="mt-2 text-[15px] text-[var(--app-muted)]">
-                Upgrade for ${PLANS.pro.priceMonthly}/mo for unlimited projects, custom domains, AI
-                project tools, peer analysis, and the full analytics suite.
+                Upgrade for ${PLANS.pro.priceMonthly}/mo for unlimited projects plus visitor insights
+                and per-paper analytics. Custom domains, AI assistance, and presentations are planned
+                and are not included yet.
               </p>
             </>
           )}
