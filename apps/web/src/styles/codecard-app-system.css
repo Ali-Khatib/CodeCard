@@ -4862,11 +4862,6 @@ html.dark .cc-analytics-paper-table__signal-chip {
   border-color: color-mix(in srgb, var(--app-slate-plum) 50%, var(--app-border));
 }
 
-.cc-home-calendar__swatch--today {
-  background: var(--app-paper);
-  border-color: var(--app-ink);
-}
-
 .cc-home-calendar__day-kicker {
   margin: 0;
   font-size: 11px;

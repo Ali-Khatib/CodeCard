@@ -324,15 +324,11 @@ export function HomeScheduleSection({
                 <ul className="cc-home-calendar__legend">
                   <li>
                     <i className="cc-home-calendar__swatch cc-home-calendar__swatch--event" />
-                    Event: a place you will be
+                    Events
                   </li>
                   <li>
                     <i className="cc-home-calendar__swatch cc-home-calendar__swatch--followup" />
-                    Follow-up: someone to check back with
-                  </li>
-                  <li>
-                    <i className="cc-home-calendar__swatch cc-home-calendar__swatch--today" />
-                    Today
+                    Follow-ups
                   </li>
                 </ul>
               </div>
@@ -396,10 +392,10 @@ export function HomeScheduleSection({
 
               <ul className="cc-home-calendar__legend cc-home-calendar__legend--compact">
                 <li>
-                  <i className="cc-home-calendar__dot cc-home-calendar__dot--event" /> Event
+                  <i className="cc-home-calendar__dot cc-home-calendar__dot--event" /> Events
                 </li>
                 <li>
-                  <i className="cc-home-calendar__dot cc-home-calendar__dot--followup" /> Follow-up
+                  <i className="cc-home-calendar__dot cc-home-calendar__dot--followup" /> Follow-ups
                 </li>
               </ul>
             </AppCard>
