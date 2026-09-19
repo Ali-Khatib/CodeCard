@@ -727,6 +727,18 @@ export const moderationReportSchema = z
   })
   .strict();
 
+export const waitlistSignupSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Enter your email to join the waitlist.')
+    .email('Enter a valid email address')
+    .max(255)
+    .transform((value) => value.toLowerCase()),
+  /** Honeypot — must stay empty. Non-empty submissions are accepted and dropped. */
+  website: z.string().max(200).optional().default(''),
+});
+
 export const dmcaNoticeSchema = z.object({
   claimant_name: z.string().min(1).max(200).trim(),
   claimant_email: z.string().email().max(255),
@@ -755,6 +767,7 @@ export type CreateCollectionInput = z.infer<typeof createCollectionInputSchema>;
 export type UpdateCollectionInput = z.infer<typeof updateCollectionInputSchema>;
 export type CollectionMembershipInput = z.infer<typeof collectionMembershipInputSchema>;
 export type UpdateConnectionMetadataInput = z.infer<typeof updateConnectionMetadataInputSchema>;
+export type WaitlistSignupInput = z.infer<typeof waitlistSignupSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;

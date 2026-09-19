@@ -88,7 +88,9 @@ export function EditorialWaitlist() {
       return;
     }
     setPending(true);
-    const next = await submitWaitlistEmail(email);
+    const form = event.currentTarget;
+    const honeypot = (form.elements.namedItem('website') as HTMLInputElement | null)?.value ?? '';
+    const next = await submitWaitlistEmail(email, { website: honeypot });
     setPending(false);
     if (!next.ok) {
       setError(waitlistValidationMessage(next.error));
@@ -165,6 +167,14 @@ export function EditorialWaitlist() {
                 <label htmlFor={fieldId} className="cc-ed-waitlist__label">
                   Email
                 </label>
+                <input
+                  className="cc-ed-waitlist__honeypot"
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
                 <input
                   id={fieldId}
                   name="email"

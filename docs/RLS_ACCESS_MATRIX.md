@@ -53,6 +53,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `billing_events` | ✅ | ❌ | ❌ | ❌ | ❌ | No client policies |
 | `moderation_reports` | ✅ | ❌ INSERT | ❌ INSERT | SELECT own reports | ❌ | Public intake via service-role RPC; client INSERT revoked |
 | `dmca_notices` | ✅ | ❌ | ❌ | ❌ SELECT | ❌ | Service-role insert only; validated `/api/dmca` rate-limited route |
+| `waitlist_signups` | ✅ | ❌ | ❌ | ❌ | ❌ | No client access. Service-role insert only via `/api/waitlist` |
 | `audit_logs` | ✅ | ❌ | ❌ | SELECT tenant | SELECT if same tenant | |
 | `jobs` | ✅ | ❌ | ❌ | ❌ | ❌ | Service-role / SECURITY DEFINER claim only |
 | `account_deletion_operations` | ✅ | ❌ | ❌ | ❌ | ❌ | Grants revoked from anon/authenticated |

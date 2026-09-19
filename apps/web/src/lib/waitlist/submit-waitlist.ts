@@ -1,69 +1,63 @@
+import { waitlistSignupSchema } from '@codecard/validation';
+
 export const WAITLIST_STORAGE_KEY = 'codecard.waitlist.emails';
 
 export type WaitlistValidationError = 'required' | 'invalid';
 
 export type WaitlistSubmitResult =
   | { ok: true; status: 'joined' | 'already' }
-  | { ok: false; error: WaitlistValidationError };
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  | { ok: false; error: WaitlistValidationError | 'unavailable' };
 
 export function normalizeWaitlistEmail(raw: string): string {
   return raw.trim().toLowerCase();
 }
 
 export function validateWaitlistEmail(raw: string): WaitlistValidationError | null {
-  const trimmed = raw.trim();
-  if (!trimmed) return 'required';
-  if (!EMAIL_PATTERN.test(trimmed)) return 'invalid';
-  return null;
+  const parsed = waitlistSignupSchema.safeParse({ email: raw, website: '' });
+  if (parsed.success) return null;
+  const message = parsed.error.errors[0]?.message ?? '';
+  if (/join the waitlist/i.test(message) || raw.trim() === '') return 'required';
+  return 'invalid';
 }
 
-export function waitlistValidationMessage(error: WaitlistValidationError): string {
+export function waitlistValidationMessage(
+  error: WaitlistValidationError | 'unavailable',
+): string {
   if (error === 'required') return 'Enter your email to join the waitlist.';
+  if (error === 'unavailable') return 'Something went wrong. Please try again.';
   return 'Enter a valid email address.';
 }
 
-function readStoredEmails(storage: Pick<Storage, 'getItem'>): string[] {
-  try {
-    const raw = storage.getItem(WAITLIST_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item): item is string => typeof item === 'string');
-  } catch {
-    return [];
-  }
-}
+type WaitlistApiSuccess = { ok: true; status: 'joined' | 'already' };
 
-/**
- * Isolated waitlist submit. Persists locally until a backend is connected.
- * Do not invent remote endpoints here — swap the storage/adapter later.
- */
 export async function submitWaitlistEmail(
   raw: string,
-  storage?: Pick<Storage, 'getItem' | 'setItem'> | null,
+  extras: { website?: string } = {},
 ): Promise<WaitlistSubmitResult> {
   const error = validateWaitlistEmail(raw);
   if (error) return { ok: false, error };
 
   const email = normalizeWaitlistEmail(raw);
-  const store =
-    storage === undefined
-      ? typeof window !== 'undefined'
-        ? window.localStorage
-        : null
-      : storage;
 
-  if (!store) {
-    return { ok: true, status: 'joined' };
+  try {
+    const response = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, website: extras.website ?? '' }),
+    });
+
+    if (response.status === 429) return { ok: false, error: 'unavailable' };
+    if (!response.ok) {
+      if (response.status === 422) return { ok: false, error: 'invalid' };
+      return { ok: false, error: 'unavailable' };
+    }
+
+    const payload = (await response.json()) as WaitlistApiSuccess;
+    if (payload?.ok && (payload.status === 'joined' || payload.status === 'already')) {
+      return { ok: true, status: payload.status };
+    }
+    return { ok: false, error: 'unavailable' };
+  } catch {
+    return { ok: false, error: 'unavailable' };
   }
-
-  const existing = readStoredEmails(store);
-  if (existing.includes(email)) {
-    return { ok: true, status: 'already' };
-  }
-
-  store.setItem(WAITLIST_STORAGE_KEY, JSON.stringify([...existing, email]));
-  return { ok: true, status: 'joined' };
 }

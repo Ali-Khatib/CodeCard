@@ -16,9 +16,8 @@ item is **External required** and must be applied in the DNS zone for
 
 ## 1. What sends email
 
-**Code-verified:** CodeCard has **no application email provider**. There is no
-Resend, Postmark, SendGrid, SES, or nodemailer dependency, and no transactional
-email module. Every email is sent by **Supabase Auth**.
+**Code-verified:** Auth email is still sent by **Supabase Auth**. Waitlist confirmation
+is sent by **Resend** when `RESEND_API_KEY` is set.
 
 | Email | Trigger | Code reference |
 |-------|---------|----------------|
@@ -26,9 +25,11 @@ email module. Every email is sent by **Supabase Auth**.
 | Resend confirmation | `supabase.auth.resend({ type: 'signup' })` | `apps/web/src/components/dashboard/email-verification-banner.tsx` |
 | Password reset | `supabase.auth.resetPasswordForEmail` | `apps/web/src/app/forgot-password/page.tsx` |
 | Email change confirmation | Supabase (`double_confirm_changes = true`) | `supabase/config.toml` |
+| Waitlist confirmation | `sendWaitlistConfirmationEmail` via Resend | `apps/web/src/lib/waitlist/send-waitlist-confirmation.ts` |
 
-There are no marketing, receipt, or notification emails. Stripe sends its own
-billing email directly; that is configured in the Stripe Dashboard and is
+There are no receipts or product-notification emails besides waitlist confirmation.
+Launch mail to saved waitlist addresses is a later operator send from `waitlist_signups`.
+Stripe sends its own billing email directly; that is configured in the Stripe Dashboard and is
 outside CodeCard's DNS scope.
 
 **No email templates are stored in this repository.** Bodies come from the
@@ -216,7 +217,7 @@ Run against staging first, with a test mailbox.
 
 | Item | Status |
 |------|--------|
-| Application email provider | **N/A** — Supabase Auth only (Code-verified) |
+| Application email provider | **Resend** for waitlist confirmation (Code-verified). Auth still Supabase. |
 | Email templates in repo | **None** (Code-verified) |
 | Redirect origin construction | **Code-verified**, depends on `NEXT_PUBLIC_APP_URL` |
 | Enumeration-safe failure copy | **Code-verified** |

@@ -88,6 +88,7 @@ describe('kill switch safety properties', () => {
       ['src/app/api/account/export/route.ts', "killSwitch: 'accountExport'"],
       ['src/app/api/dmca/route.ts', "killSwitch: 'publicReports'"],
       ['src/app/api/moderation/report/route.ts', "killSwitch: 'publicReports'"],
+      ['src/app/api/waitlist/route.ts', "killSwitch: 'waitlist'"],
     ];
     for (const [file, needle] of expectations) {
       expect(readWeb(file), file).toContain(needle);

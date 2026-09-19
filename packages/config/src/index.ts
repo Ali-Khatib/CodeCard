@@ -58,6 +58,8 @@ export const RATE_LIMITS = {
   ai: { requests: 10, window: '1 h' as const },
   moderation: { requests: 5, window: '1 h' as const },
   dmca: { requests: 3, window: '1 h' as const },
+  /** Public landing waitlist intake. */
+  waitlist: { requests: 8, window: '1 m' as const },
   billing: { requests: 20, window: '1 m' as const },
   /** Authenticated account export downloads — intentionally strict. */
   accountExport: { requests: 5, window: '1 h' as const },

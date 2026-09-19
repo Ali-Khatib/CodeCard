@@ -47,6 +47,7 @@ describe('WS11-T005 secure API route audit', () => {
         'moderation/report/route.ts',
         'public/research/[paperId]/pdf/route.ts',
         'upload/route.ts',
+        'waitlist/route.ts',
         'webhooks/stripe/route.ts',
       ].sort(),
     );
@@ -63,6 +64,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/admin/reports/[id]',
       '/api/admin/reports/[id]/note',
       '/api/upload',
+      '/api/waitlist',
       '/api/public/research/[paperId]/pdf',
       '/api/webhooks/stripe',
       '/api/auth/complete-password-reset',
@@ -77,6 +79,7 @@ describe('WS11-T005 secure API route audit', () => {
     for (const rel of [
       'src/app/api/analytics/route.ts',
       'src/app/api/dmca/route.ts',
+      'src/app/api/waitlist/route.ts',
       'src/app/api/moderation/report/route.ts',
       'src/app/api/account/export/route.ts',
       'src/app/api/account/delete/route.ts',

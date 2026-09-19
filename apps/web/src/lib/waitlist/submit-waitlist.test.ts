@@ -1,22 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
-  WAITLIST_STORAGE_KEY,
   normalizeWaitlistEmail,
   submitWaitlistEmail,
   validateWaitlistEmail,
   waitlistValidationMessage,
 } from './submit-waitlist';
-
-function memoryStorage(initial: Record<string, string> = {}) {
-  const data = { ...initial };
-  return {
-    getItem: (key: string) => (key in data ? data[key] : null),
-    setItem: (key: string, value: string) => {
-      data[key] = value;
-    },
-    data,
-  };
-}
 
 describe('waitlist email submit', () => {
   it('rejects empty and malformed emails', () => {
@@ -29,26 +17,45 @@ describe('waitlist email submit', () => {
     expect(waitlistValidationMessage('invalid')).toMatch(/valid/i);
   });
 
-  it('normalizes emails before storing', () => {
+  it('normalizes emails before sending', () => {
     expect(normalizeWaitlistEmail('  You@CodeCard.DEV ')).toBe('you@codecard.dev');
   });
 
-  it('stores first join and blocks duplicates', async () => {
-    const storage = memoryStorage();
-    const first = await submitWaitlistEmail('You@CodeCard.dev', storage);
-    expect(first).toEqual({ ok: true, status: 'joined' });
-    const stored = JSON.parse(storage.data[WAITLIST_STORAGE_KEY] ?? '[]') as string[];
-    expect(stored).toEqual(['you@codecard.dev']);
+  it('posts to the waitlist API and maps joined vs already', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, status: 'joined' }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
 
-    const second = await submitWaitlistEmail('you@codecard.dev', storage);
+    const first = await submitWaitlistEmail('You@CodeCard.dev');
+    expect(first).toEqual({ ok: true, status: 'joined' });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/waitlist',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'you@codecard.dev', website: '' }),
+      }),
+    );
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, status: 'already' }),
+    });
+    const second = await submitWaitlistEmail('you@codecard.dev');
     expect(second).toEqual({ ok: true, status: 'already' });
-    expect(JSON.parse(storage.data[WAITLIST_STORAGE_KEY] ?? '[]')).toHaveLength(1);
+
+    vi.unstubAllGlobals();
   });
 
-  it('returns validation errors without writing storage', async () => {
-    const storage = memoryStorage();
-    const result = await submitWaitlistEmail('bad', storage);
+  it('returns validation errors without calling the API', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const result = await submitWaitlistEmail('bad');
     expect(result).toEqual({ ok: false, error: 'invalid' });
-    expect(storage.data[WAITLIST_STORAGE_KEY]).toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugSchema, signUpSchema, urlSchema } from '../src/index';
+import { slugSchema, signUpSchema, urlSchema, waitlistSignupSchema } from '../src/index';
 
 describe('slugSchema', () => {
   it('accepts valid slugs', () => {
@@ -22,6 +22,16 @@ describe('urlSchema', () => {
   it('rejects non-http protocols', () => {
     expect(urlSchema.safeParse('javascript:alert(1)').success).toBe(false);
     expect(urlSchema.safeParse('ftp://example.com').success).toBe(false);
+  });
+});
+
+describe('waitlistSignupSchema', () => {
+  it('lowercases email and rejects invalid addresses', () => {
+    expect(waitlistSignupSchema.safeParse({ email: '  You@CodeCard.DEV ' }).success).toBe(true);
+    expect(waitlistSignupSchema.parse({ email: '  You@CodeCard.DEV ' }).email).toBe(
+      'you@codecard.dev',
+    );
+    expect(waitlistSignupSchema.safeParse({ email: 'not-an-email' }).success).toBe(false);
   });
 });
 

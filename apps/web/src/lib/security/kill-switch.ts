@@ -28,6 +28,8 @@ export const KILL_SWITCH_FEATURES = {
   publicReports: 'CODECARD_DISABLE_PUBLIC_REPORTS',
   /** New account signups (see caveat below). */
   signups: 'CODECARD_DISABLE_SIGNUPS',
+  /** Public landing waitlist intake. */
+  waitlist: 'CODECARD_DISABLE_WAITLIST',
 } as const;
 
 export type KillSwitchFeature = keyof typeof KILL_SWITCH_FEATURES;

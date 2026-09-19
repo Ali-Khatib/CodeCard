@@ -48,6 +48,7 @@ export const RLS_APPLICATION_TABLES = [
   'audit_logs',
   'jobs',
   'account_deletion_operations',
+  'waitlist_signups',
 ] as const;
 
 /** Owner-private tables: no anonymous SELECT policies. */
@@ -67,6 +68,7 @@ const NO_CLIENT_ACCESS_TABLES = [
   'jobs',
   'billing_events',
   'account_deletion_operations',
+  'waitlist_signups',
 ] as const;
 
 const STORAGE_BUCKETS = ['avatars', 'project-media', 'private-docs'] as const;
@@ -176,6 +178,10 @@ describe('WS11-T001 RLS access matrix and migration contracts', () => {
     }
     expect(sql).toContain('claim_storage_cleanup_jobs');
     expect(sql).toContain('REVOKE ALL ON FUNCTION claim_storage_cleanup_jobs');
+    expect(sql).toContain('REVOKE ALL ON TABLE public.waitlist_signups FROM anon, authenticated');
+    const waitlistRoute = read('apps/web/src/app/api/waitlist/route.ts');
+    expect(waitlistRoute).toContain("rateLimitType: 'waitlist'");
+    expect(waitlistRoute).toContain('createServiceClient');
   });
 
   it('requires published+public for public project/research SELECT policies', () => {

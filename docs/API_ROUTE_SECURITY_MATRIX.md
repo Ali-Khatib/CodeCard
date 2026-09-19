@@ -12,6 +12,7 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 |---|---|---|---|---|---|---|---|
 | `/api/analytics` | POST | Public | Zod via `secureJsonRoute` | N/A (public ingest) | `analytics` | JSON | Published-target checks in handler |
 | `/api/dmca` | POST | Public | Zod + 32 KiB | N/A | `dmca` | JSON | Service-role insert |
+| `/api/waitlist` | POST | Public | Zod + 8 KiB + honeypot | N/A | `waitlist` | JSON | Service-role insert; Resend confirmation |
 | `/api/moderation/report` | POST | Public (optional verified user) | Strict profile/project UUID + reason allowlist + optional 1,500-char plain text | N/A (public submission) | `moderation` strict per source | Constant accepted JSON | Public-state RPC validation; private HMAC source dedupe; no moderation oracle/admin audit |
 | `/api/account/export` | POST (GET→405) | Required | Strict Zod | **same-origin** | `accountExport` strict | JSON download | Session identity only; no-store |
 | `/api/account/delete` | POST (GET→405) | Required | Zod + confirmation | **same-origin** | `accountDelete` strict | JSON | Reauth required |

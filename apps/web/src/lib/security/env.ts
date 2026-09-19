@@ -11,6 +11,7 @@ const serverEnvSchema = z.object({
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
   SENTRY_DSN: z.string().url().optional(),
+  RESEND_API_KEY: z.string().min(1).optional(),
 });
 
 const publicEnvSchema = z.object({
@@ -78,6 +79,7 @@ export function assertNoLeakedPublicSecrets(): void {
     'NEXT_PUBLIC_SECRET',
     'NEXT_PUBLIC_WEBHOOK',
     'NEXT_PUBLIC_UPSTASH',
+    'NEXT_PUBLIC_RESEND',
   ];
   for (const key of Object.keys(process.env)) {
     if (forbidden.some((f) => key.startsWith(f))) {

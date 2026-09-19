@@ -31,7 +31,7 @@ select ok(
         'connection_notes','collections','collection_items','circle_activity',
         'circle_viewer_state','public_profile_events','project_view_events',
         'analytics_events','subscription_customers','subscriptions','billing_events',
-        'moderation_reports','dmca_notices','audit_logs','jobs',
+        'moderation_reports','dmca_notices','waitlist_signups','audit_logs','jobs',
         'account_deletion_operations'
       )
   ),

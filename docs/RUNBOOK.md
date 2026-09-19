@@ -173,6 +173,7 @@ feature returns **503** with a generic message that names no switch.
 | `CODECARD_DISABLE_ACCOUNT_EXPORT` | `/api/account/export` |
 | `CODECARD_DISABLE_PUBLIC_REPORTS` | `/api/dmca`, `/api/moderation/report` |
 | `CODECARD_DISABLE_SIGNUPS` | Reserved — see caveat below |
+| `CODECARD_DISABLE_WAITLIST` | `/api/waitlist` — landing waitlist intake |
 
 **Only the exact string `1` activates a switch.** `true`, `yes`, `0`, and empty
 are all treated as "enabled", so a malformed value cannot silently take a
