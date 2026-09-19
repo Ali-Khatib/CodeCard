@@ -26,66 +26,66 @@ const AUDIENCE: AudienceCard[] = [
   {
     id: 'builders',
     eyebrow: 'Builders',
-    title: 'Lead with proof.',
-    body: 'Repos, demos, and case studies first, not buried under schools and titles.',
+    title: 'Show the work, not the speech.',
+    body: 'Put your best projects in front of someone while you are still talking.',
     detailLead:
-      'When someone opens your CodeCard, the work hits first. Stack, demos, and outcomes sit where eyes land.',
+      'When someone asks what you do, open your CodeCard. Images, stack, and the story are ready on their phone.',
     points: [
-      'First of all, pin the projects that prove how you think, not a laundry list of every build.',
-      'Second of all, keep demos, stack, and outcomes next to the story so nothing gets buried.',
-      'Third, share one living link at standups, intros, and hiring screens.',
+      'First of all, pin the projects that prove how you think.',
+      'Second of all, let them explore the work during the conversation.',
+      'Third, connect in person and keep a note so you can follow up.',
     ],
   },
   {
     id: 'recruiters',
     eyebrow: 'Recruiters',
-    title: 'Decide faster.',
-    body: 'Identity, role, and demonstrated work in one glance. Skip the PDF chase.',
+    title: 'See the work in the room.',
+    body: 'Scan a CodeCard and look at selected work without waiting for a follow up email.',
     detailLead:
-      'CodeCard compresses the first pass: who they are, what they ship, and whether the work matches the seat.',
+      'The first look can happen on a phone, in the conversation. Role, stack, and proof sit together.',
     points: [
-      'First of all, scan role, stack, and proof without opening five tabs or chasing a PDF.',
-      'Second of all, jump straight into projects and papers that show judgment, not just titles.',
-      'Third, share your CodeCard QR so people you meet in person can scan and connect.',
+      'First of all, scan the QR and open the card in the browser.',
+      'Second of all, jump into projects and papers that show judgment.',
+      'Third, the builder can remember when you met and follow up with context.',
     ],
   },
   {
     id: 'events',
     eyebrow: 'Events',
-    title: 'Show it live.',
-    body: 'QR or your screen at a meetup. They scan and scroll your work while you talk.',
+    title: 'Meet. Show. Keep the thread.',
+    body: 'Display your QR on your phone. They scan, explore, and you keep the event and the follow up.',
     detailLead:
-      'At a meetup or conference, the conversation should not end with a tossed link or traded emails, hoping they open it later and somehow know what they are looking at.',
+      'Add upcoming events to your calendar so you know where you plan to meet people. After the scan, the connection stays with a date, a place, and a note.',
     points: [
-      'First of all, put a QR on your badge, laptop, or slide and let them open the work on the spot.',
-      'Second of all, talk while they scroll projects, papers, and Circle in real time.',
-      'Third, they leave with your living profile, not a scrap of contact info that goes cold.',
+      'First of all, show your CodeCard from your phone at the meetup.',
+      'Second of all, they open your work in the browser while you talk.',
+      'Third, record the event, the person, and the next step before the week swallows it.',
     ],
   },
   {
     id: 'students',
     eyebrow: 'Students',
-    title: 'Stand out early.',
-    body: 'Ship projects before the degree line. Show skill, not just school.',
+    title: 'Lead with what you built.',
+    body: 'Show projects from your phone at a campus event instead of promising to send a link later.',
     detailLead:
-      'You do not need a long resume yet. You need proof you can build and explain it.',
+      'You do not need a long resume yet. You need proof you can show in the moment, then a way to remember who you met.',
     points: [
-      'First of all, lead with projects and coursework that show craft, not only GPA and school lines.',
-      'Second of all, surface research, hacks, and side builds so early careers still look concrete.',
-      'Third, carry one profile from campus events into internships and first roles.',
+      'First of all, lead with projects and coursework that show craft.',
+      'Second of all, keep research and side builds easy to open on a phone.',
+      'Third, keep notes and follow ups from career fairs and mixers.',
     ],
   },
   {
     id: 'freelancers',
     eyebrow: 'Freelancers',
-    title: 'Win the brief.',
-    body: 'One link that shows how you think, build, and deliver for clients.',
+    title: 'Win the room, then follow up.',
+    body: 'Show case studies on the spot, connect with the person, and schedule the next step.',
     detailLead:
-      'Clients decide on clarity. CodeCard is the brief-ready link that shows how you work.',
+      'Clients decide on clarity. CodeCard puts the work in front of them immediately, then holds the connection after you leave.',
     points: [
-      'First of all, package case studies with outcome, stack, and process in one scannable place.',
-      'Second of all, send one living URL in proposals instead of a zip of decks and files.',
-      'Third, keep Circle and connections close so warm intros turn into paid work.',
+      'First of all, package case studies with outcome, stack, and process.',
+      'Second of all, show the work from your phone instead of mailing a deck later.',
+      'Third, keep a note and a follow up so warm intros become real work.',
     ],
   },
 ];
@@ -372,10 +372,11 @@ export function EditorialAudience() {
         <p className="cc-ed__eyebrow">Who it’s for</p>
         <h2 id="editorial-audience-heading" className="cc-ed__display mt-3">
           <span className="cc-ed__lead">WHEREVER YOU SHOW UP.</span>
-          <span className="cc-ed__sub">THE WORK COMES WITH YOU.</span>
+          <span className="cc-ed__sub">THE CARD COMES WITH YOU.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Pitch, hire, meet, learn, or sell with the same living profile.
+          Meet someone, show your work, connect, and follow up. Same workflow at
+          a meetup, a campus event, or a client intro.
         </p>
       </div>
 

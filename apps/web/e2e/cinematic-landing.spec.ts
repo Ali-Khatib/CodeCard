@@ -6,7 +6,7 @@ test.describe('Editorial product landing', () => {
     expect(response?.ok()).toBeTruthy();
     const html = await page.content();
     expect(html).toContain('YOUR WORK.');
-    expect(html).toContain('ONE IDENTITY.');
+    expect(html).toContain('YOUR CONNECTIONS.');
     expect(html).not.toMatch(/View Public Profile/i);
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
@@ -16,8 +16,8 @@ test.describe('Editorial product landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/ONE LIVING/i).first()).toBeVisible();
-    await expect(page.getByText(/TECHNICAL IDENTITY/i).first()).toBeVisible();
+    await expect(page.getByText(/MEET\. SHOW\./i).first()).toBeVisible();
+    await expect(page.getByText(/CONNECT\. FOLLOW UP\./i).first()).toBeVisible();
     /* Walkthrough chapter rail — copy churns, the five chapters do not. */
     for (const chapter of ['Projects', 'Research', 'Circle', 'Analytics']) {
       await expect(page.getByText(chapter, { exact: false }).first()).toBeVisible();

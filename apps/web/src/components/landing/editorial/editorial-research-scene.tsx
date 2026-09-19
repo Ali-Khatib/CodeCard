@@ -23,7 +23,7 @@ const BEATS: EditorialResearchBeat[] = [
     researchBody:
       'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
     solutionBody:
-      'CodeCard puts your projects up front. The good stuff shows before the glance is over.',
+      'CodeCard puts selected work on a phone during the introduction. People can see it before the glance is over.',
     imageSrc: '/auth-collage/team.jpg',
     imageAlt: 'Two people collaborating at a shared workspace',
   },
@@ -37,7 +37,7 @@ const BEATS: EditorialResearchBeat[] = [
     researchBody:
       'Cross-country experiments found school prestige cues still shaped early screening. The education line moved the cut before anyone tested the work.',
     solutionBody:
-      'CodeCard leads with builds and outcomes. Proof shows up before the credential story takes over.',
+      'Lead with builds and outcomes in the room. Proof can show up before the credential story takes over.',
     imageSrc: '/auth-collage/desk.jpg',
     imageAlt: 'Focused workspace with a laptop and notes',
   },
@@ -51,7 +51,7 @@ const BEATS: EditorialResearchBeat[] = [
     researchBody:
       'Skills-based hiring research shows pools open much wider when skills are easy to find. Buried work stays out of the match.',
     solutionBody:
-      'CodeCard makes your skills and projects easy to see. More people can find you.',
+      'Make skills and projects easy to open on a phone. People you meet can see them without waiting for a later send.',
     imageSrc: '/auth-collage/code.jpg',
     imageAlt: 'Code editor showing technical work in progress',
   },

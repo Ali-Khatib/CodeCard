@@ -21,9 +21,9 @@ export function EditorialLiveDemoBox() {
           <span className="cc-ed__sub">DEMO WORKSPACE.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          A compact live preview — switch Desktop or Mobile. Each mode
-          simulates a real device viewport, then scales the full workspace
-          into this card. Scroll inside the demo to explore.
+          A compact live preview of the workspace. Switch Desktop or Mobile,
+          then scroll inside the demo. This is the card people explore after they
+          scan.
         </p>
         <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>

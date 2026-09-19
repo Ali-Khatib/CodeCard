@@ -12,6 +12,7 @@ const FOOTER_COL_PRODUCT = [
   { label: 'Home', href: MARKETING_HOME_HREF },
   { label: 'Live demo', href: LIVE_DEMO_HREF },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'FAQ', href: `${MARKETING_HOME_HREF}#faq` },
   { label: 'Research', href: '/research' },
 ] as const;
 
@@ -65,7 +66,7 @@ export function HumeFooterCluster() {
               className="cc-site-footer__display"
             >
               <span>Your work.</span>
-              <span>One identity.</span>
+              <span>Your connections.</span>
             </h2>
           </div>
         </div>
@@ -156,7 +157,7 @@ export function HumeFooterCluster() {
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
             <p className="cc-site-footer__meta-note">
-              Projects, papers, Circle, and analysis in one profile.
+              Showcase, connections, and follow ups around real meetings.
             </p>
           </div>
         </div>

@@ -80,7 +80,7 @@ export function AuthShowcaseStage() {
         >
           <h2 className="font-display text-balance text-[clamp(2.35rem,4.6vw,3.65rem)] font-normal leading-[1.05] tracking-[-0.03em] text-[#17171a]">
             Your best work. Ready to{' '}
-            <span className="cc-hume-gradient-text">share in seconds.</span>
+            <span className="cc-hume-gradient-text">show on the spot.</span>
           </h2>
           <p className="mt-5 max-w-[34ch] text-balance text-[17px] leading-relaxed text-[#5c5956] sm:text-[18px]">
             {CODECARD_TAGLINE}

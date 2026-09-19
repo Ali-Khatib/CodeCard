@@ -28,64 +28,61 @@ const STORIES: WalkStory[] = [
   {
     id: 'projects',
     label: 'Projects',
-    headline: 'PROJECTS PEOPLE CAN READ.',
-    lead: 'The quickest way to showcase your projects in a clear, educational page that covers everything you want to show off.',
+    headline: 'SHOW YOUR BEST WORK NOW.',
+    lead: 'The quickest way to impress someone with your work, right from your phone, while you are still talking.',
     points: [
-      'Tell the story: what it is, how it runs, what changed.',
-      'Put demos, stack, and outcomes where visitors can actually see them.',
-      'Let people open the work without hunting across tabs.',
+      'Open your CodeCard and QR on your phone during the introduction.',
+      'They scan, then explore images, overview, stack, and the story in the browser.',
+      'They do not need the CodeCard app just to view your work.',
     ],
-    // Code on screen — bright, clearly a project surface
     background: U('photo-1461749280684-dccba630e2f6'),
   },
   {
     id: 'research',
     label: 'Research',
-    headline: 'SHARE YOUR RESEARCH TOO.',
-    lead: 'Not only projects. Put papers on your CodeCard so people can open, skim, and cite them.',
+    headline: 'SHARE THE PAPERS TOO.',
+    lead: 'Selected work can include research. Put papers on your CodeCard so people can open them in the same conversation.',
     points: [
-      'Present findings like a product page, not a file dump.',
+      'Present findings so they are easy to skim on a phone.',
       'Keep figures and methods where eyes land first.',
-      'Link papers to the projects that prove them.',
+      'Keep papers next to the projects that prove them.',
     ],
-    // Stack of books / papers — readable topic photo
     background: U('photo-1497633762265-9d179a990aa6'),
   },
   {
     id: 'connections',
     label: 'Connections',
-    headline: 'YOUR CARD HOLDER, TOO.',
-    lead: 'CodeCard is a card holder as well. Keep who you met, why it mattered, and what to do next.',
+    headline: 'THE LIGHTEST CARD HOLDER.',
+    lead: 'CodeCard holds the face to face connections you actually care about, without turning them into another feed.',
     points: [
-      'Connect in person — someone scans your CodeCard QR, and you are connected.',
-      'No searching, usernames, or digital invites — physical QR is the only way.',
-      'Attach private notes and follow ups only you can see.',
+      'Connect through the physical scan, not a search or a digital invite.',
+      'Record when you met, where you met, and a note about the conversation.',
+      'Schedule a follow up so the person does not disappear into forgotten contacts.',
     ],
     background: U('photo-1515169067868-5387ec356754'),
   },
   {
     id: 'circle',
     label: 'Circle',
-    headline: 'YOUR NETWORK, SHIPPING LIVE.',
-    lead: 'Then see those people in Circle too. A feed of work from people you trust, without digging through chats.',
+    headline: 'STAY CLOSE TO PEOPLE YOU MET.',
+    lead: 'Circle is for the people you connected with in person. It is not a social network and it is not a public feed.',
     points: [
-      'Open Circle to watch what your saved people ship as it lands.',
-      'Follow builders, not empty status updates.',
-      'Stay close to the work that matters to you.',
+      'Keep the people you actually met in one quiet place.',
+      'See the work from connections you chose, not strangers.',
+      'Use it as memory for real relationships, not as a follower graph.',
     ],
     background: U('photo-1600880292203-757bb62b4baf'),
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    headline: 'EVERY SIGNAL. NOTHING MISSED.',
-    lead: 'Detailed analysis of views, opens, reads, and scans. We tell you everything that lands.',
+    headline: 'SEE WHAT THEY OPENED.',
+    lead: 'After they scan, you can see what they looked at so the follow up has context.',
     points: [
-      'See who looked, what they opened, and what they came back to.',
-      'Track profile, projects, research, and scans in one place.',
-      'Use the full picture to decide what to ship next.',
+      'Track views, opens, and scans from the people who met you.',
+      'Know which project they spent time on before you write.',
+      'Keep events you plan to attend so the next meetings have a place.',
     ],
-    // Night city lights / signals — not a SaaS dashboard screenshot
     background: U('photo-1514565131-fce0801e5785'),
   },
 ];
@@ -174,12 +171,13 @@ export function EditorialFeatureWalkthrough() {
       <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">What CodeCard is</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">ONE LIVING</span>
-          <span className="cc-ed__sub">TECHNICAL IDENTITY.</span>
+          <span className="cc-ed__lead">MEET. SHOW.</span>
+          <span className="cc-ed__sub">CONNECT. FOLLOW UP.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          Not a resume dump. Not a link tree. CodeCard keeps projects, papers,
-          people, and signals in one profile you can carry and share.
+          Showcase, connect, and follow up are one workflow. Meet someone, show
+          your work from your phone, remember the interaction, and keep the next
+          step.
         </p>
       </div>
 
@@ -204,7 +202,7 @@ export function EditorialFeatureWalkthrough() {
           header={
             <>
               <span className="fx-header-kicker">Crash course</span>
-              <span>Five surfaces. Learn the card.</span>
+              <span>One workflow. Five moments on the card.</span>
             </>
           }
           ariaLabel="CodeCard feature walkthrough"

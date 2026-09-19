@@ -1,17 +1,22 @@
-export const CODECARD_TAGLINE = "The fastest way to show someone what you're capable of.";
+export const CODECARD_TAGLINE = 'The quickest way to impress someone with your work.';
 
-export const CODECARD_HEADLINE_LEAD = 'Hand them your work';
-export const CODECARD_HEADLINE_ACCENT = 'like a business card.';
+export const CODECARD_HEADLINE_LEAD = 'Meet someone. Show your work.';
+export const CODECARD_HEADLINE_ACCENT = 'Connect. Follow up.';
 
 export const CODECARD_HEADLINE = `${CODECARD_HEADLINE_LEAD} ${CODECARD_HEADLINE_ACCENT}`;
 
 export const CODECARD_INTRO_HOOK =
-  'CodeCard is for the moment someone asks what you build.';
+  'CodeCard is for the moment you are standing in front of someone.';
 
-export const CODECARD_INTRO_PITCH = 'Your best work. Ready to share in seconds.';
+export const CODECARD_INTRO_PITCH =
+  'Show your best work from your phone, connect with people you actually meet, and follow up so the connection is not lost.';
 
 export const CODECARD_INTRO_USE_CASES =
-  'Made for demos, interviews, networking, and conferences, not just commits.';
+  'Made for the introduction, the showcase, and the follow up.';
 
 export const CODECARD_SUMMARY =
-  'Import your best projects, publish one page, and share it by link, QR, or straight from your screen. When someone new asks what you build, you have one place to send them and one place to remember who you met.';
+  'CodeCard lets you show what you do, connect with people you actually meet, remember the connection, and follow up.';
+
+export const CODECARD_PILLARS = ['Showcase', 'Connect', 'Follow up'] as const;
+
+export const CODECARD_WORKFLOW = 'Meet someone. Show your work. Connect. Follow up.';

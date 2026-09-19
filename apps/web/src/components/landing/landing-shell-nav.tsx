@@ -7,6 +7,7 @@ import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
   { label: 'Pricing', href: '/pricing' },
+  { label: 'FAQ', href: '/#faq', ariaLabel: 'Common questions' },
 ];
 
 export function LandingShellNav() {

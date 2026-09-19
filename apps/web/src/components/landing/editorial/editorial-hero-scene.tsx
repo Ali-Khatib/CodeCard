@@ -63,27 +63,27 @@ let heroIntroPlayed = false;
 const STATEMENT_BEATS = [
   {
     id: 'problem',
-    title: 'Your work belongs in one place.',
-    lead: 'Your work belongs',
-    sub: 'in one place.',
+    title: 'Meet someone. Show your work.',
+    lead: 'Meet someone.',
+    sub: 'Show your work.',
     lede:
-      'Not a link tree. Not a PDF resume. CodeCard is one living profile where your projects, research, connections, and analytics sit together. People actually understand what you do.',
+      'When you meet someone in person, pull out your phone and show them your CodeCard. Your QR is right there. The showcase happens during the conversation.',
   },
   {
     id: 'shift',
-    title: 'Show what you build right on the spot.',
-    lead: 'Show what you build',
-    sub: 'right on the spot.',
+    title: 'They scan. They explore on the spot.',
+    lead: 'They scan.',
+    sub: 'They explore on the spot.',
     lede:
-      'When someone asks what you build, open your card. Demos, stack, outcomes, and papers are right there. Nothing buried across a dozen other tabs.',
+      'They scan with their phone. Your CodeCard opens in their browser. They can open a project and see images, overview, stack, and the story. No app required to view it.',
   },
   {
     id: 'identity',
-    title: 'One card. Your whole story.',
-    lead: 'One card.',
-    sub: 'Your whole story.',
+    title: 'Connect. Remember. Follow up.',
+    lead: 'Connect. Remember.',
+    sub: 'Follow up.',
     lede:
-      'Projects, papers, and connection notes stay on one identity you can hand off at a meetup, interview, or pitch. You carry it with you after.',
+      'Keep the date, the place, and a note about the conversation. Schedule the next step so the connection does not disappear. Your work. Your connections. Your follow ups.',
   },
 ] as const;
 

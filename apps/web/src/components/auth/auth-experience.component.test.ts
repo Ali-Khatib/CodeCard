@@ -49,7 +49,7 @@ describe('Auth experience polish contracts', () => {
     expect(collage).toContain('AuthShowcaseStage');
     expect(collage).toContain('cc-hume-hero__float-icon');
     expect(collage).toContain('cc-hume-gradient-text');
-    expect(collage).toContain('share in seconds');
+    expect(collage).toContain('show on the spot');
     expect(collage).toContain('CODECARD_TAGLINE');
     expect(collage).toContain('Code2');
     expect(collage).toContain('GitBranch');

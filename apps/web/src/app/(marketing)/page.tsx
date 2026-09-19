@@ -3,9 +3,9 @@ import { ProductPage } from '@/components/landing/product-page';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/',
-  title: 'CodeCard | Quick showcase for your work',
+  title: 'CodeCard | Show your work. Connect. Follow up.',
   description:
-    "The fastest way to show someone what you're capable of. Your best work, ready to share by link, QR, or from your phone.",
+    'The quickest way to impress someone with your work. Show your CodeCard from your phone, connect with people you actually meet, and follow up.',
   absoluteTitle: true,
 });
 

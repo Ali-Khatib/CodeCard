@@ -16,12 +16,12 @@ export function EditorialFinalCta() {
           id="editorial-finale-heading"
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
-          <span className="cc-ed__lead">BUILD THE PROFILE</span>
-          <span className="cc-ed__sub">YOUR WORK DESERVES.</span>
+          <span className="cc-ed__lead">SHOW IT. CONNECT.</span>
+          <span className="cc-ed__sub">THEN FOLLOW UP.</span>
         </h2>
         <p className="cc-ed__lede mt-3">
-          Projects, research, Circle, connections, and analysis in one living
-          identity.
+          Your work, your connections, and your follow ups. A lightweight
+          networking assistant for people you actually meet.
         </p>
         <div className="cc-ed__actions mt-6">
           <Link
