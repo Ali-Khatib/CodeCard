@@ -165,7 +165,10 @@ export function DashboardOverviewView({
             <h1 className="cc-profile-home__title">
               {greeting}, {firstName}.
             </h1>
-            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
+            <p className="mt-2 max-w-xl text-[16px] leading-relaxed text-[var(--app-ink)]">
+              This is where you edit your card and manage your calendar.
+            </p>
+            <p className="mt-1 max-w-xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
               {loopStatusCopy}
             </p>
           </div>

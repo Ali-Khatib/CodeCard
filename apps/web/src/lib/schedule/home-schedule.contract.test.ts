@@ -15,12 +15,16 @@ describe('Home calendar and follow-ups', () => {
     expect(shell).not.toContain("label: 'Calendar'");
     expect(overview).toContain('HomeScheduleSection');
     expect(overview).toContain('HomeIdentitySection');
+    expect(overview).toContain('This is where you edit your card and manage your calendar.');
     expect(page).toContain('loadHomeSchedule');
     const calendar = read('src/components/dashboard/home-schedule-section.tsx');
     expect(calendar).toContain('cc-home-calendar');
     expect(calendar).toContain('data-calendar-day');
     expect(calendar).toContain('updateOwnerEventAction');
+    expect(calendar).toContain('updateConnectionMetadataAction');
     expect(calendar).toContain('Follow-up');
+    expect(calendar).toContain('cc-home-calendar__legend');
+    expect(calendar).toContain('Remove this follow-up');
   });
 
   it('stores owner events privately and follow-ups on connections', () => {

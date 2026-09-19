@@ -45,6 +45,7 @@ describe('Phase 1 web app IA freeze', () => {
     expect(overview).toContain('ProfileShareHero');
     expect(overview).toContain('HomeIdentitySection');
     expect(overview).toContain('HomeScheduleSection');
+    expect(overview).toContain('This is where you edit your card and manage your calendar.');
     expect(page).toContain('getHomeWorkspaceNextStep');
   });
 

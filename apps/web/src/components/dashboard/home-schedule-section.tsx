@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
+import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
 import {
   createOwnerEventAction,
   deleteOwnerEventAction,
@@ -61,14 +62,22 @@ export function HomeScheduleSection({
   const [minute, setMinute] = useState(0);
   const [meridiem, setMeridiem] = useState<'AM' | 'PM'>('AM');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingFollowUpId, setEditingFollowUpId] = useState<string | null>(null);
+  const [followUpDate, setFollowUpDate] = useState('');
   const [localEvents, setLocalEvents] = useState(events);
+  const [localFollowUps, setLocalFollowUps] = useState(followUps);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     setLocalEvents(events);
   }, [events]);
 
+  useEffect(() => {
+    setLocalFollowUps(followUps);
+  }, [followUps]);
+
   const listedEvents = preview ? localEvents : events;
+  const listedFollowUps = preview ? localFollowUps : followUps;
   const cells = useMemo(() => monthCells(year, monthIndex), [year, monthIndex]);
 
   const eventsByDay = useMemo(() => {
@@ -85,7 +94,7 @@ export function HomeScheduleSection({
 
   const followUpsByDay = useMemo(() => {
     const map = new Map<string, HomeFollowUp[]>();
-    for (const item of followUps) {
+    for (const item of listedFollowUps) {
       const key = localDateKeyFromIso(item.followUpAt);
       if (!key) continue;
       const list = map.get(key) ?? [];
@@ -93,13 +102,15 @@ export function HomeScheduleSection({
       map.set(key, list);
     }
     return map;
-  }, [followUps]);
+  }, [listedFollowUps]);
 
   const dayEvents = eventsByDay.get(selectedKey) ?? [];
   const dayFollowUps = followUpsByDay.get(selectedKey) ?? [];
 
   const resetForm = (nextKey = selectedKey) => {
     setEditingId(null);
+    setEditingFollowUpId(null);
+    setFollowUpDate('');
     setTitle('');
     setLocation('');
     setHour12(12);
@@ -110,12 +121,23 @@ export function HomeScheduleSection({
 
   const startEdit = (event: OwnerEvent) => {
     const parts = timePartsFromIso(event.startsAt);
+    setEditingFollowUpId(null);
+    setFollowUpDate('');
     setEditingId(event.id);
     setTitle(event.title);
     setLocation(event.location ?? '');
     setHour12(parts.hour12);
     setMinute(parts.minute);
     setMeridiem(parts.meridiem);
+  };
+
+  const startEditFollowUp = (item: HomeFollowUp) => {
+    const key = localDateKeyFromIso(item.followUpAt) || selectedKey;
+    setEditingId(null);
+    setTitle('');
+    setEditingFollowUpId(item.connectionId);
+    setFollowUpDate(key);
+    setSelectedKey(key);
   };
 
   const saveEvent = () => {
@@ -189,6 +211,63 @@ export function HomeScheduleSection({
     });
   };
 
+  const saveFollowUp = () => {
+    if (pending || !editingFollowUpId || !followUpDate) {
+      notifyError(MUTATION_FEEDBACK.schedule.followUpUpdateFailed);
+      return;
+    }
+    const nextIso = `${followUpDate}T12:00:00.000Z`;
+    if (preview) {
+      setLocalFollowUps((current) =>
+        current.map((item) =>
+          item.connectionId === editingFollowUpId ? { ...item, followUpAt: nextIso } : item,
+        ),
+      );
+      notifySuccess(MUTATION_FEEDBACK.schedule.followUpUpdated);
+      resetForm(followUpDate);
+      return;
+    }
+    startTransition(async () => {
+      const result = await updateConnectionMetadataAction({
+        connectionId: editingFollowUpId,
+        followUpAt: followUpDate,
+      });
+      if (!result.success) {
+        notifyError(
+          sanitizeMutationError(result.error, MUTATION_FEEDBACK.schedule.followUpUpdateFailed),
+        );
+        return;
+      }
+      notifySuccess(MUTATION_FEEDBACK.schedule.followUpUpdated);
+      resetForm(followUpDate);
+    });
+  };
+
+  const removeFollowUp = (item: HomeFollowUp) => {
+    if (pending) return;
+    if (!window.confirm(`Remove this follow-up with ${item.personName}?`)) return;
+    if (preview) {
+      setLocalFollowUps((current) => current.filter((row) => row.connectionId !== item.connectionId));
+      if (editingFollowUpId === item.connectionId) resetForm(selectedKey);
+      notifySuccess(MUTATION_FEEDBACK.schedule.followUpDeleted);
+      return;
+    }
+    startTransition(async () => {
+      const result = await updateConnectionMetadataAction({
+        connectionId: item.connectionId,
+        followUpAt: null,
+      });
+      if (!result.success) {
+        notifyError(
+          sanitizeMutationError(result.error, MUTATION_FEEDBACK.schedule.followUpDeleteFailed),
+        );
+        return;
+      }
+      if (editingFollowUpId === item.connectionId) resetForm(selectedKey);
+      notifySuccess(MUTATION_FEEDBACK.schedule.followUpDeleted);
+    });
+  };
+
   const goMonth = (delta: number) => {
     const next = shiftMonth(year, monthIndex, delta);
     setYear(next.year);
@@ -203,7 +282,7 @@ export function HomeScheduleSection({
             <p className="cc-workspace-section__eyebrow">Your calendar</p>
             <h2 className="cc-workspace-section__title">Events and follow-ups</h2>
             <p className="cc-workspace-section__copy">
-              Pick a day. See what is already planned. Add a place you will be, or open a follow-up.
+              Pick a day. See what is already planned. Add, edit, or delete events and follow-ups.
             </p>
           </div>
           <AppButton variant="ghost" href={`${basePath}/connections`}>
@@ -238,6 +317,24 @@ export function HomeScheduleSection({
                 >
                   →
                 </button>
+              </div>
+
+              <div className="cc-home-calendar__legend-block">
+                <p className="cc-home-calendar__legend-title">Legend</p>
+                <ul className="cc-home-calendar__legend">
+                  <li>
+                    <i className="cc-home-calendar__swatch cc-home-calendar__swatch--event" />
+                    Event: a place you will be
+                  </li>
+                  <li>
+                    <i className="cc-home-calendar__swatch cc-home-calendar__swatch--followup" />
+                    Follow-up: someone to check back with
+                  </li>
+                  <li>
+                    <i className="cc-home-calendar__swatch cc-home-calendar__swatch--today" />
+                    Today
+                  </li>
+                </ul>
               </div>
 
               <div className="cc-home-calendar__weekdays" aria-hidden>
@@ -279,6 +376,7 @@ export function HomeScheduleSection({
                             .join(' ')}
                           onClick={() => {
                             setSelectedKey(cell.dateKey);
+                            if (editingFollowUpId) setFollowUpDate(cell.dateKey);
                             if (editingId) resetForm(cell.dateKey);
                           }}
                         >
@@ -296,7 +394,7 @@ export function HomeScheduleSection({
                 ))}
               </div>
 
-              <ul className="cc-home-calendar__legend">
+              <ul className="cc-home-calendar__legend cc-home-calendar__legend--compact">
                 <li>
                   <i className="cc-home-calendar__dot cc-home-calendar__dot--event" /> Event
                 </li>
@@ -354,9 +452,17 @@ export function HomeScheduleSection({
                           <p className="mt-0.5 text-[12px] text-[var(--app-smoke)]">{item.context}</p>
                         ) : null}
                       </div>
-                      <Link href={`${basePath}/connections`} className="cc-home-calendar__open">
-                        Open
-                      </Link>
+                      <div className="cc-home-calendar__item-actions">
+                        <button type="button" onClick={() => startEditFollowUp(item)} disabled={pending}>
+                          Edit
+                        </button>
+                        <button type="button" onClick={() => removeFollowUp(item)} disabled={pending}>
+                          Delete
+                        </button>
+                        <Link href={`${basePath}/connections`} className="cc-home-calendar__open">
+                          Open
+                        </Link>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -364,10 +470,52 @@ export function HomeScheduleSection({
 
               {preview ? (
                 <p className="mt-4 text-[12px] text-[var(--app-smoke)]">
-                  Demo calendar. Changes stay on this page. Sign in to save events to your account.
+                  Demo calendar. Changes stay on this page. Sign in to save events and follow-ups to your account.
                 </p>
               ) : null}
 
+              {editingFollowUpId ? (
+                <form
+                  className="cc-home-calendar__form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    saveFollowUp();
+                  }}
+                >
+                  <p className="cc-home-calendar__form-title">Edit follow-up</p>
+                  <label className="cc-home-calendar__label" htmlFor="home-cal-followup-date">
+                    Follow-up date
+                  </label>
+                  <input
+                    id="home-cal-followup-date"
+                    className="cc-app-input"
+                    type="date"
+                    value={followUpDate}
+                    onChange={(e) => {
+                      setFollowUpDate(e.target.value);
+                      if (e.target.value) setSelectedKey(e.target.value);
+                    }}
+                    required
+                    disabled={pending}
+                  />
+                  <p className="text-[12px] text-[var(--app-smoke)]">
+                    Pick a day on the calendar, or type a date, then save.
+                  </p>
+                  <div className="cc-home-calendar__form-actions">
+                    <button
+                      type="button"
+                      className="cc-app-btn cc-app-btn--ghost"
+                      onClick={() => resetForm(selectedKey)}
+                      disabled={pending}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="cc-app-btn cc-app-btn--primary" disabled={pending}>
+                      Save follow-up
+                    </button>
+                  </div>
+                </form>
+              ) : (
               <form
                   className="cc-home-calendar__form"
                   onSubmit={(e) => {
@@ -463,6 +611,7 @@ export function HomeScheduleSection({
                     </button>
                   </div>
                 </form>
+              )}
             </AppCard>
           </div>
         )}

@@ -4805,21 +4805,66 @@ html.dark .cc-analytics-paper-table__signal-chip {
   background: var(--app-slate-plum);
 }
 
+.cc-home-calendar__legend-block {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--app-bone) 70%, var(--app-paper));
+}
+
+.cc-home-calendar__legend-title {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--app-iris);
+}
+
 .cc-home-calendar__legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin: 14px 0 0;
+  gap: 12px 16px;
+  margin: 0;
   padding: 0;
   list-style: none;
   color: var(--app-smoke);
   font-size: 12px;
 }
 
+.cc-home-calendar__legend--compact {
+  margin: 14px 0 0;
+}
+
 .cc-home-calendar__legend li {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.cc-home-calendar__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1px solid var(--app-border);
+  flex-shrink: 0;
+}
+
+.cc-home-calendar__swatch--event {
+  background: color-mix(in srgb, var(--app-iris) 32%, var(--app-paper));
+  border-color: color-mix(in srgb, var(--app-iris) 55%, var(--app-border));
+}
+
+.cc-home-calendar__swatch--followup {
+  background: color-mix(in srgb, var(--app-slate-plum) 32%, var(--app-paper));
+  border-color: color-mix(in srgb, var(--app-slate-plum) 50%, var(--app-border));
+}
+
+.cc-home-calendar__swatch--today {
+  background: var(--app-paper);
+  border-color: var(--app-ink);
 }
 
 .cc-home-calendar__day-kicker {
