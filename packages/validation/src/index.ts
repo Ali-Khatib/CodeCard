@@ -736,7 +736,7 @@ export const waitlistSignupSchema = z.object({
     .max(255)
     .transform((value) => value.toLowerCase()),
   /** Honeypot — must stay empty. Non-empty submissions are accepted and dropped. */
-  website: z.string().max(200).optional().default(''),
+  website: z.string().max(200).default(''),
 });
 
 export const dmcaNoticeSchema = z.object({

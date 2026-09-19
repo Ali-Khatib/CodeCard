@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       killSwitch: 'waitlist',
     },
     async (data) => {
-      if (data.website.trim().length > 0) {
+      if ((data.website ?? '').trim().length > 0) {
         return NextResponse.json({ ok: true, status: 'joined' });
       }
 

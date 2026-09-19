@@ -5,7 +5,10 @@ const DEFAULT_FROM = 'CodeCard <hello@codecard.app>';
 
 export async function sendWaitlistConfirmationEmail(
   email: string,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Record<string, string | undefined> = process.env as Record<
+    string,
+    string | undefined
+  >,
   fetchImpl: typeof fetch = fetch,
 ): Promise<boolean> {
   const apiKey = env.RESEND_API_KEY?.trim();
