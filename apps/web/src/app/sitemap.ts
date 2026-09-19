@@ -16,6 +16,7 @@ function appOrigin(): string {
 const STATIC_PATHS = [
   '/',
   '/pricing',
+  '/faq',
   '/how-it-works',
   '/profiles',
   '/research',

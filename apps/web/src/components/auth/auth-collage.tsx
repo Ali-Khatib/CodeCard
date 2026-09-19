@@ -79,8 +79,8 @@ export function AuthShowcaseStage() {
           transition={{ duration: reduced ? 0.01 : 0.55, ease: 'easeOut' }}
         >
           <h2 className="font-display text-balance text-[clamp(2.35rem,4.6vw,3.65rem)] font-normal leading-[1.05] tracking-[-0.03em] text-[#17171a]">
-            Your best work. Ready to{' '}
-            <span className="cc-hume-gradient-text">show on the spot.</span>
+            Impress them now.{' '}
+            <span className="cc-hume-gradient-text">Keep who you met.</span>
           </h2>
           <p className="mt-5 max-w-[34ch] text-balance text-[17px] leading-relaxed text-[#5c5956] sm:text-[18px]">
             {CODECARD_TAGLINE}

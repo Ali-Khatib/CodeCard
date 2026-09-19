@@ -12,7 +12,7 @@ const FOOTER_COL_PRODUCT = [
   { label: 'Home', href: MARKETING_HOME_HREF },
   { label: 'Live demo', href: LIVE_DEMO_HREF },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'FAQ', href: `${MARKETING_HOME_HREF}#faq` },
+  { label: 'FAQ', href: '/faq' },
   { label: 'Research', href: '/research' },
 ] as const;
 
@@ -65,8 +65,8 @@ export function HumeFooterCluster() {
               id="footer-statement-heading"
               className="cc-site-footer__display"
             >
-              <span>Your work.</span>
-              <span>Your connections.</span>
+              <span>Impress them now.</span>
+              <span>Keep who you met.</span>
             </h2>
           </div>
         </div>
@@ -157,7 +157,7 @@ export function HumeFooterCluster() {
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
             <p className="cc-site-footer__meta-note">
-              Showcase, connections, and follow ups around real meetings.
+              Impress in the room. Keep who you met. Follow up.
             </p>
           </div>
         </div>

@@ -22,7 +22,7 @@ test.describe('Landing page', () => {
     await expect(headline).toBeVisible();
     /* Accessible name spans the visible lead plus the sr-only second line. */
     await expect(headline).toContainText(/YOUR WORK\./);
-    await expect(headline).toContainText(/YOUR CONNECTIONS\./);
+    await expect(headline).toContainText(/YOUR PHONE\./);
 
     await expect(page.getByTestId('editorial-research-proof')).toBeAttached();
     await expect(page.locator('#build-yours')).toBeAttached();
@@ -38,7 +38,10 @@ test.describe('Landing page', () => {
   test('marketing nav exposes Pricing and no stale sections', async ({ page }) => {
     const nav = page.getByRole('navigation').first();
     await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Common questions' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Common questions' })).toHaveAttribute(
+      'href',
+      '/faq',
+    );
     /* Sections that were retired from the nav must not come back silently. */
     await expect(nav.getByRole('link', { name: 'Research' })).toHaveCount(0);
     await expect(nav.getByRole('link', { name: 'How it works' })).toHaveCount(0);

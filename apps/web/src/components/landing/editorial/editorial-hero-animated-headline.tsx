@@ -2,7 +2,7 @@
 
 import { HeroRotatingWord } from '@/components/ui/animated-hero';
 
-const HERO_WORDS = ['CONNECTIONS.', 'FOLLOW UPS.'] as const;
+const HERO_WORDS = ['PHONE.', 'POCKET.'] as const;
 
 /** Client-only rotating second line — keeps `editorial-hero.tsx` a server component for LCP. */
 export function EditorialHeroAnimatedHeadline() {
@@ -11,7 +11,7 @@ export function EditorialHeroAnimatedHeadline() {
       <span className="cc-ed-hero__rotating-prefix">YOUR</span>
       <HeroRotatingWord
         words={HERO_WORDS}
-        reducedMotionLabel="CONNECTIONS."
+        reducedMotionLabel="PHONE."
       />
     </span>
   );

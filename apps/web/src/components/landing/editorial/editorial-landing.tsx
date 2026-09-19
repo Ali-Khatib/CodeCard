@@ -4,7 +4,6 @@ import { EditorialHeroScene } from './editorial-hero-scene';
 import { EditorialFeatureWalkthrough } from './editorial-feature-walkthrough';
 import { EditorialLiveDemoBox } from './editorial-live-demo-box';
 import { EditorialAudience } from './editorial-audience';
-import { EditorialFaq } from './editorial-faq';
 import { EditorialFinalCta } from './editorial-final-cta';
 import { EditorialWaitlist } from './editorial-waitlist';
 import '@/styles/editorial-landing.css';
@@ -31,7 +30,6 @@ export function EditorialLanding() {
       <EditorialFeatureWalkthrough />
       <EditorialLiveDemoBox />
       <EditorialAudience />
-      <EditorialFaq />
       <EditorialResearchScene />
       <EditorialFinalCta />
       <EditorialWaitlist />

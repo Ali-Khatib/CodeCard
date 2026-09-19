@@ -17,8 +17,8 @@ describe('Editorial product landing contract', () => {
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('data-hero-statement');
     expect(hero).toContain('YOUR WORK.');
-    expect(hero).toContain('YOUR CONNECTIONS.');
-    expect(hero).toContain('YOUR FOLLOW UPS.');
+    expect(hero).toContain('YOUR PHONE.');
+    expect(hero).toContain('YOUR POCKET.');
     expect(hero).toContain('cc-ed__lead');
     expect(hero).toContain('EditorialHeroAnimatedHeadline');
     /* The shader field belongs to the scene now — shared with the statement. */
@@ -37,7 +37,7 @@ describe('Editorial product landing contract', () => {
     expect(landing).toContain('EditorialAudience');
     expect(landing).toContain('EditorialResearchScene');
     expect(landing).toContain('EditorialWaitlist');
-    expect(landing).toContain('EditorialFaq');
+    expect(landing).not.toContain('EditorialFaq');
     expect(landing).not.toContain('ProductStory');
     expect(landing).not.toContain('ProductAnalysisSection');
     expect(landing).not.toContain('EditorialNetworkBridge');
@@ -57,15 +57,15 @@ describe('Editorial product landing contract', () => {
     expect(walk).toContain('Circle');
     expect(walk).toContain('Connections');
     expect(walk).toContain('Analytics');
-    expect(walk).toContain('SHOW YOUR BEST WORK NOW.');
-    expect(walk).toContain('SHARE THE PAPERS TOO.');
-    expect(walk).toContain('They do not need the CodeCard app');
+    expect(walk).toContain('SHOW IT WHILE YOU TALK.');
+    expect(walk).toContain('PAPERS IN THE SAME BEAT.');
+    expect(walk).toContain('Open it on your phone');
     expect(walk).toContain('content:');
     expect(walk).toContain('photo-1461749280684-dccba630e2f6');
     expect(walk).toContain('photo-1497633762265-9d179a990aa6');
     expect(walk).toContain('photo-1514565131-fce0801e5785');
     expect(walk).toContain('Crash course');
-    expect(walk).toContain('One workflow. Five moments on the card.');
+    expect(walk).toContain('Impress. Keep. Follow up.');
     expect(walk).not.toContain('Walk the live product');
     expect(walk).not.toContain('Scroll to see');
     expect(walk).not.toContain('Five ways your work lives');
@@ -189,9 +189,9 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('data-statement-beat');
     expect(scene).toContain('data-statement-word');
     expect(scene).toContain(' / 03');
-    expect(scene).toContain('Meet someone. Show your work.');
-    expect(scene).toContain('They scan. They explore on the spot.');
-    expect(scene).toContain('Connect. Remember. Follow up.');
+    expect(scene).toContain('Impress in the room.');
+    expect(scene).toContain('Keep the people you met.');
+    expect(scene).toContain('Follow up so you do not lose them.');
     expect(scene).toContain('cc-ed-hero-scene__statement-body');
     expect(scene).toContain('What this is');
     expect(scene).toContain('cc-ed-hero-scene__statement-tag');

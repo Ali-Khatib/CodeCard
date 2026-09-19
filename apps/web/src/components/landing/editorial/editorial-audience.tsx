@@ -27,65 +27,65 @@ const AUDIENCE: AudienceCard[] = [
     id: 'builders',
     eyebrow: 'Builders',
     title: 'Show the work, not the speech.',
-    body: 'Put your best projects in front of someone while you are still talking.',
+    body: 'Best projects. In front of them. While you talk.',
     detailLead:
-      'When someone asks what you do, open your CodeCard. Images, stack, and the story are ready on their phone.',
+      'They ask what you do. Open CodeCard. Proof is already there.',
     points: [
-      'First of all, pin the projects that prove how you think.',
-      'Second of all, let them explore the work during the conversation.',
-      'Third, connect in person and keep a note so you can follow up.',
+      'Pin the projects that prove how you think.',
+      'Let them explore while you talk.',
+      'Connect in person. Keep a note. Follow up.',
     ],
   },
   {
     id: 'recruiters',
     eyebrow: 'Recruiters',
     title: 'See the work in the room.',
-    body: 'Scan a CodeCard and look at selected work without waiting for a follow up email.',
+    body: 'Scan. Look. Decide before the email thread starts.',
     detailLead:
-      'The first look can happen on a phone, in the conversation. Role, stack, and proof sit together.',
+      'Role, stack, and proof sit together, in the conversation.',
     points: [
-      'First of all, scan the QR and open the card in the browser.',
-      'Second of all, jump into projects and papers that show judgment.',
-      'Third, the builder can remember when you met and follow up with context.',
+      'Open the card. Jump into the work.',
+      'Projects and papers that show judgment.',
+      'They remember the meeting and follow up with context.',
     ],
   },
   {
     id: 'events',
     eyebrow: 'Events',
-    title: 'Meet. Show. Keep the thread.',
-    body: 'Display your QR on your phone. They scan, explore, and you keep the event and the follow up.',
+    title: 'Do not lose the room.',
+    body: 'They see the work. You keep the person and the next step.',
     detailLead:
-      'Add upcoming events to your calendar so you know where you plan to meet people. After the scan, the connection stays with a date, a place, and a note.',
+      'Date, place, note. The event stays attached to the people you met.',
     points: [
-      'First of all, show your CodeCard from your phone at the meetup.',
-      'Second of all, they open your work in the browser while you talk.',
-      'Third, record the event, the person, and the next step before the week swallows it.',
+      'CodeCard out at the meetup.',
+      'They open the work while you talk.',
+      'Record the person and the next step before the week swallows it.',
     ],
   },
   {
     id: 'students',
     eyebrow: 'Students',
     title: 'Lead with what you built.',
-    body: 'Show projects from your phone at a campus event instead of promising to send a link later.',
+    body: 'Show projects now. Do not promise a link later.',
     detailLead:
-      'You do not need a long resume yet. You need proof you can show in the moment, then a way to remember who you met.',
+      'Proof in the moment. Then a way to remember who you met.',
     points: [
-      'First of all, lead with projects and coursework that show craft.',
-      'Second of all, keep research and side builds easy to open on a phone.',
-      'Third, keep notes and follow ups from career fairs and mixers.',
+      'Lead with projects and coursework.',
+      'Research and side builds, ready to open.',
+      'Notes and follow ups from fairs and mixers.',
     ],
   },
   {
     id: 'freelancers',
     eyebrow: 'Freelancers',
     title: 'Win the room, then follow up.',
-    body: 'Show case studies on the spot, connect with the person, and schedule the next step.',
+    body: 'Case studies on the spot. Then the next step, scheduled.',
     detailLead:
-      'Clients decide on clarity. CodeCard puts the work in front of them immediately, then holds the connection after you leave.',
+      'Work in front of them immediately. Connection held after you leave.',
     points: [
-      'First of all, package case studies with outcome, stack, and process.',
-      'Second of all, show the work from your phone instead of mailing a deck later.',
-      'Third, keep a note and a follow up so warm intros become real work.',
+      'Outcome, stack, process. Packaged.',
+      'Show it now. No deck later.',
+      'Note plus follow up. Warm intros become work.',
     ],
   },
 ];
@@ -371,12 +371,12 @@ export function EditorialAudience() {
       <div className="cc-ed-audience__intro">
         <p className="cc-ed__eyebrow">Who it’s for</p>
         <h2 id="editorial-audience-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">WHEREVER YOU SHOW UP.</span>
-          <span className="cc-ed__sub">THE CARD COMES WITH YOU.</span>
+          <span className="cc-ed__lead">IMPRESS WHERE YOU STAND.</span>
+          <span className="cc-ed__sub">KEEP WHO YOU MET.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Meet someone, show your work, connect, and follow up. Same workflow at
-          a meetup, a campus event, or a client intro.
+          Same three beats at a meetup, a campus event, or a client intro. Show
+          the work. Keep the people. Follow up.
         </p>
       </div>
 

@@ -63,27 +63,24 @@ let heroIntroPlayed = false;
 const STATEMENT_BEATS = [
   {
     id: 'problem',
-    title: 'Meet someone. Show your work.',
-    lead: 'Meet someone.',
-    sub: 'Show your work.',
-    lede:
-      'When you meet someone in person, pull out your phone and show them your CodeCard. Your QR is right there. The showcase happens during the conversation.',
+    title: 'Impress in the room.',
+    lead: 'Impress in the room.',
+    sub: 'Work in front of them now.',
+    lede: 'The showcase happens while you are still talking. Not later. Not in an email.',
   },
   {
     id: 'shift',
-    title: 'They scan. They explore on the spot.',
-    lead: 'They scan.',
-    sub: 'They explore on the spot.',
-    lede:
-      'They scan with their phone. Your CodeCard opens in their browser. They can open a project and see images, overview, stack, and the story. No app required to view it.',
+    title: 'Keep the people you met.',
+    lead: 'Keep the people you met.',
+    sub: 'The ones who stood in front of you.',
+    lede: 'Date, place, a note. Real meetings, held. Not a feed of strangers.',
   },
   {
     id: 'identity',
-    title: 'Connect. Remember. Follow up.',
-    lead: 'Connect. Remember.',
-    sub: 'Follow up.',
-    lede:
-      'Keep the date, the place, and a note about the conversation. Schedule the next step so the connection does not disappear. Your work. Your connections. Your follow ups.',
+    title: 'Follow up so you do not lose them.',
+    lead: 'Follow up.',
+    sub: 'So you do not lose them.',
+    lede: 'The next step is scheduled. The connection stays yours.',
   },
 ] as const;
 

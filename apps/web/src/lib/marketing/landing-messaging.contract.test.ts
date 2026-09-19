@@ -11,7 +11,7 @@ describe('landing positioning copy', () => {
   it('keeps FAQ in the marketing pill as a fourth item', () => {
     const shell = read('src/components/landing/landing-shell-nav.tsx');
     expect(shell).toContain("{ label: 'Pricing', href: '/pricing' }");
-    expect(shell).toContain("{ label: 'FAQ', href: '/#faq'");
+    expect(shell).toContain("{ label: 'FAQ', href: '/faq'");
   });
 
   it('answers recurring product questions without replacement claims', () => {
@@ -28,12 +28,14 @@ describe('landing positioning copy', () => {
   });
 
   it('frames CodeCard as showcase, connection holder, and follow up', () => {
-    expect(CODECARD_TAGLINE).toBe('The quickest way to impress someone with your work.');
+    expect(CODECARD_TAGLINE).toBe(
+      'Impress in the room. Keep the people you met. Follow up.',
+    );
     expect(CODECARD_SUMMARY).toContain('people you actually meet');
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
-    expect(hero).toContain('They do not need the app just to look');
+    expect(hero).toContain('Hand them your phone.');
     expect(hero).not.toContain('ONE IDENTITY');
     const landing = read('src/components/landing/editorial/editorial-landing.tsx');
-    expect(landing).toContain('EditorialFaq');
+    expect(landing).not.toContain('EditorialFaq');
   });
 });

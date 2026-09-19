@@ -1,0 +1,271 @@
+/* Dedicated FAQ marketing page. Cream paper + editorial type. */
+
+.cc-faq-page {
+  --faq-cream: #fcf1e7;
+  --faq-ink: #17171a;
+  --faq-muted: #5c5956;
+  --faq-field: #0c0c0e;
+  --faq-iris: #e95a0b;
+  --faq-fg: #efedeb;
+  --ed-bg: var(--faq-cream);
+  --ed-fg: var(--faq-ink);
+  background: var(--faq-cream);
+  color: var(--faq-ink);
+}
+
+.cc-faq-page[data-chapter='faq'] {
+  --ed-bg: var(--faq-cream);
+  --ed-fg: var(--faq-ink);
+}
+
+.cc-faq-portal {
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+}
+
+.cc-faq-portal [data-gp-caption] {
+  inset: calc(var(--gp-word-bottom, 50%) + 4.5rem) clamp(1.25rem, 5vw, 4rem) auto;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.cc-faq-portal [data-gp-hint] {
+  display: none;
+}
+
+.cc-faq-portal [data-gp-enter] {
+  min-height: 46px;
+  padding: 0 1.35rem;
+  gap: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--faq-ink) 18%, transparent);
+  border-radius: 999px;
+  background: var(--faq-ink);
+  color: var(--faq-cream);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.cc-faq-portal [data-gp-enter]:hover {
+  background: #2a2a2e;
+}
+
+.cc-faq-portal [data-gp-enter]:focus-visible {
+  outline: 2px solid var(--faq-iris);
+  outline-offset: 4px;
+}
+
+.cc-faq-portal [data-gp-content] {
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  padding: 5rem clamp(1.25rem, 5vw, 4.5rem) 6rem;
+}
+
+/* Keep the portal outro opaque so cream questions do not show through. */
+.cc-faq-page .cc-faq-portal[data-gp-motion='on'] [data-gp-content] {
+  background: var(--faq-field);
+}
+
+.cc-faq-portal [data-gp-touch-picker] {
+  top: auto;
+  bottom: 1.15rem;
+}
+
+.cc-faq-front__header {
+  position: absolute;
+  inset: clamp(5.5rem, 12vh, 7rem) clamp(1.25rem, 5vw, 4rem) auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.cc-faq-front__mark {
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: 1.2rem;
+  letter-spacing: -0.05em;
+  color: var(--faq-ink);
+}
+
+.cc-faq-front__aside {
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--faq-ink) 55%, transparent);
+}
+
+.cc-faq-front__eyebrow {
+  position: absolute;
+  inset: auto 1.5rem calc(100% - var(--gp-word-top, 35%) + 2rem);
+  margin: 0;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--faq-ink) 58%, transparent);
+}
+
+.cc-faq-front__support {
+  position: absolute;
+  inset: calc(var(--gp-word-bottom, 50%) + 1.75rem) 1.5rem auto;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--faq-ink) 72%, transparent);
+}
+
+.cc-faq-front__scroll {
+  position: absolute;
+  inset: auto 1.5rem 8%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--faq-ink) 48%, transparent);
+}
+
+.cc-faq-portal-copy {
+  width: min(40rem, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cc-faq-portal-copy p {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--faq-fg);
+  text-wrap: balance;
+}
+
+.cc-faq-list {
+  position: relative;
+  z-index: 1;
+  background: var(--faq-cream);
+  color: var(--faq-ink);
+  padding: clamp(3.5rem, 10vh, 7rem) clamp(1.25rem, 5vw, 4.5rem)
+    clamp(5rem, 12vh, 8rem);
+}
+
+.cc-faq-list__inner {
+  width: min(46rem, 100%);
+  margin: 0 auto;
+}
+
+.cc-faq-list__kicker {
+  margin: 0 0 0.65rem;
+  font-family: Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faq-iris);
+}
+
+.cc-faq-list__title {
+  margin: 0 0 2.75rem;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(2.25rem, 6vw, 4.25rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.cc-faq-item {
+  border-top: 1px solid color-mix(in srgb, var(--faq-ink) 12%, transparent);
+  overflow: hidden;
+}
+
+.cc-faq-item:last-child {
+  border-bottom: 1px solid color-mix(in srgb, var(--faq-ink) 12%, transparent);
+}
+
+.cc-faq-item__trigger {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 1rem 1.25rem;
+  width: 100%;
+  min-height: 5.25rem;
+  padding: 1.35rem 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.cc-faq-item__trigger:focus-visible {
+  outline: 2px solid var(--faq-iris);
+  outline-offset: 6px;
+}
+
+.cc-faq-item__index {
+  padding-top: 0.55rem;
+  font-family: Arial, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: color-mix(in srgb, var(--faq-ink) 42%, transparent);
+}
+
+.cc-faq-item__question {
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.45rem, 3.2vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-wrap: pretty;
+}
+
+.cc-faq-item__icon {
+  margin-top: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px solid color-mix(in srgb, var(--faq-ink) 16%, transparent);
+  border-radius: 999px;
+  color: var(--faq-ink);
+}
+
+.cc-faq-item__answer {
+  padding: 0 0 1.7rem 3.1rem;
+  max-width: 38rem;
+  font-family: Arial, sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--faq-muted);
+}
+
+@media (max-width: 640px) {
+  .cc-faq-item__trigger {
+    grid-template-columns: 1fr auto;
+  }
+
+  .cc-faq-item__index {
+    display: none;
+  }
+
+  .cc-faq-item__answer {
+    padding-left: 0;
+  }
+
+  .cc-faq-front__header {
+    top: 5.25rem;
+  }
+
+  .cc-faq-front__scroll {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-faq-item__icon {
+    transition: none;
+  }
+}

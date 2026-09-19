@@ -16,12 +16,11 @@ export function EditorialFinalCta() {
           id="editorial-finale-heading"
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
-          <span className="cc-ed__lead">SHOW IT. CONNECT.</span>
-          <span className="cc-ed__sub">THEN FOLLOW UP.</span>
+          <span className="cc-ed__lead">IMPRESS THEM NOW.</span>
+          <span className="cc-ed__sub">KEEP THEM.</span>
         </h2>
         <p className="cc-ed__lede mt-3">
-          Your work, your connections, and your follow ups. A lightweight
-          networking assistant for people you actually meet.
+          Work in the room. People you actually met. Follow ups that do not slip.
         </p>
         <div className="cc-ed__actions mt-6">
           <Link

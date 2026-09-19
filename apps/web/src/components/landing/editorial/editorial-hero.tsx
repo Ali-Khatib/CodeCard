@@ -26,21 +26,16 @@ export function EditorialHero() {
             data-hero-statement
           >
             <span className="cc-ed__lead">YOUR WORK.</span>
-            <span className="sr-only">YOUR CONNECTIONS. YOUR FOLLOW UPS.</span>
+            <span className="sr-only">YOUR PHONE. YOUR POCKET.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
         </div>
         <div className="cc-ed-hero__baseline">
           <div className="cc-ed-hero__baseline-copy">
             <p className="cc-ed__lede">
-              The quickest way to impress someone with your work. Show it from
-              your phone, connect with people you actually meet, and follow up.
+              Your work, ready to show from the lock screen.
             </p>
-            <p className="cc-ed__connect-principle">
-              <strong>Meet. Show. Explore. Connect. Follow up.</strong> Open
-              your QR on your phone. They scan it. Your CodeCard opens in their
-              browser. They do not need the app just to look.
-            </p>
+            <p className="cc-ed__connect-principle">Hand them your phone.</p>
           </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">
             <Link

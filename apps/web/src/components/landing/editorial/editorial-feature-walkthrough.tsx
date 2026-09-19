@@ -28,60 +28,60 @@ const STORIES: WalkStory[] = [
   {
     id: 'projects',
     label: 'Projects',
-    headline: 'SHOW YOUR BEST WORK NOW.',
-    lead: 'The quickest way to impress someone with your work, right from your phone, while you are still talking.',
+    headline: 'SHOW IT WHILE YOU TALK.',
+    lead: 'Open it on your phone. They see your best work before the intro is over.',
     points: [
-      'Open your CodeCard and QR on your phone during the introduction.',
-      'They scan, then explore images, overview, stack, and the story in the browser.',
-      'They do not need the CodeCard app just to view your work.',
+      'Impress faster than a speech or a later link.',
+      'They go as deep as they want. You keep talking.',
+      'The showcase happens in the room.',
     ],
     background: U('photo-1461749280684-dccba630e2f6'),
   },
   {
     id: 'research',
     label: 'Research',
-    headline: 'SHARE THE PAPERS TOO.',
-    lead: 'Selected work can include research. Put papers on your CodeCard so people can open them in the same conversation.',
+    headline: 'PAPERS IN THE SAME BEAT.',
+    lead: 'Research sits next to the builds. They can open it before they walk away.',
     points: [
-      'Present findings so they are easy to skim on a phone.',
-      'Keep figures and methods where eyes land first.',
-      'Keep papers next to the projects that prove them.',
+      'Figures land first. Methods are there if they want them.',
+      'Papers next to the projects that prove them.',
+      'One conversation. Builds and findings together.',
     ],
     background: U('photo-1497633762265-9d179a990aa6'),
   },
   {
     id: 'connections',
     label: 'Connections',
-    headline: 'THE LIGHTEST CARD HOLDER.',
-    lead: 'CodeCard holds the face to face connections you actually care about, without turning them into another feed.',
+    headline: 'PEOPLE YOU ACTUALLY MET.',
+    lead: 'Keep the face-to-face ones. The handshake is the connection.',
     points: [
-      'Connect through the physical scan, not a search or a digital invite.',
-      'Record when you met, where you met, and a note about the conversation.',
-      'Schedule a follow up so the person does not disappear into forgotten contacts.',
+      'Date, place, a note from the conversation.',
+      'No search. No digital invite hunt.',
+      'Follow up so they do not vanish into forgotten contacts.',
     ],
     background: U('photo-1515169067868-5387ec356754'),
   },
   {
     id: 'circle',
     label: 'Circle',
-    headline: 'STAY CLOSE TO PEOPLE YOU MET.',
-    lead: 'Circle is for the people you connected with in person. It is not a social network and it is not a public feed.',
+    headline: 'WHO YOU MET. NOT A FEED.',
+    lead: 'Circle is the people who stood in front of you. Quiet. Chosen.',
     points: [
-      'Keep the people you actually met in one quiet place.',
-      'See the work from connections you chose, not strangers.',
-      'Use it as memory for real relationships, not as a follower graph.',
+      'One place for real meetings.',
+      'Their work, because you connected.',
+      'Memory for relationships, not a follower graph.',
     ],
     background: U('photo-1600880292203-757bb62b4baf'),
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    headline: 'SEE WHAT THEY OPENED.',
-    lead: 'After they scan, you can see what they looked at so the follow up has context.',
+    headline: 'FOLLOW UP WITH CONTEXT.',
+    lead: 'See what they opened. Write like you were still in the room.',
     points: [
-      'Track views, opens, and scans from the people who met you.',
-      'Know which project they spent time on before you write.',
-      'Keep events you plan to attend so the next meetings have a place.',
+      'Views, opens, scans from people who met you.',
+      'Know which project they lingered on.',
+      'Keep events you plan to attend.',
     ],
     background: U('photo-1514565131-fce0801e5785'),
   },
@@ -171,13 +171,12 @@ export function EditorialFeatureWalkthrough() {
       <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">What CodeCard is</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">MEET. SHOW.</span>
-          <span className="cc-ed__sub">CONNECT. FOLLOW UP.</span>
+          <span className="cc-ed__lead">IMPRESS IN THE ROOM.</span>
+          <span className="cc-ed__sub">KEEP WHO YOU MET.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          Showcase, connect, and follow up are one workflow. Meet someone, show
-          your work from your phone, remember the interaction, and keep the next
-          step.
+          Work in front of them now. Keep the people you actually met. Follow up
+          so they do not disappear.
         </p>
       </div>
 
@@ -202,7 +201,7 @@ export function EditorialFeatureWalkthrough() {
           header={
             <>
               <span className="fx-header-kicker">Crash course</span>
-              <span>One workflow. Five moments on the card.</span>
+              <span>Impress. Keep. Follow up.</span>
             </>
           }
           ariaLabel="CodeCard feature walkthrough"

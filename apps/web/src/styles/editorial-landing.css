@@ -2512,57 +2512,6 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
   color: #efedeb;
 }
 
-/* —— Common questions —— */
-.cc-ed-faq {
-  padding: clamp(4rem, 11vh, 7rem) 0 clamp(3rem, 8vh, 5rem);
-  background: transparent;
-}
-
-.cc-ed-faq__intro {
-  max-width: min(56rem, 100%);
-  margin: 0 auto clamp(2rem, 5vh, 3rem);
-  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  text-align: center;
-}
-
-.cc-ed-faq__list {
-  max-width: min(44rem, 100%);
-  margin: 0 auto;
-  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.cc-ed-faq__item {
-  border: 1px solid var(--ed-border);
-  border-radius: var(--ed-radius);
-  background: var(--ed-paper);
-  padding: 0.15rem 1.15rem 0.35rem;
-}
-
-.cc-ed-faq__question {
-  cursor: pointer;
-  list-style: none;
-  padding: 0.95rem 0;
-  font-family: var(--ed-sans, inherit);
-  font-size: 1.02rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--ed-ink);
-}
-
-.cc-ed-faq__question::-webkit-details-marker {
-  display: none;
-}
-
-.cc-ed-faq__answer {
-  margin: 0 0 1rem;
-  font-size: 0.98rem;
-  line-height: 1.55;
-  color: var(--ed-muted, #5c5956);
-}
-
 /* —— Waitlist coda (after finale; composition zoom only) —— */
 .cc-ed-waitlist {
   overflow-x: clip;

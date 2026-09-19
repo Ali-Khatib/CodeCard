@@ -6,7 +6,7 @@ test.describe('Editorial product landing', () => {
     expect(response?.ok()).toBeTruthy();
     const html = await page.content();
     expect(html).toContain('YOUR WORK.');
-    expect(html).toContain('YOUR CONNECTIONS.');
+    expect(html).toContain('YOUR PHONE.');
     expect(html).not.toMatch(/View Public Profile/i);
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
