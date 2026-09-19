@@ -23,7 +23,7 @@ const BEATS: EditorialResearchBeat[] = [
     researchBody:
       'Eye-tracking research shows first looks often last only a few seconds. Name, school, and title get seen. Real projects get skipped.',
     solutionBody:
-      'Selected work during the intro. They see it before the glance is over.',
+      'Selected work during the intro. They see it before the glance is over, inside a living technical identity.',
     imageSrc: '/auth-collage/team.jpg',
     imageAlt: 'Two people collaborating at a shared workspace',
   },
@@ -51,7 +51,7 @@ const BEATS: EditorialResearchBeat[] = [
     researchBody:
       'Skills-based hiring research shows pools open much wider when skills are easy to find. Buried work stays out of the match.',
     solutionBody:
-      'Skills and projects, open in the room. No later send.',
+      'Skills, projects, and research, open together. No later send.',
     imageSrc: '/auth-collage/code.jpg',
     imageAlt: 'Code editor showing technical work in progress',
   },

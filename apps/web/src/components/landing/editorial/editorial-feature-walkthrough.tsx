@@ -28,60 +28,72 @@ const STORIES: WalkStory[] = [
   {
     id: 'projects',
     label: 'Projects',
-    headline: 'SHOW IT WHILE YOU TALK.',
-    lead: 'Open it on your phone. They see your best work before the intro is over.',
+    headline: 'SHOW WHAT YOU BUILD.',
+    lead: 'A visual, structured showcase. What it is, how it works, the stack, the outcome.',
     points: [
-      'Impress faster than a speech or a later link.',
-      'They go as deep as they want. You keep talking.',
-      'The showcase happens in the room.',
+      'Images, presentations, demos, descriptions, and results, ready to open.',
+      'One of the quickest ways to put actual work in front of someone.',
+      'Open it on your phone. They can go as deep as they want while you talk.',
     ],
     background: U('photo-1461749280684-dccba630e2f6'),
   },
   {
     id: 'research',
     label: 'Research',
-    headline: 'PAPERS IN THE SAME BEAT.',
-    lead: 'Research sits next to the builds. They can open it before they walk away.',
+    headline: 'PRESENT THE RESEARCH.',
+    lead: 'Papers and findings sit next to the projects that support them. Presented, not dumped.',
     points: [
-      'Figures land first. Methods are there if they want them.',
-      'Papers next to the projects that prove them.',
-      'One conversation. Builds and findings together.',
+      'Figures, methods, and related builds in a form people can actually explore.',
+      'Research should feel understandable, not like a folder of PDFs.',
+      'The same living profile holds what you build and what you study.',
     ],
     background: U('photo-1497633762265-9d179a990aa6'),
   },
   {
     id: 'connections',
     label: 'Connections',
-    headline: 'PEOPLE YOU ACTUALLY MET.',
-    lead: 'Keep the face-to-face ones. The handshake is the connection.',
+    headline: 'THE LIGHTEST CARD HOLDER.',
+    lead: 'For the valuable people you actually meet. The physical interaction is the connection.',
     points: [
-      'Date, place, a note from the conversation.',
-      'No search. No digital invite hunt.',
-      'Follow up so they do not vanish into forgotten contacts.',
+      'When you met, where you met, what you talked about, and what comes next.',
+      'No username search. No digital invite hunt. The handshake is intentional.',
+      'Schedule a follow up after you impress each other.',
     ],
     background: U('photo-1515169067868-5387ec356754'),
   },
   {
+    id: 'events',
+    label: 'Events',
+    headline: 'PLACES YOU PLAN TO BE.',
+    lead: 'Keep upcoming events, then attach the people you meet there to that day.',
+    points: [
+      'Meetups, fairs, and conferences in one calendar.',
+      'Attend, connect in person, and keep the room attached to the relationship.',
+      'Events, connections, and follow ups belong to the same workflow.',
+    ],
+    background: U('photo-1505373877841-8d25f7d46678'),
+  },
+  {
     id: 'circle',
     label: 'Circle',
-    headline: 'WHO YOU MET. NOT A FEED.',
-    lead: 'Circle is the people who stood in front of you. Quiet. Chosen.',
+    headline: 'YOUR LIVING NETWORK.',
+    lead: 'Stay with the people you have actually connected with. See what they are working on and shipping.',
     points: [
-      'One place for real meetings.',
-      'Their work, because you connected.',
-      'Memory for relationships, not a follower graph.',
+      'The network starts with real relationships, not a follower graph.',
+      'Their latest work, because you chose each other.',
+      'Quiet, chosen, and built for staying connected, not farming engagement.',
     ],
     background: U('photo-1600880292203-757bb62b4baf'),
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    headline: 'FOLLOW UP WITH CONTEXT.',
-    lead: 'See what they opened. Write like you were still in the room.',
+    headline: 'A LIVING PROFILE.',
+    lead: 'See how people interact with your identity and your work.',
     points: [
-      'Views, opens, scans from people who met you.',
-      'Know which project they lingered on.',
-      'Keep events you plan to attend.',
+      'Profile views, project opens, research activity, and QR scans.',
+      'Know which work they lingered on after the meeting.',
+      'This is not a static page. It is a living technical identity.',
     ],
     background: U('photo-1514565131-fce0801e5785'),
   },
@@ -92,6 +104,7 @@ const MOBILE_LABELS: Record<string, string> = {
   projects: 'Projects',
   research: 'Research',
   connections: 'Connect',
+  events: 'Events',
   circle: 'Circle',
   analytics: 'Stats',
 };
@@ -171,12 +184,13 @@ export function EditorialFeatureWalkthrough() {
       <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">What CodeCard is</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">IMPRESS IN THE ROOM.</span>
-          <span className="cc-ed__sub">KEEP WHO YOU MET.</span>
+          <span className="cc-ed__lead">YOUR WORK. YOUR IDENTITY.</span>
+          <span className="cc-ed__sub">YOUR CONNECTIONS.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          Work in front of them now. Keep the people you actually met. Follow up
-          so they do not disappear.
+          One system around a living technical identity. Build it. Show the work.
+          Meet people. Connect in person. Remember the context. Stay connected.
+          Follow up.
         </p>
       </div>
 
@@ -201,7 +215,7 @@ export function EditorialFeatureWalkthrough() {
           header={
             <>
               <span className="fx-header-kicker">Crash course</span>
-              <span>Impress. Keep. Follow up.</span>
+              <span>Identity. Work. Connections.</span>
             </>
           }
           ariaLabel="CodeCard feature walkthrough"

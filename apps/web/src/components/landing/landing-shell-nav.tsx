@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { LAYOUT } from '@/lib/design/tokens';
 import { CodeCardMarkLogo } from './codecard-mark-logo';
+import { MarketingHomeControl } from './marketing-home-control';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
@@ -32,6 +33,7 @@ export function LandingShellNav() {
     >
       <CodeCardMarkLogo />
       <LandingHeroNav items={MARKETING_NAV_ITEMS} />
+      <MarketingHomeControl />
     </div>
   );
 }

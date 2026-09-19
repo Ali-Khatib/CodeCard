@@ -129,6 +129,57 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-ma
   text-shadow: none;
 }
 
+/* Fixed top-right home mark on marketing pages that are not the landing. */
+.cc-marketing-shell .cc-ed-home-control {
+  position: fixed;
+  right: clamp(0.7rem, 2.4vw, 1.5rem);
+  top: calc(0.7rem + env(safe-area-inset-top, 0px));
+  z-index: 101;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ed-ink, #232324);
+  text-decoration: none;
+  transition:
+    color 0.22s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.35s ease;
+}
+
+html[data-logo-tone='light'] .cc-marketing-shell .cc-ed-home-control {
+  color: #efedeb;
+  filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.48));
+}
+
+html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
+  color: var(--ed-ink, #232324);
+  filter: none;
+}
+
+.cc-marketing-shell:not(:has(.cc-ed)) .cc-ed-home-control {
+  color: var(--ed-ink, #232324);
+  filter: none;
+}
+
+.cc-marketing-shell .cc-ed-home-control:hover,
+.cc-marketing-shell .cc-ed-home-control:focus-visible {
+  background: color-mix(in srgb, var(--ed-accent, #e95a0b) 14%, transparent);
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--ed-accent, #e95a0b) 38%, transparent),
+    0 0 44px color-mix(in srgb, var(--ed-accent, #e95a0b) 16%, transparent);
+}
+
+.cc-marketing-shell .cc-ed-home-control:focus-visible {
+  outline: 2px solid var(--accent-orange, #e95a0b);
+  outline-offset: 3px;
+}
+
 @keyframes cc-nav-gradient-shift {
   0% {
     background-position: 0% 50%;

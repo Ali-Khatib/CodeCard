@@ -17,11 +17,12 @@ export function EditorialLiveDemoBox() {
       <div className="cc-ed-demo-embed__intro">
         <p className="cc-ed__eyebrow">Live workspace</p>
         <h2 id="editorial-live-demo-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">SEE THE CARD</span>
+          <span className="cc-ed__lead">SEE THE LIVING PROFILE</span>
           <span className="cc-ed__sub">THEY WOULD OPEN.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          What they explore after they scan. Desktop or mobile. Scroll inside.
+          Projects, research, connections, Circle, events, and analytics in one
+          workspace. Desktop or mobile. Scroll inside.
         </p>
         <p className="mt-5 text-center">
           <LiveDemoLink className="cc-ed__link">Open Live Demo →</LiveDemoLink>

@@ -8,20 +8,20 @@ import { TYPE } from '@/lib/design/tokens';
 
 const BLOCKS = [
   {
-    title: 'Hand off your work',
-    body: 'The fastest way to show what you are capable of. Link, QR, or your screen in the room. Like a business card, but your projects and demos are right there.',
+    title: 'Show the work itself',
+    body: 'Projects with images, stack, demos, and outcomes. Research presented so someone can actually understand it. One of the quickest ways to put your actual work in front of someone.',
   },
   {
-    title: 'Remember who you met',
-    body: 'Private notes on connections, where you met, and what to follow up on. A contact list keeps your network. CodeCard keeps your context.',
+    title: 'Connect for real',
+    body: 'Connections start with a face to face meeting, not a search or a cold invite. Then you keep when, where, what you talked about, and the next step.',
   },
   {
-    title: 'Great tools, wrong moment',
-    body: 'Career networks are built for titles and timelines. Code hosts are built for repositories. Neither is built for one scroll of your best work when someone is right in front of you.',
+    title: 'A different purpose',
+    body: 'GitHub is excellent for hosting and collaborating on code. LinkedIn serves as a professional networking platform. CodeCard is the layer between your identity, your work, and the people you meet in the real world. It can sit next to the tools you already use.',
   },
   {
-    title: 'The piece that was missing',
-    body: 'Import from what you already have, publish one page, and turn repositories into stories people actually understand. Your profiles link out. Setup takes minutes.',
+    title: 'The rest of the system',
+    body: 'Events you plan to attend. Circle for the people you chose. Analytics for how your identity and work are being seen. Follow through so a strong meeting can become collaboration.',
   },
 ] as const;
 

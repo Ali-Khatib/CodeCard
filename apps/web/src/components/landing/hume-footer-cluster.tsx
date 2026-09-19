@@ -65,8 +65,8 @@ export function HumeFooterCluster() {
               id="footer-statement-heading"
               className="cc-site-footer__display"
             >
-              <span>Impress them now.</span>
-              <span>Keep who you met.</span>
+              <span>Your work. Your identity.</span>
+              <span>Your connections.</span>
             </h2>
           </div>
         </div>
@@ -139,7 +139,19 @@ export function HumeFooterCluster() {
                         {link.label}
                       </LiveDemoLink>
                     ) : (
-                      <Link href={link.href} className="cc-site-footer__link">
+                      <Link
+                        href={link.href}
+                        className="cc-site-footer__link"
+                        onClick={
+                          link.href === '/faq'
+                            ? (event) => {
+                                if (window.location.pathname !== '/faq') return;
+                                event.preventDefault();
+                                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                              }
+                            : undefined
+                        }
+                      >
                         {link.label}
                       </Link>
                     )}
@@ -157,7 +169,7 @@ export function HumeFooterCluster() {
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
             <p className="cc-site-footer__meta-note">
-              Impress in the room. Keep who you met. Follow up.
+              A living technical identity for the real world.
             </p>
           </div>
         </div>

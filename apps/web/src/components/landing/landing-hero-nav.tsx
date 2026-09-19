@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { AnimatedNavFramer } from '@/components/ui/animated-nav-framer';
-import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 
 export type NavItem = {
   label: string;
@@ -28,14 +27,6 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === MARKETING_HOME_HREF) {
-        return (
-          pathname === MARKETING_HOME_HREF ||
-          pathname === '/how-it-works' ||
-          pathname === '/research' ||
-          pathname.startsWith('/research/')
-        );
-      }
       if (href === '/profiles') {
         return pathname === '/profiles';
       }
@@ -86,7 +77,13 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   aria-label={item.ariaLabel ?? item.label}
-                  onClick={(event) => event.stopPropagation()}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (item.href === '/faq' && pathname === '/faq') {
+                      event.preventDefault();
+                      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                    }
+                  }}
                   onMouseEnter={() => prefetchHref(item.href, router)}
                   onFocus={() => prefetchHref(item.href, router)}
                   className={`cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press${active ? ' cc-nav-pill-item--active' : ''}`}

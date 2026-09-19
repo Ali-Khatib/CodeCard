@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Plus } from 'lucide-react';
 import GlyphPortal, { type GlyphPortalStyle } from '@/components/ui/glyph-portal';
@@ -71,7 +71,7 @@ function FaqAccordion() {
                         }
                         className="grid place-items-center"
                       >
-                        <Plus size={16} strokeWidth={1.75} />
+                        <Plus size={18} strokeWidth={1.75} />
                       </motion.span>
                     </span>
                   </button>
@@ -106,6 +106,10 @@ function FaqAccordion() {
 }
 
 export function FaqPage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   return (
     <div className="cc-ed cc-faq-page" data-chapter="faq" data-testid="faq-page">
       <h1 className="sr-only">FAQ</h1>
@@ -115,7 +119,7 @@ export function FaqPage() {
         fontFamily={PORTAL_FONT}
         fontWeight={900}
         scrollLength={2.2}
-        enterLabel="Read the answers"
+        enterLabel=""
         style={PORTAL_STYLE}
         background={
           <div
@@ -132,16 +136,16 @@ export function FaqPage() {
           <>
             <div className="cc-faq-front__header">
               <span className="cc-faq-front__mark">CodeCard</span>
-              <span className="cc-faq-front__aside">Real world introductions</span>
+              <span className="cc-faq-front__aside">Living technical identity</span>
             </div>
-            <p className="cc-faq-front__eyebrow">A closer look at what this is</p>
+            <p className="cc-faq-front__eyebrow">A closer look at what CodeCard is</p>
             <p className="cc-faq-front__support">Scroll through the letters to begin.</p>
             <span className="cc-faq-front__scroll">Scroll to enter</span>
           </>
         }
       >
         <div className="cc-faq-portal-copy">
-          <p>Straight answers on showcase, connection, and follow up.</p>
+          <p>Straight answers on identity, work, and real world connections.</p>
         </div>
       </GlyphPortal>
       <FaqAccordion />

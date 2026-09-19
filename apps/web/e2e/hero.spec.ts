@@ -22,7 +22,7 @@ test.describe('Landing page', () => {
     await expect(headline).toBeVisible();
     /* Accessible name spans the visible lead plus the sr-only second line. */
     await expect(headline).toContainText(/YOUR WORK\./);
-    await expect(headline).toContainText(/YOUR PHONE\./);
+    await expect(headline).toContainText(/ONE IDENTITY\./);
 
     await expect(page.getByTestId('editorial-research-proof')).toBeAttached();
     await expect(page.locator('#build-yours')).toBeAttached();
@@ -42,8 +42,10 @@ test.describe('Landing page', () => {
       'href',
       '/faq',
     );
+    await expect(nav.getByRole('link', { name: 'CodeCard landing' })).toHaveCount(0);
     /* Sections that were retired from the nav must not come back silently. */
     await expect(nav.getByRole('link', { name: 'Research' })).toHaveCount(0);
     await expect(nav.getByRole('link', { name: 'How it works' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Top of page' }).first()).toBeVisible();
   });
 });

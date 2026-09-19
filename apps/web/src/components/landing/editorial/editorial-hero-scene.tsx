@@ -65,22 +65,22 @@ const STATEMENT_BEATS = [
     id: 'problem',
     title: 'Impress in the room.',
     lead: 'Impress in the room.',
-    sub: 'Work in front of them now.',
-    lede: 'The showcase happens while you are still talking. Not later. Not in an email.',
+    sub: 'They get the work. They leave impressed.',
+    lede: 'Projects and research, presented so the person in front of you understands what you built and why it matters.',
   },
   {
     id: 'shift',
     title: 'Keep the people you met.',
     lead: 'Keep the people you met.',
-    sub: 'The ones who stood in front of you.',
-    lede: 'Date, place, a note. Real meetings, held. Not a feed of strangers.',
+    sub: 'Face to face. Not a pointless add.',
+    lede: 'The connection starts in the room. Then you hold the chance to work together, not a feed of strangers.',
   },
   {
     id: 'identity',
     title: 'Follow up so you do not lose them.',
     lead: 'Follow up.',
-    sub: 'So you do not lose them.',
-    lede: 'The next step is scheduled. The connection stays yours.',
+    sub: 'So the meeting becomes something.',
+    lede: 'Notes, events, Circle, and a next step. Foster what comes after you impress each other.',
   },
 ] as const;
 

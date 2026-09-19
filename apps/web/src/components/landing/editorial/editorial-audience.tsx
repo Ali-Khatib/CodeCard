@@ -26,66 +26,66 @@ const AUDIENCE: AudienceCard[] = [
   {
     id: 'builders',
     eyebrow: 'Builders',
-    title: 'Show the work, not the speech.',
-    body: 'Best projects. In front of them. While you talk.',
+    title: 'Let them understand the work.',
+    body: 'Projects with stack, visuals, demos, and outcomes. Ready when they ask.',
     detailLead:
-      'They ask what you do. Open CodeCard. Proof is already there.',
+      'They should get what you built, not wait for a later link or a long speech.',
     points: [
       'Pin the projects that prove how you think.',
-      'Let them explore while you talk.',
-      'Connect in person. Keep a note. Follow up.',
+      'They explore images, stack, and results while you talk.',
+      'Then connect in person and keep the chance to collaborate.',
     ],
   },
   {
     id: 'recruiters',
     eyebrow: 'Recruiters',
-    title: 'See the work in the room.',
-    body: 'Scan. Look. Decide before the email thread starts.',
+    title: 'Proof sits with the person.',
+    body: 'Role, stack, projects, and research in one living profile.',
     detailLead:
-      'Role, stack, and proof sit together, in the conversation.',
+      'Judgment is easier when the work is open during the conversation.',
     points: [
-      'Open the card. Jump into the work.',
-      'Projects and papers that show judgment.',
-      'They remember the meeting and follow up with context.',
+      'Jump from identity into the actual builds.',
+      'Projects and papers that show how they think.',
+      'Context from the meeting stays attached if you connect.',
     ],
   },
   {
     id: 'events',
     eyebrow: 'Events',
-    title: 'Do not lose the room.',
-    body: 'They see the work. You keep the person and the next step.',
+    title: 'The room, then the follow through.',
+    body: 'Keep the event. Meet people. Connect. Remember who mattered.',
     detailLead:
-      'Date, place, note. The event stays attached to the people you met.',
+      'Upcoming places you plan to be, tied to the people you meet there.',
     points: [
-      'CodeCard out at the meetup.',
-      'They open the work while you talk.',
-      'Record the person and the next step before the week swallows it.',
+      'Track the meetup, fair, or conference beforehand.',
+      'Show the work so they understand it in the room.',
+      'Save the person, the place, and the next step before the week swallows it.',
     ],
   },
   {
     id: 'students',
     eyebrow: 'Students',
-    title: 'Lead with what you built.',
-    body: 'Show projects now. Do not promise a link later.',
+    title: 'Lead with what you can do.',
+    body: 'Coursework, side builds, and research, presented as identity.',
     detailLead:
-      'Proof in the moment. Then a way to remember who you met.',
+      'Show the work first. Then keep the people from fairs, labs, and mixers.',
     points: [
-      'Lead with projects and coursework.',
-      'Research and side builds, ready to open.',
-      'Notes and follow ups from fairs and mixers.',
+      'Projects and research ready to open.',
+      'A profile that is more than a resume line.',
+      'Notes and follow ups from the people you actually met.',
     ],
   },
   {
     id: 'freelancers',
     eyebrow: 'Freelancers',
-    title: 'Win the room, then follow up.',
-    body: 'Case studies on the spot. Then the next step, scheduled.',
+    title: 'Impress, then turn it into work.',
+    body: 'Case studies on the spot. Then a real next step.',
     detailLead:
-      'Work in front of them immediately. Connection held after you leave.',
+      'After you impress each other, keep the context and follow through.',
     points: [
-      'Outcome, stack, process. Packaged.',
-      'Show it now. No deck later.',
-      'Note plus follow up. Warm intros become work.',
+      'Outcome, stack, and process, packaged to understand.',
+      'Connect because you were in the same room.',
+      'Notes and a scheduled follow up so a strong intro can become a project.',
     ],
   },
 ];
@@ -371,12 +371,12 @@ export function EditorialAudience() {
       <div className="cc-ed-audience__intro">
         <p className="cc-ed__eyebrow">Who it’s for</p>
         <h2 id="editorial-audience-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">IMPRESS WHERE YOU STAND.</span>
-          <span className="cc-ed__sub">KEEP WHO YOU MET.</span>
+          <span className="cc-ed__lead">THE SAME SYSTEM.</span>
+          <span className="cc-ed__sub">DIFFERENT ROOMS.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-4">
-          Same three beats at a meetup, a campus event, or a client intro. Show
-          the work. Keep the people. Follow up.
+          Identity, work, and real connections at a meetup, a campus event, or a
+          client intro. The pieces stay the same. The room changes.
         </p>
       </div>
 

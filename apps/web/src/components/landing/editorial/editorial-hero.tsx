@@ -26,16 +26,22 @@ export function EditorialHero() {
             data-hero-statement
           >
             <span className="cc-ed__lead">YOUR WORK.</span>
-            <span className="sr-only">YOUR PHONE. YOUR POCKET.</span>
+            <span className="sr-only">ONE IDENTITY.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
         </div>
         <div className="cc-ed-hero__baseline">
           <div className="cc-ed-hero__baseline-copy">
             <p className="cc-ed__lede">
-              Your work, ready to show from the lock screen.
+              Your work, your research, and the people you actually meet, held
+              as one living technical identity. Stay connected. Follow through.
             </p>
-            <p className="cc-ed__connect-principle">Hand them your phone.</p>
+            <p className="cc-ed__connect-principle">
+              <strong>Meet. Show. Understand. Connect. Follow up.</strong> They
+              scan your QR. Your CodeCard opens in their browser. They get the
+              work while you are still talking. They do not need the app just to
+              look. If they skip the scan, they can see it on your screen.
+            </p>
           </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">
             <Link

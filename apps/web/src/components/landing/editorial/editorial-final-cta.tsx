@@ -16,11 +16,11 @@ export function EditorialFinalCta() {
           id="editorial-finale-heading"
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
-          <span className="cc-ed__lead">IMPRESS THEM NOW.</span>
-          <span className="cc-ed__sub">KEEP THEM.</span>
+          <span className="cc-ed__lead">YOUR WORK. YOUR IDENTITY.</span>
+          <span className="cc-ed__sub">YOUR CONNECTIONS.</span>
         </h2>
         <p className="cc-ed__lede mt-3">
-          Work in the room. People you actually met. Follow ups that do not slip.
+          Keep your work, identity, and valuable connections with you.
         </p>
         <div className="cc-ed__actions mt-6">
           <Link

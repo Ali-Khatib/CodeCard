@@ -17,8 +17,10 @@ describe('Editorial product landing contract', () => {
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('data-hero-statement');
     expect(hero).toContain('YOUR WORK.');
-    expect(hero).toContain('YOUR PHONE.');
-    expect(hero).toContain('YOUR POCKET.');
+    expect(hero).toContain('ONE IDENTITY.');
+    expect(hero).toContain('scan your QR.');
+    expect(hero).not.toContain('YOUR PHONE.');
+    expect(hero).not.toContain('Hand them your phone.');
     expect(hero).toContain('cc-ed__lead');
     expect(hero).toContain('EditorialHeroAnimatedHeadline');
     /* The shader field belongs to the scene now — shared with the statement. */
@@ -57,15 +59,19 @@ describe('Editorial product landing contract', () => {
     expect(walk).toContain('Circle');
     expect(walk).toContain('Connections');
     expect(walk).toContain('Analytics');
-    expect(walk).toContain('SHOW IT WHILE YOU TALK.');
-    expect(walk).toContain('PAPERS IN THE SAME BEAT.');
+    expect(walk).toContain('SHOW WHAT YOU BUILD.');
+    expect(walk).toContain('PRESENT THE RESEARCH.');
+    expect(walk).toContain('THE LIGHTEST CARD HOLDER.');
+    expect(walk).toContain('PLACES YOU PLAN TO BE.');
+    expect(walk).toContain('YOUR LIVING NETWORK.');
+    expect(walk).toContain('A LIVING PROFILE.');
     expect(walk).toContain('Open it on your phone');
     expect(walk).toContain('content:');
     expect(walk).toContain('photo-1461749280684-dccba630e2f6');
     expect(walk).toContain('photo-1497633762265-9d179a990aa6');
     expect(walk).toContain('photo-1514565131-fce0801e5785');
     expect(walk).toContain('Crash course');
-    expect(walk).toContain('Impress. Keep. Follow up.');
+    expect(walk).toContain('Identity. Work. Connections.');
     expect(walk).not.toContain('Walk the live product');
     expect(walk).not.toContain('Scroll to see');
     expect(walk).not.toContain('Five ways your work lives');
