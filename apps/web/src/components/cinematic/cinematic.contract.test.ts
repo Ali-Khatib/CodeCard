@@ -212,7 +212,9 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('data-statement-progress-fill');
     expect(scene).toContain('cc-ed-hero-scene__statement-progress');
     expect(css).toContain('.cc-ed-hero-scene__statement-stage');
+    expect(css).toContain('All groups share one slot');
     expect(css).toContain('.cc-ed-hero-scene__statement-progress-fill');
+    expect(scene).not.toContain('BEAT_EXIT_LIFT');
     expect(css).toContain('Instrument Serif');
     expect(css).toContain('--cc-ed-nav-clearance');
     expect(css).toContain('cream/orange');

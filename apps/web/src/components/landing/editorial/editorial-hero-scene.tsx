@@ -52,12 +52,6 @@ const STATEMENT_CHAR_DIM = 0.4;
 const STATEMENT_CHAR_LIT = 1;
 /** Share of each group's segment spent filling before it hands over. */
 const BEAT_FILL_SHARE = 0.72;
-/**
- * A finished group lifts as it fades. The incoming group fades in where the old
- * one sat, without moving, so nothing appears to spawn from below.
- */
-const BEAT_EXIT_LIFT = -36;
-
 let heroIntroPlayed = false;
 
 const STATEMENT_BEATS = [
@@ -383,14 +377,14 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             );
           });
 
-          /* Filled group lifts away, clearing the slot for the next one. */
+          /* Filled group fades in place so the next one occupies the same slot. */
           if (!isLast) {
             statementTl!.fromTo(
               beat,
               { autoAlpha: 1, y: 0 },
               {
                 autoAlpha: 0,
-                y: BEAT_EXIT_LIFT,
+                y: 0,
                 duration: fadeDur,
                 ease: 'power2.in',
                 immediateRender: false,

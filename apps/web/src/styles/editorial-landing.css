@@ -3087,32 +3087,33 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
   opacity: 0.45;
 }
 
-/* Statement copy — big block on the right, starting just under the bar */
+/* Statement copy — one shared slot under the bar, all three groups sit here. */
 .cc-ed-hero-scene__statement-stage {
   position: absolute;
   /*
-   * Clear air under the bar — the copy should not hang off the progress line.
-   * All three groups share this top edge, so it cannot be centred per group.
+   * Shared top edge for every beat. Keep this high enough that the longest
+   * group (headline + lede) still lands inside the viewport.
    */
-  top: calc(var(--cc-ed-nav-clearance) + 12rem);
+  top: calc(var(--cc-ed-nav-clearance) + 7.25rem);
   right: clamp(1.5rem, 5vw, 4rem);
+  bottom: clamp(1.75rem, 5vh, 3.25rem);
   left: auto;
   z-index: 2;
-  width: min(70rem, 70vw);
-  min-height: clamp(24rem, 58vh, 44rem);
-  overflow: visible;
+  width: min(64rem, 68vw);
+  overflow: hidden;
   text-align: left;
 }
 
 /* All groups share one slot and cross-fade in place — never move vertically. */
 .cc-ed-hero-scene__statement-slot {
   position: absolute;
-  inset: 0 0 auto 0;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.6rem, 3.6vh, 2.75rem);
+  justify-content: flex-start;
+  gap: clamp(1.15rem, 2.4vh, 1.85rem);
   width: 100%;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 .cc-ed-hero-scene__statement-body {
@@ -3120,22 +3121,22 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
   max-width: 100%;
   /* Beat copy — Instrument Serif cream/orange */
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(3.25rem, 7vw, 7.25rem);
+  font-size: clamp(2.65rem, 5.4vw, 5.65rem);
   font-weight: 400;
-  letter-spacing: -0.034em;
-  line-height: 1.01;
+  letter-spacing: -0.032em;
+  line-height: 1.05;
   text-align: left;
   text-wrap: balance;
 }
 
 .cc-ed-hero-scene__statement-lede {
   margin: 0;
-  max-width: 48rem;
+  max-width: 42rem;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.4rem, 2.2vw, 2.15rem);
+  font-size: clamp(1.12rem, 1.65vw, 1.72rem);
   font-weight: 450;
-  letter-spacing: -0.016em;
-  line-height: 1.42;
+  letter-spacing: -0.014em;
+  line-height: 1.4;
   text-align: left;
   text-wrap: pretty;
   hyphens: none;
@@ -3173,22 +3174,22 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__statement-stage {
-    top: calc(var(--cc-ed-nav-clearance) + 8rem);
+    top: calc(var(--cc-ed-nav-clearance) + 6.25rem);
     right: clamp(1rem, 4vw, 1.5rem);
     left: clamp(1rem, 4vw, 1.5rem);
     width: auto;
   }
 
   .cc-ed-hero-scene__statement-slot {
-    gap: clamp(1.25rem, 2.8vh, 1.9rem);
+    gap: clamp(0.95rem, 2.2vh, 1.45rem);
   }
 
   .cc-ed-hero-scene__statement-body {
-    font-size: clamp(2.5rem, 11vw, 3.9rem);
+    font-size: clamp(2.15rem, 9.4vw, 3.15rem);
   }
 
   .cc-ed-hero-scene__statement-lede {
-    font-size: clamp(1.2rem, 4.9vw, 1.5rem);
+    font-size: clamp(1.05rem, 4.2vw, 1.32rem);
   }
 }
 
