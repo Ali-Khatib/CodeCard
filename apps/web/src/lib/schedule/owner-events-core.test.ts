@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   executeCreateOwnerEvent,
   executeDeleteOwnerEvent,
+  executeUpdateOwnerEvent,
   listOwnerUpcomingEvents,
 } from './owner-events-core';
 
@@ -15,6 +16,7 @@ function createMock(options: {
   count?: number;
   insertError?: { message?: string } | null;
   deleteRow?: boolean;
+  updateRow?: boolean;
   list?: Array<{
     id: string;
     title: string;
@@ -79,6 +81,28 @@ function createMock(options: {
                   },
               error: options.insertError ?? null,
             }),
+          })),
+        })),
+        update: vi.fn((payload: Record<string, unknown>) => ({
+          eq: vi.fn((col: string, val: string) => ({
+            eq: vi.fn((_col2: string, ownerId: string) => ({
+              select: vi.fn(() => ({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data:
+                    options.updateRow && col === 'id' && val === EVENT_ID && ownerId === OWNER
+                      ? {
+                          id: EVENT_ID,
+                          title: payload.title,
+                          location: payload.location,
+                          starts_at: payload.starts_at,
+                          ends_at: payload.ends_at ?? null,
+                          notes: payload.notes ?? null,
+                        }
+                      : null,
+                  error: null,
+                }),
+              })),
+            })),
           })),
         })),
         delete: vi.fn(() => ({
@@ -153,6 +177,32 @@ describe('owner events core', () => {
       { user: { id: OTHER } },
     );
     expect(result.code).toBe('NOT_FOUND');
+  });
+
+  it('updates an owned event and hides another owner’s row', async () => {
+    const { client } = createMock({ updateRow: true });
+    const updated = await executeUpdateOwnerEvent(
+      client,
+      {
+        eventId: EVENT_ID,
+        title: 'Launch',
+        startsAt: '2026-09-22T18:00:00.000Z',
+      },
+      { user: { id: OWNER } },
+    );
+    expect(updated.success).toBe(true);
+    expect(updated.event?.title).toBe('Launch');
+
+    const hidden = await executeUpdateOwnerEvent(
+      client,
+      {
+        eventId: EVENT_ID,
+        title: 'Launch',
+        startsAt: '2026-09-22T18:00:00.000Z',
+      },
+      { user: { id: OTHER } },
+    );
+    expect(hidden.code).toBe('NOT_FOUND');
   });
 
   it('lists upcoming events for the owner', async () => {

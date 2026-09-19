@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import {
   executeCreateOwnerEvent,
   executeDeleteOwnerEvent,
+  executeUpdateOwnerEvent,
   ownerEventErrorMessage,
   type OwnerEventMutationState,
 } from '@/lib/schedule/owner-events-core';
@@ -62,6 +63,28 @@ export async function deleteOwnerEventAction(input: {
   const limited = await withRateLimit(user.id);
   if (limited) return limited;
   const result = await executeDeleteOwnerEvent(supabase, input, { user });
+  if (result.success) revalidateSchedule();
+  return result;
+}
+
+export async function updateOwnerEventAction(input: {
+  eventId: string;
+  title: string;
+  location?: string | null;
+  startsAt: string;
+  endsAt?: string | null;
+  notes?: string | null;
+}): Promise<OwnerEventMutationState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: ownerEventErrorMessage('UNAUTHENTICATED'), code: 'UNAUTHENTICATED' };
+  }
+  const limited = await withRateLimit(user.id);
+  if (limited) return limited;
+  const result = await executeUpdateOwnerEvent(supabase, input, { user });
   if (result.success) revalidateSchedule();
   return result;
 }

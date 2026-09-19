@@ -2,6 +2,7 @@ import { LIMITS } from '@codecard/config';
 import {
   createOwnerEventInputSchema,
   ownerEventIdInputSchema,
+  updateOwnerEventInputSchema,
 } from '@codecard/validation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { sanitizePlainTextNote } from '@/lib/connections/connection-metadata-core';
@@ -92,8 +93,8 @@ export async function listOwnerUpcomingEvents(
 
   const fromIso =
     options?.fromIso ??
-    new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-  const limit = Math.min(Math.max(options?.limit ?? 20, 1), 50);
+    new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString();
+  const limit = Math.min(Math.max(options?.limit ?? 200, 1), 200);
 
   const { data, error } = await supabase
     .from(OWNER_EVENTS_TABLE)
@@ -173,6 +174,57 @@ export async function executeCreateOwnerEvent(
     .single();
 
   if (error || !data) return fail('TEMPORARY_FAILURE');
+  return { success: true, event: mapEventRow(data) };
+}
+
+export async function executeUpdateOwnerEvent(
+  supabase: SupabaseClient,
+  raw: unknown,
+  options?: { user?: AuthUser | null },
+): Promise<OwnerEventMutationState> {
+  const parsed = updateOwnerEventInputSchema.safeParse(raw);
+  if (!parsed.success) return fail('INVALID_INPUT');
+
+  const starts = coerceIsoDateTime(parsed.data.startsAt);
+  if (!starts.ok || !starts.iso) return fail('INVALID_INPUT');
+
+  let endsIso: string | null = null;
+  if (parsed.data.endsAt !== undefined && parsed.data.endsAt !== null) {
+    const ends = coerceIsoDateTime(parsed.data.endsAt);
+    if (!ends.ok) return fail('INVALID_INPUT');
+    endsIso = ends.iso;
+    if (endsIso && Date.parse(endsIso) < Date.parse(starts.iso)) {
+      return fail('INVALID_INPUT');
+    }
+  }
+
+  const user = await getAuthenticatedUser(supabase, options);
+  if (!user) return fail('UNAUTHENTICATED');
+
+  const title = sanitizePlainTextNote(parsed.data.title);
+  if (!title) return fail('INVALID_INPUT');
+
+  const location =
+    parsed.data.location == null ? null : sanitizePlainTextNote(parsed.data.location) || null;
+  const notes =
+    parsed.data.notes == null ? null : sanitizePlainTextNote(parsed.data.notes) || null;
+
+  const { data, error } = await supabase
+    .from(OWNER_EVENTS_TABLE)
+    .update({
+      title,
+      location,
+      starts_at: starts.iso,
+      ends_at: endsIso,
+      notes,
+    })
+    .eq('id', parsed.data.eventId)
+    .eq('owner_user_id', user.id)
+    .select('id, title, location, starts_at, ends_at, notes')
+    .maybeSingle();
+
+  if (error) return fail('TEMPORARY_FAILURE');
+  if (!data) return fail('NOT_FOUND');
   return { success: true, event: mapEventRow(data) };
 }
 

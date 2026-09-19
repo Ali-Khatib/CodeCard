@@ -592,6 +592,10 @@ export const ownerEventIdInputSchema = z.object({
   eventId: z.string().uuid(),
 });
 
+export const updateOwnerEventInputSchema = createOwnerEventInputSchema.extend({
+  eventId: z.string().uuid(),
+});
+
 export const connectionMetadataInputSchema = z.object({
   connectionId: z.string().uuid(),
 });
@@ -804,6 +808,7 @@ export type UpdateCollectionInput = z.infer<typeof updateCollectionInputSchema>;
 export type CollectionMembershipInput = z.infer<typeof collectionMembershipInputSchema>;
 export type UpdateConnectionMetadataInput = z.infer<typeof updateConnectionMetadataInputSchema>;
 export type CreateOwnerEventInput = z.infer<typeof createOwnerEventInputSchema>;
+export type UpdateOwnerEventInput = z.infer<typeof updateOwnerEventInputSchema>;
 export type OwnerEventIdInput = z.infer<typeof ownerEventIdInputSchema>;
 export type WaitlistSignupInput = z.infer<typeof waitlistSignupSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;

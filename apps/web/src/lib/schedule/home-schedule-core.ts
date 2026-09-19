@@ -70,7 +70,7 @@ export async function loadHomeSchedule(
     .eq('owner_user_id', user.id)
     .not('follow_up_at', 'is', null)
     .order('follow_up_at', { ascending: true })
-    .limit(20);
+    .limit(100);
 
   if (error) {
     return {

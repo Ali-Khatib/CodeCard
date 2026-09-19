@@ -11,13 +11,20 @@ export function getUpcomingFollowUps(connections: WorkspaceConnection[]) {
     });
 }
 
+/** Keep follow-up dots on the printed calendar day, not the UTC day before. */
+export function followUpDisplayDateToIso(display: string): string {
+  const parsed = new Date(display);
+  if (Number.isNaN(parsed.getTime())) return new Date().toISOString();
+  return new Date(
+    Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate(), 12, 0, 0),
+  ).toISOString();
+}
+
 export function followUpsToHomeItems(connections: WorkspaceConnection[]): HomeFollowUp[] {
   return getUpcomingFollowUps(connections).map((c) => ({
     connectionId: c.id,
     personName: c.name,
     context: c.meetingPoint || null,
-    followUpAt: c.followUpDate
-      ? new Date(c.followUpDate).toISOString()
-      : new Date().toISOString(),
+    followUpAt: c.followUpDate ? followUpDisplayDateToIso(c.followUpDate) : new Date().toISOString(),
   }));
 }

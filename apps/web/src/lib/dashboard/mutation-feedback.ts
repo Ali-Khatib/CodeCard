@@ -69,8 +69,10 @@ export const MUTATION_FEEDBACK = {
   },
   schedule: {
     created: 'Event added',
+    updated: 'Event updated',
     deleted: 'Event removed',
     createFailed: 'We could not add that event. Try again.',
+    updateFailed: 'We could not update that event. Try again.',
     deleteFailed: 'We could not remove that event. Try again.',
   },
   sessionExpired: 'Your session expired. Sign in again.',

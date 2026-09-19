@@ -16,6 +16,11 @@ describe('Home calendar and follow-ups', () => {
     expect(overview).toContain('HomeScheduleSection');
     expect(overview).toContain('HomeIdentitySection');
     expect(page).toContain('loadHomeSchedule');
+    const calendar = read('src/components/dashboard/home-schedule-section.tsx');
+    expect(calendar).toContain('cc-home-calendar');
+    expect(calendar).toContain('data-calendar-day');
+    expect(calendar).toContain('updateOwnerEventAction');
+    expect(calendar).toContain('Follow-up');
   });
 
   it('stores owner events privately and follow-ups on connections', () => {
