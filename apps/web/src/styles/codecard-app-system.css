@@ -342,6 +342,55 @@ html.dark .cc-app-sidebar__brand:focus-visible {
   left: 12px;
 }
 
+/* Live demo only — floating exit. Hidden in the landing iframe. */
+.cc-app-demo-back-to-landing {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--app-radius-pill);
+  border: 1px solid var(--app-border-strong);
+  background: var(--app-paper);
+  color: var(--app-ink);
+  font-family: var(--app-font);
+  font-size: var(--app-type-button);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 10px 24px rgba(34, 34, 34, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+}
+
+.cc-app-demo-back-to-landing:hover {
+  border-color: var(--app-iris);
+  background: var(--app-paper);
+}
+
+.cc-app-demo-back-to-landing:focus-visible {
+  outline: 2px solid var(--app-iris);
+  outline-offset: 3px;
+}
+
+.cc-app-root--embedded .cc-app-demo-back-to-landing {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .cc-app-demo-back-to-landing {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+html.dark .cc-app-demo-back-to-landing {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
 .cc-app-sidebar-toggle:hover {
   background: var(--app-paper);
   border-color: var(--app-iris);

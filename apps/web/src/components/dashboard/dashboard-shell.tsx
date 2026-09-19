@@ -13,7 +13,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
-import { workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
+import { isDemoWorkspacePath, workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
@@ -299,6 +299,14 @@ export function DashboardShell({
     <MutationFeedbackProvider>
     <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref && !embedded ? 'cc-app-root--route-pending' : ''} ${embedded ? 'cc-app-root--embedded' : ''}`}>
       {pendingHref && !embedded && <div className="cc-app-route-progress" aria-hidden />}
+      {isDemoWorkspacePath(basePath) && !embedded ? (
+        <Link
+          href={MARKETING_HOME_HREF}
+          className="cc-app-demo-back-to-landing"
+        >
+          Back to landing
+        </Link>
+      ) : null}
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed"

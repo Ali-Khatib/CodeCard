@@ -36,6 +36,18 @@ describe('authenticated dashboard isolation from Alex Chen demo', () => {
     const shell = readFileSync(resolve(WEB, 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
     expect(shell).not.toMatch(/label:\s*['"]My Profile['"]/);
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Projects'");
+    expect(shell).toContain("label: 'Your Work'");
+  });
+
+  it('puts Back to landing on the demo workspace only, not signed-in accounts', () => {
+    const shell = readFileSync(resolve(WEB, 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
+    const dashboard = readFileSync(
+      resolve(WEB, 'src/app/dashboard/(authenticated)/layout.tsx'),
+      'utf8',
+    );
+    expect(shell).toContain('isDemoWorkspacePath(basePath) && !embedded');
+    expect(shell).toContain('cc-app-demo-back-to-landing');
+    expect(dashboard).not.toContain('cc-app-demo-back-to-landing');
+    expect(dashboard).not.toContain('LIVE_DEMO_WORKSPACE_HREF');
   });
 });
