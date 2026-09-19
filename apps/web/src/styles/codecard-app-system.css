@@ -4662,6 +4662,54 @@ html.dark .cc-analytics-paper-table__signal-chip {
   gap: 12px;
 }
 
+.cc-home-schedule {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .cc-home-schedule {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+.cc-home-schedule__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.cc-home-schedule__row--link {
+  text-decoration: none;
+}
+
+.cc-home-schedule__row--link:hover {
+  border-color: color-mix(in srgb, var(--app-iris) 35%, var(--app-border));
+}
+
+.cc-home-schedule__remove {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--app-smoke);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cc-home-schedule__remove:hover {
+  color: var(--app-ink);
+}
+
+.cc-home-schedule__form {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 .cc-profile-home__zone-title {
   margin-top: 6px;
   font-size: clamp(1.55rem, 3vw, 2rem);

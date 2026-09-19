@@ -451,6 +451,7 @@ export async function listOwnerConnections(
       created_at,
       source,
       context,
+      follow_up_at,
       saved_profile:saved_profile_id (
         ${TARGET_SELECT}
       )
@@ -494,6 +495,7 @@ export async function listOwnerConnections(
         createdAt: row.created_at as string,
         source: row.source as string,
         context: (row.context as string | null) ?? null,
+        followUpAt: (row.follow_up_at as string | null) ?? null,
         privateNote: notesMap[row.id as string] ?? null,
         target: toSafeTarget(targetRow),
       },

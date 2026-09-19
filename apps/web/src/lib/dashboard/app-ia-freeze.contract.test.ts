@@ -44,6 +44,7 @@ describe('Phase 1 web app IA freeze', () => {
     expect(overview).toContain('isProfilePublic ? \'Public\' : \'Private\'');
     expect(overview).toContain('ProfileShareHero');
     expect(overview).toContain('HomeIdentitySection');
+    expect(overview).toContain('HomeScheduleSection');
     expect(page).toContain('getHomeWorkspaceNextStep');
   });
 

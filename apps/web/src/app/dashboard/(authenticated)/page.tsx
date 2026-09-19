@@ -12,6 +12,7 @@ import type { OverviewCircleWorksEmpty } from '@/lib/dashboard/overview-circle-w
 import { listCircleFeed } from '@/lib/circle/circle-feed-core';
 import { getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
+import { loadHomeSchedule } from '@/lib/schedule/home-schedule-core';
 
 export default async function DashboardHomePage() {
   const supabase = await createClient();
@@ -35,11 +36,12 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult, contentResult, circleFeed] = await Promise.all([
+  const [completionResult, analyticsResult, contentResult, circleFeed, schedule] = await Promise.all([
     loadProfileCompletion(supabase, profile),
     loadOwnerAnalytics(supabase, user!.id),
     loadOwnerOverviewContent(supabase, user!.id),
     listCircleFeed(supabase, { limit: 3, filter: 'all' }),
+    loadHomeSchedule(supabase, { user: user! }),
   ]);
 
   if (!completionResult.ok) {
@@ -119,6 +121,9 @@ export default async function DashboardHomePage() {
       circleWorksEmpty={circleWorksEmpty}
       suggested={suggested}
       hasAnyProject={completionResult.hasAnyProject}
+      events={schedule.events}
+      followUps={schedule.followUps}
+      scheduleError={Boolean(schedule.code)}
     />
   );
 }

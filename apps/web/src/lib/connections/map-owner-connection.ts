@@ -27,6 +27,7 @@ export type AuthenticatedConnectionCard = WorkspaceConnection & {
   privateNote: string | null;
   context: string | null;
   connectedAtIso: string | null;
+  followUpAtIso: string | null;
 };
 
 /** Map a safe owner list item into the existing Connections card shape. */
@@ -40,6 +41,8 @@ export function mapOwnerConnectionToCard(
 
   const meetingPoint = item.context?.trim() || '';
   const location = target.location?.trim() || '';
+  const followUpAt = item.followUpAt;
+  const followUpScheduled = Boolean(followUpAt);
 
   return {
     id: item.connectionId,
@@ -52,7 +55,8 @@ export function mapOwnerConnectionToCard(
     date: formatConnectedDate(item.connectedAt ?? item.createdAt),
     source: SOURCE_LABEL[item.source] ?? 'QR',
     note: item.privateNote?.trim() || publicPreview,
-    followUp: 'none',
+    followUp: followUpScheduled ? 'scheduled' : 'none',
+    followUpDate: followUpScheduled && followUpAt ? formatConnectedDate(followUpAt) : undefined,
     tags: [],
     avatarUrl: target.avatarPublicUrl ?? undefined,
     profileSlug: target.slug || undefined,
@@ -61,5 +65,6 @@ export function mapOwnerConnectionToCard(
     privateNote: item.privateNote,
     context: item.context,
     connectedAtIso: item.connectedAt ?? item.createdAt,
+    followUpAtIso: item.followUpAt,
   };
 }

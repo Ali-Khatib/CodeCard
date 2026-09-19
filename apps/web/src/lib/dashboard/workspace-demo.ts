@@ -29,6 +29,15 @@ export type WorkspaceConnection = {
   lastViewed?: string;
 };
 
+export type DemoOwnerEvent = {
+  id: string;
+  title: string;
+  location: string | null;
+  startsAt: string;
+  endsAt: string | null;
+  notes: string | null;
+};
+
 export const DEMO_WORKSPACE = {
   displayName: DEMO_PROFILE.display_name,
   email: 'alex.chen@stripe.com',
@@ -145,6 +154,33 @@ export const DEMO_CONNECTIONS: WorkspaceConnection[] = [
     avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
     tags: ['hiring', 'enterprise'],
     lastViewed: 'Yesterday',
+  },
+];
+
+export const DEMO_OWNER_EVENTS: DemoOwnerEvent[] = [
+  {
+    id: 'e1',
+    title: 'DevConf SF hallway hours',
+    location: 'Moscone West',
+    startsAt: '2026-09-22T23:00:00.000Z',
+    endsAt: null,
+    notes: null,
+  },
+  {
+    id: 'e2',
+    title: 'Coffee with Jordan after the talk',
+    location: 'Blue Bottle, Market St',
+    startsAt: '2026-09-24T16:30:00.000Z',
+    endsAt: null,
+    notes: null,
+  },
+  {
+    id: 'e3',
+    title: 'SchemaSync booth',
+    location: 'KubeCon North America',
+    startsAt: '2026-10-08T15:00:00.000Z',
+    endsAt: null,
+    notes: null,
   },
 ];
 

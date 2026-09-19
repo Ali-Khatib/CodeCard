@@ -554,6 +554,42 @@ export const updateConnectionMetadataInputSchema = z.object({
     .union([z.string().datetime(), z.null()])
     .optional(),
   metAt: z.union([z.string().datetime(), z.null()]).optional(),
+  followUpAt: z.union([z.string(), z.null()]).optional(),
+});
+
+const optionalPlainText = (max: number) =>
+  z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v == null) return null;
+      const trimmed = v.trim();
+      return trimmed === '' ? null : trimmed;
+    })
+    .superRefine((v, ctx) => {
+      if (typeof v === 'string' && v.length > max) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Text is too long',
+        });
+      }
+    });
+
+/** Owner-private calendar event on Home. Dates may be ISO or datetime-local. */
+export const createOwnerEventInputSchema = z.object({
+  title: z
+    .string()
+    .transform((v) => v.trim())
+    .pipe(z.string().min(1, 'Title is required').max(120, 'Title is too long')),
+  location: optionalPlainText(200),
+  startsAt: z.string().trim().min(1).max(40),
+  endsAt: z.union([z.string(), z.null()]).optional(),
+  notes: optionalPlainText(2000),
+});
+
+export const ownerEventIdInputSchema = z.object({
+  eventId: z.string().uuid(),
 });
 
 export const connectionMetadataInputSchema = z.object({
@@ -767,6 +803,8 @@ export type CreateCollectionInput = z.infer<typeof createCollectionInputSchema>;
 export type UpdateCollectionInput = z.infer<typeof updateCollectionInputSchema>;
 export type CollectionMembershipInput = z.infer<typeof collectionMembershipInputSchema>;
 export type UpdateConnectionMetadataInput = z.infer<typeof updateConnectionMetadataInputSchema>;
+export type CreateOwnerEventInput = z.infer<typeof createOwnerEventInputSchema>;
+export type OwnerEventIdInput = z.infer<typeof ownerEventIdInputSchema>;
 export type WaitlistSignupInput = z.infer<typeof waitlistSignupSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;

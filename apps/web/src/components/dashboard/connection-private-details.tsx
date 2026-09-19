@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { useConfirmPanelA11y } from '@/lib/a11y/use-confirm-panel-a11y';
+import { toDateInputValue } from '@/lib/schedule/datetime';
 
 type ConnectionPrivateDetailsProps = {
   connectionId: string;
@@ -11,11 +12,16 @@ type ConnectionPrivateDetailsProps = {
   initialNote: string | null;
   initialContext: string | null;
   initialConnectedAt: string | null;
+  initialFollowUpAt?: string | null;
   /** Existing meeting-point names for pick-or-create. */
   meetingPointSuggestions?: string[];
   open: boolean;
   onClose: () => void;
-  onSaved?: (next: { privateNote: string | null; context: string | null }) => void;
+  onSaved?: (next: {
+    privateNote: string | null;
+    context: string | null;
+    followUpAt: string | null;
+  }) => void;
 };
 
 export function ConnectionPrivateDetails({
@@ -24,6 +30,7 @@ export function ConnectionPrivateDetails({
   initialNote,
   initialContext,
   initialConnectedAt,
+  initialFollowUpAt = null,
   meetingPointSuggestions = [],
   open,
   onClose,
@@ -31,12 +38,15 @@ export function ConnectionPrivateDetails({
 }: ConnectionPrivateDetailsProps) {
   const [note, setNote] = useState(initialNote ?? '');
   const [context, setContext] = useState(initialContext ?? '');
+  const [followUpAt, setFollowUpAt] = useState(toDateInputValue(initialFollowUpAt));
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const dirtyRef = useRef(false);
   dirtyRef.current =
-    note !== (initialNote ?? '') || context !== (initialContext ?? '');
+    note !== (initialNote ?? '') ||
+    context !== (initialContext ?? '') ||
+    followUpAt !== toDateInputValue(initialFollowUpAt);
 
   const requestClose = useCallback(() => {
     if (dirtyRef.current && !window.confirm('Discard unsaved private details?')) {
@@ -56,10 +66,11 @@ export function ConnectionPrivateDetails({
     if (open) {
       setNote(initialNote ?? '');
       setContext(initialContext ?? '');
+      setFollowUpAt(toDateInputValue(initialFollowUpAt));
       setError(null);
       setStatus(null);
     }
-  }, [open, initialNote, initialContext, connectionId]);
+  }, [open, initialNote, initialContext, initialFollowUpAt, connectionId]);
 
   if (!open) return null;
 
@@ -71,6 +82,7 @@ export function ConnectionPrivateDetails({
         connectionId,
         privateNote: opts?.clearNote ? null : note === '' ? null : note,
         context: context === '' ? null : context,
+        followUpAt: followUpAt === '' ? null : followUpAt,
       });
       if (!result.success || !result.metadata) {
         setError(result.error ?? 'Could not save private details.');
@@ -78,10 +90,12 @@ export function ConnectionPrivateDetails({
       }
       setNote(result.metadata.privateNote ?? '');
       setContext(result.metadata.context ?? '');
+      setFollowUpAt(toDateInputValue(result.metadata.followUpAt));
       setStatus('Private details saved.');
       onSaved?.({
         privateNote: result.metadata.privateNote,
         context: result.metadata.context,
+        followUpAt: result.metadata.followUpAt,
       });
     });
   };
@@ -158,6 +172,25 @@ export function ConnectionPrivateDetails({
           <div>
             <p className="mb-1 text-[13px] text-[var(--app-smoke)]">Connected on</p>
             <p className="text-[15px] text-[var(--app-ink)]">{connectedLabel}</p>
+          </div>
+
+          <div>
+            <label
+              htmlFor={`follow-up-${connectionId}`}
+              className="mb-1 block text-[13px] text-[var(--app-smoke)]"
+            >
+              Follow up on
+            </label>
+            <input
+              id={`follow-up-${connectionId}`}
+              className="cc-app-input"
+              type="date"
+              value={followUpAt}
+              onChange={(e) => setFollowUpAt(e.target.value)}
+            />
+            <p className="mt-1.5 text-[12px] text-[var(--app-smoke)]">
+              Shows on Home so you can check in after you meet.
+            </p>
           </div>
 
           <div>

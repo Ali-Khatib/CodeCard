@@ -170,11 +170,13 @@ export function AuthenticatedConnectionsClient({
           initialNote={detailsConnection.privateNote}
           initialContext={detailsConnection.context}
           initialConnectedAt={detailsConnection.connectedAtIso}
+          initialFollowUpAt={detailsConnection.followUpAtIso}
           meetingPointSuggestions={meetingPointSuggestions}
           open
           onClose={() => setDetailsId(null)}
-          onSaved={({ privateNote, context }) => {
+          onSaved={({ privateNote, context, followUpAt }) => {
             const meetingPoint = context?.trim() || '';
+            const scheduled = Boolean(followUpAt);
             setConnections((prev) =>
               prev.map((c) =>
                 c.id === detailsConnection.id
@@ -185,6 +187,15 @@ export function AuthenticatedConnectionsClient({
                       note: privateNote?.trim() || c.note,
                       meetingPoint,
                       metAt: meetingPoint || c.metAt,
+                      followUp: scheduled ? 'scheduled' : 'none',
+                      followUpDate: scheduled && followUpAt
+                        ? new Date(followUpAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })
+                        : undefined,
+                      followUpAtIso: followUpAt,
                     }
                   : c,
               ),

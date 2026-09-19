@@ -205,6 +205,12 @@ export async function executeLocalAccountContentDeletion(
     .eq('owner_user_id', ctx.ownerUserId);
   if (collectionsError) return { ok: false, reason: 'delete_failed' };
 
+  const { error: eventsError } = await supabase
+    .from('owner_events')
+    .delete()
+    .eq('owner_user_id', ctx.ownerUserId);
+  if (eventsError) return { ok: false, reason: 'delete_failed' };
+
   const { error: connectionsError } = await supabase
     .from('saved_connections')
     .delete()

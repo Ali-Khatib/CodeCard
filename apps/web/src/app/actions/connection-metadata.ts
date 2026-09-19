@@ -37,6 +37,7 @@ export async function updateConnectionMetadataAction(input: {
   context?: string | null;
   connectedAt?: string | null;
   metAt?: string | null;
+  followUpAt?: string | null;
   source?: 'qr' | 'nfc' | 'direct_link' | 'manual' | 'app';
 }): Promise<MetadataMutationState> {
   const supabase = await createClient();
@@ -52,6 +53,7 @@ export async function updateConnectionMetadataAction(input: {
   const result = await executeUpdateConnectionMetadata(supabase, input, { user });
   if (result.success) {
     revalidatePath('/dashboard/connections');
+    revalidatePath('/dashboard');
   }
   return result;
 }

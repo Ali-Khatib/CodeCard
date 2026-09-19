@@ -10,6 +10,7 @@ import type { Profile } from '@codecard/types';
 import { Sparkline } from './sparkline';
 import { FadeInView } from './fade-in-view';
 import { HomeIdentitySection } from './home-identity-section';
+import { HomeScheduleSection } from './home-schedule-section';
 import { ProfileShareHero } from './profile-share-hero';
 import type { OverviewContentSummary } from '@/lib/dashboard/overview-queries';
 import type {
@@ -21,6 +22,8 @@ import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import type { HomeLoopState, ProfileCompletionResult } from '@/lib/profile/completion';
 import { getHomeLoopState } from '@/lib/profile/completion';
+import type { HomeFollowUp } from '@/lib/schedule/home-schedule-core';
+import type { OwnerEvent } from '@/lib/schedule/owner-events-core';
 import {
   workspaceCreateProjectHref,
   workspaceCreateResearchHref,
@@ -73,6 +76,9 @@ export type OverviewProps = {
   /** Owner project inventory exists (including drafts). */
   hasAnyProject?: boolean;
   basePath?: string;
+  events?: OwnerEvent[];
+  followUps?: HomeFollowUp[];
+  scheduleError?: boolean;
 };
 
 const PREVIEW_SPARKS: Record<'profileViews' | 'projectOpens', number[]> = {
@@ -100,6 +106,9 @@ export function DashboardOverviewView({
   suggested,
   hasAnyProject = false,
   basePath = '/dashboard',
+  events = [],
+  followUps = [],
+  scheduleError = false,
 }: OverviewProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const firstName = displayName.split(' ')[0];
@@ -257,6 +266,14 @@ export function DashboardOverviewView({
           />
         </FadeInView>
       ) : null}
+
+      <HomeScheduleSection
+        events={events}
+        followUps={followUps}
+        scheduleError={scheduleError}
+        preview={preview}
+        basePath={basePath}
+      />
 
       {showWork ? (
       <FadeInView delay={0.18}>

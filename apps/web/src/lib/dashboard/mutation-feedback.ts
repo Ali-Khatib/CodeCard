@@ -67,6 +67,12 @@ export const MUTATION_FEEDBACK = {
     linkCopiedButPrivate: 'Link copied — publish your profile before visitors can open it',
     linkCopyFailed: 'Could not copy your link. Open Home to share from there.',
   },
+  schedule: {
+    created: 'Event added',
+    deleted: 'Event removed',
+    createFailed: 'We could not add that event. Try again.',
+    deleteFailed: 'We could not remove that event. Try again.',
+  },
   sessionExpired: 'Your session expired. Sign in again.',
   genericFailure: 'Something went wrong. Try again.',
 } as const;
@@ -81,6 +87,7 @@ const KNOWN_SAFE_MESSAGES = new Set<string>([
   ...Object.values(MUTATION_FEEDBACK.research),
   ...Object.values(MUTATION_FEEDBACK.account),
   ...Object.values(MUTATION_FEEDBACK.share),
+  ...Object.values(MUTATION_FEEDBACK.schedule),
   MUTATION_FEEDBACK.sessionExpired,
   MUTATION_FEEDBACK.genericFailure,
 ]);

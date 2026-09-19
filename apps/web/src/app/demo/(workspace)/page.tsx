@@ -1,8 +1,11 @@
 import { DashboardOverviewView } from '@/components/dashboard/dashboard-overview-view';
 import {
+  DEMO_CONNECTIONS,
+  DEMO_OWNER_EVENTS,
   DEMO_PROFILE_LINKS,
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
+import { followUpsToHomeItems } from '@/lib/dashboard/connections-summary';
 import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
 import { overviewCircleWorksFromDemoFeed } from '@/lib/dashboard/overview-circle-works';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
@@ -114,6 +117,8 @@ export default function DemoWorkspaceOverviewPage() {
       })}
       hasAnyProject
       basePath={basePath}
+      events={DEMO_OWNER_EVENTS}
+      followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}
     />
   );
 }

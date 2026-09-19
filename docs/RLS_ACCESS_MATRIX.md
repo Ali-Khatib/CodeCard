@@ -41,6 +41,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `research_figures` | ✅ | via paper visibility | ❌ | full | via paper visibility | |
 | `saved_connections` | ✅ | ❌ | ❌ | full | ❌ | Target cannot see saver |
 | `connection_notes` | ✅ | ❌ | ❌ | full | ❌ | Private to saver |
+| `owner_events` | ✅ | ❌ | ❌ | full | ❌ | Owner-private calendar; Home only |
 | `collections` | ✅ | ❌ | ❌ | full | ❌ | |
 | `collection_items` | ✅ | ❌ | ❌ | full (same-owner membership) | ❌ | Parent + Connection ownership |
 | `circle_activity` | ✅ | ❌ | ❌ | SELECT via Connection / own actor; INSERT/DELETE own actor | SELECT only if Connection | No UPDATE; feed also filters published |

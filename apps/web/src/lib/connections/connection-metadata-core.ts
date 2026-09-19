@@ -12,6 +12,7 @@ import {
   resolveOwnedProfile,
   type AuthUser,
 } from '@/lib/profile/profile-auth-core';
+import { coerceIsoDateTime } from '@/lib/schedule/datetime';
 
 export type MetadataErrorCode =
   | 'UNAUTHENTICATED'
@@ -25,6 +26,7 @@ export type ConnectionMetadata = {
   context: string | null;
   connectedAt: string | null;
   metAt: string | null;
+  followUpAt: string | null;
   source: string;
   updatedAt: string;
 };
@@ -72,13 +74,14 @@ async function loadOwnedConnectionRow(
   context: string | null;
   connected_at: string | null;
   met_at: string | null;
+  follow_up_at: string | null;
   source: string;
   updated_at: string;
   tenant_id: string;
 } | null> {
   const { data } = await supabase
     .from(CONNECTIONS_TABLE)
-    .select('id, context, connected_at, met_at, source, updated_at, tenant_id')
+    .select('id, context, connected_at, met_at, follow_up_at, source, updated_at, tenant_id')
     .eq('id', connectionId)
     .eq('owner_user_id', ownerUserId)
     .maybeSingle();
@@ -140,6 +143,7 @@ export async function executeReadConnectionMetadata(
       context: row.context ?? null,
       connectedAt: row.connected_at,
       metAt: row.met_at,
+      followUpAt: row.follow_up_at ?? null,
       source: row.source,
       updatedAt: row.updated_at,
     },
@@ -173,6 +177,11 @@ export async function executeUpdateConnectionMetadata(
   }
   if (parsed.data.metAt !== undefined) {
     connectionPatch.met_at = parsed.data.metAt;
+  }
+  if (parsed.data.followUpAt !== undefined) {
+    const followUp = coerceIsoDateTime(parsed.data.followUpAt);
+    if (!followUp.ok) return fail('INVALID_INPUT');
+    connectionPatch.follow_up_at = followUp.iso;
   }
 
   if (Object.keys(connectionPatch).length > 0) {

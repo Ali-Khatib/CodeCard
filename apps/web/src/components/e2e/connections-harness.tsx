@@ -45,6 +45,7 @@ export function ConnectionsHarness() {
     privateNote: null,
     context: null,
     connectedAtIso: '2026-07-17T00:00:00.000Z',
+    followUpAtIso: null,
   };
 
   return (

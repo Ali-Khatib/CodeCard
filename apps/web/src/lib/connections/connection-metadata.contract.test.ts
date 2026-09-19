@@ -67,6 +67,7 @@ describe('WS15-T006 private notes contract', () => {
     expect(actions).toContain('updateConnectionMetadataAction');
     expect(panel).toContain('Only you can see this information');
     expect(panel).toContain('Private note');
+    expect(panel).toContain('Follow up on');
     expect(panel).not.toContain('dangerouslySetInnerHTML');
     expect(exportBuild).toContain(".from('connection_notes')");
     expect(exportBuild).toContain('context');

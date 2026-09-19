@@ -5,10 +5,12 @@ import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
 import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
 import {
   DEMO_CONNECTIONS,
+  DEMO_OWNER_EVENTS,
   DEMO_PROFILE_LINKS,
   DEMO_SUGGESTED_STEP,
   DEMO_WORKSPACE,
 } from '@/lib/dashboard/workspace-demo';
+import { followUpsToHomeItems } from '@/lib/dashboard/connections-summary';
 import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
 import { overviewCircleWorksFromDemoFeed } from '@/lib/dashboard/overview-circle-works';
 import {
@@ -252,6 +254,8 @@ export function EditorialProductFrame({
                 href: `${LIVE_DEMO_WORKSPACE_HREF}/projects`,
               }}
               basePath={LIVE_DEMO_WORKSPACE_HREF}
+              events={DEMO_OWNER_EVENTS}
+              followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}
             />
           ) : null}
           {state === 'projects' ? (

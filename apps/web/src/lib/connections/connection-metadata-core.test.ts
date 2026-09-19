@@ -19,6 +19,7 @@ function createMock(options: {
     context: string | null;
     connected_at: string | null;
     met_at: string | null;
+    follow_up_at: string | null;
     source: string;
     updated_at: string;
     tenant_id: string;
@@ -136,6 +137,7 @@ describe('connection metadata core', () => {
         context: null,
         connected_at: '2026-07-01T00:00:00.000Z',
         met_at: null,
+        follow_up_at: null,
         source: 'manual',
         updated_at: '2026-07-01T00:00:00.000Z',
         tenant_id: TENANT,
@@ -173,6 +175,7 @@ describe('connection metadata core', () => {
         context: 'Intro',
         connected_at: null,
         met_at: null,
+        follow_up_at: null,
         source: 'manual',
         updated_at: '2026-07-01T00:00:00.000Z',
         tenant_id: TENANT,
@@ -197,6 +200,7 @@ describe('connection metadata core', () => {
         context: null,
         connected_at: null,
         met_at: null,
+        follow_up_at: null,
         source: 'manual',
         updated_at: '2026-07-01T00:00:00.000Z',
         tenant_id: TENANT,
@@ -226,6 +230,7 @@ describe('connection metadata core', () => {
         context: 'secret',
         connected_at: null,
         met_at: null,
+        follow_up_at: null,
         source: 'manual',
         updated_at: '2026-07-01T00:00:00.000Z',
         tenant_id: TENANT,

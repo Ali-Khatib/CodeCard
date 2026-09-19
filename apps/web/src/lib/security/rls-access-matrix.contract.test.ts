@@ -49,6 +49,7 @@ export const RLS_APPLICATION_TABLES = [
   'jobs',
   'account_deletion_operations',
   'waitlist_signups',
+  'owner_events',
 ] as const;
 
 /** Owner-private tables: no anonymous SELECT policies. */
@@ -61,6 +62,7 @@ const OWNER_PRIVATE_TABLES = [
   'subscription_customers',
   'subscriptions',
   'project_orderings',
+  'owner_events',
 ] as const;
 
 /** Tables with no client policies (service-role / revoked grants). */

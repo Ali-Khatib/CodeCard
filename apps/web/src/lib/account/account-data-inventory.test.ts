@@ -30,6 +30,7 @@ describe('WS10-T001 account data inventory', () => {
     ]) {
       expect(doc).toContain(table);
     }
+    expect(doc).toContain('owner_events');
     expect(doc).toContain('avatars');
     expect(doc).toContain('project-media');
     expect(doc).toContain('private-docs');

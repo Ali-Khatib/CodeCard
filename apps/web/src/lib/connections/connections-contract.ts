@@ -48,6 +48,7 @@ export type OwnerConnectionListItem = {
   createdAt: string;
   source: string;
   context: string | null;
+  followUpAt: string | null;
   privateNote: string | null;
   target: SafePublicConnectionTarget;
 };

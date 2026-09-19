@@ -16,6 +16,7 @@ export const LIMITS = {
   projects: { max: 50 },
   collections: { max: 50 },
   savedConnections: { max: 500 },
+  ownerEvents: { max: 100, title: 120, location: 200, notes: 2000 },
 } as const;
 
 export const FILE_LIMITS = {

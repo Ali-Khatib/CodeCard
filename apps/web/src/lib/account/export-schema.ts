@@ -217,6 +217,7 @@ const additionalAccountDataSchema = z
           saved_profile_id: z.string().uuid(),
           connected_at: isoTimestamp.nullable(),
           met_at: isoTimestamp.nullable(),
+          follow_up_at: isoTimestamp.nullable().optional(),
           source: z.string(),
           context: z.string().nullable().optional(),
           created_at: isoTimestamp,
@@ -299,6 +300,20 @@ const additionalAccountDataSchema = z
       })
       .strict()
       .nullable(),
+    owner_events: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          title: z.string(),
+          location: z.string().nullable(),
+          starts_at: isoTimestamp,
+          ends_at: isoTimestamp.nullable(),
+          notes: z.string().nullable(),
+          created_at: isoTimestamp,
+          updated_at: isoTimestamp,
+        })
+        .strict(),
+    ),
   })
   .strict();
 

@@ -50,5 +50,7 @@ export const EMPTY_STATE_COPY = {
     noCircleConnections:
       'Save people from in-person QR scans — then their public work appears here.',
     circleWorksError: 'Circle highlights could not be loaded. Open Circle to try again.',
+    noEvents: 'No upcoming events yet. Add a conference, meetup, or coffee so it is on your calendar.',
+    noFollowUps: 'Set a follow-up date on a Connection. Due reminders show up here.',
   },
 } as const;

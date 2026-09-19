@@ -74,6 +74,7 @@ export async function buildAccountExportDocument(
     moderation_reports: [],
     circle_activity: [],
     circle_viewer_state: null,
+    owner_events: [],
   };
 
   if (!profile) {
@@ -469,11 +470,11 @@ async function loadAdditionalOwnerData(
   | { ok: true; data: AccountExportDocument['additional_account_data'] }
   | { ok: false; error: 'query_failed' }
 > {
-  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes, viewerStateRes] =
+  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes, viewerStateRes, eventsRes] =
     await Promise.all([
       supabase
         .from('saved_connections')
-        .select('id, saved_profile_id, connected_at, met_at, source, context, created_at, updated_at')
+        .select('id, saved_profile_id, connected_at, met_at, follow_up_at, source, context, created_at, updated_at')
         .eq('owner_user_id', ownerUserId)
         .order('created_at', { ascending: true }),
       supabase
@@ -510,6 +511,11 @@ async function loadAdditionalOwnerData(
         .select('last_seen_at')
         .eq('viewer_user_id', ownerUserId)
         .maybeSingle(),
+      supabase
+        .from('owner_events')
+        .select('id, title, location, starts_at, ends_at, notes, created_at, updated_at')
+        .eq('owner_user_id', ownerUserId)
+        .order('starts_at', { ascending: true }),
     ]);
 
   if (
@@ -519,7 +525,8 @@ async function loadAdditionalOwnerData(
     subscriptionRes.error ||
     reportsRes.error ||
     circleRes.error ||
-    viewerStateRes.error
+    viewerStateRes.error ||
+    eventsRes.error
   ) {
     return { ok: false, error: 'query_failed' };
   }
@@ -562,6 +569,7 @@ async function loadAdditionalOwnerData(
         saved_profile_id: row.saved_profile_id,
         connected_at: toUtcIso(row.connected_at),
         met_at: toUtcIso(row.met_at),
+        follow_up_at: toUtcIso((row as { follow_up_at?: string | null }).follow_up_at),
         source: row.source,
         context: (row as { context?: string | null }).context ?? null,
         created_at: requireIso(row.created_at, generatedAt),
@@ -609,6 +617,16 @@ async function loadAdditionalOwnerData(
         viewerStateRes.data && !Array.isArray(viewerStateRes.data)
           ? { last_seen_at: toUtcIso((viewerStateRes.data as { last_seen_at?: string | null }).last_seen_at) }
           : null,
+      owner_events: (eventsRes.data ?? []).map((row) => ({
+        id: row.id,
+        title: row.title,
+        location: row.location ?? null,
+        starts_at: requireIso(row.starts_at, generatedAt),
+        ends_at: toUtcIso(row.ends_at),
+        notes: row.notes ?? null,
+        created_at: requireIso(row.created_at, generatedAt),
+        updated_at: requireIso(row.updated_at, generatedAt),
+      })),
     },
   };
 }
