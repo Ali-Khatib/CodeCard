@@ -18,7 +18,9 @@ describe('Editorial product landing contract', () => {
     expect(hero).toContain('data-hero-statement');
     expect(hero).toContain('YOUR WORK.');
     expect(hero).toContain('ONE IDENTITY.');
-    expect(hero).toContain('scan your QR.');
+    expect(hero).toContain('Where your work meets your people.');
+    expect(hero).toContain('introductions into connections.');
+    expect(hero).not.toContain('scan your QR.');
     expect(hero).not.toContain('YOUR PHONE.');
     expect(hero).not.toContain('Hand them your phone.');
     expect(hero).toContain('cc-ed__lead');
@@ -196,6 +198,7 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('data-statement-word');
     expect(scene).toContain(' / 03');
     expect(scene).toContain('Impress in the room.');
+    expect(scene).toContain('scan your QR.');
     expect(scene).toContain('Keep the people you met.');
     expect(scene).toContain('Follow up so you do not lose them.');
     expect(scene).toContain('cc-ed-hero-scene__statement-body');

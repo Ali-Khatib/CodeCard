@@ -384,7 +384,7 @@ export function DashboardShell({
             <ThemeToggle />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
-          {preview ? (
+          {(preview || isDemoWorkspacePath(basePath)) && !embedded ? (
             <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
               ← Back to landing
             </AppButton>

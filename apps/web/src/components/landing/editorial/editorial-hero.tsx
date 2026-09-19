@@ -37,10 +37,8 @@ export function EditorialHero() {
               as one living technical identity. Stay connected. Follow through.
             </p>
             <p className="cc-ed__connect-principle">
-              <strong>Meet. Show. Understand. Connect. Follow up.</strong> They
-              scan your QR. Your CodeCard opens in their browser. They get the
-              work while you are still talking. They do not need the app just to
-              look. If they skip the scan, they can see it on your screen.
+              <strong>Where your work meets your people.</strong> Turn
+              introductions into connections.
             </p>
           </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">

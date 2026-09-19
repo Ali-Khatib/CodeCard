@@ -46,9 +46,15 @@ describe('landing positioning copy', () => {
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
     expect(hero).toContain('ONE IDENTITY.');
     expect(hero).toContain('one living');
-    expect(hero).toContain('scan your QR.');
+    expect(hero).toContain('Where your work meets your people.');
+    expect(hero).toContain('introductions into connections.');
+    expect(hero).not.toContain('scan your QR.');
     expect(hero).not.toContain('Hand them your phone.');
     expect(hero).not.toContain('YOUR PHONE.');
+    const scene = read(
+      'src/components/landing/editorial/editorial-hero-scene.tsx',
+    );
+    expect(scene).toContain('scan your QR.');
     const walk = read(
       'src/components/landing/editorial/editorial-feature-walkthrough.tsx',
     );

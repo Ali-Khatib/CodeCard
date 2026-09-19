@@ -70,8 +70,9 @@ describe('Phase 1 web app IA freeze', () => {
       shell.indexOf('cc-app-sidebar__foot'),
       shell.indexOf('cc-app-main'),
     );
-    expect(foot).toContain('{preview ? (');
+    expect(foot).toContain('isDemoWorkspacePath(basePath)');
     expect(foot).toContain('Back to landing');
     expect(foot).toContain(') : null}');
+    expect(foot).not.toContain('{preview ? (');
   });
 });

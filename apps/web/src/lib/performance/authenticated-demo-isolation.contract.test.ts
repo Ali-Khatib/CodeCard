@@ -47,6 +47,13 @@ describe('authenticated dashboard isolation from Alex Chen demo', () => {
     );
     expect(shell).toContain('isDemoWorkspacePath(basePath) && !embedded');
     expect(shell).toContain('cc-app-demo-back-to-landing');
+    const css = readFileSync(
+      resolve(WEB, 'src/styles/codecard-app-system.css'),
+      'utf8',
+    );
+    expect(css).toContain(
+      '.cc-app-root:not(.cc-app-root--sidebar-collapsed) .cc-app-demo-back-to-landing',
+    );
     expect(dashboard).not.toContain('cc-app-demo-back-to-landing');
     expect(dashboard).not.toContain('LIVE_DEMO_WORKSPACE_HREF');
   });

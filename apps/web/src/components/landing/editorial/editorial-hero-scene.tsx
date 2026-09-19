@@ -66,7 +66,7 @@ const STATEMENT_BEATS = [
     title: 'Impress in the room.',
     lead: 'Impress in the room.',
     sub: 'They get the work. They leave impressed.',
-    lede: 'Projects and research, presented so the person in front of you understands what you built and why it matters.',
+    lede: 'They scan your QR. Your CodeCard opens in their browser. They get the work while you are still talking. They do not need the app just to look. If they skip the scan, they can see it on your screen.',
   },
   {
     id: 'shift',
