@@ -16,11 +16,12 @@ export function EditorialFinalCta() {
           id="editorial-finale-heading"
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
-          <span className="cc-ed__lead">YOUR WORK. YOUR IDENTITY.</span>
-          <span className="cc-ed__sub">YOUR CONNECTIONS.</span>
+          <span className="cc-ed__lead">MAKE THE NEXT CONVERSATION</span>
+          <span className="cc-ed__sub">EASIER.</span>
         </h2>
         <p className="cc-ed__lede mt-3">
-          Keep your work, identity, and valuable connections with you.
+          Create a CodeCard you can share in the moment, then use to keep the
+          relationship organized afterward.
         </p>
         <div className="cc-ed__actions mt-6">
           <Link
@@ -28,10 +29,10 @@ export function EditorialFinalCta() {
             className="cc-ed__btn-primary cc-instant-press"
             data-testid="finale-primary-cta"
           >
-            Create Your CodeCard
+            Create your CodeCard
           </Link>
           <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
-            Open Live Demo
+            View live demo
           </LiveDemoLink>
         </div>
       </div>

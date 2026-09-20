@@ -21,8 +21,8 @@ test.describe('Landing page', () => {
     const headline = page.getByRole('heading', { level: 1 });
     await expect(headline).toBeVisible();
     /* Accessible name spans the visible lead plus the sr-only second line. */
-    await expect(headline).toContainText(/YOUR WORK\./);
-    await expect(headline).toContainText(/ONE IDENTITY\./);
+    await expect(headline).toContainText(/SHARE YOUR WORK\./);
+    await expect(headline).toContainText(/KEEP THE CONNECTION\./);
 
     await expect(page.getByTestId('editorial-research-proof')).toBeAttached();
     await expect(page.locator('#build-yours')).toBeAttached();
@@ -31,7 +31,7 @@ test.describe('Landing page', () => {
   test('hero CTAs point at sign-up and the demo', async ({ page }) => {
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
     await expect(
-      page.getByRole('link', { name: /Open Live Demo/i }).first(),
+      page.getByRole('link', { name: /View live demo/i }).first(),
     ).toHaveAttribute('href', /\/demo\/?$/);
   });
 

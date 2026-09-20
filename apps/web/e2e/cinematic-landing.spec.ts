@@ -5,8 +5,8 @@ test.describe('Editorial product landing', () => {
     const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(response?.ok()).toBeTruthy();
     const html = await page.content();
-    expect(html).toContain('YOUR WORK.');
-    expect(html).toContain('ONE IDENTITY.');
+    expect(html).toContain('SHARE YOUR WORK.');
+    expect(html).toContain('KEEP THE CONNECTION.');
     expect(html).not.toMatch(/View Public Profile/i);
     await expect(page.locator('[data-hero-statement]').first()).toBeVisible();
     await expect(page.getByTestId('hero-primary-cta')).toHaveAttribute('href', '/sign-up');
@@ -16,8 +16,12 @@ test.describe('Editorial product landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/YOUR WORK\. YOUR IDENTITY\./i).first()).toBeVisible();
-    await expect(page.getByText(/YOUR CONNECTIONS\./i).first()).toBeVisible();
+    await expect(page.getByText(/AROUND THE INTRODUCTION\./i).first()).toBeVisible();
+    await expect(page.getByText(/NOT A REPLACEMENT FEED\./i).first()).toBeVisible();
+    await expect(page.getByTestId('editorial-comparison')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Built for a different moment/i }),
+    ).toBeVisible();
     /* Walkthrough chapter rail — copy churns, the product surfaces do not. */
     for (const chapter of ['Projects', 'Research', 'Circle', 'Analytics', 'Events']) {
       await expect(page.getByText(chapter, { exact: false }).first()).toBeVisible();
@@ -34,7 +38,7 @@ test.describe('Editorial product landing', () => {
     await page.goto('/#build-yours', { waitUntil: 'domcontentloaded' });
     const closing = page.locator('#build-yours');
     await expect(closing).toBeVisible({ timeout: 20000 });
-    await expect(closing.locator('a').filter({ hasText: /Open Live Demo/i }).first()).toHaveAttribute(
+    await expect(closing.locator('a').filter({ hasText: /View live demo/i }).first()).toHaveAttribute(
       'href',
       /\/demo\/?$/,
     );

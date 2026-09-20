@@ -57,24 +57,24 @@ let heroIntroPlayed = false;
 const STATEMENT_BEATS = [
   {
     id: 'problem',
-    title: 'Impress in the room.',
-    lead: 'Impress in the room.',
-    sub: 'They get the work. They leave impressed.',
-    lede: 'They scan your QR. Your CodeCard opens in their browser. They get the work while you are still talking. They do not need the app just to look. If they skip the scan, they can see it on your screen.',
+    title: 'Present the work.',
+    lead: 'Present the work.',
+    sub: 'Phone or QR. The profile opens in a browser.',
+    lede: 'Open your CodeCard on your phone or share your QR code. Visitors can open the profile immediately in their browser. They do not need the app just to look. If they skip the scan, they can see it on your screen.',
   },
   {
     id: 'shift',
-    title: 'Keep the people you met.',
-    lead: 'Keep the people you met.',
-    sub: 'Face to face. Not a pointless add.',
-    lede: 'The connection starts in the room. Then you hold the chance to work together, not a feed of strangers.',
+    title: 'Save the people you meet.',
+    lead: 'Save the people you meet.',
+    sub: 'From the same interaction, if you both want it.',
+    lede: 'When you decide to stay in touch, save the connection directly from the interaction instead of hunting for a username later.',
   },
   {
     id: 'identity',
-    title: 'Follow up so you do not lose them.',
-    lead: 'Follow up.',
-    sub: 'So the meeting becomes something.',
-    lede: 'Notes, events, Circle, and a next step. Foster what comes after you impress each other.',
+    title: 'Keep the context attached.',
+    lead: 'Keep the context attached.',
+    sub: 'Date, place, note, next step.',
+    lede: 'Record when and where you met, add a note, and schedule the next step while the context is still fresh.',
   },
 ] as const;
 
@@ -620,7 +620,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                   className="cc-ed-hero-scene__statement-tag-mark"
                   aria-hidden
                 />
-                What this is
+                How it works
               </p>
               <p
                 className="cc-ed-hero-scene__statement-pager"

@@ -46,11 +46,10 @@ export function PricingLandingPage() {
         <ScrollReveal>
           <SectionCounter index="01" label="Pricing" />
           <h1 className={`mt-6 ${TYPE.sectionHeading} mx-auto max-w-[20ch] text-balance text-phosphor`}>
-            Create fast. <span className="cc-text-reactor">Upgrade</span> when it matters.
+            Start with the essentials. <span className="cc-text-reactor">Upgrade</span> when you need more room, control, and insight.
           </h1>
           <p className="mx-auto mt-8 max-w-[600px] text-[18px] leading-[1.56] text-lichen">
-            Free helps you launch and share a CodeCard in minutes. Pro helps you look more professional,
-            track more deeply, and customize more.
+            Free covers creating and sharing a CodeCard. Pro adds capacity, customization, and analytics.
           </p>
 
           <div className="mt-10 inline-flex rounded-full border border-border/50 bg-midnight p-1 shadow-rim">
@@ -99,7 +98,11 @@ export function PricingLandingPage() {
                     <p className="cc-tag-dot text-[12px] font-medium uppercase tracking-[0.1em] text-graphite">
                       {plan.name}
                     </p>
-                    <p className="mt-3 text-[15px] leading-snug text-lichen">{plan.tagline}</p>
+                    <p className="mt-3 text-[15px] leading-snug text-lichen">
+                      {plan.id === 'free'
+                        ? 'Everything you need to create and share a CodeCard.'
+                        : 'More capacity, customization, and analytics.'}
+                    </p>
                     <p className="mt-6 font-display text-[48px] font-medium leading-none tracking-[-0.3px] text-phosphor md:text-[56px]">
                       ${price}
                       {suffix && <span className="text-[16px] font-normal text-graphite">{suffix}</span>}
@@ -166,7 +169,7 @@ export function PricingLandingPage() {
               Ready when you <span className="cc-text-reactor">are.</span>
             </h2>
             <p className="mt-6 text-[18px] text-lichen">
-              Free to launch. Pro when you want to take it seriously.
+              Start with the essentials. Pro when you need more room, control, and insight.
             </p>
             <div className="mt-10 flex justify-center">
               <MorphSignupCta layoutId="pricing-final-cta" />

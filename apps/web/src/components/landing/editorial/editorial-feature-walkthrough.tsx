@@ -11,6 +11,7 @@ import {
   gsap,
 } from '@/components/motion/gsap-runtime';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { EditorialComparison } from './editorial-comparison';
 
 const U = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=75`;
@@ -28,72 +29,72 @@ const STORIES: WalkStory[] = [
   {
     id: 'projects',
     label: 'Projects',
-    headline: 'SHOW WHAT YOU BUILD.',
-    lead: 'A visual, structured showcase. What it is, how it works, the stack, the outcome.',
+    headline: 'PRESENT THE WORK.',
+    lead: 'Enough context to understand the problem, the implementation, and the result. Not just a title and a technology list.',
     points: [
-      'Images, presentations, demos, descriptions, and results, ready to open.',
-      'One of the quickest ways to put actual work in front of someone.',
-      'Open it on your phone. They can go as deep as they want while you talk.',
+      'Images, demos, presentations, and supporting material where they add evidence.',
+      'Make the relationship between the project, your skills, and the outcome easy to read.',
+      'Open the profile while you talk. Visitors can go as deep as they want.',
     ],
     background: U('photo-1461749280684-dccba630e2f6'),
   },
   {
     id: 'research',
     label: 'Research',
-    headline: 'PRESENT THE RESEARCH.',
-    lead: 'Papers and findings sit next to the projects that support them. Presented, not dumped.',
+    headline: 'KEEP PAPERS CLOSE.',
+    lead: 'Present papers, experiments, findings, and related projects as part of the same professional profile.',
     points: [
-      'Figures, methods, and related builds in a form people can actually explore.',
-      'Research should feel understandable, not like a folder of PDFs.',
-      'The same living profile holds what you build and what you study.',
+      'Make publications accessible without burying them behind external links.',
+      'Surface the result instead of forcing visitors to decode a citation list.',
+      'Connect research to the projects, methods, and technical work around it.',
     ],
     background: U('photo-1497633762265-9d179a990aa6'),
   },
   {
     id: 'connections',
     label: 'Connections',
-    headline: 'THE LIGHTEST CARD HOLDER.',
-    lead: 'For the valuable people you actually meet. The physical interaction is the connection.',
+    headline: 'CONTEXT, NOT JUST A NAME.',
+    lead: 'A name in a contact list tells you who someone is. CodeCard lets you remember why you met.',
     points: [
-      'When you met, where you met, what you talked about, and what comes next.',
-      'No username search. No digital invite hunt. The handshake is intentional.',
-      'Schedule a follow up after you impress each other.',
+      'Record when the introduction happened, and keep the event or place attached.',
+      'Write down what was discussed while you still remember it.',
+      'Schedule the next interaction instead of leaving it to memory.',
     ],
     background: U('photo-1515169067868-5387ec356754'),
   },
   {
     id: 'events',
     label: 'Events',
-    headline: 'PLACES YOU PLAN TO BE.',
-    lead: 'Keep upcoming events, then attach the people you meet there to that day.',
+    headline: 'KEEP THE EVENT ATTACHED.',
+    lead: 'Keep conferences, meetups, fairs, and other events connected to the people you meet there.',
     points: [
-      'Meetups, fairs, and conferences in one calendar.',
-      'Attend, connect in person, and keep the room attached to the relationship.',
-      'Events, connections, and follow ups belong to the same workflow.',
+      'Keep the events on your calendar visible from the same workspace.',
+      'See which people came from which event.',
+      'Move from introduction to next step without losing the original context.',
     ],
     background: U('photo-1505373877841-8d25f7d46678'),
   },
   {
     id: 'circle',
     label: 'Circle',
-    headline: 'YOUR LIVING NETWORK.',
-    lead: 'Stay with the people you have actually connected with. See what they are working on and shipping.',
+    headline: 'A PRIVATE CIRCLE.',
+    lead: 'Circle is where your CodeCard connections live. There is no public feed or follower count.',
     points: [
-      'The network starts with real relationships, not a follower graph.',
-      'Their latest work, because you chose each other.',
-      'Quiet, chosen, and built for staying connected, not farming engagement.',
+      'People you have actually connected with, and their work.',
+      'Your notes and interaction history, kept with you.',
+      'The next step, still attached to how you met.',
     ],
     background: U('photo-1600880292203-757bb62b4baf'),
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    headline: 'A LIVING PROFILE.',
-    lead: 'See how people interact with your identity and your work.',
+    headline: 'WHAT PEOPLE OPEN.',
+    lead: 'See how visitors interact with your CodeCard and which parts of your work attract attention.',
     points: [
-      'Profile views, project opens, research activity, and QR scans.',
-      'Know which work they lingered on after the meeting.',
-      'This is not a static page. It is a living technical identity.',
+      'Profile views, QR scans, project opens, and research activity.',
+      'Returning visitors, labeled as such.',
+      'Use the numbers to see what people actually explore.',
     ],
     background: U('photo-1514565131-fce0801e5785'),
   },
@@ -184,15 +185,17 @@ export function EditorialFeatureWalkthrough() {
       <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">What CodeCard is</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">YOUR WORK. YOUR IDENTITY.</span>
-          <span className="cc-ed__sub">YOUR CONNECTIONS.</span>
+          <span className="cc-ed__lead">AROUND THE INTRODUCTION.</span>
+          <span className="cc-ed__sub">NOT A REPLACEMENT FEED.</span>
         </h2>
         <p className="cc-ed__lede mx-auto mt-5">
-          One system around a living technical identity. Build it. Show the work.
-          Meet people. Connect in person. Remember the context. Stay connected.
-          Follow up.
+          CodeCard sits next to GitHub and LinkedIn. It does not host your
+          repositories or run a social feed. It is what you open when someone
+          asks what you do, then what you use to keep the meeting organized.
         </p>
       </div>
+
+      <EditorialComparison />
 
       <div className="cc-ed-walk__bridge cc-ed-walk__bridge--in" aria-hidden />
 
@@ -215,7 +218,7 @@ export function EditorialFeatureWalkthrough() {
           header={
             <>
               <span className="fx-header-kicker">Crash course</span>
-              <span>Identity. Work. Connections.</span>
+              <span>Projects. Research. Circle.</span>
             </>
           }
           ariaLabel="CodeCard feature walkthrough"

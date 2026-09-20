@@ -134,8 +134,8 @@ export function EditorialWaitlist() {
               </h2>
               <p className="cc-ed-waitlist__lede">
                 {result.status === 'already'
-                  ? "You're already on the list. We'll let you know when CodeCard is ready."
-                  : "We'll let you know when CodeCard is ready."}
+                  ? "You're already on the list. We'll send product notes."
+                  : "You're on the list. We'll send product notes."}
               </p>
             </motion.div>
           ) : (
@@ -152,11 +152,11 @@ export function EditorialWaitlist() {
                 id="editorial-waitlist-heading"
                 className="cc-ed-waitlist__title"
               >
-                <span className="cc-ed-waitlist__lead">GET EARLY</span>
-                <span className="cc-ed-waitlist__accent">ACCESS</span>
+                <span className="cc-ed-waitlist__lead">GET PRODUCT</span>
+                <span className="cc-ed-waitlist__accent">NOTES</span>
               </h2>
               <p id={hintId} className="cc-ed-waitlist__lede">
-                Be the first to know when CodeCard is ready.
+                Leave an email if you want occasional notes about what we ship.
               </p>
               <form
                 className="cc-ed-waitlist__form"

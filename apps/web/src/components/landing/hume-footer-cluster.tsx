@@ -65,8 +65,8 @@ export function HumeFooterCluster() {
               id="footer-statement-heading"
               className="cc-site-footer__display"
             >
-              <span>Your work. Your identity.</span>
-              <span>Your connections.</span>
+              <span>Share your work.</span>
+              <span>Keep the connection.</span>
             </h2>
           </div>
         </div>
@@ -121,10 +121,10 @@ export function HumeFooterCluster() {
                 href="/sign-up"
                 className="cc-site-footer__btn cc-instant-press"
               >
-                Create Your CodeCard
+                Create your CodeCard
               </Link>
               <LiveDemoLink className="cc-site-footer__btn-ghost cc-instant-press">
-                Open Live Demo
+                View live demo
               </LiveDemoLink>
             </div>
           </div>
@@ -169,7 +169,7 @@ export function HumeFooterCluster() {
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
             <p className="cc-site-footer__meta-note">
-              A living technical identity for the real world.
+              A professional profile for real-world introductions.
             </p>
           </div>
         </div>

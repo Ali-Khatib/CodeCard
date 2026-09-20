@@ -25,20 +25,21 @@ export function EditorialHero() {
             className="cc-ed__display cc-ed__display--xl mt-4"
             data-hero-statement
           >
-            <span className="cc-ed__lead">YOUR WORK.</span>
-            <span className="sr-only">ONE IDENTITY.</span>
+            <span className="cc-ed__lead">SHARE YOUR WORK.</span>
+            <span className="sr-only">KEEP THE CONNECTION.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
         </div>
         <div className="cc-ed-hero__baseline">
           <div className="cc-ed-hero__baseline-copy">
             <p className="cc-ed__lede">
-              Your work, your research, and the people you actually meet, held
-              as one living technical identity. Stay connected. Follow through.
+              A professional profile built for real-world introductions. Show
+              projects and research from your phone, then keep the people you
+              meet with the context to follow up.
             </p>
             <p className="cc-ed__connect-principle">
-              <strong>Where your work meets your people.</strong> Turn
-              introductions into connections.
+              <strong>Phone or QR, then a browser.</strong> Visitors do not
+              need the app just to look.
             </p>
           </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">
@@ -47,10 +48,10 @@ export function EditorialHero() {
               className="cc-ed__btn-primary cc-instant-press"
               data-testid="hero-primary-cta"
             >
-              Create Your CodeCard
+              Create your CodeCard
             </Link>
             <LiveDemoLink className="cc-ed__btn-ghost cc-instant-press">
-              Open Live Demo
+              View live demo
             </LiveDemoLink>
           </div>
         </div>

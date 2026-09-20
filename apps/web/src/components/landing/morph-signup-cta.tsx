@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export function MorphSignupCta({
   layoutId = 'landing-signup-cta',
-  label = 'Start free — under 5 minutes',
+  label = 'Start free, under 5 minutes',
 }: {
   layoutId?: string;
   label?: string;

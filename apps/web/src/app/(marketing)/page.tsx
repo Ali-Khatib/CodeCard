@@ -3,9 +3,9 @@ import { ProductPage } from '@/components/landing/product-page';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/',
-  title: 'CodeCard | Your work. Your identity. Your connections.',
+  title: 'CodeCard | Share your work. Keep the connection.',
   description:
-    'A living technical identity for the real world. Show what you build and research. Connect with people you actually meet. Remember the context. Follow up.',
+    'A professional profile for real-world introductions. Show projects and research from your phone, then keep the people you meet with the context to follow up.',
   absoluteTitle: true,
 });
 

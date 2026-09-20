@@ -1801,6 +1801,209 @@ html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-bt
   overflow: hidden;
 }
 
+/* —— Category comparison (docs table, cream chapter) —— */
+.cc-ed-compare {
+  max-width: min(72rem, 100%);
+  margin: 0 auto;
+  padding-inline: clamp(1.1rem, 3.5vw, 2.75rem);
+  padding-bottom: clamp(2.25rem, 6vh, 3.75rem);
+  color: var(--ed-ink, #232324);
+}
+
+.cc-ed-compare__intro {
+  max-width: 38rem;
+  margin: 0 auto 1.75rem;
+  text-align: center;
+}
+
+.cc-ed-compare .cc-ed__eyebrow {
+  color: color-mix(in srgb, var(--ed-ink, #232324) 52%, transparent);
+}
+
+.cc-ed-compare__heading {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.85rem, 3.2vw + 0.6rem, 3.15rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--ed-ink, #232324);
+  text-wrap: pretty;
+}
+
+.cc-ed-compare__sub {
+  margin: 1rem auto 0;
+  max-width: 34rem;
+  font-size: clamp(1rem, 0.25vw + 0.95rem, 1.125rem);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 78%, transparent);
+  text-wrap: pretty;
+}
+
+.cc-ed-compare__frame {
+  border: 1px solid var(--ed-border);
+  border-radius: var(--ed-radius);
+  background: var(--ed-paper, #ffffff);
+  overflow: hidden;
+}
+
+.cc-ed-compare__scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.cc-ed-compare__table {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ed-ink, #232324);
+}
+
+.cc-ed-compare__table caption {
+  text-align: left;
+}
+
+.cc-ed-compare__table th,
+.cc-ed-compare__table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--ed-border);
+  vertical-align: middle;
+}
+
+.cc-ed-compare__table thead th {
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 62%, transparent);
+  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 70%, var(--ed-paper, #ffffff));
+  padding-top: 0.95rem;
+  padding-bottom: 0.95rem;
+}
+
+.cc-ed-compare__capability-h,
+.cc-ed-compare__table tbody th {
+  width: 22%;
+  text-align: left;
+}
+
+.cc-ed-compare__product-h:nth-child(2),
+.cc-ed-compare__detail {
+  width: 30%;
+}
+
+.cc-ed-compare__product-h,
+.cc-ed-compare__flag,
+.cc-ed-compare__row--purpose td {
+  width: 16%;
+  text-align: center;
+}
+
+.cc-ed-compare__detail,
+.cc-ed-compare__row--purpose td:nth-child(2) {
+  text-align: left;
+}
+
+.cc-ed-compare__table tbody th {
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  background: var(--ed-paper, #ffffff);
+}
+
+.cc-ed-compare__table tbody td {
+  background: var(--ed-paper, #ffffff);
+}
+
+.cc-ed-compare__capability-h,
+.cc-ed-compare__table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: 1px 0 0 var(--ed-border);
+}
+
+.cc-ed-compare__capability-h {
+  z-index: 2;
+}
+
+.cc-ed-compare__row--purpose th,
+.cc-ed-compare__row--purpose td {
+  background: color-mix(in srgb, var(--ed-cream, #fcf1e7) 55%, var(--ed-paper, #ffffff));
+  padding-top: 1.15rem;
+  padding-bottom: 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 450;
+  letter-spacing: -0.012em;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 88%, transparent);
+}
+
+.cc-ed-compare__row--purpose th {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.cc-ed-compare__row--purpose td {
+  text-align: left;
+  line-height: 1.45;
+}
+
+.cc-ed-compare__detail {
+  font-size: 0.875rem;
+  font-weight: 450;
+  letter-spacing: -0.012em;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 88%, transparent);
+}
+
+.cc-ed-compare__mark {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 450;
+  line-height: 1;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 72%, transparent);
+}
+
+.cc-ed-compare__table tbody tr:last-child th,
+.cc-ed-compare__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cc-ed-compare__note {
+  margin: 1.15rem auto 0;
+  max-width: 40rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--ed-ink, #232324) 68%, transparent);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+@media (max-width: 639px) {
+  .cc-ed-compare__table {
+    min-width: 48rem;
+    font-size: 0.9rem;
+  }
+
+  .cc-ed-compare__table th,
+  .cc-ed-compare__table td {
+    padding: 0.8rem 0.85rem;
+  }
+
+  .cc-ed-compare__capability-h,
+  .cc-ed-compare__table tbody th {
+    width: 11.5rem;
+    min-width: 11.5rem;
+  }
+}
+
 /* Continuous color wash — no hard cream / charcoal seam */
 .cc-ed-walk__bridge {
   width: 100%;

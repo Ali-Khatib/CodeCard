@@ -1,24 +1,23 @@
-export const CODECARD_TAGLINE =
-  'Your work. Your identity. Your connections.';
+export const CODECARD_TAGLINE = 'Share your work. Keep the connection.';
 
-export const CODECARD_HEADLINE_LEAD = 'Your work. Your identity.';
-export const CODECARD_HEADLINE_ACCENT = 'Your connections.';
+export const CODECARD_HEADLINE_LEAD = 'Share your work.';
+export const CODECARD_HEADLINE_ACCENT = 'Keep the connection.';
 
 export const CODECARD_HEADLINE = `${CODECARD_HEADLINE_LEAD} ${CODECARD_HEADLINE_ACCENT}`;
 
 export const CODECARD_INTRO_HOOK =
-  'A living technical identity built for the real world.';
+  'A professional profile built for real-world introductions.';
 
 export const CODECARD_INTRO_PITCH =
-  'Showcase what you build and research. Meet people in person. Connect through a real interaction. Remember the context. Stay connected. Follow up.';
+  'Show projects and research from your phone, then keep the people you meet with the context to follow up.';
 
 export const CODECARD_INTRO_USE_CASES =
-  'Identity. Work. Connections. Context. Follow through. Network. Insights.';
+  'Projects. Research. Connections. Events. Circle. Analytics.';
 
 export const CODECARD_SUMMARY =
-  'CodeCard is a living technical identity. Show what you build and research. Keep the people you actually meet. Remember the context. Stay connected. Follow up.';
+  'Someone asks what you do. You open your CodeCard or they scan your QR code. The profile opens in their browser. If you stay in touch, you can record the date, location, note, event, and follow-up.';
 
-export const CODECARD_PILLARS = ['Identity', 'Work', 'Connections'] as const;
+export const CODECARD_PILLARS = ['Work', 'Introduction', 'Follow-up'] as const;
 
 export const CODECARD_WORKFLOW =
-  'Build your identity. Show your work. Meet people. Connect in person. Remember the interaction. Stay connected. Follow up.';
+  'Present the work. Save the connection. Follow up with the original context.';

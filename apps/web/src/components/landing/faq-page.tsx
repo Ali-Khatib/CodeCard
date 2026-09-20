@@ -36,7 +36,7 @@ function FaqAccordion() {
       <div className="cc-faq-list__inner">
         <p className="cc-faq-list__kicker">Common questions</p>
         <h2 id="faq-questions-heading" className="cc-faq-list__title">
-          What CodeCard is, and isn&apos;t.
+          How CodeCard works.
         </h2>
 
         <div>
@@ -136,16 +136,16 @@ export function FaqPage() {
           <>
             <div className="cc-faq-front__header">
               <span className="cc-faq-front__mark">CodeCard</span>
-              <span className="cc-faq-front__aside">Living technical identity</span>
+              <span className="cc-faq-front__aside">Product questions</span>
             </div>
-            <p className="cc-faq-front__eyebrow">A closer look at what CodeCard is</p>
+            <p className="cc-faq-front__eyebrow">How CodeCard works</p>
             <p className="cc-faq-front__support">Scroll through the letters to begin.</p>
             <span className="cc-faq-front__scroll">Scroll to enter</span>
           </>
         }
       >
         <div className="cc-faq-portal-copy">
-          <p>Straight answers on identity, work, and real world connections.</p>
+          <p>Clear answers about sharing your work, making connections, and using CodeCard alongside GitHub and LinkedIn.</p>
         </div>
       </GlyphPortal>
       <FaqAccordion />

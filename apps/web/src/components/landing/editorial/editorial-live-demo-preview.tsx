@@ -288,7 +288,7 @@ export function EditorialLiveDemoPreview() {
             data-testid="editorial-live-demo-invitation"
           >
             <p className="cc-ed-demo-preview__invitation-title">
-              EXPLORE THE FULL EXPERIENCE
+              OPEN THE FULL WORKSPACE
             </p>
             <div className="cc-ed-demo-preview__invitation-actions">
               <button
@@ -296,10 +296,10 @@ export function EditorialLiveDemoPreview() {
                 className="cc-ed-demo-preview__invitation-dismiss"
                 onClick={() => setDismissed(true)}
               >
-                Keep exploring
+                Stay in the preview
               </button>
               <LiveDemoLink className="cc-ed-demo-preview__invitation-cta cc-instant-press">
-                Open Live Demo →
+                View live demo
               </LiveDemoLink>
             </div>
           </div>

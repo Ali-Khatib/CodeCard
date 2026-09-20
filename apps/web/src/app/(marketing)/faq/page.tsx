@@ -5,7 +5,7 @@ export const metadata = buildIndexablePageMetadata({
   path: '/faq',
   title: 'FAQ',
   description:
-    'Answers about CodeCard: living technical identity, projects, research, real world connections, Circle, events, follow ups, and how it sits next to GitHub and LinkedIn.',
+    'Answers about sharing a CodeCard, making connections, and using it alongside GitHub and LinkedIn.',
 });
 
 export default function FaqRoute() {

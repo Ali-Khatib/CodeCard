@@ -5,63 +5,48 @@ export type LandingFaqItem = {
 
 export const LANDING_FAQ_ITEMS: LandingFaqItem[] = [
   {
-    question: "Isn't CodeCard just GitHub?",
+    question: 'Is CodeCard a replacement for GitHub?',
     answer:
-      'No. GitHub is built around code hosting and collaboration. CodeCard is built around your broader technical identity, a visual work showcase, real world connections, and the relationships that continue afterward.',
+      'No. CodeCard is not a replacement for GitHub. GitHub is where code is hosted and reviewed. CodeCard presents selected work when someone asks what you do.',
   },
   {
-    question: "Isn't CodeCard just LinkedIn?",
+    question: 'Is CodeCard a replacement for LinkedIn?',
     answer:
-      'No. LinkedIn is a professional networking platform. CodeCard is designed around showing your actual work and building connections through physical interactions rather than operating as a traditional professional social network.',
+      'No. CodeCard is not a replacement for LinkedIn. LinkedIn is a professional network and feed. CodeCard is for the introduction: open the profile, show the work, and record the meeting if you want a next step.',
   },
   {
-    question: 'Is CodeCard replacing GitHub or LinkedIn?',
+    question: 'Do visitors need the CodeCard app?',
     answer:
-      'No. CodeCard is a new product with a different purpose. It is not a replacement for either. Keep GitHub for hosting and collaborating on code. Keep LinkedIn for professional networking. CodeCard can sit next to the tools you already use.',
+      'No. They can scan your QR code and open your CodeCard directly in their browser. They do not need an account just to view it.',
   },
   {
-    question: 'What makes CodeCard different?',
+    question: 'Can someone open my CodeCard without installing anything?',
     answer:
-      'CodeCard connects your identity, projects, research, real world connections, networking context, follow ups, and network in one living technical profile.',
+      'Yes. A browser is enough. If they skip the scan, you can still open the profile on your phone while you talk.',
   },
   {
-    question: 'Does the other person need the CodeCard app?',
+    question: 'How does connecting with someone work?',
     answer:
-      'No. They can scan your QR code with their phone and open your CodeCard directly in their browser. They do not need the app just to view it.',
+      'When both people choose to stay in touch, CodeCard can record the introduction from that interaction instead of asking you to hunt for a username later.',
+  },
+  {
+    question: 'What information is saved when I make a connection?',
+    answer:
+      'You can keep when and where you met, a private note, event context, and a follow-up date. That record stays with you.',
   },
   {
     question: 'Can I show my CodeCard directly from my phone?',
     answer:
-      'Yes. Your phone can display your CodeCard and QR code while you are talking to someone. If they skip the scan, they can look at the work on your screen.',
-  },
-  {
-    question: 'What happens when I connect with someone?',
-    answer:
-      'You can record when and where you met, add private notes about the conversation, and schedule a follow up so the meeting can become something more.',
-  },
-  {
-    question: 'Can CodeCard help me remember events?',
-    answer:
-      'Yes. You can keep track of upcoming events and use them as part of your networking workflow. Attend, meet people, connect, keep the context, and follow up afterward.',
+      'Yes. Open the profile and QR from your phone. Visitors can scan, or they can look at the work on your screen.',
   },
   {
     question: 'Is CodeCard a social network?',
     answer:
-      'No. CodeCard is not built around likes, comments, follower counts, or engagement farming. Circle is about staying connected to people you have actually chosen to connect with.',
+      'No. There is no public feed or follower count. Circle is the private list of people you actually connected with.',
   },
   {
     question: 'Is CodeCard just a portfolio?',
     answer:
-      'No. Your work is one part of CodeCard. The product also includes research, physical connections, relationship context, follow ups, your network, and analytics.',
-  },
-  {
-    question: 'Why not just exchange a business card?',
-    answer:
-      'A traditional card gives someone your contact information. CodeCard can immediately show them your work and then help you remember and manage the relationship afterward.',
-  },
-  {
-    question: 'Why not just send someone my portfolio?',
-    answer:
-      'You can, but CodeCard is designed for the moment you meet. You can put your work in front of someone immediately and then retain the connection and context afterward.',
+      'A portfolio explains work on the web. CodeCard is built for the moment of introduction, then for keeping date, place, notes, and follow-up attached to that meeting.',
   },
 ];

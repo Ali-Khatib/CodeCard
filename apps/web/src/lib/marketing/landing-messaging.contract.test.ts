@@ -24,37 +24,36 @@ describe('landing positioning copy', () => {
 
   it('answers recurring product questions without replacement claims', () => {
     const questions = LANDING_FAQ_ITEMS.map((item) => item.question);
-    expect(questions).toContain("Isn't CodeCard just GitHub?");
-    expect(questions).toContain("Isn't CodeCard just LinkedIn?");
+    expect(questions).toContain('Is CodeCard a replacement for GitHub?');
+    expect(questions).toContain('Is CodeCard a replacement for LinkedIn?');
     expect(questions).toContain('Is CodeCard a social network?');
     expect(questions).toContain('Is CodeCard just a portfolio?');
-    expect(questions).toContain('Does the other person need the CodeCard app?');
+    expect(questions).toContain('Do visitors need the CodeCard app?');
     const blob = LANDING_FAQ_ITEMS.map((item) => item.answer).join(' ');
     expect(blob).toContain('not a replacement');
     expect(blob).toContain('open your CodeCard directly in their browser');
-    expect(blob).toContain('living technical profile');
     expect(blob).not.toMatch(/LinkedIn alternative|GitHub alternative|GitHub meets LinkedIn/i);
     expect(blob).not.toContain('—');
   });
 
-  it('frames CodeCard as a living technical identity, not a thin showcase', () => {
+  it('frames CodeCard around introductions rather than identity slogans', () => {
     expect(CODECARD_TAGLINE).toBe(
-      'Your work. Your identity. Your connections.',
+      'Share your work. Keep the connection.',
     );
-    expect(CODECARD_SUMMARY).toContain('people you actually meet');
-    expect(CODECARD_SUMMARY).toContain('living technical identity');
+    expect(CODECARD_SUMMARY).toContain('scan your QR code');
+    expect(CODECARD_SUMMARY).not.toContain('living technical identity');
     const hero = read('src/components/landing/editorial/editorial-hero.tsx');
-    expect(hero).toContain('ONE IDENTITY.');
-    expect(hero).toContain('one living');
-    expect(hero).toContain('Where your work meets your people.');
-    expect(hero).toContain('introductions into connections.');
+    expect(hero).toContain('SHARE YOUR WORK.');
+    expect(hero).toContain('KEEP THE CONNECTION.');
+    expect(hero).toContain('real-world introductions');
+    expect(hero).toContain('Phone or QR, then a browser.');
     expect(hero).not.toContain('scan your QR.');
     expect(hero).not.toContain('Hand them your phone.');
     expect(hero).not.toContain('YOUR PHONE.');
     const scene = read(
       'src/components/landing/editorial/editorial-hero-scene.tsx',
     );
-    expect(scene).toContain('scan your QR.');
+    expect(scene).toContain('share your QR code');
     const walk = read(
       'src/components/landing/editorial/editorial-feature-walkthrough.tsx',
     );
@@ -66,5 +65,18 @@ describe('landing positioning copy', () => {
     expect(walk).toContain('Analytics');
     const landing = read('src/components/landing/editorial/editorial-landing.tsx');
     expect(landing).not.toContain('EditorialFaq');
+    const compare = read(
+      'src/components/landing/editorial/editorial-comparison.tsx',
+    );
+    expect(compare).toContain('Built for a different moment.');
+    expect(compare).toContain('Not a core capability');
+    expect(compare).toContain('<table');
+    expect(compare).toContain('Handoff in the conversation');
+    expect(compare).toContain('Introduction record');
+    expect(compare).toContain('Home calendar');
+    expect(compare).toContain('What they opened after a scan');
+    expect(compare).not.toContain('In-person work presentation');
+    expect(compare).not.toContain('Meeting-based connections');
+    expect(compare).not.toMatch(/better than|beats |replaces |outdated|fake networking/i);
   });
 });
