@@ -14,9 +14,6 @@ import {
 /** Chapters where the fixed CC mark sits over a dark surface (cream logo).
  *  Crash is sampled from the pin; these are fallbacks only. */
 const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement']);
-/** Full-bleed immersive chapters — nav collapses to a circular expand control.
- *  Only waitlist + footer. Crash Course keeps the full pill. */
-const COMPACT_NAV_CHAPTERS = ['waitlist'] as const;
 
 function chapterInk(chapter: string): LandingChromeInk {
   return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
@@ -72,18 +69,10 @@ function syncChromeTone(chapter: string) {
   applyLandingChromeInk(chapterInk(chapter));
 }
 
-function setNavCompact(active: boolean) {
-  if (active) {
-    document.documentElement.dataset.navCompact = 'true';
-  } else {
-    delete document.documentElement.dataset.navCompact;
-  }
-}
-
 /**
  * Sets data-chapter from section visibility. Backgrounds via CSS — no per-frame React color.
  * Also mirrors tone onto <html> so the marketing pill nav can follow chapter colors.
- * Compact nav snaps only at the waitlist email and footer.
+ * The pill stays expanded; click-away never collapses it to a menu circle.
  * ~1 trigger per chapter (bounded).
  */
 export function EditorialAtmosphere() {
@@ -93,6 +82,7 @@ export function EditorialAtmosphere() {
   useLayoutEffect(() => {
     /* Chrome starts on the inset cinema field — light ink until sampling runs. */
     document.documentElement.dataset.landingChapter = 'hero';
+    delete document.documentElement.dataset.navCompact;
     applyLandingChromeInk('light');
     syncChromeTone('hero');
   }, []);
@@ -115,12 +105,6 @@ export function EditorialAtmosphere() {
     };
 
     apply(sections[0]?.dataset.chapterSection ?? 'hero');
-
-    const compactActive = new Set<string>();
-    const syncCompact = () => {
-      setNavCompact(compactActive.size > 0);
-      syncChromeTone(activeRef.current || 'hero');
-    };
 
     const cleanupHtml = () => {
       delete document.documentElement.dataset.landingChapter;
@@ -164,14 +148,6 @@ export function EditorialAtmosphere() {
     };
     window.requestAnimationFrame(watchMesh);
 
-    const waitlistSection = sections.find(
-      (section) => section.dataset.chapterSection === COMPACT_NAV_CHAPTERS[0],
-    );
-    const footerEl = document.querySelector<HTMLElement>('.cc-site-footer');
-    const compactRoots = [waitlistSection, footerEl].filter(
-      (section): section is HTMLElement => Boolean(section),
-    );
-
     if (!canEnhanceMotion) {
       const chapterObserver = new IntersectionObserver(
         (entries) => {
@@ -186,28 +162,9 @@ export function EditorialAtmosphere() {
       );
       sections.forEach((section) => chapterObserver.observe(section));
 
-      const compactObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            const el = entry.target as HTMLElement;
-            const id = el.dataset.chapterSection || 'footer';
-            if (entry.isIntersecting) compactActive.add(id);
-            else compactActive.delete(id);
-          }
-          syncCompact();
-        },
-        {
-          root: null,
-          rootMargin: '-12% 0px -55% 0px',
-          threshold: [0, 0.01, 0.1, 0.25],
-        },
-      );
-      compactRoots.forEach((section) => compactObserver.observe(section));
-
       return () => {
         meshLive = false;
         chapterObserver.disconnect();
-        compactObserver.disconnect();
         footerObserver.disconnect();
         window.removeEventListener('scroll', scheduler.request);
         scheduler.cancel();
@@ -232,28 +189,9 @@ export function EditorialAtmosphere() {
       });
     });
 
-    const compactTriggers =
-      waitlistSection
-        ? [
-            ScrollTrigger.create({
-              id: 'editorial-nav-compact-end',
-              trigger: waitlistSection,
-              endTrigger: footerEl ?? waitlistSection,
-              start: 'top 70%',
-              end: 'bottom bottom',
-              onToggle: (self) => {
-                if (self.isActive) compactActive.add('endgame');
-                else compactActive.delete('endgame');
-                syncCompact();
-              },
-            }),
-          ]
-        : [];
-
     return () => {
       meshLive = false;
       chapterTriggers.forEach((t) => t.kill());
-      compactTriggers.forEach((t) => t.kill());
       footerObserver.disconnect();
       window.removeEventListener('scroll', scheduler.request);
       scheduler.cancel();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { prefetchHref } from '@/hooks/use-view-transition-navigate';
@@ -20,10 +20,6 @@ interface LandingHeroNavProps {
 export function LandingHeroNav({ items }: LandingHeroNavProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [compact, setCompact] = useState(false);
-  const [compactPeek, setCompactPeek] = useState(false);
-
-  const isExpanded = !compact || compactPeek;
 
   const isActive = useCallback(
     (href: string) => {
@@ -35,38 +31,8 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
     [pathname],
   );
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const syncCompact = () => {
-      const next = root.dataset.navCompact === 'true';
-      setCompact(next);
-      if (!next) setCompactPeek(false);
-    };
-    syncCompact();
-    const observer = new MutationObserver(syncCompact);
-    observer.observe(root, { attributes: true, attributeFilter: ['data-nav-compact'] });
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!compactPeek) return;
-    const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      const nav = document.querySelector('.cc-nav-veil');
-      if (nav && target && !nav.contains(target)) {
-        setCompactPeek(false);
-      }
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [compactPeek]);
-
   return (
-    <AnimatedNavFramer
-      isExpanded={isExpanded}
-      onCollapsedClick={() => setCompactPeek(true)}
-      collapsedLabel="Expand navigation"
-    >
+    <AnimatedNavFramer isExpanded={true}>
       <div className="cc-nav-desktop-links">
         <ul className="cc-hume-fade-group flex items-center gap-2.5 sm:gap-3">
           {items.map((item, i) => {

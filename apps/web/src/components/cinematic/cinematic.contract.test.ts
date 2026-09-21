@@ -397,6 +397,9 @@ describe('Editorial product landing contract', () => {
     expect(shell).not.toContain('morphNavVeil');
     expect(shell).not.toContain('data-nav-morphing');
     expect(hero).toContain('AnimatedNavFramer');
+    expect(hero).toContain('isExpanded={true}');
+    expect(hero).not.toContain('pointerdown');
+    expect(hero).not.toContain('compactPeek');
     expect(hero).not.toContain('cc-nav-compact-trigger');
     expect(css).toContain('pointer-events: none');
     expect(css).toMatch(/\.cc-nav-veil--collapsed[\s\S]*?background:\s*transparent/);
