@@ -19,14 +19,20 @@ describe('founder about lanyard overlay', () => {
 
   it('drops the React Bits lanyard with founder copy and local portrait', () => {
     const overlay = read('src/components/landing/about-me-overlay.tsx');
+    const faces = read('src/lib/marketing/founder-lanyard-faces.ts');
     expect(overlay).toContain("@/components/react-bits/lanyard/lanyard");
     expect(overlay).toContain('cc-about-lanyard');
-    expect(overlay).toContain(FOUNDER_ABOUT.photoSrc);
-    expect(overlay).toContain(FOUNDER_ABOUT.displayName);
-    expect(overlay).toContain(FOUNDER_ABOUT.headline);
-    expect(overlay).toContain('Bahçeşehir University');
-    expect(overlay).toContain('ASYU 2026');
-    expect(overlay).toContain('Accepted Author');
+    expect(overlay).toContain('FOUNDER_ABOUT.photoSrc');
+    expect(overlay).toContain('FOUNDER_ABOUT.displayName');
+    expect(overlay).toContain('cc-about-pass');
+    expect(overlay).toContain('lightPreset="neutral"');
+    expect(overlay).toContain('faceColor="#ffffff"');
+    expect(faces).toContain('FOUNDER_ABOUT.headline');
+    expect(faces).toContain('FOUNDER_ABOUT.degree');
+    expect(faces).toContain('FOUNDER_ABOUT.school');
+    expect(faces).toContain('FOUNDER_ABOUT.focus');
+    expect(faces).toContain('FOUNDER_ABOUT.publication');
     expect(overlay).not.toContain('—');
+    expect(faces).not.toContain('—');
   });
 });

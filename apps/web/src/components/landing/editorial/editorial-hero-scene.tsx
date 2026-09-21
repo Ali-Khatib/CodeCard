@@ -150,11 +150,11 @@ function StatementWords({
 }
 
 function stageRadius(mobile: boolean) {
-  return mobile ? 22 : 28;
+  return mobile ? 16 : 22;
 }
 
 function creamPad(mobile: boolean) {
-  return mobile ? 12 : 16;
+  return 4;
 }
 
 function scrollClipClosed(mobile: boolean) {

@@ -55,6 +55,23 @@ const BLANK_PIXEL =
 const FRONT_UV_RECT = { x: 0, y: 0, w: 0.5, h: 0.755 };
 const BACK_UV_RECT = { x: 0.5, y: 0, w: 0.5, h: 0.757 };
 
+type DrawableImage = CanvasImageSource & { width: number; height: number };
+
+function drawableFromTexture(image: unknown): DrawableImage | null {
+  if (!image) return null;
+  if (typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement) {
+    if (!image.complete || image.naturalWidth <= 0) return null;
+    return image;
+  }
+  if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap && image.width > 0) {
+    return image;
+  }
+  if (typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement && image.width > 0) {
+    return image;
+  }
+  return null;
+}
+
 interface LanyardProps {
   position?: [number, number, number];
   gravity?: [number, number, number];
@@ -71,6 +88,7 @@ interface LanyardProps {
   faceColor?: string;
   emissive?: string;
   metalness?: number;
+  lightPreset?: 'violet' | 'neutral';
 }
 
 export default function Lanyard({
@@ -89,7 +107,9 @@ export default function Lanyard({
   faceColor = '#0f0217',
   emissive = '#4c1d95',
   metalness = 0.65,
+  lightPreset = 'violet',
 }: LanyardProps) {
+  const lights = lightPreset === 'neutral';
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
   const gravityScale =
@@ -115,11 +135,27 @@ export default function Lanyard({
         onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
         data-testid="lanyard-canvas"
       >
-        <ambientLight intensity={0.45} color="#c4a7ff" />
-        <directionalLight position={[5, 8, 6]} intensity={2.2} color="#c4a7ff" />
-        <directionalLight position={[-4, -1, 5]} intensity={1.1} color="#7c3aed" />
-        <pointLight position={[2, 4, 5]} intensity={0.8} color="#a855f7" />
-        <pointLight position={[-3, 2, 3]} intensity={0.4} color="#4c1d95" />
+        <ambientLight intensity={lights ? 0.85 : 0.45} color={lights ? '#fff4ea' : '#c4a7ff'} />
+        <directionalLight
+          position={[5, 8, 6]}
+          intensity={lights ? 1.6 : 2.2}
+          color={lights ? '#fff8f1' : '#c4a7ff'}
+        />
+        <directionalLight
+          position={[-4, -1, 5]}
+          intensity={lights ? 0.7 : 1.1}
+          color={lights ? '#ffd7b0' : '#7c3aed'}
+        />
+        <pointLight
+          position={[2, 4, 5]}
+          intensity={lights ? 0.35 : 0.8}
+          color={lights ? '#ffe8d2' : '#a855f7'}
+        />
+        <pointLight
+          position={[-3, 2, 3]}
+          intensity={lights ? 0.2 : 0.4}
+          color={lights ? '#ffffff' : '#4c1d95'}
+        />
         <Physics gravity={scaledGravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
           <Band
             isMobile={isMobile}
@@ -136,9 +172,27 @@ export default function Lanyard({
           />
         </Physics>
         <Environment blur={0.6}>
-          <Lightformer intensity={2.5} color="#c4a7ff" position={[4, 6, 5]} rotation={[0, 0, 0]} scale={[80, 0.15, 1]} />
-          <Lightformer intensity={1.8} color="#7c3aed" position={[-3, 2, 4]} rotation={[0, 0, 0]} scale={[60, 0.12, 1]} />
-          <Lightformer intensity={1.2} color="#a855f7" position={[0, -2, 6]} rotation={[0, 0, 0]} scale={[100, 0.1, 1]} />
+          <Lightformer
+            intensity={lights ? 1.4 : 2.5}
+            color={lights ? '#fff6ee' : '#c4a7ff'}
+            position={[4, 6, 5]}
+            rotation={[0, 0, 0]}
+            scale={[80, 0.15, 1]}
+          />
+          <Lightformer
+            intensity={lights ? 0.6 : 1.8}
+            color={lights ? '#ffc089' : '#7c3aed'}
+            position={[-3, 2, 4]}
+            rotation={[0, 0, 0]}
+            scale={[60, 0.12, 1]}
+          />
+          <Lightformer
+            intensity={lights ? 0.5 : 1.2}
+            color={lights ? '#ffffff' : '#a855f7'}
+            position={[0, -2, 6]}
+            rotation={[0, 0, 0]}
+            scale={[100, 0.1, 1]}
+          />
         </Environment>
       </Canvas>
     </div>
@@ -268,15 +322,9 @@ function Band({
     let disposed = false;
 
     const buildComposite = () => {
-      const frontImg = frontTex.image as HTMLImageElement | undefined;
-      const backImg = backTex.image as HTMLImageElement | undefined;
-      const frontReady =
-        frontImg instanceof HTMLImageElement &&
-        frontImg.complete &&
-        frontImg.naturalWidth > 0;
-      const backReady =
-        backImg instanceof HTMLImageElement && backImg.complete && backImg.naturalWidth > 0;
-      if (!frontReady || !backReady) return false;
+      const frontImg = drawableFromTexture(frontTex.image);
+      const backImg = drawableFromTexture(backTex.image);
+      if (!frontImg || !backImg) return false;
 
       const W = ATLAS_W;
       const H = ATLAS_H;
@@ -289,15 +337,23 @@ function Band({
       ctx.fillStyle = '#1a0a2e';
       ctx.fillRect(0, 0, W, H);
 
-      const drawFitted = (img: HTMLImageElement, rect: typeof FRONT_UV_RECT) => {
+      const drawFitted = (img: DrawableImage, rect: typeof FRONT_UV_RECT) => {
+        const srcW =
+          'naturalWidth' in img && typeof img.naturalWidth === 'number' && img.naturalWidth > 0
+            ? img.naturalWidth
+            : img.width;
+        const srcH =
+          'naturalHeight' in img && typeof img.naturalHeight === 'number' && img.naturalHeight > 0
+            ? img.naturalHeight
+            : img.height;
         const rx = rect.x * W;
         const ry = rect.y * H;
         const rw = rect.w * W;
         const rh = rect.h * H;
         const pick = imageFit === 'contain' ? Math.min : Math.max;
-        const scale = pick(rw / img.naturalWidth, rh / img.naturalHeight);
-        const dw = img.naturalWidth * scale;
-        const dh = img.naturalHeight * scale;
+        const scale = pick(rw / srcW, rh / srcH);
+        const dw = srcW * scale;
+        const dh = srcH * scale;
         const dx = rx + (rw - dw) / 2;
         const dy = ry + (rh - dh) / 2;
         ctx.save();

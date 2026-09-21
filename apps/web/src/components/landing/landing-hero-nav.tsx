@@ -40,7 +40,7 @@ export function LandingHeroNav({
   return (
     <AnimatedNavFramer isExpanded={true}>
       <div className="cc-nav-desktop-links">
-        <ul className="cc-hume-fade-group flex items-center gap-2.5 sm:gap-3">
+        <ul className="cc-hume-fade-group flex min-w-0 w-full items-center">
           {items.map((item, i) => {
             const active = isActive(item.href);
             return (

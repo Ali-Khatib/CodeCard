@@ -61,6 +61,7 @@ export function AnimatedNavFramer({
   const innerRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
   const [openSize, setOpenSize] = React.useState({ width: 320, height: 58 });
+  const [availWidth, setAvailWidth] = React.useState(1200);
 
   React.useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)');
@@ -69,6 +70,25 @@ export function AnimatedNavFramer({
     media.addEventListener('change', sync);
     return () => media.removeEventListener('change', sync);
   }, []);
+
+  React.useEffect(() => {
+    const measureAvail = () => {
+      const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
+      if (shell instanceof HTMLElement) {
+        const styles = window.getComputedStyle(shell);
+        const next =
+          shell.clientWidth -
+          (Number.parseFloat(styles.paddingLeft) || 0) -
+          (Number.parseFloat(styles.paddingRight) || 0);
+        setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, Math.floor(next)));
+        return;
+      }
+      setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, window.innerWidth - (phone ? 24 : 160)));
+    };
+    measureAvail();
+    window.addEventListener('resize', measureAvail);
+    return () => window.removeEventListener('resize', measureAvail);
+  }, [phone, expanded]);
 
   // Pixel sizes only — Motion cannot reliably expand from a fixed circle back to width:auto,
   // especially once minWidth/maxWidth were locked to the collapsed size.
@@ -79,7 +99,10 @@ export function AnimatedNavFramer({
 
     const measure = () => {
       const panelHeight = panelRef.current?.offsetHeight ?? 0;
+      const previousWidth = inner.style.width;
+      inner.style.width = 'max-content';
       const width = Math.ceil(inner.scrollWidth);
+      inner.style.width = previousWidth;
       const height = Math.ceil(Math.max(inner.scrollHeight, phone ? 52 : 58) + panelHeight);
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>
@@ -99,12 +122,7 @@ export function AnimatedNavFramer({
     };
   }, [phone, children, panel, expanded]);
 
-  const maxOpenWidth = phone
-    ? Math.min(
-        openSize.width,
-        typeof window !== 'undefined' ? Math.max(window.innerWidth - 24, NAV_COLLAPSED_SIZE) : openSize.width,
-      )
-    : openSize.width;
+  const maxOpenWidth = Math.min(openSize.width, availWidth);
 
   const expand = React.useCallback(() => {
     onCollapsedClick?.();
@@ -137,7 +155,7 @@ export function AnimatedNavFramer({
         width: maxOpenWidth,
         height: openSize.height,
         minWidth: 0,
-        maxWidth: maxOpenWidth,
+        maxWidth: '100%',
         borderRadius: radius,
       }
     : {
@@ -185,7 +203,8 @@ export function AnimatedNavFramer({
         animate={expanded ? 'expanded' : 'collapsed'}
         variants={reduced ? undefined : navContentVariants}
         className={cn(
-          'cc-nav-veil__inner w-max max-w-none',
+          'cc-nav-veil__inner min-w-0 max-w-full',
+          expanded ? 'w-full' : 'w-max',
           !expanded && 'pointer-events-none',
           innerClassName,
         )}

@@ -29,11 +29,11 @@ export function EditorialHero() {
             <span className="sr-only">KEEP THE CONNECTION.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
+          <p className="cc-ed__connect-principle cc-ed-hero__quote">
+            Where your work meets your people, and introductions become
+            lasting connections.
+          </p>
         </div>
-        <p className="cc-ed__connect-principle cc-ed-hero__quote">
-          Where your work meets your people, and introductions become
-          lasting connections.
-        </p>
         <div className="cc-ed-hero__baseline">
           <div className="cc-ed-hero__baseline-copy">
             <p className="cc-ed__lede">
