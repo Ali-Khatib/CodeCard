@@ -1,0 +1,96 @@
+.cc-about-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: stretch;
+  overflow: hidden;
+  background: #100e0c;
+}
+
+.cc-about-overlay__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(233, 90, 11, 0.22), transparent 55%),
+    rgba(8, 6, 5, 0.92);
+}
+
+.cc-about-overlay__drop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  width: 100%;
+  height: 100%;
+  transform: translateY(-110%);
+  animation: cc-about-drop 0.9s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+}
+
+@keyframes cc-about-drop {
+  to {
+    transform: translateY(0);
+  }
+}
+
+.cc-about-overlay__close {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, #f6f1ec 10%, transparent);
+  color: #f6f1ec;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cc-about-overlay__stage {
+  position: relative;
+  min-height: 0;
+  height: min(78dvh, 820px);
+}
+
+.cc-about-overlay .cc-about-lanyard {
+  width: 100%;
+  height: 100%;
+}
+
+.cc-about-overlay__copy {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.25rem 1.75rem;
+  text-align: center;
+  color: #f6f1ec;
+}
+
+.cc-about-overlay__copy h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.cc-about-overlay__copy p {
+  margin: 0.35rem 0 0;
+  color: #d7cfc7;
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-about-overlay__drop {
+    animation: none;
+    transform: none;
+  }
+}

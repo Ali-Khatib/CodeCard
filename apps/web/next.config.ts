@@ -10,6 +10,7 @@ const sentryConnect =
  * - 'unsafe-inline' on script-src: REQUIRED — Next.js hydration / bootstrap; Vercel insights
  * - 'unsafe-eval' on script-src: REQUIRED today — Three.js/WebGL shader compile + animation
  *   (GSAP is used on marketing/profile). Do not drop without a production browser pass.
+ * - 'wasm-unsafe-eval' on script-src: REQUIRED — Rapier WASM for the lanyard physics scene.
  * - Theme boot is `/theme-boot.js` (same-origin), not an inline script.
  * - va.vercel-scripts.com / vitals.vercel-insights.com: Vercel Analytics + Speed Insights
  * - videos.pexels.com: royalty-free crash-course chapter videos
@@ -20,7 +21,7 @@ const sentryConnect =
 function contentSecurityPolicy(frameAncestors: "'none'" | "'self'"): string {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://va.vercel-scripts.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com",
     "media-src 'self' blob: https://cdn.coverr.co https://videos.pexels.com",

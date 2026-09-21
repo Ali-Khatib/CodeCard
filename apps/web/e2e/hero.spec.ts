@@ -38,6 +38,7 @@ test.describe('Landing page', () => {
   test('marketing nav exposes Pricing and no stale sections', async ({ page }) => {
     const nav = page.getByRole('navigation').first();
     await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
+    await expect(nav.getByRole('button', { name: 'About me' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Common questions' })).toHaveAttribute(
       'href',
       '/faq',

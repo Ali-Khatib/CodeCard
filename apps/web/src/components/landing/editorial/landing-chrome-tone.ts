@@ -128,7 +128,7 @@ export function parseClipInset(
 
 function logoEl() {
   return document.querySelector<HTMLElement>(
-    '.cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark)',
+    '.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark)',
   );
 }
 

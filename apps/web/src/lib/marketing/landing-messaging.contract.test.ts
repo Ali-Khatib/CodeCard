@@ -12,6 +12,7 @@ describe('landing positioning copy', () => {
     const shell = read('src/components/landing/landing-shell-nav.tsx');
     const mark = read('src/components/landing/codecard-mark-logo.tsx');
     const home = read('src/components/landing/marketing-home-control.tsx');
+    const faqPage = read('src/components/landing/faq-page.tsx');
     expect(shell).toContain("{ label: 'Pricing', href: '/pricing' }");
     expect(shell).toContain("{ label: 'FAQ', href: '/faq'");
     expect(shell).toContain('MarketingHomeControl');
@@ -20,6 +21,14 @@ describe('landing positioning copy', () => {
     expect(mark).not.toContain('href={MARKETING_HOME_HREF}');
     expect(home).toContain('CodeCard landing');
     expect(home).toContain('MARKETING_HOME_HREF');
+    const chrome = read('src/styles/editorial-landing.css');
+    expect(chrome).toContain(
+      '.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark)',
+    );
+    expect(chrome).toContain(
+      '.cc-marketing-shell:not(:has(.cc-ed-hero-scene)) .cc-ed-mark-logo:not(.cc-auth-mark)',
+    );
+    expect(faqPage).toContain('cc-faq-page');
   });
 
   it('answers recurring product questions without replacement claims', () => {

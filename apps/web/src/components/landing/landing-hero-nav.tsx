@@ -15,9 +15,15 @@ export type NavItem = {
 
 interface LandingHeroNavProps {
   items: NavItem[];
+  onAboutMe?: () => void;
+  aboutMeOpen?: boolean;
 }
 
-export function LandingHeroNav({ items }: LandingHeroNavProps) {
+export function LandingHeroNav({
+  items,
+  onAboutMe,
+  aboutMeOpen = false,
+}: LandingHeroNavProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -59,6 +65,21 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
               </li>
             );
           })}
+          <li>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={aboutMeOpen}
+              aria-controls="about-me-overlay"
+              onClick={(event) => {
+                event.stopPropagation();
+                onAboutMe?.();
+              }}
+              className={`cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press${aboutMeOpen ? ' cc-nav-pill-item--active' : ''}`}
+            >
+              About me
+            </button>
+          </li>
           <li>
             <LiveDemoLink className="cc-nav-pill-item cc-nav-pill-item--eq cc-hume-fade-item cc-instant-press">
               Live demo

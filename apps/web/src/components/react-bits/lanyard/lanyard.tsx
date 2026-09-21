@@ -16,11 +16,8 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import { GLTFLoader } from 'three-stdlib';
 import * as THREE from 'three';
 
-import cardGLB from './card.glb';
-import lanyardImg from './lanyard.png';
-
-const lanyardTexture = lanyardImg as string | { src: string };
-const LANYARD_TEX = typeof lanyardTexture === 'string' ? lanyardTexture : lanyardTexture.src;
+const cardGLB = '/lanyard/card.glb';
+const LANYARD_TEX = '/lanyard/lanyard.png';
 
 /** Geometry-only GLB — badge faces are composited at runtime (no embedded textures). */
 const extendLanyardLoader = (loader: GLTFLoader) => {
@@ -71,6 +68,9 @@ interface LanyardProps {
   scrollProgress?: number;
   cardScale?: number;
   className?: string;
+  faceColor?: string;
+  emissive?: string;
+  metalness?: number;
 }
 
 export default function Lanyard({
@@ -86,6 +86,9 @@ export default function Lanyard({
   scrollProgress = 0,
   cardScale = 2.25,
   className = '',
+  faceColor = '#0f0217',
+  emissive = '#4c1d95',
+  metalness = 0.65,
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -127,6 +130,9 @@ export default function Lanyard({
             lanyardWidth={lanyardWidth}
             scrollProgress={scrollProgress}
             cardScale={cardScale}
+            faceColor={faceColor}
+            emissive={emissive}
+            metalness={metalness}
           />
         </Physics>
         <Environment blur={0.6}>
@@ -150,6 +156,9 @@ interface BandProps {
   lanyardWidth?: number;
   scrollProgress?: number;
   cardScale?: number;
+  faceColor?: string;
+  emissive?: string;
+  metalness?: number;
 }
 
 type LanyardRigidBody = RapierRigidBody & {
@@ -167,6 +176,9 @@ function Band({
   lanyardWidth = 1,
   scrollProgress = 0,
   cardScale = 2.25,
+  faceColor = '#0f0217',
+  emissive = '#4c1d95',
+  metalness = 0.65,
 }: BandProps) {
   const band = useRef<THREE.Mesh<InstanceType<typeof MeshLineGeometry>, InstanceType<typeof MeshLineMaterial>>>(null!);
   const fixed = useRef<RapierRigidBody>(null!);
@@ -457,9 +469,9 @@ function Band({
                   clearcoat={isMobile ? 0 : 1}
                   clearcoatRoughness={0.1}
                   roughness={0.35}
-                  metalness={0.65}
-                  color="#0f0217"
-                  emissive="#4c1d95"
+                  metalness={metalness}
+                  color={faceColor}
+                  emissive={emissive}
                   emissiveIntensity={0.08}
                 />
               </mesh>

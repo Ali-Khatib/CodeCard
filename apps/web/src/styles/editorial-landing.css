@@ -138,15 +138,24 @@
 .cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
   left: calc(var(--cc-ed-cinema-inset, 16px) + clamp(0.7rem, 2vw, 1.15rem));
   top: calc(var(--cc-ed-cinema-inset, 16px) + 0.5rem + env(safe-area-inset-top, 0px));
+}
+
+/* Cinema field only. FAQ also uses .cc-ed, but sits on cream paper. */
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: #efedeb;
 }
 
-html[data-logo-tone='light'] .cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-mark) {
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: #efedeb;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.48);
 }
 
-html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-mark-logo:not(.cc-auth-mark) {
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark) {
+  color: var(--ed-ink, #232324);
+  text-shadow: none;
+}
+
+.cc-marketing-shell:not(:has(.cc-ed-hero-scene)) .cc-ed-mark-logo:not(.cc-auth-mark) {
   color: var(--ed-ink, #232324);
   text-shadow: none;
 }
@@ -264,13 +273,14 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   color: var(--ed-ink, #232324);
 }
 
-/* Equal-width nav pills — Pricing, Live demo, Start free */
+/* Equal-width nav pills — Pricing, FAQ, About me, Live demo, Start free */
 .cc-marketing-shell .cc-nav-pill-item--eq {
-  width: 8.25rem;
-  min-width: 8.25rem;
-  max-width: 8.25rem;
-  padding-inline: 10px;
+  width: 7.6rem;
+  min-width: 7.6rem;
+  max-width: 7.6rem;
+  padding-inline: 8px;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 @media (max-width: 767px) {

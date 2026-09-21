@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LAYOUT } from '@/lib/design/tokens';
+import { AboutMeOverlay } from './about-me-overlay';
 import { CodeCardMarkLogo } from './codecard-mark-logo';
 import { MarketingHomeControl } from './marketing-home-control';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
@@ -13,6 +14,7 @@ export const MARKETING_NAV_ITEMS: NavItem[] = [
 
 export function LandingShellNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -24,16 +26,23 @@ export function LandingShellNav() {
   }, []);
 
   return (
-    <div
-      className={`cc-marketing-nav-shell sticky top-0 inset-x-0 z-[100] flex w-full justify-center px-3 sm:px-5${
-        scrolled ? ' cc-marketing-nav-shell--scrolled' : ''
-      }`}
-      style={{ top: LAYOUT.pillNavTop }}
-      data-scrolled={scrolled ? 'true' : 'false'}
-    >
-      <CodeCardMarkLogo />
-      <LandingHeroNav items={MARKETING_NAV_ITEMS} />
-      <MarketingHomeControl />
-    </div>
+    <>
+      <div
+        className={`cc-marketing-nav-shell sticky top-0 inset-x-0 z-[100] flex w-full justify-center px-3 sm:px-5${
+          scrolled ? ' cc-marketing-nav-shell--scrolled' : ''
+        }`}
+        style={{ top: LAYOUT.pillNavTop }}
+        data-scrolled={scrolled ? 'true' : 'false'}
+      >
+        <CodeCardMarkLogo />
+        <LandingHeroNav
+          items={MARKETING_NAV_ITEMS}
+          onAboutMe={() => setAboutOpen(true)}
+          aboutMeOpen={aboutOpen}
+        />
+        <MarketingHomeControl />
+      </div>
+      <AboutMeOverlay open={aboutOpen} onClose={() => setAboutOpen(false)} />
+    </>
   );
 }

@@ -18,6 +18,7 @@ describe('CSP exception inventory', () => {
   it('keeps script-src exceptions that current shipped deps still need', () => {
     expect(nextConfig).toContain("'unsafe-inline'");
     expect(nextConfig).toContain("'unsafe-eval'");
+    expect(nextConfig).toContain("'wasm-unsafe-eval'");
     expect(nextConfig).toContain('https://va.vercel-scripts.com');
     expect(layout).toContain('/theme-boot.js');
     expect(layout).not.toContain('dangerouslySetInnerHTML');
