@@ -279,15 +279,17 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
-  padding: 8px 16px;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
+  white-space: nowrap;
   border: 0;
   background: transparent;
   color: inherit;
@@ -322,7 +324,7 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   width: auto;
   min-width: auto;
   max-width: none;
-  padding-inline: 0.85rem;
+  padding-inline: 0.75rem;
   white-space: nowrap;
   overflow: visible;
   cursor: pointer;
@@ -465,21 +467,26 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links {
+  width: max-content;
   min-width: 0;
-  width: 100%;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group {
   display: flex;
+  align-items: center;
+  justify-content: center;
   width: max-content;
   max-width: 100%;
   min-width: 0;
-  gap: 0.4rem;
+  gap: 0.15rem;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
-  padding-inline: 0.55rem;
-  gap: 0.35rem;
+  width: max-content;
+  max-width: 100%;
+  padding-block: 0.2rem;
+  padding-inline: 0.35rem;
+  gap: 0;
 }
 
 @media (max-width: 767px) {

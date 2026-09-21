@@ -60,7 +60,7 @@ export function AnimatedNavFramer({
   const [phone, setPhone] = React.useState(false);
   const innerRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
-  const [openSize, setOpenSize] = React.useState({ width: 320, height: 58 });
+  const [openSize, setOpenSize] = React.useState({ width: 420, height: 48 });
   const [availWidth, setAvailWidth] = React.useState(1200);
 
   React.useEffect(() => {
@@ -113,7 +113,7 @@ export function AnimatedNavFramer({
       const width = Math.ceil(Math.max(inner.scrollWidth, inner.offsetWidth));
       inner.style.width = previousWidth;
       inner.style.maxWidth = previousMaxWidth;
-      const height = Math.ceil(Math.max(inner.scrollHeight, phone ? 52 : 58) + panelHeight);
+      const height = Math.ceil(Math.max(inner.scrollHeight, phone ? 52 : 48) + panelHeight);
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>
           prev.width === width && prev.height === height ? prev : { width, height },
@@ -132,9 +132,7 @@ export function AnimatedNavFramer({
     };
   }, [phone, children, panel, expanded]);
 
-  const maxOpenWidth = phone
-    ? availWidth
-    : Math.min(Math.max(openSize.width, 480), availWidth);
+  const maxOpenWidth = phone ? availWidth : Math.min(openSize.width, availWidth);
 
   const expand = React.useCallback(() => {
     onCollapsedClick?.();
