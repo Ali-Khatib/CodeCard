@@ -132,7 +132,7 @@ export function AnimatedNavFramer({
     };
   }, [phone, children, panel, expanded]);
 
-  const maxOpenWidth = phone ? availWidth : Math.min(openSize.width, availWidth);
+  const maxOpenWidth = Math.min(openSize.width, availWidth);
 
   const expand = React.useCallback(() => {
     onCollapsedClick?.();

@@ -16,13 +16,10 @@ const FOOTER_COL_PRODUCT = [
   { label: 'Research', href: '/research' },
 ] as const;
 
-const FOOTER_COL_LEGAL_A = [
+const FOOTER_COL_LEGAL = [
   { label: 'Privacy', href: '/legal/privacy' },
   { label: 'Terms', href: '/legal/terms' },
   { label: 'Cookies', href: '/legal/cookies' },
-] as const;
-
-const FOOTER_COL_LEGAL_B = [
   { label: 'Acceptable Use', href: '/legal/acceptable-use' },
   { label: 'Copyright', href: '/legal/dmca' },
   { label: 'Security', href: '/legal/security' },
@@ -35,15 +32,13 @@ const FOOTER_COL_ACCOUNT = [
 ] as const;
 
 const FOOTER_COLUMNS = [
-  FOOTER_COL_PRODUCT,
-  FOOTER_COL_LEGAL_A,
-  FOOTER_COL_LEGAL_B,
-  FOOTER_COL_ACCOUNT,
+  { heading: 'Product', links: FOOTER_COL_PRODUCT },
+  { heading: 'Legal', links: FOOTER_COL_LEGAL },
+  { heading: 'Account', links: FOOTER_COL_ACCOUNT },
 ] as const;
 
 /**
- * New Form–inspired footer: oversized type, wave seam, live hover motion.
- * No portrait media — statement type only above the dark bar.
+ * Marketing footer: cream statement, wave seam, labeled link columns.
  */
 export function HumeFooterCluster() {
   const pathname = usePathname();
@@ -111,67 +106,58 @@ export function HumeFooterCluster() {
 
       <footer className="cc-site-footer__bar">
         <div className="cc-site-footer__bar-inner">
-          <div className="cc-site-footer__contact">
-            <Link href="/legal/contact" className="cc-site-footer__email" aria-label="Get in touch">
-              <span className="cc-site-footer__email-lead">Get in</span>
-              <span className="cc-site-footer__email-punch">touch.</span>
-              <span className="cc-site-footer__email-line" aria-hidden />
-            </Link>
-            <div className="cc-site-footer__actions">
-              <Link
-                href="/sign-up"
-                className="cc-site-footer__btn cc-instant-press"
-              >
-                Create your CodeCard
-              </Link>
-              <LiveDemoLink className="cc-site-footer__btn-ghost cc-instant-press">
-                View live demo
-              </LiveDemoLink>
-            </div>
-          </div>
-
           <nav className="cc-site-footer__cols" aria-label="Footer">
+            <div className="cc-site-footer__col cc-site-footer__col--brand">
+              <p className="cc-site-footer__brand">CodeCard</p>
+              <p className="cc-site-footer__tagline">
+                A professional profile for real-world introductions.
+              </p>
+              <div className="cc-site-footer__actions">
+                <Link href="/sign-up" className="cc-site-footer__btn cc-instant-press">
+                  Create your CodeCard
+                </Link>
+                <LiveDemoLink className="cc-site-footer__btn-ghost cc-instant-press">
+                  View live demo
+                </LiveDemoLink>
+              </div>
+            </div>
+
             {FOOTER_COLUMNS.map((column) => (
-              <ul key={column[0].label}>
-                {column.map((link) => (
-                  <li key={link.label}>
-                    {link.href === LIVE_DEMO_HREF ? (
-                      <LiveDemoLink className="cc-site-footer__link">
-                        {link.label}
-                      </LiveDemoLink>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        className="cc-site-footer__link"
-                        onClick={
-                          link.href === '/faq'
-                            ? (event) => {
-                                if (window.location.pathname !== '/faq') return;
-                                event.preventDefault();
-                                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-                              }
-                            : undefined
-                        }
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <div key={column.heading} className="cc-site-footer__col">
+                <p className="cc-site-footer__col-heading">{column.heading}</p>
+                <ul>
+                  {column.links.map((link) => (
+                    <li key={link.label}>
+                      {link.href === LIVE_DEMO_HREF ? (
+                        <LiveDemoLink className="cc-site-footer__link">
+                          {link.label}
+                        </LiveDemoLink>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="cc-site-footer__link"
+                          onClick={
+                            link.href === '/faq'
+                              ? (event) => {
+                                  if (window.location.pathname !== '/faq') return;
+                                  event.preventDefault();
+                                  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                                }
+                              : undefined
+                          }
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </nav>
 
-          <p className="cc-site-footer__ghost" aria-hidden>
-            <span>Get</span>
-            <span>Started.</span>
-          </p>
-
           <div className="cc-site-footer__meta">
             <p>© {year} CodeCard</p>
-            <p className="cc-site-footer__meta-note">
-              A professional profile for real-world introductions.
-            </p>
           </div>
         </div>
       </footer>

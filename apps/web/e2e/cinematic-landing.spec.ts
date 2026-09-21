@@ -16,10 +16,8 @@ test.describe('Editorial product landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
-    await expect(
-      page.getByText(/WHEN THE CONVERSATION TURNS TO YOUR WORK\./i).first(),
-    ).toBeVisible();
-    await expect(page.getByText(/HAVE IT READY TO SHOW\./i).first()).toBeVisible();
+    await expect(page.getByText(/SHOW THE WORK\./i).first()).toBeVisible();
+    await expect(page.getByText(/WHILE YOU TALK\./i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-comparison')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /Built for the handshake/i }),

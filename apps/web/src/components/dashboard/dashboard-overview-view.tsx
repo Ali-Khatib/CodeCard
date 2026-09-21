@@ -217,7 +217,7 @@ export function DashboardOverviewView({
         <FadeInView delay={0.06}>
           <section className="cc-profile-home__zone" aria-label="Suggested next step">
             <AppCard tone="meringue" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
-              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="cc-profile-next-card__row">
                 <div className="max-w-lg">
                   <AppMono>Next</AppMono>
                   <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">

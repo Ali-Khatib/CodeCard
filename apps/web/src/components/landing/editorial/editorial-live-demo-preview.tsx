@@ -5,12 +5,41 @@ import {
   EditorialLivePeekButton,
 } from '@/components/landing/editorial/editorial-live-peek-button';
 import { Monitor, Smartphone } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
+import { MOTION_DURATION } from '@/components/motion/motion-tokens';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useSmoothScroll } from '@/components/motion/smooth-scroll-provider';
 
 type PreviewMode = 'web' | 'mobile';
+
+type PeekZoom = { scale: number; y: number };
+
+function readPeekZoom(): PeekZoom {
+  if (typeof window === 'undefined') return { scale: 1.2, y: -12 };
+  if (window.matchMedia('(max-width: 767px)').matches) {
+    return { scale: 1.06, y: -4 };
+  }
+  if (window.matchMedia('(max-width: 1024px)').matches) {
+    return { scale: 1.12, y: -8 };
+  }
+  return { scale: 1.22, y: -12 };
+}
+
+function usePeekZoom(active: boolean, reduceMotion: boolean): PeekZoom {
+  const [zoom, setZoom] = useState<PeekZoom>({ scale: 1.2, y: -12 });
+
+  useEffect(() => {
+    const update = () => setZoom(readPeekZoom());
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  if (reduceMotion || !active) return { scale: 1, y: 0 };
+  return zoom;
+}
 
 const MIN_VISIBLE_MS = 18_000;
 const DWELL_MS = 28_000;
@@ -98,6 +127,10 @@ export function EditorialLiveDemoPreview() {
   const [invited, setInvited] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [peeking, setPeeking] = useState(false);
+  const zoom = usePeekZoom(peeking, reduced);
+  const peekTransition = reduced
+    ? { duration: 0 }
+    : { duration: MOTION_DURATION.section, ease: [0.22, 1, 0.36, 1] as const };
 
   const markEngaged = useCallback(() => {
     setInvited(true);
@@ -240,7 +273,13 @@ export function EditorialLiveDemoPreview() {
           : 'cc-ed-demo-preview'
       }
       data-testid="editorial-live-demo-preview"
+      data-peek-zoomed={peeking && !reduced ? 'true' : 'false'}
     >
+      <motion.div
+        className="cc-ed-demo-preview__zoom"
+        animate={{ scale: zoom.scale, y: zoom.y }}
+        transition={peekTransition}
+      >
       <div className="cc-ed-demo-preview__chrome">
         <div
           className="cc-ed-demo-preview__toolbar"
@@ -329,14 +368,22 @@ export function EditorialLiveDemoPreview() {
               </div>
             </div>
           </div>
-          {peeking ? null : (
-            <div className="cc-ed-demo-preview__peek-layer">
-              <EditorialLivePeekButton
-                scrollToDemo={false}
-                onActivate={openPeek}
-              />
-            </div>
-          )}
+          <AnimatePresence>
+            {peeking ? null : (
+              <motion.div
+                key="peek-layer"
+                className="cc-ed-demo-preview__peek-layer"
+                initial={false}
+                exit={reduced ? undefined : { opacity: 0, scale: 0.94 }}
+                transition={peekTransition}
+              >
+                <EditorialLivePeekButton
+                  scrollToDemo={false}
+                  onActivate={openPeek}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {showInvitation ? (
@@ -362,6 +409,7 @@ export function EditorialLiveDemoPreview() {
           </div>
         ) : null}
       </div>
+      </motion.div>
     </div>
   );
 }

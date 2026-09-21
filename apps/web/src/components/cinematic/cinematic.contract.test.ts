@@ -84,7 +84,7 @@ describe('Editorial product landing contract', () => {
     expect(walk).toContain('videos.pexels.com/video-files');
     expect(walk).toContain('4974774-hd_1920_1080_25fps');
     expect(walk).toContain('6549981-hd_1920_1080_25fps');
-    expect(walk).toContain('4484270-hd_1920_1080_25fps');
+    expect(walk).toContain('3248065-hd_1920_1080_25fps');
     expect(walk).toContain('8716585-hd_1920_1080_25fps');
     expect(walk).toContain('8426060-hd_1920_1080_25fps');
     expect(walk).toContain('7947507-hd_1920_1080_30fps');
@@ -211,6 +211,9 @@ describe('Editorial product landing contract', () => {
     const peek = read('src/components/landing/editorial/editorial-live-peek-button.tsx');
     expect(preview).toContain('EditorialLivePeekButton');
     expect(peek).toContain('Take a quick peek at CodeCard');
+    expect(preview).toContain('data-peek-zoomed');
+    expect(preview).toContain('scale: zoom.scale');
+    expect(css).toContain('.cc-ed-demo-preview__zoom');
     expect(preview).toContain('OPEN THE FULL WORKSPACE');
     expect(preview).toContain('View live demo');
     expect(demo).toContain('cc-ed-walk__bridge--out');

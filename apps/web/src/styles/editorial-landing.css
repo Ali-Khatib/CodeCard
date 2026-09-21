@@ -105,7 +105,7 @@
 /* Floating transparent rounded frame over the hero.
    Fixed so Lenis page transform cannot scroll the nav away. */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
-  --cc-ed-nav-end-gutter: 3.5rem;
+  --cc-ed-nav-end-gutter: clamp(2.75rem, 6.5vw, 3.5rem);
   position: fixed;
   top: 0;
   left: 0;
@@ -129,7 +129,7 @@
 
 @media (max-width: 767px) {
   .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
-    --cc-ed-nav-end-gutter: 3.4rem;
+    --cc-ed-nav-end-gutter: clamp(2.55rem, 11vw, 3.1rem);
   }
 
   .cc-marketing-shell .cc-ed-mark-logo__inner {
@@ -139,24 +139,6 @@
   .cc-marketing-shell .cc-ed-home-control {
     width: 2.2rem;
     height: 2.2rem;
-  }
-}
-
-@media (max-width: 430px) {
-  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
-    --cc-ed-nav-end-gutter: 3.45rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
-    --cc-ed-nav-end-gutter: 3.25rem;
-  }
-}
-
-@media (max-width: 330px) {
-  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
-    --cc-ed-nav-end-gutter: 3.1rem;
   }
 }
 
@@ -279,13 +261,14 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   min-height: 2.6rem;
-  padding: 0.5rem 0.9rem;
+  padding: 0.5rem clamp(0.5rem, 1.35vw, 0.95rem);
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.875rem;
+  font-size: clamp(0.72rem, 0.42rem + 1.05vw, 0.875rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
@@ -324,35 +307,10 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   width: auto;
   min-width: auto;
   max-width: none;
-  padding-inline: 0.95rem;
+  padding-inline: clamp(0.55rem, 1.5vw, 1rem);
   white-space: nowrap;
   overflow: visible;
   cursor: pointer;
-}
-
-@media (max-width: 767px) {
-  .cc-marketing-shell .cc-nav-pill-item {
-    min-height: 40px;
-    padding: 6px 10px;
-    font-size: clamp(8px, 3.15cqi, 11px);
-    letter-spacing: clamp(0.03em, 0.22cqi, 0.08em);
-  }
-
-  .cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .cc-marketing-shell .cc-nav-pill-item--eq {
-    flex: 1 1 0;
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-inline: clamp(0.12rem, 1.8cqi, 0.5rem);
-    font-size: clamp(8px, 3.35cqi, 10.5px);
-    letter-spacing: clamp(0.02em, 0.18cqi, 0.07em);
-  }
 }
 
 .cc-marketing-shell .cc-nav-pill-item--active,
@@ -475,29 +433,20 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: nowrap;
   width: max-content;
   max-width: 100%;
   min-width: 0;
-  gap: 0.5rem;
+  gap: clamp(0.2rem, 0.8vw, 0.5rem);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
   width: max-content;
   max-width: 100%;
-  padding-block: 0.25rem;
-  padding-inline: 0.45rem;
+  min-height: 3.15rem;
+  padding-block: 0.3rem;
+  padding-inline: clamp(0.4rem, 1.2vw, 0.7rem);
   gap: 0;
-}
-
-@media (max-width: 767px) {
-  .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group {
-    width: 100%;
-    gap: clamp(0.04rem, 0.7cqi, 0.45rem);
-  }
-
-  .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
-    padding-inline: clamp(0.22rem, 2cqi, 0.7rem);
-  }
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-item {
@@ -1495,7 +1444,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   overflow: visible;
   container-type: inline-size;
   padding-top: calc(var(--cc-ed-nav-clearance, 4.25rem) + 0.35rem);
-  gap: clamp(1.1rem, 2.2vh, 1.85rem);
+  gap: clamp(1.65rem, 3.4vh, 2.5rem);
 }
 
 .cc-ed-hero__mast {
@@ -1997,20 +1946,23 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   color: color-mix(in srgb, var(--ed-ink) 88%, transparent);
 }
 
-.cc-ed-walk__intro .cc-ed__lede {
-  max-width: min(38rem, 90vw);
+.cc-ed-walk__intro .cc-ed__lede,
+.cc-ed-walk__beats {
+  max-width: min(32rem, 90vw);
   margin-inline: auto;
   margin-top: 1.75rem;
+  margin-block-end: 0;
   padding-top: 1.4rem;
+  padding-inline: 0;
   border-top: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.32rem, 0.65vw + 1.16rem, 1.58rem);
+  font-size: clamp(1.15rem, 0.45vw + 1.05rem, 1.35rem);
   font-weight: 450;
   font-style: normal;
-  line-height: 1.5;
+  line-height: 1.45;
   letter-spacing: -0.016em;
   color: color-mix(in srgb, var(--ed-ink, #232324) 84%, transparent);
-  text-wrap: unset;
+  text-wrap: pretty;
   text-align: center;
 }
 
@@ -2053,7 +2005,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   color: color-mix(in srgb, var(--ed-ink, #232324) 52%, transparent);
 }
 
-.cc-ed .cc-ed-walk__intro .cc-ed__lede {
+.cc-ed .cc-ed-walk__intro .cc-ed__lede,
+.cc-ed .cc-ed-walk__intro .cc-ed-walk__beats {
   color: color-mix(in srgb, var(--ed-ink, #232324) 84%, transparent);
 }
 
@@ -2064,7 +2017,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   overflow: visible;
 }
 
-.cc-ed-walk__intro .cc-ed__lede {
+.cc-ed-walk__intro .cc-ed__lede,
+.cc-ed-walk__intro .cc-ed-walk__beats {
   overflow: visible;
 }
 
@@ -2701,11 +2655,21 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: clip;
   /* Follow chapter atmosphere — one page color until scroll flips data-chapter */
   background: transparent;
   color: var(--ed-ink, #232324);
   padding: 0 clamp(0.75rem, 2.5vw, 2rem) clamp(3.5rem, 10vh, 6.5rem);
   scroll-margin-top: var(--cc-ed-nav-clearance);
+}
+
+.cc-ed-demo-embed:has([data-peek-zoomed='true']) {
+  overflow-x: visible;
+}
+
+.cc-ed-demo-embed:has([data-peek-zoomed='true']) .cc-ed-demo-embed__intro {
+  opacity: 0.42;
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cc-ed-demo-embed .cc-ed-walk__bridge--out {
@@ -2742,6 +2706,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   max-width: min(56rem, 100%);
   margin: 0 auto clamp(1.75rem, 4vh, 2.75rem);
   text-align: center;
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cc-ed-demo-embed__chrome {
@@ -2841,9 +2806,15 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience__viewport {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
+  /* Keep hover lift + orange rim fully inside the clip box */
+  padding-block: 1.35rem;
+  margin-block: -0.35rem;
   /* Soft edges only — keep first cards readable on paint */
   mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-mode: alpha;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
 .cc-ed-audience__track {
@@ -3742,15 +3713,17 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   will-change: transform;
 }
 
-/* Tag + pager — under the bar, on the left */
+/* Tag + pager — under the bar, centered with the copy */
 .cc-ed-hero-scene__statement-chrome {
   position: absolute;
   top: calc(var(--cc-ed-nav-clearance) + 2.4rem);
-  left: clamp(1.25rem, 4vw, 3.5rem);
+  left: 0;
+  right: 0;
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: clamp(0.55rem, 1.2vw, 0.9rem);
 }
 
@@ -3797,19 +3770,20 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   opacity: 0.45;
 }
 
-/* Statement copy — one shared slot under the bar, all three groups sit here. */
+/* Statement copy — centered in the cinema frame. */
 .cc-ed-hero-scene__statement-stage {
   position: absolute;
-  top: calc(var(--cc-ed-nav-clearance) + 4.65rem);
-  left: auto;
-  right: clamp(1.5rem, 5vw, 4rem);
+  inset: 0;
   z-index: 2;
   display: grid;
-  width: min(48rem, calc(100% - clamp(2rem, 8vw, 6rem)));
-  max-width: 48rem;
+  place-items: center;
+  width: auto;
+  max-width: none;
   height: auto;
   overflow: visible;
-  text-align: left;
+  padding: calc(var(--cc-ed-nav-clearance) + 5.25rem) clamp(1.5rem, 5vw, 4rem)
+    4.5rem;
+  text-align: center;
 }
 
 /* All groups share one slot. Incoming fades up, outgoing fades down. */
@@ -3817,10 +3791,10 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: clamp(1.05rem, 2.4vh, 1.7rem);
-  width: 100%;
+  width: min(48rem, 100%);
   min-width: 0;
   opacity: 0;
   visibility: hidden;
@@ -3845,13 +3819,14 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   font-weight: 400;
   letter-spacing: -0.034em;
   line-height: 1.06;
-  text-align: left;
+  text-align: center;
   text-wrap: wrap;
 }
 
 .cc-ed-hero-scene__statement-step {
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 0.7rem;
   margin: 0;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
@@ -3873,7 +3848,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-hero-scene__statement-dek {
-  margin: 0;
+  margin: 0 auto;
   max-width: 36rem;
   flex: 0 0 auto;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
@@ -3881,13 +3856,13 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   font-weight: 400;
   letter-spacing: -0.028em;
   line-height: 1.28;
-  text-align: left;
+  text-align: center;
   text-wrap: pretty;
 }
 
 .cc-ed-hero-scene__statement-lede {
-  margin: 0;
-  margin-left: 0;
+  margin: 0 auto;
+  margin-left: auto;
   max-width: 38rem;
   flex: 0 0 auto;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
@@ -3895,7 +3870,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   font-weight: 500;
   letter-spacing: -0.016em;
   line-height: 1.5;
-  text-align: left;
+  text-align: center;
   text-wrap: pretty;
   hyphens: none;
 }
@@ -3952,10 +3927,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 @media (max-width: 767px) {
   .cc-ed-hero-scene__statement-stage {
-    top: calc(var(--cc-ed-nav-clearance) + 4.35rem);
-    left: auto;
-    right: clamp(1rem, 4vw, 1.5rem);
-    width: min(48rem, calc(100% - 1.75rem));
+    padding: calc(var(--cc-ed-nav-clearance) + 4.75rem) clamp(1rem, 4vw, 1.5rem)
+      3.5rem;
   }
 
   .cc-ed-hero-scene__statement-slot {
@@ -4378,6 +4351,15 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   margin-inline: auto;
 }
 
+.cc-ed-demo-preview__zoom {
+  width: 100%;
+  transform-origin: 50% 48%;
+}
+
+.cc-ed-demo-preview[data-peek-zoomed='true'] .cc-ed-demo-preview__zoom {
+  will-change: transform;
+}
+
 .cc-ed-demo-preview__chrome {
   position: relative;
   isolation: isolate;
@@ -4480,6 +4462,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   padding: 1.25rem;
   background: color-mix(in srgb, #141413 42%, transparent);
   backdrop-filter: blur(2px);
+  transform-origin: 50% 50%;
 }
 
 .cc-ed-demo-preview__viewport {
@@ -4677,6 +4660,10 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
     animation: none;
     transform: none;
     clip-path: none;
+    will-change: auto;
+  }
+
+  .cc-ed-demo-preview[data-peek-zoomed='true'] .cc-ed-demo-preview__zoom {
     will-change: auto;
   }
 

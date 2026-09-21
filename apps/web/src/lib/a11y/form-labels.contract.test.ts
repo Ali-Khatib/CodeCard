@@ -135,7 +135,8 @@ describe('WS12-T002 accessible form labels', () => {
 
   it('footer keeps labeled contact without placeholder-only fields', () => {
     const source = read('components/landing/hume-footer-cluster.tsx');
-    expect(source).toContain('Get in touch');
+    expect(source).toContain('/legal/contact');
+    expect(source).toContain('Contact');
     expect(source).toContain('/sign-up');
     expect(source).not.toMatch(/placeholder=/);
   });

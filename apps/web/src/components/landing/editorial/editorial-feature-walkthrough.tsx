@@ -35,7 +35,7 @@ const CHAPTERS = [
     title: 'Context on the person.',
     description:
       'Persist who you met with time, place, a private note, and the next action. The introduction is the source record.',
-    videoUrl: V('4484270/4484270-hd_1920_1080_25fps.mp4'),
+    videoUrl: V('3248065/3248065-hd_1920_1080_25fps.mp4'),
   },
   {
     id: 'events',
@@ -78,7 +78,7 @@ export function EditorialFeatureWalkthrough() {
       if (!intro) return;
 
       const lines = intro.querySelectorAll(
-        '.cc-ed__eyebrow, .cc-ed__lead, .cc-ed__sub, .cc-ed__lede',
+        '.cc-ed__eyebrow, .cc-ed__lead, .cc-ed__sub, .cc-ed-walk__beats',
       );
       gsap.fromTo(
         lines,
@@ -115,15 +115,11 @@ export function EditorialFeatureWalkthrough() {
       <div ref={introRef} className="cc-ed-walk__intro">
         <p className="cc-ed__eyebrow">In the room</p>
         <h2 id="editorial-walkthrough-heading" className="cc-ed__display mt-3">
-          <span className="cc-ed__lead">
-            WHEN THE CONVERSATION TURNS TO YOUR WORK.
-          </span>
-          <span className="cc-ed__sub">HAVE IT READY TO SHOW.</span>
+          <span className="cc-ed__lead">SHOW THE WORK.</span>
+          <span className="cc-ed__sub">WHILE YOU TALK.</span>
         </h2>
-        <p className="cc-ed__lede mx-auto mt-5">
-          Pull up your CodeCard and let the work speak for itself. Your
-          projects, research, and ideas are right there while you talk, so the
-          person you&apos;re meeting remembers more than just your name.
+        <p className="cc-ed-walk__beats">
+          Open your CodeCard. They see it. You keep talking.
         </p>
       </div>
 
