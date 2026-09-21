@@ -82,28 +82,6 @@
   color: color-mix(in srgb, var(--faq-ink) 58%, transparent);
 }
 
-.cc-faq-front__support {
-  position: absolute;
-  inset: calc(var(--gp-word-bottom, 50%) + 1.75rem) 1.5rem auto;
-  margin: 0;
-  text-align: center;
-  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
-  line-height: 1.4;
-  color: color-mix(in srgb, var(--faq-ink) 72%, transparent);
-}
-
-.cc-faq-front__scroll {
-  position: absolute;
-  inset: auto 1.5rem 8%;
-  text-align: center;
-  font-family: Arial, sans-serif;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--faq-ink) 48%, transparent);
-}
-
 .cc-faq-portal-copy {
   width: min(40rem, 100%);
   margin: 0 auto;
@@ -233,10 +211,6 @@
 
   .cc-faq-front__header {
     top: 5.25rem;
-  }
-
-  .cc-faq-front__scroll {
-    display: none;
   }
 }
 

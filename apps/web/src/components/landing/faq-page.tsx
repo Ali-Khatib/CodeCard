@@ -36,7 +36,7 @@ function FaqAccordion() {
       <div className="cc-faq-list__inner">
         <p className="cc-faq-list__kicker">Common questions</p>
         <h2 id="faq-questions-heading" className="cc-faq-list__title">
-          How CodeCard works.
+          Frequently asked.
         </h2>
 
         <div>
@@ -138,9 +138,7 @@ export function FaqPage() {
               <span className="cc-faq-front__mark">CodeCard</span>
               <span className="cc-faq-front__aside">Product questions</span>
             </div>
-            <p className="cc-faq-front__eyebrow">How CodeCard works</p>
-            <p className="cc-faq-front__support">Scroll through the letters to begin.</p>
-            <span className="cc-faq-front__scroll">Scroll to enter</span>
+            <p className="cc-faq-front__eyebrow">Common questions</p>
           </>
         }
       >
