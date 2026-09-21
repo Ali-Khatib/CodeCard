@@ -82,6 +82,17 @@
   color: color-mix(in srgb, var(--faq-ink) 58%, transparent);
 }
 
+.cc-faq-front__scroll {
+  position: absolute;
+  inset: auto 1.5rem 8%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--faq-ink) 48%, transparent);
+}
+
 .cc-faq-portal-copy {
   width: min(40rem, 100%);
   margin: 0 auto;

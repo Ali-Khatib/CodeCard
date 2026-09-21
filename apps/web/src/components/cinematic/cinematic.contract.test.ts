@@ -292,9 +292,14 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('runwayTotalVh');
     expect(scene).toContain('buildStatementReveal');
     expect(scene).toContain('BEAT_FILL_SHARE');
-    /* Word fill (reading-text-reveal), one beat on at a time, one linear bar. */
+    /* Word fill, then filled lift, fade-down, next group fades up. */
     expect(scene).toContain('data-on');
     expect(scene).toContain('setActiveBeat');
+    expect(scene).toContain('applyBeatMotion');
+    expect(scene).toContain('BEAT_ENTER_SHARE');
+    expect(scene).toContain('BEAT_SETTLE_SHARE');
+    expect(scene).toContain('BEAT_EXIT_SHARE');
+    expect(scene).toContain('translate3d');
     expect(scene).not.toContain('autoAlpha');
     expect(css).toContain("[data-on='true']");
     expect(scene).toContain('data-revealed');

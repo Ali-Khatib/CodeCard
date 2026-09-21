@@ -3700,7 +3700,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   text-align: left;
 }
 
-/* All groups share one slot and cross-fade in place — never move vertically. */
+/* All groups share one slot. Incoming fades up, outgoing fades down. */
 .cc-ed-hero-scene__statement-slot {
   grid-area: 1 / 1;
   display: flex;
@@ -3714,6 +3714,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   visibility: hidden;
   pointer-events: none;
   z-index: 0;
+  will-change: opacity, transform;
 }
 
 .cc-ed-hero-scene__statement-slot[data-on='true'] {

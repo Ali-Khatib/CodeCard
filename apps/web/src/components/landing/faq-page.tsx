@@ -138,7 +138,8 @@ export function FaqPage() {
               <span className="cc-faq-front__mark">CodeCard</span>
               <span className="cc-faq-front__aside">Product questions</span>
             </div>
-            <p className="cc-faq-front__eyebrow">Common questions</p>
+            <p className="cc-faq-front__eyebrow">Straight answers</p>
+            <span className="cc-faq-front__scroll">Scroll to enter</span>
           </>
         }
       >

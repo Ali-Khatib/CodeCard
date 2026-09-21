@@ -34,7 +34,7 @@ const HERO_HOLD_VH = { desktop: 58, mobile: 42 } as const;
  * The hero scrolls away and the statement scrolls up on plain document
  * scroll first; nothing is faked with transforms.
  */
-const STATEMENT_SCROLL_VH = { desktop: 440, mobile: 380 } as const;
+const STATEMENT_SCROLL_VH = { desktop: 620, mobile: 530 } as const;
 const CINEMA_SCRUB = 0.35;
 /** Share of the expand segment used for the clip-path tween. */
 const EXPAND_CLIP_END = 1;
@@ -43,9 +43,15 @@ const EXPAND_CLIP_END = 1;
  * Reveal runs word by word (reading-text-reveal): dim → full as scroll
  * crosses the section. Groups share one slot; ONE bar fills 0 → 1 across all three.
  */
-const STATEMENT_WORD_LERP = 0.09;
-/** Share of each group's segment spent filling before it hands over. */
-const BEAT_FILL_SHARE = 0.87;
+const STATEMENT_WORD_LERP = 0.07;
+/** Word fill, then a filled lift, then a fade-down before the next group. */
+const BEAT_ENTER_SHARE = 0.14;
+const BEAT_FILL_SHARE = 0.58;
+const BEAT_SETTLE_SHARE = 0.12;
+const BEAT_EXIT_SHARE = 0.16;
+const BEAT_RISE_PX = 22;
+const BEAT_LIFT_PX = 12;
+const BEAT_SINK_PX = 18;
 let heroIntroPlayed = false;
 
 const STATEMENT_BEATS = [
@@ -74,6 +80,34 @@ const STATEMENT_BEATS = [
     lede: 'Save who you met, where you met, and what you talked about. Add a note, set a follow-up, and pick up where the conversation left off.',
   },
 ] as const;
+
+function easeOutQuad(t: number) {
+  return 1 - (1 - t) * (1 - t);
+}
+
+function easeInQuad(t: number) {
+  return t * t;
+}
+
+function beatWindows(beatIndex: number, beatCount: number, beatSpan: number) {
+  const start = beatIndex * beatSpan;
+  const enterDur = beatIndex === 0 ? 0 : beatSpan * BEAT_ENTER_SHARE;
+  const settleDur = beatSpan * BEAT_SETTLE_SHARE;
+  const exitDur =
+    beatIndex === beatCount - 1 ? 0 : beatSpan * BEAT_EXIT_SHARE;
+  const fillDur =
+    beatSpan - enterDur - settleDur - exitDur;
+  return {
+    start,
+    enterDur,
+    fillDur,
+    settleDur,
+    exitDur,
+    enterEnd: start + enterDur,
+    fillEnd: start + enterDur + fillDur,
+    settleEnd: start + enterDur + fillDur + settleDur,
+  };
+}
 
 function wordsOf(text: string) {
   return text.trim().split(/\s+/).filter(Boolean);
@@ -273,13 +307,77 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         setPager(index);
       };
 
+      const applyBeatMotion = (progress: number) => {
+        beatEls.forEach((beat, beatIndex) => {
+          const win = beatWindows(beatIndex, beatCount, beatSpan);
+          const doneAt = win.settleEnd + win.exitDur;
+          let opacity = 0;
+          let y = BEAT_RISE_PX;
+          let on = false;
+
+          if (progress < win.start) {
+            opacity = 0;
+            y = BEAT_RISE_PX;
+          } else if (win.exitDur > 0 && progress >= doneAt) {
+            opacity = 0;
+            y = BEAT_SINK_PX;
+          } else if (progress < win.enterEnd) {
+            const t = easeOutQuad(
+              Math.min(
+                1,
+                (progress - win.start) / Math.max(win.enterDur, 1e-6),
+              ),
+            );
+            opacity = t;
+            y = BEAT_RISE_PX * (1 - t);
+            on = t > 0.02;
+          } else if (progress < win.fillEnd) {
+            opacity = 1;
+            y = 0;
+            on = true;
+          } else if (progress < win.settleEnd) {
+            const t = easeOutQuad(
+              Math.min(
+                1,
+                (progress - win.fillEnd) / Math.max(win.settleDur, 1e-6),
+              ),
+            );
+            opacity = 1;
+            y = BEAT_LIFT_PX * (1 - t);
+            on = true;
+          } else if (win.exitDur > 0) {
+            const t = easeInQuad(
+              Math.min(
+                1,
+                (progress - win.settleEnd) / Math.max(win.exitDur, 1e-6),
+              ),
+            );
+            opacity = 1 - t;
+            y = BEAT_SINK_PX * t;
+            on = opacity > 0.02;
+          } else {
+            opacity = 1;
+            y = 0;
+            on = true;
+          }
+
+          beat.style.opacity = String(opacity);
+          beat.style.visibility = on ? 'visible' : 'hidden';
+          beat.style.transform = `translate3d(0, ${y}px, 0)`;
+          beat.style.pointerEvents = on && opacity > 0.55 ? 'auto' : 'none';
+          beat.style.zIndex = on ? '1' : '0';
+        });
+      };
+
       const applyWordReveal = (progress: number) => {
         const active = activeBeatIndex(progress);
         setActiveBeat(active);
+        applyBeatMotion(progress);
         beatEls.forEach((beat, beatIndex) => {
           const words = beat.querySelectorAll<HTMLElement>(
             '[data-statement-word]',
           );
+          const win = beatWindows(beatIndex, beatCount, beatSpan);
           if (beatIndex !== active) {
             words.forEach((word) => {
               if (word.getAttribute('data-revealed') !== 'false') {
@@ -288,9 +386,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             });
             return;
           }
-          const beatStart = beatIndex * beatSpan;
-          const fillDur = beatSpan * BEAT_FILL_SHARE;
-          const local = (progress - beatStart) / Math.max(fillDur, 1e-6);
+          const local =
+            (progress - win.enterEnd) / Math.max(win.fillDur, 1e-6);
           const t = Math.max(0, Math.min(1, local));
           const count = revealedWordCount(t, words.length);
           words.forEach((word, wi) => {
