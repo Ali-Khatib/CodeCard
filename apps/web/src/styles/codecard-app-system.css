@@ -2186,6 +2186,7 @@ html.dark .cc-app-badge--blush {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
+    container-type: inline-size;
     border-top: 1px solid var(--app-border);
     background: color-mix(in srgb, var(--app-paper) 92%, transparent);
     backdrop-filter: blur(12px);
@@ -2213,15 +2214,15 @@ html.dark .cc-app-badge--blush {
     gap: 1px;
     border-radius: 8px;
     padding: 4px 0;
-    font-size: 8px;
+    font-size: clamp(7px, 2.2cqi, 10px);
     line-height: 1.05;
     white-space: nowrap;
     overflow: hidden;
   }
 
   .cc-app-mobile-nav__link svg {
-    width: 16px;
-    height: 16px;
+    width: clamp(14px, 4.2cqi, 18px);
+    height: clamp(14px, 4.2cqi, 18px);
   }
 
   .cc-app-mobile-nav__link > span {
@@ -6684,6 +6685,25 @@ html.dark .cc-public-atmosphere__grain {
   border-color: rgba(247, 242, 235, 0.45) !important;
   color: var(--hero-ink) !important;
   background: transparent !important;
+}
+
+/* QR sheet is a light paper surface inside the dark hero panel. */
+.cc-public-hero__panel .cc-qr-modal {
+  color: #1a191c;
+  background: #fcfaf6 !important;
+  border-color: rgba(26, 25, 28, 0.16) !important;
+}
+
+.cc-public-hero__panel .cc-qr-modal .cc-app-mono,
+.cc-public-hero__panel .cc-qr-modal p {
+  color: #1a191c !important;
+}
+
+.cc-public-hero__panel .cc-qr-modal .cc-app-btn--ghost,
+.cc-public-hero__panel .cc-qr-modal .cc-app-btn--soft {
+  color: #1a191c !important;
+  border-color: rgba(26, 25, 28, 0.28) !important;
+  background: #fff !important;
 }
 
 .cc-flip-card__rotator {

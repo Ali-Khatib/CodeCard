@@ -105,6 +105,7 @@
 /* Floating transparent rounded frame over the hero.
    Fixed so Lenis page transform cannot scroll the nav away. */
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+  --cc-ed-nav-end-gutter: 3.5rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -115,12 +116,48 @@
   padding: calc(
       var(--cc-ed-cinema-inset, 4px) + 0.55rem + env(safe-area-inset-top, 0px)
     )
-    calc(var(--cc-ed-cinema-inset, 4px) + 3.5rem)
+    calc(var(--cc-ed-cinema-inset, 4px) + var(--cc-ed-nav-end-gutter))
     0;
+  padding-inline: calc(
+    var(--cc-ed-cinema-inset, 4px) + var(--cc-ed-nav-end-gutter)
+  ) !important;
   pointer-events: none;
   background: transparent;
   border: 0;
   box-shadow: none;
+}
+
+@media (max-width: 767px) {
+  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+    --cc-ed-nav-end-gutter: 3.4rem;
+  }
+
+  .cc-marketing-shell .cc-ed-mark-logo__inner {
+    font-size: 1.55rem;
+  }
+
+  .cc-marketing-shell .cc-ed-home-control {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+    --cc-ed-nav-end-gutter: 3.45rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+    --cc-ed-nav-end-gutter: 3.25rem;
+  }
+}
+
+@media (max-width: 330px) {
+  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+    --cc-ed-nav-end-gutter: 3.1rem;
+  }
 }
 
 /* Fixed top-left mark on ALL marketing pages (landing + pricing + etc.).
@@ -246,9 +283,9 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   padding: 6px 14px;
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 11px;
+  font-size: clamp(8px, 3.15cqi, 11px);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: clamp(0.03em, 0.22cqi, 0.08em);
   text-transform: uppercase;
   text-decoration: none;
   border: 0;
@@ -275,12 +312,18 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
 }
 
 /* Equal nav pills that shrink so the bar never overlaps the CC mark or home. */
+.cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
 .cc-marketing-shell .cc-nav-pill-item--eq {
   flex: 1 1 0;
-  width: auto;
+  width: 100%;
   min-width: 0;
   max-width: none;
-  padding-inline: clamp(0.35rem, 0.9vw, 0.8rem);
+  padding-inline: clamp(0.2rem, 2.1cqi, 0.8rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -289,13 +332,13 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
 
 @media (max-width: 767px) {
   .cc-marketing-shell .cc-nav-pill-item--eq {
-    width: auto;
+    width: 100%;
     min-width: 0;
     max-width: none;
-    min-height: 44px;
-    padding-inline: 0.7rem;
-    font-size: 10.5px;
-    letter-spacing: 0.07em;
+    min-height: 40px;
+    padding-inline: clamp(0.12rem, 1.8cqi, 0.5rem);
+    font-size: clamp(8px, 3.35cqi, 10.5px);
+    letter-spacing: clamp(0.02em, 0.18cqi, 0.07em);
   }
 }
 
@@ -338,6 +381,7 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   color: var(--ed-ink, #232324);
   max-width: 100%;
   min-width: 0;
+  container-type: inline-size;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
@@ -418,11 +462,11 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   display: flex;
   width: 100%;
   min-width: 0;
-  gap: clamp(0.12rem, 0.55vw, 0.45rem);
+  gap: clamp(0.04rem, 0.7cqi, 0.45rem);
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
-  padding-inline: 0.7rem;
+  padding-inline: clamp(0.22rem, 2cqi, 0.7rem);
   gap: 0.35rem;
 }
 
@@ -1415,13 +1459,22 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: min(40rem, 100%);
+  width: min(62rem, 100%);
   max-width: none;
   min-width: 0;
   overflow: visible;
   container-type: inline-size;
   padding-top: calc(var(--cc-ed-nav-clearance, 4.25rem) + 0.35rem);
-  gap: 0;
+  gap: clamp(1.1rem, 2.2vh, 1.85rem);
+}
+
+.cc-ed-hero__mast {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.04em;
+  width: 100%;
+  min-width: 0;
 }
 
 .cc-ed-hero__baseline {
@@ -1448,15 +1501,15 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-hero__quote {
-  width: min(28rem, 100%);
-  margin: 0.85em 0 0;
-  max-width: 28rem;
+  width: min(42rem, 100%);
+  margin: 0;
+  max-width: 42rem;
   text-align: left;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.28rem, 1.7vw + 0.72rem, 1.85rem);
+  font-size: clamp(1.5rem, 2.35vw + 0.78rem, 2.35rem);
   font-weight: 400;
-  line-height: 1.22;
-  letter-spacing: -0.028em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   color: #efe8e0;
   text-wrap: pretty;
   text-shadow: 0 1px 18px rgba(8, 10, 9, 0.35);
@@ -1506,13 +1559,13 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 100%;
   max-width: none;
   min-width: 0;
-  margin: 0.12em 0 0;
+  margin: 0;
   overflow: visible;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.35rem, 8.4cqi, 2.85rem);
+  font-size: clamp(1.85rem, 12.2cqi, 4.55rem);
   font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 0.98;
+  letter-spacing: -0.038em;
   text-align: left;
 }
 
@@ -1639,10 +1692,10 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-ed-hero__brand {
   margin: 0;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.85rem, 11.5cqi, 3.85rem);
+  font-size: clamp(2.55rem, 16.5cqi, 6.4rem);
   font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  letter-spacing: -0.042em;
+  line-height: 0.92;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--ed-accent, #e95a0b);
@@ -1652,11 +1705,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   display: block;
   width: max-content;
   max-width: 100%;
-  margin: 0 0 0.08em;
-  font-size: clamp(1.2rem, 9.6cqi, 3.15rem);
+  margin: 0 0 0.02em;
+  font-size: 1em;
   font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: inherit;
+  line-height: inherit;
   white-space: nowrap;
   color: #efedeb;
 }
@@ -1735,8 +1788,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 @media (max-width: 767px) {
   .cc-ed-hero__quote {
-    font-size: clamp(1.18rem, 4.4vw, 1.55rem);
-    width: min(28rem, 100%);
+    font-size: clamp(1.28rem, 4.8vw, 1.75rem);
+    width: min(36rem, 100%);
   }
 
   .cc-ed-hero__baseline {
@@ -1766,7 +1819,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 @media (max-width: 640px) {
   .cc-ed-hero__headline {
-    font-size: clamp(1.2rem, 7.4vw, 1.85rem);
+    font-size: clamp(1.45rem, 8.8vw, 2.35rem);
+  }
+
+  .cc-ed-hero__brand {
+    font-size: clamp(2.05rem, 12.5vw, 3.35rem);
   }
 }
 

@@ -5475,36 +5475,59 @@ select,
 }
 
 .cc-visitor-prompt__refusal {
-  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .cc-visitor-prompt__dismiss {
+  appearance: none;
   display: inline-flex;
   min-height: 44px;
   width: 100%;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   margin: 0;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  padding: 10px 4px;
+  border: 1px solid color-mix(in srgb, var(--vp-ink) 38%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vp-ink) 7%, var(--vp-paper));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  padding: 10px 16px;
   color: var(--vp-ink);
   font-size: 14px;
-  font-weight: 600;
-  line-height: 1.35;
-  text-align: left;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cc-visitor-prompt__dismiss:hover,
+.cc-visitor-prompt__dismiss:focus-visible {
+  background: var(--vp-ink);
+  border-color: var(--vp-ink);
+  color: var(--vp-paper);
+  box-shadow: none;
+}
+
+.cc-visitor-prompt__dismiss:active {
+  transform: translateY(1px);
 }
 
 .cc-visitor-prompt__refusal-support {
-  margin: 2px 0 0;
-  max-width: 36ch;
-  padding: 0 4px;
+  margin: 0;
+  max-width: none;
+  padding: 0 6px;
   color: var(--vp-smoke);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
+  text-align: center;
 }
 
 .cc-visitor-prompt :is(a, button):focus-visible {
@@ -5567,6 +5590,12 @@ select,
     background: ButtonText;
     border-color: ButtonText;
     color: ButtonFace;
+  }
+
+  .cc-visitor-prompt__dismiss {
+    border: 1px solid CanvasText;
+    background: ButtonFace;
+    color: CanvasText;
   }
 }
 
@@ -5879,7 +5908,7 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
 
 .cc-marketing-nav-shell .cc-nav-veil {
   pointer-events: auto;
-  max-width: min(920px, calc(100% - 24px));
+  max-width: min(920px, 100%);
   transform-origin: center top;
   transition:
     box-shadow 0.55s ease,
@@ -5927,8 +5956,8 @@ html[data-nav-compact='true'] .cc-nav-veil--collapsed {
 
 @media (max-width: 767px) {
   .cc-nav-veil:not(.cc-nav-veil--collapsed) {
-    width: calc(100% - 24px);
-    max-width: calc(100% - 24px);
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -6039,11 +6068,18 @@ html[data-nav-compact='true'] .cc-nav-veil--collapsed {
 
 .cc-qr-modal {
   max-width: min(320px, calc(100vw - 32px));
+  color: var(--app-ink, #1a191c);
+}
+
+.cc-qr-modal .cc-app-mono,
+.cc-qr-modal p {
+  color: var(--app-ink, #1a191c);
 }
 
 .cc-qr-modal__close {
   min-height: 44px;
   min-width: 44px;
+  color: var(--app-ink, #1a191c);
 }
 
 .cc-social-link-react {

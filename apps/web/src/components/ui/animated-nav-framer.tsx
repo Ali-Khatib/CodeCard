@@ -71,7 +71,7 @@ export function AnimatedNavFramer({
     return () => media.removeEventListener('change', sync);
   }, []);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const measureAvail = () => {
       const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
       if (shell instanceof HTMLElement) {
@@ -83,11 +83,18 @@ export function AnimatedNavFramer({
         setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, Math.floor(next)));
         return;
       }
-      setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, window.innerWidth - (phone ? 24 : 160)));
+      const side = phone ? Math.max(32, Math.round(window.innerWidth * 0.14)) : 160;
+      setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, window.innerWidth - side * 2));
     };
     measureAvail();
+    const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
+    const ro = shell instanceof HTMLElement ? new ResizeObserver(measureAvail) : null;
+    if (shell instanceof HTMLElement) ro?.observe(shell);
     window.addEventListener('resize', measureAvail);
-    return () => window.removeEventListener('resize', measureAvail);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', measureAvail);
+    };
   }, [phone, expanded]);
 
   // Pixel sizes only — Motion cannot reliably expand from a fixed circle back to width:auto,
@@ -122,7 +129,9 @@ export function AnimatedNavFramer({
     };
   }, [phone, children, panel, expanded]);
 
-  const maxOpenWidth = Math.min(openSize.width, availWidth);
+  const maxOpenWidth = phone
+    ? availWidth
+    : Math.min(openSize.width, availWidth);
 
   const expand = React.useCallback(() => {
     onCollapsedClick?.();

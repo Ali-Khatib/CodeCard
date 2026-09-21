@@ -53,7 +53,7 @@ export function PublicCodeCardQr({
           {error ?? 'Generating QR…'}
         </p>
       )}
-      <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-smoke)]">
+      <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-ink,#1a191c)]">
         {qrUrl ?? displayUrl ?? `/${profileSlug}`}
       </p>
     </div>

@@ -19,16 +19,18 @@ export function EditorialHero() {
     >
       <div className="cc-ed-hero__content" data-testid="hero-section">
         <div className="cc-ed-hero__copy">
-          <p className="cc-ed-hero__brand">CodeCard</p>
-          <h1
-            id="editorial-hero-heading"
-            className="cc-ed-hero__headline"
-            data-hero-statement
-          >
-            <span className="cc-ed-hero__show">SHARE YOUR WORK.</span>
-            <span className="sr-only">KEEP THE CONNECTION.</span>
-            <EditorialHeroAnimatedHeadline />
-          </h1>
+          <div className="cc-ed-hero__mast">
+            <p className="cc-ed-hero__brand">CodeCard</p>
+            <h1
+              id="editorial-hero-heading"
+              className="cc-ed-hero__headline"
+              data-hero-statement
+            >
+              <span className="cc-ed-hero__show">SHARE YOUR WORK.</span>
+              <span className="sr-only">KEEP THE CONNECTION.</span>
+              <EditorialHeroAnimatedHeadline />
+            </h1>
+          </div>
           <p className="cc-ed__connect-principle cc-ed-hero__quote">
             Where your work meets your people, and introductions become
             lasting connections.

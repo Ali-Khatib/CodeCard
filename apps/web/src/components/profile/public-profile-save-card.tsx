@@ -60,7 +60,7 @@ export function PublicProfileSaveCard({
         </div>
       </div>
       {qrOpen ? (
-        <div className="mx-auto flex max-w-sm flex-col items-center rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5">
+        <div className="cc-qr-modal mx-auto flex max-w-sm flex-col items-center rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5">
           <p className="cc-app-mono mb-3">Scan to open this CodeCard</p>
           <PublicCodeCardQr profileSlug={profileSlug} />
         </div>
