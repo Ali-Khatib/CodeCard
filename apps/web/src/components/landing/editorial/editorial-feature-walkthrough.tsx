@@ -10,9 +10,6 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { ScrollTriggeredVideoHero } from '@/components/ui/scroll-triggered-video-hero';
 import { EditorialComparison } from './editorial-comparison';
 
-const U = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=75`;
-
 const V = (file: string) => `https://videos.pexels.com/video-files/${file}`;
 
 const CHAPTERS = [
@@ -23,7 +20,6 @@ const CHAPTERS = [
     description:
       'Open the live record while you speak. Problem, implementation, result, and the artifact that proves the claim.',
     videoUrl: V('4974774/4974774-hd_1920_1080_25fps.mp4'),
-    posterUrl: U('photo-1461749280684-dccba630e2f6'),
   },
   {
     id: 'research',
@@ -32,7 +28,6 @@ const CHAPTERS = [
     description:
       'Methods, findings, and the builds they describe sit in one inspectable surface. No separate citation hunt.',
     videoUrl: V('6549981/6549981-hd_1920_1080_25fps.mp4'),
-    posterUrl: U('photo-1497633762265-9d179a990aa6'),
   },
   {
     id: 'connections',
@@ -41,7 +36,6 @@ const CHAPTERS = [
     description:
       'Persist who you met with time, place, a private note, and the next action. The introduction is the source record.',
     videoUrl: V('4484270/4484270-hd_1920_1080_25fps.mp4'),
-    posterUrl: U('photo-1515169067868-5387ec356754'),
   },
   {
     id: 'events',
@@ -50,7 +44,6 @@ const CHAPTERS = [
     description:
       'Conference and meetup stay as metadata on the people from that room, not as an orphaned list.',
     videoUrl: V('8716585/8716585-hd_1920_1080_25fps.mp4'),
-    posterUrl: U('photo-1505373877841-8d25f7d46678'),
   },
   {
     id: 'circle',
@@ -59,7 +52,6 @@ const CHAPTERS = [
     description:
       'A closed set: people you actually exchanged with, their work, your notes, the meeting history. No public graph.',
     videoUrl: V('8426060/8426060-hd_1920_1080_25fps.mp4'),
-    posterUrl: U('photo-1600880292203-757bb62b4baf'),
   },
   {
     id: 'analytics',
@@ -68,7 +60,6 @@ const CHAPTERS = [
     description:
       'QR hits, project opens, paper views, and return visits after the handshake. Signal from the introduction, not a vanity count.',
     videoUrl: V('7947507/7947507-hd_1920_1080_30fps.mp4'),
-    posterUrl: U('photo-1460925895917-afdab827c52f'),
   },
 ] as const;
 

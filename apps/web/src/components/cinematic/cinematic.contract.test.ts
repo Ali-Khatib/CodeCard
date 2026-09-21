@@ -136,6 +136,9 @@ describe('Editorial product landing contract', () => {
     expect(walk).toContain("id: 'circle'");
     expect(walk).toContain("id: 'analytics'");
     expect(walk.match(/videoUrl:/g)?.length).toBe(6);
+    expect(walk).not.toContain('posterUrl');
+    expect(walk).not.toContain('images.unsplash.com');
+    expect(crash).not.toContain('poster=');
     const css = read('src/styles/editorial-landing.css');
     expect(css).toContain('.cc-ed-crash__frame');
     expect(css).toContain('.cc-ed-crash__veil');

@@ -13,7 +13,6 @@ export type CrashCourseChapter = {
   title: string;
   description: string;
   videoUrl: string;
-  posterUrl: string;
 };
 
 /** One chapter ≈ one viewport; snap interval stays under two wheel flicks. */
@@ -28,25 +27,47 @@ export function chapterIndexFromProgress(progress: number, count: number) {
 function ChapterVideo({
   chapter,
   active,
+  warm,
 }: {
   chapter: CrashCourseChapter;
   active: boolean;
+  warm?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const node = videoRef.current;
     if (!node) return;
+    node.muted = true;
+    node.defaultMuted = true;
+    node.playsInline = true;
+
+    const pinFrame = () => {
+      if (node.readyState >= 2 && node.currentTime < 0.08) {
+        try {
+          node.currentTime = 0.12;
+        } catch {
+          /* ignore seek before metadata */
+        }
+      }
+    };
+
+    const play = () => {
+      pinFrame();
+      void node.play().catch(() => undefined);
+    };
+
     if (active) {
-      const play = () => {
-        void node.play().catch(() => undefined);
-      };
       if (node.readyState >= 2) play();
-      else node.addEventListener('canplay', play, { once: true });
-      return () => node.removeEventListener('canplay', play);
+      else node.addEventListener('loadeddata', play, { once: true });
+      return () => node.removeEventListener('loadeddata', play);
     }
+
     node.pause();
-  }, [active]);
+    if (node.readyState >= 2) pinFrame();
+    else node.addEventListener('loadeddata', pinFrame, { once: true });
+    return () => node.removeEventListener('loadeddata', pinFrame);
+  }, [active, chapter.videoUrl]);
 
   return (
     <motion.div
@@ -60,13 +81,12 @@ function ChapterVideo({
       <video
         ref={videoRef}
         src={chapter.videoUrl}
-        poster={chapter.posterUrl}
         className="h-full w-full object-cover"
         muted
         loop
         playsInline
         autoPlay={active}
-        preload={active ? 'auto' : 'metadata'}
+        preload={active || warm ? 'auto' : 'metadata'}
       />
       <div className="cc-ed-crash__veil" />
     </motion.div>
@@ -173,7 +193,7 @@ export function ScrollTriggeredVideoHero({
               style={{ ['--crash-progress' as string]: '100%' }}
             >
               <div className="cc-ed-crash__media relative">
-                <ChapterVideo chapter={item} active />
+                <ChapterVideo chapter={item} active warm />
                 <CrashCopy chapters={chapters} index={index} />
               </div>
             </article>
@@ -213,6 +233,7 @@ export function ScrollTriggeredVideoHero({
                   key={item.id}
                   chapter={item}
                   active={index === activeIndex}
+                  warm={Math.abs(index - activeIndex) <= 1}
                 />
               ))}
               <CrashCopy chapters={chapters} index={activeIndex} />
