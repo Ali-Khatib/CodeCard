@@ -3710,7 +3710,17 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   gap: clamp(1.05rem, 2.4vh, 1.7rem);
   width: 100%;
   min-width: 0;
-  will-change: opacity;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cc-ed-hero-scene__statement-slot[data-on='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .cc-ed-hero-scene__statement-body {

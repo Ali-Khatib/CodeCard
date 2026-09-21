@@ -257,15 +257,41 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       let wordRevealCurrent = 0;
       let wordRevealRaf: number | null = null;
 
+      const activeBeatIndex = (progress: number) => {
+        if (progress >= 1) return beatCount - 1;
+        return Math.min(beatCount - 1, Math.max(0, Math.floor(progress / beatSpan)));
+      };
+
+      const setActiveBeat = (index: number) => {
+        beatEls.forEach((beat, i) => {
+          const on = i === index;
+          if (beat.getAttribute('data-on') !== (on ? 'true' : 'false')) {
+            beat.setAttribute('data-on', on ? 'true' : 'false');
+            beat.setAttribute('aria-hidden', on ? 'false' : 'true');
+          }
+        });
+        setPager(index);
+      };
+
       const applyWordReveal = (progress: number) => {
+        const active = activeBeatIndex(progress);
+        setActiveBeat(active);
         beatEls.forEach((beat, beatIndex) => {
+          const words = beat.querySelectorAll<HTMLElement>(
+            '[data-statement-word]',
+          );
+          if (beatIndex !== active) {
+            words.forEach((word) => {
+              if (word.getAttribute('data-revealed') !== 'false') {
+                word.setAttribute('data-revealed', 'false');
+              }
+            });
+            return;
+          }
           const beatStart = beatIndex * beatSpan;
           const fillDur = beatSpan * BEAT_FILL_SHARE;
           const local = (progress - beatStart) / Math.max(fillDur, 1e-6);
           const t = Math.max(0, Math.min(1, local));
-          const words = beat.querySelectorAll<HTMLElement>(
-            '[data-statement-word]',
-          );
           const count = revealedWordCount(t, words.length);
           words.forEach((word, wi) => {
             const next = wi < count ? 'true' : 'false';
@@ -300,23 +326,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         if (!progressFillRef.current) return;
         const fillEl = progressFillRef.current;
 
-        setPager(0);
         gsap.set(fillEl, { scaleX: 0, transformOrigin: 'left center' });
 
-        /*
-         * The handoff window is split in two so the fades run back to back
-         * instead of together — the old group is fully gone (autoAlpha also
-         * kills visibility) before the new one starts, so they never ghost
-         * over each other.
-         */
-        const fadeDur = (beatSpan * (1 - BEAT_FILL_SHARE)) / 2;
-
-        /* Group 1 sits on screen already dim while the section scrolls up. */
-        beatEls.forEach((beat, i) => {
+        beatEls.forEach((beat) => {
           beat
             .querySelectorAll<HTMLElement>('[data-statement-word]')
             .forEach((word) => word.setAttribute('data-revealed', 'false'));
-          gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0, y: 0 });
         });
         applyWordReveal(0);
 
@@ -332,85 +347,25 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => {
               root.dataset.cinemaChapter = 'statement';
-              /* Statement is full-bleed dark — white chrome. */
               applyLandingChromeInk('light');
               queueWordReveal(self.progress);
-              /*
-               * Count from the crossover, not the segment edge — the incoming
-               * group owns the slot a fade early, so the pager flips with it.
-               */
-              setPager(
-                Math.min(
-                  beatCount - 1,
-                  Math.max(
-                    0,
-                    Math.floor((self.progress + fadeDur) * beatCount),
-                  ),
-                ),
-              );
             },
             onLeave: () => {
               queueWordReveal(1);
-              setPager(beatCount - 1);
             },
             onLeaveBack: () => {
               queueWordReveal(0);
               root.dataset.cinemaChapter = 'hero';
-              setPager(0);
             },
           },
         });
 
-        /* ONE bar, linear across all three groups. */
         statementTl.fromTo(
           fillEl,
           { scaleX: 0 },
           { scaleX: 1, duration: 1, ease: 'none' },
           0,
         );
-
-        beatEls.forEach((beat, beatIndex) => {
-          const beatStart = beatIndex * beatSpan;
-          const isLast = beatIndex === beatCount - 1;
-          const fillDur = beatSpan * BEAT_FILL_SHARE;
-
-          if (beatIndex > 0) {
-            statementTl!.fromTo(
-              beat,
-              { autoAlpha: 0, y: 0 },
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: fadeDur,
-                /*
-                 * Steep curves on both sides keep each group readable for most
-                 * of its fade, so the instant where neither is lit stays a
-                 * crossover rather than a visible empty slot.
-                 */
-                ease: 'power2.out',
-                /* Without this the from-state paints at build time. */
-                immediateRender: false,
-              },
-              beatStart - fadeDur,
-            );
-          }
-
-          /* Filled group fades in place so the next one occupies the same slot. */
-          if (!isLast) {
-            statementTl!.fromTo(
-              beat,
-              { autoAlpha: 1, y: 0 },
-              {
-                autoAlpha: 0,
-                y: 0,
-                duration: fadeDur,
-                ease: 'power2.in',
-                immediateRender: false,
-              },
-              beatStart + fillDur,
-            );
-          }
-        });
       };
 
       const buildScrollCinema = () => {
@@ -580,6 +535,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                   key={beat.id}
                   className="cc-ed-hero-scene__statement-slot"
                   data-statement-beat={beat.id}
+                  data-on={i === 0 ? 'true' : 'false'}
                   aria-hidden={i !== 0}
                 >
                   <p className="cc-ed-hero-scene__statement-step">

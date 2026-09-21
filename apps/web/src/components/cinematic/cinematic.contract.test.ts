@@ -292,7 +292,11 @@ describe('Editorial product landing contract', () => {
     expect(scene).toContain('runwayTotalVh');
     expect(scene).toContain('buildStatementReveal');
     expect(scene).toContain('BEAT_FILL_SHARE');
-    /* Word fill (reading-text-reveal), pure cross-fade, one linear bar. */
+    /* Word fill (reading-text-reveal), one beat on at a time, one linear bar. */
+    expect(scene).toContain('data-on');
+    expect(scene).toContain('setActiveBeat');
+    expect(scene).not.toContain('autoAlpha');
+    expect(css).toContain("[data-on='true']");
     expect(scene).toContain('data-revealed');
     expect(scene).toContain('STATEMENT_WORD_LERP');
     expect(scene).toContain('revealedWordCount');
