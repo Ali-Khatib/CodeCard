@@ -452,6 +452,7 @@ export async function listOwnerConnections(
       source,
       context,
       follow_up_at,
+      sort_order,
       saved_profile:saved_profile_id (
         ${TARGET_SELECT}
       )

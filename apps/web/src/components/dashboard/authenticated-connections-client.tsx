@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { reorderConnectionsAction } from '@/app/actions/connections';
+import { reorderConnectionsAction, removeConnectionAction } from '@/app/actions/connections';
 import {
   addConnectionToCollectionAction,
   removeConnectionFromCollectionAction,

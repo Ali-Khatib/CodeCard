@@ -82,7 +82,7 @@ export default async function DashboardHomePage() {
   const projectsSummary = contentResult.ok ? contentResult.projects : null;
   const researchSummary = contentResult.ok ? contentResult.research : null;
 
-  let circleWorks = overviewCircleWorksFromAuthFeed(
+  const circleWorks = overviewCircleWorksFromAuthFeed(
     circleFeed.status === 'feed' ? circleFeed.items : [],
     3,
   );
