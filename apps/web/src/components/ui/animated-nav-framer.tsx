@@ -113,7 +113,7 @@ export function AnimatedNavFramer({
       const width = Math.ceil(Math.max(inner.scrollWidth, inner.offsetWidth));
       inner.style.width = previousWidth;
       inner.style.maxWidth = previousMaxWidth;
-      const height = Math.ceil(Math.max(inner.scrollHeight, phone ? 52 : 48) + panelHeight);
+      const height = Math.ceil(Math.max(inner.scrollHeight, 52) + panelHeight);
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>
           prev.width === width && prev.height === height ? prev : { width, height },
