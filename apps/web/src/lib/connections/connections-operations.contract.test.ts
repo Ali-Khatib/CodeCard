@@ -79,6 +79,7 @@ describe('WS15-T003 connections server actions wiring', () => {
       'utf8',
     );
     expect(actions).toContain("'use server'");
+    expect(actions).toContain('reorderConnectionsAction');
     expect(actions).toContain('addConnectionAction');
     expect(actions).toContain('removeConnectionAction');
     expect(actions).toContain('getConnectionStatusAction');
@@ -96,6 +97,7 @@ describe('WS15-T003 connections server actions wiring', () => {
     expect(core).toContain('executeAddConnection');
     expect(core).toContain('executeRemoveConnection');
     expect(core).toContain('listOwnerConnections');
+    expect(core).toContain("order('sort_order'");
     expect(core).toContain('executeConnectionStatus');
     expect(core).toContain("eq('owner_user_id', user.id)");
     expect(core).not.toMatch(/select\([^)]*email/i);

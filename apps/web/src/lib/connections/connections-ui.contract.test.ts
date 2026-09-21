@@ -14,6 +14,7 @@ describe('WS15-T004 real Connections save flow', () => {
       context: null,
       followUpAt: null,
       privateNote: null,
+      sortOrder: 0,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',
         slug: 'bob-smith',
@@ -40,6 +41,7 @@ describe('WS15-T004 real Connections save flow', () => {
       context: null,
       followUpAt: null,
       privateNote: null,
+      sortOrder: 0,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',
         slug: '',
@@ -64,6 +66,12 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(page).toContain('listOwnerConnections');
     expect(page).toContain('AuthenticatedConnectionsClient');
     expect(page).toContain('mapOwnerConnectionToCard');
+    const client = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/authenticated-connections-client.tsx'),
+      'utf8',
+    );
+    expect(client).toContain('onReorderConnections');
+    expect(client).toContain('reorderConnectionsAction');
     expect(page).not.toContain('DEMO_CONNECTIONS');
   });
 

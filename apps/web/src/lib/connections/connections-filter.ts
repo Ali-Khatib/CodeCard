@@ -1,6 +1,11 @@
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 
-export type ConnectionsSortId = 'newest' | 'oldest' | 'name_asc' | 'name_desc';
+export type ConnectionsSortId =
+  | 'custom'
+  | 'newest'
+  | 'oldest'
+  | 'name_asc'
+  | 'name_desc';
 export type ConnectionsCollectionFilter = 'all' | 'uncategorized' | string;
 /** `all` | `unknown` (no location) | exact country/location string. */
 export type ConnectionsLocationFilter = 'all' | 'unknown' | string;
@@ -11,6 +16,7 @@ export type FilterableConnection = WorkspaceConnection & {
   context?: string | null;
   privateNote?: string | null;
   connectedAtIso?: string | null;
+  sortOrder?: number;
 };
 
 export function normalizeConnectionsQuery(raw: string): string {
@@ -134,6 +140,16 @@ export function sortConnections(
   sort: ConnectionsSortId,
 ): FilterableConnection[] {
   const copy = [...connections];
+  if (sort === 'custom') {
+    const originalIndex = new Map(connections.map((c, index) => [c.id, index]));
+    copy.sort((a, b) => {
+      const left = a.sortOrder ?? originalIndex.get(a.id) ?? 0;
+      const right = b.sortOrder ?? originalIndex.get(b.id) ?? 0;
+      if (left !== right) return left - right;
+      return a.id.localeCompare(b.id);
+    });
+    return copy;
+  }
   copy.sort((a, b) => {
     if (sort === 'name_asc' || sort === 'name_desc') {
       const cmp = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });

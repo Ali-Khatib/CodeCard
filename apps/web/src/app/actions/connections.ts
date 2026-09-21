@@ -13,6 +13,7 @@ import {
   type ConnectionStatusResult,
   type ListConnectionsResult,
 } from '@/lib/connections/connections-core';
+import { executeReorderConnections } from '@/lib/connections/connections-order-core';
 
 export type {
   ConnectionMutationState,
@@ -111,4 +112,29 @@ export async function listConnectionsAction(): Promise<ListConnectionsResult> {
     data: { user },
   } = await supabase.auth.getUser();
   return listOwnerConnections(supabase, { user: user ?? null });
+}
+
+export async function reorderConnectionsAction(
+  connectionIds: string[],
+): Promise<{ success?: boolean; error?: string; code?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error: connectionErrorMessage('UNAUTHENTICATED'),
+      code: 'UNAUTHENTICATED',
+    };
+  }
+
+  const limited = await withConnectionRateLimit(user.id);
+  if (limited) return limited;
+
+  const result = await executeReorderConnections(supabase, connectionIds, { user });
+  if (result.success) {
+    revalidateConnectionPaths();
+  }
+  return result;
 }

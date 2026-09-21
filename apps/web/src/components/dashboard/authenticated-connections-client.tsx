@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { removeConnectionAction } from '@/app/actions/connections';
+import { reorderConnectionsAction } from '@/app/actions/connections';
 import {
   addConnectionToCollectionAction,
   removeConnectionFromCollectionAction,
@@ -132,6 +132,28 @@ export function AuthenticatedConnectionsClient({
     [router],
   );
 
+  const onReorder = useCallback(
+    async (orderedIds: string[]) => {
+      const previous = connections;
+      setError(null);
+      setConnections((prev) => {
+        const map = new Map(prev.map((c) => [c.id, c]));
+        return orderedIds.flatMap((id, index) => {
+          const item = map.get(id);
+          return item ? [{ ...item, sortOrder: index }] : [];
+        });
+      });
+      const result = await reorderConnectionsAction(orderedIds);
+      if (!result.success) {
+        setConnections(previous);
+        setError(result.error ?? 'Could not reorder Connections.');
+        return;
+      }
+      router.refresh();
+    },
+    [connections, router],
+  );
+
   return (
     <div className="space-y-8">
       {error && (
@@ -162,6 +184,7 @@ export function AuthenticatedConnectionsClient({
         memberships={memberships}
         onToggleMembership={onToggleMembership}
         onOpenPrivateDetails={setDetailsId}
+        onReorderConnections={onReorder}
       />
       {detailsConnection ? (
         <ConnectionPrivateDetails

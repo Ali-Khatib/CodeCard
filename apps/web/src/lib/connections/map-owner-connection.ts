@@ -66,5 +66,6 @@ export function mapOwnerConnectionToCard(
     context: item.context,
     connectedAtIso: item.connectedAt ?? item.createdAt,
     followUpAtIso: item.followUpAt,
+    sortOrder: item.sortOrder,
   };
 }

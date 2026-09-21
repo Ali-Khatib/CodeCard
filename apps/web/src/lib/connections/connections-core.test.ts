@@ -160,17 +160,20 @@ function createMockSupabase(options: MockOptions = {}) {
                     maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
                   };
                 }),
-                order: vi.fn().mockResolvedValue({
-                  data: ownerFiltered.map((c) => ({
-                    id: c.id,
-                    connected_at: c.connected_at ?? null,
-                    created_at: c.created_at ?? '2026-01-01T00:00:00.000Z',
-                    source: c.source ?? 'qr',
-                    context: null,
-                    saved_profile: c.saved_profile ?? publishedTarget,
-                  })),
-                  error: null,
-                }),
+                order: vi.fn(() => ({
+                  order: vi.fn().mockResolvedValue({
+                    data: ownerFiltered.map((c) => ({
+                      id: c.id,
+                      connected_at: c.connected_at ?? null,
+                      created_at: c.created_at ?? '2026-01-01T00:00:00.000Z',
+                      source: c.source ?? 'qr',
+                      context: null,
+                      sort_order: 0,
+                      saved_profile: c.saved_profile ?? publishedTarget,
+                    })),
+                    error: null,
+                  }),
+                })),
                 maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
               };
             }

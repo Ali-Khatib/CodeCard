@@ -27,6 +27,7 @@ export type WorkspaceConnection = {
   avatarUrl?: string;
   tags: string[];
   lastViewed?: string;
+  sortOrder?: number;
 };
 
 export type DemoOwnerEvent = {

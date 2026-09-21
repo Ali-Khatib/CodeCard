@@ -2280,6 +2280,36 @@ html.dark .cc-app-badge--blush {
   overflow-anchor: none;
 }
 
+.cc-connection-item--dragging {
+  opacity: 0.55;
+}
+
+.cc-connection-drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--app-muted);
+  cursor: grab;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.cc-connection-drag:active {
+  cursor: grabbing;
+}
+
+.cc-connection-drag:focus-visible {
+  outline: 2px solid var(--app-iris);
+  outline-offset: 2px;
+}
+
 @media (max-width: 767px) {
   .cc-projects-profile-strip {
     gap: 14px;
@@ -2582,6 +2612,13 @@ html.dark .cc-app-badge--blush {
   border-radius: var(--app-radius-large);
 }
 
+.cc-connection-blob__row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 6px;
+}
+
 .cc-connection-blob__trigger {
   display: flex;
   width: 100%;
@@ -2733,6 +2770,7 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-grid-card {
+  position: relative;
   overflow: hidden;
   overflow-anchor: none;
   height: 100%;
@@ -2744,6 +2782,13 @@ html.dark .cc-app-badge--blush {
 
 .cc-connection-grid-card.cc-reactive-border {
   border-radius: var(--app-radius-large);
+}
+
+.cc-connection-grid-card .cc-connection-drag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
 }
 
 .cc-connection-grid-card--open {

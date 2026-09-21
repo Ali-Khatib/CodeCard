@@ -50,6 +50,7 @@ export type OwnerConnectionListItem = {
   context: string | null;
   followUpAt: string | null;
   privateNote: string | null;
+  sortOrder: number;
   target: SafePublicConnectionTarget;
 };
 

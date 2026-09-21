@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import Image from 'next/image';
 import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
@@ -17,6 +17,7 @@ import {
 } from '@/lib/connections/connections-filter';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
+import { moveIndex, weaveVisibleOrder } from '@/lib/connections/connections-order-core';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
@@ -66,6 +67,7 @@ function scrollByDelta(scroller: HTMLElement | Window, delta: number) {
 }
 
 const SORT_OPTIONS: Array<{ id: ConnectionsSortId; label: string }> = [
+  { id: 'custom', label: 'Your order' },
   { id: 'newest', label: 'Newest connected' },
   { id: 'oldest', label: 'Oldest connected' },
   { id: 'name_asc', label: 'Name A–Z' },
@@ -101,6 +103,47 @@ function ConnectionOpenCodeCardButton({
         Open CodeCard
       </AppButton>
     </span>
+  );
+}
+
+function ConnectionDragHandle({
+  name,
+  onDragStart,
+  onMove,
+}: {
+  name: string;
+  onDragStart: () => void;
+  onMove: (direction: 'up' | 'down') => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="cc-connection-drag min-h-11 min-w-11"
+      draggable
+      aria-label={`Reorder ${name}`}
+      title="Drag to reorder"
+      onClick={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          onMove('up');
+        }
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          onMove('down');
+        }
+      }}
+      onDragStart={(event) => {
+        event.stopPropagation();
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', name);
+        onDragStart();
+      }}
+    >
+      <span aria-hidden>⋮⋮</span>
+    </button>
   );
 }
 
@@ -342,6 +385,7 @@ function ConnectionCard({
   membershipIds,
   onToggleMembership,
   onOpenPrivateDetails,
+  dragHandle,
 }: {
   connection: ViewConnection;
   expanded: boolean;
@@ -356,6 +400,7 @@ function ConnectionCard({
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
   onOpenPrivateDetails?: (connectionId: string) => void;
+  dragHandle?: ReactNode;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -375,7 +420,9 @@ function ConnectionCard({
       liftOnHover={!expanded}
       pressOnTap={false}
     >
-      <button
+      <div className="cc-connection-blob__row">
+        {dragHandle}
+        <button
         type="button"
         onMouseDown={(event) => {
           // Keep the click, skip focus — focus scroll is what yanks the page upward.
@@ -411,6 +458,7 @@ function ConnectionCard({
           <p className="cc-connection-blob__summary-value">{connection.date}</p>
         </div>
       </button>
+      </div>
       {connectionCodeCardHref(connection, variant) ? (
         <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
           <ConnectionOpenCodeCardButton
@@ -451,6 +499,7 @@ function ConnectionGridCard({
   membershipIds,
   onToggleMembership,
   onOpenPrivateDetails,
+  dragHandle,
 }: {
   connection: ViewConnection;
   expanded: boolean;
@@ -465,6 +514,7 @@ function ConnectionGridCard({
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
   onOpenPrivateDetails?: (connectionId: string) => void;
+  dragHandle?: ReactNode;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -484,6 +534,7 @@ function ConnectionGridCard({
       liftOnHover={!expanded}
       pressOnTap={false}
     >
+      {dragHandle}
       <button
         type="button"
         onMouseDown={(event) => {
@@ -594,6 +645,7 @@ export function DashboardConnectionsView({
   memberships = {},
   onToggleMembership,
   onOpenPrivateDetails,
+  onReorderConnections,
 }: {
   connections: ViewConnection[];
   basePath?: string;
@@ -608,6 +660,7 @@ export function DashboardConnectionsView({
     currentlyAssigned: boolean,
   ) => void | Promise<void>;
   onOpenPrivateDetails?: (connectionId: string) => void;
+  onReorderConnections?: (orderedIds: string[]) => void | Promise<void>;
 }) {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -616,7 +669,9 @@ export function DashboardConnectionsView({
   const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');
   const [meetingPointFilter, setMeetingPointFilter] =
     useState<ConnectionsMeetingPointFilter>('all');
-  const [sort, setSort] = useState<ConnectionsSortId>('newest');
+  const [sort, setSort] = useState<ConnectionsSortId>('custom');
+  const [demoOrder, setDemoOrder] = useState<string[] | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const listPinTokenRef = useRef(0);
   const pendingListPinRef = useRef<{ id: string; top: number } | null>(null);
 
@@ -698,11 +753,28 @@ export function DashboardConnectionsView({
     requestAnimationFrame(loop);
   }, [selectedId]);
 
+  const connectionIdsKey = connections.map((c) => c.id).join('|');
+  useEffect(() => {
+    setDemoOrder(null);
+  }, [connectionIdsKey]);
+
+  const orderedConnections = useMemo(() => {
+    if (!demoOrder) return connections;
+    const map = new Map(connections.map((c) => [c.id, c]));
+    return demoOrder.flatMap((id, index) => {
+      const item = map.get(id);
+      return item ? [{ ...item, sortOrder: index }] : [];
+    });
+  }, [connections, demoOrder]);
+
   const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
-  const locationOptions = useMemo(() => uniqueConnectionLocations(connections), [connections]);
+  const locationOptions = useMemo(
+    () => uniqueConnectionLocations(orderedConnections),
+    [orderedConnections],
+  );
   const meetingPointOptions = useMemo(
-    () => uniqueConnectionMeetingPoints(connections),
-    [connections],
+    () => uniqueConnectionMeetingPoints(orderedConnections),
+    [orderedConnections],
   );
   const locationOptionKeys = useMemo(
     () => new Set(locationOptions.map((loc) => loc.toLowerCase())),
@@ -713,12 +785,12 @@ export function DashboardConnectionsView({
     [meetingPointOptions],
   );
   const hasUnknownLocations = useMemo(
-    () => connections.some((c) => !(c.country ?? c.company ?? '').trim()),
-    [connections],
+    () => orderedConnections.some((c) => !(c.country ?? c.company ?? '').trim()),
+    [orderedConnections],
   );
   const hasUnassignedMeetingPoints = useMemo(
-    () => connections.some((c) => !connectionMeetingPointValue(c)),
-    [connections],
+    () => orderedConnections.some((c) => !connectionMeetingPointValue(c)),
+    [orderedConnections],
   );
 
   useEffect(() => {
@@ -756,16 +828,16 @@ export function DashboardConnectionsView({
   const filtered = useMemo(
     () =>
       filterAndSortConnections({
-        connections,
+        connections: orderedConnections,
         query,
         collectionFilter: variant === 'authenticated' ? collectionFilter : 'all',
         locationFilter,
         meetingPointFilter,
         memberships: variant === 'authenticated' ? memberships : {},
-        sort: variant === 'authenticated' ? sort : 'newest',
+        sort,
       }),
     [
-      connections,
+      orderedConnections,
       query,
       variant,
       collectionFilter,
@@ -776,19 +848,58 @@ export function DashboardConnectionsView({
     ],
   );
 
+  const commitOrder = useCallback(
+    (nextIds: string[]) => {
+      setSort('custom');
+      if (onReorderConnections) {
+        void onReorderConnections(nextIds);
+        return;
+      }
+      setDemoOrder(nextIds);
+    },
+    [onReorderConnections],
+  );
+
+  const reorderVisible = useCallback(
+    (fromId: string, toId: string) => {
+      const visibleIds = filtered.map((c) => c.id);
+      const from = visibleIds.indexOf(fromId);
+      const to = visibleIds.indexOf(toId);
+      if (from < 0 || to < 0 || from === to) return;
+      commitOrder(
+        weaveVisibleOrder(
+          orderedConnections.map((c) => c.id),
+          moveIndex(visibleIds, from, to),
+        ),
+      );
+    },
+    [filtered, orderedConnections, commitOrder],
+  );
+
+  const moveVisible = useCallback(
+    (id: string, direction: 'up' | 'down') => {
+      const visibleIds = filtered.map((c) => c.id);
+      const from = visibleIds.indexOf(id);
+      const to = direction === 'up' ? from - 1 : from + 1;
+      if (from < 0 || to < 0 || to >= visibleIds.length) return;
+      reorderVisible(id, visibleIds[to]!);
+    },
+    [filtered, reorderVisible],
+  );
+
   const filtersActive =
     Boolean(query.trim()) ||
     meetingPointFilter !== 'all' ||
     locationFilter !== 'all' ||
-    (variant === 'authenticated' &&
-      (collectionFilter !== 'all' || sort !== 'newest'));
+    (variant === 'authenticated' && collectionFilter !== 'all') ||
+    sort !== 'custom';
 
   const clearFilters = () => {
     setQuery('');
     setCollectionFilter('all');
     setLocationFilter('all');
     setMeetingPointFilter('all');
-    setSort('newest');
+    setSort('custom');
   };
 
   const upcomingFollowUps = useMemo(
@@ -1005,7 +1116,20 @@ export function DashboardConnectionsView({
           {viewMode === 'list' ? (
             <ul className="cc-connection-list">
               {filtered.map((c) => (
-                <li key={c.id}>
+                <li
+                  key={c.id}
+                  className={draggingId === c.id ? 'cc-connection-item--dragging' : undefined}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    if (draggingId) reorderVisible(draggingId, c.id);
+                    setDraggingId(null);
+                  }}
+                  onDragEnd={() => setDraggingId(null)}
+                >
                   <ConnectionCard
                     connection={c}
                     expanded={selectedId === c.id}
@@ -1016,6 +1140,13 @@ export function DashboardConnectionsView({
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
                     onOpenPrivateDetails={onOpenPrivateDetails}
+                    dragHandle={
+                      <ConnectionDragHandle
+                        name={c.name}
+                        onDragStart={() => setDraggingId(c.id)}
+                        onMove={(direction) => moveVisible(c.id, direction)}
+                      />
+                    }
                   />
                 </li>
               ))}
@@ -1025,7 +1156,22 @@ export function DashboardConnectionsView({
               {filtered.map((c) => (
                 <li
                   key={c.id}
-                  className={selectedId === c.id ? 'cc-connection-grid__item--open' : undefined}
+                  className={[
+                    selectedId === c.id ? 'cc-connection-grid__item--open' : '',
+                    draggingId === c.id ? 'cc-connection-item--dragging' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ') || undefined}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    if (draggingId) reorderVisible(draggingId, c.id);
+                    setDraggingId(null);
+                  }}
+                  onDragEnd={() => setDraggingId(null)}
                 >
                   <ConnectionGridCard
                     connection={c}
@@ -1037,6 +1183,13 @@ export function DashboardConnectionsView({
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
                     onOpenPrivateDetails={onOpenPrivateDetails}
+                    dragHandle={
+                      <ConnectionDragHandle
+                        name={c.name}
+                        onDragStart={() => setDraggingId(c.id)}
+                        onMove={(direction) => moveVisible(c.id, direction)}
+                      />
+                    }
                   />
                 </li>
               ))}

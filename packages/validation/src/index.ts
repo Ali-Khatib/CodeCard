@@ -508,6 +508,36 @@ export const connectionStatusInputSchema = z
     path: ['targetProfileId'],
   });
 
+export const CONNECTIONS_REORDER_MAX_COUNT = 500;
+
+export const reorderConnectionsSchema = z
+  .object({
+    connection_ids: z
+      .array(z.string().uuid('Invalid connection ID'))
+      .min(1, 'At least one Connection is required')
+      .max(
+        CONNECTIONS_REORDER_MAX_COUNT,
+        `At most ${CONNECTIONS_REORDER_MAX_COUNT} Connections`,
+      ),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    const seen = new Set<string>();
+    for (const id of data.connection_ids) {
+      if (seen.has(id)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Duplicate connection IDs are not allowed',
+          path: ['connection_ids'],
+        });
+        return;
+      }
+      seen.add(id);
+    }
+  });
+
+export type ReorderConnectionsPayload = z.infer<typeof reorderConnectionsSchema>;
+
 export const connectionNoteSchema = z.object({
   body: z.string().min(1).max(5000).trim(),
 });

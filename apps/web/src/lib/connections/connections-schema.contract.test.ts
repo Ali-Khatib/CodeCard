@@ -51,6 +51,14 @@ describe('WS15-T002 connections schema and RLS', () => {
     );
   });
 
+  it('adds owner-private sort_order for Connections reorder', () => {
+    const order = readRepo('supabase/migrations/20260921171844_connections_sort_order.sql');
+    expect(order).toContain('ADD COLUMN IF NOT EXISTS sort_order integer');
+    expect(order).toContain('idx_saved_connections_owner_sort');
+    expect(order).toContain('PARTITION BY owner_user_id');
+    expect(order).not.toMatch(/DROP TABLE saved_connections/i);
+  });
+
   it('does not claim remote application of the migration', () => {
     expect(selfGuard).not.toMatch(/supabase db push/i);
   });

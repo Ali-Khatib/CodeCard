@@ -27,7 +27,7 @@ export const IDOR_MUTATION_INVENTORY = [
   'project create/update/publish/delete/reorder/links/media',
   'research create/update/publish/delete/reorder/figures',
   'upload signed-url ownership',
-  'connections add/remove',
+  'connections add/remove/reorder',
   'collections create/rename/delete/membership',
   'connection private notes/metadata',
   'circle activity emit + read-state + cursors',
@@ -57,6 +57,10 @@ describe('WS11-T003 mutation IDOR security', () => {
       {
         file: 'src/lib/connections/connections-core.ts',
         markers: [/getAuthenticatedUser/, /owner_user_id/],
+      },
+      {
+        file: 'src/lib/connections/connections-order-core.ts',
+        markers: [/getAuthenticatedUser/, /\.eq\('owner_user_id'/],
       },
       {
         file: 'src/lib/connections/collections-core.ts',
@@ -219,6 +223,7 @@ describe('WS11-T003 mutation IDOR security', () => {
       'src/lib/connections/collections-core.ts',
       'src/lib/connections/connection-metadata-core.ts',
       'src/lib/connections/connections-core.ts',
+      'src/lib/connections/connections-order-core.ts',
       'src/lib/schedule/owner-events-core.ts',
     ]) {
       const src = readWeb(file);

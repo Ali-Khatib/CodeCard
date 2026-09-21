@@ -111,6 +111,11 @@ describe('WS15-T007 connections search filter sort', () => {
   it('sorts deterministically with id tie-breaker', () => {
     const newest = sortConnections(people, 'newest');
     expect(newest.map((p) => p.id)).toEqual(['c1', 'c3', 'c2']);
+    const custom = sortConnections(
+      people.map((p, index) => ({ ...p, sortOrder: index === 0 ? 2 : index === 1 ? 0 : 1 })),
+      'custom',
+    );
+    expect(custom.map((p) => p.id)).toEqual(['c2', 'c3', 'c1']);
     const oldest = sortConnections(people, 'oldest');
     expect(oldest.map((p) => p.id)).toEqual(['c2', 'c3', 'c1']);
     const az = sortConnections(people, 'name_asc');
@@ -144,7 +149,11 @@ describe('WS15-T007 connections search filter sort', () => {
     expect(view).toContain('Filter by country or location');
     expect(view).toContain('connections-location-filter');
     expect(view).toContain('connections-meeting-point-filter');
-    expect(view).toContain('Sort Connections');
+    expect(view).toContain('Your order');
+    expect(view).toContain('ConnectionDragHandle');
+    expect(view).toContain('cc-connection-drag min-h-11 min-w-11');
+    expect(view).toContain('onReorderConnections');
+    expect(view).toContain('weaveVisibleOrder');
     expect(view).toContain('No Connections match these filters.');
     expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('Clear filters');

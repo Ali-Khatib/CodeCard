@@ -31,7 +31,7 @@ const TARGET_SELECT =
   'id, slug, display_name, headline, location, avatar_url, is_public, owner_user_id, tenant_id';
 
 const CONNECTION_SELECT =
-  'id, saved_profile_id, connected_at, created_at, source, updated_at';
+  'id, saved_profile_id, connected_at, created_at, source, updated_at, sort_order';
 
 export type ConnectionMutationState = {
   success?: boolean;
@@ -458,6 +458,7 @@ export async function listOwnerConnections(
     `,
     )
     .eq('owner_user_id', user.id)
+    .order('sort_order', { ascending: true })
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -497,6 +498,7 @@ export async function listOwnerConnections(
         context: (row.context as string | null) ?? null,
         followUpAt: (row.follow_up_at as string | null) ?? null,
         privateNote: notesMap[row.id as string] ?? null,
+        sortOrder: typeof row.sort_order === 'number' ? row.sort_order : 0,
         target: toSafeTarget(targetRow),
       },
     ];
