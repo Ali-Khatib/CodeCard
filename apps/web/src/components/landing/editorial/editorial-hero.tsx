@@ -19,27 +19,25 @@ export function EditorialHero() {
     >
       <div className="cc-ed-hero__content" data-testid="hero-section">
         <div className="cc-ed-hero__copy">
-          <p className="cc-ed__eyebrow">CodeCard</p>
+          <p className="cc-ed-hero__brand">CodeCard</p>
           <h1
             id="editorial-hero-heading"
-            className="cc-ed__display cc-ed__display--xl mt-4"
+            className="cc-ed-hero__headline"
             data-hero-statement
           >
-            <span className="cc-ed__lead">SHARE YOUR WORK.</span>
+            <span className="cc-ed-hero__show">SHARE YOUR WORK.</span>
             <span className="sr-only">KEEP THE CONNECTION.</span>
             <EditorialHeroAnimatedHeadline />
           </h1>
         </div>
+        <p className="cc-ed__connect-principle cc-ed-hero__quote">
+          Where your work meets your people, and introductions become
+          lasting connections.
+        </p>
         <div className="cc-ed-hero__baseline">
           <div className="cc-ed-hero__baseline-copy">
             <p className="cc-ed__lede">
-              A professional profile built for real-world introductions. Show
-              projects and research from your phone, then keep the people you
-              meet with the context to follow up.
-            </p>
-            <p className="cc-ed__connect-principle">
-              <strong>Phone or QR, then a browser.</strong> Visitors do not
-              need the app just to look.
+              A profile for real-world introductions.
             </p>
           </div>
           <div className="cc-ed__actions cc-ed-hero__actions-corner">

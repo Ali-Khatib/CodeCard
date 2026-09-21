@@ -21,6 +21,8 @@ type SmoothScrollApi = {
   pause: () => void;
   /** Resume Lenis after pause. */
   resume: () => void;
+  /** Clear every pause lock and start Lenis again. */
+  release: () => void;
   /** True when Lenis is actively driving the document scroll. */
   enabled: boolean;
 };
@@ -28,6 +30,7 @@ type SmoothScrollApi = {
 const SmoothScrollContext = createContext<SmoothScrollApi>({
   pause: () => undefined,
   resume: () => undefined,
+  release: () => undefined,
   enabled: false,
 });
 
@@ -152,9 +155,14 @@ export function SmoothScrollProvider({
     }
   }, []);
 
+  const release = useCallback(() => {
+    pauseCountRef.current = 0;
+    lenisRef.current?.lenis?.start();
+  }, []);
+
   const api = useMemo<SmoothScrollApi>(
-    () => ({ pause, resume, enabled: active }),
-    [pause, resume, active],
+    () => ({ pause, resume, release, enabled: active }),
+    [pause, resume, release, active],
   );
 
   useEffect(() => {

@@ -39,7 +39,7 @@ describe('first-user Home loop', () => {
   it('keeps Create project available in the shell without competing with Home CTAs', () => {
     const shell = read('src/components/dashboard/dashboard-shell.tsx');
     const layout = read('src/app/dashboard/(authenticated)/layout.tsx');
-    const demo = read('src/app/demo/(workspace)/layout.tsx');
+    const demo = read('src/components/dashboard/demo-workspace-frame.tsx');
     expect(layout).toContain('getHomeLoopState');
     expect(layout).toContain('homeLoopState={homeLoopState}');
     expect(demo).toContain('homeLoopState="share_card"');

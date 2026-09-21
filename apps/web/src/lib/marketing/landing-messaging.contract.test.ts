@@ -46,14 +46,17 @@ describe('landing positioning copy', () => {
     expect(hero).toContain('SHARE YOUR WORK.');
     expect(hero).toContain('KEEP THE CONNECTION.');
     expect(hero).toContain('real-world introductions');
-    expect(hero).toContain('Phone or QR, then a browser.');
+    expect(hero).toContain(
+      'Where your work meets your people, and introductions become',
+    );
+    expect(hero).not.toContain('Open it on your phone, or they scan the QR.');
     expect(hero).not.toContain('scan your QR.');
     expect(hero).not.toContain('Hand them your phone.');
     expect(hero).not.toContain('YOUR PHONE.');
     const scene = read(
       'src/components/landing/editorial/editorial-hero-scene.tsx',
     );
-    expect(scene).toContain('share your QR code');
+    expect(scene).toContain('scan your QR');
     const walk = read(
       'src/components/landing/editorial/editorial-feature-walkthrough.tsx',
     );
@@ -68,13 +71,33 @@ describe('landing positioning copy', () => {
     const compare = read(
       'src/components/landing/editorial/editorial-comparison.tsx',
     );
-    expect(compare).toContain('Built for a different moment.');
+    expect(compare).toContain('Built for the handshake.');
     expect(compare).toContain('Not a core capability');
     expect(compare).toContain('<table');
-    expect(compare).toContain('Handoff in the conversation');
-    expect(compare).toContain('Introduction record');
-    expect(compare).toContain('Home calendar');
-    expect(compare).toContain('What they opened after a scan');
+    expect(compare).toContain('Definition');
+    expect(compare).toContain('Use case, and what it is mainly for.');
+    expect(compare).toContain('When the conversation turns to your work');
+    expect(compare).toContain('After you already have a name');
+    expect(compare).toContain('already know the repo');
+    expect(compare).toContain('public builder audience');
+    expect(compare).toContain('You mainly use it as a public professional network.');
+    expect(compare).toContain('You mainly use it to host and review code.');
+    expect(compare).toContain('You mainly use it as a public builder feed.');
+    expect(compare).not.toContain('CodeCard does');
+    expect(compare).not.toContain('CodeCard is.');
+    expect(compare).toContain('data-compare-fit');
+    expect(compare).toContain('cc-ed-compare__define-vs');
+    expect(compare).not.toContain('shareable technical record for in-person introductions');
+    expect(compare).toContain('Open the work in the room, on your phone or with a QR');
+    expect(compare).toContain('Keep the person from that introduction, not a later search');
+    expect(compare).toContain('Time, place, private note, and next step on the same person');
+    expect(compare).toContain('Events and follow-ups in a single calendar');
+    expect(compare).toContain('Private circle of people you actually exchanged with');
+    expect(compare).toContain('See which projects and papers they opened after the scan');
+    expect(compare).not.toContain('In-conversation handoff');
+    expect(compare).not.toContain('Session-origin connection');
+    expect(compare).not.toContain('Introduction object');
+    expect(compare).not.toContain('Post-scan instrumentation');
     expect(compare).not.toContain('In-person work presentation');
     expect(compare).not.toContain('Meeting-based connections');
     expect(compare).not.toMatch(/better than|beats |replaces |outdated|fake networking/i);

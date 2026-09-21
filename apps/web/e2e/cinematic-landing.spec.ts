@@ -16,11 +16,13 @@ test.describe('Editorial product landing', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('editorial-landing')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('editorial-feature-walkthrough')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/AROUND THE INTRODUCTION\./i).first()).toBeVisible();
-    await expect(page.getByText(/NOT A REPLACEMENT FEED\./i).first()).toBeVisible();
+    await expect(
+      page.getByText(/WHEN THE CONVERSATION TURNS TO YOUR WORK\./i).first(),
+    ).toBeVisible();
+    await expect(page.getByText(/HAVE IT READY TO SHOW\./i).first()).toBeVisible();
     await expect(page.getByTestId('editorial-comparison')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /Built for a different moment/i }),
+      page.getByRole('heading', { name: /Built for the handshake/i }),
     ).toBeVisible();
     /* Walkthrough chapter rail — copy churns, the product surfaces do not. */
     for (const chapter of ['Projects', 'Research', 'Circle', 'Analytics', 'Events']) {

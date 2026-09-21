@@ -1,12 +1,15 @@
 /* New Form–inspired marketing footer: full-bleed dark bar, orange accents. */
 
 .cc-site-footer {
-  --sf-cream: #fcf1e7;
+  --sf-cream: #ffffff;
   --sf-ink: #232324;
   --sf-mute: #5c5856;
-  --sf-dark: #0f0f10;
-  --sf-paper: #efedeb;
-  --sf-iris: var(--accent-orange, #e95a0b);
+  --sf-dark: #080a09;
+  --sf-paper: #efe7d4;
+  --sf-iris: #e95a0b;
+  --sf-moss: #1c4636;
+  --sf-leaf: #86b54a;
+  --sf-copper: #c45a22;
   /* Shared so the cream tab sits on the wave edge, not under the seam */
   --sf-seam-h: clamp(4.75rem, 16vw, 7.25rem);
   position: relative;
@@ -15,7 +18,6 @@
   max-width: none;
   margin: 0;
   overflow: visible;
-  /* Match finale black so a peek under the CTA stays black, not muddy grey */
   background: var(--sf-dark);
 }
 
@@ -25,8 +27,8 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    var(--sf-dark) 0%,
-    var(--sf-cream) 100%
+    #ececec 0%,
+    #ffffff 100%
   );
 }
 
@@ -140,8 +142,11 @@
   background: var(--sf-dark);
   color: var(--sf-cream);
   overflow: hidden;
-  /* Avoid subpixel gaps between cream statement and seam on some phones */
   margin-top: -1px;
+}
+
+.cc-site-footer__seam::before {
+  content: none;
 }
 
 .cc-site-footer__wave {
@@ -162,9 +167,25 @@
   width: 100%;
   overflow: hidden;
   background: var(--sf-dark);
-  color: var(--sf-paper);
+  color: #efedeb;
   padding: clamp(2.5rem, 6vh, 4rem) clamp(1.25rem, 5vw, 4rem)
     clamp(1.5rem, 4vh, 2.25rem);
+}
+
+.cc-site-footer__bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 55px,
+    color-mix(in srgb, #efedeb 8%, transparent) 55px,
+    color-mix(in srgb, #efedeb 8%, transparent) 56px
+  );
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
 }
 
 .cc-site-footer__bar-inner {
@@ -175,39 +196,56 @@
   display: grid;
   gap: 3rem;
   min-height: 22rem;
+  border-top: 1px solid color-mix(in srgb, #efedeb 16%, transparent);
+  padding-top: 2rem;
 }
 
 .cc-site-footer__contact {
   position: relative;
   z-index: 2;
   max-width: 36rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid color-mix(in srgb, #efedeb 14%, transparent);
 }
 
 .cc-site-footer__email {
   position: relative;
-  display: inline-block;
-  font-size: clamp(2.25rem, 5vw + 0.5rem, 4rem);
-  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
   letter-spacing: -0.035em;
-  line-height: 1.05;
-  color: var(--sf-paper);
+  line-height: 0.94;
   text-decoration: none;
+}
+
+.cc-site-footer__email-lead {
+  display: block;
+  font-size: clamp(1.85rem, 3.2vw + 0.4rem, 2.85rem);
+  color: #efedeb;
+}
+
+.cc-site-footer__email-punch {
+  display: block;
+  font-size: clamp(3.1rem, 7vw + 0.4rem, 5.5rem);
+  color: var(--sf-iris);
 }
 
 .cc-site-footer__email-line {
   display: block;
-  height: 3px;
-  margin-top: 0.35rem;
+  height: 1px;
+  margin-top: 0.55rem;
   width: 100%;
   transform-origin: left center;
-  transform: scaleX(0);
-  background: var(--sf-iris);
-  transition: transform 0.35s ease;
+  transform: scaleX(1);
+  background: color-mix(in srgb, #efedeb 28%, transparent);
+  transition: background-color 0.35s ease;
 }
 
 .cc-site-footer__email:hover .cc-site-footer__email-line,
 .cc-site-footer__email:focus-visible .cc-site-footer__email-line {
-  transform: scaleX(1);
+  background: var(--sf-iris);
 }
 
 .cc-site-footer__actions {
@@ -223,18 +261,21 @@
   justify-content: center;
   min-height: 2.85rem;
   padding: 0.7rem 1.35rem;
-  border-radius: 999px;
-  background: var(--sf-paper);
-  color: var(--sf-dark);
-  font-size: 0.9375rem;
+  border-radius: 0;
+  border: 1px solid var(--sf-iris);
+  background: var(--sf-iris);
+  color: #f6f3ef;
+  font-size: 0.8125rem;
   font-weight: 560;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
 }
 
 .cc-site-footer__btn:hover {
-  opacity: 0.92;
+  opacity: 1;
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
@@ -244,20 +285,21 @@
   justify-content: center;
   min-height: 2.85rem;
   padding: 0.7rem 1.25rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--sf-paper) 28%, transparent);
-  color: var(--sf-paper);
-  font-size: 0.9375rem;
+  border-radius: 0;
+  border: 1px solid color-mix(in srgb, #efedeb 32%, transparent);
+  color: #efedeb;
+  font-size: 0.8125rem;
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
-  background: color-mix(in srgb, var(--sf-paper) 4%, transparent);
-  backdrop-filter: blur(8px);
+  background: transparent;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .cc-site-footer__btn-ghost:hover {
-  border-color: color-mix(in srgb, var(--sf-paper) 55%, transparent);
-  background: color-mix(in srgb, var(--sf-paper) 8%, transparent);
+  border-color: color-mix(in srgb, #efedeb 62%, transparent);
+  background: color-mix(in srgb, #efedeb 6%, transparent);
 }
 
 .cc-site-footer__cols {
@@ -269,26 +311,28 @@
   width: 100%;
   max-width: none;
   padding-inline-end: clamp(3.5rem, 20vw, 16rem);
-  column-gap: clamp(1.75rem, 4vw, 4rem);
+  column-gap: 0;
   row-gap: 1.75rem;
 }
 
 .cc-site-footer__cols ul {
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 1.35rem;
   list-style: none;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.05rem;
+  border-left: 1px solid color-mix(in srgb, #efedeb 14%, transparent);
 }
 
 .cc-site-footer__link {
   position: relative;
   display: inline-block;
-  color: var(--sf-paper);
-  font-size: 0.975rem;
-  font-weight: 560;
+  color: color-mix(in srgb, #efedeb 78%, transparent);
+  font-size: 0.9375rem;
+  font-weight: 450;
+  letter-spacing: -0.01em;
   text-decoration: none;
 }
 
@@ -298,11 +342,15 @@
   left: 0;
   bottom: -0.15em;
   width: 100%;
-  height: 1.5px;
-  background: var(--sf-iris);
+  height: 1px;
+  background: #efedeb;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.28s ease;
+}
+
+.cc-site-footer__link:hover {
+  color: #f6f3ef;
 }
 
 .cc-site-footer__link:hover::after,
@@ -314,31 +362,33 @@
   position: absolute;
   inset-inline-end: clamp(1rem, 4vw, 3rem);
   inset-inline-start: auto;
-  bottom: 10%;
+  bottom: 8%;
+  z-index: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(4.5rem, 14vw, 11rem);
-  line-height: 1;
-  gap: 0.12em;
-  letter-spacing: -0.045em;
-  /* Readable watermark — was ~7% and disappeared into the bar */
-  color: color-mix(in srgb, var(--sf-paper) 32%, transparent);
+  font-size: clamp(3.75rem, 11vw, 8.25rem);
+  line-height: 0.88;
+  gap: 0.02em;
+  letter-spacing: -0.04em;
   pointer-events: none;
   user-select: none;
   text-align: right;
-  animation: cc-sf-drift 14s ease-in-out infinite;
+  animation: none;
 }
 
 .cc-site-footer__ghost span:first-child {
-  padding-inline-end: 0.08em;
+  padding-inline-end: 0.04em;
+  color: #efedeb;
 }
 
 .cc-site-footer__ghost span:last-child {
-  color: color-mix(in srgb, var(--sf-iris) 42%, var(--sf-paper) 55%);
-  opacity: 0.88;
+  color: var(--sf-iris);
+  opacity: 1;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .cc-site-footer__meta {
@@ -349,14 +399,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid color-mix(in srgb, var(--sf-paper) 12%, transparent);
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, #efedeb 16%, transparent);
 }
 
 .cc-site-footer__meta p {
   margin: 0;
   font-size: 0.8125rem;
-  color: color-mix(in srgb, var(--sf-paper) 72%, transparent);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, #efedeb 52%, transparent);
 }
 
 .cc-site-footer__meta-note {
@@ -392,9 +443,9 @@
   }
 
   .cc-site-footer__ghost {
-    opacity: 0.55;
-    font-size: clamp(3.5rem, 22vw, 6rem);
-    bottom: 28%;
+    opacity: 1;
+    font-size: clamp(3.15rem, 18vw, 5.25rem);
+    bottom: 22%;
   }
 
   .cc-site-footer__meta-note {

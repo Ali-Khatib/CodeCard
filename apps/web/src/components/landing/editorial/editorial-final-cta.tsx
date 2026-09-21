@@ -17,11 +17,11 @@ export function EditorialFinalCta() {
           className="cc-ed__display cc-ed__display--xl mt-3"
         >
           <span className="cc-ed__lead">MAKE THE NEXT CONVERSATION</span>
-          <span className="cc-ed__sub">EASIER.</span>
+          <span className="cc-ed__sub">RETRIEVABLE.</span>
         </h2>
         <p className="cc-ed__lede mt-3">
-          Create a CodeCard you can share in the moment, then use to keep the
-          relationship organized afterward.
+          Ship a card you can open in the handshake, then keep person, venue,
+          and next action on the same record.
         </p>
         <div className="cc-ed__actions mt-6">
           <Link

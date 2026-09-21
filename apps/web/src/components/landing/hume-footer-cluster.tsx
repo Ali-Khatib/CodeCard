@@ -112,8 +112,9 @@ export function HumeFooterCluster() {
       <footer className="cc-site-footer__bar">
         <div className="cc-site-footer__bar-inner">
           <div className="cc-site-footer__contact">
-            <Link href="/legal/contact" className="cc-site-footer__email">
-              Get in touch
+            <Link href="/legal/contact" className="cc-site-footer__email" aria-label="Get in touch">
+              <span className="cc-site-footer__email-lead">Get in</span>
+              <span className="cc-site-footer__email-punch">touch.</span>
               <span className="cc-site-footer__email-line" aria-hidden />
             </Link>
             <div className="cc-site-footer__actions">
@@ -163,7 +164,7 @@ export function HumeFooterCluster() {
 
           <p className="cc-site-footer__ghost" aria-hidden>
             <span>Get</span>
-            <span>Started</span>
+            <span>Started.</span>
           </p>
 
           <div className="cc-site-footer__meta">

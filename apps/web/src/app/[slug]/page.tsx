@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { isReservedProfileSlug } from '@codecard/validation';
 import { createPublicClient } from '@/lib/supabase/server';
 import {
   loadPublicProfileBySlug,
@@ -67,6 +68,8 @@ export async function generateStaticParams() {
 
 export default async function PublicProfilePage({ params }: PageProps) {
   const { slug: rawSlug } = await params;
+  const slug = normalizePublicProfileSlug(rawSlug);
+  if (!slug || isReservedProfileSlug(slug)) notFound();
   // Anonymous ISR path: cookie-free public client + cached loader on the critical render.
   // Connection chrome resolves on the client after paint (WS14-T019).
   const payload = await loadPublicProfileCached(rawSlug);

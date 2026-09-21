@@ -144,7 +144,7 @@ function ResearchChapter({
               src={beat.imageSrc}
               alt={beat.imageAlt}
               fill
-              priority={beat.id === 'attention'}
+              loading="eager"
               sizes="(max-width: 900px) 92vw, 44vw"
               className="cc-ed-research-story__img"
             />

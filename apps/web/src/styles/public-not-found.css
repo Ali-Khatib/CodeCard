@@ -1,0 +1,192 @@
+.cc-404 {
+  --cc-404-cream: #fcf1e7;
+  --cc-404-ink: #232324;
+  --cc-404-mute: #5c5856;
+  --cc-404-accent: #e95a0b;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 100dvh;
+  max-width: 100vw;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5rem 1.5rem 3rem;
+  overflow: hidden;
+  background: var(--cc-404-cream);
+  color: var(--cc-404-ink);
+}
+
+.cc-404::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 42% at 50% 28%, color-mix(in srgb, var(--cc-404-accent) 16%, transparent), transparent 62%),
+    radial-gradient(ellipse 40% 30% at 82% 88%, color-mix(in srgb, var(--cc-404-ink) 6%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+.cc-404__inner {
+  position: relative;
+  z-index: 1;
+  width: min(34rem, 100%);
+  text-align: center;
+}
+
+.cc-404__brand {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 0.2rem;
+}
+
+.cc-404__mark {
+  position: relative;
+  width: 8.25rem;
+  height: 8.25rem;
+  color: var(--cc-404-ink);
+}
+
+.cc-404__mark-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cc-404__shard--right {
+  transform-origin: 42px 34px;
+}
+
+.cc-404__crack {
+  fill: none;
+  stroke: var(--cc-404-accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cc-404__code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.08em;
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(5.5rem, 18vw, 8.5rem);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  color: var(--cc-404-ink);
+}
+
+.cc-404__zero {
+  width: 0.72em;
+  height: 0.88em;
+  flex: none;
+  color: currentColor;
+}
+
+.cc-404__eyebrow {
+  margin: 1.15rem 0 0;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cc-404-accent);
+}
+
+.cc-404__title {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.85rem, 4vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.cc-404__lede {
+  margin: 0.85rem auto 0;
+  max-width: 28rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--cc-404-mute) 88%, var(--cc-404-ink));
+}
+
+.cc-404__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: 1.85rem;
+}
+
+.cc-404__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.cc-404__btn--primary {
+  background: var(--cc-404-ink);
+  color: var(--cc-404-cream);
+  border: 1px solid var(--cc-404-ink);
+}
+
+.cc-404__btn--primary:hover {
+  background: color-mix(in srgb, var(--cc-404-ink) 88%, var(--cc-404-accent));
+  border-color: color-mix(in srgb, var(--cc-404-ink) 88%, var(--cc-404-accent));
+}
+
+.cc-404__btn--ghost {
+  background: transparent;
+  color: var(--cc-404-ink);
+  border: 1px solid color-mix(in srgb, var(--cc-404-ink) 42%, transparent);
+}
+
+.cc-404__btn--ghost:hover {
+  background: color-mix(in srgb, var(--cc-404-ink) 6%, transparent);
+}
+
+.cc-404__btn:focus-visible {
+  outline: 2px solid var(--cc-404-ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cc-404__mark-svg {
+    animation: cc-404-wobble 4.8s ease-in-out infinite;
+  }
+
+  .cc-404__shard--right {
+    animation: cc-404-slip 4.8s ease-in-out infinite;
+  }
+}
+
+@keyframes cc-404-wobble {
+  0%,
+  100% {
+    transform: rotate(-7deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-4deg) translateY(5px);
+  }
+}
+
+@keyframes cc-404-slip {
+  0%,
+  100% {
+    transform: translate(1.6px, 1.2px) rotate(6deg);
+  }
+  50% {
+    transform: translate(2.8px, 2.6px) rotate(8deg);
+  }
+}

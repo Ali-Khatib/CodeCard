@@ -7,18 +7,18 @@ import { useMotionPreferences } from '@/components/motion/motion-preferences-pro
 import {
   applyLandingChromeInk,
   createChromeToneRafScheduler,
-  syncLandingChromeFromCinema,
+  syncLandingChromeFromPage,
   type LandingChromeInk,
 } from '@/components/landing/editorial/landing-chrome-tone';
 
-/** Chapters where the fixed CC mark sits over a dark surface (light logo). */
-const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'finale', 'waitlist']);
+/** Chapters where the fixed CC mark sits over a dark surface (cream logo).
+ *  Crash is sampled from the pin; these are fallbacks only. */
+const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement']);
 /** Full-bleed immersive chapters — nav collapses to a circular expand control.
- *  Crash Course only — Research keeps the full pill. */
-const COMPACT_NAV_CHAPTERS = ['walkthrough'] as const;
+ *  Only waitlist + footer. Crash Course keeps the full pill. */
+const COMPACT_NAV_CHAPTERS = ['waitlist'] as const;
 
-function chapterInk(chapter: string, navCompact: boolean): LandingChromeInk {
-  if (navCompact) return 'light';
+function chapterInk(chapter: string): LandingChromeInk {
   return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
 }
 
@@ -68,9 +68,8 @@ function syncChromeTone(chapter: string) {
     applyLandingChromeInk(footerTone);
     return;
   }
-  if (syncLandingChromeFromCinema()) return;
-  const compact = document.documentElement.dataset.navCompact === 'true';
-  applyLandingChromeInk(chapterInk(chapter, compact));
+  if (syncLandingChromeFromPage()) return;
+  applyLandingChromeInk(chapterInk(chapter));
 }
 
 function setNavCompact(active: boolean) {
@@ -84,7 +83,7 @@ function setNavCompact(active: boolean) {
 /**
  * Sets data-chapter from section visibility. Backgrounds via CSS — no per-frame React color.
  * Also mirrors tone onto <html> so the marketing pill nav can follow chapter colors.
- * Compact nav is driven separately so it snaps only at Crash Course edges.
+ * Compact nav snaps only at the waitlist email and footer.
  * ~1 trigger per chapter (bounded).
  */
 export function EditorialAtmosphere() {
@@ -92,9 +91,9 @@ export function EditorialAtmosphere() {
   const activeRef = useRef('');
 
   useLayoutEffect(() => {
-    /* Cream letterbox under chrome on first paint — black ink until cinema owns it. */
+    /* Chrome starts on the inset cinema field — light ink until sampling runs. */
     document.documentElement.dataset.landingChapter = 'hero';
-    applyLandingChromeInk('dark');
+    applyLandingChromeInk('light');
     syncChromeTone('hero');
   }, []);
 
@@ -148,9 +147,30 @@ export function EditorialAtmosphere() {
     window.addEventListener('scroll', scheduler.request, { passive: true });
     scheduler.request();
 
-    const compactSections = COMPACT_NAV_CHAPTERS.map((id) =>
-      sections.find((section) => section.dataset.chapterSection === id),
-    ).filter((section): section is HTMLElement => Boolean(section));
+    let meshLive = true;
+    const watchMesh = () => {
+      if (!meshLive) return;
+      const chapter = activeRef.current;
+      if (
+        chapter === 'hero' ||
+        chapter === 'statement' ||
+        chapter === 'walkthrough'
+      ) {
+        scheduler.request();
+      }
+      window.setTimeout(() => {
+        if (meshLive) window.requestAnimationFrame(watchMesh);
+      }, 90);
+    };
+    window.requestAnimationFrame(watchMesh);
+
+    const waitlistSection = sections.find(
+      (section) => section.dataset.chapterSection === COMPACT_NAV_CHAPTERS[0],
+    );
+    const footerEl = document.querySelector<HTMLElement>('.cc-site-footer');
+    const compactRoots = [waitlistSection, footerEl].filter(
+      (section): section is HTMLElement => Boolean(section),
+    );
 
     if (!canEnhanceMotion) {
       const chapterObserver = new IntersectionObserver(
@@ -166,34 +186,26 @@ export function EditorialAtmosphere() {
       );
       sections.forEach((section) => chapterObserver.observe(section));
 
-      // Compact only while Crash Course actually occupies the top of the viewport.
       const compactObserver = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            const id =
-              (entry.target as HTMLElement).dataset.chapterSection ?? '';
-            if (!id) continue;
-            if (entry.isIntersecting && entry.boundingClientRect.top <= 8) {
-              compactActive.add(id);
-            } else if (
-              !entry.isIntersecting ||
-              entry.boundingClientRect.bottom <= 8
-            ) {
-              compactActive.delete(id);
-            }
+            const el = entry.target as HTMLElement;
+            const id = el.dataset.chapterSection || 'footer';
+            if (entry.isIntersecting) compactActive.add(id);
+            else compactActive.delete(id);
           }
           syncCompact();
         },
         {
           root: null,
-          // Top band of the viewport — not mid-screen early flips.
-          rootMargin: '0px 0px -85% 0px',
-          threshold: [0, 0.01, 0.1],
+          rootMargin: '-12% 0px -55% 0px',
+          threshold: [0, 0.01, 0.1, 0.25],
         },
       );
-      compactSections.forEach((section) => compactObserver.observe(section));
+      compactRoots.forEach((section) => compactObserver.observe(section));
 
       return () => {
+        meshLive = false;
         chapterObserver.disconnect();
         compactObserver.disconnect();
         footerObserver.disconnect();
@@ -220,24 +232,26 @@ export function EditorialAtmosphere() {
       });
     });
 
-    // Compact exactly for Crash Course: when the section top hits the
-    // viewport top, until the section bottom leaves the viewport top.
-    const compactTriggers = compactSections.map((section) => {
-      const id = section.dataset.chapterSection ?? '';
-      return ScrollTrigger.create({
-        id: `editorial-nav-compact-${id}`,
-        trigger: section,
-        start: 'top top',
-        end: 'bottom top',
-        onToggle: (self) => {
-          if (self.isActive) compactActive.add(id);
-          else compactActive.delete(id);
-          syncCompact();
-        },
-      });
-    });
+    const compactTriggers =
+      waitlistSection
+        ? [
+            ScrollTrigger.create({
+              id: 'editorial-nav-compact-end',
+              trigger: waitlistSection,
+              endTrigger: footerEl ?? waitlistSection,
+              start: 'top 70%',
+              end: 'bottom bottom',
+              onToggle: (self) => {
+                if (self.isActive) compactActive.add('endgame');
+                else compactActive.delete('endgame');
+                syncCompact();
+              },
+            }),
+          ]
+        : [];
 
     return () => {
+      meshLive = false;
       chapterTriggers.forEach((t) => t.kill());
       compactTriggers.forEach((t) => t.kill());
       footerObserver.disconnect();

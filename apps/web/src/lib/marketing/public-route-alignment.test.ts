@@ -38,13 +38,14 @@ describe('workspace-first public route alignment', () => {
   });
 
   it('serves the workspace demo at /demo', () => {
-    const demo = read('src/app/demo/(workspace)/page.tsx');
-    const layout = read('src/app/demo/(workspace)/layout.tsx');
+    const demo = read('src/app/demo/page.tsx');
+    const frame = read('src/components/dashboard/demo-workspace-frame.tsx');
     expect(demo).toContain('DashboardOverviewView');
     expect(demo).toContain('DEMO_PROFILE');
     expect(demo).toContain('LIVE_DEMO_WORKSPACE_HREF');
-    expect(layout).toContain('DashboardShell');
-    expect(layout).toContain('basePath={LIVE_DEMO_WORKSPACE_HREF}');
+    expect(demo).toContain('DemoWorkspaceFrame');
+    expect(frame).toContain('DashboardShell');
+    expect(frame).toContain('basePath={LIVE_DEMO_WORKSPACE_HREF}');
     expect(demo).not.toContain('PublicProfileExperience');
   });
 

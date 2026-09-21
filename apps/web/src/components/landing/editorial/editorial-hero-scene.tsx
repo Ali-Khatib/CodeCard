@@ -10,6 +10,7 @@ import {
 } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { ShaderHeroBackdrop } from '@/components/ui/shader-hero';
+import { revealedWordCount } from '@/components/ui/reading-text-reveal';
 import { useScrollTriggerRefresh } from '@/hooks/use-scroll-trigger-refresh';
 import {
   applyLandingChromeInk,
@@ -20,13 +21,8 @@ type EditorialHeroSceneProps = {
   hero: ReactNode;
 };
 
-/** Page-load entrance only — not scroll-driven. */
-const INTRO_DURATION = 1.1;
-/** Matches cubic-bezier(0.16, 1, 0.3, 1) closely (premium ease-out). */
-const INTRO_EASE = 'expo.out';
-
 /** Real scroll distance for cream inset → full-bleed (hero only). */
-const EXPAND_SCROLL_VH = { desktop: 42, mobile: 38 } as const;
+const EXPAND_SCROLL_VH = { desktop: 16, mobile: 14 } as const;
 /**
  * Extra pinned scroll after the frame is open, before the hero scrolls away.
  * Gives the full-bleed hero room to breathe instead of handing straight off
@@ -34,47 +30,48 @@ const EXPAND_SCROLL_VH = { desktop: 42, mobile: 38 } as const;
  */
 const HERO_HOLD_VH = { desktop: 58, mobile: 42 } as const;
 /**
- * Pinned scrub distance for the 3-group reveal — one viewport per group.
+ * Pinned scrub distance for the 3-group reveal.
  * The hero scrolls away and the statement scrolls up on plain document
  * scroll first; nothing is faked with transforms.
  */
-const STATEMENT_SCROLL_VH = { desktop: 300, mobile: 270 } as const;
+const STATEMENT_SCROLL_VH = { desktop: 440, mobile: 380 } as const;
 const CINEMA_SCRUB = 0.35;
 /** Share of the expand segment used for the clip-path tween. */
-const EXPAND_CLIP_END = 0.88;
+const EXPAND_CLIP_END = 1;
 
 /**
- * Reveal runs per character so the fill reads as a wipe instead of a
- * word-by-word blink. Groups are stacked in one slot; ONE bar fills 0 → 1
- * across all three.
+ * Reveal runs word by word (reading-text-reveal): dim → full as scroll
+ * crosses the section. Groups share one slot; ONE bar fills 0 → 1 across all three.
  */
-const STATEMENT_CHAR_DIM = 0.4;
-const STATEMENT_CHAR_LIT = 1;
+const STATEMENT_WORD_LERP = 0.09;
 /** Share of each group's segment spent filling before it hands over. */
-const BEAT_FILL_SHARE = 0.72;
+const BEAT_FILL_SHARE = 0.87;
 let heroIntroPlayed = false;
 
 const STATEMENT_BEATS = [
   {
-    id: 'problem',
-    title: 'Present the work.',
-    lead: 'Present the work.',
-    sub: 'Phone or QR. The profile opens in a browser.',
-    lede: 'Open your CodeCard on your phone or share your QR code. Visitors can open the profile immediately in their browser. They do not need the app just to look. If they skip the scan, they can see it on your screen.',
+    id: 'meet',
+    step: 'The moment you meet',
+    title: 'Put your work in the room.',
+    lead: 'Put your work in the room.',
+    sub: 'Show it before the conversation moves on.',
+    lede: "Open your CodeCard on your phone, or let them scan your QR. Your projects and research open instantly in their browser, right there, while you're talking.",
   },
   {
-    id: 'shift',
-    title: 'Save the people you meet.',
-    lead: 'Save the people you meet.',
-    sub: 'From the same interaction, if you both want it.',
-    lede: 'When you decide to stay in touch, save the connection directly from the interaction instead of hunting for a username later.',
+    id: 'discover',
+    step: 'What they discover about you',
+    title: 'Be more than your title.',
+    lead: 'Be more than your title.',
+    sub: 'Show people what you actually build, research, and care about.',
+    lede: 'Your title tells people what you do. Your work tells them who you are. Bring your projects, research, experience, and ideas together in one place that gives people something real to remember you by.',
   },
   {
-    id: 'identity',
-    title: 'Keep the context attached.',
-    lead: 'Keep the context attached.',
-    sub: 'Date, place, note, next step.',
-    lede: 'Record when and where you met, add a note, and schedule the next step while the context is still fresh.',
+    id: 'after',
+    step: 'After they see it',
+    title: "Don't lose the connection.",
+    lead: "Don't lose the connection.",
+    sub: 'Keep the person, not just the profile.',
+    lede: 'Save who you met, where you met, and what you talked about. Add a note, set a follow-up, and pick up where the conversation left off.',
   },
 ] as const;
 
@@ -83,8 +80,8 @@ function wordsOf(text: string) {
 }
 
 /**
- * Words stay inline-block so wrapping only ever breaks on real spaces, while
- * each character inside gets its own node for the scrubbed fill.
+ * One span per word. Scroll progress lights them in order — same mechanic as
+ * reading-text-reveal, cream/orange type stays on the parent.
  */
 function StatementWords({
   text,
@@ -105,23 +102,13 @@ function StatementWords({
   return (
     <span className={toneClass}>
       {words.map((word, wi) => (
-        <span key={`${beatId}-${tone}-${wi}`}>
-          <span
-            className="cc-ed-hero-scene__statement-word"
-            data-statement-word
-          >
-            {Array.from(word).map((char, ci) => (
-              <span
-                key={`${beatId}-${tone}-${wi}-${ci}`}
-                className="cc-ed-hero-scene__statement-char"
-                data-statement-char
-                aria-hidden
-              >
-                {char}
-              </span>
-            ))}
-          </span>
-          {wi < words.length - 1 ? ' ' : ''}
+        <span
+          key={`${beatId}-${tone}-${wi}`}
+          className="cc-ed-hero-scene__statement-word"
+          data-statement-word
+          data-revealed="false"
+        >
+          {word}{' '}
         </span>
       ))}
     </span>
@@ -133,12 +120,7 @@ function stageRadius(mobile: boolean) {
 }
 
 function creamPad(mobile: boolean) {
-  return mobile ? 14 : 18;
-}
-
-function introClipShut(mobile: boolean) {
-  const r = stageRadius(mobile);
-  return `inset(50% 50% 50% 50% round ${r}px)`;
+  return mobile ? 12 : 16;
 }
 
 function scrollClipClosed(mobile: boolean) {
@@ -199,14 +181,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       const mobile = window.matchMedia('(max-width: 767px)').matches;
       const openClip = scrollClipOpen();
       const closedClip = scrollClipClosed(mobile);
-      const shutClip = introClipShut(mobile);
       const expandScrollEnd = mobile
         ? `+=${EXPAND_SCROLL_VH.mobile}%`
         : `+=${EXPAND_SCROLL_VH.desktop}%`;
       /* The field and the hero frame are clipped as one so they stay in step. */
       const clipped = [stage, field];
       const heroMedia = field.querySelector<HTMLElement>('.cc-ed-hero__media');
-      const heroCopy = stage.querySelector<HTMLElement>('.cc-ed-hero__copy');
       const beatEls = Array.from(
         statement.querySelectorAll<HTMLElement>('[data-statement-beat]'),
       );
@@ -215,10 +195,20 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       runway.style.minHeight = `${runwayTotalVh(mobile)}vh`;
       statement.style.minHeight = `${statementTotalVh(mobile)}vh`;
 
-      const syncLogoForExpand = (_expandProgress: number) => {
-        /* Clip geometry owns chrome ink: cream letterbox → black, dark cinema → white. */
+      const shell = document.querySelector<HTMLElement>('.cc-marketing-shell');
+
+      const setCinemaInset = (progress: number) => {
+        const t = Math.min(1, Math.max(0, progress / EXPAND_CLIP_END));
+        const pad = creamPad(mobile) * (1 - t);
+        const radius = stageRadius(mobile) * (1 - t);
+        shell?.style.setProperty('--cc-ed-cinema-inset', `${pad}px`);
+        shell?.style.setProperty('--cc-ed-cinema-radius', `${radius}px`);
+      };
+
+      const syncLogoForExpand = (expandProgress: number) => {
+        setCinemaInset(expandProgress);
         if (!syncLandingChromeFromCinema()) {
-          applyLandingChromeInk('dark');
+          applyLandingChromeInk('light');
         }
       };
 
@@ -253,6 +243,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           el.style.borderRadius = '0px';
           el.style.clipPath = clip;
         }
+        setCinemaInset(clip === openClip ? 1 : 0);
       };
 
       let expandTl: gsap.core.Timeline | null = null;
@@ -260,6 +251,49 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
       const notifyCinemaReady = () => {
         window.dispatchEvent(new CustomEvent('codecard:hero-cinema-ready'));
+      };
+
+      let wordRevealTarget = 0;
+      let wordRevealCurrent = 0;
+      let wordRevealRaf: number | null = null;
+
+      const applyWordReveal = (progress: number) => {
+        beatEls.forEach((beat, beatIndex) => {
+          const beatStart = beatIndex * beatSpan;
+          const fillDur = beatSpan * BEAT_FILL_SHARE;
+          const local = (progress - beatStart) / Math.max(fillDur, 1e-6);
+          const t = Math.max(0, Math.min(1, local));
+          const words = beat.querySelectorAll<HTMLElement>(
+            '[data-statement-word]',
+          );
+          const count = revealedWordCount(t, words.length);
+          words.forEach((word, wi) => {
+            const next = wi < count ? 'true' : 'false';
+            if (word.getAttribute('data-revealed') !== next) {
+              word.setAttribute('data-revealed', next);
+            }
+          });
+        });
+      };
+
+      const tickWordReveal = () => {
+        const difference = wordRevealTarget - wordRevealCurrent;
+        wordRevealCurrent += difference * STATEMENT_WORD_LERP;
+        if (Math.abs(wordRevealTarget - wordRevealCurrent) > 0.001) {
+          applyWordReveal(wordRevealCurrent);
+          wordRevealRaf = requestAnimationFrame(tickWordReveal);
+        } else {
+          wordRevealCurrent = wordRevealTarget;
+          applyWordReveal(wordRevealCurrent);
+          wordRevealRaf = null;
+        }
+      };
+
+      const queueWordReveal = (progress: number) => {
+        wordRevealTarget = progress;
+        if (wordRevealRaf == null) {
+          wordRevealRaf = requestAnimationFrame(tickWordReveal);
+        }
       };
 
       const buildStatementReveal = () => {
@@ -279,12 +313,12 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         /* Group 1 sits on screen already dim while the section scrolls up. */
         beatEls.forEach((beat, i) => {
-          const chars = beat.querySelectorAll<HTMLElement>(
-            '[data-statement-char]',
-          );
-          gsap.set(chars, { opacity: STATEMENT_CHAR_DIM });
+          beat
+            .querySelectorAll<HTMLElement>('[data-statement-word]')
+            .forEach((word) => word.setAttribute('data-revealed', 'false'));
           gsap.set(beat, { autoAlpha: i === 0 ? 1 : 0, y: 0 });
         });
+        applyWordReveal(0);
 
         statementTl = gsap.timeline({
           defaults: { ease: 'none' },
@@ -300,6 +334,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               root.dataset.cinemaChapter = 'statement';
               /* Statement is full-bleed dark — white chrome. */
               applyLandingChromeInk('light');
+              queueWordReveal(self.progress);
               /*
                * Count from the crossover, not the segment edge — the incoming
                * group owns the slot a fade early, so the pager flips with it.
@@ -315,9 +350,11 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
               );
             },
             onLeave: () => {
+              queueWordReveal(1);
               setPager(beatCount - 1);
             },
             onLeaveBack: () => {
+              queueWordReveal(0);
               root.dataset.cinemaChapter = 'hero';
               setPager(0);
             },
@@ -334,14 +371,8 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         beatEls.forEach((beat, beatIndex) => {
           const beatStart = beatIndex * beatSpan;
-          const chars = Array.from(
-            beat.querySelectorAll<HTMLElement>('[data-statement-char]'),
-          );
           const isLast = beatIndex === beatCount - 1;
           const fillDur = beatSpan * BEAT_FILL_SHARE;
-
-          /* Re-dim at the segment edge so a reversed scrub resets cleanly. */
-          statementTl!.set(chars, { opacity: STATEMENT_CHAR_DIM }, beatStart);
 
           if (beatIndex > 0) {
             statementTl!.fromTo(
@@ -364,19 +395,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             );
           }
 
-          chars.forEach((char, ci) => {
-            statementTl!.fromTo(
-              char,
-              { opacity: STATEMENT_CHAR_DIM },
-              {
-                opacity: STATEMENT_CHAR_LIT,
-                duration: Math.max(fillDur * 0.05, 0.004),
-                ease: 'none',
-              },
-              beatStart + (ci / Math.max(chars.length, 1)) * fillDur * 0.95,
-            );
-          });
-
           /* Filled group fades in place so the next one occupies the same slot. */
           if (!isLast) {
             statementTl!.fromTo(
@@ -395,14 +413,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         });
       };
 
-      const buildScrollCinema = (opts?: { holdForIntro?: boolean }) => {
-        const holdForIntro = Boolean(opts?.holdForIntro);
-
-        lockFinalGeometry(holdForIntro ? shutClip : closedClip);
-        if (!holdForIntro) {
-          root.dataset.heroIntro = 'settled';
-          document.body.style.overflow = '';
-        }
+      const buildScrollCinema = () => {
+        lockFinalGeometry(closedClip);
+        root.dataset.heroIntro = 'settled';
+        document.body.style.overflow = '';
 
         expandTl = gsap.timeline({
           defaults: { ease: 'none' },
@@ -416,7 +430,17 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => syncLogoForExpand(self.progress),
             onLeave: () => {
+              setCinemaInset(1);
               applyLandingChromeInk('light');
+              const coverH = viewportH();
+              gsap.set(clipped, {
+                height: coverH,
+                minHeight: coverH,
+                clipPath: openClip,
+              });
+            },
+            onEnterBack: () => {
+              lockFinalGeometry(openClip);
             },
           },
         });
@@ -439,33 +463,15 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
 
         buildStatementReveal();
 
-        if (holdForIntro) {
-          expandTl.scrollTrigger?.disable(false);
-          statementTl?.scrollTrigger?.disable(false);
-          lockFinalGeometry(shutClip);
-          root.dataset.heroIntro = 'running';
-          refreshScrollTrigger({ safe: true });
-          notifyCinemaReady();
-          return;
-        }
-
-        refreshScrollTrigger({ safe: true });
-        notifyCinemaReady();
-      };
-
-      const releaseIntroHold = () => {
-        lockFinalGeometry(closedClip);
-        root.dataset.heroIntro = 'settled';
-        document.body.style.overflow = '';
-        syncLogoForExpand(0);
-        expandTl?.scrollTrigger?.enable();
-        statementTl?.scrollTrigger?.enable();
-        expandTl?.progress(0);
         refreshScrollTrigger({ safe: true });
         notifyCinemaReady();
       };
 
       const killAll = () => {
+        if (wordRevealRaf != null) {
+          cancelAnimationFrame(wordRevealRaf);
+          wordRevealRaf = null;
+        }
         expandTl?.scrollTrigger?.kill();
         expandTl?.kill();
         statementTl?.scrollTrigger?.kill();
@@ -479,78 +485,10 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         window.scrollTo(0, 0);
       }
 
-      const skipIntro =
-        !canEnhanceMotion || window.scrollY > 24 || heroIntroPlayed;
-      if (skipIntro) {
-        heroIntroPlayed = true;
-        syncLogoForExpand(0);
-        buildScrollCinema();
-        return killAll;
-      }
-
-      let cancelled = false;
-      let intro: gsap.core.Timeline | null = null;
-      let introFinished = false;
-
-      const markIntroDoneAndBuild = () => {
-        if (introFinished) return;
-        introFinished = true;
-        heroIntroPlayed = true;
-        releaseIntroHold();
-      };
-
-      document.body.style.overflow = 'hidden';
-      /* Intro starts shut over cream — black chrome until clip expands under it. */
-      applyLandingChromeInk('dark');
-      buildScrollCinema({ holdForIntro: true });
-
-      if (heroCopy) {
-        gsap.set(heroCopy, { autoAlpha: 0, y: 18 });
-      }
-
-      intro = gsap.timeline({
-        defaults: { ease: INTRO_EASE },
-        onUpdate: () => {
-          if (!syncLandingChromeFromCinema()) applyLandingChromeInk('dark');
-        },
-        onComplete: markIntroDoneAndBuild,
-      });
-
-      intro.fromTo(
-        clipped,
-        { clipPath: shutClip },
-        {
-          clipPath: closedClip,
-          duration: INTRO_DURATION,
-          ease: INTRO_EASE,
-          immediateRender: true,
-          onUpdate: () => {
-            if (!syncLandingChromeFromCinema()) applyLandingChromeInk('dark');
-          },
-        },
-        0,
-      );
-
-      if (heroCopy) {
-        intro.to(
-          heroCopy,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: INTRO_DURATION * 0.55,
-            ease: INTRO_EASE,
-          },
-          INTRO_DURATION * 0.28,
-        );
-      }
-
-      return () => {
-        cancelled = true;
-        document.body.style.overflow = '';
-        intro?.kill();
-        killAll();
-        void cancelled;
-      };
+      heroIntroPlayed = true;
+      syncLogoForExpand(0);
+      buildScrollCinema();
+      return killAll;
     },
     {
       scope: rootRef,
@@ -567,7 +505,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       data-chapter-section="hero"
       data-motion-pattern="section-enter"
       data-motion-owner="gsap"
-      data-hero-intro="pending"
+      data-hero-intro="settled"
       data-cinema-chapter="hero"
     >
       <div ref={trackRef} className="cc-ed-hero-scene__track">
@@ -644,6 +582,14 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                   data-statement-beat={beat.id}
                   aria-hidden={i !== 0}
                 >
+                  <p className="cc-ed-hero-scene__statement-step">
+                    <span className="cc-ed-hero-scene__statement-step-num">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="cc-ed-hero-scene__statement-step-label">
+                      {beat.step}
+                    </span>
+                  </p>
                   <p
                     className="cc-ed-hero-scene__statement-body"
                     aria-label={beat.title}
@@ -652,7 +598,9 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
                       text={beat.lead}
                       beatId={beat.id}
                       tone="lead"
-                    />{' '}
+                    />
+                  </p>
+                  <p className="cc-ed-hero-scene__statement-dek">
                     <StatementWords
                       text={beat.sub}
                       beatId={beat.id}

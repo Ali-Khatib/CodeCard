@@ -68,7 +68,7 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
       collapsedLabel="Expand navigation"
     >
       <div className="cc-nav-desktop-links">
-        <ul className="cc-hume-fade-group flex items-center gap-1 sm:gap-2">
+        <ul className="cc-hume-fade-group flex items-center gap-2.5 sm:gap-3">
           {items.map((item, i) => {
             const active = isActive(item.href);
             return (

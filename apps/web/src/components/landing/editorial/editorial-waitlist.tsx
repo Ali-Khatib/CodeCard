@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { Mail } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { joinDescribedBy } from '@/lib/a11y/described-by';
 import { MOTION_DURATION } from '@/components/motion/motion-tokens';
@@ -134,8 +135,8 @@ export function EditorialWaitlist() {
               </h2>
               <p className="cc-ed-waitlist__lede">
                 {result.status === 'already'
-                  ? "You're already on the list. We'll send product notes."
-                  : "You're on the list. We'll send product notes."}
+                  ? "You're already on the waitlist."
+                  : "You're on the waitlist. We'll write when a seat opens."}
               </p>
             </motion.div>
           ) : (
@@ -152,11 +153,11 @@ export function EditorialWaitlist() {
                 id="editorial-waitlist-heading"
                 className="cc-ed-waitlist__title"
               >
-                <span className="cc-ed-waitlist__lead">GET PRODUCT</span>
-                <span className="cc-ed-waitlist__accent">NOTES</span>
+                <span className="cc-ed-waitlist__lead">JOIN THE</span>
+                <span className="cc-ed-waitlist__accent">WAITLIST</span>
               </h2>
               <p id={hintId} className="cc-ed-waitlist__lede">
-                Leave an email if you want occasional notes about what we ship.
+                Leave your email. We hold your place for early access.
               </p>
               <form
                 className="cc-ed-waitlist__form"
@@ -175,24 +176,32 @@ export function EditorialWaitlist() {
                   autoComplete="off"
                   aria-hidden="true"
                 />
-                <input
-                  id={fieldId}
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  inputMode="email"
-                  required
-                  value={email}
-                  placeholder="Enter your email"
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={joinDescribedBy(hintId, error ? errorId : null)}
-                  className="cc-ed-waitlist__input"
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    setFocused(true);
-                    if (error) setError(null);
-                  }}
-                />
+                <div className="cc-ed-waitlist__field">
+                  <Mail
+                    className="cc-ed-waitlist__field-icon"
+                    size={20}
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  <input
+                    id={fieldId}
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    required
+                    value={email}
+                    placeholder="Enter your email"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={joinDescribedBy(hintId, error ? errorId : null)}
+                    className="cc-ed-waitlist__input"
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setFocused(true);
+                      if (error) setError(null);
+                    }}
+                  />
+                </div>
                 {error ? (
                   <p id={errorId} className="cc-ed-waitlist__error" role="alert">
                     {error}

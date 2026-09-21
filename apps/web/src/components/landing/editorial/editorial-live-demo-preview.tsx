@@ -1,9 +1,14 @@
 'use client';
 
+import {
+  OPEN_LIVE_PEEK_EVENT,
+  EditorialLivePeekButton,
+} from '@/components/landing/editorial/editorial-live-peek-button';
 import { Monitor, Smartphone } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useSmoothScroll } from '@/components/motion/smooth-scroll-provider';
 
 type PreviewMode = 'web' | 'mobile';
 
@@ -79,6 +84,7 @@ function ModeToggle({ mode, target, icon: Icon, label, hint, onSelect }: ModeTog
  */
 export function EditorialLiveDemoPreview() {
   const reduced = useReducedMotion();
+  const { release } = useSmoothScroll();
   const sectionRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -91,9 +97,47 @@ export function EditorialLiveDemoPreview() {
   );
   const [invited, setInvited] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [peeking, setPeeking] = useState(false);
 
   const markEngaged = useCallback(() => {
     setInvited(true);
+  }, []);
+
+  const openPeek = useCallback(() => {
+    setPeeking(true);
+    release();
+  }, [release]);
+
+  useEffect(() => {
+    const onPeek = () => openPeek();
+    window.addEventListener(OPEN_LIVE_PEEK_EVENT, onPeek);
+    return () => window.removeEventListener(OPEN_LIVE_PEEK_EVENT, onPeek);
+  }, [openPeek]);
+
+  useEffect(() => {
+    release();
+  }, [mode, release]);
+
+  useEffect(() => {
+    const stage = frameRef.current;
+    if (!stage) return;
+
+    const onWheel = (event: WheelEvent) => {
+      const iframe = stage.querySelector('iframe');
+      if (!iframe) return;
+      const rect = iframe.getBoundingClientRect();
+      const overEmbed =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+      if (!overEmbed) return;
+      event.preventDefault();
+      window.scrollBy(0, event.deltaY);
+    };
+
+    stage.addEventListener('wheel', onWheel, { passive: false });
+    return () => stage.removeEventListener('wheel', onWheel);
   }, []);
 
   useEffect(() => {
@@ -223,7 +267,11 @@ export function EditorialLiveDemoPreview() {
 
         <div
           ref={frameRef}
-          className="cc-ed-demo-preview__stage"
+          className={
+            peeking
+              ? 'cc-ed-demo-preview__stage cc-ed-demo-preview__stage--peeking'
+              : 'cc-ed-demo-preview__stage'
+          }
           onPointerEnter={() => {
             hoverStartRef.current = performance.now();
           }}
@@ -275,11 +323,20 @@ export function EditorialLiveDemoPreview() {
                   height={view.height}
                   loading="lazy"
                   allow="clipboard-write"
+                  tabIndex={peeking ? 0 : -1}
                 />
               </div>
               </div>
             </div>
           </div>
+          {peeking ? null : (
+            <div className="cc-ed-demo-preview__peek-layer">
+              <EditorialLivePeekButton
+                scrollToDemo={false}
+                onActivate={openPeek}
+              />
+            </div>
+          )}
         </div>
 
         {showInvitation ? (

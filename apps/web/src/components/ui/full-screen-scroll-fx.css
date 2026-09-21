@@ -130,10 +130,8 @@
 .fx-header .fx-header-kicker {
   margin-bottom: 0.4rem;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   letter-spacing: 0.16em;
-  /* Room for the 48px compact nav (3-line icon) between CRASH and COURSE. */
-  word-spacing: calc(48px + 2.5rem);
   text-transform: uppercase;
   color: var(--fx-accent);
   -webkit-text-stroke: 0.35px rgba(0, 0, 0, 0.55);
@@ -212,7 +210,7 @@
   margin: 1.35rem 0 0;
   max-width: min(46rem, 100%);
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: clamp(1.55rem, 2.55vw, 2.05rem);
+  font-size: clamp(1.68rem, 2.7vw, 2.2rem);
   font-weight: 600;
   line-height: 1.35;
   color: #faf7f3;
