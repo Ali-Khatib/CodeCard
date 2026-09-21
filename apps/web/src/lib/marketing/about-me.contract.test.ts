@@ -1,38 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { FOUNDER_ABOUT } from '@/lib/marketing/founder-about';
 
 const WEB = resolve(process.cwd());
 const read = (path: string) => readFileSync(resolve(WEB, path), 'utf8');
 
-describe('founder about lanyard overlay', () => {
-  it('exposes About me on the marketing pill without a seventh Home tab', () => {
+describe('marketing nav without About me', () => {
+  it('keeps Pricing and FAQ and does not add a Home tab or About me overlay', () => {
     const nav = read('src/components/landing/landing-hero-nav.tsx');
     const shell = read('src/components/landing/landing-shell-nav.tsx');
-    expect(nav).toContain('About me');
-    expect(nav).toContain('onAboutMe');
-    expect(nav).toContain('type="button"');
-    expect(shell).toContain('AboutMeOverlay');
+    expect(nav).toContain('Pricing');
+    expect(shell).toContain("href: '/faq'");
+    expect(nav).not.toContain('About me');
+    expect(nav).not.toContain('onAboutMe');
+    expect(shell).not.toContain('AboutMeOverlay');
     expect(shell).not.toContain("{ label: 'Home'");
-  });
-
-  it('drops the React Bits lanyard with founder copy and local portrait', () => {
-    const overlay = read('src/components/landing/about-me-overlay.tsx');
-    const faces = read('src/lib/marketing/founder-lanyard-faces.ts');
-    expect(overlay).toContain("@/components/react-bits/lanyard/lanyard");
-    expect(overlay).toContain('cc-about-lanyard');
-    expect(overlay).toContain('FOUNDER_ABOUT.photoSrc');
-    expect(overlay).toContain('FOUNDER_ABOUT.displayName');
-    expect(overlay).toContain('cc-about-pass');
-    expect(overlay).toContain('lightPreset="neutral"');
-    expect(overlay).toContain('faceColor="#ffffff"');
-    expect(faces).toContain('FOUNDER_ABOUT.headline');
-    expect(faces).toContain('FOUNDER_ABOUT.degree');
-    expect(faces).toContain('FOUNDER_ABOUT.school');
-    expect(faces).toContain('FOUNDER_ABOUT.focus');
-    expect(faces).toContain('FOUNDER_ABOUT.publication');
-    expect(overlay).not.toContain('—');
-    expect(faces).not.toContain('—');
+    expect(existsSync(resolve(WEB, 'src/components/landing/about-me-overlay.tsx'))).toBe(
+      false,
+    );
   });
 });
