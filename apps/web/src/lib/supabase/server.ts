@@ -7,13 +7,13 @@ import 'server-only';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { getSupabasePublicKey } from '@/lib/supabase/public-key';
+import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
 
 export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl()!,
     getSupabasePublicKey()!,
     {
       cookies: {
@@ -41,7 +41,7 @@ export async function createClient() {
  */
 export function createPublicClient() {
   return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl()!,
     getSupabasePublicKey()!,
     {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -61,7 +61,7 @@ export function createPublicClient() {
 export async function createServiceClient() {
   const { requireServerSecret } = await import('@/lib/security/env');
   return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl()!,
     requireServerSecret('SUPABASE_SERVICE_ROLE_KEY'),
     { auth: { persistSession: false, autoRefreshToken: false } },
   );

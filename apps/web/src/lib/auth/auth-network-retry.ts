@@ -22,8 +22,17 @@ export async function withAuthNetworkRetry<T>(
   throw lastError;
 }
 
+/** OAuth redirects abort in-flight fetches; do not treat that as a sign-in failure. */
+export function isAuthNavigationAbort(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const name = 'name' in error && typeof error.name === 'string' ? error.name : '';
+  const message = 'message' in error && typeof error.message === 'string' ? error.message : '';
+  return name === 'AbortError' || message.toLowerCase().includes('the operation was aborted');
+}
+
 export function isRetryableAuthNetworkError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
+  if (isAuthNavigationAbort(error)) return false;
   const name = 'name' in error && typeof error.name === 'string' ? error.name : '';
   const message = 'message' in error && typeof error.message === 'string' ? error.message : '';
   const lower = message.toLowerCase();
@@ -33,7 +42,6 @@ export function isRetryableAuthNetworkError(error: unknown): boolean {
       lower.includes('fetch') ||
       lower.includes('network') ||
       lower.includes('timeout') ||
-      lower.includes('abort') ||
       lower.includes('failed')
     );
   }

@@ -18,6 +18,7 @@ describe('GitHub OAuth identity helpers', () => {
     const src = readFileSync(resolve(process.cwd(), 'src/lib/auth/github-oauth.ts'), 'utf8');
     expect(src.match(/scopes: GITHUB_OAUTH_SCOPES/g)?.length).toBe(2);
     expect(src).not.toMatch(/scopes:.*repo/);
+    expect(src).toContain('skipBrowserRedirect: true');
   });
 
   it('allows disconnect only when GitHub is not the last identity', () => {

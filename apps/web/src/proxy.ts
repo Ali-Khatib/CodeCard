@@ -11,7 +11,7 @@ import {
 } from '@/lib/auth/recovery-session';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
-import { getSupabasePublicKey } from '@/lib/supabase/public-key';
+import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
 
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
@@ -60,7 +60,7 @@ export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl()!,
     getSupabasePublicKey()!,
     {
       cookies: {

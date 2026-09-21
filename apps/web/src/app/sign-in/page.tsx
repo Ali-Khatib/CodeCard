@@ -18,7 +18,7 @@ import { isAuthSubmissionBlocked, oauthButtonLabel } from '@/lib/auth/auth-loadi
 import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
-import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
+import { isAuthNavigationAbort, withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 
 const SETUP_MSG =
@@ -87,6 +87,7 @@ function SignInForm() {
       }
       // On success Supabase navigates away — keep the loading state.
     } catch (caught) {
+      if (isAuthNavigationAbort(caught)) return;
       const raw = caught instanceof Error && caught.message ? caught.message : 'network';
       setError(mapAuthFormError(raw, 'sign-in'));
       setOauthLoading(null);

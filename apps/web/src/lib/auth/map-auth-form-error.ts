@@ -56,10 +56,11 @@ export function mapAuthFormError(raw: string | null | undefined, context: AuthFo
     lower.includes('offline') ||
     lower.includes('load failed') ||
     lower.includes('networkerror') ||
-    lower.includes('authretryablefetcherror') ||
-    lower.includes('aborted')
+    lower.includes('authretryablefetcherror')
   ) {
-    return 'Can’t reach Supabase from this browser. Disable ad blockers/VPN for this site, hard-refresh, then try again.';
+    return context === 'sign-in'
+      ? 'Could not sign in. Please try again.'
+      : 'Could not create your account. Please try again.';
   }
 
   if (lower.includes('rate limit') || lower.includes('too many') || lower.includes('429')) {

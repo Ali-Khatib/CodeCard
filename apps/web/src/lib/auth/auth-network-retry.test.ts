@@ -27,5 +27,8 @@ describe('auth network retry', () => {
     ).toBe(true);
     expect(isRetryableAuthNetworkError(new TypeError('Load failed'))).toBe(true);
     expect(isRetryableAuthNetworkError(new Error('Invalid login credentials'))).toBe(false);
+    expect(
+      isRetryableAuthNetworkError(Object.assign(new Error('The operation was aborted.'), { name: 'AbortError' })),
+    ).toBe(false);
   });
 });

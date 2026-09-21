@@ -126,6 +126,7 @@ Theme boot is a same-origin `/theme-boot.js` (`beforeInteractive`). It is **not*
 - `'unsafe-inline'` on `style-src`: React/`style={{}}` and CSS-in-JS style attributes.
 - `https://va.vercel-scripts.com` and `vitals.vercel-insights.com`: Vercel telemetry.
 - `*.supabase.co` / `wss://*.supabase.co`: Auth, DB, Storage, Realtime.
+- `form-action` includes `https://*.supabase.co` and `https://github.com` so GitHub OAuth can leave the origin.
 - Sentry ingest hosts (also tunneled via `/monitoring`).
 
 ### OPTIONAL EXCEPTIONS

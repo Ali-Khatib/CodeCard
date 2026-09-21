@@ -16,7 +16,7 @@ import { authCallbackRedirectUrl } from '@/lib/auth/redirect';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { oauthButtonLabel } from '@/lib/auth/auth-loading';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
-import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
+import { isAuthNavigationAbort, withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 import {
   SIGNUP_CONFIRMATION_TITLE,
   resolveSignUpOutcome,
@@ -108,7 +108,8 @@ function SignUpForm() {
         setOauthLoading(null);
         requestAnimationFrame(() => errorRef.current?.focus());
       }
-    } catch {
+    } catch (caught) {
+      if (isAuthNavigationAbort(caught)) return;
       setError(mapAuthFormError('network', 'sign-up'));
       setOauthLoading(null);
       requestAnimationFrame(() => errorRef.current?.focus());

@@ -38,7 +38,8 @@ describe('mapAuthFormError', () => {
     );
   });
 
-  it('maps fetch failures to a reachable-supabase hint', () => {
-    expect(mapAuthFormError('Failed to fetch', 'sign-in')).toMatch(/ad blocker|supabase/i);
+  it('maps fetch failures to a generic retry, not ad-blocker copy', () => {
+    expect(mapAuthFormError('Failed to fetch', 'sign-in')).toMatch(/try again/i);
+    expect(mapAuthFormError('Failed to fetch', 'sign-in')).not.toMatch(/ad blocker|vpn/i);
   });
 });

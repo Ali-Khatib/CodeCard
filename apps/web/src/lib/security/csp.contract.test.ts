@@ -29,6 +29,10 @@ describe('CSP exception inventory', () => {
     expect(nextConfig).not.toMatch(/googletagmanager|facebook\.net|tiktok/i);
   });
 
+  it('allows GitHub OAuth in form-action', () => {
+    expect(nextConfig).toContain("form-action 'self' https://*.supabase.co https://github.com");
+  });
+
   it('documents required vs future CSP reductions', () => {
     expect(securityDoc).toContain('REQUIRED EXCEPTIONS');
     expect(securityDoc).toContain('POSSIBLE FUTURE REDUCTIONS');

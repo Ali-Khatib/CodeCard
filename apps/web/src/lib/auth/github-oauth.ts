@@ -39,9 +39,19 @@ type GithubOAuthResult =
   | { ok: true }
   | { ok: false; message: string };
 
+function navigateToOAuthUrl(url: string | null | undefined): GithubOAuthResult {
+  if (!url) {
+    return { ok: false, message: 'oauth_missing_url' };
+  }
+  if (typeof window !== 'undefined') {
+    window.location.assign(url);
+  }
+  return { ok: true };
+}
+
 /**
- * Starts GitHub OAuth with the browser-native Supabase redirect.
- * No server preflight — that was aborting healthy authorize flows.
+ * Starts GitHub OAuth, then navigates after the authorize URL is returned.
+ * skipBrowserRedirect avoids AbortError from the SDK navigating mid-request.
  */
 export async function startGithubOAuth({
   supabase,
@@ -52,7 +62,7 @@ export async function startGithubOAuth({
     options: {
       redirectTo: authCallbackRedirectUrl(redirectPath),
       scopes: GITHUB_OAUTH_SCOPES,
-      skipBrowserRedirect: false,
+      skipBrowserRedirect: true,
     },
   });
 
@@ -60,12 +70,7 @@ export async function startGithubOAuth({
     return { ok: false, message: error.message };
   }
 
-  // With skipBrowserRedirect: false, Supabase navigates immediately when a URL exists.
-  if (!data.url) {
-    return { ok: false, message: 'oauth_missing_url' };
-  }
-
-  return { ok: true };
+  return navigateToOAuthUrl(data.url);
 }
 
 /** Link GitHub to an already-authenticated account. */
@@ -78,7 +83,7 @@ export async function linkGithubIdentity({
     options: {
       redirectTo: authCallbackRedirectUrl(redirectPath),
       scopes: GITHUB_OAUTH_SCOPES,
-      skipBrowserRedirect: false,
+      skipBrowserRedirect: true,
     },
   });
 
@@ -86,9 +91,5 @@ export async function linkGithubIdentity({
     return { ok: false, message: error.message };
   }
 
-  if (!data.url) {
-    return { ok: false, message: 'oauth_missing_url' };
-  }
-
-  return { ok: true };
+  return navigateToOAuthUrl(data.url);
 }

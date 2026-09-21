@@ -18,16 +18,20 @@ port = 54323
 
 [auth]
 enabled = true
-# Local stack Site URL. For remote codecard-e2e (MVP), set Site URL in the
-# Supabase dashboard to https://codecard-mvp.vercel.app and keep the allow list
-# below so recovery emails hit /auth/callback → /reset-password (not bare `/`).
+# Local stack Site URL. Hosted codecard-e2e (MVP) Site URL is
+# https://codecard-mvp.vercel.app — do not `config push` this localhost value.
 site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000/**",
+  "http://localhost:3000/auth/callback",
+  "http://127.0.0.1:3000/**",
+  "http://127.0.0.1:3000/auth/callback",
   "exp://localhost:8081/**",
   "https://codecard-mvp.vercel.app/**",
   "https://codecard-mvp.vercel.app/auth/callback",
   "https://codecard-mvp.vercel.app/auth/callback?redirect=%2Freset-password",
+  "https://codecard-mvp.vercel.app/auth/callback?redirect=%2Fdashboard",
+  "https://codecard-mvp.vercel.app/auth/callback?redirect=%2Fauth%2Fconfirmed",
   "https://codecard-mvp-*.vercel.app/**",
 ]
 # Access token lifetime: 1 hour. Client auto-refreshes so users stay signed in.

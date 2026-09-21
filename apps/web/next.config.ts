@@ -16,6 +16,7 @@ const sentryConnect =
  * - videos.pexels.com: royalty-free crash-course chapter videos
  * - *.supabase.co: Auth, DB, Storage, Realtime
  * - ingest.sentry.io: error monitoring (also tunneled via /monitoring)
+ * - form-action GitHub + Supabase: GitHub OAuth may POST/navigate off-origin
  * QR images are generated locally (`qrcode`); do not allow a third-party QR image host.
  */
 function contentSecurityPolicy(frameAncestors: "'none'" | "'self'"): string {
@@ -29,7 +30,7 @@ function contentSecurityPolicy(frameAncestors: "'none'" | "'self'"): string {
     `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com ${sentryConnect}`,
     `frame-ancestors ${frameAncestors}`,
     "base-uri 'self'",
-    "form-action 'self'",
+    "form-action 'self' https://*.supabase.co https://github.com",
   ].join('; ');
 }
 

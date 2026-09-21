@@ -107,9 +107,12 @@ export function AnimatedNavFramer({
     const measure = () => {
       const panelHeight = panelRef.current?.offsetHeight ?? 0;
       const previousWidth = inner.style.width;
+      const previousMaxWidth = inner.style.maxWidth;
       inner.style.width = 'max-content';
-      const width = Math.ceil(inner.scrollWidth);
+      inner.style.maxWidth = 'none';
+      const width = Math.ceil(Math.max(inner.scrollWidth, inner.offsetWidth));
       inner.style.width = previousWidth;
+      inner.style.maxWidth = previousMaxWidth;
       const height = Math.ceil(Math.max(inner.scrollHeight, phone ? 52 : 58) + panelHeight);
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>
@@ -131,7 +134,7 @@ export function AnimatedNavFramer({
 
   const maxOpenWidth = phone
     ? availWidth
-    : Math.min(openSize.width, availWidth);
+    : Math.min(Math.max(openSize.width, 480), availWidth);
 
   const expand = React.useCallback(() => {
     onCollapsedClick?.();

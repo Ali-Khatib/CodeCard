@@ -279,13 +279,13 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 34px;
-  padding: 6px 14px;
+  min-height: 38px;
+  padding: 8px 16px;
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: clamp(8px, 3.15cqi, 11px);
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: clamp(0.03em, 0.22cqi, 0.08em);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
   border: 0;
@@ -311,31 +311,42 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   color: var(--ed-ink, #232324);
 }
 
-/* Equal nav pills that shrink so the bar never overlaps the CC mark or home. */
 .cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: auto;
   display: flex;
 }
 
 .cc-marketing-shell .cc-nav-pill-item--eq {
-  flex: 1 1 0;
-  width: 100%;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: auto;
   max-width: none;
-  padding-inline: clamp(0.2rem, 2.1cqi, 0.8rem);
+  padding-inline: 0.85rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   cursor: pointer;
 }
 
 @media (max-width: 767px) {
+  .cc-marketing-shell .cc-nav-pill-item {
+    min-height: 40px;
+    padding: 6px 10px;
+    font-size: clamp(8px, 3.15cqi, 11px);
+    letter-spacing: clamp(0.03em, 0.22cqi, 0.08em);
+  }
+
+  .cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
   .cc-marketing-shell .cc-nav-pill-item--eq {
+    flex: 1 1 0;
     width: 100%;
     min-width: 0;
-    max-width: none;
-    min-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding-inline: clamp(0.12rem, 1.8cqi, 0.5rem);
     font-size: clamp(8px, 3.35cqi, 10.5px);
     letter-spacing: clamp(0.02em, 0.18cqi, 0.07em);
@@ -460,14 +471,26 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group {
   display: flex;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
   min-width: 0;
-  gap: clamp(0.04rem, 0.7cqi, 0.45rem);
+  gap: 0.4rem;
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
-  padding-inline: clamp(0.22rem, 2cqi, 0.7rem);
+  padding-inline: 0.55rem;
   gap: 0.35rem;
+}
+
+@media (max-width: 767px) {
+  .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group {
+    width: 100%;
+    gap: clamp(0.04rem, 0.7cqi, 0.45rem);
+  }
+
+  .cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
+    padding-inline: clamp(0.22rem, 2cqi, 0.7rem);
+  }
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-item {
