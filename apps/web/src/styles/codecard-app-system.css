@@ -7316,3 +7316,66 @@ html.dark .cc-public-atmosphere__grain {
     transform: none;
   }
 }
+
+.cc-workspace-widget-grid {
+  width: 100%;
+}
+
+.cc-workspace-widget-grid [data-slot="widget"] {
+  will-change: transform;
+}
+
+.cc-workspace-widget-grid--connections [data-slot="widget"] > div:last-child {
+  overflow: visible;
+  clip-path: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.cc-workspace-project-widget {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.cc-workspace-project-widget__thumb {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--app-bone);
+}
+
+.cc-workspace-project-widget__glyph {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--app-ink);
+}
+
+.cc-workspace-project-widget__meta {
+  min-width: 0;
+}
+
+.cc-workspace-project-widget__title {
+  display: block;
+  overflow-wrap: break-word;
+  font-family: var(--app-display);
+  font-size: clamp(16px, 1.8vw, 20px);
+  font-weight: 520;
+  letter-spacing: var(--app-display-tracking);
+  line-height: 1.2;
+  color: var(--app-ink);
+}

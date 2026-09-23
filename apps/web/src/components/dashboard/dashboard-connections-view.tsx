@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import Image from 'next/image';
-import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
+import { LayoutGrid, Rows3 } from 'lucide-react';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
 import {
@@ -18,14 +18,15 @@ import {
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { moveIndex, weaveVisibleOrder } from '@/lib/connections/connections-order-core';
+import DraggableWidgetGrid, { type WidgetItem } from '@/components/ui/draggable-widget-grid';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
 const CONNECTION_VIEW_MODES = [
-  { id: 'list' as const, label: 'List view', icon: HiBars3BottomLeft },
-  { id: 'grid' as const, label: 'Grid view', icon: HiSquares2X2 },
+  { id: 'list' as const, label: 'List view', icon: Rows3 },
+  { id: 'grid' as const, label: 'Grid view', icon: LayoutGrid },
 ];
 type ConnectionsViewMode = 'list' | 'grid';
 
@@ -503,7 +504,7 @@ function ConnectionGridCard({
 }: {
   connection: ViewConnection;
   expanded: boolean;
-  onToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  onToggle: (event: MouseEvent<HTMLElement>) => void;
   variant: 'demo' | 'authenticated';
   onRemove?: (connectionId: string) => void | Promise<void>;
   collections?: Array<{ id: string; name: string }>;
@@ -530,18 +531,21 @@ function ConnectionGridCard({
       as="article"
       id={`connection-${connection.id}`}
       data-connection-id={connection.id}
-      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
+      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''} h-full`}
       liftOnHover={!expanded}
       pressOnTap={false}
     >
       {dragHandle}
-      <button
-        type="button"
-        onMouseDown={(event) => {
-          // Keep the click, skip focus — focus scroll is what yanks the page upward.
-          event.preventDefault();
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={(event) => onToggle(event)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onToggle(event as unknown as MouseEvent<HTMLElement>);
+          }
         }}
-        onClick={onToggle}
         aria-expanded={expanded}
         className="cc-connection-grid-card__trigger"
       >
@@ -554,7 +558,7 @@ function ConnectionGridCard({
         </div>
         <p className="cc-connection-grid-card__name">{connection.name}</p>
         <p className="cc-connection-grid-card__role">{connection.role}</p>
-      </button>
+      </div>
       {connectionCodeCardHref(connection, variant) ? (
         <div className="flex justify-center px-4 pb-4">
           <ConnectionOpenCodeCardButton
@@ -664,7 +668,7 @@ export function DashboardConnectionsView({
 }) {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
+  const [viewMode, setViewMode] = useState<ConnectionsViewMode>('grid');
   const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
   const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');
   const [meetingPointFilter, setMeetingPointFilter] =
@@ -707,7 +711,7 @@ export function DashboardConnectionsView({
     });
   }, []);
 
-  const toggleConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
+  const toggleConnection = useCallback((event: MouseEvent<HTMLElement>, id: string) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -858,6 +862,20 @@ export function DashboardConnectionsView({
       setDemoOrder(nextIds);
     },
     [onReorderConnections],
+  );
+
+  const widgetItems = useMemo<WidgetItem[]>(
+    () =>
+      filtered.map((connection) => ({
+        id: connection.id,
+        size: 'sm' as const,
+        label: connection.name,
+      })),
+    [filtered],
+  );
+  const widgetById = useMemo(
+    () => new Map(filtered.map((connection) => [connection.id, connection])),
+    [filtered],
   );
 
   const reorderVisible = useCallback(
@@ -1152,27 +1170,25 @@ export function DashboardConnectionsView({
               ))}
             </ul>
           ) : (
-            <ul className="cc-connection-grid">
-              {filtered.map((c) => (
-                <li
-                  key={c.id}
-                  className={[
-                    selectedId === c.id ? 'cc-connection-grid__item--open' : '',
-                    draggingId === c.id ? 'cc-connection-item--dragging' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ') || undefined}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    event.dataTransfer.dropEffect = 'move';
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    if (draggingId) reorderVisible(draggingId, c.id);
-                    setDraggingId(null);
-                  }}
-                  onDragEnd={() => setDraggingId(null)}
-                >
+            <DraggableWidgetGrid
+              className="cc-workspace-widget-grid cc-workspace-widget-grid--connections"
+              items={widgetItems}
+              maxColumns={4}
+              cellSize={210}
+              gap={14}
+              radius={22}
+              onChange={(next) => {
+                commitOrder(
+                  weaveVisibleOrder(
+                    orderedConnections.map((c) => c.id),
+                    next.map((item) => item.id),
+                  ),
+                );
+              }}
+              renderItem={(item) => {
+                const c = widgetById.get(item.id);
+                if (!c) return null;
+                return (
                   <ConnectionGridCard
                     connection={c}
                     expanded={selectedId === c.id}
@@ -1183,17 +1199,10 @@ export function DashboardConnectionsView({
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
                     onOpenPrivateDetails={onOpenPrivateDetails}
-                    dragHandle={
-                      <ConnectionDragHandle
-                        name={c.name}
-                        onDragStart={() => setDraggingId(c.id)}
-                        onMove={(direction) => moveVisible(c.id, direction)}
-                      />
-                    }
                   />
-                </li>
-              ))}
-            </ul>
+                );
+              }}
+            />
           )}
 
           {filtered.length === 0 && (

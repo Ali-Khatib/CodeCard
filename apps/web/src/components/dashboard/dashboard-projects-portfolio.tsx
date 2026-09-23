@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { HiSquares2X2, HiBars3BottomLeft } from 'react-icons/hi2';
+import { LayoutGrid, Rows3 } from 'lucide-react';
 import type {
   PortfolioCreator,
   PortfolioOpenTransition,
@@ -12,7 +12,7 @@ import { workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
 import { ProjectsProfileStrip } from './projects-profile-strip';
 import { FadeInView } from './fade-in-view';
 import { ProjectsVerticalStack } from './projects-vertical-stack';
-import { ProjectsBubbleGrid } from './projects-bubble-grid';
+import { ProjectsWidgetGrid } from './projects-widget-grid';
 import { FilterBar, AppButton } from './ui/dashboard-ui';
 
 const ALL_PROJECTS_FILTER = 'All';
@@ -33,8 +33,8 @@ type ProjectSort = (typeof SORT_OPTIONS)[number];
 const SORT_WITHOUT_VIEWS: ProjectSort[] = ['Visitor order', 'Recently updated'];
 
 const VIEW_MODES = [
-  { id: 'stack' as const, label: 'Stack', icon: HiBars3BottomLeft },
-  { id: 'grid' as const, label: 'Grid', icon: HiSquares2X2 },
+  { id: 'stack' as const, label: 'Stack', icon: Rows3 },
+  { id: 'grid' as const, label: 'Grid', icon: LayoutGrid },
 ];
 
 type ViewMode = (typeof VIEW_MODES)[number]['id'];
@@ -199,7 +199,7 @@ export function DashboardProjectsPortfolio({
 
       {filteredProjects.length > 0 ? (
         viewMode === 'grid' ? (
-          <ProjectsBubbleGrid
+          <ProjectsWidgetGrid
             projects={filteredProjects}
             basePath={basePath}
             openTransition={openTransition}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HiBars3BottomLeft, HiSquares2X2 } from 'react-icons/hi2';
+import { LayoutGrid, Rows3 } from 'lucide-react';
 import type {
   PortfolioCreator,
   PortfolioOpenTransition,
@@ -19,8 +19,8 @@ import { DashboardResearchView } from './dashboard-research-view';
 import { AppButton } from './ui/dashboard-ui';
 
 const VIEW_MODES = [
-  { id: 'list' as const, label: 'List', icon: HiBars3BottomLeft },
-  { id: 'grid' as const, label: 'Grid', icon: HiSquares2X2 },
+  { id: 'list' as const, label: 'List', icon: Rows3 },
+  { id: 'grid' as const, label: 'Grid', icon: LayoutGrid },
 ];
 
 type WorkViewMode = (typeof VIEW_MODES)[number]['id'];
@@ -46,7 +46,7 @@ export function DashboardYourWorkView({
   basePath?: string;
   openTransition?: PortfolioOpenTransition;
 }) {
-  const [viewMode, setViewMode] = useState<WorkViewMode>('list');
+  const [viewMode, setViewMode] = useState<WorkViewMode>('grid');
   const hasProjects = projects.length > 0 && !emptyProjects;
   const hasPapers = papers.length > 0;
   const emptyWorkspace = !hasProjects && !hasPapers;

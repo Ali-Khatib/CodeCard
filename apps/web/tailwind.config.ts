@@ -69,7 +69,10 @@ export default {
         },
         input: 'var(--input)',
         ring: 'var(--ring)',
-        card: 'var(--surface)',
+        card: {
+          DEFAULT: 'var(--surface)',
+          foreground: 'var(--card-foreground)',
+        },
         muted: 'var(--text-secondary)',
         'muted-foreground': 'var(--muted-foreground)',
         cream: 'var(--hume-cream)',
