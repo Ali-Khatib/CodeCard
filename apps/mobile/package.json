@@ -15,18 +15,18 @@
   "dependencies": {
     "@codecard/types": "*",
     "@codecard/validation": "*",
-    "@supabase/supabase-js": "^2.47.10",
-    "expo": "~56.0.12",
-    "expo-camera": "~56.0.8",
-    "expo-secure-store": "~15.0.3",
-    "expo-status-bar": "~56.0.4",
-    "react": "19.2.3",
-    "react-native": "0.85.3",
-    "react-native-qrcode-svg": "^6.3.23",
+    "@supabase/supabase-js": "^2.116.0",
+    "expo": "~57.0.24",
+    "expo-camera": "~57.0.5",
+    "expo-secure-store": "~57.0.4",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.3.0",
+    "react-native": "0.87.1",
+    "react-native-qrcode-svg": "^6.3.24",
     "react-native-svg": "^15.15.5"
   },
   "devDependencies": {
-    "@types/react": "~19.2.2",
+    "@types/react": "~19.3.0",
     "typescript": "~6.0.3",
     "vitest": "^4.1.11"
   }
