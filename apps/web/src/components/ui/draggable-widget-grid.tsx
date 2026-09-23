@@ -564,7 +564,10 @@ const Widget = memo(function Widget({
       return
     }
     if (e.pointerType !== 'touch') {
-      e.currentTarget.focus({ preventScroll: true })
+      const target = e.currentTarget
+      if (target instanceof HTMLElement) {
+        target.focus({ preventScroll: true })
+      }
       controls.start(e)
       return
     }
