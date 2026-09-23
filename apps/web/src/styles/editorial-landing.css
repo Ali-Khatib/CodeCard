@@ -1492,7 +1492,6 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   color: #efe8e0;
   text-wrap: pretty;
   text-shadow: 0 1px 18px rgba(8, 10, 9, 0.35);
-  will-change: transform;
 }
 
 .cc-ed-hero__baseline .cc-ed__connect-principle strong,
@@ -1547,8 +1546,6 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   line-height: 0.98;
   letter-spacing: -0.038em;
   text-align: left;
-  transform-origin: left top;
-  will-change: transform, opacity;
 }
 
 .cc-ed-hero__phrase-stage {
@@ -1681,8 +1678,6 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--ed-accent, #e95a0b);
-  transform-origin: left top;
-  will-change: transform;
 }
 
 .cc-ed-hero__show {
@@ -2778,16 +2773,25 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
     linear-gradient(135deg, color-mix(in srgb, var(--ed-iris) 8%, var(--ed-page)), var(--ed-page));
 }
 
-/* —— Who it’s for (editorial persona stories) —— */
+/* —— Who it’s for (horizontal persona strip) —— */
 .cc-ed-audience {
-  padding: clamp(4.5rem, 12vh, 8rem) 0 clamp(3rem, 8vh, 5.5rem);
-  overflow-x: clip;
+  padding: 0;
+  overflow: hidden;
   background: transparent;
 }
 
+.cc-ed-audience__pin {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100svh;
+  padding: clamp(5.5rem, 12vh, 7.5rem) 0 clamp(2.5rem, 6vh, 3.75rem);
+  box-sizing: border-box;
+}
+
 .cc-ed-audience__intro {
-  max-width: min(38rem, 100%);
-  margin: 0 auto clamp(3.5rem, 9vh, 6rem);
+  max-width: min(40rem, 100%);
+  margin: 0 0 clamp(1.75rem, 4vh, 2.5rem);
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
   text-align: left;
 }
@@ -2816,45 +2820,41 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   text-wrap: pretty;
 }
 
-.cc-ed-audience__stories {
-  display: flex;
-  flex-direction: column;
-}
-
-.cc-ed-audience__story {
-  position: relative;
-  display: grid;
-  min-height: min(100vh, 58rem);
-  padding: clamp(4.5rem, 10vh, 7.5rem) clamp(1.25rem, 5vw, 4.5rem)
-    clamp(5rem, 12vh, 8.5rem);
+.cc-ed-audience__viewport {
   overflow: hidden;
-  border-top: 1px solid color-mix(in srgb, #232324 12%, transparent);
 }
 
-.cc-ed-audience__copy {
-  position: relative;
-  z-index: 1;
-  width: min(36rem, 54%);
-  max-width: 100%;
+.cc-ed-audience__track {
+  display: flex;
+  width: max-content;
+  gap: 1.1rem;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
   will-change: transform;
 }
 
-.cc-ed-audience__story--image-start .cc-ed-audience__copy,
-.cc-ed-audience__story--image-start .cc-ed-audience__dek {
-  margin-left: auto;
-  text-align: right;
+.cc-ed-audience__card {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  width: min(28rem, 78vw);
+  padding-bottom: 0.35rem;
 }
 
-.cc-ed-audience__dek {
+.cc-ed-audience__frame {
   position: relative;
-  z-index: 4;
-  width: min(36rem, 54%);
-  max-width: 100%;
-  margin-top: 0.35rem;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  background: #ece8e2;
+}
+
+.cc-ed-audience__photo {
+  object-fit: cover;
+  object-position: center;
 }
 
 .cc-ed-audience__number {
-  margin: 0;
+  margin: 1.05rem 0 0;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
   font-size: 0.75rem;
   letter-spacing: 0.16em;
@@ -2863,162 +2863,60 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience__title {
-  margin: 0.55rem 0 0;
+  margin: 0.4rem 0 0;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(4.4rem, 11vw, 9.25rem);
+  font-size: clamp(2.15rem, 4.2vw, 3.15rem);
   font-weight: 400;
-  letter-spacing: -0.045em;
-  line-height: 0.82;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
   text-transform: uppercase;
   color: #232324;
 }
 
 .cc-ed-audience__lead {
-  position: relative;
-  z-index: 4;
-  margin: 1.15rem 0 0;
-  max-width: 16ch;
+  margin: 0.7rem 0 0;
+  max-width: 18ch;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.65rem, 2.4vw, 2.35rem);
+  font-size: clamp(1.2rem, 1.7vw, 1.45rem);
   font-weight: 400;
   letter-spacing: -0.03em;
-  line-height: 1.12;
+  line-height: 1.15;
   color: #232324;
   text-wrap: pretty;
 }
 
-.cc-ed-audience__story--image-start .cc-ed-audience__lead {
-  margin-left: auto;
-}
-
 .cc-ed-audience__body {
-  position: relative;
-  z-index: 4;
-  margin: 1rem 0 0;
-  max-width: 22rem;
-  font-size: 1.05rem;
+  margin: 0.55rem 0 0;
+  max-width: 24rem;
+  font-size: 1rem;
   line-height: 1.5;
   color: color-mix(in srgb, #232324 70%, transparent);
   text-wrap: pretty;
 }
 
-.cc-ed-audience__story--image-start .cc-ed-audience__body {
-  margin-left: auto;
+.cc-ed-audience[data-audience-motion='snap'] .cc-ed-audience__pin {
+  min-height: 0;
+  padding-top: clamp(4.5rem, 10vh, 6.5rem);
 }
 
-.cc-ed-audience__frame {
-  position: absolute;
-  z-index: 3;
-  overflow: hidden;
-  background: #ece8e2;
-  transform-origin: center center;
-  will-change: transform;
+.cc-ed-audience[data-audience-motion='snap'] .cc-ed-audience__viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
 }
 
-.cc-ed-audience__photo {
-  object-fit: cover;
-  object-position: center;
+.cc-ed-audience[data-audience-motion='snap'] .cc-ed-audience__track {
+  will-change: auto;
 }
 
-.cc-ed-audience__story--image-end .cc-ed-audience__frame {
-  right: clamp(1rem, 7vw, 5.5rem);
-  top: 22%;
-}
-
-.cc-ed-audience__story--image-start .cc-ed-audience__frame {
-  left: clamp(1rem, 7vw, 5.5rem);
-  top: 18%;
-}
-
-.cc-ed-audience__story--wide .cc-ed-audience__frame {
-  width: min(46vw, 38rem);
-  height: min(58vh, 32rem);
-}
-
-.cc-ed-audience__story--tall .cc-ed-audience__frame {
-  width: min(36vw, 30rem);
-  height: min(70vh, 38rem);
-  top: 14%;
-}
-
-.cc-ed-audience__story--square .cc-ed-audience__frame {
-  width: min(40vw, 32rem);
-  height: min(40vw, 32rem);
-  top: 28%;
-}
-
-.cc-ed-audience__story:nth-child(3) .cc-ed-audience__frame {
-  top: 28%;
-}
-
-.cc-ed-audience__story:nth-child(5) .cc-ed-audience__frame {
-  right: clamp(2rem, 10vw, 7rem);
-  top: 16%;
-}
-
-@media (max-width: 767px) {
-  .cc-ed-audience__intro {
-    text-align: left;
-    margin-bottom: clamp(2.5rem, 8vh, 3.5rem);
-  }
-
-  .cc-ed-audience__story {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    padding: clamp(3rem, 8vh, 4.25rem) clamp(1.15rem, 5vw, 1.75rem)
-      clamp(3.5rem, 9vh, 5rem);
-    gap: 0;
-  }
-
-  .cc-ed-audience__copy,
-  .cc-ed-audience__dek,
-  .cc-ed-audience__story--image-start .cc-ed-audience__copy,
-  .cc-ed-audience__story--image-start .cc-ed-audience__dek {
-    width: 100%;
-    margin-left: 0;
-    text-align: left;
-  }
-
-  .cc-ed-audience__title {
-    font-size: clamp(3.4rem, 18vw, 5.25rem);
-  }
-
-  .cc-ed-audience__lead,
-  .cc-ed-audience__story--image-start .cc-ed-audience__lead,
-  .cc-ed-audience__body,
-  .cc-ed-audience__story--image-start .cc-ed-audience__body {
-    max-width: 28rem;
-    margin-left: 0;
-  }
-
-  .cc-ed-audience__frame,
-  .cc-ed-audience__story--image-end .cc-ed-audience__frame,
-  .cc-ed-audience__story--image-start .cc-ed-audience__frame,
-  .cc-ed-audience__story--wide .cc-ed-audience__frame,
-  .cc-ed-audience__story--tall .cc-ed-audience__frame,
-  .cc-ed-audience__story--square .cc-ed-audience__frame,
-  .cc-ed-audience__story:nth-child(3) .cc-ed-audience__frame,
-  .cc-ed-audience__story:nth-child(5) .cc-ed-audience__frame {
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    width: min(92vw, 28rem);
-    height: auto;
-    aspect-ratio: 5 / 4;
-    margin: -2.4rem 0 0 auto;
-  }
-
-  .cc-ed-audience__story--image-start .cc-ed-audience__frame {
-    margin-right: auto;
-    margin-left: 0;
-  }
+.cc-ed-audience[data-audience-motion='snap'] .cc-ed-audience__card {
+  scroll-snap-align: start;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cc-ed-audience__copy,
-  .cc-ed-audience__frame {
+  .cc-ed-audience__track {
     will-change: auto;
     transform: none !important;
   }

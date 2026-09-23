@@ -195,7 +195,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
   const statementRef = useRef<HTMLElement>(null);
   const pagerRef = useRef<HTMLSpanElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
-  const { canEnhanceMotion, hydrated } = useMotionPreferences();
+  const { hydrated } = useMotionPreferences();
   useScrollTriggerRefresh();
 
   useGSAP(
@@ -281,7 +281,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
       };
 
       let expandTl: gsap.core.Timeline | null = null;
-      let typeTl: gsap.core.Timeline | null = null;
       let statementTl: gsap.core.Timeline | null = null;
 
       const notifyCinemaReady = () => {
@@ -420,126 +419,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         }
       };
 
-      /**
-       * Scroll-tied type layer on top of the existing expand.
-       * The clip-path takeover stays on expandTl; this only moves
-       * CODECARD, the rotating headline, and the supporting sentence.
-       */
-      const buildTypeCinema = () => {
-        if (!canEnhanceMotion) return;
-
-        const wordmark = root.querySelector<HTMLElement>('[data-hero-wordmark]');
-        const headline = root.querySelector<HTMLElement>('[data-hero-headline]');
-        const quote = root.querySelector<HTMLElement>('[data-hero-quote]');
-        if (!wordmark || !headline || !quote) return;
-
-        const expandVh = mobile
-          ? EXPAND_SCROLL_VH.mobile
-          : EXPAND_SCROLL_VH.desktop;
-        const holdVh = mobile ? HERO_HOLD_VH.mobile : HERO_HOLD_VH.desktop;
-        const typeScrollVh = expandVh + holdVh;
-        const growUntil = (expandVh + holdVh * 0.38) / typeScrollVh;
-
-        const readTypeGeom = () => {
-          const currentX = Number(gsap.getProperty(wordmark, 'x')) || 0;
-          const currentY = Number(gsap.getProperty(wordmark, 'y')) || 0;
-          const currentQuoteY = Number(gsap.getProperty(quote, 'y')) || 0;
-          const wr = wordmark.getBoundingClientRect();
-          const qr = quote.getBoundingClientRect();
-          const naturalW = Math.max(wordmark.offsetWidth, 1);
-          const naturalH = Math.max(wordmark.offsetHeight, 1);
-          const naturalLeft = wr.left - currentX;
-          const naturalTop = wr.top - currentY;
-          const quoteNaturalTop = qr.top - currentQuoteY;
-          const vw = window.innerWidth;
-          const vh = window.innerHeight;
-          const gutter = mobile ? 12 : 20;
-          const targetW = Math.min(
-            vw * (mobile ? 0.94 : 0.96),
-            vw - gutter * 2,
-          );
-          const scale = Math.max(1.05, targetW / naturalW);
-          const x = (vw - naturalW * scale) / 2 - naturalLeft;
-          const targetTop = Math.min(
-            Math.max(vh * (mobile ? 0.16 : 0.13), 76),
-            vh * 0.2,
-          );
-          const y = targetTop - naturalTop;
-          const wordBottom = targetTop + naturalH * scale;
-          const quoteTarget = Math.min(
-            vh * (mobile ? 0.7 : 0.66),
-            Math.max(wordBottom + (mobile ? 16 : 24), vh * 0.52),
-          );
-          return {
-            scale,
-            x,
-            y,
-            quoteY: quoteTarget - quoteNaturalTop,
-          };
-        };
-
-        let geom = readTypeGeom();
-
-        gsap.set(wordmark, { transformOrigin: 'left top', force3D: true });
-        gsap.set(headline, { transformOrigin: 'left top' });
-
-        typeTl = gsap.timeline({
-          defaults: { ease: 'none' },
-          scrollTrigger: {
-            id: 'editorial-hero-type',
-            trigger: runway,
-            start: 'top top',
-            end: `+=${typeScrollVh}%`,
-            scrub: CINEMA_SCRUB,
-            invalidateOnRefresh: true,
-            markers: gsapMarkersEnabled(),
-            onRefreshInit: () => {
-              geom = readTypeGeom();
-            },
-            onRefresh: () => {
-              geom = readTypeGeom();
-            },
-          },
-        });
-
-        typeTl.fromTo(
-          wordmark,
-          { scale: 1, x: 0, y: 0 },
-          {
-            scale: () => geom.scale,
-            x: () => geom.x,
-            y: () => geom.y,
-            duration: growUntil,
-            ease: 'none',
-          },
-          0,
-        );
-
-        typeTl.fromTo(
-          headline,
-          { opacity: 1, y: 0, scale: 1 },
-          {
-            opacity: 0,
-            y: mobile ? -16 : -28,
-            scale: 0.94,
-            duration: growUntil * 0.52,
-            ease: 'none',
-          },
-          0,
-        );
-
-        typeTl.fromTo(
-          quote,
-          { y: 0 },
-          {
-            y: () => geom.quoteY,
-            duration: growUntil,
-            ease: 'none',
-          },
-          0.03,
-        );
-      };
-
       const buildStatementReveal = () => {
         if (!progressFillRef.current) return;
         const fillEl = progressFillRef.current;
@@ -634,7 +513,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
           );
         }
 
-        buildTypeCinema();
         buildStatementReveal();
 
         refreshScrollTrigger({ safe: true });
@@ -648,8 +526,6 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
         }
         expandTl?.scrollTrigger?.kill();
         expandTl?.kill();
-        typeTl?.scrollTrigger?.kill();
-        typeTl?.kill();
         statementTl?.scrollTrigger?.kill();
         statementTl?.kill();
       };
@@ -668,7 +544,7 @@ export function EditorialHeroScene({ hero }: EditorialHeroSceneProps) {
     },
     {
       scope: rootRef,
-      dependencies: [hydrated, canEnhanceMotion],
+      dependencies: [hydrated],
       revertOnUpdate: false,
     },
   );
