@@ -2773,7 +2773,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
     linear-gradient(135deg, color-mix(in srgb, var(--ed-iris) 8%, var(--ed-page)), var(--ed-page));
 }
 
-/* —— Who it’s for (name / photo / copy filmstrip) —— */
+/* —— Who it’s for (overlapping name / photo / copy filmstrip) —— */
 .cc-ed-audience {
   padding: 0;
   overflow: hidden;
@@ -2783,8 +2783,9 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-ed-audience__pin {
   display: flex;
   flex-direction: column;
+  height: 100svh;
   min-height: 100svh;
-  padding: clamp(5.25rem, 11vh, 7rem) 0 clamp(1.5rem, 4vh, 2.25rem);
+  padding: clamp(5rem, 10vh, 6.5rem) 0 clamp(1.25rem, 3vh, 2rem);
   box-sizing: border-box;
 }
 
@@ -2801,9 +2802,9 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience__heading {
-  margin: 0.55rem 0 0;
+  margin: 0.45rem 0 0;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.7rem, 2.6vw + 0.5rem, 2.45rem);
+  font-size: clamp(1.55rem, 2.2vw + 0.45rem, 2.15rem);
   font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1.08;
@@ -2821,25 +2822,40 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-ed-audience__track {
   display: flex;
+  flex-flow: row nowrap;
   align-items: center;
   width: max-content;
-  gap: clamp(2.75rem, 5.5vw, 5.5rem);
-  padding-inline: clamp(1.5rem, 5vw, 4.5rem);
+  height: 100%;
   will-change: transform;
 }
 
 .cc-ed-audience__card {
-  display: flex;
+  display: grid;
   flex: 0 0 auto;
   align-items: center;
-  gap: clamp(1.75rem, 3.6vw, 3.75rem);
-  width: auto;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto;
+  column-gap: 0.75rem;
+  width: 100vw;
+  margin-left: -20vw;
+  padding-inline: 2rem;
+}
+
+.cc-ed-audience__card:first-child {
+  margin-left: 8vw;
+}
+
+.cc-ed-audience__card--last {
+  padding-right: 28vw;
 }
 
 .cc-ed-audience__name {
-  flex: 0 0 auto;
-  width: min(22vw, 15.5rem);
-  min-width: 9.5rem;
+  grid-column: 2 / 6;
+  grid-row: 1;
+  z-index: 3;
+  width: auto;
+  min-width: 0;
+  pointer-events: none;
 }
 
 .cc-ed-audience__number {
@@ -2852,12 +2868,12 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience__title {
-  margin: 0.45rem 0 0;
+  margin: 0.4rem 0 0;
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(2.6rem, 5.6vw, 5.25rem);
+  font-size: clamp(2.8rem, 6.4vw, 6rem);
   font-weight: 400;
-  letter-spacing: -0.045em;
-  line-height: 0.86;
+  letter-spacing: -0.05em;
+  line-height: 0.84;
   text-transform: none;
   color: #232324;
   text-wrap: balance;
@@ -2866,9 +2882,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-ed-audience__frame {
   position: relative;
-  flex: 0 0 auto;
-  width: min(44vw, 38rem);
-  aspect-ratio: 5 / 4;
+  grid-column: 5 / 9;
+  grid-row: 1;
+  width: 100%;
+  max-height: min(52rem, 58vh);
+  aspect-ratio: 1;
   overflow: hidden;
   background: #ece8e2;
 }
@@ -2879,9 +2897,15 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience__dek {
-  flex: 0 0 auto;
-  width: min(20vw, 16.5rem);
-  min-width: 11.5rem;
+  grid-column: 9 / 12;
+  grid-row: 1;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: auto;
+  min-width: 0;
+  padding-left: clamp(1.25rem, 2.5vw, 3rem);
 }
 
 .cc-ed-audience__lead,
@@ -2896,7 +2920,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-ed-audience__lead {
   font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
-  font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+  font-size: clamp(1.12rem, 1.45vw, 1.4rem);
   font-weight: 400;
   letter-spacing: -0.028em;
   line-height: 1.2;
@@ -2913,7 +2937,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-ed-audience__pager {
   flex: 0 0 auto;
   margin: 0;
-  padding: 1.1rem clamp(1.5rem, 5vw, 4.5rem) 0;
+  padding: 1rem clamp(1.5rem, 5vw, 4.5rem) 0;
   font-family: var(--font-eyebrow), ui-monospace, monospace;
   font-size: 0.78rem;
   letter-spacing: 0.14em;
@@ -2926,6 +2950,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-audience[data-audience-motion='snap'] .cc-ed-audience__pin {
+  height: auto;
   min-height: 0;
   padding-top: clamp(4.5rem, 10vh, 6.5rem);
 }
@@ -2947,21 +2972,27 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 @media (max-width: 767px) {
-  .cc-ed-audience__card {
+  .cc-ed-audience__card,
+  .cc-ed-audience__card:first-child,
+  .cc-ed-audience__card--last {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: min(82vw, 24rem);
+    width: min(84vw, 24.5rem);
+    margin-left: 0;
+    padding-inline: 1.15rem;
     gap: 1rem;
   }
 
   .cc-ed-audience__name,
   .cc-ed-audience__dek {
     width: 100%;
-    min-width: 0;
+    padding-left: 0;
   }
 
   .cc-ed-audience__frame {
     width: 100%;
+    max-height: none;
   }
 
   .cc-ed-audience__title {

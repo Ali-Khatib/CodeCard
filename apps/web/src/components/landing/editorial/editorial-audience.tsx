@@ -14,11 +14,21 @@ import { LANDING_PERSONAS } from '@/lib/marketing/landing-personas';
 
 function PersonaCard({
   persona,
+  index,
 }: {
   persona: (typeof LANDING_PERSONAS)[number];
+  index: number;
 }) {
+  const last = index === LANDING_PERSONAS.length - 1;
   return (
-    <article className="cc-ed-audience__card" data-audience-card={persona.id}>
+    <article
+      className={
+        last
+          ? 'cc-ed-audience__card cc-ed-audience__card--last'
+          : 'cc-ed-audience__card'
+      }
+      data-audience-card={persona.id}
+    >
       <div className="cc-ed-audience__name">
         <p className="cc-ed-audience__number">{persona.number}</p>
         <h3 className="cc-ed-audience__title">{persona.title}</h3>
@@ -28,7 +38,7 @@ function PersonaCard({
           src={persona.imageSrc}
           alt={persona.imageAlt}
           fill
-          sizes="(max-width: 767px) 78vw, 42vw"
+          sizes="(max-width: 767px) 78vw, 36vw"
           className="cc-ed-audience__photo"
           style={{ objectPosition: persona.imagePosition }}
         />
@@ -42,8 +52,9 @@ function PersonaCard({
 }
 
 /**
- * Who CodeCard is for — a continuous name / photo / copy strip.
- * Neighbors stay in frame so the next title slides over the last dek.
+ * Who CodeCard is for — Creative Giants-style overlapping filmstrip.
+ * Each slide is a viewport-wide 12-col grid (name / photo / copy). Later
+ * slides pull left so the next title crosses the previous dek.
  */
 export function EditorialAudience() {
   const rootRef = useRef<HTMLElement>(null);
@@ -93,9 +104,9 @@ export function EditorialAudience() {
             id: 'editorial-audience-strip',
             trigger: pin,
             start: 'top top',
-            end: () => `+=${Math.max(shift(), window.innerWidth) * 1.15}`,
+            end: () => `+=${shift()}`,
             pin: true,
-            scrub: 0.55,
+            scrub: 0.65,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
@@ -138,8 +149,12 @@ export function EditorialAudience() {
             className="cc-ed-audience__track"
             data-testid="editorial-audience-track"
           >
-            {LANDING_PERSONAS.map((persona) => (
-              <PersonaCard key={persona.id} persona={persona} />
+            {LANDING_PERSONAS.map((persona, index) => (
+              <PersonaCard
+                key={persona.id}
+                persona={persona}
+                index={index}
+              />
             ))}
           </div>
         </div>
