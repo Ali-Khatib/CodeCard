@@ -18,36 +18,39 @@ function PersonaCard({
   persona: (typeof LANDING_PERSONAS)[number];
 }) {
   return (
-    <article
-      className="cc-ed-audience__card"
-      data-audience-card={persona.id}
-    >
+    <article className="cc-ed-audience__card" data-audience-card={persona.id}>
+      <div className="cc-ed-audience__name">
+        <p className="cc-ed-audience__number">{persona.number}</p>
+        <h3 className="cc-ed-audience__title">{persona.title}</h3>
+      </div>
       <figure className="cc-ed-audience__frame">
         <Image
           src={persona.imageSrc}
           alt={persona.imageAlt}
           fill
-          sizes="(max-width: 767px) 78vw, 28rem"
+          sizes="(max-width: 767px) 78vw, 42vw"
           className="cc-ed-audience__photo"
           style={{ objectPosition: persona.imagePosition }}
         />
       </figure>
-      <p className="cc-ed-audience__number">{persona.number}</p>
-      <h3 className="cc-ed-audience__title">{persona.title}</h3>
-      <p className="cc-ed-audience__lead">{persona.lead}</p>
-      <p className="cc-ed-audience__body">{persona.body}</p>
+      <div className="cc-ed-audience__dek">
+        <p className="cc-ed-audience__lead">{persona.lead}</p>
+        <p className="cc-ed-audience__body">{persona.body}</p>
+      </div>
     </article>
   );
 }
 
 /**
- * Who CodeCard is for — five persona cards in a horizontal strip.
- * Page scroll drives the strip sideways; reduced motion uses native snap.
+ * Who CodeCard is for — a continuous name / photo / copy strip.
+ * Neighbors stay in frame so the next title slides over the last dek.
  */
 export function EditorialAudience() {
   const rootRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const pagerRef = useRef<HTMLSpanElement>(null);
   const { canEnhanceMotion, hydrated } = useMotionPreferences();
   useScrollTriggerRefresh();
 
@@ -55,12 +58,30 @@ export function EditorialAudience() {
     () => {
       if (!hydrated || !canEnhanceMotion) return;
       const pin = pinRef.current;
+      const viewport = viewportRef.current;
       const track = trackRef.current;
-      if (!pin || !track) return;
+      if (!pin || !viewport || !track) return;
 
       ensureGsapPlugins();
 
-      const shift = () => Math.max(0, track.scrollWidth - pin.clientWidth);
+      const cards = Array.from(
+        track.querySelectorAll<HTMLElement>('[data-audience-card]'),
+      );
+      const count = Math.max(cards.length, 1);
+
+      const shift = () =>
+        Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+      const setPager = (progress: number) => {
+        if (!pagerRef.current) return;
+        const index = Math.min(
+          count - 1,
+          Math.max(0, Math.round(progress * (count - 1))),
+        );
+        pagerRef.current.textContent = String(index + 1).padStart(2, '0');
+      };
+
+      setPager(0);
 
       gsap.fromTo(
         track,
@@ -72,12 +93,13 @@ export function EditorialAudience() {
             id: 'editorial-audience-strip',
             trigger: pin,
             start: 'top top',
-            end: () => `+=${shift() + window.innerHeight * 0.35}`,
+            end: () => `+=${Math.max(shift(), window.innerWidth) * 1.15}`,
             pin: true,
-            scrub: 0.45,
+            scrub: 0.55,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
+            onUpdate: (self) => setPager(self.progress),
           },
         },
       );
@@ -108,13 +130,9 @@ export function EditorialAudience() {
           >
             Made for the moment you meet.
           </h2>
-          <p className="cc-ed-audience__intro-lede">
-            CodeCard is built for people who need to show what they do when the
-            introduction happens, not days later.
-          </p>
         </div>
 
-        <div className="cc-ed-audience__viewport">
+        <div ref={viewportRef} className="cc-ed-audience__viewport">
           <div
             ref={trackRef}
             className="cc-ed-audience__track"
@@ -125,6 +143,16 @@ export function EditorialAudience() {
             ))}
           </div>
         </div>
+
+        <p className="cc-ed-audience__pager" aria-live="polite">
+          <span ref={pagerRef} data-audience-index>
+            01
+          </span>
+          <span className="cc-ed-audience__pager-total">
+            {' '}
+            / {String(LANDING_PERSONAS.length).padStart(2, '0')}
+          </span>
+        </p>
       </div>
     </section>
   );
