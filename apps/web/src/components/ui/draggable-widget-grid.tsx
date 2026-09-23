@@ -65,6 +65,50 @@ export interface DraggableWidgetGridProps {
   className?: string
 }
 
+function scrollParent(el: HTMLElement | null): HTMLElement | Window {
+  let node = el?.parentElement ?? null
+  while (node) {
+    const { overflowY } = getComputedStyle(node)
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+      node.scrollHeight > node.clientHeight + 1
+    ) {
+      return node
+    }
+    node = node.parentElement
+  }
+  return window
+}
+
+function scrollTopOf(scroller: HTMLElement | Window) {
+  return scroller === window
+    ? window.scrollY
+    : (scroller as HTMLElement).scrollTop
+}
+
+function setScrollTop(scroller: HTMLElement | Window, top: number) {
+  if (scroller === window) {
+    window.scrollTo({ top, left: 0, behavior: 'instant' })
+    return
+  }
+  ;(scroller as HTMLElement).scrollTop = top
+}
+
+/** Keep the viewport still across the layout frames that follow a drop. */
+function pinScroll(el: HTMLElement | null, top: number) {
+  const scroller = scrollParent(el)
+  const apply = () => {
+    if (Math.abs(scrollTopOf(scroller) - top) > 0.5) setScrollTop(scroller, top)
+  }
+  apply()
+  const endAt = performance.now() + 320
+  const loop = () => {
+    apply()
+    if (performance.now() < endAt) requestAnimationFrame(loop)
+  }
+  requestAnimationFrame(loop)
+}
+
 const SPANS: { [K in WidgetSize]: { col: number; row: number } } = {
   sm: { col: 1, row: 1 },
   wide: { col: 2, row: 1 },
@@ -520,6 +564,7 @@ const Widget = memo(function Widget({
       return
     }
     if (e.pointerType !== 'touch') {
+      e.currentTarget.focus({ preventScroll: true })
       controls.start(e)
       return
     }
@@ -789,7 +834,7 @@ export function DraggableWidgetGrid({
     const el = grid.current?.querySelector(
       `[data-widget-id="${CSS.escape(id)}"]`,
     ) as HTMLElement | null
-    el?.focus()
+    el?.focus({ preventScroll: true })
   }, [items])
 
   const handlers: WidgetHandlers = useMemo(
@@ -813,10 +858,16 @@ export function DraggableWidgetGrid({
         if (!frame.current) frame.current = requestAnimationFrame(() => step())
       },
       end: (id) => {
+        const scroller = scrollParent(grid.current)
+        const pinnedTop = scrollTopOf(scroller)
         cancelAnimationFrame(frame.current)
         step(true)
         frame.current = 0
         dragging.current = null
+        const focused = document.activeElement
+        if (focused instanceof HTMLElement && focused.closest('[data-slot="widget"]')) {
+          focused.blur()
+        }
         setHeld(null)
         setLanded(id)
         window.clearTimeout(ring.current)
@@ -829,6 +880,7 @@ export function DraggableWidgetGrid({
         const after = latest.current.items
         if (before && !sameOrder(before, after))
           latest.current.onChange?.(after)
+        pinScroll(grid.current, pinnedTop)
       },
       key: (e, id) => {
         if (!editable || !e.altKey) return

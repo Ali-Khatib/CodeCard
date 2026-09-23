@@ -20,18 +20,24 @@ export function EditorialHero() {
       <div className="cc-ed-hero__content" data-testid="hero-section">
         <div className="cc-ed-hero__copy">
           <div className="cc-ed-hero__mast">
-            <p className="cc-ed-hero__brand">CodeCard</p>
+            <p className="cc-ed-hero__brand" data-hero-wordmark>
+              CodeCard
+            </p>
             <h1
               id="editorial-hero-heading"
               className="cc-ed-hero__headline"
               data-hero-statement
+              data-hero-headline
             >
               <span className="cc-ed-hero__show">SHARE YOUR WORK.</span>
               <span className="sr-only">KEEP THE CONNECTION.</span>
               <EditorialHeroAnimatedHeadline />
             </h1>
           </div>
-          <p className="cc-ed__connect-principle cc-ed-hero__quote">
+          <p
+            className="cc-ed__connect-principle cc-ed-hero__quote"
+            data-hero-quote
+          >
             Where your work meets your people, and introductions become
             lasting connections.
           </p>

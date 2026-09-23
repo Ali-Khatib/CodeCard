@@ -17,11 +17,11 @@ describe('WS12-T010 accessible dialogs contracts', () => {
     expect(hook).toContain('triggerRef');
   });
 
-  it('editorial audience detail traps Tab while open', () => {
+  it('editorial audience is a static story section, not a modal', () => {
     const source = read('components/landing/editorial/editorial-audience.tsx');
-    expect(source).toContain('role="dialog"');
-    expect(source).toContain("e.key === 'Tab'");
-    expect(source).toContain("e.key === 'Escape'");
+    expect(source).not.toContain('role="dialog"');
+    expect(source).toContain('LANDING_PERSONAS');
+    expect(source).toContain('editorial-audience');
   });
 
   it('project delete uses alertdialog with cancel-first focus', () => {

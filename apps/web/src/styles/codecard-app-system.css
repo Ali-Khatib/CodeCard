@@ -7319,6 +7319,9 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-workspace-widget-grid {
   width: 100%;
+  /* Same reason as .cc-connection-list: rearranging widgets must not
+     let scroll-anchoring yank the page to the top. */
+  overflow-anchor: none;
 }
 
 .cc-workspace-widget-grid [data-slot="widget"] {
