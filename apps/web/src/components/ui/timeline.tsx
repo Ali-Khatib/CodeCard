@@ -59,24 +59,6 @@ function PersonaCard({ item }: { item: TimelineStop }) {
   );
 }
 
-function PersonaPanel({ item }: { item: TimelineStop }) {
-  const below = item.rail === 'bottom';
-
-  return (
-    <article
-      className="cc-tl-panel"
-      data-audience-card={item.id}
-    >
-      <div className="cc-tl-slot cc-tl-slot--top">
-        {!below ? <PersonaCard item={item} /> : null}
-      </div>
-      <div className="cc-tl-slot cc-tl-slot--bottom">
-        {below ? <PersonaCard item={item} /> : null}
-      </div>
-    </article>
-  );
-}
-
 export function Timeline({
   title = 'The life of a CodeCard',
   periodLabel = 'Create. Meet. Share. Connect. Meet again.',
@@ -112,36 +94,39 @@ export function Timeline({
       if (!pin || !viewport || !track) return;
 
       const phone = () => window.matchMedia('(max-width: 767px)').matches;
-      const panelWidth = () =>
-        phone() ? viewport.clientWidth : Math.round(viewport.clientWidth * 0.74);
-      const peek = () => (phone() ? 0 : (viewport.clientWidth - panelWidth()) / 2);
+      const panels = () =>
+        Array.from(track.querySelectorAll<HTMLElement>('.cc-tl-panel'));
 
       const sizePanels = () => {
-        const width = panelWidth();
-        track.querySelectorAll<HTMLElement>('.cc-tl-panel').forEach((panel) => {
+        const width = viewport.clientWidth;
+        panels().forEach((panel) => {
           panel.style.width = `${width}px`;
           panel.style.flexBasis = `${width}px`;
         });
-        if (!phone()) {
-          track.style.transform = `translate3d(${peek()}px,0,0)`;
-        }
       };
 
       const shift = () => {
         sizePanels();
-        return Math.max(0, (items.length - 1) * panelWidth());
+        return Math.max(0, (items.length - 1) * viewport.clientWidth);
       };
 
-      const setPager = (progress: number) => {
+      const paint = (progress: number) => {
         if (items.length === 0) return;
+        const pos = progress * Math.max(items.length - 1, 1);
         const index = Math.min(
           items.length - 1,
-          Math.max(0, Math.round(progress * (items.length - 1))),
+          Math.max(0, Math.round(pos)),
         );
         if (pagerRef.current) pagerRef.current.textContent = String(index + 1);
+
+        panels().forEach((panel, i) => {
+          const dist = Math.abs(pos - i);
+          const opacity = dist >= 0.92 ? 0 : 1 - dist * 1.08;
+          panel.style.opacity = String(Math.max(0, Math.min(1, opacity)));
+        });
+
         const spine = spineRef.current;
         if (!spine) return;
-        spine.style.setProperty('--tl-progress', String(progress));
         spine.querySelectorAll<HTMLElement>('[data-tl-stop]').forEach((stop, i) => {
           const threshold = items.length <= 1 ? 0 : i / (items.length - 1);
           stop.dataset.reached = progress + 0.02 >= threshold ? 'true' : 'false';
@@ -150,12 +135,14 @@ export function Timeline({
       };
 
       sizePanels();
-      setPager(0);
+      paint(0);
       if (line) line.style.width = canEnhanceMotion ? '12%' : '100%';
 
-      if (!hydrated || !canEnhanceMotion) return;
-      if (window.matchMedia('(max-width: 767px)').matches) {
+      if (!hydrated || !canEnhanceMotion || phone()) {
         if (line) line.style.width = '100%';
+        panels().forEach((panel) => {
+          panel.style.opacity = '1';
+        });
         return;
       }
 
@@ -183,9 +170,9 @@ export function Timeline({
 
       gsap.fromTo(
         track,
-        { x: () => peek() },
+        { x: 0 },
         {
-          x: () => peek() - shift(),
+          x: () => -shift(),
           ease: 'none',
           scrollTrigger: {
             id: 'editorial-audience-strip',
@@ -199,7 +186,7 @@ export function Timeline({
             markers: gsapMarkersEnabled(),
             onRefreshInit: sizePanels,
             onRefresh: sizePanels,
-            onUpdate: (self) => setPager(self.progress),
+            onUpdate: (self) => paint(self.progress),
           },
         },
       );
@@ -229,46 +216,51 @@ export function Timeline({
         </div>
 
         <div ref={viewportRef} className="cc-tl-viewport">
-          <div ref={spineRef} className="cc-tl-spine" aria-hidden>
-            <div className="cc-tl-spine__track">
-              <div ref={lineRef} className="cc-tl-line cc-tl-spine__fill" />
-            </div>
-            <ol className="cc-tl-spine__stops">
-              {items.map((item, index) => (
-                <li
-                  key={item.id}
-                  data-tl-stop
-                  data-rail={item.rail ?? 'top'}
-                  data-edge={
-                    index === 0 ? 'start' : index === items.length - 1 ? 'end' : 'mid'
-                  }
-                  data-reached={index === 0 ? 'true' : 'false'}
-                  data-current={index === 0 ? 'true' : 'false'}
-                  className="cc-tl-spine__stop"
-                  style={{
-                    ['--stop' as string]: String(
-                      items.length <= 1 ? 0 : index / (items.length - 1),
-                    ),
-                    ['--stop-accent' as string]: item.accent,
-                  }}
-                >
-                  <span className="cc-tl-spine__stem" />
-                  <span className="cc-tl-spine__node" />
-                  <span className="cc-tl-spine__label">{item.title}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-
           <div
             ref={trackRef}
             className="cc-tl-track"
             data-testid="editorial-audience-track"
           >
             {items.map((item) => (
-              <PersonaPanel key={item.id} item={item} />
+              <article
+                key={item.id}
+                className="cc-tl-panel"
+                data-audience-card={item.id}
+              >
+                <PersonaCard item={item} />
+              </article>
             ))}
           </div>
+        </div>
+
+        <div ref={spineRef} className="cc-tl-spine" aria-hidden>
+          <div className="cc-tl-spine__track">
+            <div ref={lineRef} className="cc-tl-line cc-tl-spine__fill" />
+          </div>
+          <ol className="cc-tl-spine__stops">
+            {items.map((item, index) => (
+              <li
+                key={item.id}
+                data-tl-stop
+                data-edge={
+                  index === 0 ? 'start' : index === items.length - 1 ? 'end' : 'mid'
+                }
+                data-reached={index === 0 ? 'true' : 'false'}
+                data-current={index === 0 ? 'true' : 'false'}
+                className="cc-tl-spine__stop"
+                style={{
+                  ['--stop' as string]: String(
+                    items.length <= 1 ? 0 : index / (items.length - 1),
+                  ),
+                  ['--stop-accent' as string]: item.accent,
+                }}
+              >
+                <span className="cc-tl-spine__stem" />
+                <span className="cc-tl-spine__node" />
+                <span className="cc-tl-spine__label">{item.title}</span>
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div className="cc-tl-foot">

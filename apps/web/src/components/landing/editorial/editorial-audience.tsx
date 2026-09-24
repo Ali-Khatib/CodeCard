@@ -36,7 +36,6 @@ export function EditorialAudience() {
           imageAlt: persona.imageAlt,
           imagePosition: persona.imagePosition,
           accent: persona.accent,
-          rail: persona.rail,
         }))}
       />
     </section>
