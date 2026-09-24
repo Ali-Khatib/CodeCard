@@ -111,17 +111,25 @@ export function Timeline({
       const line = lineRef.current;
       if (!pin || !viewport || !track) return;
 
+      const phone = () => window.matchMedia('(max-width: 767px)').matches;
+      const panelWidth = () =>
+        phone() ? viewport.clientWidth : Math.round(viewport.clientWidth * 0.74);
+      const peek = () => (phone() ? 0 : (viewport.clientWidth - panelWidth()) / 2);
+
       const sizePanels = () => {
-        const width = viewport.clientWidth;
+        const width = panelWidth();
         track.querySelectorAll<HTMLElement>('.cc-tl-panel').forEach((panel) => {
           panel.style.width = `${width}px`;
           panel.style.flexBasis = `${width}px`;
         });
+        if (!phone()) {
+          track.style.transform = `translate3d(${peek()}px,0,0)`;
+        }
       };
 
       const shift = () => {
         sizePanels();
-        return Math.max(0, (items.length - 1) * viewport.clientWidth);
+        return Math.max(0, (items.length - 1) * panelWidth());
       };
 
       const setPager = (progress: number) => {
@@ -175,9 +183,9 @@ export function Timeline({
 
       gsap.fromTo(
         track,
-        { x: 0 },
+        { x: () => peek() },
         {
-          x: () => -shift(),
+          x: () => peek() - shift(),
           ease: 'none',
           scrollTrigger: {
             id: 'editorial-audience-strip',
