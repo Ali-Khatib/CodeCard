@@ -1,6 +1,8 @@
 export type LandingPersonaLayout = 'image-end' | 'image-start';
 export type LandingPersonaFrame = 'wide' | 'tall' | 'square';
 
+export type LandingPersonaRail = 'top' | 'bottom';
+
 export type LandingPersona = {
   id: string;
   number: string;
@@ -11,6 +13,8 @@ export type LandingPersona = {
   imageSrc: string;
   imageAlt: string;
   imagePosition: string;
+  accent: string;
+  rail: LandingPersonaRail;
   layout: LandingPersonaLayout;
   frame: LandingPersonaFrame;
 };
@@ -26,6 +30,8 @@ export const LANDING_PERSONAS: LandingPersona[] = [
     imageSrc: '/landing/personas/builders.jpg',
     imageAlt: 'Software engineers building at neighboring desks',
     imagePosition: 'left center',
+    accent: '#7d94a8',
+    rail: 'top',
     layout: 'image-end',
     frame: 'wide',
   },
@@ -39,6 +45,8 @@ export const LANDING_PERSONAS: LandingPersona[] = [
     imageSrc: '/landing/personas/recruiters.jpg',
     imageAlt: 'Two people agreeing across a hiring table',
     imagePosition: 'center',
+    accent: '#d06a32',
+    rail: 'bottom',
     layout: 'image-start',
     frame: 'tall',
   },
@@ -52,6 +60,8 @@ export const LANDING_PERSONAS: LandingPersona[] = [
     imageSrc: '/landing/personas/events.jpg',
     imageAlt: 'Speaker presenting to a conference audience',
     imagePosition: 'center',
+    accent: '#e6b325',
+    rail: 'top',
     layout: 'image-end',
     frame: 'wide',
   },
@@ -65,6 +75,8 @@ export const LANDING_PERSONAS: LandingPersona[] = [
     imageSrc: '/landing/personas/students.jpg',
     imageAlt: 'University students collaborating with laptops on campus',
     imagePosition: 'center',
+    accent: '#7f9148',
+    rail: 'bottom',
     layout: 'image-start',
     frame: 'square',
   },
@@ -78,6 +90,8 @@ export const LANDING_PERSONAS: LandingPersona[] = [
     imageSrc: '/landing/personas/freelancers.jpg',
     imageAlt: 'Independent work setup with a notebook, laptop, and coffee',
     imagePosition: 'center',
+    accent: '#c49a5a',
+    rail: 'top',
     layout: 'image-end',
     frame: 'tall',
   },
