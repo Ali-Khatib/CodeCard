@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  type CSSProperties,
-  useRef,
-} from 'react';
+import { type CSSProperties, useRef } from 'react';
 import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import {
@@ -37,53 +34,40 @@ export type TimelineProps = {
   items: TimelineStop[];
 };
 
-function PersonaStop({
-  item,
-  compact,
-}: {
-  item: TimelineStop;
-  compact?: boolean;
-}) {
+function PersonaStop({ item }: { item: TimelineStop }) {
   const top = item.rail === 'top';
 
   return (
     <article
-      className={cn(
-        'relative flex h-full w-[22vw] flex-col max-[600px]:w-[72vw]',
-        compact && 'w-[20vw]',
-      )}
+      className="relative flex h-full w-[min(22rem,28vw)] shrink-0 flex-col max-[767px]:h-auto max-[767px]:w-full"
       data-audience-card={item.id}
-      data-tl-stop={item.id}
     >
       <div
         className={cn(
-          'absolute left-0 flex h-full w-px flex-col items-center',
-          top ? 'top-0' : 'bottom-0',
+          'absolute left-0 flex w-px flex-col items-center',
+          top ? 'inset-y-0' : 'inset-y-0',
         )}
+        aria-hidden
       >
         {top ? (
           <>
             <span
-              className="relative z-10 size-[0.85vw] shrink-0 rounded-full max-[600px]:size-2.5"
-              data-tl-dot={item.id}
+              className="size-2.5 shrink-0 rounded-full"
               style={{ backgroundColor: item.accent }}
             />
             <span
-              className="w-px flex-1 origin-top rounded-full"
-              data-tl-line={item.id}
+              className="w-px flex-1"
               style={{ backgroundColor: item.accent }}
             />
           </>
         ) : (
           <>
             <span
-              className="w-px flex-1 origin-bottom rounded-full"
-              data-tl-line={item.id}
+              className="w-px flex-1"
               style={{ backgroundColor: item.accent }}
             />
             <span
-              className="relative z-10 size-[0.85vw] shrink-0 rounded-full max-[600px]:size-2.5"
-              data-tl-dot={item.id}
+              className="size-2.5 shrink-0 rounded-full"
               style={{ backgroundColor: item.accent }}
             />
           </>
@@ -92,15 +76,14 @@ function PersonaStop({
 
       <div
         className={cn(
-          'flex h-full flex-col pl-[1.6vw] max-[600px]:pl-5',
-          top ? 'justify-start pb-[8%]' : 'justify-end pt-[8%]',
+          'flex h-full flex-col pl-5',
+          top ? 'justify-start pb-8' : 'justify-end pt-8',
         )}
-        data-tl-copy={item.id}
       >
         <figure
           className={cn(
-            'relative mb-[1.1vw] w-[13.5vw] overflow-hidden max-[600px]:mb-3 max-[600px]:w-[58vw]',
-            top ? 'order-1' : 'order-3',
+            'relative w-full overflow-hidden bg-[#111]',
+            top ? 'order-1 mb-3' : 'order-3 mt-3',
           )}
           style={{ aspectRatio: '5 / 4' }}
         >
@@ -108,23 +91,23 @@ function PersonaStop({
             src={item.imageSrc}
             alt={item.imageAlt}
             fill
-            sizes="(max-width: 600px) 58vw, 14vw"
+            sizes="(max-width: 767px) 88vw, 28vw"
             className="object-cover"
             style={{ objectPosition: item.imagePosition ?? 'center' }}
           />
         </figure>
         <h3
           className={cn(
-            'font-[family-name:var(--font-display),Georgia,serif] text-[2.15vw] font-light leading-none tracking-[-0.04em] max-[600px]:text-[7vw]',
-            top ? 'order-2 mb-[0.55vw] mt-[0.15vw]' : 'order-2 mb-[0.55vw]',
+            'font-[family-name:var(--font-display),Georgia,serif] text-[clamp(1.8rem,3vw,2.6rem)] font-light leading-none tracking-[-0.04em]',
+            top ? 'order-2 mb-2' : 'order-2 mb-2',
           )}
         >
           {item.title}
         </h3>
         <p
           className={cn(
-            'w-[90%] text-[0.95vw] leading-[1.35] max-[600px]:text-[3.6vw]',
-            top ? 'order-3' : 'order-1 mb-[0.7vw]',
+            'max-w-[22ch] text-[0.95rem] leading-snug',
+            top ? 'order-3' : 'order-1 mb-2',
           )}
           style={{ color: 'var(--tl-muted)' }}
         >
@@ -142,10 +125,11 @@ export function Timeline({
   mutedTextColor = 'rgba(245,245,245,0.62)',
   activeColor = '#ff5f00',
   backgroundColor = '#000000',
-  duration = 1.1,
   items,
 }: TimelineProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const pagerRef = useRef<HTMLSpanElement>(null);
   const { canEnhanceMotion, hydrated } = useMotionPreferences();
@@ -153,7 +137,6 @@ export function Timeline({
 
   const topItems = items.filter((item) => item.rail === 'top');
   const bottomItems = items.filter((item) => item.rail === 'bottom');
-  const normalizedDuration = Math.max(0.2, duration);
   const sectionStyle: CSSProperties = {
     color: textColor,
     backgroundColor,
@@ -162,18 +145,12 @@ export function Timeline({
 
   useGSAP(
     () => {
-      const section = sectionRef.current;
+      const pin = pinRef.current;
+      const viewport = viewportRef.current;
       const track = trackRef.current;
-      if (!section || !track) return;
+      if (!pin || !viewport || !track) return;
 
-      ensureGsapPlugins();
-
-      const nodes = items.map((item) => ({
-        item,
-        line: section.querySelector<HTMLElement>(`[data-tl-line="${item.id}"]`),
-        dot: section.querySelector<HTMLElement>(`[data-tl-dot="${item.id}"]`),
-        copy: section.querySelector<HTMLElement>(`[data-tl-copy="${item.id}"]`),
-      }));
+      const shift = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
 
       const setPager = (progress: number) => {
         if (!pagerRef.current || items.length === 0) return;
@@ -184,107 +161,62 @@ export function Timeline({
         pagerRef.current.textContent = String(index + 1);
       };
 
-      const reveal = (enhanced: boolean) => {
-        nodes.forEach(({ line, dot, copy }) => {
-          gsap.set(line, {
-            scaleY: enhanced ? 0 : 1,
-            transformOrigin: 'center',
-          });
-          gsap.set(dot, { scale: enhanced ? 0 : 1 });
-          gsap.set(copy, {
-            y: enhanced ? 28 : 0,
-            opacity: enhanced ? 0 : 1,
-          });
-        });
-      };
-
-      if (!hydrated || !canEnhanceMotion || window.matchMedia('(max-width: 600px)').matches) {
-        reveal(false);
-        gsap.set('.cc-tl-line', { width: '92%' });
-        setPager(1);
-        return;
-      }
-
-      reveal(true);
       setPager(0);
 
-      const isNarrow = window.innerWidth < 1100;
-      const slidePercent = isNarrow ? -58 : -52;
+      const line = pin.querySelector<HTMLElement>('.cc-tl-line');
+      if (line) {
+        line.style.width = '92%';
+      }
+
+      if (!hydrated || !canEnhanceMotion) return;
+      if (window.matchMedia('(max-width: 767px)').matches) return;
+
+      ensureGsapPlugins();
+
+      if (line) {
+        gsap.fromTo(
+          line,
+          { width: '8%' },
+          {
+            width: '92%',
+            ease: 'none',
+            scrollTrigger: {
+              trigger: pin,
+              start: 'top top',
+              end: () => `+=${Math.max(shift(), window.innerWidth)}`,
+              scrub: true,
+              markers: gsapMarkersEnabled(),
+            },
+          },
+        );
+      }
 
       gsap.fromTo(
         track,
-        { xPercent: 0 },
+        { x: 0 },
         {
-          xPercent: slidePercent,
+          x: () => -shift(),
           ease: 'none',
           scrollTrigger: {
             id: 'editorial-audience-strip',
-            trigger: section,
+            trigger: pin,
             start: 'top top',
-            end: isNarrow ? '88% 50%' : '92% bottom',
+            end: () => `+=${Math.max(shift(), window.innerWidth)}`,
+            pin: true,
             scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
             markers: gsapMarkersEnabled(),
             onUpdate: (self) => setPager(self.progress),
           },
         },
       );
-
-      gsap.fromTo(
-        section.querySelector('.cc-tl-line'),
-        { width: '0%' },
-        {
-          width: isNarrow ? '72%' : '94%',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: isNarrow ? 'top 30%' : 'top 22%',
-            end: isNarrow ? '82% 50%' : '90% bottom',
-            scrub: true,
-            markers: gsapMarkersEnabled(),
-          },
-        },
-      );
-
-      const starts = isNarrow
-        ? [18, 30, 42, 54, 66]
-        : [10, 26, 42, 58, 72];
-
-      nodes.forEach(({ item, line, dot, copy }, index) => {
-        const start = starts[index] ?? 10 + index * 16;
-        gsap.set(line, {
-          transformOrigin: item.rail === 'top' ? 'top' : 'bottom',
-        });
-
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: `${start}% 32%`,
-              end: `${start + 16}% 52%`,
-              scrub: true,
-              markers: gsapMarkersEnabled(),
-            },
-          })
-          .to(line, { scaleY: 1, duration: normalizedDuration * 0.4 })
-          .to(dot, { scale: 1, duration: normalizedDuration * 0.35 }, '<')
-          .to(
-            copy,
-            {
-              y: 0,
-              opacity: 1,
-              duration: normalizedDuration,
-              ease: 'power2.out',
-            },
-            '<',
-          );
-      });
     },
     {
       scope: sectionRef,
       dependencies: [
         canEnhanceMotion,
         hydrated,
-        normalizedDuration,
         items.map((item) => item.id).join('|'),
       ],
       revertOnUpdate: true,
@@ -295,63 +227,67 @@ export function Timeline({
     <section
       ref={sectionRef}
       id="journey"
-      className="relative h-[200vw] w-full max-[600px]:h-auto"
+      className="relative w-full"
       style={sectionStyle}
     >
-      <div className="sticky top-0 flex h-screen w-full flex-col overflow-hidden pt-[11vh] max-[600px]:relative max-[600px]:h-auto max-[600px]:overflow-visible max-[600px]:pt-16">
+      <div
+        ref={pinRef}
+        className="flex min-h-[100svh] flex-col justify-between py-24 max-[767px]:min-h-0 max-[767px]:py-16"
+      >
         <div
-          ref={trackRef}
-          className="cc-tl-track mr-[2vw] flex h-[31vw] w-[200vw] items-center px-[5vw] max-[600px]:mr-0 max-[600px]:h-auto max-[600px]:w-full max-[600px]:flex-col max-[600px]:items-stretch max-[600px]:gap-14 max-[600px]:px-5"
-          data-testid="editorial-audience-track"
+          ref={viewportRef}
+          className="relative min-h-[36rem] flex-1 overflow-hidden max-[767px]:overflow-visible"
         >
-          <div className="relative h-full w-full max-[600px]:h-auto">
-            <div className="absolute left-0 top-[49%] flex h-fit w-full -translate-y-1/2 items-center max-[600px]:hidden">
-              <div
-                className="size-[0.7vw] rounded-full"
-                style={{ backgroundColor: activeColor }}
-              />
-              <div
-                className="cc-tl-line h-px w-0 rounded-full"
-                style={{ backgroundColor: activeColor }}
-              />
-              <div
-                className="size-[0.7vw] rounded-full"
-                style={{ backgroundColor: activeColor }}
-              />
-            </div>
-
-            <div className="flex h-1/2 w-full items-start max-[600px]:h-auto max-[600px]:flex-col max-[600px]:gap-12">
-              <div className="w-[18%] shrink-0 pt-[0.4vw] max-[600px]:w-full max-[600px]:pt-0">
-                <h3 className="w-[12ch] font-[family-name:var(--font-display),Georgia,serif] text-[2.8vw] font-light leading-[0.95] tracking-[-0.04em] max-[600px]:w-auto max-[600px]:text-[11vw]">
-                  {title}
-                </h3>
+          <div
+            ref={trackRef}
+            className="cc-tl-track relative flex h-full w-max items-stretch px-[5vw] max-[767px]:w-full max-[767px]:flex-col max-[767px]:gap-12"
+            data-testid="editorial-audience-track"
+          >
+            <div className="relative flex h-full min-h-[36rem] w-max flex-col max-[767px]:h-auto max-[767px]:min-h-0 max-[767px]:w-full">
+              <div className="absolute left-0 top-1/2 hidden w-full -translate-y-1/2 items-center min-[768px]:flex">
+                <div
+                  className="size-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: activeColor }}
+                />
+                <div
+                  className="cc-tl-line h-px w-[92%] rounded-full"
+                  style={{ backgroundColor: activeColor }}
+                />
+                <div
+                  className="size-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: activeColor }}
+                />
               </div>
-              <div className="flex h-full w-full justify-start gap-x-[16vw] max-[600px]:h-auto max-[600px]:flex-col max-[600px]:gap-12">
+
+              <div className="flex h-1/2 items-start gap-x-24 pr-[12vw] max-[767px]:h-auto max-[767px]:flex-col max-[767px]:gap-10 max-[767px]:pr-0">
+                <div className="w-[16rem] shrink-0 pt-2 max-[767px]:w-full">
+                  <h3 className="font-[family-name:var(--font-display),Georgia,serif] text-[clamp(2.4rem,4vw,3.6rem)] font-light leading-[0.95] tracking-[-0.04em]">
+                    {title}
+                  </h3>
+                </div>
                 {topItems.map((item) => (
                   <PersonaStop key={item.id} item={item} />
                 ))}
               </div>
-            </div>
 
-            <div className="flex h-1/2 w-full items-end max-[600px]:mt-10 max-[600px]:h-auto max-[600px]:flex-col max-[600px]:items-start max-[600px]:gap-12">
-              <div className="w-[26%] shrink-0 max-[600px]:w-full">
-                <p
-                  className="text-[1.15vw] leading-none max-[600px]:text-[4.2vw]"
-                  style={{ color: mutedTextColor }}
-                >
-                  {periodLabel}
-                </p>
-              </div>
-              <div className="ml-[6vw] flex h-full w-full justify-start gap-x-[20vw] max-[600px]:ml-0 max-[600px]:h-auto max-[600px]:flex-col max-[600px]:gap-12">
+              <div className="flex h-1/2 items-end gap-x-28 pr-[12vw] max-[767px]:mt-10 max-[767px]:h-auto max-[767px]:flex-col max-[767px]:items-start max-[767px]:gap-10 max-[767px]:pr-0">
+                <div className="w-[16rem] shrink-0 max-[767px]:w-full">
+                  <p
+                    className="text-[1.05rem] leading-snug"
+                    style={{ color: mutedTextColor }}
+                  >
+                    {periodLabel}
+                  </p>
+                </div>
                 {bottomItems.map((item) => (
-                  <PersonaStop key={item.id} item={item} compact />
+                  <PersonaStop key={item.id} item={item} />
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-auto flex items-center justify-between px-[5vw] pb-10 max-[600px]:mt-12 max-[600px]:px-5">
+        <div className="flex items-center justify-between px-[5vw] pt-6">
           <p
             className="font-[family-name:var(--font-eyebrow),ui-monospace,monospace] text-[0.72rem] uppercase tracking-[0.14em]"
             style={{ color: mutedTextColor }}
