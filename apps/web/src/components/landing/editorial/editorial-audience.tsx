@@ -29,13 +29,13 @@ export function EditorialAudience() {
         activeColor="#ff5f00"
         items={LANDING_PERSONAS.map((persona) => ({
           id: persona.id,
+          number: persona.number,
           title: persona.title,
           body: persona.body,
           imageSrc: persona.imageSrc,
           imageAlt: persona.imageAlt,
           imagePosition: persona.imagePosition,
           accent: persona.accent,
-          rail: persona.rail,
         }))}
       />
     </section>

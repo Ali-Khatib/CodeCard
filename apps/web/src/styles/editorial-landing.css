@@ -2786,6 +2786,13 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   background: #000000;
 }
 
+.cc-ed-audience h3,
+.cc-ed-audience p {
+  white-space: normal;
+  word-spacing: normal;
+  overflow-wrap: break-word;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cc-ed-audience .cc-tl-track {
     will-change: auto;
