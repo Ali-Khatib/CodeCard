@@ -1,54 +1,98 @@
 'use client';
 
-import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
-import { HERO_FIELD } from '@/components/ui/hero';
+
+function sectionY(el: Element | null) {
+  if (!(el instanceof HTMLElement)) return null;
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  return { top, bottom: top + el.offsetHeight };
+}
 
 /**
- * Multi-color stroke around the marketing pill. Starts once the hero
- * cinema leaves, and completes when the footer is fully in view.
+ * Colors the existing nav pill border after the hero. Crash Course and the
+ * life timeline do not advance the stroke; it resumes after those chapters.
  */
 export function EditorialNavProgress() {
-  const svgRef = useRef<SVGSVGElement>(null);
   const { canEnhanceMotion, hydrated } = useMotionPreferences();
 
   useGSAP(
     () => {
-      const svg = svgRef.current;
       const page = document.querySelector('.cc-ed');
       const hero =
         document.querySelector<HTMLElement>('.cc-ed-hero-scene') ??
         document.querySelector<HTMLElement>('[data-chapter-section="hero"]');
+      const crash = document.querySelector<HTMLElement>(
+        '[data-chapter-section="walkthrough"]',
+      );
+      const timeline = document.querySelector<HTMLElement>(
+        '[data-chapter-section="audience"]',
+      );
       const footer = document.querySelector<HTMLElement>('.cc-site-footer');
-      if (!svg || !page || !hero || !footer) return;
+      if (!page || !hero || !footer) return;
 
-      const apply = (progress: number) => {
-        const next = Math.min(1, Math.max(0, progress));
-        svg.style.setProperty('--cc-nav-progress', String(next));
-        svg.dataset.active = next > 0.01 ? 'true' : 'false';
+      const html = document.documentElement;
+
+      const progressFromScroll = () => {
+        const heroBox = sectionY(hero);
+        const footerBox = sectionY(footer);
+        if (!heroBox || !footerBox) return 0;
+
+        const skip = [sectionY(crash), sectionY(timeline)].filter(
+          (box): box is { top: number; bottom: number } => Boolean(box),
+        );
+        const finish = footerBox.bottom - window.innerHeight;
+        const ranges: Array<{ start: number; end: number }> = [];
+        let cursor = heroBox.bottom;
+
+        for (const gap of skip.sort((a, b) => a.top - b.top)) {
+          if (gap.top > cursor) ranges.push({ start: cursor, end: gap.top });
+          cursor = Math.max(cursor, gap.bottom);
+        }
+        if (finish > cursor) ranges.push({ start: cursor, end: finish });
+
+        const total = ranges.reduce(
+          (sum, range) => sum + Math.max(0, range.end - range.start),
+          0,
+        );
+        if (total <= 0) return 0;
+
+        const y = window.scrollY;
+        let filled = 0;
+        for (const range of ranges) {
+          const length = Math.max(0, range.end - range.start);
+          if (y >= range.end) filled += length;
+          else if (y > range.start) filled += y - range.start;
+        }
+        return Math.min(1, Math.max(0, filled / total));
       };
 
-      apply(0);
+      const apply = () => {
+        const next = progressFromScroll();
+        html.style.setProperty('--cc-nav-progress', String(next));
+        if (next > 0.01) html.dataset.navProgress = 'on';
+        else delete html.dataset.navProgress;
+      };
 
+      apply();
       if (!hydrated) return;
 
       ensureGsapPlugins();
-
-      const trigger = ScrollTrigger.create({
+      ScrollTrigger.create({
         id: 'editorial-nav-progress',
-        trigger: hero,
-        start: 'bottom top',
-        endTrigger: footer,
-        end: 'bottom bottom',
+        start: 0,
+        end: 'max',
         scrub: canEnhanceMotion ? 0.35 : true,
-        onUpdate: (self) => apply(self.progress),
-        onRefresh: (self) => apply(self.progress),
+        onUpdate: apply,
+        onRefresh: apply,
       });
 
-      apply(trigger.progress);
+      return () => {
+        html.style.removeProperty('--cc-nav-progress');
+        delete html.dataset.navProgress;
+      };
     },
     {
       dependencies: [canEnhanceMotion, hydrated],
@@ -56,48 +100,5 @@ export function EditorialNavProgress() {
     },
   );
 
-  return (
-    <svg
-      ref={svgRef}
-      className="cc-nav-progress"
-      viewBox="0 0 100 40"
-      preserveAspectRatio="none"
-      aria-hidden
-      data-active="false"
-    >
-      <defs>
-        <linearGradient
-          id="cc-nav-progress-grad"
-          x1="0"
-          y1="0"
-          x2="1"
-          y2="1"
-        >
-          <stop offset="0%" stopColor={HERO_FIELD.moss} />
-          <stop offset="22%" stopColor={HERO_FIELD.orange} />
-          <stop offset="48%" stopColor={HERO_FIELD.chlorophyll} />
-          <stop offset="72%" stopColor={HERO_FIELD.copper} />
-          <stop offset="100%" stopColor={HERO_FIELD.bone} />
-        </linearGradient>
-      </defs>
-      <rect
-        className="cc-nav-progress__track"
-        x="1.4"
-        y="1.4"
-        width="97.2"
-        height="37.2"
-        rx="18.6"
-        pathLength="100"
-      />
-      <rect
-        className="cc-nav-progress__fill"
-        x="1.4"
-        y="1.4"
-        width="97.2"
-        height="37.2"
-        rx="18.6"
-        pathLength="100"
-      />
-    </svg>
-  );
+  return null;
 }

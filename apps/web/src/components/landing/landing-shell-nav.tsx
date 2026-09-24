@@ -33,10 +33,8 @@ export function LandingShellNav() {
       data-scrolled={scrolled ? 'true' : 'false'}
     >
       <CodeCardMarkLogo />
-      <div className="cc-nav-progress-host">
-        <LandingHeroNav items={MARKETING_NAV_ITEMS} />
-        <EditorialNavProgress />
-      </div>
+      <LandingHeroNav items={MARKETING_NAV_ITEMS} />
+      <EditorialNavProgress />
       <MarketingHomeControl />
     </div>
   );
