@@ -5,6 +5,7 @@ import { LAYOUT } from '@/lib/design/tokens';
 import { CodeCardMarkLogo } from './codecard-mark-logo';
 import { MarketingHomeControl } from './marketing-home-control';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
+import { EditorialNavProgress } from './editorial/editorial-nav-progress';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
   { label: 'Pricing', href: '/pricing' },
@@ -32,7 +33,10 @@ export function LandingShellNav() {
       data-scrolled={scrolled ? 'true' : 'false'}
     >
       <CodeCardMarkLogo />
-      <LandingHeroNav items={MARKETING_NAV_ITEMS} />
+      <div className="cc-nav-progress-host">
+        <LandingHeroNav items={MARKETING_NAV_ITEMS} />
+        <EditorialNavProgress />
+      </div>
       <MarketingHomeControl />
     </div>
   );

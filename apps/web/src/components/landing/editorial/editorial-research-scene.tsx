@@ -16,6 +16,7 @@ const BEATS: EditorialResearchBeat[] = [
   {
     id: 'attention',
     index: '01',
+    accent: '#e95a0b',
     marker: 'Attention window',
     problemTitle: 'Early review can be extremely brief.',
     problemLead: 'EARLY REVIEW',
@@ -30,6 +31,7 @@ const BEATS: EditorialResearchBeat[] = [
   {
     id: 'prestige',
     index: '02',
+    accent: '#86b54a',
     marker: 'Prestige bias',
     problemTitle: 'Prestige cues can shape early cuts.',
     problemLead: 'PRESTIGE CUES',
@@ -44,6 +46,7 @@ const BEATS: EditorialResearchBeat[] = [
   {
     id: 'proof',
     index: '03',
+    accent: '#8c9288',
     marker: 'Skills visibility',
     problemTitle: 'Skills evidence is easy to miss.',
     problemLead: 'SKILLS EVIDENCE',
@@ -73,7 +76,7 @@ export function EditorialResearchScene() {
   const wash = useTransform(
     scrollYProgress,
     [0, 0.4, 0.82, 1],
-    ['#fcf1e7', '#8f8a84', '#202020', '#1a1a1c'],
+    ['#fcf1e7', '#8c9288', '#1c4636', '#080a09'],
   );
 
   return (

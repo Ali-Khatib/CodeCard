@@ -22,6 +22,7 @@ export type EditorialResearchBeat = {
   solutionBody: string;
   imageSrc: string;
   imageAlt: string;
+  accent?: string;
 };
 
 function RedactedWord({
@@ -133,6 +134,9 @@ function ResearchChapter({
       }
       data-testid={`editorial-proof-box-${beat.id}`}
       aria-label={`${beat.index} ${beat.marker}`}
+      style={
+        beat.accent ? ({ ['--beat-accent' as string]: beat.accent }) : undefined
+      }
     >
       <div className="cc-ed-research-story__frame">
         <div className="cc-ed-research-story__grid">

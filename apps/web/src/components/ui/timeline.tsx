@@ -241,6 +241,7 @@ export function Timeline({
                     ['--stop' as string]: String(
                       items.length <= 1 ? 0 : index / (items.length - 1),
                     ),
+                    ['--stop-accent' as string]: item.accent,
                   }}
                 >
                   <span className="cc-tl-spine__stem" />

@@ -22,10 +22,10 @@ export function EditorialAudience() {
       <Timeline
         title="The life of a CodeCard"
         periodLabel="Create. Meet. Share. Connect. Meet again."
-        backgroundColor="#000000"
-        textColor="#f5f5f5"
-        mutedTextColor="rgba(245,245,245,0.62)"
-        activeColor="#ff5f00"
+        backgroundColor="#080a09"
+        textColor="#efe7d4"
+        mutedTextColor="rgba(239,231,212,0.64)"
+        activeColor="#86b54a"
         items={LANDING_PERSONAS.map((persona) => ({
           id: persona.id,
           number: persona.number,

@@ -13,6 +13,13 @@
   --ed-accent: var(--accent-orange, #e95a0b);
   --ed-iris: var(--ed-accent);
   --ed-dark: var(--surface-dark, #202020);
+  --hero-ink: #080a09;
+  --hero-moss: #1c4636;
+  --hero-chlorophyll: #86b54a;
+  --hero-orange: #e95a0b;
+  --hero-copper: #c45a22;
+  --hero-bone: #efe7d4;
+  --hero-stone: #8c9288;
   /* Cool stone — mid chapters */
   --ed-stone: #e9e8e6;
   /* Research proof wash — darker gray so the chapter reads clearly */
@@ -68,8 +75,8 @@
 }
 
 .cc-ed[data-chapter='audience'] {
-  --ed-bg: #000000;
-  --ed-fg: #f5f5f5;
+  --ed-bg: var(--hero-ink, #080a09);
+  --ed-fg: var(--hero-bone, #efe7d4);
 }
 
 .cc-ed[data-chapter='proof'] {
@@ -129,6 +136,7 @@
   background: transparent;
   border: 0;
   box-shadow: none;
+  overflow: visible;
 }
 
 @media (max-width: 767px) {
@@ -361,6 +369,55 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   max-width: 100%;
   min-width: 0;
   container-type: inline-size;
+}
+
+.cc-nav-progress-host {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.cc-nav-progress {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  inset: -5px;
+  z-index: 4;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+html:has(.cc-ed) .cc-nav-progress {
+  display: block;
+}
+
+.cc-nav-progress[data-active='true'] {
+  opacity: 1;
+}
+
+.cc-nav-progress__track,
+.cc-nav-progress__fill {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cc-nav-progress__track {
+  stroke: color-mix(in srgb, #8c9288 32%, transparent);
+  stroke-width: 1.5;
+}
+
+.cc-nav-progress__fill {
+  stroke: url(#cc-nav-progress-grad);
+  stroke-width: 2.5;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - (var(--cc-nav-progress, 0) * 100));
 }
 
 .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
@@ -2782,8 +2839,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-ed-audience {
   padding: 0;
   overflow: hidden;
-  color: #f5f5f5;
-  background: #000000;
+  color: var(--hero-bone, #efe7d4);
+  background: var(--hero-ink, #080a09);
 }
 
 .cc-ed-audience h3,
@@ -2980,15 +3037,22 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   transform: translateY(-50%);
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--tl-accent, #ff5f00) 22%, #1a1a1a);
+  background: color-mix(in srgb, var(--hero-moss, #1c4636) 55%, #141816);
 }
 
 .cc-tl-spine__fill {
   height: 100%;
   width: 12%;
   border-radius: inherit;
-  background: var(--tl-accent, #ff5f00);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--tl-accent, #ff5f00) 55%, transparent);
+  background: linear-gradient(
+    90deg,
+    var(--hero-moss, #1c4636),
+    var(--hero-orange, #e95a0b),
+    var(--hero-chlorophyll, #86b54a),
+    var(--hero-copper, #c45a22),
+    var(--hero-stone, #8c9288)
+  );
+  box-shadow: 0 0 18px color-mix(in srgb, var(--hero-chlorophyll, #86b54a) 40%, transparent);
 }
 
 .cc-tl-spine__stops {
@@ -3014,7 +3078,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 13px;
   height: 13px;
   transform: translate(-50%, -50%);
-  border: 2px solid color-mix(in srgb, var(--tl-accent, #ff5f00) 42%, transparent);
+  border: 2px solid color-mix(in srgb, var(--stop-accent, var(--hero-stone, #8c9288)) 55%, transparent);
   border-radius: 50%;
   background: #000;
   box-shadow: 0 0 0 4px #000;
@@ -3026,7 +3090,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 2px;
   height: 26px;
   transform: translateX(-50%);
-  background: color-mix(in srgb, var(--tl-accent, #ff5f00) 38%, transparent);
+  background: color-mix(in srgb, var(--stop-accent, var(--hero-stone, #8c9288)) 42%, transparent);
 }
 
 .cc-tl-spine__stop[data-rail='top'] .cc-tl-spine__stem {
@@ -3068,28 +3132,28 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-tl-spine__stop[data-reached='true'] .cc-tl-spine__node {
-  border-color: var(--tl-accent, #ff5f00);
-  background: var(--tl-accent, #ff5f00);
+  border-color: var(--stop-accent, var(--hero-chlorophyll, #86b54a));
+  background: var(--stop-accent, var(--hero-chlorophyll, #86b54a));
 }
 
 .cc-tl-spine__stop[data-reached='true'] .cc-tl-spine__stem {
-  background: color-mix(in srgb, var(--tl-accent, #ff5f00) 78%, transparent);
+  background: color-mix(in srgb, var(--stop-accent, var(--hero-chlorophyll, #86b54a)) 78%, transparent);
 }
 
 .cc-tl-spine__stop[data-reached='true'] .cc-tl-spine__label {
-  color: color-mix(in srgb, var(--tl-accent, #ff5f00) 82%, white);
+  color: color-mix(in srgb, var(--stop-accent, var(--hero-chlorophyll, #86b54a)) 82%, white);
 }
 
 .cc-tl-spine__stop[data-current='true'] .cc-tl-spine__node {
   width: 17px;
   height: 17px;
   box-shadow:
-    0 0 0 4px #000,
-    0 0 16px color-mix(in srgb, var(--tl-accent, #ff5f00) 65%, transparent);
+    0 0 0 4px var(--hero-ink, #080a09),
+    0 0 16px color-mix(in srgb, var(--stop-accent, var(--hero-chlorophyll, #86b54a)) 65%, transparent);
 }
 
 .cc-tl-spine__stop[data-current='true'] .cc-tl-spine__label {
-  color: var(--tl-accent, #ff5f00);
+  color: var(--stop-accent, var(--hero-chlorophyll, #86b54a));
 }
 
 @media (min-width: 768px) {
@@ -4012,13 +4076,13 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 2px;
-  background: var(--ed-accent, #e95a0b);
+  background: var(--hero-chlorophyll, #86b54a);
   flex-shrink: 0;
 }
 
 .cc-ed-research-scene__label .cc-ed__eyebrow {
   margin: 0;
-  color: color-mix(in srgb, var(--ed-accent) 70%, #efedeb);
+  color: color-mix(in srgb, var(--hero-chlorophyll, #86b54a) 62%, #efedeb);
 }
 
 .cc-ed-research-scene__beats {
@@ -4035,9 +4099,10 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   display: grid;
   gap: clamp(4rem, 12vh, 7.5rem);
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  --research-surface: #202020;
-  --research-fg: #efedeb;
-  --research-muted: color-mix(in srgb, #efedeb 84%, transparent);
+  --research-surface: var(--hero-ink, #080a09);
+  --research-fg: var(--hero-bone, #efe7d4);
+  --research-muted: color-mix(in srgb, var(--hero-bone, #efe7d4) 78%, transparent);
+  --beat-accent: var(--hero-orange, #e95a0b);
 }
 
 .cc-ed-research-story__beat {
@@ -4122,7 +4187,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-research-story__index {
-  color: var(--ed-accent, #e95a0b);
+  color: var(--beat-accent, var(--hero-orange, #e95a0b));
   font-variant-numeric: tabular-nums;
 }
 
@@ -4150,7 +4215,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-research-story__headline-line--accent {
-  color: color-mix(in srgb, var(--ed-accent, #e95a0b) 78%, var(--research-fg));
+  color: color-mix(in srgb, var(--beat-accent, var(--hero-orange, #e95a0b)) 82%, var(--research-fg));
 }
 
 .cc-ed-research-redact__word {
@@ -4197,7 +4262,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-ed-research-story__brand {
-  color: var(--ed-accent, #e95a0b);
+  color: var(--beat-accent, var(--hero-chlorophyll, #86b54a));
   font-weight: 500;
 }
 
@@ -4215,7 +4280,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   min-height: 2.75rem;
   padding: 0.65rem 1.25rem;
   border-radius: 999px;
-  background: var(--ed-accent, #e95a0b);
+  background: var(--beat-accent, var(--hero-orange, #e95a0b));
   color: #efedeb;
   font-size: 0.8125rem;
   font-weight: 500;
@@ -4253,7 +4318,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-ed-research-story__cta-group:hover .cc-ed-research-story__cta-arrow,
 .cc-ed-research-story__cta-group:focus-within .cc-ed-research-story__cta-arrow {
-  background: var(--ed-accent, #e95a0b);
+  background: var(--beat-accent, var(--hero-chlorophyll, #86b54a));
   color: #efedeb;
   transform: translateX(2px);
 }
