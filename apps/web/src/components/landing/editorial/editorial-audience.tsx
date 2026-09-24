@@ -4,7 +4,7 @@ import { Timeline } from '@/components/ui/timeline';
 import { LANDING_PERSONAS } from '@/lib/marketing/landing-personas';
 
 /**
- * Who CodeCard is for — sequential moments, not exclusive types.
+ * The life of a CodeCard — sequential create / meet / share / connect / meet again.
  */
 export function EditorialAudience() {
   return (
@@ -17,11 +17,11 @@ export function EditorialAudience() {
       aria-labelledby="editorial-audience-heading"
     >
       <h2 id="editorial-audience-heading" className="sr-only">
-        Who CodeCard is for
+        The life of a CodeCard
       </h2>
       <Timeline
-        title="Who it's for"
-        periodLabel="Not five types. Five moments."
+        title="The life of a CodeCard"
+        periodLabel="Create. Meet. Share. Connect. Meet again."
         backgroundColor="#000000"
         textColor="#f5f5f5"
         mutedTextColor="rgba(245,245,245,0.62)"
@@ -30,11 +30,13 @@ export function EditorialAudience() {
           id: persona.id,
           number: persona.number,
           title: persona.title,
+          lead: persona.lead,
           body: persona.body,
           imageSrc: persona.imageSrc,
           imageAlt: persona.imageAlt,
           imagePosition: persona.imagePosition,
           accent: persona.accent,
+          rail: persona.rail,
         }))}
       />
     </section>
