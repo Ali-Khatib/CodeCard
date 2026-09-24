@@ -2789,8 +2789,177 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-ed-audience h3,
 .cc-ed-audience p {
   white-space: normal;
-  word-spacing: 0.05em;
+  letter-spacing: 0.01em;
+  word-spacing: 0.16em;
   overflow-wrap: break-word;
+}
+
+.cc-tl,
+.cc-tl-pin {
+  position: relative;
+  width: 100%;
+}
+
+.cc-tl-pin {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+}
+
+.cc-tl-head,
+.cc-tl-foot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-inline: 6vw;
+}
+
+.cc-tl-head {
+  padding-top: 5.5rem;
+  padding-bottom: 0.75rem;
+}
+
+.cc-tl-foot {
+  align-items: center;
+  padding-top: 0.65rem;
+  padding-bottom: 1.35rem;
+}
+
+.cc-tl-head__title,
+.cc-tl-card__lead {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.012em;
+  word-spacing: 0.18em;
+  line-height: 1.12;
+}
+
+.cc-tl-head__title {
+  font-size: clamp(1.7rem, 2.8vw, 2.45rem);
+}
+
+.cc-tl-head__period {
+  margin: 0;
+  max-width: 22rem;
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  line-height: 1.4;
+  text-align: right;
+  letter-spacing: 0.02em;
+  word-spacing: 0.14em;
+  color: var(--tl-muted);
+}
+
+.cc-tl-foot__meta {
+  margin: 0;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  word-spacing: 0.16em;
+  color: var(--tl-muted);
+}
+
+.cc-tl-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cc-tl-track {
+  display: flex;
+  align-items: stretch;
+  width: max-content;
+  height: 100%;
+}
+
+.cc-tl-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding-inline: 6vw;
+  overflow: hidden;
+}
+
+.cc-tl-slot {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cc-tl-slot--top {
+  align-items: flex-end;
+  padding-bottom: 2.4rem;
+}
+
+.cc-tl-slot--bottom {
+  align-items: flex-start;
+  padding-top: 2.4rem;
+}
+
+.cc-tl-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+  gap: clamp(1.1rem, 2.6vw, 2.25rem);
+  width: 100%;
+  max-width: 78rem;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.cc-tl-card__photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #111;
+}
+
+.cc-tl-card__copy {
+  display: flex;
+  min-width: 0;
+  max-width: 38rem;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cc-tl-card__kicker {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  word-spacing: 0.2em;
+}
+
+.cc-tl-card__lead {
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.65rem, 2.7vw, 2.4rem);
+}
+
+.cc-tl-card__body {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(0.98rem, 1.15vw, 1.12rem);
+  line-height: 1.5;
+  letter-spacing: 0.015em;
+  word-spacing: 0.12em;
+  color: var(--tl-muted);
 }
 
 .cc-tl-spine {
@@ -2842,31 +3011,30 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   position: absolute;
   top: 0;
   left: 0;
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   transform: translate(-50%, -50%);
   border: 2px solid color-mix(in srgb, var(--tl-accent, #ff5f00) 42%, transparent);
   border-radius: 50%;
   background: #000;
-  box-shadow: 0 0 0 5px #000;
+  box-shadow: 0 0 0 4px #000;
 }
 
 .cc-tl-spine__stem {
   position: absolute;
   left: 0;
   width: 2px;
+  height: 26px;
   transform: translateX(-50%);
   background: color-mix(in srgb, var(--tl-accent, #ff5f00) 38%, transparent);
 }
 
 .cc-tl-spine__stop[data-rail='top'] .cc-tl-spine__stem {
   bottom: 0;
-  height: 44px;
 }
 
 .cc-tl-spine__stop[data-rail='bottom'] .cc-tl-spine__stem {
   top: 0;
-  height: 44px;
 }
 
 .cc-tl-spine__label {
@@ -2874,19 +3042,29 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   left: 0;
   transform: translateX(-50%);
   font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
   color: rgba(245, 245, 245, 0.42);
 }
 
 .cc-tl-spine__stop[data-rail='top'] .cc-tl-spine__label {
-  bottom: 50px;
+  bottom: 32px;
 }
 
 .cc-tl-spine__stop[data-rail='bottom'] .cc-tl-spine__label {
-  top: 50px;
+  top: 32px;
+}
+
+.cc-tl-spine__stop[data-edge='start'] .cc-tl-spine__label {
+  left: 0;
+  transform: none;
+}
+
+.cc-tl-spine__stop[data-edge='end'] .cc-tl-spine__label {
+  left: 0;
+  transform: translateX(-100%);
 }
 
 .cc-tl-spine__stop[data-reached='true'] .cc-tl-spine__node {
@@ -2903,11 +3081,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-tl-spine__stop[data-current='true'] .cc-tl-spine__node {
-  width: 19px;
-  height: 19px;
+  width: 17px;
+  height: 17px;
   box-shadow:
-    0 0 0 5px #000,
-    0 0 18px color-mix(in srgb, var(--tl-accent, #ff5f00) 65%, transparent);
+    0 0 0 4px #000,
+    0 0 16px color-mix(in srgb, var(--tl-accent, #ff5f00) 65%, transparent);
 }
 
 .cc-tl-spine__stop[data-current='true'] .cc-tl-spine__label {
@@ -2917,6 +3095,65 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 @media (min-width: 768px) {
   .cc-tl-spine {
     display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .cc-tl-pin {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .cc-tl-head {
+    padding-top: 4.5rem;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .cc-tl-head__period {
+    max-width: none;
+    text-align: left;
+  }
+
+  .cc-tl-viewport {
+    overflow: visible;
+  }
+
+  .cc-tl-track {
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  .cc-tl-panel {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .cc-tl-slot {
+    flex: none;
+    overflow: visible;
+  }
+
+  .cc-tl-slot--top,
+  .cc-tl-slot--bottom {
+    padding: 0;
+  }
+
+  .cc-tl-card {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+  }
+
+  .cc-tl-card__photo {
+    aspect-ratio: 16 / 11;
+    height: auto;
+    max-height: 42vh;
   }
 }
 

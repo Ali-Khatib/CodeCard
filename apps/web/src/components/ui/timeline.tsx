@@ -37,39 +37,23 @@ export type TimelineProps = {
 
 function PersonaCard({ item }: { item: TimelineStop }) {
   return (
-    <div className="grid w-full max-w-[86rem] grid-cols-1 items-center gap-8 min-[768px]:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] min-[768px]:gap-16">
-      <figure className="relative aspect-[16/11] w-full overflow-hidden bg-[#111] min-[768px]:max-h-[48vh]">
+    <div className="cc-tl-card">
+      <figure className="cc-tl-card__photo">
         <Image
           src={item.imageSrc}
           alt={item.imageAlt}
           fill
-          sizes="(max-width: 767px) 88vw, 50vw"
+          sizes="(max-width: 767px) 88vw, 42vw"
           className="object-cover"
           style={{ objectPosition: item.imagePosition ?? 'center' }}
         />
       </figure>
-      <div className="min-w-0">
-        <p
-          className="m-0 font-[family-name:var(--font-eyebrow),ui-monospace,monospace] text-[0.92rem] uppercase tracking-[0.16em]"
-          style={{ color: item.accent }}
-        >
+      <div className="cc-tl-card__copy">
+        <p className="cc-tl-card__kicker" style={{ color: item.accent }}>
           {item.number} — {item.title}
         </p>
-        {item.lead ? (
-          <h3 className="mt-4 mb-4 font-[family-name:var(--font-display),Georgia,serif] text-[clamp(2.6rem,5.4vw,4.4rem)] font-light leading-[1.02] tracking-[-0.02em] [word-spacing:0.06em] whitespace-normal">
-            {item.lead}
-          </h3>
-        ) : (
-          <h3 className="mt-4 mb-4 font-[family-name:var(--font-display),Georgia,serif] text-[clamp(3rem,5.8vw,5rem)] font-light leading-none tracking-[-0.02em] [word-spacing:0.06em] whitespace-normal">
-            {item.title}
-          </h3>
-        )}
-        <p
-          className="m-0 max-w-[46ch] text-[clamp(1.12rem,1.45vw,1.4rem)] leading-[1.5] [word-spacing:0.04em] whitespace-normal"
-          style={{ color: 'var(--tl-muted)' }}
-        >
-          {item.body}
-        </p>
+        <h3 className="cc-tl-card__lead">{item.lead ?? item.title}</h3>
+        <p className="cc-tl-card__body">{item.body}</p>
       </div>
     </div>
   );
@@ -80,13 +64,13 @@ function PersonaPanel({ item }: { item: TimelineStop }) {
 
   return (
     <article
-      className="cc-tl-panel box-border flex h-full w-full shrink-0 flex-col px-[6vw]"
+      className="cc-tl-panel"
       data-audience-card={item.id}
     >
-      <div className="flex min-h-0 flex-1 items-end pb-16 max-[767px]:items-start max-[767px]:pb-4">
+      <div className="cc-tl-slot cc-tl-slot--top">
         {!below ? <PersonaCard item={item} /> : null}
       </div>
-      <div className="flex min-h-0 flex-1 items-start pt-16 max-[767px]:pt-4">
+      <div className="cc-tl-slot cc-tl-slot--bottom">
         {below ? <PersonaCard item={item} /> : null}
       </div>
     </article>
@@ -116,6 +100,7 @@ export function Timeline({
     color: textColor,
     backgroundColor,
     ['--tl-muted' as string]: mutedTextColor,
+    ['--tl-accent' as string]: activeColor,
   };
 
   useGSAP(
@@ -226,35 +211,17 @@ export function Timeline({
     <section
       ref={sectionRef}
       id="journey"
-      className="relative w-full"
+      className="cc-tl"
       style={sectionStyle}
     >
-      <div
-        ref={pinRef}
-        className="flex min-h-[100svh] flex-col max-[767px]:min-h-0"
-      >
-        <div className="flex shrink-0 items-end justify-between gap-6 px-[6vw] pt-24 pb-4 max-[767px]:pt-16">
-          <h3 className="m-0 font-[family-name:var(--font-display),Georgia,serif] text-[clamp(2.8rem,5.2vw,4.6rem)] font-light leading-none tracking-[-0.02em] [word-spacing:0.06em] whitespace-normal">
-            {title}
-          </h3>
-          <p
-            className="m-0 max-w-[22rem] text-right text-[clamp(1.05rem,1.4vw,1.25rem)] leading-snug [word-spacing:0.04em] whitespace-normal"
-            style={{ color: mutedTextColor }}
-          >
-            {periodLabel}
-          </p>
+      <div ref={pinRef} className="cc-tl-pin">
+        <div className="cc-tl-head">
+          <h3 className="cc-tl-head__title">{title}</h3>
+          <p className="cc-tl-head__period">{periodLabel}</p>
         </div>
 
-        <div
-          ref={viewportRef}
-          className="relative min-h-[32rem] flex-1 overflow-hidden max-[767px]:overflow-visible"
-        >
-          <div
-            ref={spineRef}
-            className="cc-tl-spine"
-            aria-hidden
-            style={{ ['--tl-accent' as string]: activeColor }}
-          >
+        <div ref={viewportRef} className="cc-tl-viewport">
+          <div ref={spineRef} className="cc-tl-spine" aria-hidden>
             <div className="cc-tl-spine__track">
               <div ref={lineRef} className="cc-tl-line cc-tl-spine__fill" />
             </div>
@@ -264,6 +231,9 @@ export function Timeline({
                   key={item.id}
                   data-tl-stop
                   data-rail={item.rail ?? 'top'}
+                  data-edge={
+                    index === 0 ? 'start' : index === items.length - 1 ? 'end' : 'mid'
+                  }
                   data-reached={index === 0 ? 'true' : 'false'}
                   data-current={index === 0 ? 'true' : 'false'}
                   className="cc-tl-spine__stop"
@@ -283,7 +253,7 @@ export function Timeline({
 
           <div
             ref={trackRef}
-            className="cc-tl-track flex h-full w-max items-stretch max-[767px]:w-full max-[767px]:flex-col max-[767px]:gap-14"
+            className="cc-tl-track"
             data-testid="editorial-audience-track"
           >
             {items.map((item) => (
@@ -292,24 +262,15 @@ export function Timeline({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-between px-[6vw] pt-3 pb-8">
-          <p
-            className="m-0 font-[family-name:var(--font-eyebrow),ui-monospace,monospace] text-[0.8rem] uppercase tracking-[0.14em]"
-            style={{ color: mutedTextColor }}
-            aria-live="polite"
-          >
+        <div className="cc-tl-foot">
+          <p className="cc-tl-foot__meta" aria-live="polite">
             [
             <span ref={pagerRef} data-audience-index>
               1
             </span>
             /{items.length}]
           </p>
-          <p
-            className="m-0 font-[family-name:var(--font-eyebrow),ui-monospace,monospace] text-[0.8rem] uppercase tracking-[0.14em]"
-            style={{ color: mutedTextColor }}
-          >
-            The life of a CodeCard
-          </p>
+          <p className="cc-tl-foot__meta">The life of a CodeCard</p>
         </div>
       </div>
     </section>
