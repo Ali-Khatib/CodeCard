@@ -13,7 +13,7 @@ import {
 
 /** Chapters where the fixed CC mark sits over a dark surface (cream logo).
  *  Crash is sampled from the pin; these are fallbacks only. */
-const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement']);
+const LIGHT_LOGO_CHAPTERS = new Set(['hero', 'statement', 'audience']);
 
 function chapterInk(chapter: string): LandingChromeInk {
   return LIGHT_LOGO_CHAPTERS.has(chapter) ? 'light' : 'dark';
