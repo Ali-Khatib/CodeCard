@@ -2811,8 +2811,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-tl-pin {
   display: flex;
   flex-direction: column;
-  height: 100svh;
-  max-height: 100svh;
+  height: 136svh;
+  max-height: none;
   overflow: hidden;
 }
 
@@ -2833,8 +2833,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-tl-foot {
   align-items: center;
-  padding-top: 0.65rem;
-  padding-bottom: 1.35rem;
+  padding-top: 1.1rem;
+  padding-bottom: 1.85rem;
 }
 
 .cc-tl-head__title,
@@ -2896,14 +2896,14 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   min-width: 0;
   min-height: 0;
   padding-inline: 3.5vw;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-tl-slot {
   display: flex;
   flex: 1 1 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cc-tl-slot--top {
@@ -2933,7 +2933,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 100%;
   aspect-ratio: 16 / 11;
   height: auto;
-  max-height: min(22vh, 100%);
+  max-height: min(34vh, 100%);
   min-height: 0;
   overflow: hidden;
   background: #111;
@@ -2965,8 +2965,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-tl-card__body {
   margin: 0;
-  max-width: 38ch;
-  font-size: clamp(0.95rem, 1.05vw, 1.08rem);
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.15vw, 1.14rem);
   line-height: 1.5;
   letter-spacing: 0.015em;
   word-spacing: 0.12em;
