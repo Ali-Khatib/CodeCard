@@ -75,7 +75,7 @@ function PersonaPanel({ item }: { item: TimelineStop }) {
 
 export function Timeline({
   title = "Who it's for",
-  periodLabel = 'Five people. One card.',
+  periodLabel = 'Not five types. Five moments.',
   textColor = '#f5f5f5',
   mutedTextColor = 'rgba(245,245,245,0.62)',
   activeColor = '#ff5f00',

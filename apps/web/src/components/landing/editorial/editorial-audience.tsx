@@ -4,8 +4,7 @@ import { Timeline } from '@/components/ui/timeline';
 import { LANDING_PERSONAS } from '@/lib/marketing/landing-personas';
 
 /**
- * Who CodeCard is for — pinned horizontal journey.
- * Photos and matching colors stand in for dates.
+ * Who CodeCard is for — sequential moments, not exclusive types.
  */
 export function EditorialAudience() {
   return (
@@ -22,7 +21,7 @@ export function EditorialAudience() {
       </h2>
       <Timeline
         title="Who it's for"
-        periodLabel="Five people. One card."
+        periodLabel="Not five types. Five moments."
         backgroundColor="#000000"
         textColor="#f5f5f5"
         mutedTextColor="rgba(245,245,245,0.62)"
