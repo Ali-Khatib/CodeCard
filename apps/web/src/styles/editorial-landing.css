@@ -2811,8 +2811,8 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-tl-pin {
   display: flex;
   flex-direction: column;
-  height: 136svh;
-  max-height: none;
+  height: 100svh;
+  max-height: 100svh;
   overflow: hidden;
 }
 
@@ -2827,14 +2827,14 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-tl-head {
-  padding-top: 5.5rem;
-  padding-bottom: 0.75rem;
+  padding-top: 4.75rem;
+  padding-bottom: 0.5rem;
 }
 
 .cc-tl-foot {
   align-items: center;
-  padding-top: 1.1rem;
-  padding-bottom: 1.85rem;
+  padding-top: 0.55rem;
+  padding-bottom: 1.1rem;
 }
 
 .cc-tl-head__title,
@@ -2896,24 +2896,24 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   min-width: 0;
   min-height: 0;
   padding-inline: 3.5vw;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .cc-tl-slot {
   display: flex;
   flex: 1 1 0;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .cc-tl-slot--top {
   align-items: flex-end;
-  padding-bottom: 2.1rem;
+  padding-bottom: 1.6rem;
 }
 
 .cc-tl-slot--bottom {
   align-items: flex-start;
-  padding-top: 2.1rem;
+  padding-top: 1.6rem;
 }
 
 .cc-tl-card {
@@ -2933,7 +2933,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   width: 100%;
   aspect-ratio: 16 / 11;
   height: auto;
-  max-height: min(34vh, 100%);
+  max-height: min(20vh, 100%);
   min-height: 0;
   overflow: hidden;
   background: #111;
@@ -2958,16 +2958,16 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-tl-card__lead {
-  margin: 0 0 0.7rem;
-  font-size: clamp(1.45rem, 2.3vw, 2.15rem);
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
   overflow-wrap: break-word;
 }
 
 .cc-tl-card__body {
   margin: 0;
-  max-width: 44ch;
-  font-size: clamp(1rem, 1.15vw, 1.14rem);
-  line-height: 1.5;
+  max-width: 42ch;
+  font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+  line-height: 1.45;
   letter-spacing: 0.015em;
   word-spacing: 0.12em;
   overflow-wrap: break-word;
