@@ -2957,22 +2957,22 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 
 .cc-tl-slot--top {
   align-items: flex-end;
-  padding-bottom: 2.4rem;
+  padding-bottom: 0.85rem;
 }
 
 .cc-tl-slot--bottom {
   align-items: flex-start;
-  padding-top: 2.4rem;
+  padding-top: 0.85rem;
 }
 
 .cc-tl-card {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: stretch;
+  align-items: center;
   gap: clamp(1.1rem, 2.6vw, 2.25rem);
   width: 100%;
   max-width: 78rem;
-  height: 100%;
+  height: auto;
   max-height: 100%;
   min-height: 0;
 }
@@ -2980,8 +2980,9 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 .cc-tl-card__photo {
   position: relative;
   width: 100%;
-  height: 100%;
-  max-height: 100%;
+  aspect-ratio: 16 / 11;
+  height: auto;
+  max-height: min(28vh, 100%);
   min-height: 0;
   overflow: hidden;
   background: #111;
@@ -3088,7 +3089,7 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   position: absolute;
   left: 0;
   width: 2px;
-  height: 26px;
+  height: 18px;
   transform: translateX(-50%);
   background: color-mix(in srgb, var(--stop-accent, var(--hero-stone, #8c9288)) 42%, transparent);
 }
@@ -3114,11 +3115,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
 }
 
 .cc-tl-spine__stop[data-rail='top'] .cc-tl-spine__label {
-  bottom: 32px;
+  bottom: 24px;
 }
 
 .cc-tl-spine__stop[data-rail='bottom'] .cc-tl-spine__label {
-  top: 32px;
+  top: 24px;
 }
 
 .cc-tl-spine__stop[data-edge='start'] .cc-tl-spine__label {
