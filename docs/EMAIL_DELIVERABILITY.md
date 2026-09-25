@@ -24,7 +24,7 @@ by **Resend** when `RESEND_API_KEY` is set.
 |-------|---------|----------------|
 | Signup confirmation | `supabase.auth.signUp` with `emailRedirectTo` | `apps/web/src/app/sign-up/page.tsx` |
 | Resend confirmation | `supabase.auth.resend({ type: 'signup' })` | `apps/web/src/components/dashboard/email-verification-banner.tsx` |
-| Password reset | `POST /api/auth/forgot-password` (generateLink + CodeCard mailbox, Auth recover fallback) | `apps/web/src/app/api/auth/forgot-password/route.ts` |
+| Password reset | `POST /api/auth/forgot-password` → Supabase Auth recover | `apps/web/src/app/api/auth/forgot-password/route.ts` |
 | Email change confirmation | Supabase (`double_confirm_changes = true`) | `supabase/config.toml` |
 | Waitlist confirmation | `sendWaitlistConfirmationEmail` from `getcodecard@gmail.com` (Gmail app password, Resend fallback) | `apps/web/src/lib/waitlist/send-waitlist-confirmation.ts` |
 

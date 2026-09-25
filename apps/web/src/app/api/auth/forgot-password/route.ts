@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server';
 import { forgotPasswordSchema } from '@codecard/validation';
 import { secureJsonRoute } from '@/lib/security/secure-route';
-import { createServiceClient } from '@/lib/supabase/server';
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
-import {
-  passwordResetRedirectUrl,
-  passwordResetTokenCallbackUrl,
-} from '@/lib/auth/password-recovery';
-import { sendPasswordResetEmail } from '@/lib/auth/send-recovery-email';
+import { passwordResetRedirectUrl } from '@/lib/auth/password-recovery';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 
 /**
  * Public password-reset intake.
- * Always returns the same success payload so the route cannot probe accounts.
- * Prefers a CodeCard mailbox send; falls back to Supabase Auth recover.
+ * Asks Supabase Auth to send the recovery email. Always returns the same
+ * success payload so the route cannot probe accounts.
  */
 export async function POST(request: Request) {
   if (!isSameOriginMutation(request)) {
@@ -30,33 +25,9 @@ export async function POST(request: Request) {
     async (data) => {
       const email = data.email.trim().toLowerCase();
       const redirectTo = passwordResetRedirectUrl();
-
-      try {
-        const admin = await createServiceClient();
-        const generated = await admin.auth.admin.generateLink({
-          type: 'recovery',
-          email,
-          options: { redirectTo },
-        });
-        const tokenHash = generated.data.properties?.hashed_token;
-        const resetUrl = tokenHash
-          ? passwordResetTokenCallbackUrl(tokenHash)
-          : generated.data.properties?.action_link;
-        if (resetUrl) {
-          const sent = await sendPasswordResetEmail(email, resetUrl);
-          if (sent) {
-            return NextResponse.json(
-              { ok: true },
-              { status: 200, headers: { 'Cache-Control': 'no-store' } },
-            );
-          }
-        }
-      } catch {
-        // Fall through to Supabase recover so a missing mailbox still tries Auth SMTP.
-      }
-
       const supabaseUrl = getSupabaseUrl();
       const anon = getSupabasePublicKey();
+
       if (supabaseUrl && anon) {
         try {
           await fetch(
