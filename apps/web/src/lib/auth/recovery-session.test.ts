@@ -24,6 +24,7 @@ describe('recovery session privilege', () => {
   it('allows only reset/callback/recovery helper paths', () => {
     expect(isRecoveryAllowedPath('/reset-password')).toBe(true);
     expect(isRecoveryAllowedPath('/auth/callback')).toBe(true);
+    expect(isRecoveryAllowedPath('/auth/recover')).toBe(true);
     expect(isRecoveryAllowedPath('/auth/mark-recovery')).toBe(true);
     expect(isRecoveryAllowedPath('/api/auth/complete-password-reset')).toBe(true);
     expect(isRecoveryAllowedPath('/dashboard')).toBe(false);

@@ -20,6 +20,7 @@ Central guard: `isSameOriginMutation` in `apps/web/src/lib/security/same-origin.
 | Surface | Classification | Enforcement |
 |---------|----------------|-------------|
 | `POST /api/upload` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/auth/forgot-password` | Public ingest (email send) | `isSameOriginMutation` |
 | `POST /api/auth/complete-password-reset` | Browser cookie mutation | `isSameOriginMutation` |
 | `POST /api/account/export` | Browser cookie sensitive read | `isSameOriginMutation` |
 | `POST /api/account/delete` | Browser cookie mutation | `isSameOriginMutation` |

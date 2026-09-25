@@ -34,6 +34,7 @@ describe('sanitizeInternalRedirect', () => {
     expect(sanitizeInternalRedirect('/sign-in')).toBe('/dashboard');
     expect(sanitizeInternalRedirect('/sign-up?plan=pro')).toBe('/dashboard');
     expect(sanitizeInternalRedirect('/auth/callback?redirect=/dashboard')).toBe('/dashboard');
+    expect(sanitizeInternalRedirect('/auth/recover')).toBe('/dashboard');
     expect(sanitizeInternalRedirect('/auth/error')).toBe('/dashboard');
   });
 

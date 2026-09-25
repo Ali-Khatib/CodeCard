@@ -6,6 +6,7 @@ const AUTH_LOOP_PREFIXES = [
   '/sign-up',
   '/forgot-password',
   '/auth/callback',
+  '/auth/recover',
   '/auth/error',
 ] as const;
 

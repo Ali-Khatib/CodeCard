@@ -9,6 +9,7 @@ import {
   isRecoveryCooldownActive,
   mapPasswordResetClientError,
   passwordResetRedirectUrl,
+  passwordResetTokenCallbackUrl,
 } from '@/lib/auth/password-recovery';
 import { forgotPasswordSchema, resetPasswordSchema } from '@codecard/validation';
 
@@ -33,6 +34,13 @@ describe('password recovery redirect URLs', () => {
 
   it('uses reset-password as the post-callback destination', () => {
     expect(passwordResetRedirectUrl()).toContain('redirect=%2Freset-password');
+  });
+
+  it('builds a same-origin token_hash callback without leaking action links', () => {
+    const url = passwordResetTokenCallbackUrl('recovery-hash');
+    expect(url).toBe(
+      'https://app.codecard.test/auth/callback?token_hash=recovery-hash&type=recovery&redirect=%2Freset-password',
+    );
   });
 });
 
@@ -78,6 +86,14 @@ describe('recovery UX helpers', () => {
       resolve(process.cwd(), 'src/app/api/auth/complete-password-reset/route.ts'),
       'utf8',
     );
+    const forgotPage = readFileSync(resolve(process.cwd(), 'src/app/forgot-password/page.tsx'), 'utf8');
+    const forgotApi = readFileSync(
+      resolve(process.cwd(), 'src/app/api/auth/forgot-password/route.ts'),
+      'utf8',
+    );
+    expect(forgotPage).toContain('/api/auth/forgot-password');
+    expect(forgotApi).toContain('generateLink');
+    expect(forgotApi).toContain('passwordResetTokenCallbackUrl');
     expect(page).toContain('/api/auth/complete-password-reset');
     expect(api).toContain("signOut({ scope: 'global' })");
     expect(api).toContain("rateLimit(`auth:reset:${ip}`, 'auth')");

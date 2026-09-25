@@ -17,7 +17,7 @@ export function AuthHashRecoveryCatcher() {
   useEffect(() => {
     if (!isSupabasePublicKeyConfigured()) return;
     if (typeof window === 'undefined') return;
-    if (pathname.startsWith('/auth/callback') || pathname.startsWith('/reset-password')) return;
+    if (pathname.startsWith('/reset-password') || pathname.startsWith('/auth/recover')) return;
 
     const hash = window.location.hash.replace(/^#/, '');
     if (!hash) return;

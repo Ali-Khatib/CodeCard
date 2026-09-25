@@ -25,6 +25,7 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |
+| `/api/auth/forgot-password` | POST | Public | Zod email | **same-origin** | `auth` fail-closed | Constant success JSON | generateLink + CodeCard mailbox; Auth recover fallback; no link in response |
 | `/api/auth/complete-password-reset` | POST | Recovery session | Zod password | **same-origin** | `auth` fail-closed | JSON | Clears recovery privilege then global sign-out |
 | `/api/internal/rate-limit-verify` | GET | Env flag `CODECARD_RATE_LIMIT_VERIFY=1` | None | N/A | Dedicated 3/1m probe | JSON | Publicly callable while the flag is set; unset in production |
 | `/api/internal/sentry-verify` | GET | Env flag `CODECARD_SENTRY_VERIFY=1` | None | N/A | None | JSON | Publicly callable while the flag is set; unset in production |

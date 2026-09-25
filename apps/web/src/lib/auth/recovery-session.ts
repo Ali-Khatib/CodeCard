@@ -12,6 +12,7 @@ export function isRecoveryAllowedPath(pathname: string): boolean {
   return (
     pathname.startsWith('/reset-password') ||
     pathname.startsWith('/auth/callback') ||
+    pathname.startsWith('/auth/recover') ||
     pathname.startsWith('/auth/confirmed') ||
     pathname.startsWith('/auth/mark-recovery') ||
     pathname.startsWith('/api/auth/complete-password-reset')

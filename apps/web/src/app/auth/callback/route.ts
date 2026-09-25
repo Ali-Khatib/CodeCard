@@ -28,6 +28,11 @@ export async function GET(request: Request) {
   });
 
   if (resolution.kind === 'error') {
+    // Implicit recovery links land here with tokens only in the hash.
+    // Same-origin redirect keeps the fragment; /auth/recover reads it.
+    if (resolution.reason === 'missing_code') {
+      return NextResponse.redirect(new URL('/auth/recover', origin));
+    }
     logOAuthCallbackFailure(resolution.reason);
     return NextResponse.redirect(
       buildAuthErrorUrl(origin, resolution.reason, resolution.redirectPath),

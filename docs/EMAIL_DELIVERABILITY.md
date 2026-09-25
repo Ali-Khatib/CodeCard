@@ -24,7 +24,7 @@ by **Resend** when `RESEND_API_KEY` is set.
 |-------|---------|----------------|
 | Signup confirmation | `supabase.auth.signUp` with `emailRedirectTo` | `apps/web/src/app/sign-up/page.tsx` |
 | Resend confirmation | `supabase.auth.resend({ type: 'signup' })` | `apps/web/src/components/dashboard/email-verification-banner.tsx` |
-| Password reset | `supabase.auth.resetPasswordForEmail` | `apps/web/src/app/forgot-password/page.tsx` |
+| Password reset | `POST /api/auth/forgot-password` (generateLink + CodeCard mailbox, Auth recover fallback) | `apps/web/src/app/api/auth/forgot-password/route.ts` |
 | Email change confirmation | Supabase (`double_confirm_changes = true`) | `supabase/config.toml` |
 | Waitlist confirmation | `sendWaitlistConfirmationEmail` from `getcodecard@gmail.com` (Gmail app password, Resend fallback) | `apps/web/src/lib/waitlist/send-waitlist-confirmation.ts` |
 
@@ -133,11 +133,11 @@ no signal.
 2. `window.location.origin`.
 3. `http://localhost:3000`.
 
-Every email-sending call site is a **client** component — `sign-up/page.tsx`,
-`forgot-password/page.tsx`, `account-deletion-dialog.tsx`, and
-`lib/auth/github-oauth.ts` — so step 2 always applies in a browser and the
-`localhost` fallback is unreachable for real users. **A production email will not
-contain a `localhost` link even if the variable is missing.**
+Signup and GitHub OAuth still build `redirectTo` in the browser. Password reset
+is sent from `POST /api/auth/forgot-password`, so that path **must** have
+`NEXT_PUBLIC_APP_URL` set on the server or the emailed host falls back to
+localhost. **A production reset email will not contain a localhost link when the
+variable is set.**
 
 What an unset `NEXT_PUBLIC_APP_URL` does cause: the link points at whichever host
 the user happened to be on. On a preview deployment or a non-canonical alias that

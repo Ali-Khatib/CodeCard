@@ -76,7 +76,7 @@ https://*-<team-slug>.vercel.app/**   # if using Vercel preview deployments
 | Flow | App route | Redirect chain |
 |------|-----------|----------------|
 | OAuth (GitHub) | `sign-in`, `sign-up` buttons | Provider → `{APP_URL}/auth/callback?redirect={safePath}` → internal path |
-| Password recovery | `forgot-password` | Email link → `{APP_URL}/auth/callback?redirect=%2Freset-password` → `/reset-password` |
+| Password recovery | `forgot-password` | Email link → `{APP_URL}/auth/callback?token_hash=…&type=recovery` (or hash implicit → `/auth/recover`) → `/reset-password` |
 | Email confirmation | Sign-up | Email link → `{APP_URL}/auth/callback?redirect=%2Fauth%2Fconfirmed` → `/auth/confirmed` |
 | Email sign-in | `sign-in` | Session in-app → `sanitizeInternalRedirect(?redirect=)` |
 | OAuth / callback errors | `auth/callback` | Failure → `/auth/error?reason=…` |

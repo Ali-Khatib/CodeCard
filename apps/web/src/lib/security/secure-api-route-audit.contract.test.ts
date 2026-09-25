@@ -41,6 +41,7 @@ describe('WS11-T005 secure API route audit', () => {
         'admin/users/[id]/suspend/route.ts',
         'analytics/route.ts',
         'auth/complete-password-reset/route.ts',
+        'auth/forgot-password/route.ts',
         'dmca/route.ts',
         'internal/rate-limit-verify/route.ts',
         'internal/sentry-verify/route.ts',
@@ -68,6 +69,7 @@ describe('WS11-T005 secure API route audit', () => {
       '/api/public/research/[paperId]/pdf',
       '/api/webhooks/stripe',
       '/api/auth/complete-password-reset',
+      '/api/auth/forgot-password',
       '/api/internal/rate-limit-verify',
       '/api/internal/sentry-verify',
     ]) {

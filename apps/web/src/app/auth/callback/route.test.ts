@@ -62,6 +62,16 @@ describe('GET /auth/callback', () => {
     expect(response.headers.get('location')).toBe('https://codecard-mvp.vercel.app/dashboard');
   });
 
+  it('sends implicit recoveries without a query code to the hash handler', async () => {
+    const { GET } = await import('@/app/auth/callback/route');
+    const response = await GET(
+      new Request('https://codecard-mvp.vercel.app/auth/callback?redirect=%2Freset-password'),
+    );
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toBe('https://codecard-mvp.vercel.app/auth/recover');
+  });
+
   it('shows link_expired recovery for invalid or expired codes', async () => {
     exchangeCodeForSession.mockResolvedValue({
       error: { message: 'Auth code expired' },

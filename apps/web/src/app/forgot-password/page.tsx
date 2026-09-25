@@ -2,7 +2,6 @@
 
 import { Suspense, useRef, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import { forgotPasswordSchema } from '@codecard/validation';
 import { AuthShell } from '@/components/auth/auth-shell';
@@ -10,7 +9,7 @@ import {
   PASSWORD_RESET_GENERIC_ERROR,
   PASSWORD_RESET_GENERIC_SUCCESS,
 } from '@/lib/auth/redirect';
-import { isRecoveryCooldownActive, passwordResetRedirectUrl } from '@/lib/auth/password-recovery';
+import { isRecoveryCooldownActive } from '@/lib/auth/password-recovery';
 import { withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 
 const SETUP_MSG =
@@ -49,17 +48,16 @@ function ForgotPasswordForm() {
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const { error: resetError } = await withAuthNetworkRetry(() =>
-        supabase.auth.resetPasswordForEmail(parsed.data.email, {
-          redirectTo: passwordResetRedirectUrl(),
-        }),
-      );
-
-      if (resetError) {
-        setError(PASSWORD_RESET_GENERIC_ERROR);
-        return;
-      }
+      await withAuthNetworkRetry(async () => {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ email: parsed.data.email }),
+        });
+        if (!response.ok) {
+          throw new Error('reset_request_failed');
+        }
+      });
 
       setSuccess(true);
       setLastSentAt(Date.now());

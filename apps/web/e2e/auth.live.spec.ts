@@ -297,20 +297,15 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     // Capture the reset request to assert the redirectTo target is a real,
     // non-production, local CodeCard reset route.
     const recoverRequest = page.waitForRequest(
-      (req) => req.url().includes(`${isolatedHost}/auth/v1/recover`),
+      (req) =>
+        req.method() === 'POST' &&
+        new URL(req.url()).pathname === '/api/auth/forgot-password',
       { timeout: 20_000 },
     );
     await page.getByLabel('Email').fill(primary.email);
     await page.getByRole('button', { name: /Send reset link/i }).click();
     const req = await recoverRequest;
-    const body = (req.postDataJSON?.() ?? {}) as Record<string, unknown>;
-    const redirectTo = decodeURIComponent(
-      new URL(req.url()).searchParams.get('redirect_to') ??
-        String(body.redirect_to ?? body.redirectTo ?? ''),
-    );
-    expect(redirectTo).toContain('localhost');
-    expect(redirectTo).not.toContain(PRODUCTION_SUPABASE_PROJECT_REF);
-    expect(redirectTo).toContain('/reset-password');
+    expect(req.postDataJSON()).toEqual({ email: primary.email });
 
     // Generic public response for an existing account; must not reveal existence
     // or expose raw provider errors. (A rate-limited send surfaces the same
@@ -390,7 +385,7 @@ test.describe('WS14-T002 authentication E2E (isolated real backend)', () => {
     const requestDeadline = Date.now() + 180_000;
     for (;;) {
       const recoverResponsePromise = page.waitForResponse(
-        (res) => res.url().includes(`${isolatedHost}/auth/v1/recover`),
+        (res) => new URL(res.url()).pathname === '/api/auth/forgot-password',
         { timeout: 20_000 },
       );
       await page.goto('/forgot-password', { waitUntil: 'networkidle' });
