@@ -18,8 +18,8 @@ port = 54323
 
 [auth]
 enabled = true
-# Local stack Site URL. Hosted codecard-e2e (MVP) Site URL is
-# https://codecard-mvp.vercel.app — do not `config push` this localhost value.
+# Local stack Site URL only. Hosted CodeCard Site URL is
+# https://codecard-mvp.vercel.app — never config-push this localhost value.
 site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000/**",
@@ -33,6 +33,8 @@ additional_redirect_urls = [
   "https://codecard-mvp.vercel.app/auth/callback?redirect=%2Fdashboard",
   "https://codecard-mvp.vercel.app/auth/callback?redirect=%2Fauth%2Fconfirmed",
   "https://codecard-mvp-*.vercel.app/**",
+  "https://code-card-web.vercel.app/**",
+  "https://code-card-web.vercel.app/auth/callback",
 ]
 # Access token lifetime: 1 hour. Client auto-refreshes so users stay signed in.
 jwt_expiry = 3600
