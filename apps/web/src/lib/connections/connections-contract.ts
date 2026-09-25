@@ -49,7 +49,6 @@ export type OwnerConnectionListItem = {
   source: string;
   context: string | null;
   followUpAt: string | null;
-  privateNote: string | null;
   sortOrder: number;
   target: SafePublicConnectionTarget;
 };
@@ -138,15 +137,17 @@ export const FORBIDDEN_CONNECTION_RESPONSE_FIELDS = [
   'ip_address',
   'user_agent',
   'private_note',
+  'privatenote',
   'connection_note',
   'saver_list',
 ] as const;
 
 export function isForbiddenConnectionResponseField(key: string): boolean {
-  const lower = key.toLowerCase();
-  return FORBIDDEN_CONNECTION_RESPONSE_FIELDS.some(
-    (forbidden) => lower === forbidden || lower.includes(forbidden),
-  );
+  const compact = key.toLowerCase().replace(/[_-]/g, '');
+  return FORBIDDEN_CONNECTION_RESPONSE_FIELDS.some((forbidden) => {
+    const needle = forbidden.toLowerCase().replace(/[_-]/g, '');
+    return compact === needle || compact.includes(needle);
+  });
 }
 
 /**

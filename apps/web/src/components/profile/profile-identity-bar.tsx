@@ -7,6 +7,7 @@ import {
   resolveProfileLinkIcon,
   type ProfileLinkItem,
 } from '@/lib/icons/profile-links';
+import { isSafeRemoteImageUrl } from '@/lib/media/safe-remote-image';
 
 interface ProfileIdentityBarProps {
   displayName: string;
@@ -25,9 +26,9 @@ export function ProfileIdentityBar({
 }: ProfileIdentityBarProps) {
   return (
     <header className="flex items-center gap-3 px-4 py-3 md:gap-4 md:px-6">
-      {avatarUrl ? (
+      {isSafeRemoteImageUrl(avatarUrl) ? (
         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-1 ring-zinc-800">
-          <Image src={avatarUrl} alt="" fill className="object-cover" sizes="44px" priority />
+          <Image src={avatarUrl!} alt="" fill className="object-cover" sizes="44px" priority />
         </div>
       ) : (
         <div

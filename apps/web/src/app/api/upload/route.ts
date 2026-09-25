@@ -77,6 +77,14 @@ export async function POST(request: Request) {
     return jsonNoStore({ error: 'Invalid upload metadata.' }, 400);
   }
 
+  const content = validateUploadContentPrefix({
+    mimeType: validated.data.mimeType,
+    contentPrefixBase64: validated.data.contentPrefixBase64,
+  });
+  if (!content.ok) {
+    return jsonNoStore({ error: content.message }, content.status);
+  }
+
   // Private PDF uploads remain intentionally disabled (WS04-T007 external links only).
   if (validated.data.resourceType === 'private-doc') {
     return jsonNoStore({ error: 'Private document uploads are not available.' }, 403);
@@ -146,16 +154,6 @@ export async function POST(request: Request) {
 
   if (!metadata.ok) {
     return jsonNoStore({ error: metadata.message }, metadata.status);
-  }
-
-  // Magic-byte sniff on the content prefix — metadata alone is not enough (CWE-434).
-  // Full-object verification still runs at finalize before DB attach.
-  const content = validateUploadContentPrefix({
-    mimeType: metadata.mimeType,
-    contentPrefixBase64: validated.data.contentPrefixBase64,
-  });
-  if (!content.ok) {
-    return jsonNoStore({ error: content.message }, content.status);
   }
 
   const ownership = await resolveUploadOwnership(

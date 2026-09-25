@@ -57,6 +57,7 @@ describe('WS15-T001 connections data contract', () => {
     expect(SAFE_CONNECTION_TARGET_FIELDS).not.toContain('email');
     expect(isForbiddenConnectionResponseField('email')).toBe(true);
     expect(isForbiddenConnectionResponseField('stripe_customer_id')).toBe(true);
+    expect(isForbiddenConnectionResponseField('privateNote')).toBe(true);
     expect(isForbiddenConnectionResponseField('displayName')).toBe(false);
     expect(FORBIDDEN_CONNECTION_RESPONSE_FIELDS.length).toBeGreaterThan(5);
   });

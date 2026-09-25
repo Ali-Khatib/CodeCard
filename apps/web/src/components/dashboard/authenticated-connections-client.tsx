@@ -190,7 +190,7 @@ export function AuthenticatedConnectionsClient({
         <ConnectionPrivateDetails
           connectionId={detailsConnection.id}
           connectionName={detailsConnection.name}
-          initialNote={detailsConnection.privateNote}
+          initialNote={null}
           initialContext={detailsConnection.context}
           initialConnectedAt={detailsConnection.connectedAtIso}
           initialFollowUpAt={detailsConnection.followUpAtIso}

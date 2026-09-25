@@ -102,6 +102,8 @@ describe('WS15-T003 connections server actions wiring', () => {
     expect(core).toContain("eq('owner_user_id', user.id)");
     expect(core).not.toMatch(/select\([^)]*email/i);
     expect(core).not.toMatch(/stripe_customer/i);
+    expect(core).not.toContain('connection_notes');
+    expect(core).not.toContain('privateNote');
     expect(core).toContain('TARGET_NOT_AVAILABLE');
     expect(core).toContain('SELF_CONNECTION');
     expect(core).toContain('ALREADY_CONNECTED');

@@ -499,6 +499,7 @@ describe('listOwnerConnections', () => {
     expect(result.connections[0].target.displayName).toBe('Bob Smith');
     expect(result.connections[0].target).not.toHaveProperty('email');
     expect(result.connections[0].target).not.toHaveProperty('owner_user_id');
+    expect(result.connections[0]).not.toHaveProperty('privateNote');
     expect(JSON.stringify(result.connections)).not.toMatch(/email|stripe|password/i);
   });
 

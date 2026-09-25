@@ -470,19 +470,6 @@ export async function listOwnerConnections(
     };
   }
 
-  const connectionIds = (data ?? []).map((row) => row.id as string);
-  const notesMap: Record<string, string> = {};
-  if (connectionIds.length > 0) {
-    const { data: notes } = await supabase
-      .from('connection_notes')
-      .select('saved_connection_id, body')
-      .eq('owner_user_id', user.id)
-      .in('saved_connection_id', connectionIds);
-    for (const note of notes ?? []) {
-      notesMap[note.saved_connection_id] = note.body;
-    }
-  }
-
   const connections: OwnerConnectionListItem[] = (data ?? []).flatMap((row) => {
     const saved = row.saved_profile as TargetProfileRow | TargetProfileRow[] | null;
     const targetRow = Array.isArray(saved) ? saved[0] : saved;
@@ -498,7 +485,6 @@ export async function listOwnerConnections(
         source: row.source as string,
         context: (row.context as string | null) ?? null,
         followUpAt: (row.follow_up_at as string | null) ?? null,
-        privateNote: notesMap[row.id as string] ?? null,
         sortOrder: typeof row.sort_order === 'number' ? row.sort_order : 0,
         target: toSafeTarget(targetRow),
       },

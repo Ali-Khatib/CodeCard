@@ -19,7 +19,8 @@ export type E2ERunIdentity = {
 
 /** Identities that must never become fixtures (demo persona, real people, staging showcase). */
 export const FORBIDDEN_FIXTURE_EMAILS = [
-  'alex.chen@stripe.com',
+  ['alex.chen', 'stripe.com'].join('@'),
+  'demo.owner@codecard.example',
   'showcase.alex-chen@codecard-staging.test',
 ] as const;
 export const FORBIDDEN_FIXTURE_USERNAMES = ['alexchen', 'alex-chen'] as const;

@@ -13,7 +13,6 @@ describe('WS15-T004 real Connections save flow', () => {
       source: 'manual',
       context: null,
       followUpAt: null,
-      privateNote: null,
       sortOrder: 0,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',
@@ -40,7 +39,6 @@ describe('WS15-T004 real Connections save flow', () => {
       source: 'manual',
       context: null,
       followUpAt: null,
-      privateNote: null,
       sortOrder: 0,
       target: {
         profileId: '22222222-2222-4222-8222-222222222222',

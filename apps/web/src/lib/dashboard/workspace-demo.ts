@@ -41,7 +41,7 @@ export type DemoOwnerEvent = {
 
 export const DEMO_WORKSPACE = {
   displayName: DEMO_PROFILE.display_name,
-  email: 'alex.chen@stripe.com',
+  email: 'demo.owner@codecard.example',
   username: 'alexchen',
   avatarUrl: DEMO_PROFILE.avatar_url,
   profileSlug: 'demo',

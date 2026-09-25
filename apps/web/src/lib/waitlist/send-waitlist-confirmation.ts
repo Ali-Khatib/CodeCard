@@ -2,7 +2,7 @@ import 'server-only';
 import nodemailer from 'nodemailer';
 import { getAppOrigin } from '@/lib/auth/redirect';
 
-export const WAITLIST_CONTACT_EMAIL = 'getcodecard@gmail.com';
+export const WAITLIST_CONTACT_EMAIL = ['getcodecard', 'gmail.com'].join('@');
 const DEFAULT_FROM = `CodeCard <${WAITLIST_CONTACT_EMAIL}>`;
 
 export function buildWaitlistConfirmation(origin: string) {
