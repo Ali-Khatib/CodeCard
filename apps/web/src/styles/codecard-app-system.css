@@ -171,7 +171,7 @@ html.dark .cc-app-sidebar-toggle__card span:last-child {
   flex-direction: column;
   border-right: 1px solid var(--app-border);
   background: var(--app-bone);
-  padding: 16px 12px 52px 12px;
+  padding: 16px 12px 14px 12px;
   transition: transform var(--app-slide-duration) var(--app-slide-ease);
   overflow-y: auto;
   overflow-x: hidden;
@@ -1957,17 +1957,18 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-sidebar__nav {
   margin-top: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+  min-height: min-content;
+  overflow: visible;
 }
 
 .cc-app-sidebar__foot {
   margin-top: auto;
   display: grid;
-  gap: 12px;
-  padding-top: 28px;
+  gap: 8px;
+  padding-top: 10px;
+  padding-bottom: 2px;
   border-top: 1px solid var(--app-border);
   flex-shrink: 0;
   letter-spacing: 0.01em;
@@ -4431,16 +4432,7 @@ html.dark .cc-analytics-paper-table__signal-chip {
 }
 
 @container app-main (min-width: 720px) {
-  .cc-profile-share-hero__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .cc-profile-share-hero__grid--with-share {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@container app-main (min-width: 1080px) {
+  .cc-profile-share-hero__grid,
   .cc-profile-share-hero__grid--with-share {
     grid-template-columns: 1fr 1fr 1fr;
   }
@@ -4564,7 +4556,8 @@ html.dark .cc-analytics-paper-table__signal-chip {
   font-family: var(--app-display);
   font-size: var(--app-type-card-title);
   font-weight: 520;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
+  word-spacing: 0.12em;
   line-height: 1.2;
   color: var(--app-ink);
 }
