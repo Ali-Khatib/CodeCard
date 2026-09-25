@@ -1957,7 +1957,7 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-sidebar__nav {
   margin-top: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 20px;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
@@ -1967,7 +1967,7 @@ html.dark .cc-app-badge--blush {
   margin-top: auto;
   display: grid;
   gap: 12px;
-  padding-top: 16px;
+  padding-top: 28px;
   border-top: 1px solid var(--app-border);
   flex-shrink: 0;
   letter-spacing: 0.01em;
