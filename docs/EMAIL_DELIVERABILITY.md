@@ -17,7 +17,8 @@ item is **External required** and must be applied in the DNS zone for
 ## 1. What sends email
 
 **Code-verified:** Auth email is still sent by **Supabase Auth**. Waitlist confirmation
-is sent by **Resend** when `RESEND_API_KEY` is set.
+is sent from `getcodecard@gmail.com` when `GMAIL_APP_PASSWORD` is set, and otherwise
+by **Resend** when `RESEND_API_KEY` is set.
 
 | Email | Trigger | Code reference |
 |-------|---------|----------------|
@@ -25,7 +26,7 @@ is sent by **Resend** when `RESEND_API_KEY` is set.
 | Resend confirmation | `supabase.auth.resend({ type: 'signup' })` | `apps/web/src/components/dashboard/email-verification-banner.tsx` |
 | Password reset | `supabase.auth.resetPasswordForEmail` | `apps/web/src/app/forgot-password/page.tsx` |
 | Email change confirmation | Supabase (`double_confirm_changes = true`) | `supabase/config.toml` |
-| Waitlist confirmation | `sendWaitlistConfirmationEmail` via Resend | `apps/web/src/lib/waitlist/send-waitlist-confirmation.ts` |
+| Waitlist confirmation | `sendWaitlistConfirmationEmail` from `getcodecard@gmail.com` (Gmail app password, Resend fallback) | `apps/web/src/lib/waitlist/send-waitlist-confirmation.ts` |
 
 There are no receipts or product-notification emails besides waitlist confirmation.
 Launch mail to saved waitlist addresses is a later operator send from `waitlist_signups`.

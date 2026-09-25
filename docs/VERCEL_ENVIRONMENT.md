@@ -81,7 +81,8 @@ Visibility:
 | `UPSTASH_REDIS_REST_URL` | for rate limits | P, Pr | server | Upstash | See [`UPSTASH.md`](./UPSTASH.md) | set P+Pr on `codecard-mvp` |
 | `UPSTASH_REDIS_REST_TOKEN` | for rate limits | P, Pr | server | Upstash | See [`UPSTASH.md`](./UPSTASH.md) | set P+Pr on `codecard-mvp` |
 | `RESEND_API_KEY` | for waitlist mail | P, Pr | server | Resend | Confirms landing waitlist signups | **set on codecard-mvp** |
-| `WAITLIST_FROM_EMAIL` | no | P, Pr | server | App | Optional From, default `CodeCard <hello@codecard.app>` | optional |
+| `WAITLIST_FROM_EMAIL` | no | P, Pr | server | App | Optional From, default `CodeCard <getcodecard@gmail.com>` | optional |
+| `GMAIL_APP_PASSWORD` | for Gmail waitlist mail | P, Pr | server | Gmail | App password for `getcodecard@gmail.com`; preferred waitlist sender | **set on codecard-mvp** |
 | `CODECARD_RATE_LIMIT_VERIFY` | never steady-state | temporary | server | App | Bounded 429 probe; unset after | unset |
 
 ### 2.4 Optional public

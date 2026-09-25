@@ -12,6 +12,7 @@ const serverEnvSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
   SENTRY_DSN: z.string().url().optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
+  GMAIL_APP_PASSWORD: z.string().optional(),
 });
 
 const publicEnvSchema = z.object({
