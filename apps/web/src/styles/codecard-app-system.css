@@ -255,11 +255,22 @@ html.dark .cc-app-sidebar__brand:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   padding: 10px 12px;
   border-radius: var(--app-radius-card);
   border: 1px solid var(--app-border);
   background: var(--app-paper);
+}
+
+.cc-app-sidebar-appearance > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+  letter-spacing: 0.01em;
+  word-spacing: 0.14em;
+}
+
+.cc-app-sidebar-appearance [data-testid='theme-toggle'] {
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
@@ -1946,17 +1957,32 @@ html.dark .cc-app-badge--blush {
 
 .cc-app-sidebar__nav {
   margin-top: 12px;
+  margin-bottom: 4px;
   flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
 }
 
 .cc-app-sidebar__foot {
   margin-top: auto;
   display: grid;
-  gap: 8px;
-  padding-top: 12px;
+  gap: 12px;
+  padding-top: 16px;
   border-top: 1px solid var(--app-border);
   flex-shrink: 0;
+  letter-spacing: 0.01em;
+  word-spacing: 0.14em;
+}
+
+.cc-app-sidebar__foot .cc-app-btn,
+.cc-app-sidebar__foot .cc-async-action-btn__label {
+  letter-spacing: 0.012em;
+  word-spacing: 0.16em;
+  white-space: normal;
+  height: auto;
+  min-height: 44px;
+  line-height: 1.25;
+  text-align: center;
 }
 
 .cc-app-sidebar-appearance {

@@ -36,7 +36,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <div
       className={cn(
-        'flex h-8 w-16 cursor-pointer rounded-full p-1 transition-all duration-300',
+        'relative h-8 w-14 shrink-0 cursor-pointer rounded-full p-0.5 transition-all duration-300',
         isDark
           ? 'border border-zinc-800 bg-zinc-950'
           : 'border border-[var(--app-border)] bg-[var(--app-paper)]',
@@ -57,31 +57,22 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       data-theme-success={justChanged ? 'true' : 'false'}
       data-testid="theme-toggle"
     >
-      <div className="flex w-full items-center justify-between">
-        <div
-          className={cn(
-            'flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-300',
-            isDark ? 'translate-x-0 bg-zinc-800' : 'translate-x-8 bg-[var(--app-bone)]',
-          )}
-        >
-          {isDark ? (
-            <Moon className="h-4 w-4 text-white" strokeWidth={1.5} />
-          ) : (
-            <Sun className="h-4 w-4 text-[var(--app-ink)]" strokeWidth={1.5} />
-          )}
-        </div>
-        <div
-          className={cn(
-            'flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-300',
-            isDark ? 'bg-transparent' : '-translate-x-8',
-          )}
-        >
-          {isDark ? (
-            <Sun className="h-4 w-4 text-gray-500" strokeWidth={1.5} />
-          ) : (
-            <Moon className="h-4 w-4 text-[var(--app-smoke)]" strokeWidth={1.5} />
-          )}
-        </div>
+      <span
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute top-0.5 left-0.5 h-7 w-7 rounded-full transition-transform duration-300',
+          isDark ? 'translate-x-0 bg-zinc-800' : 'translate-x-6 bg-[var(--app-bone)]',
+        )}
+      />
+      <div className="relative z-10 flex h-full items-center justify-between px-1">
+        <Moon
+          className={cn('h-3.5 w-3.5', isDark ? 'text-white' : 'text-[var(--app-smoke)]')}
+          strokeWidth={1.5}
+        />
+        <Sun
+          className={cn('h-3.5 w-3.5', isDark ? 'text-gray-500' : 'text-[var(--app-ink)]')}
+          strokeWidth={1.5}
+        />
       </div>
       <span className="sr-only">{justChanged ? (isDark ? 'Dark mode on' : 'Light mode on') : null}</span>
     </div>

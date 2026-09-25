@@ -381,7 +381,7 @@ export function DashboardShell({
               <p className="text-[13px] font-medium text-[var(--app-ink)]">Appearance</p>
               <p className="text-[11px] text-[var(--app-smoke)]">Light or dark</p>
             </div>
-            <ThemeToggle />
+            <ThemeToggle className="shrink-0" />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
           {(preview || isDemoWorkspacePath(basePath)) && !embedded ? (
