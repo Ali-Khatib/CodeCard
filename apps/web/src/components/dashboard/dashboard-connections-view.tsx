@@ -516,6 +516,15 @@ function ConnectionGridCard({
   onOpenPrivateDetails?: (connectionId: string) => void;
   dragHandle?: ReactNode;
 }) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [panelHeight, setPanelHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    setPanelHeight(expanded ? el.scrollHeight : 0);
+  }, [expanded, connection.id]);
+
   return (
     <ReactiveBorder
       as="article"
@@ -560,9 +569,10 @@ function ConnectionGridCard({
 
       <div
         className="cc-connection-grid-card__expand-slot"
+        style={{ height: panelHeight }}
         aria-hidden={!expanded}
       >
-        <div className="cc-connection-grid-card__expand-body">
+        <div ref={bodyRef} className="cc-connection-grid-card__expand-body">
           <ConnectionExpandedBody
             connection={connection}
             variant={variant}
@@ -657,7 +667,7 @@ export function DashboardConnectionsView({
 }) {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ConnectionsViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
   const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
   const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');
   const [meetingPointFilter, setMeetingPointFilter] =

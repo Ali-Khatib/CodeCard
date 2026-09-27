@@ -2857,10 +2857,10 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-grid-card--open {
-  aspect-ratio: auto;
+  aspect-ratio: unset;
   height: auto;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
   box-shadow: none;
   border-color: var(--app-border-strong);
 }
@@ -2970,25 +2970,15 @@ html.dark .cc-app-badge--blush {
 }
 
 .cc-connection-grid-card__expand-slot {
-  display: grid;
-  grid-template-rows: 0fr;
+  flex: 0 0 auto;
   overflow: hidden;
-  transition: grid-template-rows var(--app-slide-duration) var(--app-slide-ease);
-}
-
-.cc-connection-grid-card--open .cc-connection-grid-card__expand-slot {
-  grid-template-rows: 1fr;
+  height: 0;
+  transition: height var(--app-slide-duration) var(--app-slide-ease);
 }
 
 .cc-connection-grid-card__expand-body {
-  min-height: 0;
-  overflow: hidden;
   padding: 16px 18px 18px;
   border-top: 1px solid var(--app-border);
-}
-
-.cc-connection-grid-card--open .cc-connection-grid-card__expand-body {
-  overflow: visible;
 }
 
 .cc-connection-grid-card__expand-body .cc-connection-meta {

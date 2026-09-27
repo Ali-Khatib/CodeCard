@@ -146,8 +146,12 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(demo).not.toContain("source: 'NFC'");
     expect(demo).not.toContain("source: 'Manual'");
     expect(demo).not.toContain("source: 'Conference'");
+    expect(view).toContain("useState<ConnectionsViewMode>('list')");
+    expect(view).not.toContain("useState<ConnectionsViewMode>('grid')");
     expect(view).toContain('cc-connection-grid');
     expect(view).toContain('cc-connection-grid__item--open');
+    expect(view).toContain('cc-connection-grid-card__expand-slot');
+    expect(view).toContain('setPanelHeight(expanded ? el.scrollHeight : 0)');
     expect(view).not.toContain('DraggableWidgetGrid');
     expect(view).not.toContain('DashFilterBar');
     expect(view).not.toContain("SOURCES = ['All', 'QR']");
