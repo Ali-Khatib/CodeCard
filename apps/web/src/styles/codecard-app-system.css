@@ -5747,7 +5747,14 @@ html.dark .cc-home-circle-glance__card:hover {
   display: grid;
   gap: 14px;
   width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-rows: 1fr;
   align-items: stretch;
+}
+
+.cc-projects-bubble-grid > * {
+  min-height: 0;
+  height: 100%;
 }
 
 .cc-projects-bubble {
@@ -5791,15 +5798,18 @@ html.dark .cc-home-circle-glance__card:hover {
 
 .cc-projects-bubble__title {
   min-width: 0;
+  min-height: 2.4em;
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-size: clamp(16px, 1.75vw, 20px);
   font-weight: 520;
   letter-spacing: var(--app-display-tracking);
   line-height: 1.2;
   color: var(--app-ink);
-  display: block;
-  overflow: visible;
+  display: -webkit-box;
+  overflow: hidden;
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .cc-projects-bubble__badge {
@@ -7446,6 +7456,7 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-workspace-widget-grid [data-slot="widget"] {
   will-change: transform;
+  min-height: 200px;
 }
 
 .cc-workspace-widget-grid--connections [data-slot="widget"] > div:last-child {
@@ -7493,8 +7504,12 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-workspace-project-widget__title {
-  display: block;
+  display: -webkit-box;
+  min-height: 2.4em;
+  overflow: hidden;
   overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-family: var(--app-display);
   font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 520;

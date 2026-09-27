@@ -21,9 +21,9 @@ export function ProjectsWidgetGrid({
 }) {
   const items = useMemo<WidgetItem[]>(
     () =>
-      projects.map((project, index) => ({
+      projects.map((project) => ({
         id: project.id,
-        size: index === 0 ? 'wide' : 'sm',
+        size: 'sm',
         label: project.title,
       })),
     [projects],

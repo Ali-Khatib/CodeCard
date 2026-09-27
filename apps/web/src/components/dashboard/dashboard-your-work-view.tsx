@@ -46,7 +46,7 @@ export function DashboardYourWorkView({
   basePath?: string;
   openTransition?: PortfolioOpenTransition;
 }) {
-  const [viewMode, setViewMode] = useState<WorkViewMode>('grid');
+  const [viewMode, setViewMode] = useState<WorkViewMode>('list');
   const hasProjects = projects.length > 0 && !emptyProjects;
   const hasPapers = papers.length > 0;
   const emptyWorkspace = !hasProjects && !hasPapers;

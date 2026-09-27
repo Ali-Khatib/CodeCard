@@ -41,6 +41,15 @@ describe('Work workspace', () => {
     expect(research).toContain('workspaceResearchEditHref');
   });
 
+  it('opens Projects and Research in list view, not grid', () => {
+    const work = read('src/components/dashboard/dashboard-your-work-view.tsx');
+    const widgets = read('src/components/dashboard/projects-widget-grid.tsx');
+    expect(work).toContain("useState<WorkViewMode>('list')");
+    expect(work).not.toContain("useState<WorkViewMode>('grid')");
+    expect(widgets).toContain("size: 'sm'");
+    expect(widgets).not.toContain("index === 0 ? 'wide'");
+  });
+
   it('explains the public CodeCard relationship without embedding the public UI', () => {
     const work = read('src/components/dashboard/dashboard-your-work-view.tsx');
     const stack = read('src/components/dashboard/projects-vertical-stack.tsx');

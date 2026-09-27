@@ -18,16 +18,11 @@ export function ProjectsBubbleGrid({
   openTransition?: PortfolioOpenTransition;
 }) {
   const reduced = useReducedMotion();
-  const count = projects.length;
-  const colMin = count <= 2 ? 'minmax(200px, 1fr)' : count === 3 ? 'minmax(160px, 1fr)' : 'minmax(140px, 1fr)';
 
   return (
     <motion.div
       className="cc-projects-bubble-grid"
       layout
-      style={{
-        gridTemplateColumns: `repeat(auto-fit, ${colMin})`,
-      }}
       initial={reduced ? false : { opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
