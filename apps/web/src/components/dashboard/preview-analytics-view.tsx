@@ -45,7 +45,7 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
       />
 
       <FadeInView delay={0}>
-        <AnalyticsAiInsights insights={data.insights} />
+        <AnalyticsAiInsights insights={data.insights} sample />
       </FadeInView>
 
       <FadeInView delay={0.04}>

@@ -3,6 +3,7 @@
  * Do not import `buildAnalyticsData` into authenticated dashboard routes.
  * Real owner aggregates live in `analytics-queries.ts` / `analytics-aggregate.ts`.
  */
+import { buildSampleAnalyticsReview, type AnalyticsReview } from '@/lib/dashboard/analytics-review';
 
 export type TimeRange = 'today' | '7d' | '30d' | '90d' | '1y' | 'lifetime';
 
@@ -151,7 +152,7 @@ export type AnalyticsBundle = {
   browsers: AudienceSlice[];
   referrers: ReferrerCard[];
   guestStats: GuestStats;
-  insights: { highlight: string; lines: string[] };
+  insights: AnalyticsReview;
 };
 
 const DEMO_POSTERS = {
@@ -474,15 +475,7 @@ export function buildAnalyticsData(
       guestPct: 77,
       returningGuests: scale(48, range),
     },
-    insights: {
-      highlight: 'DevFlow is your strongest opener — recruiters spend 94s on average, 2.1× your other projects.',
-      lines: [
-        '77% of visitors browse as guests without signing in. QR and LinkedIn drive most of them.',
-        'GitHub sends the highest-intent traffic: 38% click through to a project or repo.',
-        'Tuesday 10 AM is your best window — profile views spike 24% vs your weekly average.',
-        'Consider adding a demo video to SchemaSync; projects with video get 2.4× more opens.',
-      ],
-    },
+    insights: buildSampleAnalyticsReview(),
   };
 }
 

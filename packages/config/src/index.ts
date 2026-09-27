@@ -129,6 +129,7 @@ export const PLANS = {
       'Per-project peer research analysis',
       'Per-project peer project analysis',
       'Premium analytics',
+      'AI review of your analytics',
       'Per-research-paper analytics',
       'Visitor insights',
     ],

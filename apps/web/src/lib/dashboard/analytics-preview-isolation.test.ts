@@ -44,6 +44,8 @@ describe('WS08-T011 preview analytics isolation', () => {
 
     expect(previewView).toContain('buildAnalyticsData');
     expect(previewView).toContain('Sample analytics');
+    expect(previewView).toContain('AnalyticsAiInsights');
+    expect(previewView).toContain('sample');
     expect(previewView).toContain('not live visitor data');
     expect(previewView).not.toContain('Preview · Demo sample');
     expect(previewView).not.toContain('fictional layout samples');

@@ -52,6 +52,7 @@ describe('analyticsEntitlementFor', () => {
       planId: 'free',
       visitorInsights: false,
       perResearchPaper: false,
+      aiReview: false,
     });
   });
 
@@ -60,6 +61,7 @@ describe('analyticsEntitlementFor', () => {
       planId: 'pro',
       visitorInsights: true,
       perResearchPaper: true,
+      aiReview: true,
     });
   });
 });

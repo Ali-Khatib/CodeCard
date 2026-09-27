@@ -24,6 +24,9 @@ describe('marketing Guide walkthrough', () => {
     expect(GUIDE_SECTIONS.find((section) => section.id === 'work')?.points.join(' ')).toContain(
       'mini presentation',
     );
+    expect(GUIDE_SECTIONS.find((section) => section.id === 'analytics')?.points.join(' ')).toContain(
+      'plain-language review',
+    );
   });
 
   it('is a dedicated page from the landing pill, not an in-page tab', () => {

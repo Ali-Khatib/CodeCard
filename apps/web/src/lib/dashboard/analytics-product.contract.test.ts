@@ -4,6 +4,8 @@ import { resolve } from 'node:path';
 import { EMPTY_STATE_COPY } from './empty-state-copy';
 import { isAnalyticsTrendRange } from './analytics-trends';
 import { PRO_ANALYTICS_SECTIONS } from './analytics-entitlement';
+import { ANALYTICS_REVIEW_FEATURE } from './analytics-review';
+import { PLANS } from '@codecard/config';
 
 function read(rel: string) {
   return readFileSync(resolve(process.cwd(), rel), 'utf8');
@@ -66,16 +68,28 @@ describe('Analytics product contract', () => {
     expect(view).toContain('entitlement.visitorInsights');
     expect(view).not.toContain('unique visitors');
     expect(view).not.toContain('AnalyticsGeoPanel');
-    expect(view).not.toContain('AnalyticsAiInsights');
     expect(view).not.toContain('AnalyticsGuestStats');
+    expect(view).toContain('AnalyticsAiInsights');
+    expect(view).toContain('entitlement.aiReview');
+    expect(view).toContain('buildOwnerAnalyticsReview');
   });
 
-  it('keeps Pro gating truthful for visitor insights and per-paper rows', () => {
-    expect(PRO_ANALYTICS_SECTIONS).toEqual(['visitorInsights', 'perResearchPaper']);
+  it('keeps Pro gating truthful for visitor insights, per-paper rows, and the review', () => {
+    expect(PRO_ANALYTICS_SECTIONS).toEqual([
+      'visitorInsights',
+      'perResearchPaper',
+      'aiReview',
+    ]);
     const view = read(AUTH_VIEW);
     expect(view).toContain('data-analytics-pro-locked');
+    expect(view).toContain('data-analytics-review-locked');
     expect(view).toContain('How people reach you');
     expect(view).toContain('Per research paper analytics');
+    expect(view).toContain('Unlock this review');
+    expect(view).toContain('See a sample');
+    expect(view).toContain('LIVE_DEMO_WORKSPACE_HREF');
+    expect(view).not.toContain('Upgrade to Pro');
+    expect(PLANS.pro.features).toContain(ANALYTICS_REVIEW_FEATURE);
   });
 
   it('keeps trend ranges to query-backed 7 and 30 UTC days', () => {
@@ -99,6 +113,11 @@ describe('Analytics product contract', () => {
     expect(previewView).toContain('Sample analytics');
     expect(previewView).toContain('not live visitor data');
     expect(previewView).toContain('buildAnalyticsData');
+    expect(previewView).toContain('AnalyticsAiInsights');
+    expect(previewView).toContain('sample');
+    const pricing = read('src/components/landing/pricing-landing-page.tsx');
+    expect(pricing).toContain('plan.features');
+    expect(pricing).toContain('AI review of your analytics');
     expect(demoData).toContain('Preview/demo sample analytics only');
   });
 });

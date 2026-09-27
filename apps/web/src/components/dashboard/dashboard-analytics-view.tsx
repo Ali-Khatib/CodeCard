@@ -10,7 +10,10 @@ import {
   ANALYTICS_ACCURACY_DISCLOSURE_HEADLINE,
 } from '@/lib/dashboard/analytics-accuracy-disclosure';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
+import { buildOwnerAnalyticsReview } from '@/lib/dashboard/analytics-review';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import { FadeInView } from './fade-in-view';
+import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
   AppButton,
@@ -111,6 +114,30 @@ export function DashboardAnalyticsView({
       {!isZeroState ? (
         <>
           <FadeInView delay={0}>
+            {entitlement.aiReview ? (
+              <AnalyticsAiInsights insights={buildOwnerAnalyticsReview(summary)} />
+            ) : (
+              <AppCard className="!border-[var(--app-border-strong)] !p-6" data-analytics-review-locked>
+                <SectionLabel>A read of your numbers</SectionLabel>
+                <p className="mt-3 text-[17px] font-semibold tracking-[-0.02em] text-[var(--app-ink)]">
+                  A simple review of which project to put first, and what the traffic actually means.
+                </p>
+                <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-muted)]">
+                  See a filled-in sample on the live demo, then unlock it on your own card.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <AppButton variant="soft" href="/dashboard/billing">
+                    Unlock this review
+                  </AppButton>
+                  <AppButton variant="ghost" href={`${LIVE_DEMO_WORKSPACE_HREF}/analytics`}>
+                    See a sample
+                  </AppButton>
+                </div>
+              </AppCard>
+            )}
+          </FadeInView>
+
+          <FadeInView delay={0.02}>
             <AppCard tone="meringue" className="!p-8">
               <MetricLabel>CodeCard views</MetricLabel>
               <p className="mt-4 text-[52px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[62px]">

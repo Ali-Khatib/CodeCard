@@ -122,6 +122,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       'After the introduction, you can see whether people opened the card, clicked a project, or used a link. It is a glance, not a growth dashboard.',
     points: [
       'Profile views and project opens tell you if the card was actually used.',
+      'A plain-language review says which project to move up, and what the traffic means.',
       'Link clicks show which outbound links visitors trusted.',
       'Use it to decide what to publish next, not to chase vanity numbers.',
     ],
