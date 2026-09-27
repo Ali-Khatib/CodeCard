@@ -142,9 +142,9 @@ export function DashboardAnalyticsView({
               <AnalyticsCoachChat review={review} summary={summary} />
             ) : (
               <AppCard className="!border-[var(--app-border-strong)] !p-6" data-analytics-coach-locked>
-                <SectionLabel>Ask these numbers</SectionLabel>
+                <SectionLabel>Chat</SectionLabel>
                 <p className="mt-3 text-[17px] font-semibold tracking-[-0.02em] text-[var(--app-ink)]">
-                  A coach that turns views into a decision — what to move, what to leave.
+                  Ask what to change. A coach that turns views into a decision.
                 </p>
                 <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-muted)]">
                   Try the sample conversation in the live demo, then unlock it here.

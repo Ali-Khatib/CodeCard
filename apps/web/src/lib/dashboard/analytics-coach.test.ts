@@ -20,7 +20,7 @@ describe('analytics coach', () => {
   it('explains traffic without inventing visitors', () => {
     const answer = answerAnalyticsQuestion('What does this traffic mean?', review);
     expect(answer).toBe(review.trafficMeaning);
-    expect(answer).not.toMatch(/unique visitors|recruiter|Tuesday/i);
+    expect(answer).not.toMatch(/unique visitors|recruiter|Tuesday|intent|click through/i);
   });
 
   it('uses open-rate when the card is glanced at but work is skipped', () => {

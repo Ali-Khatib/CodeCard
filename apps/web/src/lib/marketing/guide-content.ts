@@ -132,11 +132,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     demoLabel: 'Open Analytics in the live demo',
     frame: 'analysis',
     extra: {
-      title: 'The review, then the conversation',
+      title: 'The review, then the chat',
       body:
-        'The sample review sits on the left. The coach sits beside it so you can ask the next question without scrolling past the charts. Try “Which project should I put first?” on Alex Chen’s card.',
+        'Read the plain-language review first. The chat is the next block on the same page. Ask what to move, or what the traffic means. Try “Which project should I put first?” on Alex Chen’s card.',
       href: `${LIVE_DEMO_WORKSPACE_HREF}/analytics`,
-      hrefLabel: 'Ask the sample coach',
+      hrefLabel: 'Open the sample chat',
       frame: 'analysis',
     },
   },

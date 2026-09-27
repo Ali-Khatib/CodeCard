@@ -40,7 +40,7 @@ describe('analytics review', () => {
     expect(review.moveUp?.title).toBe('Pulse');
     expect(review.highlight).toContain('Pulse');
     expect(review.moveUp?.reason).toContain('DevFlow');
-    expect(review.trafficMeaning).toMatch(/opening work|warm handoff/i);
+    expect(review.trafficMeaning).toMatch(/opening work|tap a link/i);
   });
 
   it('keeps the most-opened project first when stay time agrees', () => {
@@ -89,6 +89,7 @@ describe('analytics review', () => {
     expect(sample.trafficMeaning).toMatch(/GitHub|QR|LinkedIn/);
     expect(sample.lines.join(' ')).toContain('SchemaSync');
     expect(sample.highlight + sample.trafficMeaning + sample.lines.join(' ')).not.toMatch(/\bPro\b/);
+    expect(sample.trafficMeaning).not.toMatch(/intent|click through|CTR/i);
   });
 
   it('lists the review on the paid plan', () => {

@@ -26,7 +26,7 @@ export function buildSampleAnalyticsReview(): AnalyticsReview {
         'People linger about a minute and a half — more than twice as long as Pulse. Lead with the work they already finish.',
     },
     trafficMeaning:
-      'Most people browse as guests. They found you from GitHub, a QR, or LinkedIn. GitHub visitors click through. QR visitors are the ones you actually met.',
+      'Most people opened the card without signing in. Some came from GitHub, some from a QR, some from LinkedIn. People from GitHub usually open a project. People from a QR are the ones you met in the room.',
     lines: [
       'SchemaSync gets opens but less time. Keep it on the card — just not in the first slot.',
       'Pulse is the quiet one. Fine as a third project. Do not let it sit above the work people already choose.',
@@ -80,7 +80,7 @@ export function buildOwnerAnalyticsReview(summary: OwnerAnalyticsSummary): Analy
       'Most visits stop on the card. Only a small share open a project. The first project may not be the one they came for — or the work is easy to miss.';
   } else if (clicks > 0 && clicks >= opens * 0.5) {
     trafficMeaning =
-      'People who open work also click out to a link. That is a warm handoff — they trusted something enough to leave the card.';
+      'People who open a project also tap a link you listed. They trusted it enough to leave the card.';
   } else {
     trafficMeaning =
       'People who land are opening work. The card is doing its job: they came to look, and they looked.';

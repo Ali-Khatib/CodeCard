@@ -43,9 +43,12 @@ export function AnalyticsCoachChat({
 
   return (
     <AppCard className="cc-analytics-coach !p-5 md:!p-6" data-analytics-coach={sample ? 'sample' : 'live'}>
-      <SectionLabel>{sample ? 'Sample coach' : 'Ask these numbers'}</SectionLabel>
+      <SectionLabel>{sample ? 'Sample chat' : 'Chat'}</SectionLabel>
+      <h2 className="mt-2 text-[20px] font-semibold tracking-[-0.03em] text-[var(--app-ink)]">
+        Ask what to change
+      </h2>
       <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-        Turn the counts into a decision. Ask what to move, or what the traffic means.
+        Type a question, or tap one below. Answers stay on the numbers on this page.
       </p>
 
       <ul className="cc-analytics-coach__thread" aria-live="polite">
