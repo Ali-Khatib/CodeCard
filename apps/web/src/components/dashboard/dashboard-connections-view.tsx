@@ -18,7 +18,6 @@ import {
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { moveIndex, weaveVisibleOrder } from '@/lib/connections/connections-order-core';
-import DraggableWidgetGrid, { type WidgetItem } from '@/components/ui/draggable-widget-grid';
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
@@ -517,21 +516,12 @@ function ConnectionGridCard({
   onOpenPrivateDetails?: (connectionId: string) => void;
   dragHandle?: ReactNode;
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const [panelHeight, setPanelHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const el = bodyRef.current;
-    if (!el) return;
-    setPanelHeight(expanded ? el.scrollHeight : 0);
-  }, [expanded, connection.id]);
-
   return (
     <ReactiveBorder
       as="article"
       id={`connection-${connection.id}`}
       data-connection-id={connection.id}
-      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''} h-full`}
+      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
     >
@@ -570,10 +560,9 @@ function ConnectionGridCard({
 
       <div
         className="cc-connection-grid-card__expand-slot"
-        style={{ height: panelHeight }}
         aria-hidden={!expanded}
       >
-        <div ref={bodyRef} className="cc-connection-grid-card__expand-body">
+        <div className="cc-connection-grid-card__expand-body">
           <ConnectionExpandedBody
             connection={connection}
             variant={variant}
@@ -864,19 +853,6 @@ export function DashboardConnectionsView({
     [onReorderConnections],
   );
 
-  const widgetItems = useMemo<WidgetItem[]>(
-    () =>
-      filtered.map((connection) => ({
-        id: connection.id,
-        size: 'sm' as const,
-        label: connection.name,
-      })),
-    [filtered],
-  );
-  const widgetById = useMemo(
-    () => new Map(filtered.map((connection) => [connection.id, connection])),
-    [filtered],
-  );
 
   const reorderVisible = useCallback(
     (fromId: string, toId: string) => {
@@ -1170,25 +1146,27 @@ export function DashboardConnectionsView({
               ))}
             </ul>
           ) : (
-            <DraggableWidgetGrid
-              className="cc-workspace-widget-grid cc-workspace-widget-grid--connections"
-              items={widgetItems}
-              maxColumns={4}
-              cellSize={210}
-              gap={14}
-              radius={22}
-              onChange={(next) => {
-                commitOrder(
-                  weaveVisibleOrder(
-                    orderedConnections.map((c) => c.id),
-                    next.map((item) => item.id),
-                  ),
-                );
-              }}
-              renderItem={(item) => {
-                const c = widgetById.get(item.id);
-                if (!c) return null;
-                return (
+            <ul className="cc-connection-grid">
+              {filtered.map((c) => (
+                <li
+                  key={c.id}
+                  className={[
+                    selectedId === c.id ? 'cc-connection-grid__item--open' : '',
+                    draggingId === c.id ? 'cc-connection-item--dragging' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ') || undefined}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    if (draggingId) reorderVisible(draggingId, c.id);
+                    setDraggingId(null);
+                  }}
+                  onDragEnd={() => setDraggingId(null)}
+                >
                   <ConnectionGridCard
                     connection={c}
                     expanded={selectedId === c.id}
@@ -1199,10 +1177,17 @@ export function DashboardConnectionsView({
                     membershipIds={memberships[c.id] ?? []}
                     onToggleMembership={onToggleMembership}
                     onOpenPrivateDetails={onOpenPrivateDetails}
+                    dragHandle={
+                      <ConnectionDragHandle
+                        name={c.name}
+                        onDragStart={() => setDraggingId(c.id)}
+                        onMove={(direction) => moveVisible(c.id, direction)}
+                      />
+                    }
                   />
-                );
-              }}
-            />
+                </li>
+              ))}
+            </ul>
           )}
 
           {filtered.length === 0 && (

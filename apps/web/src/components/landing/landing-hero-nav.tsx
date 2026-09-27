@@ -45,7 +45,10 @@ export function LandingHeroNav({ items }: LandingHeroNavProps) {
                   aria-label={item.ariaLabel ?? item.label}
                   onClick={(event) => {
                     event.stopPropagation();
-                    if (item.href === '/faq' && pathname === '/faq') {
+                    if (
+                      (item.href === '/faq' && pathname === '/faq') ||
+                      (item.href === '/guide' && pathname === '/guide')
+                    ) {
                       event.preventDefault();
                       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                     }

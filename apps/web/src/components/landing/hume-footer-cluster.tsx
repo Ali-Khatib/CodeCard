@@ -11,6 +11,7 @@ import '@/styles/editorial-landing.css';
 const FOOTER_COL_PRODUCT = [
   { label: 'Home', href: MARKETING_HOME_HREF },
   { label: 'Live demo', href: LIVE_DEMO_HREF },
+  { label: 'Guide', href: '/guide' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Research', href: '/research' },

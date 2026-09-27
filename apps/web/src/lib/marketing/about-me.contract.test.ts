@@ -9,7 +9,8 @@ describe('marketing nav without About me', () => {
   it('keeps Pricing and FAQ and does not add a Home tab or About me overlay', () => {
     const nav = read('src/components/landing/landing-hero-nav.tsx');
     const shell = read('src/components/landing/landing-shell-nav.tsx');
-    expect(nav).toContain('Pricing');
+    expect(shell).toContain("href: '/guide'");
+    expect(shell).toContain("href: '/pricing'");
     expect(shell).toContain("href: '/faq'");
     expect(nav).not.toContain('About me');
     expect(nav).not.toContain('onAboutMe');

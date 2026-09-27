@@ -32,7 +32,8 @@ export type EditorialProductState =
   | 'research'
   | 'circle'
   | 'connections'
-  | 'analysis';
+  | 'analysis'
+  | 'settings';
 
 /** Demo workspace nav labels — live demo is source of truth. */
 const TABS: { id: EditorialProductState; label: string }[] = [
@@ -42,6 +43,7 @@ const TABS: { id: EditorialProductState; label: string }[] = [
   { id: 'connections', label: 'Connections' },
   { id: 'circle', label: 'Circle' },
   { id: 'analysis', label: 'Analytics' },
+  { id: 'settings', label: 'Settings' },
 ];
 
 const DEMO_PROJECT_NAMES = ['DevFlow', 'SchemaSync', 'Pulse'] as const;
@@ -128,6 +130,14 @@ const PreviewAnalyticsView = dynamic(
   () =>
     import('@/components/dashboard/preview-analytics-view').then(
       (m) => m.PreviewAnalyticsView,
+    ),
+  { ssr: true },
+);
+
+const DashboardSettingsView = dynamic(
+  () =>
+    import('@/components/dashboard/dashboard-settings-view').then(
+      (m) => m.DashboardSettingsView,
     ),
   { ssr: true },
 );
@@ -270,6 +280,15 @@ export function EditorialProductFrame({
           ) : null}
           {state === 'analysis' ? (
             <PreviewAnalyticsView displayName={DEMO_PROFILE.display_name} />
+          ) : null}
+          {state === 'settings' ? (
+            <DashboardSettingsView
+              email={DEMO_WORKSPACE.email}
+              plan="pro"
+              profileSlug={DEMO_WORKSPACE.profileSlug}
+              isPublic
+              accountControls="demo"
+            />
           ) : null}
         </div>
       </div>

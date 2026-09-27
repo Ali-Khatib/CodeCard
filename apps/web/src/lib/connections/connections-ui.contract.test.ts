@@ -146,6 +146,9 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(demo).not.toContain("source: 'NFC'");
     expect(demo).not.toContain("source: 'Manual'");
     expect(demo).not.toContain("source: 'Conference'");
+    expect(view).toContain('cc-connection-grid');
+    expect(view).toContain('cc-connection-grid__item--open');
+    expect(view).not.toContain('DraggableWidgetGrid');
     expect(view).not.toContain('DashFilterBar');
     expect(view).not.toContain("SOURCES = ['All', 'QR']");
     expect(view).toContain('All meeting points');

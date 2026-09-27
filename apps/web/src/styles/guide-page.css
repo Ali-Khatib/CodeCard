@@ -1,0 +1,171 @@
+/* Long-form product guide. Cream paper, sticky jump nav, live-demo snapshots. */
+
+.cc-guide-page {
+  --guide-cream: #fcf1e7;
+  --guide-ink: #17171a;
+  --guide-muted: #5c5956;
+  --guide-iris: #e95a0b;
+  --ed-bg: var(--guide-cream);
+  --ed-fg: var(--guide-ink);
+  background: var(--guide-cream);
+  color: var(--guide-ink);
+  padding-bottom: 6rem;
+}
+
+.cc-guide-hero {
+  width: min(46rem, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 5.5rem 0 2.25rem;
+}
+
+.cc-guide-hero__kicker,
+.cc-guide-section__kicker,
+.cc-guide-jump__label {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--guide-ink) 58%, transparent);
+}
+
+.cc-guide-hero__title,
+.cc-guide-section__title {
+  margin: 0.65rem 0 0;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--guide-ink);
+}
+
+.cc-guide-hero__title {
+  font-size: clamp(2.4rem, 6vw, 4.1rem);
+}
+
+.cc-guide-hero__lead,
+.cc-guide-section__lead,
+.cc-guide-extra__body {
+  margin: 1.1rem 0 0;
+  max-width: 38rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--guide-muted);
+}
+
+.cc-guide-hero__demo,
+.cc-guide-section__try {
+  display: inline-flex;
+  margin-top: 1.35rem;
+  min-height: 2.75rem;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--guide-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.cc-guide-jump {
+  position: sticky;
+  top: 4.6rem;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  width: min(72rem, calc(100% - 1.5rem));
+  margin: 0 auto 1.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--guide-ink) 12%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--guide-cream) 88%, #fff);
+  backdrop-filter: blur(12px);
+}
+
+.cc-guide-jump__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-guide-jump__link {
+  display: inline-flex;
+  min-height: 2.1rem;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--guide-ink);
+  text-decoration: none;
+}
+
+.cc-guide-jump__link:hover,
+.cc-guide-jump__link--active {
+  background: color-mix(in srgb, var(--guide-iris) 14%, transparent);
+}
+
+.cc-guide-section {
+  width: min(72rem, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 3.5rem 0 2.5rem;
+  scroll-margin-top: 8.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--guide-ink) 10%, transparent);
+}
+
+.cc-guide-section__title {
+  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+}
+
+.cc-guide-section__points {
+  margin: 1.25rem 0 0;
+  padding-left: 1.15rem;
+  max-width: 40rem;
+}
+
+.cc-guide-section__points li {
+  margin: 0.55rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--guide-ink);
+}
+
+.cc-guide-section__frame {
+  margin-top: 2rem;
+}
+
+.cc-guide-section__frame .cc-ed__frame--demo {
+  pointer-events: none;
+}
+
+.cc-guide-extra {
+  margin-top: 2rem;
+  padding: 1.4rem 1.5rem 1.55rem;
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--guide-ink) 12%, transparent);
+  background: color-mix(in srgb, #fff 55%, var(--guide-cream));
+}
+
+.cc-guide-extra__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 720px) {
+  .cc-guide-jump {
+    top: 4.15rem;
+    border-radius: 1.15rem;
+  }
+
+  .cc-guide-hero,
+  .cc-guide-section {
+    width: min(72rem, calc(100% - 1.5rem));
+  }
+}
