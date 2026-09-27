@@ -9,9 +9,8 @@ import './globals.css';
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  // Optional: if Inter is not ready quickly, keep metrics-matched fallback and
-  // avoid a late text LCP update from webfont swap (WS14-T019).
+  // Variable Inter is one file. Listing 400/500/600 as static files made
+  // Vercel Turbopack fail the build (`next/font/google queries have exactly one entry`).
   display: 'optional',
   adjustFontFallback: true,
 });
@@ -35,7 +34,6 @@ const spaceMono = Space_Mono({
 const orbitron = Orbitron({
   variable: '--font-cyber-display',
   subsets: ['latin'],
-  weight: ['500', '700'],
   preload: false,
 });
 
