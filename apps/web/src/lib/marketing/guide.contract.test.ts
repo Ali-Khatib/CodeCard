@@ -41,6 +41,8 @@ describe('marketing Guide walkthrough', () => {
     expect(view).toContain('jumpToSection');
     expect(view).toContain('EditorialProductFrame');
     expect(view).toContain('section.extra.frame');
+    const frame = read('src/components/landing/editorial/editorial-product-frame.tsx');
+    expect(frame).toContain('MutationFeedbackProvider');
     expect(how).toContain('permanentRedirect');
     expect(how).toContain('MARKETING_GUIDE_HREF');
   });

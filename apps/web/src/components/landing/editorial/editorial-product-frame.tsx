@@ -23,6 +23,7 @@ import {
   publicDemoProjectHref,
 } from '@/lib/marketing/demo-url';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
+import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import type { Profile } from '@codecard/types';
 import '@/styles/codecard-app-system.css';
 
@@ -187,6 +188,7 @@ export function EditorialProductFrame({
       </header>
 
       <div className="cc-app-root cc-ed__demo-snap" aria-hidden>
+        <MutationFeedbackProvider>
         <div className="cc-ed__demo-snap__inner">
           {state === 'profile' ? (
             <DashboardOverviewView
@@ -291,6 +293,7 @@ export function EditorialProductFrame({
             />
           ) : null}
         </div>
+        </MutationFeedbackProvider>
       </div>
     </article>
   );
