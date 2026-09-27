@@ -1,8 +1,10 @@
 'use client';
 
+import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE } from '@/lib/projects/demo-data';
+import { DEMO_FEATURED_PROJECTS, DEMO_PROFILE, DEMO_RESUME_URL } from '@/lib/projects/demo-data';
 import { DEMO_RESEARCH_PAPERS } from '@/lib/research/demo-data';
+import type { GuideShotId } from '@/lib/marketing/guide-content';
 import {
   DEMO_CONNECTIONS,
   DEMO_OWNER_EVENTS,
@@ -151,37 +153,63 @@ const DashboardOverviewView = dynamic(
   { ssr: true },
 );
 
+const ProjectDetailView = dynamic(
+  () =>
+    import('@/components/featured-work/project-detail-view').then(
+      (m) => m.ProjectDetailView,
+    ),
+  { ssr: true },
+);
+
+function tabForShot(shot: GuideShotId | undefined, state: EditorialProductState): EditorialProductState {
+  if (!shot) return state;
+  if (shot.startsWith('home-')) return 'profile';
+  if (shot === 'work-research') return 'research';
+  if (shot.startsWith('work-')) return 'projects';
+  if (shot.startsWith('connections-')) return 'connections';
+  if (shot.startsWith('circle-')) return 'circle';
+  if (shot.startsWith('analytics-')) return 'analysis';
+  if (shot.startsWith('settings-')) return 'settings';
+  return state;
+}
+
 /**
  * Landing product frame = live demo UI (same components + styles),
  * clipped as a non-interactive snapshot so marketing stays in sync.
  */
 export function EditorialProductFrame({
   state = 'profile',
+  shot,
   className = '',
   size = 'default',
+  fit = 'clip',
 }: {
   state?: EditorialProductState;
+  shot?: GuideShotId;
   className?: string;
   size?: 'default' | 'lg';
+  fit?: 'clip' | 'content';
 }) {
+  const tab = tabForShot(shot, state);
   return (
     <article
-      className={`cc-ed__frame cc-ed__frame--demo ${size === 'lg' ? 'cc-ed__frame--lg' : ''} ${className}`.trim()}
+      className={`cc-ed__frame cc-ed__frame--demo ${size === 'lg' ? 'cc-ed__frame--lg' : ''} ${fit === 'content' ? 'cc-ed__frame--fit' : ''} ${className}`.trim()}
       data-testid="editorial-product-frame"
-      data-state={state}
+      data-state={tab}
+      data-shot={shot}
     >
       <header className="cc-ed__demo-chrome" aria-hidden>
         <p className="cc-ed__demo-chrome-title">
-          {TABS.find((t) => t.id === state)?.label ?? 'CodeCard'}
+          {TABS.find((t) => t.id === tab)?.label ?? 'CodeCard'}
         </p>
         <nav className="cc-ed__frame-tabs" aria-hidden>
-          {TABS.map((tab) => (
+          {TABS.map((item) => (
             <span
-              key={tab.id}
+              key={item.id}
               className="cc-ed__frame-tab"
-              data-active={tab.id === state ? 'true' : undefined}
+              data-active={item.id === tab ? 'true' : undefined}
             >
-              {tab.label}
+              {item.label}
             </span>
           ))}
         </nav>
@@ -190,8 +218,20 @@ export function EditorialProductFrame({
       <div className="cc-app-root cc-ed__demo-snap" aria-hidden>
         <MutationFeedbackProvider>
         <div className="cc-ed__demo-snap__inner">
-          {state === 'profile' ? (
+          {(shot ?? (state === 'profile' ? 'home-desk' : undefined))?.startsWith('home-') ||
+          (!shot && state === 'profile') ? (
             <DashboardOverviewView
+              guideFocus={
+                shot === 'home-identity'
+                  ? 'identity'
+                  : shot === 'home-share'
+                    ? 'share'
+                    : shot === 'home-calendar'
+                      ? 'calendar'
+                      : shot === 'home-desk'
+                        ? 'desk'
+                        : undefined
+              }
               greeting={greetingForHour()}
               displayName={DEMO_WORKSPACE.displayName}
               completion={overviewCompletion}
@@ -258,14 +298,27 @@ export function EditorialProductFrame({
               followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}
             />
           ) : null}
-          {state === 'projects' ? (
+          {tab === 'projects' && shot !== 'work-project' ? (
             <DashboardProjectsPortfolio
               creator={portfolioCreator}
               projects={portfolioProjects}
               basePath={LIVE_DEMO_WORKSPACE_HREF}
             />
           ) : null}
-          {state === 'research' ? (
+          {shot === 'work-project' && DEMO_FEATURED_PROJECTS[0] ? (
+            <Suspense fallback={<p className="p-6 text-sm">Opening the project…</p>}>
+              <ProjectDetailView
+                project={DEMO_FEATURED_PROJECTS[0]}
+                profileSlug={DEMO_WORKSPACE.profileSlug}
+                displayName={DEMO_PROFILE.display_name}
+                projects={DEMO_FEATURED_PROJECTS}
+                resumeUrl={DEMO_RESUME_URL}
+                backHref={`${LIVE_DEMO_WORKSPACE_HREF}/work`}
+                backLabel="Your Work"
+              />
+            </Suspense>
+          ) : null}
+          {tab === 'research' ? (
             <DashboardResearchView
               papers={publishedPapers}
               profileSlug={DEMO_WORKSPACE.profileSlug}
@@ -273,23 +326,48 @@ export function EditorialProductFrame({
               basePath={LIVE_DEMO_WORKSPACE_HREF}
             />
           ) : null}
-          {state === 'circle' ? <DashboardCircleView /> : null}
-          {state === 'connections' ? (
+          {tab === 'circle' ? <DashboardCircleView /> : null}
+          {tab === 'connections' ? (
             <DashboardConnectionsView
               connections={DEMO_CONNECTIONS}
               basePath={LIVE_DEMO_WORKSPACE_HREF}
+              initialSelectedId={shot === 'connections-open' ? 'c1' : null}
             />
           ) : null}
-          {state === 'analysis' ? (
-            <PreviewAnalyticsView displayName={DEMO_PROFILE.display_name} />
+          {tab === 'analysis' ? (
+            <PreviewAnalyticsView
+              displayName={DEMO_PROFILE.display_name}
+              guideFocus={
+                shot === 'analytics-review'
+                  ? 'review'
+                  : shot === 'analytics-reach'
+                    ? 'reach'
+                    : shot === 'analytics-projects'
+                      ? 'projects'
+                      : shot === 'analytics-research'
+                        ? 'research'
+                        : shot === 'analytics-audience'
+                          ? 'audience'
+                          : undefined
+              }
+            />
           ) : null}
-          {state === 'settings' ? (
+          {tab === 'settings' ? (
             <DashboardSettingsView
               email={DEMO_WORKSPACE.email}
               plan="pro"
               profileSlug={DEMO_WORKSPACE.profileSlug}
               isPublic
               accountControls="demo"
+              initialSection={
+                shot === 'settings-signin'
+                  ? 'account'
+                  : shot === 'settings-plan'
+                    ? 'billing'
+                    : shot === 'settings-export'
+                      ? 'danger'
+                      : 'profile'
+              }
             />
           ) : null}
         </div>

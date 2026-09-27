@@ -1,16 +1,25 @@
-import {
-  LIVE_DEMO_PROFILE_HREF,
-  LIVE_DEMO_WORKSPACE_HREF,
-} from '@/lib/marketing/demo-url';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
-export type GuideFrameState =
-  | 'profile'
-  | 'projects'
-  | 'research'
-  | 'circle'
-  | 'connections'
-  | 'analysis'
-  | 'settings';
+export type GuideShotId =
+  | 'home-desk'
+  | 'home-identity'
+  | 'home-share'
+  | 'home-calendar'
+  | 'work-projects'
+  | 'work-research'
+  | 'work-project'
+  | 'connections-list'
+  | 'connections-open'
+  | 'circle-feed'
+  | 'analytics-review'
+  | 'analytics-reach'
+  | 'analytics-projects'
+  | 'analytics-research'
+  | 'analytics-audience'
+  | 'settings-identity'
+  | 'settings-signin'
+  | 'settings-plan'
+  | 'settings-export';
 
 export type GuideSectionId =
   | 'home'
@@ -19,6 +28,13 @@ export type GuideSectionId =
   | 'circle'
   | 'analytics'
   | 'settings';
+
+export type GuideShot = {
+  id: string;
+  title: string;
+  caption: string;
+  shot: GuideShotId;
+};
 
 export type GuideSection = {
   id: GuideSectionId;
@@ -29,14 +45,7 @@ export type GuideSection = {
   points: string[];
   demoHref: string;
   demoLabel: string;
-  frame?: GuideFrameState;
-  extra?: {
-    title: string;
-    body: string;
-    href: string;
-    hrefLabel: string;
-    frame?: GuideFrameState;
-  };
+  shots: GuideShot[];
 };
 
 export const GUIDE_SECTIONS: GuideSection[] = [
@@ -55,14 +64,34 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: LIVE_DEMO_WORKSPACE_HREF,
     demoLabel: 'Open Home in the live demo',
-    frame: 'profile',
-    extra: {
-      title: 'The CodeCard people actually scan',
-      body:
-        'When someone opens your public card or scans your QR, they get the visitor view: your face, your work, and a way to connect. That scan is the only way a Connection is created.',
-      href: LIVE_DEMO_PROFILE_HREF,
-      hrefLabel: 'Open the public CodeCard',
-    },
+    shots: [
+      {
+        id: 'home-desk',
+        title: 'The desk',
+        caption:
+          'Greeting, profile completion, and the next step. Stay here until the card is ready.',
+        shot: 'home-desk',
+      },
+      {
+        id: 'home-identity',
+        title: 'Who you are',
+        caption: 'Photo, headline, bio, links, and skills. This is what visitors read first.',
+        shot: 'home-identity',
+      },
+      {
+        id: 'home-share',
+        title: 'The card people scan',
+        caption:
+          'Link, QR, and a live preview of the public CodeCard. A scan is how a Connection is created.',
+        shot: 'home-share',
+      },
+      {
+        id: 'home-calendar',
+        title: 'Calendar and follow-ups',
+        caption: 'Pick a day. See events and follow-ups next to the person they belong to.',
+        shot: 'home-calendar',
+      },
+    ],
   },
   {
     id: 'work',
@@ -79,7 +108,27 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/work`,
     demoLabel: 'Open Your Work in the live demo',
-    frame: 'projects',
+    shots: [
+      {
+        id: 'work-projects',
+        title: 'Projects',
+        caption: 'The work on your card. Publish what people should open. Drafts stay private.',
+        shot: 'work-projects',
+      },
+      {
+        id: 'work-research',
+        title: 'Research',
+        caption: 'Papers sit next to projects when a paper is part of the same introduction.',
+        shot: 'work-research',
+      },
+      {
+        id: 'work-project',
+        title: 'A project opened',
+        caption:
+          'Story, screenshots, the stack, and the mini presentation. This is what a visitor sees after they tap a project.',
+        shot: 'work-project',
+      },
+    ],
   },
   {
     id: 'connections',
@@ -96,7 +145,21 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/connections`,
     demoLabel: 'Open Connections in the live demo',
-    frame: 'connections',
+    shots: [
+      {
+        id: 'connections-list',
+        title: 'People you saved',
+        caption: 'List view is the default. Upcoming follow-ups sit at the top.',
+        shot: 'connections-list',
+      },
+      {
+        id: 'connections-open',
+        title: 'One person opened',
+        caption:
+          'Where you met, the note, the follow-up, and a way back to their CodeCard.',
+        shot: 'connections-open',
+      },
+    ],
   },
   {
     id: 'circle',
@@ -112,7 +175,14 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/circle`,
     demoLabel: 'Open Circle in the live demo',
-    frame: 'circle',
+    shots: [
+      {
+        id: 'circle-feed',
+        title: 'New work nearby',
+        caption: 'Projects and papers from people you already saved. Not a public feed.',
+        shot: 'circle-feed',
+      },
+    ],
   },
   {
     id: 'analytics',
@@ -130,15 +200,39 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/analytics`,
     demoLabel: 'Open Analytics in the live demo',
-    frame: 'analysis',
-    extra: {
-      title: 'The review, then the chat',
-      body:
-        'Read the plain-language review first. The chat is the next block on the same page. Ask what to move, or what the traffic means. Try “Which project should I put first?” on Alex Chen’s card.',
-      href: `${LIVE_DEMO_WORKSPACE_HREF}/analytics`,
-      hrefLabel: 'Open the sample chat',
-      frame: 'analysis',
-    },
+    shots: [
+      {
+        id: 'analytics-review',
+        title: 'The review, then the chat',
+        caption:
+          'Read what the traffic means, then ask what to change. Try “Which project should I put first?”',
+        shot: 'analytics-review',
+      },
+      {
+        id: 'analytics-reach',
+        title: 'How people found you',
+        caption: 'Reach, visits, guests, and where the card was opened.',
+        shot: 'analytics-reach',
+      },
+      {
+        id: 'analytics-projects',
+        title: 'Each project',
+        caption: 'Time on the page, saves, and which project people actually finish.',
+        shot: 'analytics-projects',
+      },
+      {
+        id: 'analytics-research',
+        title: 'Each paper',
+        caption: 'Opens, PDF downloads, and citation copies for the papers on the card.',
+        shot: 'analytics-research',
+      },
+      {
+        id: 'analytics-audience',
+        title: 'Who opened it',
+        caption: 'Roles inferred from the visit, plus the latest activity.',
+        shot: 'analytics-audience',
+      },
+    ],
   },
   {
     id: 'settings',
@@ -154,6 +248,31 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/settings`,
     demoLabel: 'Open Settings in the live demo',
-    frame: 'settings',
+    shots: [
+      {
+        id: 'settings-identity',
+        title: 'CodeCard identity',
+        caption: 'Username, visibility, and the public card. Identity editing stays on Home.',
+        shot: 'settings-identity',
+      },
+      {
+        id: 'settings-signin',
+        title: 'Sign-in',
+        caption: 'Email, password, and GitHub. Visitors never see this.',
+        shot: 'settings-signin',
+      },
+      {
+        id: 'settings-plan',
+        title: 'Plan',
+        caption: 'Free or Pro. This is billing, not the public card.',
+        shot: 'settings-plan',
+      },
+      {
+        id: 'settings-export',
+        title: 'Export and delete',
+        caption: 'Download a copy of your data, or delete the account. Deletion cannot be undone.',
+        shot: 'settings-export',
+      },
+    ],
   },
 ];

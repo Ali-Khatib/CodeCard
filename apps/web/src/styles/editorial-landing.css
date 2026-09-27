@@ -1014,6 +1014,15 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   height: min(52rem, 82vh);
 }
 
+.cc-ed__frame--fit,
+.cc-ed__frame--fit .cc-ed__demo-snap {
+  overflow: visible;
+}
+
+.cc-ed__frame--fit .cc-ed__demo-snap {
+  height: auto;
+}
+
 .cc-ed__demo-snap__inner {
   position: absolute;
   top: 0;

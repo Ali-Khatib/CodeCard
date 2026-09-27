@@ -649,6 +649,7 @@ export function DashboardConnectionsView({
   onToggleMembership,
   onOpenPrivateDetails,
   onReorderConnections,
+  initialSelectedId = null,
 }: {
   connections: ViewConnection[];
   basePath?: string;
@@ -664,9 +665,10 @@ export function DashboardConnectionsView({
   ) => void | Promise<void>;
   onOpenPrivateDetails?: (connectionId: string) => void;
   onReorderConnections?: (orderedIds: string[]) => void | Promise<void>;
+  initialSelectedId?: string | null;
 }) {
   const [query, setQuery] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
   const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
   const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
   const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');

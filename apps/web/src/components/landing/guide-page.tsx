@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { EditorialProductFrame } from '@/components/landing/editorial/editorial-product-frame';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
@@ -19,14 +19,56 @@ function jumpToSection(id: GuideSectionId) {
 }
 
 function GuideJumpNav({ active }: { active: GuideSectionId }) {
+  const listRef = useRef<HTMLUListElement>(null);
+  const [thumb, setThumb] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const link = list.querySelector<HTMLElement>(`[data-guide-nav="${active}"]`);
+      if (!link) return;
+      const listBox = list.getBoundingClientRect();
+      const box = link.getBoundingClientRect();
+      setThumb({
+        left: box.left - listBox.left + list.scrollLeft,
+        top: box.top - listBox.top + list.scrollTop,
+        width: box.width,
+        height: box.height,
+        ready: true,
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [active]);
+
   return (
     <nav className="cc-guide-jump" aria-label="Guide sections">
       <p className="cc-guide-jump__label">Jump to</p>
-      <ul className="cc-guide-jump__list">
+      <ul ref={listRef} className="cc-guide-jump__list">
+        <li
+          className="cc-guide-jump__thumb"
+          aria-hidden
+          style={{
+            opacity: thumb.ready ? 1 : 0,
+            transform: `translate(${thumb.left}px, ${thumb.top}px)`,
+            width: thumb.width,
+            height: thumb.height,
+          }}
+        />
         {GUIDE_SECTIONS.map((section) => (
           <li key={section.id}>
             <a
               href={`#${section.id}`}
+              data-guide-nav={section.id}
               className={`cc-guide-jump__link${
                 active === section.id ? ' cc-guide-jump__link--active' : ''
               }`}
@@ -58,27 +100,25 @@ export function GuidePage() {
   }, []);
 
   useEffect(() => {
-    const nodes = GUIDE_SECTIONS.map((section) =>
-      document.getElementById(`guide-${section.id}`),
-    ).filter((node): node is HTMLElement => node != null);
-
-    if (nodes.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        const id = visible?.target.id.replace('guide-', '') as GuideSectionId | undefined;
-        if (id && GUIDE_SECTIONS.some((section) => section.id === id)) {
-          setActive(id);
+    const updateActive = () => {
+      const marker = NAV_OFFSET + 8;
+      let current: GuideSectionId = 'home';
+      for (const section of GUIDE_SECTIONS) {
+        const el = document.getElementById(`guide-${section.id}`);
+        if (el && el.getBoundingClientRect().top <= marker) {
+          current = section.id;
         }
-      },
-      { rootMargin: '-20% 0px -55% 0px', threshold: [0.15, 0.35, 0.6] },
-    );
+      }
+      setActive(current);
+    };
 
-    for (const node of nodes) observer.observe(node);
-    return () => observer.disconnect();
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+    return () => {
+      window.removeEventListener('scroll', updateActive);
+      window.removeEventListener('resize', updateActive);
+    };
   }, []);
 
   return (
@@ -118,26 +158,19 @@ export function GuidePage() {
             </Link>
           </div>
 
-          {section.frame ? (
-            <div className="cc-guide-section__frame">
-              <EditorialProductFrame state={section.frame} size="lg" />
-            </div>
-          ) : null}
-
-          {section.extra ? (
-            <aside className="cc-guide-extra">
-              <h3 className="cc-guide-extra__title">{section.extra.title}</h3>
-              <p className="cc-guide-extra__body">{section.extra.body}</p>
-              <Link href={section.extra.href} className="cc-guide-section__try">
-                {section.extra.hrefLabel}
-              </Link>
-              {section.extra.frame ? (
-                <div className="cc-guide-section__frame cc-guide-section__frame--extra">
-                  <EditorialProductFrame state={section.extra.frame} size="lg" />
+          <div className="cc-guide-shots">
+            {section.shots.map((item) => (
+              <figure key={item.id} className="cc-guide-shot">
+                <figcaption className="cc-guide-shot__caption">
+                  <h3 className="cc-guide-shot__title">{item.title}</h3>
+                  <p className="cc-guide-shot__body">{item.caption}</p>
+                </figcaption>
+                <div className="cc-guide-section__frame">
+                  <EditorialProductFrame shot={item.shot} size="lg" fit="content" />
                 </div>
-              ) : null}
-            </aside>
-          ) : null}
+              </figure>
+            ))}
+          </div>
         </section>
       ))}
     </div>

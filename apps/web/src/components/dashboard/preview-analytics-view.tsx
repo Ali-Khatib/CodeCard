@@ -24,7 +24,20 @@ const RANGES: TimeRange[] = ['7d', '30d', '90d', 'lifetime'];
 /**
  * Preview-only sample analytics. Do not import into authenticated routes.
  */
-export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayName?: string }) {
+export type AnalyticsGuideFocus =
+  | 'review'
+  | 'reach'
+  | 'projects'
+  | 'research'
+  | 'audience';
+
+export function PreviewAnalyticsView({
+  displayName = 'Alex Chen',
+  guideFocus,
+}: {
+  displayName?: string;
+  guideFocus?: AnalyticsGuideFocus;
+}) {
   const [range, setRange] = useState<TimeRange>('30d');
   const data = useMemo(() => buildAnalyticsData(range, { displayName }), [range, displayName]);
 
@@ -34,6 +47,11 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
   );
 
   const topKpis = data.kpis.slice(0, 4);
+  const showReview = !guideFocus || guideFocus === 'review';
+  const showReach = !guideFocus || guideFocus === 'reach';
+  const showProjects = !guideFocus || guideFocus === 'projects';
+  const showResearch = !guideFocus || guideFocus === 'research';
+  const showAudience = !guideFocus || guideFocus === 'audience';
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -45,11 +63,15 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
         }
       />
 
+      {showReview ? (
       <FadeInView delay={0} className="cc-analytics-decision">
         <AnalyticsAiInsights insights={data.insights} sample />
         <AnalyticsCoachChat review={data.insights} sample />
       </FadeInView>
+      ) : null}
 
+      {showReach ? (
+      <>
       <FadeInView delay={0.04}>
         <AppCard tone="meringue" className="!p-8">
           <MetricLabel>Profile reach</MetricLabel>
@@ -96,15 +118,23 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
           topCities={data.topCities}
         />
       </FadeInView>
+      </>
+      ) : null}
 
+      {showProjects ? (
       <FadeInView delay={0.2}>
         <AnalyticsProjectPanel projects={data.projectDetails} />
       </FadeInView>
+      ) : null}
 
+      {showResearch ? (
       <FadeInView delay={0.28}>
         <AnalyticsResearchPanel summary={data.researchSummary} />
       </FadeInView>
+      ) : null}
 
+      {showAudience ? (
+      <>
       <FadeInView delay={0.32}>
         <AnalyticsAudiencePanel roles={data.roles} />
       </FadeInView>
@@ -122,6 +152,8 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
           </ul>
         </AppCard>
       </FadeInView>
+      </>
+      ) : null}
     </div>
   );
 }

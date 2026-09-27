@@ -293,6 +293,7 @@ export function DashboardSettingsView({
   accountControls = 'demo',
   deletionAuth = { hasPassword: true, oauthProvider: null },
   openDeletionOnMount = false,
+  initialSection,
 }: {
   email?: string;
   plan?: AccountPlanId;
@@ -305,9 +306,10 @@ export function DashboardSettingsView({
   accountControls?: 'live' | 'demo';
   deletionAuth?: AccountDeletionAuthMode;
   openDeletionOnMount?: boolean;
+  initialSection?: 'profile' | 'account' | 'billing' | 'danger';
 }) {
   const [openId, setOpenId] = useState<string>(
-    openDeletionOnMount ? 'danger' : 'profile',
+    initialSection ?? (openDeletionOnMount ? 'danger' : 'profile'),
   );
   const live = accountControls === 'live';
   const githubCanDisconnect = Boolean(

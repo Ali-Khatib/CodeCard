@@ -79,6 +79,8 @@ export type OverviewProps = {
   events?: OwnerEvent[];
   followUps?: HomeFollowUp[];
   scheduleError?: boolean;
+  /** Guide snapshots: show one Home zone instead of the full desk. */
+  guideFocus?: 'desk' | 'identity' | 'share' | 'calendar';
 };
 
 const PREVIEW_SPARKS: Record<'profileViews' | 'projectOpens', number[]> = {
@@ -109,6 +111,7 @@ export function DashboardOverviewView({
   events = [],
   followUps = [],
   scheduleError = false,
+  guideFocus,
 }: OverviewProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const firstName = displayName.split(' ')[0];
@@ -117,7 +120,10 @@ export function DashboardOverviewView({
     hasAnyProject,
     isPublic: isProfilePublic,
   });
-  const showShare = loopState === 'publish_card' || loopState === 'share_card';
+  const showShare =
+    guideFocus === 'share' ||
+    loopState === 'publish_card' ||
+    loopState === 'share_card';
   const showWork = loopState !== 'complete_identity';
   const showLaterSurfaces = loopState === 'share_card';
   const showCompletion = completion.percentage < 100;
@@ -138,6 +144,10 @@ export function DashboardOverviewView({
     { key: 'projectOpens', label: 'Project opens' },
   ];
   const circleHref = `${basePath}/circle`;
+  const showDesk = !guideFocus || guideFocus === 'desk';
+  const showIdentityZone = !guideFocus || guideFocus === 'identity';
+  const showShareZone = !guideFocus || guideFocus === 'share';
+  const showCalendarZone = !guideFocus || guideFocus === 'calendar';
 
   useEffect(() => {
     const flag = sessionStorage.getItem(SHARE_LINK_COPIED_FLAG);
@@ -157,6 +167,8 @@ export function DashboardOverviewView({
 
   return (
     <div className="cc-profile-home">
+      {showDesk ? (
+      <>
       {/* ── Zone 1: Greeting strip ── */}
       <FadeInView delay={0}>
         <header className="cc-profile-home__greeting">
@@ -248,8 +260,10 @@ export function DashboardOverviewView({
           </section>
         </FadeInView>
       ) : null}
+      </>
+      ) : null}
 
-      {showShare ? (
+      {showShare && showShareZone ? (
       <FadeInView delay={0.08}>
         <section id="share" aria-label="Share your CodeCard" className="scroll-mt-24">
           <ProfileShareHero
@@ -262,7 +276,7 @@ export function DashboardOverviewView({
       </FadeInView>
       ) : null}
 
-      {profile ? (
+      {profile && showIdentityZone ? (
         <FadeInView delay={0.12}>
           <HomeIdentitySection
             profile={profile}
@@ -273,6 +287,7 @@ export function DashboardOverviewView({
         </FadeInView>
       ) : null}
 
+      {showCalendarZone ? (
       <HomeScheduleSection
         events={events}
         followUps={followUps}
@@ -280,8 +295,9 @@ export function DashboardOverviewView({
         preview={preview}
         basePath={basePath}
       />
+      ) : null}
 
-      {showWork ? (
+      {showDesk && showWork ? (
       <FadeInView delay={0.18}>
         <section className="cc-profile-home__zone" aria-label="Your work">
           <div className="cc-profile-home__zone-head">
@@ -420,7 +436,7 @@ export function DashboardOverviewView({
       </FadeInView>
       ) : null}
 
-      {showLaterSurfaces ? (
+      {showDesk && showLaterSurfaces ? (
         <>
       <FadeInView delay={0.2}>
         <section className="cc-profile-home__zone" aria-label="Audience reach">
