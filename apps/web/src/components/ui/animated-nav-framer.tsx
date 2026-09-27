@@ -60,7 +60,7 @@ export function AnimatedNavFramer({
   const [phone, setPhone] = React.useState(false);
   const innerRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
-  const [openSize, setOpenSize] = React.useState({ width: 420, height: 48 });
+  const [openSize, setOpenSize] = React.useState({ width: 640, height: 52 });
   const [availWidth, setAvailWidth] = React.useState(1200);
 
   React.useEffect(() => {
@@ -108,11 +108,25 @@ export function AnimatedNavFramer({
       const panelHeight = panelRef.current?.offsetHeight ?? 0;
       const previousWidth = inner.style.width;
       const previousMaxWidth = inner.style.maxWidth;
+      const group = inner.querySelector('.cc-hume-fade-group');
+      const previousGroupMax =
+        group instanceof HTMLElement ? group.style.maxWidth : '';
       inner.style.width = 'max-content';
       inner.style.maxWidth = 'none';
-      const width = Math.ceil(Math.max(inner.scrollWidth, inner.offsetWidth));
+      if (group instanceof HTMLElement) group.style.maxWidth = 'none';
+      const padX =
+        group instanceof HTMLElement
+          ? (Number.parseFloat(window.getComputedStyle(inner).paddingLeft) || 0) +
+            (Number.parseFloat(window.getComputedStyle(inner).paddingRight) || 0)
+          : 0;
+      const contentWidth =
+        group instanceof HTMLElement
+          ? group.scrollWidth + padX
+          : Math.max(inner.scrollWidth, inner.offsetWidth);
+      const width = Math.ceil(contentWidth);
       inner.style.width = previousWidth;
       inner.style.maxWidth = previousMaxWidth;
+      if (group instanceof HTMLElement) group.style.maxWidth = previousGroupMax;
       const height = Math.ceil(Math.max(inner.scrollHeight, 52) + panelHeight);
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>

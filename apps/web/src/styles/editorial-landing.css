@@ -451,7 +451,7 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   justify-content: center;
   flex-wrap: nowrap;
   width: max-content;
-  max-width: 100%;
+  max-width: none;
   min-width: 0;
   gap: clamp(0.2rem, 0.8vw, 0.5rem);
 }

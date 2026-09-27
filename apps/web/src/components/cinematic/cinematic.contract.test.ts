@@ -397,6 +397,9 @@ describe('Editorial product landing contract', () => {
     expect(framer).toContain('<Menu');
     expect(framer).toContain('NAV_COLLAPSED_SIZE');
     expect(framer).toContain('scrollWidth');
+    expect(framer).toContain('width: 640');
+    expect(framer).not.toContain('width: 420');
+    expect(framer).toContain('.cc-hume-fade-group');
     expect(shell).not.toContain('morphNavVeil');
     expect(shell).not.toContain('data-nav-morphing');
     expect(hero).toContain('AnimatedNavFramer');
