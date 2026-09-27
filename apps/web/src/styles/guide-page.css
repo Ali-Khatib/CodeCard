@@ -195,12 +195,12 @@
 .cc-guide-section__frame .cc-ed__frame--demo,
 .cc-guide-section__frame .cc-ed__frame--fit {
   pointer-events: none;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .cc-guide-page .cc-ed__demo-snap {
   height: auto;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .cc-guide-page .cc-ed__demo-snap__inner {
@@ -208,6 +208,12 @@
   width: 100%;
   max-width: 1040px;
   transform: none;
+}
+
+.cc-guide-page .cc-ed__demo-snap .cc-app-mobile-nav,
+.cc-guide-page .cc-ed__demo-snap .cc-app-sidebar,
+.cc-guide-page .cc-ed__demo-snap .cc-public-dock {
+  display: none;
 }
 
 @media (max-width: 720px) {

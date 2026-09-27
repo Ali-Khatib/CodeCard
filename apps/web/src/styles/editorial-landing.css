@@ -90,6 +90,7 @@
   --ed-fg: var(--ed-ink, #232324);
 }
 
+/* Cinema chrome. Guide/FAQ must not use .cc-ed or this restyles their nav. */
 .cc-marketing-shell:has(.cc-ed) {
   background: var(--ed-cream, #fcf1e7);
   --cc-ed-nav-height: calc(4.25rem + env(safe-area-inset-top, 0px));
@@ -1014,13 +1015,16 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   height: min(52rem, 82vh);
 }
 
-.cc-ed__frame--fit,
-.cc-ed__frame--fit .cc-ed__demo-snap {
-  overflow: visible;
-}
-
 .cc-ed__frame--fit .cc-ed__demo-snap {
   height: auto;
+  overflow: hidden;
+}
+
+.cc-ed__frame--fit .cc-ed__demo-snap__inner {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--ed-demo-design-w) * 1px);
+  transform: none;
 }
 
 .cc-ed__demo-snap__inner {

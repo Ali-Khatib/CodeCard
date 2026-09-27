@@ -68,9 +68,19 @@ describe('marketing Guide walkthrough', () => {
     expect(view).toContain('EditorialProductFrame');
     expect(view).toContain('section.shots');
     expect(view).toContain('fit="content"');
+    expect(view).toContain('className="cc-guide-page"');
+    expect(view).not.toContain('cc-ed cc-guide-page');
+    expect(view).not.toContain('className="cc-ed');
     const frame = read('src/components/landing/editorial/editorial-product-frame.tsx');
+    const landingCss = read('src/styles/editorial-landing.css');
+    const guideCss = read('src/styles/guide-page.css');
     expect(frame).toContain('MutationFeedbackProvider');
     expect(frame).toContain('fit === \'content\'');
+    expect(landingCss).toContain('.cc-ed__frame--fit .cc-ed__demo-snap__inner');
+    expect(landingCss).toContain(
+      '/* Cinema chrome. Guide/FAQ must not use .cc-ed or this restyles their nav. */',
+    );
+    expect(guideCss).not.toContain('overflow: visible');
     expect(how).toContain('permanentRedirect');
     expect(how).toContain('MARKETING_GUIDE_HREF');
   });

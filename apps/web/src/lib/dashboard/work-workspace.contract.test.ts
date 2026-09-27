@@ -44,10 +44,14 @@ describe('Work workspace', () => {
   it('opens Projects and Research in list view, not grid', () => {
     const work = read('src/components/dashboard/dashboard-your-work-view.tsx');
     const widgets = read('src/components/dashboard/projects-widget-grid.tsx');
+    const frame = read('src/components/landing/editorial/editorial-product-frame.tsx');
     expect(work).toContain("useState<WorkViewMode>('list')");
     expect(work).not.toContain("useState<WorkViewMode>('grid')");
+    expect(work).toContain('viewMode={viewMode === \'grid\' ? \'grid\' : \'stack\'}');
     expect(widgets).toContain("size: 'sm'");
     expect(widgets).not.toContain("index === 0 ? 'wide'");
+    expect(frame).toContain('viewMode="stack"');
+    expect(frame).toContain('viewMode="list"');
   });
 
   it('explains the public CodeCard relationship without embedding the public UI', () => {

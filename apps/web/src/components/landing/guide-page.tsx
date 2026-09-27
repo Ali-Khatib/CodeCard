@@ -122,7 +122,7 @@ export function GuidePage() {
   }, []);
 
   return (
-    <div className="cc-ed cc-guide-page" data-chapter="guide" data-testid="guide-page">
+    <div className="cc-guide-page" data-testid="guide-page">
       <header className="cc-guide-hero">
         <p className="cc-guide-hero__kicker">Guide</p>
         <h1 className="cc-guide-hero__title">How the workspace works</h1>

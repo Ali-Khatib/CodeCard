@@ -303,6 +303,7 @@ export function EditorialProductFrame({
               creator={portfolioCreator}
               projects={portfolioProjects}
               basePath={LIVE_DEMO_WORKSPACE_HREF}
+              viewMode="stack"
             />
           ) : null}
           {shot === 'work-project' && DEMO_FEATURED_PROJECTS[0] ? (
@@ -324,6 +325,7 @@ export function EditorialProductFrame({
               profileSlug={DEMO_WORKSPACE.profileSlug}
               isProfilePublic
               basePath={LIVE_DEMO_WORKSPACE_HREF}
+              viewMode="list"
             />
           ) : null}
           {tab === 'circle' ? <DashboardCircleView /> : null}
