@@ -214,7 +214,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 scroll-mt-28" id="skills-field">
           <FieldLabel htmlFor="skills">Skills</FieldLabel>
           <input
             id="skills"

@@ -126,6 +126,24 @@ export function HomeIdentitySection({
                   readOnly
                 />
               </label>
+              <label className="block" htmlFor="location">
+                <span className="cc-app-mono">Location</span>
+                <input
+                  id="location"
+                  className="cc-app-input mt-2 scroll-mt-28"
+                  defaultValue={profile.location ?? ''}
+                  readOnly
+                />
+              </label>
+              <label className="block" htmlFor="skills">
+                <span className="cc-app-mono">Skills</span>
+                <input
+                  id="skills"
+                  className="cc-app-input mt-2 scroll-mt-28"
+                  defaultValue={(profile.skills ?? []).join(', ')}
+                  readOnly
+                />
+              </label>
               <p className="text-[14px] text-[var(--app-smoke)]">
                 <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
                   Create an account

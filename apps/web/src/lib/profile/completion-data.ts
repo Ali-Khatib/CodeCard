@@ -65,6 +65,7 @@ export async function loadProfileCompletion(
     headline?: string | null;
     bio?: string | null;
     avatar_url?: string | null;
+    skills?: string[] | null;
   },
 ): Promise<LoadProfileCompletionResult> {
   const flags = await loadProfileCompletionFlags(supabase, profile.id);

@@ -114,6 +114,7 @@ describe('loadProfileCompletion', () => {
       headline: 'Engineer',
       bio: 'Builder',
       avatar_url: 'https://cdn.example/a.jpg',
+      skills: ['TypeScript'],
     });
 
     expect(result.ok).toBe(true);

@@ -7,8 +7,9 @@ import {
   DEMO_CONNECTIONS,
   DEMO_OWNER_EVENTS,
   DEMO_PROFILE_LINKS,
-  DEMO_SUGGESTED_STEP,
   DEMO_WORKSPACE,
+  getDemoHomeSuggestedStep,
+  getDemoProfileCompletion,
 } from '@/lib/dashboard/workspace-demo';
 import { followUpsToHomeItems } from '@/lib/dashboard/connections-summary';
 import { DEMO_CIRCLE_FEED } from '@/lib/dashboard/circle-demo';
@@ -22,10 +23,6 @@ import {
   publicDemoProjectHref,
 } from '@/lib/marketing/demo-url';
 import { greetingForHour } from '@/lib/dashboard/profile-completion';
-import {
-  calculateProfileCompletion,
-  deriveProfileCompletionInput,
-} from '@/lib/profile/completion';
 import type { Profile } from '@codecard/types';
 import '@/styles/codecard-app-system.css';
 
@@ -87,19 +84,13 @@ const demoProfile: Profile = {
   avatar_url: DEMO_PROFILE.avatar_url,
   bio: DEMO_PROFILE.bio,
   location: DEMO_PROFILE.location,
-  skills: [],
+  skills: DEMO_PROFILE.skills,
   is_public: true,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
 
-const overviewCompletion = calculateProfileCompletion(
-  deriveProfileCompletionInput(DEMO_PROFILE, {
-    hasProfileLink: DEMO_PROFILE_LINKS.length > 0,
-    hasPublishedProject: true,
-  }),
-  { hasAnyProject: true },
-);
+const overviewCompletion = getDemoProfileCompletion(LIVE_DEMO_WORKSPACE_HREF);
 
 const DashboardConnectionsView = dynamic(
   () =>
@@ -249,10 +240,7 @@ export function EditorialProductFrame({
                 ],
               }}
               circleWorks={overviewCircleWorksFromDemoFeed(DEMO_CIRCLE_FEED, 3)}
-              suggested={{
-                ...DEMO_SUGGESTED_STEP,
-                href: `${LIVE_DEMO_WORKSPACE_HREF}/projects`,
-              }}
+              suggested={getDemoHomeSuggestedStep(LIVE_DEMO_WORKSPACE_HREF)}
               basePath={LIVE_DEMO_WORKSPACE_HREF}
               events={DEMO_OWNER_EVENTS}
               followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}

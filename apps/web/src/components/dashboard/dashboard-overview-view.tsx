@@ -120,7 +120,7 @@ export function DashboardOverviewView({
   const showShare = loopState === 'publish_card' || loopState === 'share_card';
   const showWork = loopState !== 'complete_identity';
   const showLaterSurfaces = loopState === 'share_card';
-  const showCompletion = loopState === 'complete_identity';
+  const showCompletion = completion.percentage < 100;
   const loopStatusCopy =
     loopState === 'complete_identity'
       ? isProfilePublic
@@ -204,7 +204,7 @@ export function DashboardOverviewView({
       </FadeInView>
 
       {/* ── Zone 2: Profile completion (hidden at 100%) ── */}
-      {showCompletion && completion.percentage < 100 ? (
+      {showCompletion ? (
         <FadeInView delay={0.04}>
           <section aria-label="Profile completion">
             <ProfileCompletionIndicator completion={completion} />
@@ -212,14 +212,17 @@ export function DashboardOverviewView({
         </FadeInView>
       ) : null}
 
-      {/* ── Suggested next step (high on the page) ── */}
+      {/* ── Next step until 100%; suggested next steps take its place after ── */}
       {suggested ? (
         <FadeInView delay={0.06}>
-          <section className="cc-profile-home__zone" aria-label="Suggested next step">
+          <section
+            className="cc-profile-home__zone"
+            aria-label={showCompletion ? 'Next step to complete your profile' : 'Suggested next step'}
+          >
             <AppCard tone="meringue" className="cc-profile-next-card cc-suggestion-card !p-6" reactive>
               <div className="cc-profile-next-card__row">
                 <div className="max-w-lg">
-                  <AppMono>Next</AppMono>
+                  <AppMono>{showCompletion ? 'Next' : 'Suggested next step'}</AppMono>
                   <h2 className="mt-2 text-[22px] font-semibold tracking-[-0.025em] text-[var(--app-ink)]">
                     {suggested.title}
                   </h2>

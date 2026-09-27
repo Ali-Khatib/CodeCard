@@ -4,12 +4,13 @@ export const PROFILE_COMPLETION_CRITERIA = [
   'avatar',
   'profileLink',
   'publishedProject',
+  'skills',
 ] as const;
 
 export type ProfileCompletionCriterion = (typeof PROFILE_COMPLETION_CRITERIA)[number];
 
-export const PROFILE_COMPLETION_TOTAL = 5;
-export const PROFILE_COMPLETION_WEIGHT = 20;
+export const PROFILE_COMPLETION_TOTAL = PROFILE_COMPLETION_CRITERIA.length;
+export const PROFILE_COMPLETION_WEIGHT = Math.round(100 / PROFILE_COMPLETION_TOTAL);
 
 export type ProfileCompletionInput = {
   hasHeadline: boolean;
@@ -17,6 +18,7 @@ export type ProfileCompletionInput = {
   hasAvatar: boolean;
   hasProfileLink: boolean;
   hasPublishedProject: boolean;
+  hasSkills: boolean;
 };
 
 export type ProfileCompletionCriterionResult = {
@@ -40,6 +42,7 @@ const CRITERION_LABELS: Record<ProfileCompletionCriterion, string> = {
   avatar: 'Avatar',
   profileLink: 'Profile link',
   publishedProject: 'Published project',
+  skills: 'Skills',
 };
 
 export function hasPersistedHeadline(headline?: string | null): boolean {
@@ -54,11 +57,16 @@ export function hasPersistedAvatar(avatarUrl?: string | null): boolean {
   return Boolean(avatarUrl?.trim());
 }
 
+export function hasPersistedSkills(skills?: string[] | null): boolean {
+  return Boolean(skills?.some((skill) => skill.trim()));
+}
+
 export function deriveProfileCompletionInput(
   profile: {
     headline?: string | null;
     bio?: string | null;
     avatar_url?: string | null;
+    skills?: string[] | null;
   },
   flags: {
     hasProfileLink: boolean;
@@ -71,6 +79,7 @@ export function deriveProfileCompletionInput(
     hasAvatar: hasPersistedAvatar(profile.avatar_url),
     hasProfileLink: flags.hasProfileLink,
     hasPublishedProject: flags.hasPublishedProject,
+    hasSkills: hasPersistedSkills(profile.skills),
   };
 }
 
@@ -110,12 +119,13 @@ function criterionHref(
   if (id === 'bio') return workspacePath(basePath, '#bio');
   if (id === 'avatar') return workspacePath(basePath, '#photo');
   if (id === 'profileLink') return workspacePath(basePath, '#links');
+  if (id === 'skills') return workspacePath(basePath, '#skills');
   return workspacePath(basePath, '#profile');
 }
 
 export function calculateProfileCompletion(
   input: ProfileCompletionInput,
-  options: { hasAnyProject?: boolean } = {},
+  options: { hasAnyProject?: boolean; basePath?: string } = {},
 ): ProfileCompletionResult {
   const hasAnyProject = options.hasAnyProject ?? false;
   const values: Record<ProfileCompletionCriterion, boolean> = {
@@ -124,17 +134,21 @@ export function calculateProfileCompletion(
     avatar: input.hasAvatar,
     profileLink: input.hasProfileLink,
     publishedProject: input.hasPublishedProject,
+    skills: input.hasSkills,
   };
 
   const criteria = PROFILE_COMPLETION_CRITERIA.map((id) => ({
     id,
     label: CRITERION_LABELS[id],
     complete: values[id],
-    href: criterionHref(id, { hasAnyProject }),
+    href: criterionHref(id, { hasAnyProject, basePath: options.basePath }),
   }));
 
   const completedCount = criteria.filter((item) => item.complete).length;
-  const percentage = Math.min(100, completedCount * PROFILE_COMPLETION_WEIGHT);
+  const percentage = Math.min(
+    100,
+    Math.round((completedCount / PROFILE_COMPLETION_TOTAL) * 100),
+  );
 
   return {
     percentage,
@@ -193,6 +207,12 @@ export function getProfileCompletionNextStep(
           : 'Add a project, then publish it to complete your profile.',
         href,
       };
+    case 'skills':
+      return {
+        title: 'Add your skills',
+        detail: 'List a few skills so visitors know what you work with.',
+        href,
+      };
     default:
       return null;
   }
@@ -223,16 +243,17 @@ export function getHomeWorkspaceNextStep(
   options: { hasAnyProject: boolean; isPublic: boolean; basePath?: string },
 ): HomeWorkspaceNextStep {
   const basePath = options.basePath ?? '/dashboard';
+  const completionStep = getProfileCompletionNextStep(completion, options);
+  if (completionStep) return completionStep;
+
   const state = getHomeLoopState(completion, options);
 
   if (state === 'complete_identity') {
-    return (
-      getProfileCompletionNextStep(completion, options) ?? {
-        title: 'Complete your CodeCard',
-        detail: 'Add the details visitors see first: headline, bio, photo, and a profile link.',
-        href: workspacePath(basePath, '#profile'),
-      }
-    );
+    return {
+      title: 'Complete your CodeCard',
+      detail: 'Add the details visitors see first: headline, bio, photo, and a profile link.',
+      href: workspacePath(basePath, '#profile'),
+    };
   }
 
   if (state === 'create_project') {

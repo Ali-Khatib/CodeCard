@@ -13,6 +13,15 @@ describe('first-user Home loop', () => {
     expect(page).toContain('hasAnyProject={completionResult.hasAnyProject}');
   });
 
+  it('keeps the live demo Home next step on profile completion until 100%', () => {
+    const demo = read('src/app/demo/page.tsx');
+    const workspace = read('src/lib/dashboard/workspace-demo.ts');
+    expect(demo).toContain('getDemoProfileCompletion');
+    expect(demo).toContain('getDemoHomeSuggestedStep');
+    expect(workspace).toContain('completion.percentage < 100');
+    expect(workspace).toContain('DEMO_SUGGESTED_STEP');
+  });
+
   it('hides competing Home surfaces until the card is public', () => {
     const overview = read('src/components/dashboard/dashboard-overview-view.tsx');
     expect(overview).toContain("loopState === 'complete_identity'");
@@ -20,6 +29,8 @@ describe('first-user Home loop', () => {
     expect(overview).toContain('showShare');
     expect(overview).toContain('showWork');
     expect(overview).toContain('showLaterSurfaces');
+    expect(overview).toContain('showCompletion = completion.percentage < 100');
+    expect(overview).toContain('Suggested next step');
     expect(overview).toContain('Continue building');
   });
 

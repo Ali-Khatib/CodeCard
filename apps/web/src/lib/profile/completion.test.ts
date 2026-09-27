@@ -12,6 +12,7 @@ import {
   hasPersistedAvatar,
   hasPersistedBio,
   hasPersistedHeadline,
+  hasPersistedSkills,
 } from './completion';
 
 const emptyInput = {
@@ -20,7 +21,12 @@ const emptyInput = {
   hasAvatar: false,
   hasProfileLink: false,
   hasPublishedProject: false,
+  hasSkills: false,
 };
+
+function percentForCount(count: number) {
+  return Math.round((count / PROFILE_COMPLETION_TOTAL) * 100);
+}
 
 describe('calculateProfileCompletion', () => {
   it('returns 0% when no criteria are complete', () => {
@@ -28,7 +34,7 @@ describe('calculateProfileCompletion', () => {
     expect(result.percentage).toBe(0);
     expect(result.completedCount).toBe(0);
     expect(result.totalCount).toBe(PROFILE_COMPLETION_TOTAL);
-    expect(result.incompleteCriteria).toHaveLength(5);
+    expect(result.incompleteCriteria).toHaveLength(PROFILE_COMPLETION_TOTAL);
   });
 
   it.each([
@@ -37,33 +43,35 @@ describe('calculateProfileCompletion', () => {
     ['avatar', { hasAvatar: true }],
     ['profile link', { hasProfileLink: true }],
     ['published project', { hasPublishedProject: true }],
-  ] as const)('returns 20%% when only %s is complete', (_label, partial) => {
+    ['skills', { hasSkills: true }],
+  ] as const)('returns one-criterion weight when only %s is complete', (_label, partial) => {
     const result = calculateProfileCompletion({ ...emptyInput, ...partial });
+    expect(result.percentage).toBe(percentForCount(1));
     expect(result.percentage).toBe(PROFILE_COMPLETION_WEIGHT);
     expect(result.completedCount).toBe(1);
   });
 
-  it('returns 40% when two criteria are complete', () => {
+  it('returns two-criterion percent when two criteria are complete', () => {
     const result = calculateProfileCompletion({
       ...emptyInput,
       hasHeadline: true,
       hasBio: true,
     });
-    expect(result.percentage).toBe(40);
+    expect(result.percentage).toBe(percentForCount(2));
     expect(result.completedCount).toBe(2);
   });
 
-  it('returns 60% when three criteria are complete', () => {
+  it('returns three-criterion percent when three criteria are complete', () => {
     const result = calculateProfileCompletion({
       ...emptyInput,
       hasHeadline: true,
       hasBio: true,
       hasAvatar: true,
     });
-    expect(result.percentage).toBe(60);
+    expect(result.percentage).toBe(percentForCount(3));
   });
 
-  it('returns 80% when four criteria are complete', () => {
+  it('returns four-criterion percent when four criteria are complete', () => {
     const result = calculateProfileCompletion({
       ...emptyInput,
       hasHeadline: true,
@@ -71,19 +79,20 @@ describe('calculateProfileCompletion', () => {
       hasAvatar: true,
       hasProfileLink: true,
     });
-    expect(result.percentage).toBe(80);
+    expect(result.percentage).toBe(percentForCount(4));
   });
 
-  it('returns 100% when all five criteria are complete', () => {
+  it('returns 100% when all criteria are complete', () => {
     const result = calculateProfileCompletion({
       hasHeadline: true,
       hasBio: true,
       hasAvatar: true,
       hasProfileLink: true,
       hasPublishedProject: true,
+      hasSkills: true,
     });
     expect(result.percentage).toBe(100);
-    expect(result.completedCount).toBe(5);
+    expect(result.completedCount).toBe(PROFILE_COMPLETION_TOTAL);
     expect(result.incompleteCriteria).toHaveLength(0);
   });
 
@@ -94,9 +103,10 @@ describe('calculateProfileCompletion', () => {
       hasAvatar: true,
       hasProfileLink: true,
       hasPublishedProject: true,
+      hasSkills: true,
     });
     expect(result.percentage).toBeLessThanOrEqual(100);
-    expect(result.totalCount).toBe(5);
+    expect(result.totalCount).toBe(PROFILE_COMPLETION_TOTAL);
   });
 
   it('ignores whitespace-only headline and bio values', () => {
@@ -107,12 +117,15 @@ describe('calculateProfileCompletion', () => {
     expect(input.hasHeadline).toBe(false);
     expect(input.hasBio).toBe(false);
     expect(input.hasAvatar).toBe(true);
+    expect(input.hasSkills).toBe(false);
   });
 
-  it('ignores whitespace-only avatar values', () => {
+  it('ignores whitespace-only avatar and skills values', () => {
     expect(hasPersistedAvatar('   ')).toBe(false);
     expect(hasPersistedHeadline('Engineer')).toBe(true);
     expect(hasPersistedBio('Builder')).toBe(true);
+    expect(hasPersistedSkills(['  ', ''])).toBe(false);
+    expect(hasPersistedSkills(['TypeScript'])).toBe(true);
   });
 });
 
@@ -124,6 +137,7 @@ describe('getProfileCompletionNextStep', () => {
       hasAvatar: true,
       hasProfileLink: true,
       hasPublishedProject: false,
+      hasSkills: true,
     });
     const step = getProfileCompletionNextStep(completion, { hasAnyProject: false });
     expect(step?.href).toBe('/dashboard/projects/new');
@@ -148,8 +162,23 @@ describe('getProfileCompletionNextStep', () => {
       hasAvatar: true,
       hasProfileLink: true,
       hasPublishedProject: true,
+      hasSkills: true,
     });
     expect(getProfileCompletionNextStep(completion, { hasAnyProject: true })).toBeNull();
+  });
+
+  it('points missing skills to the skills field', () => {
+    const completion = calculateProfileCompletion({
+      hasHeadline: true,
+      hasBio: true,
+      hasAvatar: true,
+      hasProfileLink: true,
+      hasPublishedProject: true,
+      hasSkills: false,
+    });
+    const step = getProfileCompletionNextStep(completion, { hasAnyProject: true });
+    expect(step?.title).toBe('Add your skills');
+    expect(step?.href).toBe('/dashboard#skills');
   });
 });
 
@@ -160,6 +189,7 @@ describe('getHomeLoopState', () => {
     hasAvatar: true,
     hasProfileLink: true,
     hasPublishedProject: false,
+    hasSkills: false,
   });
   const fullyComplete = calculateProfileCompletion({
     hasHeadline: true,
@@ -167,6 +197,7 @@ describe('getHomeLoopState', () => {
     hasAvatar: true,
     hasProfileLink: true,
     hasPublishedProject: true,
+    hasSkills: true,
   });
 
   it('is complete_identity until headline, bio, avatar, and a link exist', () => {
@@ -187,12 +218,12 @@ describe('getHomeLoopState', () => {
     ).toBe('/dashboard/projects/new');
   });
 
-  it('asks to publish the CodeCard once any project exists and the card is private', () => {
+  it('asks to publish the CodeCard once the profile is complete and the card is private', () => {
     expect(getHomeLoopState(identityReady, { hasAnyProject: true, isPublic: false })).toBe(
       'publish_card',
     );
     expect(
-      getHomeWorkspaceNextStep(identityReady, { hasAnyProject: true, isPublic: false }).title,
+      getHomeWorkspaceNextStep(fullyComplete, { hasAnyProject: true, isPublic: false }).title,
     ).toBe('Publish your CodeCard');
   });
 
@@ -223,15 +254,34 @@ describe('getHomeWorkspaceNextStep', () => {
     expect(step.title).toBe('Add a headline');
   });
 
-  it('does not send a draft-only user to publish-a-project instead of publish-the-card', () => {
-    const identityReady = calculateProfileCompletion({
+  it('keeps profile-completion steps on Home until 100%, then suggests publish/share', () => {
+    const almostDone = calculateProfileCompletion({
       hasHeadline: true,
       hasBio: true,
       hasAvatar: true,
       hasProfileLink: true,
-      hasPublishedProject: false,
+      hasPublishedProject: true,
+      hasSkills: false,
     });
-    const step = getHomeWorkspaceNextStep(identityReady, { hasAnyProject: true, isPublic: false });
-    expect(step.href).toBe('/dashboard#visibility');
+    expect(almostDone.percentage).toBeLessThan(100);
+    expect(
+      getHomeWorkspaceNextStep(almostDone, { hasAnyProject: true, isPublic: true }).title,
+    ).toBe('Add your skills');
+
+    const complete = calculateProfileCompletion({
+      hasHeadline: true,
+      hasBio: true,
+      hasAvatar: true,
+      hasProfileLink: true,
+      hasPublishedProject: true,
+      hasSkills: true,
+    });
+    expect(complete.percentage).toBe(100);
+    expect(
+      getHomeWorkspaceNextStep(complete, { hasAnyProject: true, isPublic: false }).href,
+    ).toBe('/dashboard#visibility');
+    expect(
+      getHomeWorkspaceNextStep(complete, { hasAnyProject: true, isPublic: true }).href,
+    ).toBe('/dashboard#share');
   });
 });

@@ -1,4 +1,12 @@
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
+import {
+  calculateProfileCompletion,
+  deriveProfileCompletionInput,
+  getHomeWorkspaceNextStep,
+  type HomeWorkspaceNextStep,
+  type ProfileCompletionResult,
+} from '@/lib/profile/completion';
 import { DEMO_PROFILE } from '@/lib/projects/demo-data';
 
 export type WorkspaceActivity = {
@@ -45,9 +53,44 @@ export const DEMO_WORKSPACE = {
   username: 'alexchen',
   avatarUrl: DEMO_PROFILE.avatar_url,
   profileSlug: 'demo',
-  completion: 78,
+  completion: calculateProfileCompletion(
+    deriveProfileCompletionInput(DEMO_PROFILE, {
+      hasProfileLink: DEMO_PROFILE.links.length > 0,
+      hasPublishedProject: true,
+    }),
+    { hasAnyProject: true },
+  ).percentage,
   profileReach: 1284,
 };
+
+export function getDemoProfileCompletion(
+  basePath = LIVE_DEMO_WORKSPACE_HREF,
+): ProfileCompletionResult {
+  return calculateProfileCompletion(
+    deriveProfileCompletionInput(DEMO_PROFILE, {
+      hasProfileLink: DEMO_PROFILE.links.length > 0,
+      hasPublishedProject: true,
+    }),
+    { hasAnyProject: true, basePath },
+  );
+}
+
+export function getDemoHomeSuggestedStep(
+  basePath = LIVE_DEMO_WORKSPACE_HREF,
+): HomeWorkspaceNextStep {
+  const completion = getDemoProfileCompletion(basePath);
+  if (completion.percentage < 100) {
+    return getHomeWorkspaceNextStep(completion, {
+      hasAnyProject: true,
+      isPublic: true,
+      basePath,
+    });
+  }
+  return {
+    ...DEMO_SUGGESTED_STEP,
+    href: `${basePath.replace(/\/$/, '')}/work`,
+  };
+}
 
 export const DEMO_OVERVIEW_ACTIVITY: WorkspaceActivity[] = [
   { id: '1', text: 'Jordan scanned your CodeCard QR at DevConf', time: '4m ago' },
