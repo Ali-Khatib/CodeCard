@@ -3650,6 +3650,103 @@ html.dark .cc-analytics-project-panel .cc-app-section-subtitle {
 }
 
 /* Static neon edge — no pointer-tracking JS (smooth on phones) */
+.cc-analytics-decision {
+  display: grid;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .cc-analytics-decision {
+    grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+  }
+}
+
+.cc-analytics-coach {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.cc-analytics-coach__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  max-height: 16.5rem;
+  overflow: auto;
+  list-style: none;
+}
+
+.cc-analytics-coach__empty {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--app-bone);
+  color: var(--app-smoke);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.cc-analytics-coach__bubble {
+  max-width: 94%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.cc-analytics-coach__bubble p {
+  margin: 0;
+}
+
+.cc-analytics-coach__bubble--user {
+  align-self: flex-end;
+  background: var(--app-ink);
+  color: var(--app-paper);
+}
+
+.cc-analytics-coach__bubble--assistant {
+  align-self: flex-start;
+  background: var(--app-bone);
+  color: var(--app-ink);
+}
+
+.cc-analytics-coach__prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cc-analytics-coach__prompt {
+  border: 1px solid var(--app-border-strong);
+  border-radius: 999px;
+  background: var(--app-paper);
+  color: var(--app-ink);
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 560;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cc-analytics-coach__prompt:hover {
+  border-color: var(--app-iris);
+}
+
+.cc-analytics-coach__form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cc-analytics-coach__form .cc-app-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .cc-analytics-project-card {
   position: relative;
   isolation: isolate;

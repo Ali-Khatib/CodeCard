@@ -14,6 +14,7 @@ import { buildOwnerAnalyticsReview } from '@/lib/dashboard/analytics-review';
 import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
+import { AnalyticsCoachChat } from './analytics/analytics-coach-chat';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
   AppButton,
@@ -64,6 +65,8 @@ export function DashboardAnalyticsView({
   const isZeroState = !summary.hasAnyEvents;
   const publicHref = profileSlug ? `/${profileSlug}` : null;
   const copy = EMPTY_STATE_COPY.analytics;
+  const review =
+    !isZeroState && entitlement.aiReview ? buildOwnerAnalyticsReview(summary) : null;
 
   return (
     <div className="cc-app-page cc-app-page--1040 space-y-8">
@@ -113,9 +116,9 @@ export function DashboardAnalyticsView({
 
       {!isZeroState ? (
         <>
-          <FadeInView delay={0}>
-            {entitlement.aiReview ? (
-              <AnalyticsAiInsights insights={buildOwnerAnalyticsReview(summary)} />
+          <FadeInView delay={0} className="cc-analytics-decision">
+            {review ? (
+              <AnalyticsAiInsights insights={review} />
             ) : (
               <AppCard className="!border-[var(--app-border-strong)] !p-6" data-analytics-review-locked>
                 <SectionLabel>A read of your numbers</SectionLabel>
@@ -128,6 +131,27 @@ export function DashboardAnalyticsView({
                 <div className="mt-4 flex flex-wrap gap-3">
                   <AppButton variant="soft" href="/dashboard/billing">
                     Unlock this review
+                  </AppButton>
+                  <AppButton variant="ghost" href={`${LIVE_DEMO_WORKSPACE_HREF}/analytics`}>
+                    See a sample
+                  </AppButton>
+                </div>
+              </AppCard>
+            )}
+            {review ? (
+              <AnalyticsCoachChat review={review} summary={summary} />
+            ) : (
+              <AppCard className="!border-[var(--app-border-strong)] !p-6" data-analytics-coach-locked>
+                <SectionLabel>Ask these numbers</SectionLabel>
+                <p className="mt-3 text-[17px] font-semibold tracking-[-0.02em] text-[var(--app-ink)]">
+                  A coach that turns views into a decision — what to move, what to leave.
+                </p>
+                <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-muted)]">
+                  Try the sample conversation in the live demo, then unlock it here.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <AppButton variant="soft" href="/dashboard/billing">
+                    Unlock this coach
                   </AppButton>
                   <AppButton variant="ghost" href={`${LIVE_DEMO_WORKSPACE_HREF}/analytics`}>
                     See a sample

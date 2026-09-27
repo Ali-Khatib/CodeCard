@@ -131,6 +131,11 @@ export function GuidePage() {
               <Link href={section.extra.href} className="cc-guide-section__try">
                 {section.extra.hrefLabel}
               </Link>
+              {section.extra.frame ? (
+                <div className="cc-guide-section__frame cc-guide-section__frame--extra">
+                  <EditorialProductFrame state={section.extra.frame} size="lg" />
+                </div>
+              ) : null}
             </aside>
           ) : null}
         </section>

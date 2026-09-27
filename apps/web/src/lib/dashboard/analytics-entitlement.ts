@@ -2,8 +2,9 @@
  * Plan gating for owner analytics.
  *
  * `PLANS.free` advertises "Basic analytics" while `PLANS.pro` advertises
- * "Visitor insights", "Per research paper analytics", and
- * "AI review of your analytics". The gate is applied to the aggregate BEFORE
+ * "Visitor insights", "Per research paper analytics",
+ * "AI review of your analytics", and "Analytics coach for your card". The gate
+ * is applied to the aggregate BEFORE
  * it leaves the server, so a free-plan response never carries Pro-only rows
  * for the client to reveal. The review is derived on the client from fields
  * the owner already received.

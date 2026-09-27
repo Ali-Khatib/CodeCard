@@ -11,6 +11,7 @@ import { Sparkline } from './sparkline';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsHumeChart } from './analytics/analytics-hume-chart';
 import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
+import { AnalyticsCoachChat } from './analytics/analytics-coach-chat';
 import { AnalyticsGuestStats } from './analytics/analytics-guest-stats';
 import { AnalyticsGeoPanel } from './analytics/analytics-geo-panel';
 import { AnalyticsProjectPanel } from './analytics/analytics-project-panel';
@@ -44,8 +45,9 @@ export function PreviewAnalyticsView({ displayName = 'Alex Chen' }: { displayNam
         }
       />
 
-      <FadeInView delay={0}>
+      <FadeInView delay={0} className="cc-analytics-decision">
         <AnalyticsAiInsights insights={data.insights} sample />
+        <AnalyticsCoachChat review={data.insights} sample />
       </FadeInView>
 
       <FadeInView delay={0.04}>

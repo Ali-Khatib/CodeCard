@@ -158,6 +158,10 @@
   letter-spacing: -0.03em;
 }
 
+.cc-guide-section__frame--extra {
+  margin-top: 1.5rem;
+}
+
 @media (max-width: 720px) {
   .cc-guide-jump {
     top: 4.15rem;

@@ -35,6 +35,7 @@ export type GuideSection = {
     body: string;
     href: string;
     hrefLabel: string;
+    frame?: GuideFrameState;
   };
 };
 
@@ -116,19 +117,28 @@ export const GUIDE_SECTIONS: GuideSection[] = [
   {
     id: 'analytics',
     nav: 'Analytics',
-    title: 'Analytics shows how people used the card',
+    title: 'Analytics turns looks into a decision',
     kicker: 'Analytics',
     lead:
-      'After the introduction, you can see whether people opened the card, clicked a project, or used a link. It is a glance, not a growth dashboard.',
+      'After the introduction you can see whether people opened the card, clicked a project, or used a link. The review and the coach sit at the top so the numbers become a next move, not a chart to stare at.',
     points: [
       'Profile views and project opens tell you if the card was actually used.',
       'A plain-language review says which project to move up, and what the traffic means.',
+      'Ask the coach a question. It stays on your numbers and answers in decisions: what to lead with, what to leave.',
       'Link clicks show which outbound links visitors trusted.',
       'Use it to decide what to publish next, not to chase vanity numbers.',
     ],
     demoHref: `${LIVE_DEMO_WORKSPACE_HREF}/analytics`,
     demoLabel: 'Open Analytics in the live demo',
     frame: 'analysis',
+    extra: {
+      title: 'The review, then the conversation',
+      body:
+        'The sample review sits on the left. The coach sits beside it so you can ask the next question without scrolling past the charts. Try “Which project should I put first?” on Alex Chen’s card.',
+      href: `${LIVE_DEMO_WORKSPACE_HREF}/analytics`,
+      hrefLabel: 'Ask the sample coach',
+      frame: 'analysis',
+    },
   },
   {
     id: 'settings',

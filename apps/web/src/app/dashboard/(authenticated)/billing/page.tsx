@@ -154,8 +154,8 @@ export default async function BillingPage() {
               </p>
               <p className="mt-2 text-[15px] text-[var(--app-muted)]">
                 Upgrade for ${PLANS.pro.priceMonthly}/mo for unlimited projects plus visitor insights,
-                per-paper analytics, and an AI review of your analytics. Custom domains, AI
-                assistance, and presentations are planned and are not included yet.
+                per-paper analytics, an AI review of your analytics, and an analytics coach.
+                Custom domains, AI assistance, and presentations are planned and are not included yet.
               </p>
             </>
           )}

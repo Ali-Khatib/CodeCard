@@ -24,9 +24,11 @@ describe('marketing Guide walkthrough', () => {
     expect(GUIDE_SECTIONS.find((section) => section.id === 'work')?.points.join(' ')).toContain(
       'mini presentation',
     );
-    expect(GUIDE_SECTIONS.find((section) => section.id === 'analytics')?.points.join(' ')).toContain(
-      'plain-language review',
-    );
+    const analytics = GUIDE_SECTIONS.find((section) => section.id === 'analytics');
+    expect(analytics?.points.join(' ')).toContain('plain-language review');
+    expect(analytics?.points.join(' ')).toContain('Ask the coach');
+    expect(analytics?.extra?.frame).toBe('analysis');
+    expect(analytics?.extra?.title).toMatch(/review|conversation/i);
   });
 
   it('is a dedicated page from the landing pill, not an in-page tab', () => {
@@ -38,6 +40,7 @@ describe('marketing Guide walkthrough', () => {
     expect(view).toContain('cc-guide-jump');
     expect(view).toContain('jumpToSection');
     expect(view).toContain('EditorialProductFrame');
+    expect(view).toContain('section.extra.frame');
     expect(how).toContain('permanentRedirect');
     expect(how).toContain('MARKETING_GUIDE_HREF');
   });

@@ -21,7 +21,7 @@ const FAQ = [
   },
   {
     q: 'What do I get with Pro?',
-    a: 'Pro includes unlimited projects, custom domains, AI assistance for creating projects, AI-generated presentation and writing inside projects, per-project peer research analysis, per-project peer project analysis, premium analytics, an AI review of your analytics, per-research-paper analytics, and visitor insights.',
+    a: 'Pro includes unlimited projects, custom domains, AI assistance for creating projects, AI-generated presentation and writing inside projects, per-project peer research analysis, per-project peer project analysis, premium analytics, an AI review of your analytics, an analytics coach for your card, per-research-paper analytics, and visitor insights.',
   },
   {
     q: 'How does billing work?',

@@ -5,6 +5,7 @@ import { EMPTY_STATE_COPY } from './empty-state-copy';
 import { isAnalyticsTrendRange } from './analytics-trends';
 import { PRO_ANALYTICS_SECTIONS } from './analytics-entitlement';
 import { ANALYTICS_REVIEW_FEATURE } from './analytics-review';
+import { ANALYTICS_COACH_FEATURE } from './analytics-coach';
 import { PLANS } from '@codecard/config';
 
 function read(rel: string) {
@@ -70,6 +71,8 @@ describe('Analytics product contract', () => {
     expect(view).not.toContain('AnalyticsGeoPanel');
     expect(view).not.toContain('AnalyticsGuestStats');
     expect(view).toContain('AnalyticsAiInsights');
+    expect(view).toContain('AnalyticsCoachChat');
+    expect(view).toContain('cc-analytics-decision');
     expect(view).toContain('entitlement.aiReview');
     expect(view).toContain('buildOwnerAnalyticsReview');
   });
@@ -86,10 +89,13 @@ describe('Analytics product contract', () => {
     expect(view).toContain('How people reach you');
     expect(view).toContain('Per research paper analytics');
     expect(view).toContain('Unlock this review');
+    expect(view).toContain('Unlock this coach');
+    expect(view).toContain('data-analytics-coach-locked');
     expect(view).toContain('See a sample');
     expect(view).toContain('LIVE_DEMO_WORKSPACE_HREF');
     expect(view).not.toContain('Upgrade to Pro');
     expect(PLANS.pro.features).toContain(ANALYTICS_REVIEW_FEATURE);
+    expect(PLANS.pro.features).toContain(ANALYTICS_COACH_FEATURE);
   });
 
   it('keeps trend ranges to query-backed 7 and 30 UTC days', () => {
@@ -114,10 +120,13 @@ describe('Analytics product contract', () => {
     expect(previewView).toContain('not live visitor data');
     expect(previewView).toContain('buildAnalyticsData');
     expect(previewView).toContain('AnalyticsAiInsights');
+    expect(previewView).toContain('AnalyticsCoachChat');
+    expect(previewView).toContain('cc-analytics-decision');
     expect(previewView).toContain('sample');
     const pricing = read('src/components/landing/pricing-landing-page.tsx');
     expect(pricing).toContain('plan.features');
     expect(pricing).toContain('AI review of your analytics');
+    expect(pricing).toContain('analytics coach for your card');
     expect(demoData).toContain('Preview/demo sample analytics only');
   });
 });
