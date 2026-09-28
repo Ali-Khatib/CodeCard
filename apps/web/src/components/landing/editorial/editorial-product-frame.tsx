@@ -214,21 +214,23 @@ export function EditorialProductFrame({
           (!shot && state === 'profile') ? (
             <DashboardOverviewView
               guideFocus={
-                shot === 'home-share'
-                  ? 'share'
-                  : shot === 'home-identity'
-                    ? 'identity'
-                    : shot === 'home-calendar'
-                      ? 'calendar'
-                      : shot === 'home-work'
-                        ? 'work'
-                        : shot === 'home-reach'
-                          ? 'reach'
-                          : shot === 'home-circle'
-                            ? 'circle'
-                            : shot === 'home-desk'
-                              ? 'desk'
-                              : undefined
+                shot === 'home-overview' || !shot
+                  ? undefined
+                  : shot === 'home-share'
+                    ? 'share'
+                    : shot === 'home-identity'
+                      ? 'identity'
+                      : shot === 'home-calendar'
+                        ? 'calendar'
+                        : shot === 'home-work'
+                          ? 'work'
+                          : shot === 'home-reach'
+                            ? 'reach'
+                            : shot === 'home-circle'
+                              ? 'circle'
+                              : shot === 'home-desk'
+                                ? 'desk'
+                                : undefined
               }
               hasAnyProject
               greeting={greetingForHour()}
