@@ -105,18 +105,10 @@ const DashboardConnectionsView = dynamic(
   { ssr: true },
 );
 
-const DashboardProjectsPortfolio = dynamic(
+const DashboardYourWorkView = dynamic(
   () =>
-    import('@/components/dashboard/dashboard-projects-portfolio').then(
-      (m) => m.DashboardProjectsPortfolio,
-    ),
-  { ssr: true },
-);
-
-const DashboardResearchView = dynamic(
-  () =>
-    import('@/components/dashboard/dashboard-research-view').then(
-      (m) => m.DashboardResearchView,
+    import('@/components/dashboard/dashboard-your-work-view').then(
+      (m) => m.DashboardYourWorkView,
     ),
   { ssr: true },
 );
@@ -222,16 +214,23 @@ export function EditorialProductFrame({
           (!shot && state === 'profile') ? (
             <DashboardOverviewView
               guideFocus={
-                shot === 'home-identity'
-                  ? 'identity'
-                  : shot === 'home-share'
-                    ? 'share'
+                shot === 'home-share'
+                  ? 'share'
+                  : shot === 'home-identity'
+                    ? 'identity'
                     : shot === 'home-calendar'
                       ? 'calendar'
-                      : shot === 'home-desk'
-                        ? 'desk'
-                        : undefined
+                      : shot === 'home-work'
+                        ? 'work'
+                        : shot === 'home-reach'
+                          ? 'reach'
+                          : shot === 'home-circle'
+                            ? 'circle'
+                            : shot === 'home-desk'
+                              ? 'desk'
+                              : undefined
               }
+              hasAnyProject
               greeting={greetingForHour()}
               displayName={DEMO_WORKSPACE.displayName}
               completion={overviewCompletion}
@@ -298,12 +297,21 @@ export function EditorialProductFrame({
               followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}
             />
           ) : null}
-          {tab === 'projects' && shot !== 'work-project' ? (
-            <DashboardProjectsPortfolio
+          {shot === 'work-projects' ||
+          shot === 'work-research' ||
+          (!shot && (tab === 'projects' || tab === 'research')) ? (
+            <DashboardYourWorkView
               creator={portfolioCreator}
               projects={portfolioProjects}
+              papers={publishedPapers}
+              profileSlug={DEMO_WORKSPACE.profileSlug}
+              isProfilePublic
               basePath={LIVE_DEMO_WORKSPACE_HREF}
-              viewMode="stack"
+              guideFocus={
+                shot === 'work-research' || (!shot && tab === 'research')
+                  ? 'research'
+                  : 'projects'
+              }
             />
           ) : null}
           {shot === 'work-project' && DEMO_FEATURED_PROJECTS[0] ? (
@@ -318,15 +326,6 @@ export function EditorialProductFrame({
                 backLabel="Your Work"
               />
             </Suspense>
-          ) : null}
-          {tab === 'research' ? (
-            <DashboardResearchView
-              papers={publishedPapers}
-              profileSlug={DEMO_WORKSPACE.profileSlug}
-              isProfilePublic
-              basePath={LIVE_DEMO_WORKSPACE_HREF}
-              viewMode="list"
-            />
           ) : null}
           {tab === 'circle' ? <DashboardCircleView /> : null}
           {tab === 'connections' ? (

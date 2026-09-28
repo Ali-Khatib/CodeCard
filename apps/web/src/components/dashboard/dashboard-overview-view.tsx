@@ -80,7 +80,7 @@ export type OverviewProps = {
   followUps?: HomeFollowUp[];
   scheduleError?: boolean;
   /** Guide snapshots: show one Home zone instead of the full desk. */
-  guideFocus?: 'desk' | 'identity' | 'share' | 'calendar';
+  guideFocus?: 'desk' | 'share' | 'identity' | 'calendar' | 'work' | 'reach' | 'circle';
 };
 
 const PREVIEW_SPARKS: Record<'profileViews' | 'projectOpens', number[]> = {
@@ -144,10 +144,14 @@ export function DashboardOverviewView({
     { key: 'projectOpens', label: 'Project opens' },
   ];
   const circleHref = `${basePath}/circle`;
-  const showDesk = !guideFocus || guideFocus === 'desk';
-  const showIdentityZone = !guideFocus || guideFocus === 'identity';
-  const showShareZone = !guideFocus || guideFocus === 'share';
-  const showCalendarZone = !guideFocus || guideFocus === 'calendar';
+  const focused = Boolean(guideFocus);
+  const showDesk = !focused || guideFocus === 'desk';
+  const showIdentityZone = !focused || guideFocus === 'identity';
+  const showShareZone = !focused || guideFocus === 'share';
+  const showCalendarZone = !focused || guideFocus === 'calendar';
+  const showWorkZone = focused ? guideFocus === 'work' : showWork;
+  const showReachZone = focused ? guideFocus === 'reach' : showLaterSurfaces;
+  const showCircleZone = focused ? guideFocus === 'circle' : showLaterSurfaces;
 
   useEffect(() => {
     const flag = sessionStorage.getItem(SHARE_LINK_COPIED_FLAG);
@@ -297,7 +301,7 @@ export function DashboardOverviewView({
       />
       ) : null}
 
-      {showDesk && showWork ? (
+      {showWorkZone ? (
       <FadeInView delay={0.18}>
         <section className="cc-profile-home__zone" aria-label="Your work">
           <div className="cc-profile-home__zone-head">
@@ -436,8 +440,9 @@ export function DashboardOverviewView({
       </FadeInView>
       ) : null}
 
-      {showDesk && showLaterSurfaces ? (
+      {showReachZone || showCircleZone ? (
         <>
+      {showReachZone ? (
       <FadeInView delay={0.2}>
         <section className="cc-profile-home__zone" aria-label="Audience reach">
           <div className="cc-profile-home__zone-head">
@@ -490,7 +495,9 @@ export function DashboardOverviewView({
           )}
         </section>
       </FadeInView>
+      ) : null}
 
+      {showCircleZone ? (
       <FadeInView delay={0.24}>
         <section className="cc-profile-home__zone cc-home-circle-glance" aria-label="From your Circle">
           <div className="cc-profile-home__zone-head">
@@ -570,6 +577,7 @@ export function DashboardOverviewView({
           )}
         </section>
       </FadeInView>
+      ) : null}
         </>
       ) : null}
     </div>

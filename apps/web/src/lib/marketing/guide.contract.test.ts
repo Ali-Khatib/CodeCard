@@ -19,7 +19,7 @@ describe('marketing Guide walkthrough', () => {
       'Settings',
     ]);
     expect(GUIDE_SECTIONS.find((section) => section.id === 'connections')?.lead).toContain(
-      'scans your QR',
+      'scan your QR',
     );
     expect(GUIDE_SECTIONS.find((section) => section.id === 'work')?.points.join(' ')).toContain(
       'mini presentation',
@@ -35,9 +35,12 @@ describe('marketing Guide walkthrough', () => {
     expect(GUIDE_SECTIONS.every((section) => section.shots.length >= 1)).toBe(true);
     expect(shots.map((shot) => shot.shot)).toEqual([
       'home-desk',
-      'home-identity',
       'home-share',
+      'home-identity',
       'home-calendar',
+      'home-work',
+      'home-reach',
+      'home-circle',
       'work-projects',
       'work-project',
       'work-research',
@@ -62,6 +65,11 @@ describe('marketing Guide walkthrough', () => {
       '05 · Analytics',
       '06 · Settings',
     ]);
+    const home = read('src/components/dashboard/dashboard-overview-view.tsx');
+    expect(home).toContain("guideFocus === 'work'");
+    expect(home).toContain("guideFocus === 'reach'");
+    expect(home).toContain("guideFocus === 'circle'");
+    expect(home).not.toContain('showDesk && showWork');
   });
 
   it('is a dedicated page from the landing pill, not an in-page tab', () => {

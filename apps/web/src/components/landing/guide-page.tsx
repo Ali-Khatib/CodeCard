@@ -182,8 +182,8 @@ export function GuidePage() {
         <p className="cc-guide-hero__kicker">Guide</p>
         <h1 className="cc-guide-hero__title">How the workspace works</h1>
         <p className="cc-guide-hero__lead">
-          Same six tabs as the live demo, in this order. Read each step, look at the
-          screen, then try it on Alex Chen&apos;s card.
+          Six tabs, in this order. Each step is one screen and what it does.
+          Then try it on Alex Chen&apos;s card.
         </p>
         <LiveDemoLink className="cc-guide-hero__demo">Open the live demo</LiveDemoLink>
       </header>

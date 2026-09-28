@@ -35,6 +35,7 @@ export function DashboardYourWorkView({
   isProfilePublic = false,
   basePath = '/dashboard',
   openTransition,
+  guideFocus,
 }: {
   creator: PortfolioCreator;
   projects: PortfolioProject[];
@@ -45,11 +46,14 @@ export function DashboardYourWorkView({
   isProfilePublic?: boolean;
   basePath?: string;
   openTransition?: PortfolioOpenTransition;
+  guideFocus?: 'projects' | 'research';
 }) {
   const [viewMode, setViewMode] = useState<WorkViewMode>('list');
   const hasProjects = projects.length > 0 && !emptyProjects;
   const hasPapers = papers.length > 0;
   const emptyWorkspace = !hasProjects && !hasPapers;
+  const showProjects = !guideFocus || guideFocus === 'projects';
+  const showResearch = !guideFocus || guideFocus === 'research';
   const publicCardHref = profileSlug ? publicDemoProfileBasePath(profileSlug) : null;
   const projectCountLabel = `${projects.length} project${projects.length === 1 ? '' : 's'}`;
   const paperCountLabel = `${papers.length} paper${papers.length === 1 ? '' : 's'}`;
@@ -124,6 +128,7 @@ export function DashboardYourWorkView({
         </div>
       ) : (
         <>
+          {showProjects ? (
           <section
             id="projects"
             className="cc-your-work__section scroll-mt-24"
@@ -149,7 +154,9 @@ export function DashboardYourWorkView({
               viewMode={viewMode === 'grid' ? 'grid' : 'stack'}
             />
           </section>
+          ) : null}
 
+          {showResearch ? (
           <section
             id="research"
             className="cc-your-work__section scroll-mt-24"
@@ -175,6 +182,7 @@ export function DashboardYourWorkView({
               viewMode={viewMode}
             />
           </section>
+          ) : null}
         </>
       )}
     </div>
