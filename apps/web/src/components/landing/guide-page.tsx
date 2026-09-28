@@ -1,14 +1,61 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Component, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { EditorialProductFrame } from '@/components/landing/editorial/editorial-product-frame';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { GUIDE_SECTIONS, type GuideSectionId } from '@/lib/marketing/guide-content';
-import '@/styles/editorial-landing.css';
+import { GUIDE_SECTIONS, type GuideSectionId, type GuideShotId } from '@/lib/marketing/guide-content';
 import '@/styles/guide-page.css';
 
 const NAV_OFFSET = 132;
+
+class GuideShotBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) {
+      return <p className="cc-guide-shot__fallback">Snapshot unavailable.</p>;
+    }
+    return this.props.children;
+  }
+}
+
+function GuideLiveShot({ shot }: { shot: GuideShotId }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '320px 0px' },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="cc-guide-section__frame">
+      {visible ? (
+        <GuideShotBoundary>
+          <EditorialProductFrame shot={shot} size="lg" fit="content" />
+        </GuideShotBoundary>
+      ) : (
+        <div className="cc-guide-shot__placeholder" aria-hidden />
+      )}
+    </div>
+  );
+}
 
 function jumpToSection(id: GuideSectionId) {
   const el = document.getElementById(`guide-${id}`);
@@ -91,6 +138,14 @@ export function GuidePage() {
   const [active, setActive] = useState<GuideSectionId>('home');
 
   useEffect(() => {
+    const html = document.documentElement;
+    delete html.dataset.landingChapter;
+    delete html.dataset.navTone;
+    delete html.dataset.navCompact;
+    delete html.dataset.logoTone;
+  }, []);
+
+  useEffect(() => {
     const hash = window.location.hash.replace('#', '') as GuideSectionId;
     if (GUIDE_SECTIONS.some((section) => section.id === hash)) {
       jumpToSection(hash);
@@ -165,9 +220,7 @@ export function GuidePage() {
                   <h3 className="cc-guide-shot__title">{item.title}</h3>
                   <p className="cc-guide-shot__body">{item.caption}</p>
                 </figcaption>
-                <div className="cc-guide-section__frame">
-                  <EditorialProductFrame shot={item.shot} size="lg" fit="content" />
-                </div>
+                <GuideLiveShot shot={item.shot} />
               </figure>
             ))}
           </div>

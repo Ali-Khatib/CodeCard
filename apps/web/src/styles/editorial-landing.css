@@ -90,8 +90,8 @@
   --ed-fg: var(--ed-ink, #232324);
 }
 
-/* Cinema chrome. Guide/FAQ must not use .cc-ed or this restyles their nav. */
-.cc-marketing-shell:has(.cc-ed) {
+/* Cinema chrome only while the landing hero scene is on the page. */
+.cc-marketing-shell:has(.cc-ed-hero-scene) {
   background: var(--ed-cream, #fcf1e7);
   --cc-ed-nav-height: calc(4.25rem + env(safe-area-inset-top, 0px));
   --cc-ed-nav-clearance: var(--cc-ed-nav-height);
@@ -100,7 +100,7 @@
 }
 
 @media (max-width: 767px) {
-  .cc-marketing-shell:has(.cc-ed) {
+  .cc-marketing-shell:has(.cc-ed-hero-scene) {
     --cc-ed-cinema-inset: 4px;
     --cc-ed-cinema-radius: 16px;
   }
@@ -110,13 +110,13 @@
  * Cinema is full viewport; the white page shows through clip-path inset.
  * Chrome sits inside that rounded hero, not in the cream frame.
  */
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-main {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-main {
   padding-top: 0;
 }
 
 /* Floating transparent rounded frame over the hero.
    Fixed so Lenis page transform cannot scroll the nav away. */
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell {
   --cc-ed-nav-end-gutter: clamp(2.75rem, 6.5vw, 3.5rem);
   position: fixed;
   top: 0;
@@ -141,7 +141,7 @@
 }
 
 @media (max-width: 767px) {
-  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell {
+  .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell {
     --cc-ed-nav-end-gutter: clamp(2.55rem, 11vw, 3.1rem);
   }
 
@@ -168,7 +168,7 @@
   transition: color 0.22s ease, text-shadow 0.22s ease, filter 0.35s ease, top 0.01s linear, left 0.01s linear;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-ed-mark-logo:not(.cc-auth-mark) {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-ed-mark-logo:not(.cc-auth-mark) {
   left: calc(var(--cc-ed-cinema-inset, 16px) + clamp(0.7rem, 2vw, 1.15rem));
   top: calc(var(--cc-ed-cinema-inset, 16px) + 0.5rem + env(safe-area-inset-top, 0px));
 }
@@ -239,7 +239,7 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   filter: none;
 }
 
-.cc-marketing-shell:not(:has(.cc-ed)) .cc-ed-home-control {
+.cc-marketing-shell:not(:has(.cc-ed-hero-scene)) .cc-ed-home-control {
   color: var(--ed-ink, #232324);
   filter: none;
 }
@@ -271,7 +271,7 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
 
 /*
  * Unified nav pill items — apply on ALL marketing pages (pricing, demo, etc.),
- * not only editorial home (:has(.cc-ed)). Without this, non-editorial routes
+ * not only editorial home (:has(.cc-ed-hero-scene)). Without this, non-editorial routes
  * render bare 16px links jammed into the glass pill.
  */
 .cc-marketing-shell .cc-nav-pill-item {
@@ -309,7 +309,7 @@ html[data-nav-tone='dark'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-it
 
 html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item,
 html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item,
-.cc-marketing-shell:not(:has(.cc-ed)) .cc-nav-pill-item {
+.cc-marketing-shell:not(:has(.cc-ed-hero-scene)) .cc-nav-pill-item {
   color: var(--ed-ink, #232324);
 }
 
@@ -356,15 +356,15 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
     transition: none;
   }
 
-  html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
-  html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
-  .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before {
+  html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil::before,
+  html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil::before,
+  .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil::before {
     animation: none;
   }
 }
 
 
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil {
   pointer-events: auto;
   color: var(--ed-ink, #232324);
   max-width: 100%;
@@ -372,11 +372,11 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   container-type: inline-size;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil:not(.cc-nav-veil--collapsed),
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil:not(.cc-nav-veil--collapsed) {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed),
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil:not(.cc-nav-veil--collapsed),
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil:not(.cc-nav-veil--collapsed) {
   background: transparent !important;
   filter: none !important;
   backdrop-filter: none !important;
@@ -385,12 +385,12 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   border-radius: 16px !important;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed) {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed) {
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 22%, transparent);
 }
 
 /* Pill nav — frosted glass on non-editorial pages. Editorial uses tone rules below. */
-.cc-marketing-shell:not(:has(.cc-ed)) .cc-marketing-nav-shell .cc-nav-veil {
+.cc-marketing-shell:not(:has(.cc-ed-hero-scene)) .cc-marketing-nav-shell .cc-nav-veil {
   transition:
     background-color 0.55s ease,
     border-color 0.45s ease,
@@ -402,11 +402,11 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 /* Collapsed expand control must stay a clear ghost over Crash Course titles. */
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed,
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil--collapsed,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil--collapsed {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -414,39 +414,39 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   -webkit-backdrop-filter: none !important;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed::before,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed::before,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed::before {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed::before,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed::before,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed::before {
   content: none !important;
   display: none !important;
 }
 
-html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed {
+html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed {
   color: #efedeb;
 }
 
-html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--collapsed svg {
+html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--collapsed svg {
   color: #efedeb;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button {
   transition: color 0.45s ease, background-color 0.45s ease, border-color 0.45s ease;
 }
 
 /* Nav wayfinding must not inherit hero --ed-fg or GSAP partial opacity */
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link {
   opacity: 1;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links {
   width: max-content;
   min-width: 0;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links .cc-hume-fade-group {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -457,7 +457,7 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   gap: clamp(0.2rem, 0.8vw, 0.5rem);
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
   width: max-content;
   max-width: 100%;
   min-height: 3.15rem;
@@ -466,18 +466,18 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--coll
   gap: 0;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-item {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links .cc-hume-fade-item {
   opacity: 1 !important;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:hover) .cc-hume-fade-item,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:focus-visible) .cc-hume-fade-item {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:hover) .cc-hume-fade-item,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links .cc-hume-fade-group:has(.cc-hume-fade-item:focus-visible) .cc-hume-fade-item {
   opacity: 1 !important;
 }
 
 /* Light chapters — transparent rounded frame + ink type */
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -488,67 +488,69 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-sh
   -webkit-backdrop-filter: none;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil::before,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
   display: none;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'] {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-pill-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-hume-fade-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/sign-in'] {
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'] {
   background: transparent;
   color: var(--ed-ink, #232324);
   border: 0;
   box-shadow: none;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo:hover,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, var(--ed-accent, #e95a0b) 12%, transparent);
   border: 0;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-hover-underline {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-hover-underline {
   display: none !important;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-ghost-link::after,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-pill-item.cc-nav-ghost-link::after {
+.cc-marketing-shell .cc-nav-ghost-link::after,
+.cc-marketing-shell .cc-nav-pill-item::after,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-ghost-link::after,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-pill-item.cc-nav-ghost-link::after {
   display: none !important;
   content: none !important;
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-mobile-trigger {
   border-color: color-mix(in srgb, var(--ed-ink, #232324) 16%, transparent);
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--mobile-open {
   background: transparent;
 }
 
 /* Dark chapters — transparent rounded frame + light type */
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -559,56 +561,56 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
   -webkit-backdrop-filter: none;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil::before,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil::before,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
   display: none;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'] {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'],
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/sign-in'] {
   color: #efedeb;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: #efedeb;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a.cc-btn-pill-demo,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a.cc-btn-pill-demo,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'] {
   background: transparent;
   color: #efedeb;
   border: 0;
   box-shadow: none;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo:hover,
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, var(--ed-accent, #e95a0b) 12%, transparent);
   border: 0;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-mobile-trigger {
   border-color: color-mix(in srgb, #efedeb 28%, transparent);
   color: #efedeb;
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--mobile-open {
   background: transparent;
 }
 
 /* Fallback when tone attr missing — cream page under chrome (safe first paint) */
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -619,62 +621,62 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-
   -webkit-backdrop-filter: blur(12px) saturate(1.1);
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil::before,
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil::before,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil::before {
   display: none;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-pill-item,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-hume-fade-item {
   color: var(--ed-ink, #232324);
   transition: color 0.22s ease;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'] {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'] {
   background: transparent;
   color: var(--ed-ink, #232324);
   border: 0;
   box-shadow: none;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo:hover,
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo']:hover {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo:hover,
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo']:hover {
   background: color-mix(in srgb, var(--ed-accent, #e95a0b) 12%, transparent);
   border: 0;
 }
 
 /* Cream mid-chapters — must beat the cinema cream defaults above */
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'] {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-pill-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-hume-fade-item,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'],
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/sign-in'] {
   color: var(--ed-ink, #232324);
 }
 
-html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
 }
 
 /* Override marketing scrolled gradient on editorial — tone rules own the glass surface */
-.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   background:
     linear-gradient(
       135deg,
@@ -683,7 +685,7 @@ html[data-nav-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn
     );
 }
 
-html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   background:
     linear-gradient(
       135deg,
@@ -693,66 +695,66 @@ html[data-nav-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-she
 }
 
 /* Keep nav type locked to the CC mark — same surface, same ink/cream */
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'],
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-pill-item,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-hume-fade-item,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'],
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/sign-in'],
 html[data-logo-tone='dark'] .cc-marketing-shell .cc-nav-pill-item,
 html[data-logo-tone='dark'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item {
   color: var(--ed-ink, #232324);
 }
 
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: var(--ed-ink, #232324);
 }
 
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell .cc-nav-veil,
-html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell .cc-nav-veil,
+html[data-logo-tone='dark'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell--scrolled .cc-nav-veil {
   background: color-mix(in srgb, #ffffff 10%, transparent);
   border: 1px solid color-mix(in srgb, var(--ed-ink, #232324) 14%, transparent);
 }
 
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-brand,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-ghost-link,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-nav-pill-item,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-hume-fade-item,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-demo,
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil [data-live-demo],
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/demo'],
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a[href='/sign-in'],
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-brand,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-ghost-link,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-nav-pill-item,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-hume-fade-item,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-demo,
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil [data-live-demo],
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/demo'],
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a[href='/sign-in'],
 html[data-logo-tone='light'] .cc-marketing-shell .cc-nav-pill-item,
 html[data-logo-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-item {
   color: #efedeb;
 }
 
-html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil .cc-btn-pill-primary {
+html[data-logo-tone='light'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil .cc-btn-pill-primary {
   background: color-mix(in srgb, currentColor 4%, transparent);
   color: #efedeb;
 }
 
-html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button,
-html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil,
-html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil a,
-html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil button {
+html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-landing-chapter='finale'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-landing-chapter='waitlist'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-landing-chapter='demo'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button,
+html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil,
+html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil a,
+html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil button {
   color: var(--ed-ink, #232324);
 }
 
@@ -765,11 +767,11 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed) .cc-nav-veil 
   font-weight: 560;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-mobile-trigger {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-mobile-trigger {
   display: none;
 }
 
-.cc-marketing-shell:has(.cc-ed) .cc-nav-veil--mobile-open {
+.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil--mobile-open {
   background: transparent;
 }
 

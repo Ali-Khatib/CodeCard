@@ -7,11 +7,20 @@
   --guide-iris: #e95a0b;
   --ed-bg: var(--guide-cream);
   --ed-fg: var(--guide-ink);
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
   background: var(--guide-cream);
   color: var(--guide-ink);
-  padding-bottom: 6rem;
+  padding: 1.25rem 0 6rem;
   font-family: var(--font-inter), system-ui, sans-serif;
   font-weight: 400;
+}
+
+.cc-marketing-shell:has(.cc-guide-page) .cc-nav-ghost-link::after,
+.cc-marketing-shell:has(.cc-guide-page) .cc-nav-pill-item::after {
+  display: none !important;
+  content: none !important;
 }
 
 .cc-guide-hero {
@@ -44,6 +53,7 @@
 
 .cc-guide-hero__title {
   font-size: clamp(2.4rem, 6vw, 4.1rem);
+  color: #17171a;
 }
 
 .cc-guide-hero__lead,
@@ -166,6 +176,22 @@
 
 .cc-guide-shot {
   margin: 0;
+}
+
+.cc-guide-shot__placeholder,
+.cc-guide-shot__fallback {
+  min-height: 22rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--guide-ink) 10%, transparent);
+  background: #fff;
+}
+
+.cc-guide-shot__fallback {
+  display: flex;
+  align-items: center;
+  min-height: 8rem;
+  padding: 1.25rem;
+  color: var(--guide-muted);
 }
 
 .cc-guide-shot__caption {

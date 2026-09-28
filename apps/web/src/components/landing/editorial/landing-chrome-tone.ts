@@ -134,7 +134,7 @@ function logoEl() {
 
 function navEl() {
   return document.querySelector<HTMLElement>(
-    '.cc-marketing-shell:has(.cc-ed) .cc-nav-veil',
+    '.cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil',
   );
 }
 
