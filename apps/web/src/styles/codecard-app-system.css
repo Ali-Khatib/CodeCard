@@ -1172,6 +1172,21 @@ button.cc-app-nav-link:focus-visible {
   outline-offset: 2px;
 }
 
+.cc-app-user-card__view {
+  display: inline-flex;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-iris);
+  text-decoration: none;
+}
+
+.cc-app-user-card__view:hover,
+.cc-app-user-card__view:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 /* ?? Inputs ?? */
 .cc-app-input {
   width: 100%;

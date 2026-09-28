@@ -13,7 +13,11 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
-import { isDemoWorkspacePath, workspaceCreateProjectHref } from '@/lib/marketing/demo-url';
+import {
+  isDemoWorkspacePath,
+  publicDemoProfileBasePath,
+  workspaceCreateProjectHref,
+} from '@/lib/marketing/demo-url';
 import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
@@ -108,6 +112,7 @@ export function DashboardShell({
   const [signingOut, setSigningOut] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
+  const cardHref = profileSlug ? publicDemoProfileBasePath(profileSlug) : null;
 
   useDashboardSessionGuard();
 
@@ -331,42 +336,44 @@ export function DashboardShell({
           />
         </div>
 
-        <Link
-          href={`${basePath}#profile`}
-          className="cc-app-user-card cc-app-user-card--link mt-4 block"
-          aria-label="Open profile editor: photo, bio, and links"
-        >
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-[11px] font-medium">
-                  {initials}
-                </span>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="break-words text-[14px] font-medium leading-tight text-[var(--app-ink)]">
-                {displayName ?? 'Workspace'}
-              </p>
-              <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
-                @{profileSlug ?? email?.split('@')[0] ?? 'you'}
-              </p>
-              {preview || embedded ? null : (
-                <p className="mt-1.5 text-[11px] font-medium text-[var(--app-iris)]">
-                  Edit photo, bio, links
+        <div className="cc-app-user-card mt-4">
+          <Link
+            href={`${basePath}#profile`}
+            className="cc-app-user-card--link block"
+            aria-label="Edit profile"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-[11px] font-medium">
+                    {initials}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="break-words text-[14px] font-medium leading-tight text-[var(--app-ink)]">
+                  {displayName ?? 'Workspace'}
                 </p>
-              )}
-              {completion != null && (
-                <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
-                  {completion}% ready
-                </span>
-              )}
+                <p className="mt-0.5 break-all text-[12px] leading-tight text-[var(--app-smoke)]">
+                  @{profileSlug ?? email?.split('@')[0] ?? 'you'}
+                </p>
+                {completion != null && (
+                  <span className="cc-app-badge cc-app-badge--blush mt-2 inline-flex">
+                    {completion}% ready
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+          {cardHref ? (
+            <Link href={cardHref} className="cc-app-user-card__view">
+              View card
+            </Link>
+          ) : null}
+        </div>
 
         <div className="cc-app-sidebar__nav">{navLinks}</div>
 
@@ -430,6 +437,15 @@ export function DashboardShell({
                 <p className="border-b border-[var(--app-border)] px-3 py-2 text-[12px] text-[var(--app-smoke)]">
                   {email}
                 </p>
+                {cardHref ? (
+                  <Link
+                    href={cardHref}
+                    className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    View card
+                  </Link>
+                ) : null}
                 <Link
                   href={`${basePath}#profile`}
                   className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
