@@ -6,8 +6,8 @@ export type GuideShotId =
   | 'home-share'
   | 'home-calendar'
   | 'work-projects'
-  | 'work-research'
   | 'work-project'
+  | 'work-research'
   | 'connections-list'
   | 'connections-open'
   | 'circle-feed'
@@ -53,9 +53,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'home',
     nav: 'Home',
     title: 'Home is where you run your CodeCard',
-    kicker: 'Home',
+    kicker: '01 · Home',
     lead:
-      'This is the desk. Edit who you are, see how the public card looks, and keep the next meeting next to the person. Visitors never see this screen. They see the CodeCard you publish.',
+      'This is the desk. Visitors never see it. You edit the card here, then publish what they should see.',
     points: [
       'Edit your photo, headline, bio, links, and skills. That is the identity on the card.',
       'Watch profile completion until it hits 100%, then Home suggests the next useful step.',
@@ -67,28 +67,30 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'home-desk',
-        title: 'The desk',
+        title: 'Start at the desk',
         caption:
-          'Greeting, profile completion, and the next step. Stay here until the card is ready.',
+          'Greeting, how complete the card is, and the next step. Stay here until the card is ready to share.',
         shot: 'home-desk',
       },
       {
         id: 'home-identity',
-        title: 'Who you are',
-        caption: 'Photo, headline, bio, links, and skills. This is what visitors read first.',
+        title: 'Write who you are',
+        caption:
+          'Photo, headline, bio, links, and skills. This is the first thing a visitor reads on the card.',
         shot: 'home-identity',
       },
       {
         id: 'home-share',
-        title: 'The card people scan',
+        title: 'Share the card they scan',
         caption:
-          'Link, QR, and a live preview of the public CodeCard. A scan is how a Connection is created.',
+          'Copy the link, show the QR, and preview the public CodeCard. A scan is how a Connection is created.',
         shot: 'home-share',
       },
       {
         id: 'home-calendar',
-        title: 'Calendar and follow-ups',
-        caption: 'Pick a day. See events and follow-ups next to the person they belong to.',
+        title: 'Keep the next meeting here',
+        caption:
+          'Pick a day. Events and follow-ups sit next to the person, so the next conversation is not lost.',
         shot: 'home-calendar',
       },
     ],
@@ -97,9 +99,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'work',
     nav: 'Work',
     title: 'Your Work holds projects and research',
-    kicker: 'Your Work',
+    kicker: '02 · Work',
     lead:
-      'One place for what you ship. Projects first, then papers. Publish what visitors should open from your card. Drafts stay private until you say otherwise.',
+      'Projects first. Then open one. Then research. Publish what visitors should open. Drafts stay private.',
     points: [
       'Each project can carry a short story, images, a mini presentation, and the stack you used.',
       'Add screenshots and a hero so people can see the product, not just the repo link.',
@@ -111,22 +113,24 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'work-projects',
-        title: 'Projects',
-        caption: 'The work on your card. Publish what people should open. Drafts stay private.',
+        title: 'Projects in a list',
+        caption:
+          'This is the first view. Publish what people should open from the card. Drafts stay private.',
         shot: 'work-projects',
       },
       {
-        id: 'work-research',
-        title: 'Research',
-        caption: 'Papers sit next to projects when a paper is part of the same introduction.',
-        shot: 'work-research',
-      },
-      {
         id: 'work-project',
-        title: 'A project opened',
+        title: 'Open a project',
         caption:
           'Story, screenshots, the stack, and the mini presentation. This is what a visitor sees after they tap a project.',
         shot: 'work-project',
+      },
+      {
+        id: 'work-research',
+        title: 'Then research',
+        caption:
+          'Papers sit under projects when a paper is part of the same introduction.',
+        shot: 'work-research',
       },
     ],
   },
@@ -134,7 +138,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'connections',
     nav: 'Connections',
     title: 'Connections are people you actually met',
-    kicker: 'Connections',
+    kicker: '03 · Connections',
     lead:
       'CodeCard does not let you search for strangers and add them. A Connection is created when someone scans your QR. After that, you keep the context so the follow-up is easy.',
     points: [
@@ -148,15 +152,16 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'connections-list',
-        title: 'People you saved',
-        caption: 'List view is the default. Upcoming follow-ups sit at the top.',
+        title: 'People you actually met',
+        caption:
+          'List first. A Connection only appears after someone scans your QR. Upcoming follow-ups sit at the top.',
         shot: 'connections-list',
       },
       {
         id: 'connections-open',
-        title: 'One person opened',
+        title: 'Open one person',
         caption:
-          'Where you met, the note, the follow-up, and a way back to their CodeCard.',
+          'Where you met, your private note, the follow-up, and a way back to their CodeCard.',
         shot: 'connections-open',
       },
     ],
@@ -165,7 +170,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'circle',
     nav: 'Circle',
     title: 'Circle is new work from people you already know',
-    kicker: 'Circle',
+    kicker: '04 · Circle',
     lead:
       'Circle is not a social feed you browse for strangers. It is a quiet list of new projects and papers from people you have already connected with.',
     points: [
@@ -178,8 +183,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'circle-feed',
-        title: 'New work nearby',
-        caption: 'Projects and papers from people you already saved. Not a public feed.',
+        title: 'New work from people you know',
+        caption:
+          'Projects and papers from Connections only. If this is empty, scan someone in person first.',
         shot: 'circle-feed',
       },
     ],
@@ -188,7 +194,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'analytics',
     nav: 'Analytics',
     title: 'Analytics turns looks into a decision',
-    kicker: 'Analytics',
+    kicker: '05 · Analytics',
     lead:
       'After the introduction you can see whether people opened the card, clicked a project, or used a link. The review and the coach sit at the top so the numbers become a next move, not a chart to stare at.',
     points: [
@@ -203,26 +209,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'analytics-review',
-        title: 'The review, then the chat',
+        title: 'Read the review, then ask',
         caption:
-          'Read what the traffic means, then ask what to change. Try “Which project should I put first?”',
+          'Plain words first. Then ask the coach. Try “Which project should I put first?”',
         shot: 'analytics-review',
       },
       {
         id: 'analytics-reach',
-        title: 'How people found you',
+        title: 'How people found the card',
         caption: 'Reach, visits, guests, and where the card was opened.',
         shot: 'analytics-reach',
       },
       {
         id: 'analytics-projects',
-        title: 'Each project',
+        title: 'Which projects they open',
         caption: 'Time on the page, saves, and which project people actually finish.',
         shot: 'analytics-projects',
       },
       {
         id: 'analytics-research',
-        title: 'Each paper',
+        title: 'Which papers they open',
         caption: 'Opens, PDF downloads, and citation copies for the papers on the card.',
         shot: 'analytics-research',
       },
@@ -238,7 +244,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'settings',
     nav: 'Settings',
     title: 'Settings is the quiet control room',
-    kicker: 'Settings',
+    kicker: '06 · Settings',
     lead:
       'Publish or keep the card private. Change how the workspace looks. Manage the account. Nothing here is the introduction. It just keeps the card safe and usable.',
     points: [
@@ -251,25 +257,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     shots: [
       {
         id: 'settings-identity',
-        title: 'CodeCard identity',
-        caption: 'Username, visibility, and the public card. Identity editing stays on Home.',
+        title: 'Visibility and username',
+        caption:
+          'Username and whether the card is public. The photo and bio are edited on Home, not here.',
         shot: 'settings-identity',
       },
       {
         id: 'settings-signin',
-        title: 'Sign-in',
+        title: 'How you sign in',
         caption: 'Email, password, and GitHub. Visitors never see this.',
         shot: 'settings-signin',
       },
       {
         id: 'settings-plan',
-        title: 'Plan',
+        title: 'Plan and billing',
         caption: 'Free or Pro. This is billing, not the public card.',
         shot: 'settings-plan',
       },
       {
         id: 'settings-export',
-        title: 'Export and delete',
+        title: 'Export or delete',
         caption: 'Download a copy of your data, or delete the account. Deletion cannot be undone.',
         shot: 'settings-export',
       },

@@ -24,21 +24,22 @@
 }
 
 .cc-guide-hero {
-  width: min(46rem, calc(100% - 2.5rem));
+  width: min(58rem, calc(100% - 2.5rem));
   margin: 0 auto;
-  padding: 5.5rem 0 2.25rem;
+  padding: 5.5rem 0 2.5rem;
 }
 
 .cc-guide-hero__kicker,
 .cc-guide-section__kicker,
-.cc-guide-jump__label {
+.cc-guide-jump__label,
+.cc-guide-shot__step {
   margin: 0;
   font-family: Arial, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--guide-ink) 58%, transparent);
+  color: var(--guide-iris);
 }
 
 .cc-guide-hero__title,
@@ -52,17 +53,17 @@
 }
 
 .cc-guide-hero__title {
-  font-size: clamp(2.4rem, 6vw, 4.1rem);
+  font-size: clamp(3.1rem, 8vw, 5.6rem);
   color: #17171a;
 }
 
 .cc-guide-hero__lead,
 .cc-guide-section__lead,
 .cc-guide-extra__body {
-  margin: 1.1rem 0 0;
-  max-width: 38rem;
-  font-size: 1.05rem;
-  line-height: 1.55;
+  margin: 1.25rem 0 0;
+  max-width: 42rem;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  line-height: 1.5;
   color: var(--guide-muted);
 }
 
@@ -87,7 +88,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.65rem 1rem;
-  width: min(72rem, calc(100% - 1.5rem));
+  width: min(78rem, calc(100% - 1.5rem));
   margin: 0 auto 1.5rem;
   padding: 0.7rem 0.9rem;
   border: 1px solid color-mix(in srgb, var(--guide-ink) 12%, transparent);
@@ -144,34 +145,21 @@
 }
 
 .cc-guide-section {
-  width: min(72rem, calc(100% - 2.5rem));
+  width: min(78rem, calc(100% - 2.5rem));
   margin: 0 auto;
-  padding: 3.5rem 0 2.5rem;
+  padding: 4.5rem 0 3rem;
   scroll-margin-top: 8.5rem;
   border-top: 1px solid color-mix(in srgb, var(--guide-ink) 10%, transparent);
 }
 
 .cc-guide-section__title {
-  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
-}
-
-.cc-guide-section__points {
-  margin: 1.25rem 0 0;
-  padding-left: 1.15rem;
-  max-width: 40rem;
-}
-
-.cc-guide-section__points li {
-  margin: 0.55rem 0;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--guide-ink);
+  font-size: clamp(2.4rem, 5.4vw, 4.2rem);
 }
 
 .cc-guide-shots {
   display: grid;
-  gap: 2.75rem;
-  margin-top: 2.25rem;
+  gap: 4.5rem;
+  margin-top: 2.75rem;
 }
 
 .cc-guide-shot {
@@ -195,23 +183,31 @@
 }
 
 .cc-guide-shot__caption {
-  max-width: 40rem;
-  margin-bottom: 1rem;
+  max-width: 46rem;
+  margin-bottom: 1.35rem;
+}
+
+.cc-guide-shot__step {
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
 }
 
 .cc-guide-shot__title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display), 'Instrument Serif', Georgia, serif;
+  font-size: clamp(2rem, 4.2vw, 3.2rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
   color: var(--guide-ink);
 }
 
 .cc-guide-shot__body {
-  margin: 0.4rem 0 0;
-  font-size: 0.98rem;
+  margin: 0.7rem 0 0;
+  max-width: 40rem;
+  font-size: clamp(1.08rem, 1.7vw, 1.28rem);
   line-height: 1.5;
-  color: var(--guide-muted);
+  color: var(--guide-ink);
 }
 
 .cc-guide-section__frame {

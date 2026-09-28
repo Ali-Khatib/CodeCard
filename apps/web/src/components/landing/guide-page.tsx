@@ -182,15 +182,20 @@ export function GuidePage() {
         <p className="cc-guide-hero__kicker">Guide</p>
         <h1 className="cc-guide-hero__title">How the workspace works</h1>
         <p className="cc-guide-hero__lead">
-          Same tabs as the live demo. Jump to the one you want, or read the whole page.
-          Then try it on Alex Chen&apos;s card.
+          Same six tabs as the live demo, in this order. Read each step, look at the
+          screen, then try it on Alex Chen&apos;s card.
         </p>
         <LiveDemoLink className="cc-guide-hero__demo">Open the live demo</LiveDemoLink>
       </header>
 
       <GuideJumpNav active={active} />
 
-      {GUIDE_SECTIONS.map((section) => (
+      {GUIDE_SECTIONS.map((section, sectionIndex) => {
+        const stepStart = GUIDE_SECTIONS.slice(0, sectionIndex).reduce(
+          (count, item) => count + item.shots.length,
+          0,
+        );
+        return (
         <section
           key={section.id}
           id={`guide-${section.id}`}
@@ -203,20 +208,15 @@ export function GuidePage() {
               {section.title}
             </h2>
             <p className="cc-guide-section__lead">{section.lead}</p>
-            <ul className="cc-guide-section__points">
-              {section.points.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-            <Link href={section.demoHref} className="cc-guide-section__try">
-              {section.demoLabel}
-            </Link>
           </div>
 
           <div className="cc-guide-shots">
-            {section.shots.map((item) => (
+            {section.shots.map((item, shotIndex) => (
               <figure key={item.id} className="cc-guide-shot">
                 <figcaption className="cc-guide-shot__caption">
+                  <p className="cc-guide-shot__step">
+                    {String(stepStart + shotIndex + 1).padStart(2, '0')}
+                  </p>
                   <h3 className="cc-guide-shot__title">{item.title}</h3>
                   <p className="cc-guide-shot__body">{item.caption}</p>
                 </figcaption>
@@ -224,8 +224,13 @@ export function GuidePage() {
               </figure>
             ))}
           </div>
+
+          <Link href={section.demoHref} className="cc-guide-section__try">
+            {section.demoLabel}
+          </Link>
         </section>
-      ))}
+        );
+      })}
     </div>
   );
 }

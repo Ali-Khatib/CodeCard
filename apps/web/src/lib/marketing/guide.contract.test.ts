@@ -39,8 +39,8 @@ describe('marketing Guide walkthrough', () => {
       'home-share',
       'home-calendar',
       'work-projects',
-      'work-research',
       'work-project',
+      'work-research',
       'connections-list',
       'connections-open',
       'circle-feed',
@@ -53,6 +53,14 @@ describe('marketing Guide walkthrough', () => {
       'settings-signin',
       'settings-plan',
       'settings-export',
+    ]);
+    expect(GUIDE_SECTIONS.map((section) => section.kicker)).toEqual([
+      '01 · Home',
+      '02 · Work',
+      '03 · Connections',
+      '04 · Circle',
+      '05 · Analytics',
+      '06 · Settings',
     ]);
   });
 
@@ -68,6 +76,8 @@ describe('marketing Guide walkthrough', () => {
     expect(view).toContain('EditorialProductFrame');
     expect(view).toContain('GuideLiveShot');
     expect(view).toContain('section.shots');
+    expect(view).toContain('cc-guide-shot__step');
+    expect(view).not.toContain('cc-guide-section__points');
     expect(view).toContain('fit="content"');
     expect(view).toContain('className="cc-guide-page"');
     expect(view).not.toContain('cc-ed cc-guide-page');
