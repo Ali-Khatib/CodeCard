@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { AuthenticatedConnectionsClient } from '@/components/dashboard/authenticated-connections-client';
 import { listOwnerConnections } from '@/lib/connections/connections-core';
+import { listOwnerNotesMap } from '@/lib/connections/connection-metadata-core';
+import { listPendingScanOffers } from '@/lib/connections/scan-offers-core';
 import {
   listOwnerCollections,
   listOwnerMembershipMap,
@@ -15,13 +17,14 @@ export default async function ConnectionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [result, collectionsResult, membershipResult, profileResult] = await Promise.all([
+  const [result, collectionsResult, membershipResult, profileResult, scanOffers] = await Promise.all([
     listOwnerConnections(supabase),
     listOwnerCollections(supabase),
     listOwnerMembershipMap(supabase),
     user
       ? supabase.from('profiles').select('slug').eq('owner_user_id', user.id).maybeSingle()
       : Promise.resolve({ data: null }),
+    listPendingScanOffers(supabase),
   ]);
 
   if (result.error && result.code === 'UNAUTHENTICATED') {
@@ -60,12 +63,20 @@ export default async function ConnectionsPage() {
   }
 
   const cards = result.connections.map(mapOwnerConnectionToCard);
+  const notes = await listOwnerNotesMap(
+    supabase,
+    cards.map((card) => card.id),
+  );
+  for (const card of cards) {
+    card.privateNote = notes[card.id] ?? null;
+  }
 
   return (
     <AuthenticatedConnectionsClient
       initialConnections={cards}
       initialCollections={collectionsResult.collections}
       initialMemberships={membershipResult.memberships}
+      initialScanOffers={scanOffers.offers}
       profileSlug={profileResult.data?.slug ?? null}
     />
   );

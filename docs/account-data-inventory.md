@@ -86,6 +86,7 @@ Project columns include foundation fields: `slug`, `user_role`, `started_at`, `e
 | Table | Purpose | Owner key | Other-person? | Export | Deletion | Task |
 |---|---|---|---|---|---|---|
 | `saved_connections` | Saved profiles | `owner_user_id` | References another profile id | **Safe/redacted**: owner’s connection row only; **not** the other profile’s private fields/email | Delete | WS10-T004 |
+| `connection_scan_offers` | Inbound QR handshake | `scanned_user_id` | Scanner identity after they connect from QR | **Do not export** pending offers | Delete | Scan handshake |
 | `connection_notes` | Private notes | `owner_user_id` | May mention others in free text | **Export in full** (user-authored) | Delete | WS10-T004 |
 | `collections` | Private collections | `owner_user_id` | No | **Export in full** | Delete | WS10-T004 |
 | `collection_items` | Collection membership | via `collection_id` | May reference others’ public items | **Export metadata** of item refs owned via collection | Cascade delete | WS10-T004 |

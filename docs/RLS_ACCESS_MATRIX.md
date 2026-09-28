@@ -29,7 +29,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 |---|---|---|---|---|---|---|
 | `tenants` | ✅ | ❌ | ❌ | SELECT; UPDATE if owner/admin | SELECT if same tenant | Membership via `user_tenant_ids()` |
 | `tenant_memberships` | ✅ | ❌ | ❌ | SELECT | SELECT if same tenant | No client INSERT/UPDATE/DELETE |
-| `profiles` | ✅ | published only | ❌ | full | published only | Drafts private |
+| `profiles` | ✅ | published only | ❌ | full | published only; inbound scan offer / saved Connection snapshot | Drafts private |
 | `profile_links` | ✅ | if profile public | ❌ | full | if profile public | |
 | `projects` | ✅ | published+public profile | ❌ | full | published+public | Drafts private |
 | `project_domains` | ✅ | via project visibility | ❌ | full | via project visibility | |
@@ -39,7 +39,8 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `project_orderings` | ✅ | ❌ | ❌ | full | ❌ | Owner profile only |
 | `research_papers` | ✅ | published+public profile | ❌ | full | published+public | |
 | `research_figures` | ✅ | via paper visibility | ❌ | full | via paper visibility | |
-| `saved_connections` | ✅ | ❌ | ❌ | full | ❌ | Target cannot see saver |
+| `saved_connections` | ✅ | ❌ | ❌ | full | ❌ | Target cannot list savers. Reverse add is a separate scan offer. |
+| `connection_scan_offers` | ✅ | ❌ | ❌ | scanned user SELECT/UPDATE; scanner INSERT, SELECT, UPDATE to pending | ❌ | Pending QR handshake only |
 | `connection_notes` | ✅ | ❌ | ❌ | full | ❌ | Private to saver |
 | `owner_events` | ✅ | ❌ | ❌ | full | ❌ | Owner-private calendar; Home only |
 | `collections` | ✅ | ❌ | ❌ | full | ❌ | |

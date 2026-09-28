@@ -28,6 +28,7 @@ export type AuthenticatedConnectionCard = WorkspaceConnection & {
   context: string | null;
   connectedAtIso: string | null;
   followUpAtIso: string | null;
+  metAtIso: string | null;
 };
 
 /** Map a safe owner list item into the existing Connections card shape. */
@@ -66,6 +67,7 @@ export function mapOwnerConnectionToCard(
     context: item.context,
     connectedAtIso: item.connectedAt ?? item.createdAt,
     followUpAtIso: item.followUpAt,
+    metAtIso: item.metAt,
     sortOrder: item.sortOrder,
   };
 }

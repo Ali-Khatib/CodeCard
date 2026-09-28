@@ -31,6 +31,10 @@ describe('Connections in-person loop', () => {
     expect(actions).toContain('addConnectionAction');
     expect(core).toContain('CONNECTIONS_TABLE');
     expect(core).toContain('CONNECTION_CREATE_SOURCE');
+    expect(core).toContain('notifyCardOwnerOfScan');
+    const offers = read('src/components/dashboard/inbound-scan-offers.tsx');
+    expect(offers).toContain('just scanned your card');
+    expect(offers).toContain('Add connection');
   });
 
   it('lists saved people with Open CodeCard as the return path', () => {

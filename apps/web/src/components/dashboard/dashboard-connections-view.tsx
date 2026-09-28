@@ -260,9 +260,9 @@ function ConnectionExpandedBody({
             <AppButton
               variant="ghost"
               onClick={() => onOpenPrivateDetails(connection.id)}
-              ariaLabel={`Edit private note for ${connection.name}`}
+              ariaLabel={`Edit where you met, when, notes, and follow-up for ${connection.name}`}
             >
-              Private note
+              Edit details
             </AppButton>
           ) : null}
         </div>

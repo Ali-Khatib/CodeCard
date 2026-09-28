@@ -23,6 +23,7 @@ import {
   resolveOwnedProfile,
   type AuthUser,
 } from '@/lib/profile/profile-auth-core';
+import { notifyCardOwnerOfScan } from '@/lib/connections/scan-offers-core';
 import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
 
 export { UNPUBLISHED_SAVED_TARGET_POLICY };
@@ -245,6 +246,13 @@ export async function executeAddConnection(
     targetProfileId: target.id,
   });
   if (existing) {
+    await notifyCardOwnerOfScan(supabase, {
+      scannerUserId: user.id,
+      scannerProfileId: owned.profile.id,
+      scannedUserId: target.owner_user_id,
+      scannedProfileId: target.id,
+      scannedTenantId: target.tenant_id,
+    });
     return {
       success: true,
       alreadyConnected: true,
@@ -293,6 +301,13 @@ export async function executeAddConnection(
         targetProfileId: target.id,
       });
       if (again) {
+        await notifyCardOwnerOfScan(supabase, {
+          scannerUserId: user.id,
+          scannerProfileId: owned.profile.id,
+          scannedUserId: target.owner_user_id,
+          scannedProfileId: target.id,
+          scannedTenantId: target.tenant_id,
+        });
         return {
           success: true,
           alreadyConnected: true,
@@ -316,6 +331,14 @@ export async function executeAddConnection(
     }
     return fail('TEMPORARY_FAILURE');
   }
+
+  await notifyCardOwnerOfScan(supabase, {
+    scannerUserId: user.id,
+    scannerProfileId: owned.profile.id,
+    scannedUserId: target.owner_user_id,
+    scannedProfileId: target.id,
+    scannedTenantId: target.tenant_id,
+  });
 
   return {
     success: true,
@@ -452,6 +475,7 @@ export async function listOwnerConnections(
       source,
       context,
       follow_up_at,
+      met_at,
       sort_order,
       saved_profile:saved_profile_id (
         ${TARGET_SELECT}
@@ -485,6 +509,7 @@ export async function listOwnerConnections(
         source: row.source as string,
         context: (row.context as string | null) ?? null,
         followUpAt: (row.follow_up_at as string | null) ?? null,
+        metAt: (row.met_at as string | null) ?? null,
         sortOrder: typeof row.sort_order === 'number' ? row.sort_order : 0,
         target: toSafeTarget(targetRow),
       },

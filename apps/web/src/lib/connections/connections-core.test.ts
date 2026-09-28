@@ -260,6 +260,24 @@ function createMockSupabase(options: MockOptions = {}) {
       };
     }
 
+    if (table === 'connection_scan_offers') {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+            })),
+          })),
+        })),
+        insert: vi.fn().mockResolvedValue({ error: null }),
+        update: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({ error: null }),
+          })),
+        })),
+      };
+    }
+
     throw new Error(`Unexpected table ${table}`);
   });
 

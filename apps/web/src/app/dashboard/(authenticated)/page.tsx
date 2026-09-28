@@ -13,6 +13,8 @@ import { listCircleFeed } from '@/lib/circle/circle-feed-core';
 import { getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 import { loadHomeSchedule } from '@/lib/schedule/home-schedule-core';
+import { listPendingScanOffers } from '@/lib/connections/scan-offers-core';
+import { HomeScanOffers } from '@/components/dashboard/home-scan-offers';
 
 export default async function DashboardHomePage() {
   const supabase = await createClient();
@@ -36,12 +38,14 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult, contentResult, circleFeed, schedule] = await Promise.all([
+  const [completionResult, analyticsResult, contentResult, circleFeed, schedule, scanOffers] =
+    await Promise.all([
     loadProfileCompletion(supabase, profile),
     loadOwnerAnalytics(supabase, user!.id),
     loadOwnerOverviewContent(supabase, user!.id),
     listCircleFeed(supabase, { limit: 3, filter: 'all' }),
     loadHomeSchedule(supabase, { user: user! }),
+    listPendingScanOffers(supabase, { user: user! }),
   ]);
 
   if (!completionResult.ok) {
@@ -100,7 +104,9 @@ export default async function DashboardHomePage() {
   }
 
   return (
-    <DashboardOverviewView
+    <>
+      <HomeScanOffers initialOffers={scanOffers.offers} />
+      <DashboardOverviewView
       greeting={greetingForHour()}
       displayName={displayName}
       completion={completion}
@@ -125,5 +131,6 @@ export default async function DashboardHomePage() {
       followUps={schedule.followUps}
       scheduleError={Boolean(schedule.code)}
     />
+    </>
   );
 }

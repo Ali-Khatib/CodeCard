@@ -10,19 +10,23 @@ import {
 import { DashboardConnectionsView } from '@/components/dashboard/dashboard-connections-view';
 import { ConnectionsCollectionsPanel } from '@/components/dashboard/connections-collections-panel';
 import { ConnectionPrivateDetails } from '@/components/dashboard/connection-private-details';
+import { InboundScanOffers } from '@/components/dashboard/inbound-scan-offers';
 import type { AuthenticatedConnectionCard } from '@/lib/connections/map-owner-connection';
 import type { OwnerCollection } from '@/lib/connections/collections-core';
+import type { ScanOfferCard } from '@/lib/connections/scan-offers-core';
 import { uniqueConnectionMeetingPoints } from '@/lib/connections/connections-filter';
 
 export function AuthenticatedConnectionsClient({
   initialConnections,
   initialCollections,
   initialMemberships,
+  initialScanOffers = [],
   profileSlug = null,
 }: {
   initialConnections: AuthenticatedConnectionCard[];
   initialCollections: OwnerCollection[];
   initialMemberships: Record<string, string[]>;
+  initialScanOffers?: ScanOfferCard[];
   profileSlug?: string | null;
 }) {
   const router = useRouter();
@@ -43,6 +47,11 @@ export function AuthenticatedConnectionsClient({
   useEffect(() => {
     setMemberships(initialMemberships);
   }, [initialMemberships]);
+
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('details');
+    if (fromUrl) setDetailsId(fromUrl);
+  }, []);
 
   const detailsConnection = detailsId
     ? connections.find((c) => c.id === detailsId) ?? null
@@ -171,6 +180,13 @@ export function AuthenticatedConnectionsClient({
           </button>
         </p>
       )}
+      <InboundScanOffers
+        initialOffers={initialScanOffers}
+        onAccepted={(connectionId) => {
+          setDetailsId(connectionId);
+          router.refresh();
+        }}
+      />
       <ConnectionsCollectionsPanel
         initialCollections={collections}
         onCollectionsChange={setCollections}
@@ -190,14 +206,15 @@ export function AuthenticatedConnectionsClient({
         <ConnectionPrivateDetails
           connectionId={detailsConnection.id}
           connectionName={detailsConnection.name}
-          initialNote={null}
+          initialNote={detailsConnection.privateNote}
           initialContext={detailsConnection.context}
           initialConnectedAt={detailsConnection.connectedAtIso}
+          initialMetAt={detailsConnection.metAtIso}
           initialFollowUpAt={detailsConnection.followUpAtIso}
           meetingPointSuggestions={meetingPointSuggestions}
           open
           onClose={() => setDetailsId(null)}
-          onSaved={({ privateNote, context, followUpAt }) => {
+          onSaved={({ privateNote, context, followUpAt, metAt }) => {
             const meetingPoint = context?.trim() || '';
             const scheduled = Boolean(followUpAt);
             setConnections((prev) =>
@@ -219,6 +236,7 @@ export function AuthenticatedConnectionsClient({
                           })
                         : undefined,
                       followUpAtIso: followUpAt,
+                      metAtIso: metAt,
                     }
                   : c,
               ),

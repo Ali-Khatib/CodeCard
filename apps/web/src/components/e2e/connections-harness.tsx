@@ -46,6 +46,7 @@ export function ConnectionsHarness() {
     context: null,
     connectedAtIso: '2026-07-17T00:00:00.000Z',
     followUpAtIso: null,
+    metAtIso: '2026-07-17T00:00:00.000Z',
   };
 
   return (

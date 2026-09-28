@@ -12,6 +12,7 @@ type ConnectionPrivateDetailsProps = {
   initialNote: string | null;
   initialContext: string | null;
   initialConnectedAt: string | null;
+  initialMetAt?: string | null;
   initialFollowUpAt?: string | null;
   /** Existing meeting-point names for pick-or-create. */
   meetingPointSuggestions?: string[];
@@ -21,6 +22,7 @@ type ConnectionPrivateDetailsProps = {
     privateNote: string | null;
     context: string | null;
     followUpAt: string | null;
+    metAt: string | null;
   }) => void;
 };
 
@@ -30,6 +32,7 @@ export function ConnectionPrivateDetails({
   initialNote,
   initialContext,
   initialConnectedAt,
+  initialMetAt = null,
   initialFollowUpAt = null,
   meetingPointSuggestions = [],
   open,
@@ -38,6 +41,7 @@ export function ConnectionPrivateDetails({
 }: ConnectionPrivateDetailsProps) {
   const [note, setNote] = useState(initialNote ?? '');
   const [context, setContext] = useState(initialContext ?? '');
+  const [metAt, setMetAt] = useState(toDateInputValue(initialMetAt ?? initialConnectedAt));
   const [followUpAt, setFollowUpAt] = useState(toDateInputValue(initialFollowUpAt));
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -46,6 +50,7 @@ export function ConnectionPrivateDetails({
   dirtyRef.current =
     note !== (initialNote ?? '') ||
     context !== (initialContext ?? '') ||
+    metAt !== toDateInputValue(initialMetAt ?? initialConnectedAt) ||
     followUpAt !== toDateInputValue(initialFollowUpAt);
 
   const requestClose = useCallback(() => {
@@ -66,15 +71,16 @@ export function ConnectionPrivateDetails({
     if (open) {
       setNote(initialNote ?? '');
       setContext(initialContext ?? '');
+      setMetAt(toDateInputValue(initialMetAt ?? initialConnectedAt));
       setFollowUpAt(toDateInputValue(initialFollowUpAt));
       setError(null);
       setStatus(null);
     }
-  }, [open, initialNote, initialContext, initialFollowUpAt, connectionId]);
+  }, [open, initialNote, initialContext, initialMetAt, initialConnectedAt, initialFollowUpAt, connectionId]);
 
   if (!open) return null;
 
-  const save = (opts?: { clearNote?: boolean }) => {
+  const save = (opts?: { clearNote?: boolean; clearFollowUp?: boolean }) => {
     if (pending) return;
     setError(null);
     startTransition(async () => {
@@ -82,7 +88,8 @@ export function ConnectionPrivateDetails({
         connectionId,
         privateNote: opts?.clearNote ? null : note === '' ? null : note,
         context: context === '' ? null : context,
-        followUpAt: followUpAt === '' ? null : followUpAt,
+        metAt: metAt === '' ? null : `${metAt}T12:00:00.000Z`,
+        followUpAt: opts?.clearFollowUp || followUpAt === '' ? null : followUpAt,
       });
       if (!result.success || !result.metadata) {
         setError(result.error ?? 'Could not save private details.');
@@ -90,25 +97,19 @@ export function ConnectionPrivateDetails({
       }
       setNote(result.metadata.privateNote ?? '');
       setContext(result.metadata.context ?? '');
+      setMetAt(toDateInputValue(result.metadata.metAt));
       setFollowUpAt(toDateInputValue(result.metadata.followUpAt));
       setStatus('Private details saved.');
       onSaved?.({
         privateNote: result.metadata.privateNote,
         context: result.metadata.context,
         followUpAt: result.metadata.followUpAt,
+        metAt: result.metadata.metAt,
       });
     });
   };
 
   const attemptClose = requestClose;
-
-  const connectedLabel = initialConnectedAt
-    ? new Date(initialConnectedAt).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : 'Recently';
 
   return (
     <div
@@ -170,8 +171,19 @@ export function ConnectionPrivateDetails({
           </div>
 
           <div>
-            <p className="mb-1 text-[13px] text-[var(--app-smoke)]">Connected on</p>
-            <p className="text-[15px] text-[var(--app-ink)]">{connectedLabel}</p>
+            <label
+              htmlFor={`met-at-${connectionId}`}
+              className="mb-1 block text-[13px] text-[var(--app-smoke)]"
+            >
+              Met on
+            </label>
+            <input
+              id={`met-at-${connectionId}`}
+              className="cc-app-input"
+              type="date"
+              value={metAt}
+              onChange={(e) => setMetAt(e.target.value)}
+            />
           </div>
 
           <div>
@@ -189,8 +201,22 @@ export function ConnectionPrivateDetails({
               onChange={(e) => setFollowUpAt(e.target.value)}
             />
             <p className="mt-1.5 text-[12px] text-[var(--app-smoke)]">
-              Shows on Home so you can check in after you meet.
+              Optional. Shows on Home. Clear the date, or remove it, then save.
             </p>
+            {followUpAt ? (
+              <div className="mt-2">
+                <AppButton
+                  variant="ghost"
+                  onClick={() => {
+                    setFollowUpAt('');
+                    save({ clearFollowUp: true });
+                  }}
+                  ariaLabel={`Remove follow-up with ${connectionName}`}
+                >
+                  Remove follow-up
+                </AppButton>
+              </div>
+            ) : null}
           </div>
 
           <div>

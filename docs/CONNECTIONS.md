@@ -6,10 +6,10 @@ Internal reference for the real authenticated Connections feature.
 
 A Connection is a **private directed** relationship:
 
-`authenticated owner user → published target CodeCard profile`
+`authenticated owner user → target CodeCard profile`
 
-- Not mutual
-- Target users cannot see who saved them, which collections they are in, or private notes
+- Each person has their own row. Scanning does not silently write into the other person’s list.
+- After A connects from B’s QR, B gets a pending **scan offer**: “this person just scanned your card.” B can add A, then save where / when / notes / follow-up.
 - Demo data (`DEMO_CONNECTIONS`, preview `/dashboard/preview/connections`, live Alex Chen demo) is isolated and must never seed authenticated accounts
 
 ## Persistence
@@ -18,6 +18,7 @@ A Connection is a **private directed** relationship:
 |---|---|
 | `saved_connections` | Core save + `source`, `connected_at`, `met_at`, `context` |
 | `connection_notes` | One private note body per Connection |
+| `connection_scan_offers` | Pending inbound QR handshake (scanned owner) |
 | `collections` | Private owner folders |
 | `collection_items` | Membership (owned Connection ↔ owned collection) |
 
@@ -26,6 +27,8 @@ Forward-only migrations (manual deploy — do **not** run `supabase db push` fro
 - `20260717020001_connections_self_guard.sql`
 - `20260717031351_connections_collections_hardening.sql`
 - `20260717040001_connection_notes_metadata.sql`
+- `20260928125647_connection_scan_offers.sql`
+- `20260928140000_connection_scan_handshake_rls.sql`
 
 ## RLS
 
@@ -48,7 +51,8 @@ Export and deletion already cover Connections, notes, collections, and membershi
 ## MVP limits
 
 - No contact importing
-- No mutual request/accept
+- No search directory of strangers
+- QR scan creates the scanner’s Connection; the scanned owner gets a pending add
 - No recommendations / AI ranking / discoverable people
 - No shared collections
 - No reminders or messaging

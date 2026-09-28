@@ -32,6 +32,7 @@ export const RLS_APPLICATION_TABLES = [
   'research_papers',
   'research_figures',
   'saved_connections',
+  'connection_scan_offers',
   'connection_notes',
   'collections',
   'collection_items',
