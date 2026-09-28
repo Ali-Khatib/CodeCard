@@ -4,7 +4,14 @@ import { Component, type ReactNode, useEffect, useLayoutEffect, useRef, useState
 import Link from 'next/link';
 import { EditorialProductFrame } from '@/components/landing/editorial/editorial-product-frame';
 import { LiveDemoLink } from '@/components/marketing/live-demo-link';
-import { GUIDE_SECTIONS, type GuideSectionId, type GuideShotId } from '@/lib/marketing/guide-content';
+import {
+  GUIDE_SECTIONS,
+  GUIDE_STORY,
+  type GuideCallout,
+  type GuideSection,
+  type GuideSectionId,
+  type GuideShotId,
+} from '@/lib/marketing/guide-content';
 import '@/styles/guide-page.css';
 
 const NAV_OFFSET = 132;
@@ -57,7 +64,7 @@ function GuideLiveShot({ shot }: { shot: GuideShotId }) {
   );
 }
 
-function jumpToSection(id: GuideSectionId) {
+function jumpToSection(id: GuideSectionId | 'story') {
   const el = document.getElementById(`guide-${id}`);
   if (!el) return;
   const top = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
@@ -134,6 +141,126 @@ function GuideJumpNav({ active }: { active: GuideSectionId }) {
   );
 }
 
+function GuideOverview({
+  shot,
+  callouts,
+}: {
+  shot: GuideShotId;
+  callouts: GuideCallout[];
+}) {
+  return (
+    <figure className="cc-guide-overview">
+      <div className="cc-guide-overview__stage">
+        <GuideLiveShot shot={shot} />
+        <ol className="cc-guide-overview__pins" aria-hidden>
+          {callouts.map((item) => (
+            <li
+              key={item.n}
+              className="cc-guide-overview__pin"
+              style={{ left: item.x, top: item.y }}
+            >
+              {item.n}
+            </li>
+          ))}
+        </ol>
+      </div>
+      <ol className="cc-guide-overview__legend">
+        {callouts.map((item) => (
+          <li key={item.n} className="cc-guide-overview__legend-item">
+            <span className="cc-guide-overview__n" aria-hidden>
+              {item.n}
+            </span>
+            <div>
+              <p className="cc-guide-overview__legend-title">{item.title}</p>
+              <p className="cc-guide-overview__legend-body">{item.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </figure>
+  );
+}
+
+function GuideWorkflow({
+  workflow,
+}: {
+  workflow: NonNullable<GuideSection['workflow']>;
+}) {
+  return (
+    <div className="cc-guide-flow">
+      <h3 className="cc-guide-flow__title">{workflow.title}</h3>
+      <ol className="cc-guide-flow__list">
+        {workflow.steps.map((step, index) => (
+          <li key={step.title} className="cc-guide-flow__step">
+            <p className="cc-guide-flow__kicker">
+              {String(index + 1).padStart(2, '0')}
+            </p>
+            <h4 className="cc-guide-flow__heading">{step.title}</h4>
+            <p className="cc-guide-flow__caption">{step.caption}</p>
+            {step.shot ? <GuideLiveShot shot={step.shot} /> : null}
+          </li>
+        ))}
+      </ol>
+      <p className="cc-guide-flow__result">{workflow.result}</p>
+    </div>
+  );
+}
+
+function GuideSectionBlock({ section }: { section: GuideSection }) {
+  return (
+    <section
+      id={`guide-${section.id}`}
+      className="cc-guide-section"
+      aria-labelledby={`guide-${section.id}-heading`}
+    >
+      <div className="cc-guide-section__copy">
+        <p className="cc-guide-section__kicker">{section.kicker}</p>
+        <h2 id={`guide-${section.id}-heading`} className="cc-guide-section__title">
+          {section.title}
+        </h2>
+        <p className="cc-guide-section__lead">{section.lead}</p>
+      </div>
+
+      <div className="cc-guide-cando">
+        <h3 className="cc-guide-cando__heading">What you can do here</h3>
+        <ul className="cc-guide-cando__list">
+          {section.canDo.map((item) => (
+            <li key={item.title} className="cc-guide-cando__item">
+              <p className="cc-guide-cando__title">{item.title}</p>
+              <p className="cc-guide-cando__body">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <GuideOverview shot={section.overviewShot} callouts={section.callouts} />
+
+      {section.workflow ? <GuideWorkflow workflow={section.workflow} /> : null}
+
+      {section.details.length > 0 ? (
+        <details className="cc-guide-more">
+          <summary className="cc-guide-more__summary">Show more of this page</summary>
+          <div className="cc-guide-more__body">
+            {section.details.map((item) => (
+              <figure key={item.shot} className="cc-guide-shot">
+                <figcaption className="cc-guide-shot__caption">
+                  <h3 className="cc-guide-shot__title">{item.title}</h3>
+                  <p className="cc-guide-shot__body">{item.body}</p>
+                </figcaption>
+                <GuideLiveShot shot={item.shot} />
+              </figure>
+            ))}
+          </div>
+        </details>
+      ) : null}
+
+      <Link href={section.demoHref} className="cc-guide-section__try">
+        {section.demoLabel}
+      </Link>
+    </section>
+  );
+}
+
 export function GuidePage() {
   const [active, setActive] = useState<GuideSectionId>('home');
 
@@ -146,9 +273,11 @@ export function GuidePage() {
   }, []);
 
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '') as GuideSectionId;
-    if (GUIDE_SECTIONS.some((section) => section.id === hash)) {
-      jumpToSection(hash);
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'story') {
+      jumpToSection('story');
+    } else if (GUIDE_SECTIONS.some((section) => section.id === hash)) {
+      jumpToSection(hash as GuideSectionId);
     } else {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
@@ -180,57 +309,60 @@ export function GuidePage() {
     <div className="cc-guide-page" data-testid="guide-page">
       <header className="cc-guide-hero">
         <p className="cc-guide-hero__kicker">Guide</p>
-        <h1 className="cc-guide-hero__title">How the workspace works</h1>
+        <h1 className="cc-guide-hero__title">Show me around CodeCard</h1>
         <p className="cc-guide-hero__lead">
-          Six tabs, in this order. Each step is one screen and what it does.
-          Then try it on Alex Chen&apos;s card.
+          Skim the map. Stop where you want to look closer. Then try it on Alex
+          Chen&apos;s card.
         </p>
         <LiveDemoLink className="cc-guide-hero__demo">Open the live demo</LiveDemoLink>
       </header>
 
+      <section className="cc-guide-glance" aria-labelledby="guide-glance-heading">
+        <h2 id="guide-glance-heading" className="cc-guide-glance__heading">
+          CodeCard, at a glance
+        </h2>
+        <ul className="cc-guide-glance__list">
+          {GUIDE_SECTIONS.map((section) => (
+            <li key={section.id}>
+              <a
+                href={`#${section.id}`}
+                className="cc-guide-glance__card"
+                onClick={(event) => {
+                  event.preventDefault();
+                  jumpToSection(section.id);
+                }}
+              >
+                <p className="cc-guide-glance__title">{section.glanceTitle}</p>
+                <p className="cc-guide-glance__body">{section.glanceBody}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <GuideJumpNav active={active} />
 
-      {GUIDE_SECTIONS.map((section, sectionIndex) => {
-        const stepStart = GUIDE_SECTIONS.slice(0, sectionIndex).reduce(
-          (count, item) => count + item.shots.length,
-          0,
-        );
-        return (
-        <section
-          key={section.id}
-          id={`guide-${section.id}`}
-          className="cc-guide-section"
-          aria-labelledby={`guide-${section.id}-heading`}
-        >
-          <div className="cc-guide-section__copy">
-            <p className="cc-guide-section__kicker">{section.kicker}</p>
-            <h2 id={`guide-${section.id}-heading`} className="cc-guide-section__title">
-              {section.title}
-            </h2>
-            <p className="cc-guide-section__lead">{section.lead}</p>
-          </div>
+      {GUIDE_SECTIONS.map((section) => (
+        <GuideSectionBlock key={section.id} section={section} />
+      ))}
 
-          <div className="cc-guide-shots">
-            {section.shots.map((item, shotIndex) => (
-              <figure key={item.id} className="cc-guide-shot">
-                <figcaption className="cc-guide-shot__caption">
-                  <p className="cc-guide-shot__step">
-                    {String(stepStart + shotIndex + 1).padStart(2, '0')}
-                  </p>
-                  <h3 className="cc-guide-shot__title">{item.title}</h3>
-                  <p className="cc-guide-shot__body">{item.caption}</p>
-                </figcaption>
-                <GuideLiveShot shot={item.shot} />
-              </figure>
-            ))}
-          </div>
-
-          <Link href={section.demoHref} className="cc-guide-section__try">
-            {section.demoLabel}
-          </Link>
-        </section>
-        );
-      })}
+      <section
+        id="guide-story"
+        className="cc-guide-story"
+        aria-labelledby="guide-story-heading"
+      >
+        <p className="cc-guide-section__kicker">The loop</p>
+        <h2 id="guide-story-heading" className="cc-guide-section__title">
+          {GUIDE_STORY.title}
+        </h2>
+        <ol className="cc-guide-story__list">
+          {GUIDE_STORY.steps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+        <p className="cc-guide-story__close">{GUIDE_STORY.close}</p>
+        <LiveDemoLink className="cc-guide-hero__demo">Try it on the live demo</LiveDemoLink>
+      </section>
     </div>
   );
 }

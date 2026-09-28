@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { GUIDE_SECTIONS } from './guide-content';
+import { GUIDE_SECTIONS, GUIDE_STORY, guideCoveredShots } from './guide-content';
 import { MARKETING_GUIDE_HREF } from './site-routes';
 
 const WEB = resolve(process.cwd());
@@ -21,19 +21,20 @@ describe('marketing Guide walkthrough', () => {
     expect(GUIDE_SECTIONS.find((section) => section.id === 'connections')?.lead).toContain(
       'scan your QR',
     );
-    expect(GUIDE_SECTIONS.find((section) => section.id === 'work')?.points.join(' ')).toContain(
-      'mini presentation',
-    );
+    const work = GUIDE_SECTIONS.find((section) => section.id === 'work');
+    expect(work?.canDo.map((item) => `${item.title} ${item.body}`).join(' ')).toContain('slides');
     const analytics = GUIDE_SECTIONS.find((section) => section.id === 'analytics');
-    expect(analytics?.points.join(' ')).toContain('plain-language review');
-    expect(analytics?.points.join(' ')).toContain('Ask the coach');
-    expect(analytics?.shots.some((shot) => shot.shot === 'analytics-review')).toBe(true);
+    expect(analytics?.canDo.map((item) => `${item.title} ${item.body}`).join(' ')).toContain(
+      'Ask the coach',
+    );
+    expect(analytics?.overviewShot).toBe('analytics-review');
+    expect(GUIDE_SECTIONS.every((section) => section.canDo.length >= 3)).toBe(true);
+    expect(GUIDE_STORY.close).toContain('quick introduction');
   });
 
-  it('shows a full snapshot for every surface on every page', () => {
-    const shots = GUIDE_SECTIONS.flatMap((section) => section.shots);
-    expect(GUIDE_SECTIONS.every((section) => section.shots.length >= 1)).toBe(true);
-    expect(shots.map((shot) => shot.shot)).toEqual([
+  it('keeps every surface discoverable without dumping them as one list', () => {
+    const covered = guideCoveredShots();
+    for (const shot of [
       'home-desk',
       'home-share',
       'home-identity',
@@ -56,7 +57,9 @@ describe('marketing Guide walkthrough', () => {
       'settings-signin',
       'settings-plan',
       'settings-export',
-    ]);
+    ] as const) {
+      expect(covered).toContain(shot);
+    }
     expect(GUIDE_SECTIONS.map((section) => section.kicker)).toEqual([
       '01 · Home',
       '02 · Work',
@@ -83,8 +86,13 @@ describe('marketing Guide walkthrough', () => {
     expect(view).toContain('jumpToSection');
     expect(view).toContain('EditorialProductFrame');
     expect(view).toContain('GuideLiveShot');
-    expect(view).toContain('section.shots');
-    expect(view).toContain('cc-guide-shot__step');
+    expect(view).toContain('cc-guide-glance');
+    expect(view).toContain('What you can do here');
+    expect(view).toContain('cc-guide-overview');
+    expect(view).toContain('Show more of this page');
+    expect(view).toContain('cc-guide-story');
+    expect(view).toContain('section.workflow');
+    expect(view).not.toContain('cc-guide-shot__step');
     expect(view).not.toContain('cc-guide-section__points');
     expect(view).toContain('fit="content"');
     expect(view).toContain('className="cc-guide-page"');
@@ -111,5 +119,19 @@ describe('marketing Guide walkthrough', () => {
     expect(guideCss).not.toContain('overflow: visible');
     expect(how).toContain('permanentRedirect');
     expect(how).toContain('MARKETING_GUIDE_HREF');
+  });
+
+  it('treats Connections as a scan-to-follow-up walkthrough', () => {
+    const connections = GUIDE_SECTIONS.find((section) => section.id === 'connections');
+    expect(connections?.workflow?.title).toBe('Meet someone');
+    expect(connections?.workflow?.steps.map((step) => step.title)).toEqual([
+      'Show your QR',
+      'They scan it',
+      'They appear here',
+      'Add context',
+      'Plan the follow-up',
+    ]);
+    expect(connections?.workflow?.steps.some((step) => step.shot === 'home-share')).toBe(true);
+    expect(connections?.workflow?.result).toContain('where you met');
   });
 });
