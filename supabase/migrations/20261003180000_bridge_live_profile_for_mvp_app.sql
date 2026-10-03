@@ -80,9 +80,43 @@ UPDATE public.profiles
 SET owner_user_id = id
 WHERE owner_user_id IS NULL;
 
-UPDATE public.profiles
-SET slug = username
-WHERE slug IS NULL OR btrim(slug) = '';
+-- username and visibility exist only on the pre-MVP profile table.
+-- A database created from 20250627000001 already has slug and must skip these.
+DO $legacy_profile_backfill$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'username'
+  ) THEN
+    RETURN;
+  END IF;
+
+  UPDATE public.profiles
+  SET slug = username
+  WHERE slug IS NULL OR btrim(slug) = '';
+
+  UPDATE public.profiles p
+  SET display_name = COALESCE(
+    NULLIF(btrim(u.raw_user_meta_data->>'full_name'), ''),
+    NULLIF(btrim(u.raw_user_meta_data->>'name'), ''),
+    p.display_name
+  )
+  FROM auth.users u
+  WHERE p.id = u.id
+    AND (
+      p.display_name = p.username
+      OR p.display_name = split_part(u.email, '@', 1)
+    );
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'visibility'
+  ) THEN
+    UPDATE public.profiles
+    SET is_public = (visibility = 'public'::public.profile_visibility);
+  END IF;
+END
+$legacy_profile_backfill$;
 
 INSERT INTO public.tenants (name, slug)
 SELECT p.display_name, p.slug
@@ -107,26 +141,10 @@ WHERE p.tenant_id IS NOT NULL
   );
 
 UPDATE public.profiles p
-SET display_name = COALESCE(
-  NULLIF(btrim(u.raw_user_meta_data->>'full_name'), ''),
-  NULLIF(btrim(u.raw_user_meta_data->>'name'), ''),
-  p.display_name
-)
-FROM auth.users u
-WHERE p.id = u.id
-  AND (
-    p.display_name = p.username
-    OR p.display_name = split_part(u.email, '@', 1)
-  );
-
-UPDATE public.profiles p
 SET avatar_url = COALESCE(NULLIF(p.avatar_url, ''), NULLIF(u.raw_user_meta_data->>'avatar_url', ''))
 FROM auth.users u
 WHERE p.id = u.id
   AND (p.avatar_url IS NULL OR p.avatar_url = '');
-
-UPDATE public.profiles
-SET is_public = (visibility = 'public'::public.profile_visibility);
 
 ALTER TABLE public.profiles
   ALTER COLUMN owner_user_id SET NOT NULL,
@@ -190,90 +208,27 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS profiles_sync_visibility ON public.profiles;
-CREATE TRIGGER profiles_sync_visibility
-  BEFORE INSERT OR UPDATE ON public.profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION public.profiles_sync_visibility();
+DO $legacy_visibility_trigger$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'visibility'
+  ) THEN
+    RETURN;
+  END IF;
+
+  EXECUTE 'DROP TRIGGER IF EXISTS profiles_sync_visibility ON public.profiles';
+  EXECUTE 'CREATE TRIGGER profiles_sync_visibility BEFORE INSERT OR UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.profiles_sync_visibility()';
+END
+$legacy_visibility_trigger$;
 
 DROP POLICY IF EXISTS profiles_mvp_public_select ON public.profiles;
 CREATE POLICY profiles_mvp_public_select ON public.profiles
   FOR SELECT
   USING (is_public = true OR owner_user_id = auth.uid());
 
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'public'
-AS $function$
-DECLARE
-  base_username TEXT;
-  final_username TEXT;
-  suffix INTEGER := 0;
-  display TEXT;
-  tid uuid;
-BEGIN
-  base_username := lower(regexp_replace(
-    COALESCE(
-      NEW.raw_user_meta_data->>'username',
-      NEW.raw_user_meta_data->>'user_name',
-      NEW.raw_user_meta_data->>'preferred_username',
-      split_part(NEW.email, '@', 1)
-    ),
-  '[^a-z0-9_-]', '', 'g'));
-
-  IF length(base_username) < 3 THEN
-    base_username := 'user' || substr(replace(NEW.id::text, '-', ''), 1, 8);
-  END IF;
-
-  final_username := substr(base_username, 1, 30);
-
-  WHILE EXISTS (
-    SELECT 1 FROM public.profiles WHERE username = final_username OR slug = final_username
-  ) OR EXISTS (
-    SELECT 1 FROM public.tenants WHERE slug = final_username
-  ) LOOP
-    suffix := suffix + 1;
-    final_username := substr(base_username, 1, 28) || suffix::text;
-  END LOOP;
-
-  display := COALESCE(
-    NULLIF(btrim(NEW.raw_user_meta_data->>'full_name'), ''),
-    NULLIF(btrim(NEW.raw_user_meta_data->>'name'), ''),
-    NULLIF(btrim(NEW.raw_user_meta_data->>'display_name'), ''),
-    final_username
-  );
-
-  INSERT INTO public.tenants (name, slug)
-  VALUES (display, final_username)
-  RETURNING id INTO tid;
-
-  INSERT INTO public.profiles (
-    id, username, display_name, slug, owner_user_id, tenant_id,
-    is_public, avatar_url, skills, visibility
-  ) VALUES (
-    NEW.id,
-    final_username,
-    display,
-    final_username,
-    NEW.id,
-    tid,
-    false,
-    NULLIF(NEW.raw_user_meta_data->>'avatar_url', ''),
-    '{}',
-    'private'
-  );
-
-  INSERT INTO public.tenant_memberships (tenant_id, user_id, role)
-  VALUES (tid, NEW.id, 'owner');
-
-  INSERT INTO public.audit_logs (user_id, action, metadata)
-  VALUES (NEW.id, 'user.created', jsonb_build_object('provider', NEW.raw_app_meta_data->>'provider'));
-
-  RETURN NEW;
-END;
-$function$;
+-- Signup provisioning lives in 20261003193000_ensure_owner_profile.sql.
+-- This bridge must not replace handle_new_user with a legacy-only insert.
 
 CREATE TABLE IF NOT EXISTS public.profile_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -302,8 +257,22 @@ ALTER TABLE public.projects
   ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS case_study_sections jsonb NOT NULL DEFAULT '{}'::jsonb;
 
-ALTER TABLE public.projects ALTER COLUMN is_featured SET DEFAULT false;
-ALTER TABLE public.projects ALTER COLUMN visibility SET DEFAULT 'private';
+DO $legacy_project_defaults$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'projects' AND column_name = 'is_featured'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.projects ALTER COLUMN is_featured SET DEFAULT false';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'projects' AND column_name = 'visibility'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.projects ALTER COLUMN visibility SET DEFAULT ''private''';
+  END IF;
+END
+$legacy_project_defaults$;
 
 CREATE OR REPLACE FUNCTION public.projects_fill_legacy_owner()
 RETURNS trigger
@@ -331,11 +300,19 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS projects_fill_legacy_owner ON public.projects;
-CREATE TRIGGER projects_fill_legacy_owner
-  BEFORE INSERT OR UPDATE ON public.projects
-  FOR EACH ROW
-  EXECUTE FUNCTION public.projects_fill_legacy_owner();
+DO $legacy_project_owner$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'projects' AND column_name = 'user_id'
+  ) THEN
+    RETURN;
+  END IF;
+
+  EXECUTE 'DROP TRIGGER IF EXISTS projects_fill_legacy_owner ON public.projects';
+  EXECUTE 'CREATE TRIGGER projects_fill_legacy_owner BEFORE INSERT OR UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION public.projects_fill_legacy_owner()';
+END
+$legacy_project_owner$;
 
 CREATE TABLE IF NOT EXISTS public.project_focus_areas (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -570,30 +547,30 @@ DROP POLICY IF EXISTS project_focus_areas_owner ON public.project_focus_areas;
 CREATE POLICY project_focus_areas_owner ON public.project_focus_areas
   FOR ALL
   USING (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   );
 
 DROP POLICY IF EXISTS project_domains_owner ON public.project_domains;
 CREATE POLICY project_domains_owner ON public.project_domains
   FOR ALL
   USING (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   );
 
 DROP POLICY IF EXISTS project_media_assets_owner ON public.project_media_assets;
 CREATE POLICY project_media_assets_owner ON public.project_media_assets
   FOR ALL
   USING (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   );
 
 DROP POLICY IF EXISTS project_media_assets_public_select ON public.project_media_assets;
@@ -611,10 +588,10 @@ DROP POLICY IF EXISTS project_links_owner ON public.project_links;
 CREATE POLICY project_links_owner ON public.project_links
   FOR ALL
   USING (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.user_id = auth.uid())
+    EXISTS (SELECT 1 FROM public.projects pr WHERE pr.id = project_id AND pr.owner_user_id = auth.uid())
   );
 
 DROP POLICY IF EXISTS project_orderings_owner ON public.project_orderings;

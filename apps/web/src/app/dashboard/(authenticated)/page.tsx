@@ -15,6 +15,7 @@ import { loadProfileCompletion } from '@/lib/profile/completion-data';
 import { loadHomeSchedule } from '@/lib/schedule/home-schedule-core';
 import { listPendingScanOffers } from '@/lib/connections/scan-offers-core';
 import { HomeScanOffers } from '@/components/dashboard/home-scan-offers';
+import { loadOwnerProfile, OWNER_HOME_PROFILE_COLUMNS } from '@/lib/profile/owner-profile';
 
 export default async function DashboardHomePage() {
   const supabase = await createClient();
@@ -22,13 +23,21 @@ export default async function DashboardHomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select(
-      'id, tenant_id, owner_user_id, slug, display_name, headline, bio, avatar_url, location, skills, is_public, created_at, updated_at',
-    )
-    .eq('owner_user_id', user!.id)
-    .single();
+  const { profile, error: profileError } = await loadOwnerProfile<{
+    id: string;
+    tenant_id: string;
+    owner_user_id: string;
+    slug: string;
+    display_name: string | null;
+    headline: string | null;
+    bio: string | null;
+    avatar_url: string | null;
+    location: string | null;
+    skills: string[] | null;
+    is_public: boolean;
+    created_at: string;
+    updated_at: string;
+  }>(supabase, user!.id, OWNER_HOME_PROFILE_COLUMNS);
 
   if (profileError) {
     return <DashboardOverviewLoadErrorState />;

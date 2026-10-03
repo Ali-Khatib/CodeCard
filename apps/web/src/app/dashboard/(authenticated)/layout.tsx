@@ -8,6 +8,7 @@ import { buildSignInHref } from '@/lib/auth/session-expiry';
 import { getCircleUnreadSummary } from '@/lib/circle/circle-read-state-core';
 import { getHomeLoopState } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
+import { loadOwnerProfile, OWNER_SHELL_PROFILE_COLUMNS } from '@/lib/profile/owner-profile';
 
 export default async function AuthenticatedDashboardLayout({
   children,
@@ -28,12 +29,16 @@ export default async function AuthenticatedDashboardLayout({
     redirect('/reset-password');
   }
 
-  const [{ data: profile }, circleUnread] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('id, slug, display_name, avatar_url, headline, bio, is_public')
-      .eq('owner_user_id', user.id)
-      .single(),
+  const [{ profile }, circleUnread] = await Promise.all([
+    loadOwnerProfile<{
+      id: string;
+      slug: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      headline: string | null;
+      bio: string | null;
+      is_public: boolean;
+    }>(supabase, user.id, OWNER_SHELL_PROFILE_COLUMNS),
     getCircleUnreadSummary(supabase),
   ]);
 
