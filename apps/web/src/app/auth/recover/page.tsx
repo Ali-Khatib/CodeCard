@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { parseRecoveryHash } from '@/lib/auth/recovery-hash';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 
 /**
@@ -19,10 +20,8 @@ export default function AuthRecoverPage() {
       return;
     }
 
-    const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : '';
-    const params = new URLSearchParams(hash);
-    const hasHashToken = Boolean(params.get('access_token'));
     const supabase = createClient();
+    const tokens = parseRecoveryHash(window.location.hash);
     let cancelled = false;
     let navigated = false;
 
@@ -32,30 +31,39 @@ export default function AuthRecoverPage() {
       router.replace('/auth/mark-recovery');
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) return;
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+    function fail() {
+      if (cancelled || navigated) return;
+      navigated = true;
+      setFailed(true);
+      router.replace('/auth/error?reason=missing_code&redirect=%2Freset-password');
+    }
+
+    void (async () => {
+      if (tokens) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token: tokens.accessToken,
+          refresh_token: tokens.refreshToken,
+        });
+        if (cancelled) return;
+        if (!error && data.session) {
+          go();
+          return;
+        }
+        fail();
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (data.session) {
         go();
+        return;
       }
-    });
-
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) go();
-    });
-
-    const timeout = window.setTimeout(() => {
-      if (!navigated && !hasHashToken) {
-        setFailed(true);
-        router.replace('/auth/error?reason=missing_code&redirect=%2Freset-password');
-      }
-    }, 1500);
+      fail();
+    })();
 
     return () => {
       cancelled = true;
-      subscription.unsubscribe();
-      window.clearTimeout(timeout);
     };
   }, [router]);
 

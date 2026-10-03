@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { defaultPostAuthRedirectForType } from '@/lib/auth/auth-link-forward';
+import { parseRecoveryHash } from '@/lib/auth/recovery-hash';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 
 /**
@@ -19,12 +20,10 @@ export function AuthHashRecoveryCatcher() {
     if (typeof window === 'undefined') return;
     if (pathname.startsWith('/reset-password') || pathname.startsWith('/auth/recover')) return;
 
-    const hash = window.location.hash.replace(/^#/, '');
-    if (!hash) return;
+    const tokens = parseRecoveryHash(window.location.hash);
+    if (!tokens) return;
 
-    const params = new URLSearchParams(hash);
-    if (!params.get('access_token')) return;
-
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const type = params.get('type');
     const destination =
       type === 'recovery' ||
@@ -44,26 +43,18 @@ export function AuthHashRecoveryCatcher() {
       router.refresh();
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) return;
-      if (
-        event === 'PASSWORD_RECOVERY' ||
-        event === 'SIGNED_IN' ||
-        (event === 'INITIAL_SESSION' && type === 'recovery')
-      ) {
+    void supabase.auth
+      .setSession({
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+      })
+      .then(({ data, error }) => {
+        if (cancelled || error || !data.session) return;
         go();
-      }
-    });
-
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) go();
-    });
+      });
 
     return () => {
       cancelled = true;
-      subscription.unsubscribe();
     };
   }, [pathname, router]);
 
