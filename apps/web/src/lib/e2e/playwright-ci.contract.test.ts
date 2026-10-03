@@ -29,7 +29,9 @@ describe('WS14-T012 Playwright CI workflow contract', () => {
     expect(workflow).toContain('public.live.spec.ts');
     expect(workflow).toContain('account.live.spec.ts');
     expect(workflow).toContain('PLAYWRIGHT_E2E_SCREENSHOT: only-on-failure');
-    expect(workflow).toContain('actions/upload-artifact@v4');
+    expect(workflow).toContain(
+      'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4',
+    );
     expect(workflow).toContain('if: failure()');
     expect(workflow).toContain('retention-days: 7');
 
