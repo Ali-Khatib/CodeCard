@@ -51,6 +51,8 @@ export type GuideScreen = {
   tab: string;
   callout: string;
   body: string;
+  /** Visible text in the live screen that the highlight must land on. */
+  anchor: string;
   spot: GuideSpot;
 };
 
@@ -110,6 +112,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Home',
         callout: 'This is your public card',
         body: 'This is the identity you hand someone digitally. They do not need an app or an account to view it.',
+        anchor: 'How people see you',
         spot: { x: 8, y: 18, w: 84, h: 62 },
       },
       {
@@ -117,6 +120,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Home',
         callout: 'Share your CodeCard',
         body: 'In person, they scan your QR and your public card opens. No app download required. Copying the public link does not create a Connection.',
+        anchor: 'Get your QR code',
         spot: { x: 10, y: 16, w: 80, h: 58 },
       },
     ],
@@ -143,6 +147,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Work',
         callout: 'Your work lives here',
         body: 'Projects are the first thing someone can open after they scan you.',
+        anchor: 'DevFlow',
         spot: { x: 7, y: 24, w: 86, h: 62 },
       },
       {
@@ -150,6 +155,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Work',
         callout: 'Research sits with the builds',
         body: 'Papers and research projects live in the same tab, not on a separate social profile.',
+        anchor: 'Retrieval Evaluation',
         spot: { x: 7, y: 22, w: 86, h: 64 },
       },
     ],
@@ -177,6 +183,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Connections',
         callout: 'Who you met',
         body: 'Each person you saved from a scan stays in this list.',
+        anchor: 'Elena Vasquez',
         spot: { x: 7, y: 30, w: 86, h: 46 },
       },
       {
@@ -184,6 +191,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Connections',
         callout: 'Add context',
         body: 'The note stays on the person: where you met and what you talked about. Edit them to add the date and a follow-up.',
+        anchor: 'Met at the booth',
         spot: { x: 6, y: 18, w: 88, h: 58 },
       },
     ],
@@ -210,6 +218,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Circle',
         callout: 'Their new work',
         body: 'A private look at what people you have met are publishing. Not a public engagement feed.',
+        anchor: 'PipelineX',
         spot: { x: 7, y: 28, w: 86, h: 62 },
       },
     ],
@@ -235,6 +244,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Analytics',
         callout: 'Profile views',
         body: 'The large number is people reached. Project opens and QR scans sit with it, so you can see what they looked at.',
+        anchor: 'Profile reach',
         spot: { x: 6, y: 55, w: 88, h: 40 },
       },
     ],
@@ -258,6 +268,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         tab: 'Settings',
         callout: 'Account controls',
         body: 'Profile, account, billing, and export sit in one list. Your photo and bio stay on Home.',
+        anchor: 'CodeCard identity',
         spot: { x: 8, y: 16, w: 84, h: 48 },
       },
     ],

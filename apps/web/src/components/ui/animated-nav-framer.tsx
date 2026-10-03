@@ -153,7 +153,6 @@ export function AnimatedNavFramer({
       const previousNavMax = nav instanceof HTMLElement ? nav.style.maxWidth : '';
       const previousGroupMax = group instanceof HTMLElement ? group.style.maxWidth : '';
       const previousGroupWidth = group instanceof HTMLElement ? group.style.width : '';
-      const previousWrap = group instanceof HTMLElement ? group.style.flexWrap : '';
 
       const readPadX = () => {
         const styles = window.getComputedStyle(inner);
@@ -211,18 +210,21 @@ export function AnimatedNavFramer({
           ? (Number.parseFloat(window.getComputedStyle(nav).borderTopWidth) || 0) +
             (Number.parseFloat(window.getComputedStyle(nav).borderBottomWidth) || 0)
           : 0;
-      const width = Math.min(safe, Math.ceil(Math.min(fitted, budget) + borderX));
+      const wraps = fitted > budget + 1;
+      const slack = wraps ? 0 : 8;
+      const width = Math.min(safe, Math.ceil(Math.min(fitted, budget) + borderX + slack));
 
       if (nav instanceof HTMLElement) {
         nav.style.width = `${width}px`;
         nav.style.maxWidth = `${width}px`;
+        nav.dataset.navWrap = wraps ? 'true' : 'false';
       }
       inner.style.width = '100%';
       inner.style.maxWidth = '100%';
       if (group instanceof HTMLElement) {
         group.style.width = '100%';
         group.style.maxWidth = '100%';
-        group.style.flexWrap = 'wrap';
+        group.style.flexWrap = wraps ? 'wrap' : 'nowrap';
       }
       void inner.offsetHeight;
       const height = Math.ceil(Math.max(inner.scrollHeight, 52) + panelHeight + borderY);
@@ -236,7 +238,7 @@ export function AnimatedNavFramer({
       if (group instanceof HTMLElement) {
         group.style.maxWidth = previousGroupMax;
         group.style.width = previousGroupWidth;
-        group.style.flexWrap = previousWrap;
+        group.style.flexWrap = wraps ? 'wrap' : 'nowrap';
       }
 
       setNavFit((prev) => (Math.abs(prev - fit) < 0.004 ? prev : Number(fit.toFixed(4))));

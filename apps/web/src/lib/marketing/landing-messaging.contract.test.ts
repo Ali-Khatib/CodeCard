@@ -13,10 +13,7 @@ describe('landing positioning copy', () => {
     const mark = read('src/components/landing/codecard-mark-logo.tsx');
     const home = read('src/components/landing/marketing-home-control.tsx');
     const faqPage = read('src/components/landing/faq-page.tsx');
-    expect(shell).toContain("{ label: 'Guide', href: '/guide'");
-    expect(shell.indexOf("{ label: 'Guide', href: '/guide'")).toBeLessThan(
-      shell.indexOf("{ label: 'Pricing', href: '/pricing' }"),
-    );
+    expect(shell).not.toContain("{ label: 'Guide', href: '/guide'");
     expect(shell).toContain("{ label: 'Pricing', href: '/pricing' }");
     expect(shell).toContain("{ label: 'FAQ', href: '/faq'");
     expect(shell).toContain('MarketingHomeControl');

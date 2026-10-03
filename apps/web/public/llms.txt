@@ -8,8 +8,6 @@ CodeCard is a public-first portfolio product. Visitors can browse published prof
 
 - Home: /
 - Pricing: /pricing
-- Guide: /guide
-- How it works: /how-it-works
 - Research index: /research
 - Public profiles: /{profileSlug}
 - Public projects: /{profileSlug}/projects/{projectId}

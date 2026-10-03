@@ -7,7 +7,6 @@ import { MarketingHomeControl } from './marketing-home-control';
 import { LandingHeroNav, type NavItem } from './landing-hero-nav';
 
 export const MARKETING_NAV_ITEMS: NavItem[] = [
-  { label: 'Guide', href: '/guide', ariaLabel: 'How the CodeCard workspace works' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'FAQ', href: '/faq', ariaLabel: 'Common questions' },
 ];

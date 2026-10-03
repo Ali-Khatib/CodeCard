@@ -13,6 +13,7 @@
   z-index: 1;
   background: var(--guide-cream);
   color: var(--guide-ink);
+  overflow-anchor: none;
   padding: 0 0 5.5rem;
   font-family: var(--font-inter), system-ui, sans-serif;
   font-weight: 400;
@@ -304,8 +305,10 @@
 
 .cc-guide-shot-frame {
   margin: 0;
+  height: 28rem;
+  max-height: 28rem;
   overflow: hidden;
-  max-height: 32rem;
+  overflow-anchor: none;
   border: 1px solid var(--guide-line);
   border-radius: 18px;
   background: #fff;
@@ -326,28 +329,8 @@
   position: relative;
   width: 100%;
   max-width: 1040px;
+  transition: none !important;
   transform: none;
-}
-
-/* Crop each live frame so the explained control sits in the window. */
-.cc-guide-page [data-shot='work-projects'] .cc-ed__demo-snap__inner {
-  margin-top: -54rem;
-}
-
-.cc-guide-page [data-shot='work-research'] .cc-ed__demo-snap__inner {
-  margin-top: -59rem;
-}
-
-.cc-guide-page [data-shot='connections-list'] .cc-ed__demo-snap__inner {
-  margin-top: -23rem;
-}
-
-.cc-guide-page [data-shot='connections-open'] .cc-ed__demo-snap__inner {
-  margin-top: -70rem;
-}
-
-.cc-guide-page [data-shot='circle-feed'] .cc-ed__demo-snap__inner {
-  margin-top: -14rem;
 }
 
 .cc-guide-page .cc-ed__demo-snap .cc-app-mobile-nav,
@@ -362,9 +345,11 @@
   transition-duration: 0.01ms !important;
 }
 
+.cc-guide-shot,
 .cc-guide-shot__placeholder,
 .cc-guide-shot__fallback {
-  min-height: 18rem;
+  height: 100%;
+  min-height: 100%;
   background: #fff;
 }
 
@@ -535,13 +520,8 @@
 @media (min-width: 900px) {
   .cc-guide-screen {
     grid-template-columns: minmax(13.5rem, 17rem) minmax(0, 1fr);
-    align-items: start;
+    align-items: center;
     column-gap: 1.25rem;
-  }
-
-  .cc-guide-screen__callout {
-    position: relative;
-    top: var(--spot-y);
   }
 }
 
@@ -568,7 +548,8 @@
   }
 
   .cc-guide-shot-frame {
-    max-height: 26rem;
+    height: 22rem;
+    max-height: 22rem;
   }
 }
 
@@ -582,11 +563,9 @@
 @keyframes cc-guide-rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 

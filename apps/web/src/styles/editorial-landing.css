@@ -313,7 +313,9 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   flex: 0 1 auto;
   min-height: 2.6rem;
   max-width: 100%;
-  padding: 0.5rem calc(clamp(0.5rem, 1.35vw, 0.95rem) * var(--cc-nav-fit, 1));
+  /* Uppercase glyphs sit high in the em box. A few extra pixels of top padding centers them. */
+  padding-block: calc(0.5rem * var(--cc-nav-fit, 1) + 2px) calc(0.5rem * var(--cc-nav-fit, 1) - 1px);
+  padding-inline: calc(clamp(0.5rem, 1.35vw, 0.95rem) * var(--cc-nav-fit, 1));
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: calc(clamp(0.72rem, 0.42rem + 1.05vw, 0.875rem) * var(--cc-nav-fit, 1));
@@ -356,12 +358,16 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   column-gap: calc(clamp(0.4rem, 0.85vw, 0.55rem) * var(--cc-nav-fit, 1));
   row-gap: 0.2rem;
+}
+
+.cc-nav-veil[data-nav-wrap='true'] .cc-hume-fade-group {
+  flex-wrap: wrap;
 }
 
 .cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
@@ -503,7 +509,7 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
   max-width: 100%;
   min-width: 0;

@@ -5921,6 +5921,10 @@ button.cc-copy-feedback:active:not(.cc-copy-success) {
   position: relative;
 }
 
+.cc-marketing-nav-shell .cc-nav-veil:not(.cc-nav-veil--collapsed) {
+  justify-content: center;
+}
+
 .cc-nav-veil--collapsed {
   padding: 0;
   margin-inline: auto;

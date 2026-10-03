@@ -99,65 +99,180 @@ function useEntered() {
   return { ref, entered };
 }
 
+type GuideOverlay = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+function findAnchor(root: HTMLElement, label: string): HTMLElement | null {
+  const needle = label.replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!needle) return null;
+  let best: HTMLElement | null = null;
+  let bestScore = Infinity;
+  const nodes = root.querySelectorAll('*');
+  for (const node of nodes) {
+    if (!(node instanceof HTMLElement)) continue;
+    const text = (node.innerText || '').replace(/\s+/g, ' ').trim();
+    if (!text.toLowerCase().includes(needle)) continue;
+    if (text.length > needle.length + 80) continue;
+    const rect = node.getBoundingClientRect();
+    if (rect.width < 8 || rect.height < 8) continue;
+    const exact = text.toLowerCase() === needle;
+    const score = (exact ? 0 : 100000) + text.length * 20 + rect.width * rect.height;
+    if (score < bestScore) {
+      best = node;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
+function highlightTarget(node: HTMLElement, root: HTMLElement, stageWidth: number): HTMLElement {
+  const rect = node.getBoundingClientRect();
+  if (rect.height >= 32 && rect.width >= 72) return node;
+  const parent = node.parentElement;
+  if (!parent || parent === root || !root.contains(parent)) return node;
+  const parentRect = parent.getBoundingClientRect();
+  if (parentRect.height > 120 || parentRect.width > stageWidth * 0.92) return node;
+  return parent;
+}
+
 function GuideScreenView({ screen, eager }: { screen: GuideScreen; eager?: boolean }) {
   const { ref, entered } = useEntered();
-  const [line, setLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(
-    null,
-  );
+  const [overlay, setOverlay] = useState<GuideOverlay | null>(null);
 
   useEffect(() => {
     const fig = ref.current;
     if (!fig) return;
-    const measure = () => {
-      const spot = fig.querySelector('.cc-guide-screen__spot');
+    let frame = 0;
+    let shifting = false;
+
+    const readShift = (inner: HTMLElement) => {
+      const value = getComputedStyle(inner).transform;
+      if (!value || value === 'none') return 0;
+      const match = /matrix\(([^)]+)\)/.exec(value);
+      if (!match) return 0;
+      const parts = match[1].split(',').map((part) => Number(part.trim()));
+      return parts.length === 6 ? parts[5] || 0 : 0;
+    };
+
+    const place = () => {
+      const stage = fig.querySelector('.cc-guide-screen__stage');
       const callout = fig.querySelector('.cc-guide-screen__callout');
-      if (!spot || !callout) return false;
-      const fr = fig.getBoundingClientRect();
-      const sr = spot.getBoundingClientRect();
-      const cr = callout.getBoundingClientRect();
-      if (fr.width < 2 || sr.width < 2) return false;
-      const wide = window.matchMedia('(min-width: 900px)').matches;
-      const aligned = wide ? Math.abs(cr.top - sr.top) < 48 : cr.top > sr.bottom - 8;
-      if (!aligned) return false;
-      if (wide) {
-        setLine({
-          x1: cr.right - fr.left + 6,
-          y1: cr.top + Math.min(22, cr.height / 2) - fr.top,
-          x2: sr.left - fr.left - 2,
-          y2: sr.top + sr.height * 0.42 - fr.top,
+      const clip = fig.querySelector('.cc-guide-shot-frame');
+      const inner = fig.querySelector('.cc-ed__demo-snap__inner');
+      if (!(stage instanceof HTMLElement) || !(callout instanceof HTMLElement)) return false;
+      if (!(clip instanceof HTMLElement) || !(inner instanceof HTMLElement)) return false;
+
+      const match = findAnchor(inner, screen.anchor);
+      if (!match) return false;
+      const target = highlightTarget(match, inner, clip.clientWidth);
+      const frameRect = clip.getBoundingClientRect();
+      if (frameRect.height < 40) return false;
+      const visibleTop = frameRect.top + 12;
+      const visibleBottom = frameRect.bottom - 12;
+      const visibleMid = (visibleTop + visibleBottom) / 2;
+      const before = target.getBoundingClientRect();
+      const delta = before.top + before.height / 2 - visibleMid;
+      const outside = before.bottom < frameRect.top + 8 || before.top > frameRect.bottom - 8;
+      if (!shifting && (outside || Math.abs(delta) > 4)) {
+        const maxUp = Math.max(0, inner.scrollHeight - frameRect.height);
+        const next = Math.max(-maxUp, Math.min(24, readShift(inner) - delta));
+        shifting = true;
+        inner.style.setProperty('transform', `translate3d(0px, ${next}px, 0px)`, 'important');
+        window.requestAnimationFrame(() => {
+          shifting = false;
+          place();
         });
-      } else {
-        const x = sr.left + sr.width / 2 - fr.left;
-        setLine({
-          x1: x,
-          y1: sr.bottom - fr.top + 4,
-          x2: x,
-          y2: cr.top - fr.top - 4,
-        });
+        return false;
       }
+
+      const box = target.getBoundingClientRect();
+      if (box.bottom < frameRect.top + 8 || box.top > frameRect.bottom - 8) {
+        setOverlay(null);
+        return false;
+      }
+      const stageRect = stage.getBoundingClientRect();
+      const figRect = fig.getBoundingClientRect();
+      const pad = 10;
+      const left = box.left - stageRect.left - pad;
+      const top = box.top - stageRect.top - pad;
+      const width = box.width + pad * 2;
+      const height = box.height + pad * 2;
+      if (width < 16 || height < 16 || figRect.width < 2) return false;
+
+      const wide = window.matchMedia('(min-width: 900px)').matches;
+      const calloutRect = callout.getBoundingClientRect();
+      const line = wide
+        ? {
+            x1: calloutRect.right - figRect.left + 8,
+            y1: calloutRect.top + calloutRect.height / 2 - figRect.top,
+            x2: stageRect.left + left - figRect.left - 2,
+            y2: stageRect.top + top + height / 2 - figRect.top,
+          }
+        : {
+            x1: stageRect.left + left + width / 2 - figRect.left,
+            y1: stageRect.top + top + height - figRect.top + 4,
+            x2: stageRect.left + left + width / 2 - figRect.left,
+            y2: calloutRect.top - figRect.top - 4,
+          };
+
+      const next: GuideOverlay = { left, top, width, height, ...line };
+      setOverlay((prev) => {
+        if (
+          prev &&
+          Math.abs(prev.left - next.left) < 2 &&
+          Math.abs(prev.top - next.top) < 2 &&
+          Math.abs(prev.width - next.width) < 2 &&
+          Math.abs(prev.height - next.height) < 2 &&
+          Math.abs(prev.x2 - next.x2) < 2 &&
+          Math.abs(prev.y2 - next.y2) < 2
+        ) {
+          return prev;
+        }
+        return next;
+      });
       return true;
     };
-    let frames = 0;
+
+    let tries = 0;
     const tick = () => {
-      if (measure() || frames > 24) return;
-      frames += 1;
-      requestAnimationFrame(tick);
+      if (place() || tries > 48) return;
+      tries += 1;
+      frame = window.requestAnimationFrame(tick);
     };
     tick();
-    const later = window.setTimeout(tick, 120);
-    const observer = new ResizeObserver(() => {
-      measure();
+
+    const clip = fig.querySelector('.cc-guide-shot-frame');
+    const resized = new ResizeObserver(() => {
+      place();
     });
-    observer.observe(fig);
-    const stage = fig.querySelector('.cc-guide-screen__stage');
-    if (stage) observer.observe(stage);
-    window.addEventListener('resize', measure);
-    return () => {
-      window.clearTimeout(later);
-      observer.disconnect();
-      window.removeEventListener('resize', measure);
+    const watchInner = () => {
+      const inner = fig.querySelector('.cc-ed__demo-snap__inner');
+      if (inner instanceof HTMLElement) resized.observe(inner);
     };
-  }, [entered, ref, screen.shot, screen.spot.x, screen.spot.y, screen.spot.w, screen.spot.h]);
+    const mutations = new MutationObserver(() => {
+      watchInner();
+      place();
+    });
+    const shot = fig.querySelector('.cc-guide-shot');
+    if (shot) mutations.observe(shot, { childList: true });
+    watchInner();
+    resized.observe(fig);
+    window.addEventListener('resize', place);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      mutations.disconnect();
+      resized.disconnect();
+      window.removeEventListener('resize', place);
+    };
+  }, [ref, screen.anchor, screen.shot]);
 
   const markerId = `cc-guide-arrow-${screen.shot}`;
 
@@ -166,7 +281,6 @@ function GuideScreenView({ screen, eager }: { screen: GuideScreen; eager?: boole
       ref={ref}
       className="cc-guide-screen"
       data-entered={entered ? 'true' : 'false'}
-      style={{ ['--spot-y' as string]: `${screen.spot.y}%` }}
     >
       <figcaption className="cc-guide-screen__callout">
         <p className="cc-guide-screen__callout-title">{screen.callout}</p>
@@ -180,17 +294,19 @@ function GuideScreenView({ screen, eager }: { screen: GuideScreen; eager?: boole
         <div className="cc-guide-shot-frame">
           <GuideLiveShot shot={screen.shot} eager={eager} />
         </div>
-        <div
-          className="cc-guide-screen__spot"
-          style={{
-            left: `${screen.spot.x}%`,
-            top: `${screen.spot.y}%`,
-            width: `${screen.spot.w}%`,
-            height: `${screen.spot.h}%`,
-          }}
-        />
+        {overlay ? (
+          <div
+            className="cc-guide-screen__spot"
+            style={{
+              left: overlay.left,
+              top: overlay.top,
+              width: overlay.width,
+              height: overlay.height,
+            }}
+          />
+        ) : null}
       </div>
-      {line ? (
+      {overlay ? (
         <svg className="cc-guide-screen__arrow" aria-hidden>
           <defs>
             <marker
@@ -205,10 +321,10 @@ function GuideScreenView({ screen, eager }: { screen: GuideScreen; eager?: boole
             </marker>
           </defs>
           <line
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
+            x1={overlay.x1}
+            y1={overlay.y1}
+            x2={overlay.x2}
+            y2={overlay.y2}
             markerEnd={`url(#${markerId})`}
           />
         </svg>
