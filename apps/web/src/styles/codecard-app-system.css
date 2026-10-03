@@ -7090,7 +7090,18 @@ html.dark .cc-public-atmosphere__grain {
   .cc-public-hero--fade {
     animation: cc-public-hero-fade linear both;
     animation-timeline: view();
-    animation-range: exit -10% exit 55%;
+    /* Hold full opacity while the card is on screen. Fade only as it leaves. */
+    animation-range: exit 48% exit 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  @supports (animation-timeline: view()) {
+    .cc-public-hero--fade {
+      /* The portrait is taller than the phone. Don't fade the bio until that
+         portrait has cleared and the text card itself is scrolling away. */
+      animation-range: exit 70% exit 100%;
+    }
   }
 }
 

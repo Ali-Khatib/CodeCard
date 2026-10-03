@@ -35,11 +35,11 @@ describe('marketing Guide walkthrough', () => {
       'Settings',
     ]);
     const connections = GUIDE_SECTIONS.find((section) => section.id === 'connections');
-    expect(connections?.principle?.title).toContain('QR scans');
-    expect(connections?.principle?.body).toContain('view a CodeCard');
+    expect(connections?.lead).toContain('scan your QR');
+    expect(connections?.lead).toContain('view a CodeCard');
     const work = GUIDE_SECTIONS.find((section) => section.id === 'work');
     expect(work?.canDo.map((item) => `${item.title} ${item.body}`).join(' ')).toContain('slides');
-    expect(work?.groups?.map((group) => group.title)).toEqual([
+    expect(work?.canDo.map((item) => item.title)).toEqual([
       'Projects',
       'Project pages',
       'Research',
@@ -47,39 +47,25 @@ describe('marketing Guide walkthrough', () => {
     ]);
     const analytics = GUIDE_SECTIONS.find((section) => section.id === 'analytics');
     expect(analytics?.canDo.map((item) => item.title).join(' ')).toContain('Review & Coach');
-    expect(analytics?.overviewShot).toBe('analytics-review');
+    expect(analytics?.screens[0]?.shot).toBe('analytics-reach');
     expect(GUIDE_SECTIONS.every((section) => section.canDoHeading === 'What you can do')).toBe(
       true,
     );
-    expect(GUIDE_CLOSE.body).toContain('quick introduction');
+    expect(GUIDE_CLOSE.body).toContain('moments that happen offline');
   });
 
-  it('keeps every surface discoverable without numbering each feature', () => {
+  it('keeps the tour on real demo screens without numbering each feature', () => {
     const covered = guideCoveredShots();
     for (const shot of [
-      'home-overview',
-      'home-desk',
       'home-share',
       'home-identity',
-      'home-calendar',
-      'home-work',
-      'home-reach',
-      'home-circle',
       'work-projects',
-      'work-project',
       'work-research',
       'connections-list',
       'connections-open',
       'circle-feed',
-      'analytics-review',
       'analytics-reach',
-      'analytics-projects',
-      'analytics-research',
-      'analytics-audience',
       'settings-identity',
-      'settings-signin',
-      'settings-plan',
-      'settings-export',
     ] as const) {
       expect(covered).toContain(shot);
     }
@@ -134,23 +120,14 @@ describe('marketing Guide walkthrough', () => {
       '.cc-marketing-shell:has(.cc-ed) .cc-marketing-nav-shell',
     );
     expect(chromeTone).toContain(':has(.cc-ed-hero-scene) .cc-nav-veil');
-    expect(guideCss).toContain('content-visibility: auto');
     expect(guideCss).toContain('.cc-guide-chapter');
     expect(guideCss).not.toContain('overflow: visible');
     expect(how).toContain('permanentRedirect');
     expect(how).toContain('MARKETING_GUIDE_HREF');
   });
 
-  it('treats Connections as a QR scan walkthrough, not a numbered feature index', () => {
+  it('treats Connections as a QR scan, not a public-link save', () => {
     const connections = GUIDE_SECTIONS.find((section) => section.id === 'connections');
-    expect(connections?.workflow?.title).toBe('How a Connection starts');
-    expect(connections?.workflow?.steps.map((step) => step.title)).toEqual([
-      'Scan QR',
-      'Open CodeCard',
-      'Connect',
-      'Add context',
-      'Follow up',
-    ]);
     expect(connections?.canDo.map((item) => item.title)).toEqual([
       'People you’ve met',
       'Meeting context',
@@ -163,7 +140,8 @@ describe('marketing Guide walkthrough', () => {
     );
     expect(homeShare?.body).toContain('does not create a Connection');
     const circle = GUIDE_SECTIONS.find((section) => section.id === 'circle');
-    expect(circle?.aside?.body).toContain('Connections are the people');
-    expect(circle?.aside?.body).toContain('Circle is what those people are doing');
+    expect(circle?.lead).toContain('Connections are the people');
+    expect(circle?.lead).toContain('Circle is what those people are doing');
+    expect(circle?.lead.toLowerCase()).toContain('not social media');
   });
 });

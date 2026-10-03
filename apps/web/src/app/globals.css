@@ -2312,7 +2312,7 @@ select,
 
   @media (max-width: 767px) {
     .cc-nav-veil:not(.cc-nav-veil--collapsed) {
-      width: fit-content;
+      width: 100%;
       max-width: 100%;
       transition:
         border-radius 0.24s ease,
@@ -5956,7 +5956,7 @@ html[data-nav-compact='true'] .cc-nav-veil--collapsed {
 
 @media (max-width: 767px) {
   .cc-nav-veil:not(.cc-nav-veil--collapsed) {
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
   }
 }

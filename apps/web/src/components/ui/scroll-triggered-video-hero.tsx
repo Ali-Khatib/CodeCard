@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
-import { motion } from 'framer-motion';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ensureGsapPlugins } from '@/components/motion/gsap-runtime';
 import { cn } from '@/lib/utils';
@@ -24,6 +23,11 @@ export function chapterIndexFromProgress(progress: number, count: number) {
   return Math.min(Math.floor(t * count), count - 1);
 }
 
+/** Phones stall or paint black when several 1080p files share one decoder. */
+function phoneVideoUrl(url: string) {
+  return url.replace('hd_1920_1080_', 'sd_640_360_');
+}
+
 function ChapterVideo({
   chapter,
   active,
@@ -41,55 +45,73 @@ function ChapterVideo({
     node.muted = true;
     node.defaultMuted = true;
     node.playsInline = true;
+    node.setAttribute('playsinline', '');
+    node.setAttribute('webkit-playsinline', 'true');
 
-    const pinFrame = () => {
-      if (node.readyState >= 2 && node.currentTime < 0.08) {
-        try {
-          node.currentTime = 0.12;
-        } catch {
-          /* ignore seek before metadata */
-        }
-      }
-    };
-
-    const play = () => {
-      pinFrame();
-      void node.play().catch(() => undefined);
-    };
-
-    if (active) {
-      if (node.readyState >= 2) play();
-      else node.addEventListener('loadeddata', play, { once: true });
-      return () => node.removeEventListener('loadeddata', play);
+    if (!active) {
+      node.pause();
+      return;
     }
 
-    node.pause();
-    if (node.readyState >= 2) pinFrame();
-    else node.addEventListener('loadeddata', pinFrame, { once: true });
-    return () => node.removeEventListener('loadeddata', pinFrame);
+    let cancelled = false;
+    let onScreen = false;
+    let tries = 0;
+    const kick = () => {
+      if (cancelled || !onScreen) return;
+      node.muted = true;
+      const attempt = node.play();
+      if (!attempt) return;
+      attempt.catch(() => {
+        if (cancelled || !onScreen || tries >= 5) return;
+        tries += 1;
+        window.setTimeout(kick, 320);
+      });
+    };
+
+    const onReady = () => kick();
+    node.addEventListener('loadeddata', onReady);
+    node.addEventListener('canplay', onReady);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        onScreen = entries.some((entry) => entry.isIntersecting);
+        if (onScreen) kick();
+        else node.pause();
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(node);
+    if (node.readyState < 2) node.load();
+    const rect = node.getBoundingClientRect();
+    onScreen = rect.width > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+    if (onScreen) kick();
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      node.removeEventListener('loadeddata', onReady);
+      node.removeEventListener('canplay', onReady);
+    };
   }, [active, chapter.videoUrl]);
 
   return (
-    <motion.div
-      className="absolute inset-0 h-full w-full"
-      initial={false}
-      animate={{ opacity: active ? 1 : 0 }}
-      transition={{ duration: 0.55, ease: 'easeInOut' }}
-      style={{ zIndex: active ? 2 : 0 }}
+    <div
+      className="cc-ed-crash__clip"
+      data-active={active ? 'true' : 'false'}
       aria-hidden={!active}
     >
       <video
         ref={videoRef}
         src={chapter.videoUrl}
-        className="h-full w-full object-cover"
+        className="cc-ed-crash__video"
         muted
         loop
         playsInline
         autoPlay={active}
         preload={active || warm ? 'auto' : 'metadata'}
+        disablePictureInPicture
       />
       <div className="cc-ed-crash__veil" />
-    </motion.div>
+    </div>
   );
 }
 
@@ -133,6 +155,15 @@ export function ScrollTriggeredVideoHero({
   const frameRef = useRef<HTMLDivElement>(null);
   const indexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [phone, setPhone] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+    const sync = () => setPhone(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
 
   useGSAP(
     () => {
@@ -193,7 +224,14 @@ export function ScrollTriggeredVideoHero({
               style={{ ['--crash-progress' as string]: '100%' }}
             >
               <div className="cc-ed-crash__media relative">
-                <ChapterVideo chapter={item} active warm />
+                <ChapterVideo
+                  chapter={{
+                    ...item,
+                    videoUrl: phone ? phoneVideoUrl(item.videoUrl) : item.videoUrl,
+                  }}
+                  active
+                  warm
+                />
                 <CrashCopy chapters={chapters} index={index} />
               </div>
             </article>
@@ -228,14 +266,22 @@ export function ScrollTriggeredVideoHero({
             aria-label="Crash course progress"
           >
             <div className="cc-ed-crash__media">
-              {chapters.map((item, index) => (
-                <ChapterVideo
-                  key={item.id}
-                  chapter={item}
-                  active={index === activeIndex}
-                  warm={Math.abs(index - activeIndex) <= 1}
-                />
-              ))}
+              {chapters.map((item, index) => {
+                const active = index === activeIndex;
+                const warm = phone ? index === activeIndex + 1 : Math.abs(index - activeIndex) <= 1;
+                if (phone && !active && !warm) return null;
+                return (
+                  <ChapterVideo
+                    key={item.id}
+                    chapter={{
+                      ...item,
+                      videoUrl: phone ? phoneVideoUrl(item.videoUrl) : item.videoUrl,
+                    }}
+                    active={active}
+                    warm={warm}
+                  />
+                );
+              })}
               <CrashCopy chapters={chapters} index={activeIndex} />
             </div>
           </div>

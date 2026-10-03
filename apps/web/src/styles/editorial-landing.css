@@ -118,6 +118,10 @@
    Fixed so Lenis page transform cannot scroll the nav away. */
 .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell {
   --cc-ed-nav-end-gutter: clamp(2.75rem, 6.5vw, 3.5rem);
+  --cc-nav-pad-left: calc(
+    var(--cc-ed-cinema-inset, 4px) + clamp(0.7rem, 2vw, 1.15rem) + 3.75rem
+  );
+  --cc-nav-pad-right: calc(var(--cc-ed-cinema-inset, 4px) + 0.85rem);
   position: fixed;
   top: 0;
   left: 0;
@@ -125,14 +129,14 @@
   z-index: 100;
   display: flex;
   justify-content: center;
-  padding: calc(
-      var(--cc-ed-cinema-inset, 4px) + 0.55rem + env(safe-area-inset-top, 0px)
-    )
-    calc(var(--cc-ed-cinema-inset, 4px) + var(--cc-ed-nav-end-gutter))
-    0;
-  padding-inline: calc(
-    var(--cc-ed-cinema-inset, 4px) + var(--cc-ed-nav-end-gutter)
-  ) !important;
+  align-items: flex-start;
+  box-sizing: border-box;
+  padding-top: calc(
+    var(--cc-ed-cinema-inset, 4px) + 0.55rem + env(safe-area-inset-top, 0px)
+  );
+  padding-bottom: 0;
+  padding-left: var(--cc-nav-pad-left) !important;
+  padding-right: var(--cc-nav-pad-right) !important;
   pointer-events: none;
   background: transparent;
   border: 0;
@@ -142,7 +146,10 @@
 
 @media (max-width: 767px) {
   .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-marketing-nav-shell {
-    --cc-ed-nav-end-gutter: clamp(2.55rem, 11vw, 3.1rem);
+    --cc-nav-pad-left: calc(
+      var(--cc-ed-cinema-inset, 4px) + clamp(0.7rem, 2vw, 1.15rem) + 3.15rem
+    );
+    --cc-nav-pad-right: calc(var(--cc-ed-cinema-inset, 4px) + 0.65rem);
   }
 
   .cc-marketing-shell .cc-ed-mark-logo__inner {
@@ -153,6 +160,31 @@
     width: 2.2rem;
     height: 2.2rem;
   }
+}
+
+/* Keep the pill in the gap between the fixed logo and the home control.
+   JS writes the same variables from live measurements; these are the first paint. */
+.cc-marketing-shell .cc-marketing-nav-shell {
+  box-sizing: border-box;
+  align-items: flex-start;
+  --cc-nav-pad-left: calc(clamp(0.85rem, 2.8vw, 1.75rem) + 3.8rem);
+  --cc-nav-pad-right: 0.85rem;
+  padding-left: var(--cc-nav-pad-left);
+  padding-right: var(--cc-nav-pad-right);
+}
+
+.cc-marketing-shell .cc-marketing-nav-shell:has(.cc-ed-home-control) {
+  --cc-nav-pad-right: calc(clamp(0.7rem, 2.4vw, 1.5rem) + 3.35rem);
+}
+
+.cc-marketing-shell .cc-nav-veil,
+.cc-marketing-shell .cc-nav-veil__inner {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cc-marketing-shell .cc-nav-veil__inner {
+  height: auto;
 }
 
 /* Fixed top-left mark on ALL marketing pages (landing + pricing + etc.).
@@ -278,14 +310,15 @@ html[data-logo-tone='dark'] .cc-marketing-shell .cc-ed-home-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   min-height: 2.6rem;
-  padding: 0.5rem clamp(0.5rem, 1.35vw, 0.95rem);
+  max-width: 100%;
+  padding: 0.5rem calc(clamp(0.5rem, 1.35vw, 0.95rem) * var(--cc-nav-fit, 1));
   border-radius: 999px;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: clamp(0.72rem, 0.42rem + 1.05vw, 0.875rem);
+  font-size: calc(clamp(0.72rem, 0.42rem + 1.05vw, 0.875rem) * var(--cc-nav-fit, 1));
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: calc(0.06em * var(--cc-nav-fit, 1));
   line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
@@ -313,18 +346,37 @@ html[data-nav-tone='light'] .cc-marketing-shell .cc-nav-pill-item.cc-hume-fade-i
   color: var(--ed-ink, #232324);
 }
 
+.cc-marketing-shell .cc-nav-desktop-links {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  column-gap: calc(clamp(0.4rem, 0.85vw, 0.55rem) * var(--cc-nav-fit, 1));
+  row-gap: 0.2rem;
+}
+
 .cc-marketing-shell .cc-nav-desktop-links .cc-hume-fade-group > li {
-  flex: 0 0 auto;
-  min-width: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   display: flex;
 }
 
 .cc-marketing-shell .cc-nav-pill-item--eq {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   width: auto;
-  min-width: auto;
-  max-width: none;
-  padding-inline: clamp(0.55rem, 1.5vw, 1rem);
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: calc(clamp(0.55rem, 1.5vw, 1rem) * var(--cc-nav-fit, 1));
   white-space: nowrap;
   overflow: visible;
   cursor: pointer;
@@ -442,27 +494,30 @@ html[data-nav-compact='true'] .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav
 }
 
 .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links {
-  width: max-content;
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-desktop-links .cc-hume-fade-group {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: nowrap;
-  width: max-content;
-  max-width: none;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
-  gap: clamp(0.2rem, 0.8vw, 0.5rem);
+  column-gap: calc(clamp(0.4rem, 0.85vw, 0.55rem) * var(--cc-nav-fit, 1));
+  row-gap: 0.2rem;
 }
 
 .cc-marketing-shell:has(.cc-ed-hero-scene) .cc-nav-veil:not(.cc-nav-veil--collapsed) .cc-nav-veil__inner {
-  width: max-content;
+  width: 100%;
   max-width: 100%;
+  height: auto;
   min-height: 3.15rem;
   padding-block: 0.3rem;
-  padding-inline: clamp(0.4rem, 1.2vw, 0.7rem);
+  padding-inline: calc(clamp(0.35rem, 1vw, 0.7rem) * var(--cc-nav-fit, 1));
   gap: 0;
 }
 
@@ -2431,6 +2486,35 @@ html[data-landing-chapter='proof'] .cc-marketing-shell:has(.cc-ed-hero-scene) .c
   border-radius: 26px;
   width: 100%;
   height: min(74svh, 42rem);
+  background: #0b0b0c;
+}
+
+/* No transform on this layer. iOS paints <video> black inside a transformed parent. */
+.cc-ed-crash__clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 0;
+  transform: none;
+  transition: opacity 0.45s ease;
+}
+
+.cc-ed-crash__clip[data-active='true'] {
+  opacity: 1;
+  z-index: 2;
+}
+
+.cc-ed-crash__video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  transform: none;
   background: #0b0b0c;
 }
 

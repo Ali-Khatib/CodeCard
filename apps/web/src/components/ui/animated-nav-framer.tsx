@@ -8,6 +8,13 @@ import { cn } from '@/lib/utils';
 const SPRING = { type: 'spring' as const, damping: 22, stiffness: 280 };
 /** Collapsed expand-control diameter (matches prior 3rem circle). */
 export const NAV_COLLAPSED_SIZE = 48;
+/**
+ * Smallest uniform scale before the row wraps onto another line.
+ * Below this, type gets too small to read, so the pill grows instead of clipping.
+ */
+const NAV_FIT_MIN = 0.78;
+/** Clear space between the pill and the fixed logo / home control. */
+const NAV_CHROME_GAP = 14;
 /** Pill/circle states stay fully rounded; the stacked mobile panel does not. */
 const NAV_PILL_RADIUS = 9999;
 const NAV_PANEL_RADIUS = 28;
@@ -62,6 +69,7 @@ export function AnimatedNavFramer({
   const panelRef = React.useRef<HTMLDivElement>(null);
   const [openSize, setOpenSize] = React.useState({ width: 640, height: 52 });
   const [availWidth, setAvailWidth] = React.useState(1200);
+  const [navFit, setNavFit] = React.useState(1);
 
   React.useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)');
@@ -72,65 +80,171 @@ export function AnimatedNavFramer({
   }, []);
 
   React.useLayoutEffect(() => {
+    const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
+
     const measureAvail = () => {
-      const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
       if (shell instanceof HTMLElement) {
+        const shellRect = shell.getBoundingClientRect();
+        const edge = 10;
+        let padLeft = edge;
+        let padRight = edge;
+        const logo = shell.querySelector('.cc-ed-mark-logo');
+        const home = shell.querySelector('.cc-ed-home-control');
+        if (logo instanceof HTMLElement) {
+          const rect = logo.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            padLeft = Math.max(padLeft, Math.ceil(rect.right - shellRect.left + NAV_CHROME_GAP));
+          }
+        }
+        if (home instanceof HTMLElement) {
+          const rect = home.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            padRight = Math.max(padRight, Math.ceil(shellRect.right - rect.left + NAV_CHROME_GAP));
+          }
+        }
+        shell.style.setProperty('--cc-nav-pad-left', `${padLeft}px`);
+        shell.style.setProperty('--cc-nav-pad-right', `${padRight}px`);
+
         const styles = window.getComputedStyle(shell);
         const next =
           shell.clientWidth -
           (Number.parseFloat(styles.paddingLeft) || 0) -
           (Number.parseFloat(styles.paddingRight) || 0);
-        setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, Math.floor(next)));
+        const safe = Math.max(NAV_COLLAPSED_SIZE, Math.floor(next));
+        setAvailWidth((prev) => (prev === safe ? prev : safe));
         return;
       }
       const side = phone ? Math.max(32, Math.round(window.innerWidth * 0.14)) : 160;
-      setAvailWidth(Math.max(NAV_COLLAPSED_SIZE, window.innerWidth - side * 2));
+      const safe = Math.max(NAV_COLLAPSED_SIZE, window.innerWidth - side * 2);
+      setAvailWidth((prev) => (prev === safe ? prev : safe));
     };
     measureAvail();
-    const shell = innerRef.current?.closest('.cc-marketing-nav-shell');
-    const ro = shell instanceof HTMLElement ? new ResizeObserver(measureAvail) : null;
-    if (shell instanceof HTMLElement) ro?.observe(shell);
+    const ro = new ResizeObserver(measureAvail);
+    if (shell instanceof HTMLElement) {
+      ro.observe(shell);
+      const logo = shell.querySelector('.cc-ed-mark-logo');
+      const home = shell.querySelector('.cc-ed-home-control');
+      if (logo instanceof HTMLElement) ro.observe(logo);
+      if (home instanceof HTMLElement) ro.observe(home);
+    }
     window.addEventListener('resize', measureAvail);
     return () => {
-      ro?.disconnect();
+      ro.disconnect();
       window.removeEventListener('resize', measureAvail);
     };
   }, [phone, expanded]);
 
   // Pixel sizes only — Motion cannot reliably expand from a fixed circle back to width:auto,
   // especially once minWidth/maxWidth were locked to the collapsed size.
+  // Width is capped to the gap between the logo and the home control. Labels
+  // scale down together, then wrap onto another row, so nothing is clipped.
   React.useLayoutEffect(() => {
     if (!expanded) return;
     const inner = innerRef.current;
     if (!inner) return;
+    const nav = inner.closest('.cc-nav-veil');
 
     const measure = () => {
       const panelHeight = panelRef.current?.offsetHeight ?? 0;
+      const group = inner.querySelector('.cc-hume-fade-group');
       const previousWidth = inner.style.width;
       const previousMaxWidth = inner.style.maxWidth;
-      const group = inner.querySelector('.cc-hume-fade-group');
-      const previousGroupMax =
-        group instanceof HTMLElement ? group.style.maxWidth : '';
-      inner.style.width = 'max-content';
-      inner.style.maxWidth = 'none';
-      if (group instanceof HTMLElement) group.style.maxWidth = 'none';
-      const padX =
-        group instanceof HTMLElement
-          ? (Number.parseFloat(window.getComputedStyle(inner).paddingLeft) || 0) +
-            (Number.parseFloat(window.getComputedStyle(inner).paddingRight) || 0)
+      const previousNavWidth = nav instanceof HTMLElement ? nav.style.width : '';
+      const previousNavMax = nav instanceof HTMLElement ? nav.style.maxWidth : '';
+      const previousGroupMax = group instanceof HTMLElement ? group.style.maxWidth : '';
+      const previousGroupWidth = group instanceof HTMLElement ? group.style.width : '';
+      const previousWrap = group instanceof HTMLElement ? group.style.flexWrap : '';
+
+      const readPadX = () => {
+        const styles = window.getComputedStyle(inner);
+        return (
+          (Number.parseFloat(styles.paddingLeft) || 0) +
+          (Number.parseFloat(styles.paddingRight) || 0)
+        );
+      };
+
+      const measureNatural = () => {
+        inner.style.width = 'max-content';
+        inner.style.maxWidth = 'none';
+        if (group instanceof HTMLElement) {
+          group.style.maxWidth = 'none';
+          group.style.width = 'max-content';
+          group.style.flexWrap = 'nowrap';
+        }
+        const padX = readPadX();
+        const contentWidth =
+          group instanceof HTMLElement
+            ? group.scrollWidth + padX
+            : Math.max(inner.scrollWidth, inner.offsetWidth);
+        return Math.ceil(contentWidth);
+      };
+
+      if (nav instanceof HTMLElement) nav.style.setProperty('--cc-nav-fit', '1');
+      const natural = measureNatural();
+      const safe = Math.max(NAV_COLLAPSED_SIZE, availWidth);
+      // Leave a few pixels inside the pill so the last glyph never kisses the border.
+      const budget = Math.max(NAV_COLLAPSED_SIZE, safe - 8);
+      let fit = 1;
+      if (natural > budget) {
+        const ratio = budget / natural;
+        fit = ratio >= NAV_FIT_MIN ? ratio : 1;
+      }
+      if (nav instanceof HTMLElement) nav.style.setProperty('--cc-nav-fit', String(fit));
+
+      let fitted = natural;
+      if (fit !== 1) {
+        fitted = measureNatural();
+        if (fitted > budget) {
+          fit = Math.max(NAV_FIT_MIN, fit * (budget / fitted));
+          if (nav instanceof HTMLElement) nav.style.setProperty('--cc-nav-fit', String(fit));
+          fitted = measureNatural();
+        }
+      }
+
+      const borderX =
+        nav instanceof HTMLElement
+          ? (Number.parseFloat(window.getComputedStyle(nav).borderLeftWidth) || 0) +
+            (Number.parseFloat(window.getComputedStyle(nav).borderRightWidth) || 0)
           : 0;
-      const contentWidth =
-        group instanceof HTMLElement
-          ? group.scrollWidth + padX
-          : Math.max(inner.scrollWidth, inner.offsetWidth);
-      const width = Math.ceil(contentWidth);
+      const borderY =
+        nav instanceof HTMLElement
+          ? (Number.parseFloat(window.getComputedStyle(nav).borderTopWidth) || 0) +
+            (Number.parseFloat(window.getComputedStyle(nav).borderBottomWidth) || 0)
+          : 0;
+      const width = Math.min(safe, Math.ceil(Math.min(fitted, budget) + borderX));
+
+      if (nav instanceof HTMLElement) {
+        nav.style.width = `${width}px`;
+        nav.style.maxWidth = `${width}px`;
+      }
+      inner.style.width = '100%';
+      inner.style.maxWidth = '100%';
+      if (group instanceof HTMLElement) {
+        group.style.width = '100%';
+        group.style.maxWidth = '100%';
+        group.style.flexWrap = 'wrap';
+      }
+      void inner.offsetHeight;
+      const height = Math.ceil(Math.max(inner.scrollHeight, 52) + panelHeight + borderY);
+
       inner.style.width = previousWidth;
       inner.style.maxWidth = previousMaxWidth;
-      if (group instanceof HTMLElement) group.style.maxWidth = previousGroupMax;
-      const height = Math.ceil(Math.max(inner.scrollHeight, 52) + panelHeight);
+      if (nav instanceof HTMLElement) {
+        nav.style.width = previousNavWidth;
+        nav.style.maxWidth = previousNavMax;
+      }
+      if (group instanceof HTMLElement) {
+        group.style.maxWidth = previousGroupMax;
+        group.style.width = previousGroupWidth;
+        group.style.flexWrap = previousWrap;
+      }
+
+      setNavFit((prev) => (Math.abs(prev - fit) < 0.004 ? prev : Number(fit.toFixed(4))));
       if (width > NAV_COLLAPSED_SIZE && height > 0) {
         setOpenSize((prev) =>
-          prev.width === width && prev.height === height ? prev : { width, height },
+          Math.abs(prev.width - width) <= 1 && Math.abs(prev.height - height) <= 1
+            ? prev
+            : { width, height },
         );
       }
     };
@@ -144,7 +258,7 @@ export function AnimatedNavFramer({
       ro.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [phone, children, panel, expanded]);
+  }, [phone, children, panel, expanded, availWidth]);
 
   const maxOpenWidth = Math.min(openSize.width, availWidth);
 
@@ -218,7 +332,10 @@ export function AnimatedNavFramer({
               backdropFilter: 'none',
               WebkitBackdropFilter: 'none',
             }
-          : { minWidth: 0 }
+          : ({
+              minWidth: 0,
+              '--cc-nav-fit': String(navFit),
+            } as React.CSSProperties)
       }
     >
       <motion.div
