@@ -28,7 +28,9 @@ type EditorMode =
   | { kind: 'add' }
   | { kind: 'edit'; link: ProfileLinkRow };
 
-const emptyForm = { type: 'website', label: '', url: '' };
+type EditorLinkType = (typeof PROFILE_LINK_SELECTABLE_TYPES)[number] | 'resume';
+
+const emptyForm = { type: 'website' as EditorLinkType, label: '', url: '' };
 
 export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   const router = useRouter();
@@ -48,7 +50,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   );
 
   const typeOptions = useMemo(() => {
-    const options = [...PROFILE_LINK_SELECTABLE_TYPES];
+    const options: EditorLinkType[] = [...PROFILE_LINK_SELECTABLE_TYPES];
     if (mode.kind === 'edit' && mode.link.type === 'resume' && !options.includes('resume')) {
       options.push('resume');
     }
@@ -269,7 +271,11 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               id="profile-link-type"
               className="cc-app-input"
               value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
+              onChange={(e) => {
+                const next = e.target.value as EditorLinkType;
+                if (!typeOptions.includes(next)) return;
+                setForm({ ...form, type: next });
+              }}
               aria-describedby="profile-link-type-help"
             >
               {typeOptions.map((type) => (

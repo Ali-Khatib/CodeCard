@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isReservedProfileSlug } from '@codecard/validation';
 import { createPublicClient } from '@/lib/supabase/server';
+import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
 import {
   loadPublicProfileBySlug,
   mapPublicProfileMetadata,
@@ -24,7 +25,9 @@ interface PageProps {
  */
 async function loadCachedPublicProfileForSlug(slug: string) {
   const tag = publicProfileCacheTag(slug);
-  if (!tag) return null;
+  // Placeholder or missing public keys are unconfigured. Skip the client so
+  // prerender does not throw "supabaseUrl is required" and fail the build.
+  if (!tag || !isSupabasePublicKeyConfigured()) return null;
   return unstable_cache(
     async () => loadPublicProfileBySlug(createPublicClient(), slug),
     ['public-profile-by-slug', slug],
@@ -63,6 +66,8 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   // Representative staging showcase — other public slugs still on-demand static.
+  // Without public Supabase keys there is nothing to prerender.
+  if (!isSupabasePublicKeyConfigured()) return [];
   return [{ slug: 'alex-chen' }];
 }
 
