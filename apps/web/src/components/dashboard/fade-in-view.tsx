@@ -1,17 +1,31 @@
 'use client';
 
-import { type ElementType, type ReactNode } from 'react';
+import { type ComponentType, type ElementType, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const motionByTag = new Map<ElementType, ReturnType<typeof motion.create>>();
+type FadeMotionProps = {
+  id?: string;
+  className?: string;
+  children?: ReactNode;
+  initial?: false | { y: number };
+  animate?: { y: number };
+  transition?: {
+    duration: number;
+    delay: number;
+    ease: readonly [number, number, number, number];
+  };
+};
+
+const motionByTag = new Map<ElementType, ComponentType<FadeMotionProps>>();
 
 /** motion.create() returns a new component type each call — must cache per tag or children remount every render. */
-function motionForTag(Tag: ElementType) {
+function motionForTag(Tag: ElementType): ComponentType<FadeMotionProps> {
   let cached = motionByTag.get(Tag);
   if (!cached) {
-    cached = motion.create(Tag);
+    // ElementType is wider than motion.create's default props, which drop id/className.
+    cached = motion.create(Tag) as ComponentType<FadeMotionProps>;
     motionByTag.set(Tag, cached);
   }
   return cached;

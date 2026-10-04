@@ -29,9 +29,7 @@ export function profileToFormState(profile: Profile): ProfileFormState {
   };
 }
 
-export function formStateToUpdatePayload(
-  form: ProfileFormState,
-): z.infer<typeof updateProfileSchema> {
+export function formStateToUpdatePayload(form: ProfileFormState) {
   return {
     display_name: form.display_name,
     headline: form.headline || null,
@@ -40,6 +38,7 @@ export function formStateToUpdatePayload(
     location: form.location,
     skills: parseCommaSeparatedSkills(form.skillsInput),
     is_public: form.is_public,
+    // Keep the raw role so updateProfileSchema can reject values outside the enum.
     audience_role: form.audience_role || null,
   };
 }
