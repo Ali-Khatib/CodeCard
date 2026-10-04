@@ -3,7 +3,9 @@ import {
   findDuplicateProfileLink,
   isAllowedProfileLinkHref,
   profileLinkInputSchema,
+  profileLinkUpdateInputSchema,
   PROFILE_LINKS_MAX_COUNT,
+  PROFILE_LINK_SELECTABLE_TYPES,
   reorderProfileLinksSchema,
 } from './profile-links';
 
@@ -100,6 +102,15 @@ describe('profileLinkInputSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('does not offer resume as a creatable link type', () => {
+    expect(PROFILE_LINK_SELECTABLE_TYPES).not.toContain('resume');
+    const result = profileLinkInputSchema.safeParse({
+      type: 'resume',
+      url: 'https://example.com/cv.pdf',
+    });
+    expect(result.success).toBe(false);
+  });
+
   it('rejects overlong labels', () => {
     const result = profileLinkInputSchema.safeParse({
       type: 'website',
@@ -114,6 +125,16 @@ describe('profileLinkInputSchema', () => {
       type: 'website',
       label: 'Mi sitio — español',
       url: 'https://example.com',
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('profileLinkUpdateInputSchema', () => {
+  it('allows editing an existing resume link', () => {
+    const result = profileLinkUpdateInputSchema.safeParse({
+      type: 'resume',
+      url: 'https://example.com/cv.pdf',
     });
     expect(result.success).toBe(true);
   });

@@ -136,7 +136,10 @@ export function PreviewAnalyticsView({
       {showAudience ? (
       <>
       <FadeInView delay={0.32}>
-        <AnalyticsAudiencePanel roles={data.roles} />
+        <AnalyticsAudiencePanel
+          roles={data.roles}
+          description="Sample mix. On a live card this is what signed-in visitors chose when they created their CodeCard."
+        />
       </FadeInView>
 
       <FadeInView delay={0.36}>

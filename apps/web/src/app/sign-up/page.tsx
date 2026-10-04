@@ -24,6 +24,7 @@ import {
 } from '@/lib/auth/signup-result';
 import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 import { AuthSignupConsent } from '@/components/auth/auth-signup-consent';
+import { AudienceRoleField } from '@/components/profile/audience-role-field';
 import { MINIMUM_ACCOUNT_AGE_YEARS } from '@/lib/legal/constants';
 
 const SETUP_MSG =
@@ -37,6 +38,7 @@ function SignUpForm() {
     password: '',
     display_name: '',
     slug: '',
+    audience_role: '',
   });
   const [error, setError] = useState('');
   const [fieldError, setFieldError] = useState<Partial<Record<keyof typeof form, string>>>({});
@@ -152,7 +154,8 @@ function SignUpForm() {
           path === 'email' ||
           path === 'password' ||
           path === 'display_name' ||
-          path === 'slug'
+          path === 'slug' ||
+          path === 'audience_role'
         ) {
           setFieldError({ [path]: message });
         } else {
@@ -171,6 +174,7 @@ function SignUpForm() {
             data: {
               display_name: parsed.data.display_name,
               slug: parsed.data.slug,
+              audience_role: parsed.data.audience_role,
             },
           },
         }),
@@ -252,6 +256,13 @@ function SignUpForm() {
             autoComplete="name"
             disabled={authBusy}
             error={fieldError.display_name}
+          />
+          <AudienceRoleField
+            variant="auth"
+            value={form.audience_role}
+            onChange={(role) => update('audience_role', role)}
+            disabled={authBusy}
+            error={fieldError.audience_role}
           />
           <AuthField
             id="slug"

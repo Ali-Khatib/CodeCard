@@ -4,17 +4,25 @@ export const PROFILE_LINK_LABEL_MAX_LENGTH = 50;
 export const PROFILE_LINK_URL_MAX_LENGTH = 2048;
 export const PROFILE_LINKS_MAX_COUNT = 12;
 
-export const profileLinkTypeSchema = z.enum([
+const PROFILE_LINK_SELECTABLE_TYPE_VALUES = [
   'website',
   'github',
   'linkedin',
   'twitter',
-  'resume',
   'email',
   'other',
-]);
+] as const;
 
-export const PROFILE_LINK_TYPES = profileLinkTypeSchema.options;
+/** Types users can pick when adding or changing a profile link. */
+export const profileLinkSelectableTypeSchema = z.enum(PROFILE_LINK_SELECTABLE_TYPE_VALUES);
+
+export const PROFILE_LINK_SELECTABLE_TYPES = profileLinkSelectableTypeSchema.options;
+
+/** All stored profile link types, including legacy values kept for existing rows. */
+export const profileLinkTypeSchema = z.enum([...PROFILE_LINK_SELECTABLE_TYPE_VALUES, 'resume']);
+
+/** @deprecated Prefer PROFILE_LINK_SELECTABLE_TYPES in UI; full set is profileLinkTypeSchema.options */
+export const PROFILE_LINK_TYPES = PROFILE_LINK_SELECTABLE_TYPES;
 
 const BLOCKED_URL_PROTOCOLS = new Set(['javascript:', 'data:', 'vbscript:', 'file:']);
 
@@ -141,48 +149,70 @@ export const profileLinkUrlInputSchema = z
   .trim()
   .transform((value) => value.replace(/[\u0000-\u001F\u007F]/g, ''));
 
-export const profileLinkInputSchema = z
-  .object({
-    type: profileLinkTypeSchema,
-    label: profileLinkLabelSchema,
-    url: profileLinkUrlInputSchema,
-  })
-  .superRefine((value, ctx) => {
-    const normalizedUrl = normalizeProfileLinkUrl(value.type, value.url);
-    if (!isAllowedProfileLinkHref(normalizedUrl)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Enter a valid http(s) or mailto link',
-        path: ['url'],
-      });
-      return;
-    }
-    if (value.type === 'email') {
-      const address = normalizedUrl.replace(/^mailto:/i, '');
-      const emailOk = z.string().email().safeParse(address).success;
-      if (!emailOk) {
+type ProfileLinkInputShape = {
+  type: string;
+  label?: string | null;
+  url: string;
+};
+
+function refineProfileLinkInput<T extends ProfileLinkInputShape>(schema: z.ZodType<T>) {
+  return schema
+    .superRefine((value, ctx) => {
+      const normalizedUrl = normalizeProfileLinkUrl(value.type, value.url);
+      if (!isAllowedProfileLinkHref(normalizedUrl)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Enter a valid email address',
+          message: 'Enter a valid http(s) or mailto link',
+          path: ['url'],
+        });
+        return;
+      }
+      if (value.type === 'email') {
+        const address = normalizedUrl.replace(/^mailto:/i, '');
+        const emailOk = z.string().email().safeParse(address).success;
+        if (!emailOk) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Enter a valid email address',
+            path: ['url'],
+          });
+        }
+        return;
+      }
+      const hostError = profileLinkHostError(value.type, normalizedUrl);
+      if (hostError) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: hostError,
           path: ['url'],
         });
       }
-      return;
-    }
-    const hostError = profileLinkHostError(value.type, normalizedUrl);
-    if (hostError) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: hostError,
-        path: ['url'],
-      });
-    }
-  })
-  .transform((value) => ({
-    type: value.type,
-    label: value.label ?? null,
-    url: normalizeProfileLinkUrl(value.type, value.url),
-  }));
+    })
+    .transform((value) => ({
+      type: value.type,
+      label: value.label ?? null,
+      url: normalizeProfileLinkUrl(value.type, value.url),
+    }));
+}
+
+const profileLinkInputBaseSchema = z.object({
+  label: profileLinkLabelSchema,
+  url: profileLinkUrlInputSchema,
+});
+
+/** Create / new link input — resume is not offered to users. */
+export const profileLinkInputSchema = refineProfileLinkInput(
+  profileLinkInputBaseSchema.extend({
+    type: profileLinkSelectableTypeSchema,
+  }),
+);
+
+/** Update input — allows legacy resume rows to be edited without changing type. */
+export const profileLinkUpdateInputSchema = refineProfileLinkInput(
+  profileLinkInputBaseSchema.extend({
+    type: profileLinkTypeSchema,
+  }),
+);
 
 export const reorderProfileLinksSchema = z.object({
   link_ids: z

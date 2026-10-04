@@ -44,7 +44,17 @@ export async function recordUploadIntent(
     mime_type: intent.mimeType,
     max_bytes: intent.maxBytes,
   });
-  if (error) return { ok: false };
+  if (error) {
+    console.error('[upload] storage_upload_intents insert failed', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      bucket: intent.bucket,
+      path: intent.path,
+    });
+    return { ok: false };
+  }
   return { ok: true };
 }
 

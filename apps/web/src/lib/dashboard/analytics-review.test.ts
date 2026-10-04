@@ -30,6 +30,8 @@ function summary(overrides: Partial<OwnerAnalyticsSummary> = {}): OwnerAnalytics
     ],
     topResearch: [],
     hasAnyEvents: true,
+    viewerRoles: [],
+    viewerRoleSampleSize: 0,
     ...overrides,
   };
 }

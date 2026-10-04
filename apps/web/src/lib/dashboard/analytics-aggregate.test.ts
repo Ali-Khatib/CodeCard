@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateOwnerAnalytics,
   readDurationSeconds,
+  viewerRoleBreakdown,
   type AnalyticsEventRow,
 } from './analytics-aggregate';
 
@@ -195,5 +196,23 @@ describe('WS08-T006 owner analytics aggregation', () => {
       ],
     });
     expect(summary.topProjects.map((p) => p.title)).toEqual(['Alpha', 'Zebra']);
+  });
+
+  it('counts profile views by the role visitors chose', () => {
+    const breakdown = viewerRoleBreakdown([
+      event({ event_type: 'profile_view', metadata: { audience_role: 'recruiter' } }),
+      event({ event_type: 'profile_view', metadata: { audience_role: 'recruiter' } }),
+      event({ event_type: 'profile_view', metadata: { audience_role: 'engineer' } }),
+      event({ event_type: 'profile_view', metadata: { audience_role: 'intern' } }),
+      event({ event_type: 'profile_view' }),
+    ]);
+    expect(breakdown.identified).toBe(3);
+    expect(breakdown.slices).toEqual([
+      { label: 'Recruiters', pct: 67 },
+      { label: 'Engineers', pct: 33 },
+      { label: 'Founders', pct: 0 },
+      { label: 'Managers', pct: 0 },
+      { label: 'Students', pct: 0 },
+    ]);
   });
 });

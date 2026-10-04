@@ -60,6 +60,8 @@ export interface Profile {
   location: string | null;
   skills: string[];
   is_public: boolean;
+  /** Recruiter, engineer, founder, manager, or student. Null until they choose. */
+  audience_role?: string | null;
   created_at: string;
   updated_at: string;
 }

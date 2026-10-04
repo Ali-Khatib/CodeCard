@@ -125,6 +125,7 @@ describe('parseTrustedProfileFormData', () => {
       bio: 'About',
       location: 'NYC',
       skills: ['Go', 'Rust'],
+      audience_role: '',
     });
   });
 });
@@ -138,6 +139,7 @@ describe('validateProfileEditPayload', () => {
       bio: 'Builder',
       location: 'San Francisco, CA',
       skills: ['TypeScript', 'Next.js'],
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(true);
   });
@@ -174,6 +176,7 @@ describe('validateProfileEditPayload', () => {
       bio: '',
       location: '   ',
       skills: [],
+      audience_role: 'founder',
     });
     expect(result.success).toBe(true);
     if (result.success) {
@@ -194,6 +197,7 @@ describe('pickAllowedProfileUpdate', () => {
         bio: null,
         location: null,
         skills: ['Go'],
+        audience_role: 'founder',
         is_public: true,
         evil: 'nope',
       }),
@@ -204,6 +208,7 @@ describe('pickAllowedProfileUpdate', () => {
       bio: null,
       location: null,
       skills: ['Go'],
+      audience_role: 'founder',
     });
   });
 });
@@ -252,6 +257,7 @@ describe('executeProfileUpdate', () => {
         bio: 'Updated bio',
         location: 'London, UK',
         skills: 'TypeScript, Go',
+        audience_role: 'engineer',
       }),
     );
 
@@ -263,6 +269,7 @@ describe('executeProfileUpdate', () => {
       bio: 'Updated bio',
       location: 'London, UK',
       skills: ['TypeScript', 'Go'],
+      audience_role: 'engineer',
     });
   });
 
@@ -279,6 +286,7 @@ describe('executeProfileUpdate', () => {
       bio: 'Bio',
       location: '',
       skills: '',
+      audience_role: 'recruiter',
       profile_id: 'other-profile',
       tenant_id: 'other-tenant',
       owner_user_id: 'other-user',
@@ -303,6 +311,7 @@ describe('executeProfileUpdate', () => {
         bio: '',
         location: 'a'.repeat(121),
         skills: '',
+        audience_role: 'engineer',
       }),
     );
 
@@ -338,6 +347,7 @@ describe('executeProfileUpdate', () => {
         bio: 'Bio',
         location: '',
         skills: '',
+        audience_role: 'engineer',
       }),
     );
 
@@ -361,6 +371,7 @@ describe('executeProfileUpdate', () => {
         bio: 'Bio',
         location: '',
         skills: '',
+        audience_role: 'manager',
       }),
     );
 
@@ -384,6 +395,7 @@ describe('executeProfileUpdate', () => {
         bio: 'Bio',
         location: '',
         skills: '',
+        audience_role: 'student',
       }),
     );
 
@@ -414,6 +426,7 @@ describe('buildProfileFormData', () => {
       bio: 'Bio',
       location: 'SF',
       skillsInput: 'Go, Rust',
+      audience_role: 'engineer',
     });
     expect(fd.get('skills')).toBe('Go, Rust');
     expect(fd.get('slug')).toBe('alex');

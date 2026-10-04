@@ -120,10 +120,13 @@ export function DashboardOverviewView({
     hasAnyProject,
     isPublic: isProfilePublic,
   });
+  // Demo preview stays on the share_card loop; signed-in Home always gets share tools
+  // (ProfileShareHero handles private profiles and missing slugs).
   const showShare =
     guideFocus === 'share' ||
     loopState === 'publish_card' ||
-    loopState === 'share_card';
+    loopState === 'share_card' ||
+    (Boolean(profile) && !preview);
   const showWork = loopState !== 'complete_identity';
   const showLaterSurfaces = loopState === 'share_card';
   const showCompletion = completion.percentage < 100;
@@ -269,7 +272,18 @@ export function DashboardOverviewView({
 
       {showShare && showShareZone ? (
       <FadeInView delay={0.08}>
-        <section id="share" aria-label="Share your CodeCard" className="scroll-mt-24">
+        <section
+          id="share"
+          aria-labelledby="home-share-heading"
+          className="cc-profile-home__zone scroll-mt-24"
+        >
+          <div className="cc-profile-home__zone-head">
+            <div>
+              <p className="cc-workspace-section__eyebrow" id="home-share-heading">
+                Your public card
+              </p>
+            </div>
+          </div>
           <ProfileShareHero
             profileSlug={profileSlug}
             profileId={profile?.id}

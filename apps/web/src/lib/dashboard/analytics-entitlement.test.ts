@@ -43,6 +43,8 @@ function summaryFixture(): OwnerAnalyticsSummary {
       },
     ],
     hasAnyEvents: true,
+    viewerRoles: [],
+    viewerRoleSampleSize: 0,
   } as OwnerAnalyticsSummary;
 }
 

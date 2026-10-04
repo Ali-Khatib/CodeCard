@@ -5,6 +5,18 @@ import { motion, useReducedMotion } from 'motion/react';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+const motionByTag = new Map<ElementType, ReturnType<typeof motion.create>>();
+
+/** motion.create() returns a new component type each call — must cache per tag or children remount every render. */
+function motionForTag(Tag: ElementType) {
+  let cached = motionByTag.get(Tag);
+  if (!cached) {
+    cached = motion.create(Tag);
+    motionByTag.set(Tag, cached);
+  }
+  return cached;
+}
+
 type FadeInViewProps = {
   children: ReactNode;
   className?: string;
@@ -25,7 +37,7 @@ export function FadeInView({
   id,
 }: FadeInViewProps) {
   const reduced = useReducedMotion();
-  const MotionTag = motion.create(Tag);
+  const MotionTag = motionForTag(Tag);
 
   return (
     <MotionTag

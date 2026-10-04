@@ -1,15 +1,17 @@
 import {
+  audienceRoleSchema,
   isReservedProfileSlug,
   PROFILE_SLUG_TAKEN_MESSAGE,
   RESERVED_PROFILE_SLUG_MESSAGE,
   updateProfileSchema,
   parseCommaSeparatedSkills,
+  type AudienceRole,
 } from '@codecard/validation';
 import type { Profile } from '@codecard/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export type ProfileUpdateFieldErrors = Partial<
-  Record<'display_name' | 'headline' | 'bio' | 'location' | 'skills' | 'slug', string>
+  Record<'display_name' | 'headline' | 'bio' | 'location' | 'skills' | 'slug' | 'audience_role', string>
 >;
 
 export type ProfileUpdateState = {
@@ -25,7 +27,9 @@ export type OwnedProfileRow = Pick<
   'id' | 'tenant_id' | 'owner_user_id' | 'slug' | 'display_name' | 'headline' | 'bio' | 'location' | 'skills' | 'is_public'
 >;
 
-const profileEditSchema = updateProfileSchema.omit({ is_public: true });
+const profileEditSchema = updateProfileSchema.omit({ is_public: true }).extend({
+  audience_role: audienceRoleSchema,
+});
 
 export function parseTrustedProfileFormData(formData: FormData) {
   return {
@@ -35,6 +39,7 @@ export function parseTrustedProfileFormData(formData: FormData) {
     bio: String(formData.get('bio') ?? '') || null,
     location: String(formData.get('location') ?? ''),
     skills: parseCommaSeparatedSkills(String(formData.get('skills') ?? '')),
+    audience_role: String(formData.get('audience_role') ?? ''),
   };
 }
 
@@ -45,6 +50,7 @@ export function buildProfileFormData(form: {
   bio: string;
   location: string;
   skillsInput: string;
+  audience_role: string;
 }): FormData {
   const fd = new FormData();
   fd.set('display_name', form.display_name);
@@ -53,12 +59,15 @@ export function buildProfileFormData(form: {
   fd.set('bio', form.bio);
   fd.set('location', form.location);
   fd.set('skills', form.skillsInput);
+  fd.set('audience_role', form.audience_role);
   return fd;
 }
 
 export function pickAllowedProfileUpdate(
   data: Record<string, unknown>,
-): Omit<OwnedProfileRow, 'id' | 'tenant_id' | 'owner_user_id' | 'is_public'> {
+): Omit<OwnedProfileRow, 'id' | 'tenant_id' | 'owner_user_id' | 'is_public'> & {
+  audience_role: AudienceRole;
+} {
   return {
     display_name: data.display_name as string,
     headline: (data.headline as string | null | undefined) ?? null,
@@ -66,6 +75,7 @@ export function pickAllowedProfileUpdate(
     bio: (data.bio as string | null | undefined) ?? null,
     location: (data.location as string | null | undefined) ?? null,
     skills: (data.skills as string[]) ?? [],
+    audience_role: data.audience_role as AudienceRole,
   };
 }
 

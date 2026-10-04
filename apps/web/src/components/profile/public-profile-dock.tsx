@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { PublicProfileBackLink } from './public-profile-back-link';
 import { cn } from '@/lib/utils';
 import { scrollBehaviorForPreference } from '@/hooks/use-reduced-motion';
 
@@ -58,14 +58,14 @@ export function PublicProfileDock({ backHref, backLabel, hasResearch }: PublicPr
           'px-1.5 py-1.5 shadow-[0_12px_40px_-18px_rgba(34,34,34,0.35)] backdrop-blur-xl sm:px-2',
         )}
       >
-        <Link
+        <PublicProfileBackLink
           href={backHref}
           className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)] sm:px-3"
         >
           <span aria-hidden>←</span>
           <span className="hidden truncate sm:inline">{backLabel}</span>
           <span className="sm:hidden">Back</span>
-        </Link>
+        </PublicProfileBackLink>
 
         <nav
           aria-label="CodeCard sections"

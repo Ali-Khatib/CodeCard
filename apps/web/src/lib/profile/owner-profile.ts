@@ -6,7 +6,7 @@ export const OWNER_SHELL_PROFILE_COLUMNS =
 
 /** Columns the dashboard home reads. Keep this list in the schema contract test. */
 export const OWNER_HOME_PROFILE_COLUMNS =
-  'id, tenant_id, owner_user_id, slug, display_name, headline, bio, avatar_url, location, skills, is_public, created_at, updated_at';
+  'id, tenant_id, owner_user_id, slug, display_name, headline, bio, avatar_url, location, skills, is_public, audience_role, created_at, updated_at';
 
 type ProfileQueryError = { code?: string; message?: string } | null;
 

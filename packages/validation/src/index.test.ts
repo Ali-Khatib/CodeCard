@@ -42,6 +42,7 @@ describe('signUpSchema', () => {
       password: 'weak',
       display_name: 'Test User',
       slug: 'test-user',
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -58,6 +59,7 @@ describe('signUpSchema', () => {
       password: '',
       display_name: 'Test User',
       slug: 'test-user',
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -72,7 +74,21 @@ describe('signUpSchema', () => {
       password: 'SecurePass1',
       display_name: 'Test User',
       slug: 'test-user',
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(true);
+  });
+
+  it('requires what you are when it is one of the audience roles', () => {
+    const result = signUpSchema.safeParse({
+      email: 'test@example.com',
+      password: 'SecurePass1',
+      display_name: 'Test User',
+      slug: 'test-user',
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.errors[0]?.message).toMatch(/what you are/i);
+    }
   });
 });

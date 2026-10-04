@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useState, useTransition, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PROFILE_LINK_TYPES, profileLinkUrlHelp, profileLinkUrlPlaceholder } from '@codecard/validation';
+import {
+  PROFILE_LINK_SELECTABLE_TYPES,
+  profileLinkUrlHelp,
+  profileLinkUrlPlaceholder,
+} from '@codecard/validation';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import {
   createProfileLinkAction,
@@ -42,6 +46,14 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     () => [...links].sort((a, b) => a.sort_order - b.sort_order),
     [links],
   );
+
+  const typeOptions = useMemo(() => {
+    const options = [...PROFILE_LINK_SELECTABLE_TYPES];
+    if (mode.kind === 'edit' && mode.link.type === 'resume' && !options.includes('resume')) {
+      options.push('resume');
+    }
+    return options;
+  }, [mode]);
 
   function resetEditor() {
     setMode({ kind: 'idle' });
@@ -260,9 +272,9 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               aria-describedby="profile-link-type-help"
             >
-              {PROFILE_LINK_TYPES.map((type) => (
+              {typeOptions.map((type) => (
                 <option key={type} value={type}>
-                  {type === 'twitter' ? 'X (Twitter)' : type}
+                  {type === 'twitter' ? 'X (Twitter)' : type === 'resume' ? 'Resume (legacy)' : type}
                 </option>
               ))}
             </select>

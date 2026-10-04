@@ -14,6 +14,7 @@ import {
   normalizeAnalyticsSessionId,
 } from '@/lib/analytics/dedupe';
 import { isObviousAnalyticsBot, sanitizeAnalyticsMetadata } from '@/lib/analytics/bot-filter';
+import { profileViewAudienceMetadata } from '@/lib/analytics/viewer-audience-role';
 import { parseActiveTimeSeconds } from '@/lib/analytics/active-time';
 
 const TIME_SPENT_EVENTS = new Set([
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
     } = data;
     const session_id = normalizeAnalyticsSessionId(data.session_id);
     const safeMetadata = sanitizeAnalyticsMetadata(metadata);
+    delete safeMetadata.audience_role;
 
     if (TIME_SPENT_EVENTS.has(event_type)) {
       const seconds = parseActiveTimeSeconds(safeMetadata.seconds);
@@ -183,6 +185,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true, status: 'ignored' });
       }
 
+      let viewerRole: unknown = null;
+      const {
+        data: { user: viewer },
+      } = await supabase.auth.getUser();
+      if (viewer) {
+        const { data: viewerProfile } = await supabase
+          .from('profiles')
+          .select('audience_role')
+          .eq('owner_user_id', viewer.id)
+          .maybeSingle();
+        viewerRole = viewerProfile?.audience_role ?? null;
+      }
+      const viewMetadata = profileViewAudienceMetadata(safeMetadata, viewerRole);
+
       await supabase.from('public_profile_events').insert({
         tenant_id: profile.tenant_id,
         profile_id,
@@ -197,7 +213,7 @@ export async function POST(request: Request) {
         target_type: 'profile',
         target_id: profile_id,
         event_type,
-        metadata: safeMetadata,
+        metadata: viewMetadata,
         session_id,
       });
 

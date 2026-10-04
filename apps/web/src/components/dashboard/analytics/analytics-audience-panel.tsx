@@ -26,16 +26,26 @@ function SliceBars({ title, slices }: { title: string; slices: AudienceSlice[] }
   );
 }
 
-export function AnalyticsAudiencePanel({ roles }: { roles: AudienceSlice[] }) {
+export function AnalyticsAudiencePanel({
+  roles,
+  description = 'Share of profile views from signed-in people who said what they are.',
+  emptyLabel,
+}: {
+  roles: AudienceSlice[];
+  description?: string;
+  emptyLabel?: string;
+}) {
   return (
     <AppCard className="!p-6">
       <SectionLabel>Who is viewing</SectionLabel>
-      <SectionSubtitle>
-        Inferred from profile signals, referrer context, and session behavior
-      </SectionSubtitle>
+      <SectionSubtitle>{description}</SectionSubtitle>
 
       <div className="mt-6 w-full">
-        <SliceBars title="Roles" slices={roles} />
+        {emptyLabel ? (
+          <p className="text-[14px] leading-relaxed text-[var(--app-smoke)]">{emptyLabel}</p>
+        ) : (
+          <SliceBars title="Roles" slices={roles} />
+        )}
       </div>
     </AppCard>
   );

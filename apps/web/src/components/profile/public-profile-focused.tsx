@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 import type { FeaturedProject } from '@/lib/projects/featured';
@@ -9,6 +8,7 @@ import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
 import { profileQuickHistory } from '@/lib/profile/quick-history';
+import { PublicProfileBackLink } from './public-profile-back-link';
 import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
 import { PublicHeroFlipPanel } from './public-hero-flip-panel';
@@ -210,12 +210,12 @@ export function PublicProfileFocused({
           <PublicProfileSaveCard profileSlug={profileSlug} displayName={displayName} />
         </div>
         <footer className="mt-16 border-t border-[var(--app-border)] pt-8 text-center">
-          <Link
+          <PublicProfileBackLink
             href="/"
             className="text-[14px] text-[var(--app-smoke)] hover:text-[var(--app-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-iris)]"
           >
             CodeCard home
-          </Link>
+          </PublicProfileBackLink>
         </footer>
       </main>
     </div>

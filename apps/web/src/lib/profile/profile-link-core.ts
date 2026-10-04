@@ -2,6 +2,7 @@ import {
   findDuplicateProfileLink,
   PROFILE_LINKS_MAX_COUNT,
   profileLinkInputSchema,
+  profileLinkUpdateInputSchema,
   reorderProfileLinksSchema,
 } from '@codecard/validation';
 import type { ProfileLink } from '@codecard/types';
@@ -139,13 +140,20 @@ export async function executeUpdateProfileLink(
     return { error: 'Profile link not found.' };
   }
 
-  const parsed = profileLinkInputSchema.safeParse({
+  const parsed = profileLinkUpdateInputSchema.safeParse({
     type: String(formData.get('type') ?? ''),
     label: String(formData.get('label') ?? '') || null,
     url: String(formData.get('url') ?? ''),
   });
   if (!parsed.success) {
     return validationFailure(parsed.error.errors[0]!);
+  }
+
+  if (parsed.data.type === 'resume' && owned.type !== 'resume') {
+    return {
+      error: 'Resume links are no longer supported. Choose another link type.',
+      fieldErrors: { type: 'Resume links are no longer supported. Choose another link type.' },
+    };
   }
 
   const existing = await loadOwnedProfileLinks(supabase, resolved.profile.id);

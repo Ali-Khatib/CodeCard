@@ -35,6 +35,12 @@ export async function createSignedUploadIntent(
     .createSignedUploadUrl(location.path);
 
   if (error || !data?.signedUrl || !data.token) {
+    console.error('[upload] createSignedUploadUrl failed', {
+      bucket: location.bucket,
+      path: location.path,
+      message: error?.message ?? 'missing signedUrl/token',
+      statusCode: (error as { statusCode?: string } | null)?.statusCode ?? null,
+    });
     return {
       ok: false,
       status: 500,
@@ -49,6 +55,11 @@ export async function createSignedUploadIntent(
     maxBytes: validation.maxBytes,
   });
   if (!recorded.ok) {
+    console.error('[upload] recordUploadIntent failed', {
+      bucket: location.bucket,
+      path: location.path,
+      resourceType: ownership.resourceType,
+    });
     return {
       ok: false,
       status: 500,

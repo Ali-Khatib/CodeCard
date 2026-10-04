@@ -13,6 +13,7 @@ export type ProfileFormState = {
   location: string;
   skillsInput: string;
   is_public: boolean;
+  audience_role: string;
 };
 
 export function profileToFormState(profile: Profile): ProfileFormState {
@@ -24,6 +25,7 @@ export function profileToFormState(profile: Profile): ProfileFormState {
     location: profile.location ?? '',
     skillsInput: (profile.skills ?? []).join(', '),
     is_public: profile.is_public,
+    audience_role: profile.audience_role ?? '',
   };
 }
 
@@ -38,6 +40,7 @@ export function formStateToUpdatePayload(
     location: form.location,
     skills: parseCommaSeparatedSkills(form.skillsInput),
     is_public: form.is_public,
+    audience_role: form.audience_role || null,
   };
 }
 

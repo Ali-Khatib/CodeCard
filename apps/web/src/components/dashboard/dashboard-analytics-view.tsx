@@ -15,6 +15,7 @@ import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
 import { AnalyticsCoachChat } from './analytics/analytics-coach-chat';
+import { AnalyticsAudiencePanel } from './analytics/analytics-audience-panel';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
   AppButton,
@@ -188,6 +189,18 @@ export function DashboardAnalyticsView({
                 value={<CountUp value={summary.linkClicks} />}
               />
             </div>
+          </FadeInView>
+
+          <FadeInView delay={0.05}>
+            <AnalyticsAudiencePanel
+              roles={summary.viewerRoles}
+              description="From what signed-in visitors chose on create account or their profile. Guests are not included."
+              emptyLabel={
+                summary.viewerRoleSampleSize === 0
+                  ? 'Nobody who viewed this card has said what they are yet. Recruiters, engineers, founders, managers, and students show up here after they choose.'
+                  : undefined
+              }
+            />
           </FadeInView>
 
           <FadeInView delay={0.06}>

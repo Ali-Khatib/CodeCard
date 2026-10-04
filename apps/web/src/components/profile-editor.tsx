@@ -11,6 +11,7 @@ import {
   type ProfileFormState,
 } from '@/lib/profile/profile-form';
 import { buildProfileFormData } from '@/lib/profile/profile-update-core';
+import { AudienceRoleField } from '@/components/profile/audience-role-field';
 import { ProfilePublishControls } from '@/components/profile/profile-publish-controls';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
 import {
@@ -33,6 +34,7 @@ const PROFILE_FIELD_IDS: Record<string, string> = {
   bio: 'bio',
   location: 'location',
   skills: 'skills',
+  audience_role: 'audience_role',
 };
 
 function focusProfileField(field?: string) {
@@ -120,6 +122,15 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     setClientFieldError(null);
     setSaveSuccess(false);
 
+    if (!form.audience_role) {
+      const message = 'Choose what you are.';
+      setClientError(message);
+      setClientFieldError({ field: 'audience_role', message });
+      focusProfileField('audience_role');
+      notifyError(message, MUTATION_FEEDBACK.profile.saveFailed);
+      return;
+    }
+
     const parsed = parseProfileUpdate(form);
     if (!parsed.success) {
       setClientError(parsed.message);
@@ -141,6 +152,15 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           HTML (the browser drops the inner tag during SSR), so the profile
           form must close before it. */}
       <form onSubmit={handleSubmit} className="space-y-5" aria-busy={pending} noValidate>
+        <div id="audience_role" className="scroll-mt-28">
+          <AudienceRoleField
+            value={form.audience_role}
+            onChange={(role) => setForm({ ...form, audience_role: role })}
+            error={fieldErrors.audience_role}
+            disabled={pending}
+          />
+        </div>
+
         <div className="space-y-2">
           <FieldLabel htmlFor="display_name">Display name</FieldLabel>
           <input

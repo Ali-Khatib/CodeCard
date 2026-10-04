@@ -410,6 +410,35 @@ export const profileSkillsSchema = z
     `Each skill must be 1–${PROFILE_SKILL_MAX_LENGTH} characters`,
   );
 
+/** Self-identified audience. Plural chart labels match the Roles breakdown. */
+export const AUDIENCE_ROLES = ['recruiter', 'engineer', 'founder', 'manager', 'student'] as const;
+
+export type AudienceRole = (typeof AUDIENCE_ROLES)[number];
+
+export const AUDIENCE_ROLE_LABELS: Record<AudienceRole, string> = {
+  recruiter: 'Recruiter',
+  engineer: 'Engineer',
+  founder: 'Founder',
+  manager: 'Manager',
+  student: 'Student',
+};
+
+export const AUDIENCE_ROLE_CHART_LABELS: Record<AudienceRole, string> = {
+  recruiter: 'Recruiters',
+  engineer: 'Engineers',
+  founder: 'Founders',
+  manager: 'Managers',
+  student: 'Students',
+};
+
+export function isAudienceRole(value: unknown): value is AudienceRole {
+  return typeof value === 'string' && (AUDIENCE_ROLES as readonly string[]).includes(value);
+}
+
+export const audienceRoleSchema = z.enum(AUDIENCE_ROLES, {
+  errorMap: () => ({ message: 'Choose what you are.' }),
+});
+
 export const createProfileSchema = z.object({
   display_name: z.string().min(1).max(80).trim(),
   headline: z.string().max(120).trim().optional().nullable(),
@@ -418,6 +447,10 @@ export const createProfileSchema = z.object({
   location: profileLocationSchema,
   skills: profileSkillsSchema.default([]).optional(),
   is_public: z.boolean().default(false),
+  audience_role: z
+    .union([audienceRoleSchema, z.literal(''), z.null()])
+    .optional()
+    .transform((value) => (value ? value : null)),
 });
 
 export const updateProfileSchema = createProfileSchema.partial();
@@ -722,6 +755,7 @@ export const signUpSchema = z.object({
     .min(1, 'Enter your display name')
     .max(80, 'Display name must be at most 80 characters'),
   slug: slugSchema,
+  audience_role: audienceRoleSchema,
 });
 
 export const signInSchema = z.object({

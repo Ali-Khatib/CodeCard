@@ -9,6 +9,13 @@
  * counts into the same totals — the API writes parallel rows for views.
  */
 
+import {
+  AUDIENCE_ROLE_CHART_LABELS,
+  AUDIENCE_ROLES,
+  isAudienceRole,
+  type AudienceRole,
+} from '@codecard/validation';
+
 export type AnalyticsEventRow = {
   event_type: string;
   target_id: string | null;
@@ -82,7 +89,56 @@ export type OwnerAnalyticsSummary = OwnerAnalyticsTotals & {
   topResearch: TopResearchStat[];
   /** True when at least one supported audience event exists. */
   hasAnyEvents: boolean;
+  /** Share of profile views from signed-in people who chose what they are. */
+  viewerRoles: { label: string; pct: number }[];
+  viewerRoleSampleSize: number;
 };
+
+function readViewerAudienceRole(metadata: unknown): AudienceRole | null {
+  if (!metadata || typeof metadata !== 'object' || !('audience_role' in metadata)) return null;
+  const role = (metadata as { audience_role?: unknown }).audience_role;
+  return isAudienceRole(role) ? role : null;
+}
+
+/** Percentages across the five audience roles. They sum to 100 when anyone has chosen. */
+export function viewerRoleBreakdown(events: AnalyticsEventRow[]): {
+  slices: { label: string; pct: number }[];
+  identified: number;
+} {
+  const counts = new Map<AudienceRole, number>(AUDIENCE_ROLES.map((role) => [role, 0]));
+  let identified = 0;
+  for (const event of events) {
+    if (event.event_type !== 'profile_view') continue;
+    const role = readViewerAudienceRole(event.metadata);
+    if (!role) continue;
+    counts.set(role, (counts.get(role) ?? 0) + 1);
+    identified += 1;
+  }
+
+  const pctByRole = new Map<AudienceRole, number>(AUDIENCE_ROLES.map((role) => [role, 0]));
+  if (identified > 0) {
+    const parts = AUDIENCE_ROLES.map((role) => {
+      const exact = ((counts.get(role) ?? 0) / identified) * 100;
+      return { role, pct: Math.floor(exact), remainder: exact - Math.floor(exact) };
+    });
+    let leftover = 100 - parts.reduce((sum, part) => sum + part.pct, 0);
+    const ranked = [...parts].sort((a, b) => b.remainder - a.remainder);
+    for (const part of parts) pctByRole.set(part.role, part.pct);
+    for (let i = 0; i < leftover; i += 1) {
+      const role = ranked[i]?.role;
+      if (!role) break;
+      pctByRole.set(role, (pctByRole.get(role) ?? 0) + 1);
+    }
+  }
+
+  return {
+    slices: AUDIENCE_ROLES.map((role) => ({
+      label: AUDIENCE_ROLE_CHART_LABELS[role],
+      pct: pctByRole.get(role) ?? 0,
+    })),
+    identified,
+  };
+}
 
 export function readDurationSeconds(metadata: unknown): number {
   if (!metadata || typeof metadata !== 'object' || !('seconds' in metadata)) return 0;
@@ -291,6 +347,8 @@ export function aggregateOwnerAnalytics(input: {
       researchTimeSpentSec >
     0;
 
+  const roles = viewerRoleBreakdown(events);
+
   return {
     profileId: input.profileId,
     displayName: input.displayName,
@@ -310,5 +368,7 @@ export function aggregateOwnerAnalytics(input: {
     topProjects,
     topResearch,
     hasAnyEvents,
+    viewerRoles: roles.slices,
+    viewerRoleSampleSize: roles.identified,
   };
 }

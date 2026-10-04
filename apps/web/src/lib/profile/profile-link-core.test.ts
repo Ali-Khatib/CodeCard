@@ -95,10 +95,27 @@ function createMockSupabase(options: {
           };
         }),
         update: vi.fn((payload: unknown) => ({
-          eq: vi.fn(() => ({
+          eq: vi.fn((_column: string, linkId: string) => ({
             eq: vi.fn(() => {
               update(payload);
-              return Promise.resolve({ error: options.updateError ?? null });
+              const row = {
+                id: linkId,
+                type: (payload as { type?: string }).type ?? 'github',
+                label: (payload as { label?: string | null }).label ?? null,
+                url: (payload as { url?: string }).url ?? 'https://github.com/alex',
+                sort_order: 0,
+              };
+              const response = { error: options.updateError ?? null, data: row };
+              return {
+                ...response,
+                select: vi.fn(() => ({
+                  single: vi.fn().mockResolvedValue({ data: row, error: options.updateError ?? null }),
+                })),
+                then: (
+                  onFulfilled: (value: typeof response) => unknown,
+                  onRejected?: (reason: unknown) => unknown,
+                ) => Promise.resolve(response).then(onFulfilled, onRejected),
+              };
             }),
           })),
         })),
@@ -160,6 +177,16 @@ describe('executeCreateProfileLink', () => {
     expect(result.fieldErrors?.url || result.error).toBeTruthy();
   });
 
+  it('rejects new resume links', async () => {
+    const { supabase, insert } = createMockSupabase({ user: { id: 'user-1' }, profile });
+    const result = await executeCreateProfileLink(
+      supabase,
+      makeFormData({ type: 'resume', label: 'Resume', url: 'https://example.com/cv.pdf' }),
+    );
+    expect(result.success).toBeUndefined();
+    expect(insert).not.toHaveBeenCalled();
+  });
+
   it('rejects duplicate links', async () => {
     const { supabase } = createMockSupabase({
       user: { id: 'user-1' },
@@ -183,6 +210,61 @@ describe('executeCreateProfileLink', () => {
 });
 
 describe('executeUpdateProfileLink', () => {
+  it('updates a legacy resume link', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile,
+      links: [
+        {
+          id: 'link-resume',
+          type: 'resume',
+          label: null,
+          url: 'https://example.com/old-cv.pdf',
+          sort_order: 0,
+        },
+      ],
+    });
+    const result = await executeUpdateProfileLink(
+      supabase,
+      makeFormData({
+        link_id: 'link-resume',
+        type: 'resume',
+        label: '',
+        url: 'https://example.com/new-cv.pdf',
+      }),
+    );
+    expect(result.success).toBe(true);
+    expect(update).toHaveBeenCalled();
+  });
+
+  it('rejects changing another link type to resume', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile,
+      links: [
+        {
+          id: 'link-1',
+          type: 'website',
+          label: null,
+          url: 'https://example.com',
+          sort_order: 0,
+        },
+      ],
+    });
+    const result = await executeUpdateProfileLink(
+      supabase,
+      makeFormData({
+        link_id: 'link-1',
+        type: 'resume',
+        label: '',
+        url: 'https://example.com/cv.pdf',
+      }),
+    );
+    expect(result.success).toBeUndefined();
+    expect(result.fieldErrors?.type || result.error).toMatch(/resume/i);
+    expect(update).not.toHaveBeenCalled();
+  });
+
   it('rejects foreign link IDs', async () => {
     const { supabase } = createMockSupabase({
       user: { id: 'user-1' },
