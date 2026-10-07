@@ -7,6 +7,7 @@ import {
   profileLinkUrlHelp,
   profileLinkUrlPlaceholder,
 } from '@codecard/validation';
+import type { ProfileLinkType } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import {
   createProfileLinkAction,
@@ -47,9 +48,9 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     [links],
   );
 
-  const typeOptions = useMemo(() => {
-    const options = [...PROFILE_LINK_SELECTABLE_TYPES];
-    if (mode.kind === 'edit' && mode.link.type === 'resume' && !options.includes('resume')) {
+  const typeOptions = useMemo((): ProfileLinkType[] => {
+    const options: ProfileLinkType[] = [...PROFILE_LINK_SELECTABLE_TYPES];
+    if (mode.kind === 'edit' && mode.link.type === 'resume') {
       options.push('resume');
     }
     return options;

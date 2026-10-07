@@ -152,6 +152,7 @@ describe('validateProfileEditPayload', () => {
       bio: null,
       location: '',
       skills: [],
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(false);
   });
@@ -164,6 +165,7 @@ describe('validateProfileEditPayload', () => {
       bio: null,
       location: '',
       skills: [],
+      audience_role: 'engineer',
     });
     expect(result.success).toBe(false);
   });

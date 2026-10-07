@@ -1,17 +1,27 @@
 'use client';
 
-import { type ElementType, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import {
+  type ComponentType,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
+import { motion, useReducedMotion, type MotionProps } from 'motion/react';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const motionByTag = new Map<ElementType, ReturnType<typeof motion.create>>();
+type MotionHostProps = HTMLAttributes<HTMLElement> & MotionProps;
 
-/** motion.create() returns a new component type each call — must cache per tag or children remount every render. */
-function motionForTag(Tag: ElementType) {
+/**
+ * motion.create() returns a new component type each call — must cache per tag
+ * or children remount every render (and drop focus in form fields).
+ */
+const motionByTag = new Map<ElementType, ComponentType<MotionHostProps>>();
+
+function motionForTag(Tag: ElementType): ComponentType<MotionHostProps> {
   let cached = motionByTag.get(Tag);
   if (!cached) {
-    cached = motion.create(Tag);
+    cached = motion.create(Tag) as ComponentType<MotionHostProps>;
     motionByTag.set(Tag, cached);
   }
   return cached;

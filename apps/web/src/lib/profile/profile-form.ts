@@ -1,5 +1,6 @@
 import type { Profile } from '@codecard/types';
 import {
+  isAudienceRole,
   parseCommaSeparatedSkills,
   updateProfileSchema,
 } from '@codecard/validation';
@@ -40,7 +41,7 @@ export function formStateToUpdatePayload(
     location: form.location,
     skills: parseCommaSeparatedSkills(form.skillsInput),
     is_public: form.is_public,
-    audience_role: form.audience_role || null,
+    audience_role: isAudienceRole(form.audience_role) ? form.audience_role : null,
   };
 }
 
