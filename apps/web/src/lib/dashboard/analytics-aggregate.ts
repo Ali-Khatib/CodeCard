@@ -121,7 +121,7 @@ export function viewerRoleBreakdown(events: AnalyticsEventRow[]): {
       const exact = ((counts.get(role) ?? 0) / identified) * 100;
       return { role, pct: Math.floor(exact), remainder: exact - Math.floor(exact) };
     });
-    let leftover = 100 - parts.reduce((sum, part) => sum + part.pct, 0);
+    const leftover = 100 - parts.reduce((sum, part) => sum + part.pct, 0);
     const ranked = [...parts].sort((a, b) => b.remainder - a.remainder);
     for (const part of parts) pctByRole.set(part.role, part.pct);
     for (let i = 0; i < leftover; i += 1) {
