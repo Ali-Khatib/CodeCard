@@ -56,6 +56,8 @@ describe('WS14-T015 Sentry scrubbing', () => {
 
   it('drops noisy expected framework errors', () => {
     expect(isNoisyExpectedError('NEXT_REDIRECT')).toBe(true);
+    expect(isNoisyExpectedError('Failed to fetch')).toBe(true);
+    expect(isNoisyExpectedError('Load failed')).toBe(true);
     expect(isNoisyExpectedError('CodeCard boom')).toBe(false);
   });
 });

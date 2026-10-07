@@ -42,9 +42,13 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
     let cancelled = false;
 
     const load = async () => {
-      const result = await listPendingScanOffersAction();
-      if (cancelled || result.error) return;
-      setItems(scanOffersToNotifications(result.offers, basePath));
+      try {
+        const result = await listPendingScanOffersAction();
+        if (cancelled || result.error) return;
+        setItems(scanOffersToNotifications(result.offers, basePath));
+      } catch {
+        // Network blip / aborted POST while navigating — leave bell empty.
+      }
     };
 
     void load();

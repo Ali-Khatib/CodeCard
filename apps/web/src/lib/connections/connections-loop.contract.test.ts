@@ -35,6 +35,7 @@ describe('Connections in-person loop', () => {
     const offers = read('src/components/dashboard/inbound-scan-offers.tsx');
     expect(offers).toContain('just scanned your card');
     expect(offers).toContain('Add connection');
+    expect(offers).toContain('Transient network');
   });
 
   it('lists saved people with Open CodeCard as the return path', () => {

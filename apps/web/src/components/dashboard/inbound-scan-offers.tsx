@@ -30,8 +30,12 @@ export function InboundScanOffers({
   useEffect(() => {
     let cancelled = false;
     const tick = async () => {
-      const result = await listPendingScanOffersAction();
-      if (!cancelled && !result.error) setOffers(result.offers);
+      try {
+        const result = await listPendingScanOffersAction();
+        if (!cancelled && !result.error) setOffers(result.offers);
+      } catch {
+        // Transient network / aborted server-action fetch — keep last known offers.
+      }
     };
     void tick();
     const id = window.setInterval(() => {
@@ -49,14 +53,19 @@ export function InboundScanOffers({
       setError(null);
       setPendingId(offer.id);
       startTransition(async () => {
-        const result = await acceptScanOfferAction(offer.id);
-        setPendingId(null);
-        if (!result.success || !result.connectionId) {
-          setError(result.error ?? 'Could not add this Connection.');
-          return;
+        try {
+          const result = await acceptScanOfferAction(offer.id);
+          setPendingId(null);
+          if (!result.success || !result.connectionId) {
+            setError(result.error ?? 'Could not add this Connection.');
+            return;
+          }
+          setOffers((prev) => prev.filter((item) => item.id !== offer.id));
+          onAccepted?.(result.connectionId, offer.scannerName);
+        } catch {
+          setPendingId(null);
+          setError('Could not add this Connection. Check your connection and try again.');
         }
-        setOffers((prev) => prev.filter((item) => item.id !== offer.id));
-        onAccepted?.(result.connectionId, offer.scannerName);
       });
     },
     [pending, onAccepted],
@@ -68,13 +77,18 @@ export function InboundScanOffers({
       setError(null);
       setPendingId(offer.id);
       startTransition(async () => {
-        const result = await dismissScanOfferAction(offer.id);
-        setPendingId(null);
-        if (!result.success) {
-          setError(result.error ?? 'Could not dismiss this scan.');
-          return;
+        try {
+          const result = await dismissScanOfferAction(offer.id);
+          setPendingId(null);
+          if (!result.success) {
+            setError(result.error ?? 'Could not dismiss this scan.');
+            return;
+          }
+          setOffers((prev) => prev.filter((item) => item.id !== offer.id));
+        } catch {
+          setPendingId(null);
+          setError('Could not dismiss this scan. Check your connection and try again.');
         }
-        setOffers((prev) => prev.filter((item) => item.id !== offer.id));
       });
     },
     [pending],

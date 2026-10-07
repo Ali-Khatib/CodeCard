@@ -71,6 +71,10 @@ export function isNoisyExpectedError(message: string | undefined): boolean {
   return (
     /NEXT_REDIRECT/i.test(message) ||
     /NEXT_NOT_FOUND/i.test(message) ||
-    /AbortError/i.test(message)
+    /AbortError/i.test(message) ||
+    // Browser TypeError when a server-action/RSC fetch is aborted or offline.
+    /^Failed to fetch$/i.test(message.trim()) ||
+    /^Load failed$/i.test(message.trim()) ||
+    /^NetworkError when attempting to fetch resource\.$/i.test(message.trim())
   );
 }
