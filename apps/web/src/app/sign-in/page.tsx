@@ -20,6 +20,7 @@ import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
 import { isAuthNavigationAbort, withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
 import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
+import { serializeSessionLeaseCookie } from '@/lib/auth/session-lease';
 
 const SETUP_MSG =
   'Add Supabase keys to apps/web/.env.local (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).';
@@ -139,6 +140,7 @@ function SignInForm() {
       }
 
       succeeded = true;
+      document.cookie = serializeSessionLeaseCookie();
       setFadingOut(true);
       router.push(redirectTo);
       router.refresh();

@@ -14,23 +14,26 @@ import {
 } from '@/lib/projects/case-study-sections';
 import type { FeaturedProject } from '@/lib/projects/featured';
 
-/** Stable Unsplash fallbacks when a section has no media (design fill only). */
-const FALLBACK_IMAGES = [
-  'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1607705703571-c5a8695f18f6?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1200&auto=format&fit=crop',
-] as const;
+function projectShots(project: FeaturedProject): string[] {
+  const shots = [
+    ...(project.posterUrl ? [project.posterUrl] : []),
+    ...project.screenshots,
+  ];
+  return shots.filter((shot, index) => shot && shots.indexOf(shot) === index);
+}
 
-function imagesForSection(mediaUrl: string | null, index: number): string[] {
+function imagesForSection(
+  project: FeaturedProject,
+  mediaUrl: string | null,
+  index: number,
+): string[] {
   const trimmed = mediaUrl?.trim();
   if (trimmed) return [trimmed];
-  // Distinct pair of fallbacks only when the section has no real media.
-  return [
-    FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]!,
-    FALLBACK_IMAGES[(index + 2) % FALLBACK_IMAGES.length]!,
-  ];
+  const own = projectShots(project);
+  if (own.length === 0) return [];
+  const first = own[index % own.length]!;
+  const second = own[(index + 1) % own.length]!;
+  return first === second ? [first] : [first, second];
 }
 
 export function ProjectCaseStudyTabs({
@@ -54,7 +57,7 @@ export function ProjectCaseStudyTabs({
           name: section.eyebrow,
           title: section.label,
           description: text ?? section.summary,
-          images: imagesForSection(media, index),
+          images: imagesForSection(project, media, index),
         };
       }),
     [project, visibleSections],

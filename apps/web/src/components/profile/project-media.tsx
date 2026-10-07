@@ -27,7 +27,8 @@ export function ProjectMedia({
     if (priority) setLoaded(true);
   }, [priority, src]);
 
-  const mediaClass = `object-cover object-top transition-opacity duration-300 ${
+  const contain = className.includes('object-contain');
+  const mediaClass = `${contain ? 'object-contain object-center' : 'object-cover object-top'} transition-opacity duration-300 ${
     loaded ? 'opacity-100' : 'opacity-0'
   } ${className}`;
 

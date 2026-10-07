@@ -12,7 +12,17 @@ import {
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
 import { toSessionOnlyCookieOptions } from '@/lib/auth/session-cookie-options';
+import {
+  hasSessionLease,
+  SESSION_LEASE_COOKIE,
+  sessionLeaseCookieOptions,
+  supabaseAuthCookieNames,
+} from '@/lib/auth/session-lease';
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
+
+function rememberOpenTab(response: NextResponse) {
+  response.cookies.set(SESSION_LEASE_COOKIE, '1', sessionLeaseCookieOptions());
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
@@ -54,6 +64,33 @@ export async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-pathname', pathname);
     return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
+  // A restored auth cookie is not an open session. Sign in stays on the form.
+  if (
+    hasSupabaseAuthCookie(request.cookies.getAll()) &&
+    !hasSessionLease(request.cookies.getAll())
+  ) {
+    const staleAuthCookies = supabaseAuthCookieNames(request.cookies.getAll());
+    for (const name of staleAuthCookies) {
+      request.cookies.delete(name);
+    }
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', pathname);
+    const dropAuth = (response: NextResponse) => {
+      for (const name of staleAuthCookies) {
+        response.cookies.set(name, '', { path: '/', maxAge: 0, sameSite: 'lax' });
+      }
+      return response;
+    };
+    if (isDashboard || isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/sign-in';
+      url.searchParams.set('redirect', sanitizeInternalRedirect(pathname));
+      url.searchParams.set('reason', 'session_expired');
+      return dropAuth(NextResponse.redirect(url));
+    }
+    return dropAuth(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
   const requestHeaders = new Headers(request.headers);
@@ -112,10 +149,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user) {
+    rememberOpenTab(supabaseResponse);
+  }
+
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
+    const redirect = NextResponse.redirect(url);
+    rememberOpenTab(redirect);
+    return redirect;
   }
 
   if (isResetPasswordRoute && user) {

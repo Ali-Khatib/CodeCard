@@ -47,6 +47,34 @@ export const DEMO_RESUME_URL =
 
 export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
   {
+    id: 'demo-emotion',
+    title: 'Context-Aware Emotion Recognition',
+    tagline: 'Group photos, read face by face, then as a scene',
+    description:
+      'Upload one group photo. The app finds every face, predicts an emotion for each person, then refines those labels using the rest of the group.\n\nA last fusion step reads the whole scene and returns a final group emotion, with the stage-by-stage trail still visible.\n\nThe Report tab turns that run into matrices, emotion mix, and confidence so the result is something you can show, not only a label.',
+    technologies: ['React', 'TypeScript', 'Python', 'PyTorch', 'FastAPI', 'Java', 'Spring Boot', 'PostgreSQL'],
+    domains: ['Artificial Intelligence'],
+    focusAreas: ['Emotion Recognition'],
+    posterUrl: '/showcase/emotion/interface-stages.png',
+    videoUrl: null,
+    links: [],
+    screenshots: [
+      '/showcase/emotion/interface-preview.png',
+      '/showcase/emotion/interface-stages.png',
+      '/showcase/emotion/results.png',
+    ],
+    caseStudySections: {
+      product: {
+        text: 'Start with a group photo. Stages then shows detection, per-face emotions, group refinement, and the final scene verdict on one screen.',
+        mediaUrl: '/showcase/emotion/interface-stages.png',
+      },
+      results: {
+        text: 'The report names the group emotion, lists each face by stage, and charts the mix and confidence for that run.',
+        mediaUrl: '/showcase/emotion/results.png',
+      },
+    },
+  },
+  {
     id: 'demo-1',
     title: 'DevFlow',
     tagline: 'CI/CD pipelines that actually make sense',

@@ -219,7 +219,7 @@ function StepMedia({
         <img
           src={imgs[0]!}
           alt=""
-          className="h-full w-full max-w-full object-cover"
+          className="h-full w-full max-w-full object-contain"
           draggable={false}
         />
       </motion.div>
@@ -240,7 +240,7 @@ function StepMedia({
           transition={{ duration: reducedMotion ? 0.12 : 0.45, delay: reducedMotion ? 0 : index * 0.06 }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt="" className="h-full w-full max-w-full object-cover" draggable={false} />
+          <img src={src} alt="" className="h-full w-full max-w-full object-contain" draggable={false} />
         </motion.div>
       ))}
       <span className="sr-only">{title} visuals</span>

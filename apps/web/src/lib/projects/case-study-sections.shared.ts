@@ -90,9 +90,11 @@ export function caseStudyTextForSection(
   return text || null;
 }
 
-/** Only inline images and http(s) URLs may render (blocks javascript: etc.). */
+/** Inline images, http(s) URLs, and same-site paths. Blocks javascript: and protocol-relative URLs. */
 export function isSafeCaseStudyMediaUrl(value: string): boolean {
-  return value.startsWith('data:image/') || /^https?:\/\//i.test(value);
+  if (value.startsWith('data:image/')) return true;
+  if (/^https?:\/\//i.test(value)) return true;
+  return value.startsWith('/') && !value.startsWith('//');
 }
 
 /**

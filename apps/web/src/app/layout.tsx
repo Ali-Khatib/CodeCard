@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from 'next/font/google';
 import { SkipToContentLink } from '@/components/a11y/skip-to-content';
 import { AuthHashRecoveryCatcher } from '@/components/auth/auth-hash-recovery-catcher';
+import { SessionLeaseKeeper } from '@/components/auth/session-lease-keeper';
 import { DeferredVercelTelemetry } from '@/components/telemetry/deferred-vercel-telemetry';
 import './globals.css';
 
@@ -97,6 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         } as Record<string, string>}
       >
         <SkipToContentLink />
+        <SessionLeaseKeeper />
         <AuthHashRecoveryCatcher />
         {children}
         <DeferredVercelTelemetry />

@@ -65,9 +65,15 @@ export default function DemoWorkspaceOverviewPage() {
           qrDownloads: 128,
         }}
         projectsSummary={{
-          total: 3,
-          published: 2,
+          total: 4,
+          published: 3,
           recent: [
+            {
+              id: 'demo-emotion',
+              title: 'Context-Aware Emotion Recognition',
+              isPublished: true,
+              href: `${basePath}/work`,
+            },
             {
               id: 'demo-p1',
               title: 'DevFlow',

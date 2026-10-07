@@ -73,6 +73,13 @@ export function PublicProfileFocused({
   } | null;
 }) {
   const { role, company } = parseHeadline(headline);
+  const founder = isFounderProfile({ profileId, profileSlug });
+  const founderRoles = founder
+    ? (headline ?? '')
+        .split('·')
+        .map((part) => part.trim())
+        .filter(Boolean)
+    : [];
   const history = profileQuickHistory({
     profileSlug,
     headline,
@@ -84,7 +91,6 @@ export function PublicProfileFocused({
     bio ??
     'I build developer tools that make complex workflows feel simple.';
   const firstName = displayName.split(' ')[0];
-  const founder = isFounderProfile({ profileId, profileSlug });
   const backHref =
     profileSlug === 'demo' ? '/demo' : connectionControl?.isOwnProfile ? '/dashboard' : '/';
   const backLabel =
@@ -149,13 +155,19 @@ export function PublicProfileFocused({
                 />
               }
             >
-              <p className="cc-app-mono cc-public-hero__eyebrow">
-                {founder ? 'Founder · CodeCard' : 'CodeCard'}
-              </p>
+              <p className="cc-app-mono cc-public-hero__eyebrow">CodeCard</p>
               <h1 className="cc-public-hero__title mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em]">
                 {displayName}
               </h1>
-              {role ? (
+              {founder && founderRoles.length > 0 ? (
+                <ul className="cc-founder-roles" aria-label="Roles">
+                  {founderRoles.map((part, index) => (
+                    <li key={part} className={`cc-founder-role cc-founder-role--${index}`}>
+                      {part}
+                    </li>
+                  ))}
+                </ul>
+              ) : role ? (
                 <p className="cc-public-hero__meta mt-2 break-words text-[15px] md:text-[16px]">
                   {role}
                   {company ? (

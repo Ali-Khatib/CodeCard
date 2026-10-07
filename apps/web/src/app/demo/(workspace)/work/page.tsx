@@ -10,7 +10,12 @@ import { LIVE_DEMO_WORKSPACE_HREF, publicDemoProjectHref } from '@/lib/marketing
 
 export const dynamic = 'force-static';
 
-const DEMO_NAMES = ['DevFlow', 'SchemaSync', 'Pulse'] as const;
+const DEMO_NAMES = [
+  'Context-Aware Emotion Recognition',
+  'DevFlow',
+  'SchemaSync',
+  'Pulse',
+] as const;
 
 const creator = profileToPortfolioCreator(
   {

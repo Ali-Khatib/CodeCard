@@ -23,6 +23,7 @@ import {
   signupConfirmationBody,
 } from '@/lib/auth/signup-result';
 import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
+import { serializeSessionLeaseCookie } from '@/lib/auth/session-lease';
 import { AuthSignupConsent } from '@/components/auth/auth-signup-consent';
 import { AudienceRoleField } from '@/components/profile/audience-role-field';
 import { MINIMUM_ACCOUNT_AGE_YEARS } from '@/lib/legal/constants';
@@ -198,6 +199,7 @@ function SignUpForm() {
       }
 
       succeeded = true;
+      document.cookie = serializeSessionLeaseCookie();
       setFadingOut(true);
       router.push('/dashboard');
       router.refresh();

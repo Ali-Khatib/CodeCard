@@ -46,8 +46,8 @@ async function signOutLocal() {
 /**
  * Never leave an authenticated dashboard session hanging:
  * - redirect after explicit SIGNED_OUT
- * - sign out when the tab is closed / navigated away (pagehide)
  * - sign out after idle timeout
+ * Tab-close logout is the session lease (see session-lease-keeper).
  */
 export function useDashboardSessionGuard() {
   const pathname = usePathname();
@@ -85,17 +85,10 @@ export function useDashboardSessionGuard() {
       }, AUTH_IDLE_TIMEOUT_MS);
     };
 
-    const onPageHide = (event: PageTransitionEvent) => {
-      if (event.persisted) return;
-      beaconSignOut();
-      void signOutLocal();
-    };
-
     resetIdle();
     for (const eventName of ACTIVITY_EVENTS) {
       window.addEventListener(eventName, resetIdle, { passive: true });
     }
-    window.addEventListener('pagehide', onPageHide);
 
     return () => {
       subscription.unsubscribe();
@@ -103,7 +96,6 @@ export function useDashboardSessionGuard() {
       for (const eventName of ACTIVITY_EVENTS) {
         window.removeEventListener(eventName, resetIdle);
       }
-      window.removeEventListener('pagehide', onPageHide);
     };
   }, [pathname]);
 }

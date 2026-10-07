@@ -9,6 +9,7 @@ import {
   logOAuthCallbackFailure,
   resolveOAuthCallback,
 } from '@/lib/auth/oauth-callback';
+import { SESSION_LEASE_COOKIE, sessionLeaseCookieOptions } from '@/lib/auth/session-lease';
 
 function isRecoveryExchange(resolution: {
   method: 'code' | 'token_hash';
@@ -66,7 +67,9 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.redirect(`${origin}${resolution.redirectPath}`);
+    const redirect = NextResponse.redirect(`${origin}${resolution.redirectPath}`);
+    redirect.cookies.set(SESSION_LEASE_COOKIE, '1', sessionLeaseCookieOptions());
+    return redirect;
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : 'exchange_failed';
     const reason = classifyCodeExchangeError(message);

@@ -45,7 +45,7 @@ export function FounderGreeting({ displayName }: { displayName: string }) {
         <p className="cc-founder-greeting__mark">CodeCard Founder</p>
         <p className="cc-founder-greeting__title">You’re looking at the founder.</p>
         <p className="cc-founder-greeting__body">
-          {displayName} built CodeCard — the card you’re reading right now.
+          {displayName} built CodeCard, the app you are using right now.
         </p>
       </div>
     </div>

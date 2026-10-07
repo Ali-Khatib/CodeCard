@@ -414,12 +414,12 @@ export function ProjectDetailView({
                       projectTitle: project.title,
                       index: i,
                     })}
-                    className="group relative aspect-[16/10] overflow-hidden rounded-[14px] border border-border/40 bg-midnight outline-none transition-colors hover:border-lavender/50 focus-visible:ring-2 focus-visible:ring-lavender md:min-h-[280px]"
+                    className="group relative aspect-[16/10] overflow-hidden rounded-[14px] border border-border/40 bg-[#12081c] outline-none transition-colors hover:border-lavender/50 focus-visible:ring-2 focus-visible:ring-lavender md:min-h-[280px]"
                   >
                     <ProjectMedia
                       src={src}
                       alt=""
-                      className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                      className="object-contain object-center"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void-canvas/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                   </button>

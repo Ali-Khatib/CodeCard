@@ -5,7 +5,12 @@ import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 export const dynamic = 'force-static';
 
-const DEMO_NAMES = ['DevFlow', 'SchemaSync', 'Pulse'] as const;
+const DEMO_NAMES = [
+  'Context-Aware Emotion Recognition',
+  'DevFlow',
+  'SchemaSync',
+  'Pulse',
+] as const;
 
 const projects = DEMO_FEATURED_PROJECTS.filter((p) =>
   DEMO_NAMES.includes(p.title as (typeof DEMO_NAMES)[number]),

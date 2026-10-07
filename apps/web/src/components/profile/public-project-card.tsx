@@ -184,7 +184,7 @@ export function PublicProjectCard({
                     key={src + i}
                     className="relative aspect-[16/10] overflow-hidden rounded-[16px] border border-[var(--app-border)] bg-[var(--app-bone)]"
                   >
-                    <Image src={src} alt="" fill className="object-cover" sizes="400px" />
+                    <Image src={src} alt="" fill className="object-contain" sizes="400px" />
                   </div>
                 ))}
               </div>
