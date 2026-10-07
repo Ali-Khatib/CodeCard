@@ -23,10 +23,13 @@ describe('QR scan handshake', () => {
 
   it('lets the scanner reopen an offer and the card owner read the scanner profile', () => {
     const sql = read('../../supabase/migrations/20260928140000_connection_scan_handshake_rls.sql');
+    const mvpSql = read('../../supabase/migrations/20261007192600_mvp_scan_handshake_rls.sql');
     expect(sql).toContain('connection_scan_offers_scanner_select');
     expect(sql).toContain('connection_scan_offers_scanner_reopen');
     expect(sql).toContain("status = 'pending'");
     expect(sql).toContain('profiles_scan_handshake_select');
     expect(sql).toContain('saved_connections');
+    expect(mvpSql).toContain('profiles_scan_handshake_select');
+    expect(mvpSql).toContain('connection_scan_offers_scanner_reopen');
   });
 });

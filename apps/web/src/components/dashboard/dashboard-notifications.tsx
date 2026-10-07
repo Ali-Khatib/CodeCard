@@ -1,7 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
+import { listPendingScanOffersAction } from '@/app/actions/scan-offers';
+import { scanOffersToNotifications } from '@/lib/dashboard/live-notifications';
 import { DEMO_NOTIFICATIONS, type DashboardNotification } from '@/lib/dashboard/notifications-demo';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 
@@ -26,6 +35,23 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
   const triggerRef = useRef<HTMLButtonElement>(null);
   const isMobile = useIsMobile();
   const unread = useMemo(() => items.filter((n) => n.unread).length, [items]);
+
+  useEffect(() => {
+    if (demoMode) return;
+
+    let cancelled = false;
+
+    const load = async () => {
+      const result = await listPendingScanOffersAction();
+      if (cancelled || result.error) return;
+      setItems(scanOffersToNotifications(result.offers, basePath));
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [basePath, demoMode]);
 
   useLayoutEffect(() => {
     if (!open || !isMobile || !triggerRef.current) {
