@@ -19,7 +19,7 @@ const EXCEPTIONS = /** @type {AuditException[]} */ ([
     reason:
       'No fixed release yet (advisory range includes latest 2.0.2). Reachable only via Expo/Metro mobile tooling, not the web runtime.',
     owner: 'platform',
-    expires: '2026-09-30',
+    expires: '2026-12-31',
   },
   {
     id: 'GHSA-5p2g-fcmc-qvqq',
@@ -27,7 +27,7 @@ const EXCEPTIONS = /** @type {AuditException[]} */ ([
     reason:
       'No fixed release yet (advisory range includes latest 2.0.2). Reachable only via Expo/Metro mobile tooling, not the web runtime.',
     owner: 'platform',
-    expires: '2026-09-30',
+    expires: '2026-12-31',
   },
 ]);
 
