@@ -2153,11 +2153,13 @@ html.dark .cc-app-badge--blush {
   display: grid;
   gap: 8px;
   padding-top: 10px;
-  padding-bottom: 2px;
+  padding-bottom: max(2px, env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--app-border);
   flex-shrink: 0;
   letter-spacing: 0.01em;
   word-spacing: 0.14em;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .cc-app-sidebar__foot .cc-app-btn,
@@ -2169,6 +2171,12 @@ html.dark .cc-app-badge--blush {
   min-height: 44px;
   line-height: 1.25;
   text-align: center;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.cc-app-sidebar__sign-in {
+  margin-top: 2px;
 }
 
 .cc-app-sidebar-appearance {

@@ -7,6 +7,7 @@ import 'server-only';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { toSessionOnlyCookieOptions } from '@/lib/auth/session-cookie-options';
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
 
 export async function createClient() {
@@ -23,7 +24,7 @@ export async function createClient() {
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
+              cookieStore.set(name, value, toSessionOnlyCookieOptions(options, value)),
             );
           } catch {
             // Server Component — ignore

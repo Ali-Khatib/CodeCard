@@ -114,6 +114,7 @@ export function DashboardShell({
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
   const cardHref = profileSlug ? publicDemoProfileBasePath(profileSlug) : null;
+  const isLiveDemo = preview || isDemoWorkspacePath(basePath);
 
   useDashboardSessionGuard();
 
@@ -379,11 +380,6 @@ export function DashboardShell({
         <div className="cc-app-sidebar__nav">{navLinks}</div>
 
         <div className="cc-app-sidebar__foot">
-          {preview && (
-            <AppButton variant="primary" block href={DEMO_SIGN_IN_HREF}>
-              Sign in
-            </AppButton>
-          )}
           <div className="cc-app-sidebar-appearance">
             <div className="min-w-0">
               <p className="text-[13px] font-medium text-[var(--app-ink)]">Appearance</p>
@@ -392,7 +388,17 @@ export function DashboardShell({
             <ThemeToggle className="shrink-0" />
           </div>
           {profileSlug && <CopyProfileLinkButton slug={profileSlug} />}
-          {(preview || isDemoWorkspacePath(basePath)) && !embedded ? (
+          {isLiveDemo && !embedded ? (
+            <AppButton
+              variant="primary"
+              block
+              href={DEMO_SIGN_IN_HREF}
+              className="cc-app-sidebar__sign-in"
+            >
+              Sign in
+            </AppButton>
+          ) : null}
+          {isLiveDemo && !embedded ? (
             <AppButton variant="ghost" block href={MARKETING_HOME_HREF}>
               ← Back to landing
             </AppButton>
@@ -461,18 +467,11 @@ export function DashboardShell({
                 >
                   Settings
                 </Link>
-                {preview ? (
+                {isLiveDemo ? (
                   <>
                     <Link
-                      href={MARKETING_HOME_HREF}
-                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)] md:hidden"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      ← Back to landing
-                    </Link>
-                    <Link
                       href={DEMO_SIGN_IN_HREF}
-                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
+                      className="block px-3 py-2 text-[14px] font-medium text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       Sign in
@@ -483,6 +482,13 @@ export function DashboardShell({
                       onClick={() => setUserMenuOpen(false)}
                     >
                       Create account
+                    </Link>
+                    <Link
+                      href={MARKETING_HOME_HREF}
+                      className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)] md:hidden"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      ← Back to landing
                     </Link>
                   </>
                 ) : (
@@ -549,7 +555,7 @@ export function DashboardShell({
           );
         })}
       </nav>
-      {!preview && !embedded && !isDemoWorkspacePath(basePath) ? (
+      {!isLiveDemo && !embedded ? (
         <ConnectionRequestHost enabled />
       ) : null}
     </div>

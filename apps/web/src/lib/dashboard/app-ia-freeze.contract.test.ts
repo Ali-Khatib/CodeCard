@@ -72,9 +72,14 @@ describe('Phase 1 web app IA freeze', () => {
       shell.indexOf('cc-app-sidebar__foot'),
       shell.indexOf('cc-app-main'),
     );
-    expect(foot).toContain('isDemoWorkspacePath(basePath)');
+    expect(foot).toContain('isLiveDemo');
+    expect(foot).toContain('Sign in');
+    expect(foot).toContain('CopyProfileLinkButton');
     expect(foot).toContain('Back to landing');
     expect(foot).toContain(') : null}');
     expect(foot).not.toContain('{preview ? (');
+    // Sign in sits under Copy public link (not above Appearance).
+    expect(foot.indexOf('CopyProfileLinkButton')).toBeLessThan(foot.indexOf('Sign in'));
   });
 });
+

@@ -11,6 +11,7 @@ import {
 } from '@/lib/auth/recovery-session';
 import { sanitizeInternalRedirect } from '@/lib/auth/redirect';
 import { hasSupabaseAuthCookie } from '@/lib/auth/session-expiry';
+import { toSessionOnlyCookieOptions } from '@/lib/auth/session-cookie-options';
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
 
 export async function proxy(request: NextRequest) {
@@ -71,7 +72,11 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(
+              name,
+              value,
+              toSessionOnlyCookieOptions(options, value),
+            ),
           );
         },
       },
