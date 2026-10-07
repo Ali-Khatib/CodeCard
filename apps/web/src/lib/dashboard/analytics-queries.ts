@@ -115,7 +115,10 @@ export async function loadOwnerAnalytics(
       .order('sort_order', { ascending: true }),
   ]);
 
-  if (eventsResult.error || sourcesResult.error || projectsResult.error || researchResult.error) {
+  // Events/projects/research are required for a coherent summary. Traffic-source
+  // reads are optional — a missing public_profile_events table must not blank
+  // the whole Analytics page (the false-suspension class of fail-closed bug).
+  if (eventsResult.error || projectsResult.error || researchResult.error) {
     return { ok: false, reason: 'query_failed' };
   }
 
@@ -125,7 +128,9 @@ export async function loadOwnerAnalytics(
     profileSlug: profile.slug ?? '',
     isPublic: Boolean(profile.is_public),
     events: (eventsResult.data ?? []) as AnalyticsEventRow[],
-    profileSources: (sourcesResult.data ?? []) as ProfileSourceRow[],
+    profileSources: sourcesResult.error
+      ? []
+      : ((sourcesResult.data ?? []) as ProfileSourceRow[]),
     projects: (projectsResult.data ?? []) as OwnedProjectRow[],
     researchPapers: (researchResult.data ?? []) as OwnedResearchRow[],
   });
