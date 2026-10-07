@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
+import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import {
   executeAvatarUploadFlow,
@@ -415,12 +416,22 @@ export function AvatarUpload({
 
       {statusMessage && !pending ? (
         error ? (
-          <p role="alert" className="text-[14px] text-red-600" aria-live="polite">
-            {statusMessage}
+          <p
+            role="alert"
+            className="flex items-center gap-2 text-[14px] text-red-600"
+            aria-live="polite"
+          >
+            <StatusFeedbackIcon variant="error" size={18} />
+            <span>{statusMessage}</span>
           </p>
         ) : (
-          <p role="status" className="text-[14px] text-[var(--app-smoke)]" aria-live="polite">
-            {statusMessage}
+          <p
+            role="status"
+            className="flex items-center gap-2 text-[14px] text-[var(--app-smoke)]"
+            aria-live="polite"
+          >
+            <StatusFeedbackIcon variant="success" happy size={18} />
+            <span>{statusMessage}</span>
           </p>
         )
       ) : null}

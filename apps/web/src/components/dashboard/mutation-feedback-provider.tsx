@@ -19,6 +19,7 @@ import {
   type MutationFeedbackVariant,
   MUTATION_FEEDBACK,
 } from '@/lib/dashboard/mutation-feedback';
+import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 
 const SUCCESS_DURATION_MS = 5200;
 const ERROR_DURATION_MS = 9000;
@@ -62,6 +63,12 @@ function FeedbackToast({
       aria-atomic="true"
       data-testid={`mutation-toast-${item.variant}`}
     >
+      <StatusFeedbackIcon
+        variant={isError ? 'error' : 'success'}
+        happy={!isError}
+        size={24}
+        className="cc-mutation-toast__icon"
+      />
       <div className="cc-mutation-toast__body">
         <p className="cc-mutation-toast__message">{item.message}</p>
         <div className="cc-mutation-toast__actions">

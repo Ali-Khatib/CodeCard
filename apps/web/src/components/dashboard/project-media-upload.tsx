@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROJECT_SCREENSHOT_MAX_COUNT } from '@codecard/validation';
 import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
+import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { deleteProjectScreenshotAction } from '@/lib/projects/delete-project-screenshot-action';
@@ -672,19 +673,26 @@ export function ProjectMediaUpload({
         {(coverError || coverSuccess || coverCleanupWarning) && !coverPending && (
           <p
             role={coverError ? 'alert' : 'status'}
-            className={`text-[14px] ${coverError ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
+            className={`flex items-center gap-2 text-[14px] ${coverError ? 'text-red-600' : 'text-[var(--app-smoke)]'}`}
             aria-live="polite"
           >
-            {coverError ||
-              (coverSuccess
-                ? coverCleanupWarning
-                  ? messageForUploadFailure('cleanup_warning')
-                  : coverOptimizationNote
-                    ? `Cover saved. ${coverOptimizationNote}.`
-                    : 'Cover saved.'
-                : coverCleanupWarning
-                  ? messageForUploadFailure('cleanup_warning')
-                  : '')}
+            <StatusFeedbackIcon
+              variant={coverError ? 'error' : 'success'}
+              happy={!coverError}
+              size={18}
+            />
+            <span>
+              {coverError ||
+                (coverSuccess
+                  ? coverCleanupWarning
+                    ? messageForUploadFailure('cleanup_warning')
+                    : coverOptimizationNote
+                      ? `Cover saved. ${coverOptimizationNote}.`
+                      : 'Cover saved.'
+                  : coverCleanupWarning
+                    ? messageForUploadFailure('cleanup_warning')
+                    : '')}
+            </span>
           </p>
         )}
       </div>

@@ -5,6 +5,7 @@ import { useId, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { CountUp } from '@/components/landing/count-up';
 import type { ProfileCompletionResult } from '@/lib/profile/completion';
+import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 import { AppCard, AppMono } from './ui/dashboard-ui';
 
 type ProfileCompletionIndicatorProps = {
@@ -99,7 +100,11 @@ export function ProfileCompletionIndicator({
               >
                 <span className="font-medium text-[var(--app-ink)]">{item.label}</span>
                 <span className="flex items-center gap-2">
-                  <span aria-hidden>{item.complete ? '✓' : '○'}</span>
+                  {item.complete ? (
+                    <StatusFeedbackIcon variant="success" size={18} label="Complete" />
+                  ) : (
+                    <StatusFeedbackIcon variant="neutral" size={18} label="Incomplete" />
+                  )}
                   <span
                     className={
                       item.complete ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
