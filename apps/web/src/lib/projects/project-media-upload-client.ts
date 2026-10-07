@@ -19,6 +19,7 @@ import {
 } from '@/lib/storage/upload-failure';
 import { readFileContentPrefixBase64 } from '@/lib/storage/upload-content-prefix';
 import type { UploadStage } from '@/lib/storage/upload-progress';
+import { extractUploadExtension } from '@/lib/storage/upload-validation';
 
 export const PROJECT_MEDIA_UPLOAD_BUCKET = STORAGE_BUCKETS.projectMedia;
 
@@ -80,18 +81,6 @@ const MIME_TO_EXTENSIONS: Record<string, readonly string[]> = {
   'image/webp': ['webp'],
 };
 
-function extractExtension(filename: string): string | null {
-  const trimmed = filename.trim();
-  if (!trimmed || trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('..')) {
-    return null;
-  }
-  const parts = trimmed.split('.');
-  if (parts.length !== 2) return null;
-  const extension = parts[1]?.trim().toLowerCase();
-  if (!extension || !/^[a-z0-9]{2,5}$/.test(extension)) return null;
-  return extension;
-}
-
 export function validateProjectMediaFile(file: File): {
   ok: true;
   mimeType: string;
@@ -103,7 +92,7 @@ export function validateProjectMediaFile(file: File): {
     return { ok: false, message: 'File size must be greater than zero.' };
   }
 
-  const extension = extractExtension(file.name);
+  const extension = extractUploadExtension(file.name);
   if (!extension) {
     return { ok: false, message: 'Invalid filename.' };
   }

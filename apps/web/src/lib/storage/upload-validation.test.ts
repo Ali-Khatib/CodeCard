@@ -80,9 +80,32 @@ describe('validateUploadMetadata', () => {
     }
   });
 
-  it('rejects traversal filenames and double extensions', () => {
+  it('rejects traversal / missing extensions and accepts date-dotted camera names', () => {
     expect(extractUploadExtension('../avatar.png')).toBeNull();
-    expect(extractUploadExtension('avatar.pdf.exe')).toBeNull();
     expect(extractUploadExtension('avatar')).toBeNull();
+    expect(extractUploadExtension('avatar.pdf.exe')).toBe('exe');
+    expect(
+      extractUploadExtension(
+        'Photograph-_10.9.2026-ebc614c4-4723-48b0-a19b-828a34b9a1dc.png',
+      ),
+    ).toBe('png');
+
+    expect(
+      validateUploadMetadata({
+        resourceType: 'avatar',
+        filename: 'Photograph-_10.9.2026.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }).ok,
+    ).toBe(true);
+
+    expect(
+      validateUploadMetadata({
+        resourceType: 'avatar',
+        filename: 'avatar.pdf.exe',
+        mimeType: 'image/png',
+        size: 1024,
+      }).ok,
+    ).toBe(false);
   });
 });

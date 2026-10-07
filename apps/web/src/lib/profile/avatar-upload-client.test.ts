@@ -40,6 +40,11 @@ describe('validateAvatarFile', () => {
     expect(validateAvatarFile(makeFile('avatar.png', 'image/jpeg', 1024)).ok).toBe(false);
     expect(validateAvatarFile(makeFile('../avatar.png', 'image/png', 1024)).ok).toBe(false);
     expect(validateAvatarFile(makeFile('avatar.pdf.exe', 'image/png', 1024)).ok).toBe(false);
+    expect(
+      validateAvatarFile(
+        makeFile('Photograph-_10.9.2026-ebc614c4-4723-48b0-a19b-828a34b9a1dc.png', 'image/png', 1024),
+      ).ok,
+    ).toBe(true);
   });
 
   it('maps validation errors to user-facing messages', () => {

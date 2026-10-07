@@ -72,16 +72,24 @@ function allowedMimeTypesForResourceType(
 
 export function extractUploadExtension(filename: string): string | null {
   const trimmed = filename.trim();
-  if (!trimmed || trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('..')) {
+  if (
+    !trimmed ||
+    trimmed.includes('/') ||
+    trimmed.includes('\\') ||
+    trimmed.includes('..') ||
+    /[\u0000-\u001f]/.test(trimmed)
+  ) {
     return null;
   }
 
-  const parts = trimmed.split('.');
-  if (parts.length !== 2) {
+  // Phone/camera exports often include dates with dots (e.g. Photograph-_10.9.2026.png).
+  // Use the final extension only; storage paths still use a generated UUID name.
+  const lastDot = trimmed.lastIndexOf('.');
+  if (lastDot <= 0 || lastDot === trimmed.length - 1) {
     return null;
   }
 
-  const extension = parts[1]?.trim().toLowerCase();
+  const extension = trimmed.slice(lastDot + 1).trim().toLowerCase();
   if (!extension || !/^[a-z0-9]{2,5}$/.test(extension)) {
     return null;
   }

@@ -1,4 +1,5 @@
 import { FILE_LIMITS } from '@codecard/config';
+import { extractUploadExtension } from '@/lib/storage/upload-validation';
 
 const BLOCKED_EXTENSIONS = new Set([
   'svg',
@@ -26,25 +27,6 @@ export type AvatarFileValidationResult =
   | { ok: true; mimeType: string }
   | { ok: false; status: 400 | 413 | 415; message: string };
 
-function extractAvatarExtension(filename: string): string | null {
-  const trimmed = filename.trim();
-  if (!trimmed || trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('..')) {
-    return null;
-  }
-
-  const parts = trimmed.split('.');
-  if (parts.length !== 2) {
-    return null;
-  }
-
-  const extension = parts[1]?.trim().toLowerCase();
-  if (!extension || !/^[a-z0-9]{2,5}$/.test(extension)) {
-    return null;
-  }
-
-  return extension;
-}
-
 export function validateAvatarFileMetadata(input: {
   filename: string;
   mimeType: string;
@@ -54,7 +36,7 @@ export function validateAvatarFileMetadata(input: {
     return { ok: false, status: 400, message: 'File size must be greater than zero.' };
   }
 
-  const extension = extractAvatarExtension(input.filename);
+  const extension = extractUploadExtension(input.filename);
   if (!extension) {
     return { ok: false, status: 400, message: 'Invalid filename.' };
   }

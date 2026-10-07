@@ -12,5 +12,6 @@ describe('crop-image', () => {
     expect(source).toContain('croppedCanvas.toBlob');
     expect(source).toContain('new File([');
     expect(source).toContain("crossOrigin', 'anonymous'");
+    expect(source).toContain('image.${extensionForMime(mimeType)}');
   });
 });

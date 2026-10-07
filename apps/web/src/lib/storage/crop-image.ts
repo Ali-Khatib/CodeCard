@@ -16,16 +16,11 @@ function extensionForMime(mimeType: string): string {
   return 'jpg';
 }
 
-function stemFromFileName(fileName: string): string {
-  const base = fileName.trim() || 'image';
-  const dot = base.lastIndexOf('.');
-  if (dot <= 0) return base;
-  return base.slice(0, dot);
-}
-
 /**
  * Rasterize a react-easy-crop pixel area into an uploadable File.
  * Defaults to JPEG for broad compatibility with existing upload validators.
+ * Output always uses a simple name (`image.jpg`) so camera exports with
+ * date dots in the stem cannot fail filename validation after crop.
  */
 export async function getCroppedImageFile(input: {
   imageSrc: string;
@@ -35,6 +30,7 @@ export async function getCroppedImageFile(input: {
   quality?: number;
   maxDimension?: number;
 }): Promise<File> {
+  void input.fileName;
   const mimeType = input.mimeType ?? 'image/jpeg';
   const quality = input.quality ?? 0.92;
   const image = await createImage(input.imageSrc);
@@ -97,6 +93,6 @@ export async function getCroppedImageFile(input: {
     );
   });
 
-  const fileName = `${stemFromFileName(input.fileName)}.${extensionForMime(mimeType)}`;
+  const fileName = `image.${extensionForMime(mimeType)}`;
   return new File([blob], fileName, { type: mimeType, lastModified: Date.now() });
 }
