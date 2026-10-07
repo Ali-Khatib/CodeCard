@@ -35,7 +35,13 @@ export function createClient() {
         getAll() {
           return readBrowserCookies();
         },
-        setAll(cookiesToSet) {
+        setAll(
+          cookiesToSet: {
+            name: string;
+            value: string;
+            options?: Record<string, unknown>;
+          }[],
+        ) {
           if (typeof document === 'undefined') return;
           cookiesToSet.forEach(({ name, value, options }) => {
             document.cookie = serializeSessionCookie(name, value, options);
