@@ -66,7 +66,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const openDeletion = params.delete === '1';
   const providers = resolveProviders(user!);
 
-  const [{ data: subscription }, { data: profile }] = await Promise.all([
+  const [subscriptionResult, profileResult, suspensionProbe] = await Promise.all([
     supabase
       .from('subscriptions')
       .select('status, stripe_price_id')
@@ -78,7 +78,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       .select('slug, is_public')
       .eq('owner_user_id', user!.id)
       .maybeSingle(),
+    supabase.rpc('is_current_account_suspended'),
   ]);
+
+  const subscription = subscriptionResult.error ? null : subscriptionResult.data;
+  const profile = profileResult.error ? null : profileResult.data;
 
   return (
     <DashboardSettingsView
@@ -86,6 +90,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       plan={resolveAccountPlanId(subscription?.status, subscription?.stripe_price_id)}
       profileSlug={profile?.slug}
       isPublic={Boolean(profile?.is_public)}
+      isSuspended={suspensionProbe.data === true && !suspensionProbe.error}
       hasPassword={providers.hasPassword}
       googleConnected={providers.googleConnected}
       githubConnected={providers.githubConnected}

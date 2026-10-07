@@ -71,12 +71,12 @@ describe('WS13-T006 account suspension contracts', () => {
   });
 
   it('blocks suspended users on all publish cores', () => {
-    expect(profilePublish).toContain('isCurrentAccountSuspended');
-    expect(projectPublish).toContain('isCurrentAccountSuspended');
-    expect(researchPublish).toContain('isCurrentAccountSuspended');
-    expect(profilePublish).toMatch(/suspended and cannot publish/i);
-    expect(projectPublish).toMatch(/suspended and cannot publish/i);
-    expect(researchPublish).toMatch(/suspended and cannot publish/i);
+    expect(profilePublish).toContain('getPublishBlockForSuspension');
+    expect(projectPublish).toContain('getPublishBlockForSuspension');
+    expect(researchPublish).toContain('getPublishBlockForSuspension');
+    expect(profilePublish).toContain('suspensionBlock.error');
+    expect(projectPublish).toContain('suspensionBlock.error');
+    expect(researchPublish).toContain('suspensionBlock.error');
   });
 
   it('exposes a guarded admin UI action distinct from deletion', () => {

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import {
   createContext,
   useCallback,
@@ -12,6 +13,7 @@ import {
 } from 'react';
 import {
   createMutationFeedbackId,
+  MUTATION_FEEDBACK_LEARN_MORE_BY_MESSAGE,
   sanitizeMutationError,
   type MutationFeedbackItem,
   type MutationFeedbackVariant,
@@ -60,15 +62,28 @@ function FeedbackToast({
       aria-atomic="true"
       data-testid={`mutation-toast-${item.variant}`}
     >
-      <p className="cc-mutation-toast__message">{item.message}</p>
-      <button
-        type="button"
-        className="cc-mutation-toast__dismiss"
-        aria-label="Dismiss notification"
-        onClick={() => onDismiss(item.id)}
-      >
-        Dismiss
-      </button>
+      <div className="cc-mutation-toast__body">
+        <p className="cc-mutation-toast__message">{item.message}</p>
+        <div className="cc-mutation-toast__actions">
+          {item.learnMoreHref ? (
+            <Link
+              href={item.learnMoreHref}
+              className="cc-mutation-toast__learn-more"
+              onClick={() => onDismiss(item.id)}
+            >
+              Learn more
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            className="cc-mutation-toast__dismiss"
+            aria-label="Dismiss notification"
+            onClick={() => onDismiss(item.id)}
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -122,6 +137,7 @@ export function MutationFeedbackProvider({ children }: { children: ReactNode }) 
         variant,
         message: trimmed,
         createdAt: now,
+        learnMoreHref: MUTATION_FEEDBACK_LEARN_MORE_BY_MESSAGE[trimmed],
       };
 
       setItems((prev) => {

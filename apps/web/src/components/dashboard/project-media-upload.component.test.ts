@@ -25,6 +25,9 @@ describe('ProjectMediaUpload component', () => {
     expect(component).toContain('Retry upload for');
     expect(component).toContain('progressPercent');
     expect(component).toContain("'optimizing'");
+    expect(component).toContain('ImageCropDialog');
+    expect(component).toContain('Edit cover image');
+    expect(component).toContain('aspect={16 / 9}');
     expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toMatch(/service.?role/i);
   });

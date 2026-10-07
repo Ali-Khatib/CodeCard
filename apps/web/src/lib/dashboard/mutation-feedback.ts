@@ -10,6 +10,15 @@ export type MutationFeedbackItem = {
   variant: MutationFeedbackVariant;
   message: string;
   createdAt: number;
+  learnMoreHref?: string;
+};
+
+/** Errors that should offer a Learn more link to publishing restrictions. */
+export const MUTATION_FEEDBACK_LEARN_MORE_BY_MESSAGE: Record<string, string> = {
+  'Your account is suspended and cannot publish content.':
+    '/dashboard/settings#publishing-restrictions',
+  'We could not verify your account status right now. Publishing is paused — try again in a moment.':
+    '/dashboard/settings#publishing-restrictions',
 };
 
 export const MUTATION_FEEDBACK = {
@@ -61,6 +70,10 @@ export const MUTATION_FEEDBACK = {
     deleted: 'Your CodeCard account has been deleted.',
     deleteFailed: 'We couldn’t delete your account. Nothing was changed.',
     deleteDemo: 'Demo only — no account was deleted.',
+    suspended:
+      'Your account is suspended and cannot publish content.',
+    statusUnavailable:
+      'We could not verify your account status right now. Publishing is paused — try again in a moment.',
   },
   share: {
     linkCopied: 'Link copied',

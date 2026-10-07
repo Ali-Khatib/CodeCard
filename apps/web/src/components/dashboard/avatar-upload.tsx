@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import {
   executeAvatarUploadFlow,
@@ -76,10 +77,14 @@ export function AvatarUpload({
   const [success, setSuccess] = useState(false);
   const [cleanupWarning, setCleanupWarning] = useState(false);
   const [optimizationNote, setOptimizationNote] = useState<string | null>(null);
+  const [cropSourceUrl, setCropSourceUrl] = useState<string | null>(null);
+  const [cropSourceName, setCropSourceName] = useState('');
+  const cropSourceUrlRef = useRef<string | null>(null);
 
   const pending = isActiveUploadStage(stage);
   const displayUrl = previewUrl ?? savedAvatarUrl;
   const altText = profileAvatarAltText(displayName);
+  const cropOpen = Boolean(cropSourceUrl);
 
   useEffect(() => {
     setSavedAvatarUrl(initialAvatarUrl);
@@ -92,10 +97,23 @@ export function AvatarUpload({
     }
   }, []);
 
+  const revokeCropSourceUrl = useCallback(() => {
+    if (cropSourceUrlRef.current) {
+      URL.revokeObjectURL(cropSourceUrlRef.current);
+      cropSourceUrlRef.current = null;
+    }
+    setCropSourceUrl(null);
+    setCropSourceName('');
+  }, []);
+
   useEffect(() => {
     return () => {
       abortRef.current?.abort();
       revokePreviewUrl();
+      if (cropSourceUrlRef.current) {
+        URL.revokeObjectURL(cropSourceUrlRef.current);
+        cropSourceUrlRef.current = null;
+      }
     };
   }, [revokePreviewUrl]);
 
@@ -110,6 +128,13 @@ export function AvatarUpload({
       fileInputRef.current.value = '';
     }
   }, [revokePreviewUrl]);
+
+  const closeCropDialog = useCallback(() => {
+    revokeCropSourceUrl();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [revokeCropSourceUrl]);
 
   const runUpload = useCallback(
     async (file: File) => {
@@ -214,8 +239,8 @@ export function AvatarUpload({
       setProgressPercent(null);
 
       const file = event.target.files?.[0];
+      event.target.value = '';
       if (!file) {
-        resetSelection();
         return;
       }
 
@@ -228,15 +253,27 @@ export function AvatarUpload({
         return;
       }
 
+      revokeCropSourceUrl();
+      const objectUrl = URL.createObjectURL(file);
+      cropSourceUrlRef.current = objectUrl;
+      setCropSourceUrl(objectUrl);
+      setCropSourceName(file.name);
+    },
+    [pending, resetSelection, revokeCropSourceUrl],
+  );
+
+  const handleCropConfirm = useCallback(
+    (file: File) => {
+      revokeCropSourceUrl();
       revokePreviewUrl();
       const objectUrl = URL.createObjectURL(file);
       previewUrlRef.current = objectUrl;
       setPreviewUrl(objectUrl);
       setSelectedFile(file);
-      // Upload immediately — users expect choosing a photo to save it.
+      // After crop, upload immediately — choosing + cropping saves the photo.
       void runUpload(file);
     },
-    [pending, resetSelection, revokePreviewUrl, runUpload],
+    [revokeCropSourceUrl, revokePreviewUrl, runUpload],
   );
 
   const handleCancelSelection = useCallback(() => {
@@ -346,10 +383,26 @@ export function AvatarUpload({
             ) : null}
           </div>
           <p id={`${inputId}-constraints`} className="text-[13px] text-[var(--app-smoke)]">
-            JPEG, PNG, or WebP up to 5 MB. Choosing a photo uploads it right away.
+            JPEG, PNG, or WebP up to 5 MB. Crop and adjust before it uploads.
           </p>
         </div>
       </div>
+
+      {cropSourceUrl ? (
+        <ImageCropDialog
+          open={cropOpen}
+          imageSrc={cropSourceUrl}
+          fileName={cropSourceName || 'avatar.jpg'}
+          title="Edit profile photo"
+          description="Drag to reposition. Use the slider to zoom. Your photo is cropped to a circle."
+          aspect={1}
+          cropShape="round"
+          confirmLabel="Save photo"
+          maxOutputDimension={1024}
+          onCancel={closeCropDialog}
+          onConfirm={handleCropConfirm}
+        />
+      ) : null}
 
       {pending ? (
         <UploadProgressIndicator

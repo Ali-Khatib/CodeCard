@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { isCurrentAccountSuspended } from '@/lib/account/suspension-guard';
+import { getPublishBlockForSuspension } from '@/lib/account/suspension-guard';
 import {
   loadOwnedResearchPaper,
   resolveAuthenticatedUser,
@@ -114,11 +114,14 @@ export async function executeSetResearchPublished(
     };
   }
 
-  if (input.isPublished && (await isCurrentAccountSuspended(supabase))) {
-    return {
-      error: 'Your account is suspended and cannot publish content.',
-      errorCode: 'server',
-    };
+  if (input.isPublished) {
+    const suspensionBlock = await getPublishBlockForSuspension(supabase);
+    if (suspensionBlock) {
+      return {
+        error: suspensionBlock.error,
+        errorCode: 'server',
+      };
+    }
   }
 
   const { error } = await supabase

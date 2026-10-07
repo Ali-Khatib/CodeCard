@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROJECT_SCREENSHOT_MAX_COUNT } from '@codecard/validation';
+import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
 import { deleteProjectScreenshotAction } from '@/lib/projects/delete-project-screenshot-action';
@@ -107,6 +108,9 @@ export function ProjectMediaUpload({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState('');
   const [selectionError, setSelectionError] = useState('');
+  const [coverCropSourceUrl, setCoverCropSourceUrl] = useState<string | null>(null);
+  const [coverCropSourceName, setCoverCropSourceName] = useState('');
+  const coverCropSourceUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     setSavedCover(cover);
@@ -127,8 +131,26 @@ export function ProjectMediaUpload({
         URL.revokeObjectURL(url);
       }
       previewUrls.clear();
+      if (coverCropSourceUrlRef.current) {
+        URL.revokeObjectURL(coverCropSourceUrlRef.current);
+        coverCropSourceUrlRef.current = null;
+      }
     };
   }, []);
+
+  const revokeCoverCropSource = useCallback(() => {
+    if (coverCropSourceUrlRef.current) {
+      URL.revokeObjectURL(coverCropSourceUrlRef.current);
+      coverCropSourceUrlRef.current = null;
+    }
+    setCoverCropSourceUrl(null);
+    setCoverCropSourceName('');
+  }, []);
+
+  const closeCoverCropDialog = useCallback(() => {
+    revokeCoverCropSource();
+    if (coverInputRef.current) coverInputRef.current.value = '';
+  }, [revokeCoverCropSource]);
 
   const coverPending = isActiveUploadStage(coverStage);
   const hasCover = Boolean(savedCover);
@@ -171,28 +193,42 @@ export function ProjectMediaUpload({
       setCoverProgress(null);
 
       const file = event.target.files?.[0];
+      event.target.value = '';
       if (!file) {
-        resetCoverSelection();
         return;
       }
 
       const validation = validateProjectMediaFile(file);
       if (!validation.ok) {
         resetCoverSelection();
-        event.target.value = '';
         setCoverError(validation.message);
         setCoverRetryable(false);
         setCoverStage('failed');
         return;
       }
 
+      revokeCoverCropSource();
+      const objectUrl = URL.createObjectURL(file);
+      coverCropSourceUrlRef.current = objectUrl;
+      setCoverCropSourceUrl(objectUrl);
+      setCoverCropSourceName(file.name);
+    },
+    [coverPending, resetCoverSelection, revokeCoverCropSource],
+  );
+
+  const handleCoverCropConfirm = useCallback(
+    (file: File) => {
+      revokeCoverCropSource();
       if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
       const objectUrl = URL.createObjectURL(file);
       trackPreviewUrl(objectUrl);
       setCoverPreviewUrl(objectUrl);
       setCoverFile(file);
+      setCoverStage('idle');
+      setCoverError('');
+      setCoverRetryable(false);
     },
-    [coverPending, coverPreviewUrl, resetCoverSelection, revokePreviewUrl, trackPreviewUrl],
+    [coverPreviewUrl, revokeCoverCropSource, revokePreviewUrl, trackPreviewUrl],
   );
 
   const handleCoverUpload = useCallback(async () => {
@@ -520,8 +556,25 @@ export function ProjectMediaUpload({
         </h2>
         <p id="project-media-constraints" className="mt-2 text-[14px] text-[var(--app-smoke)]">
           Add a cover image and screenshots for this project. JPEG, PNG, or WebP up to 5 MB each.
+          Cover images can be cropped before upload.
         </p>
       </div>
+
+      {coverCropSourceUrl ? (
+        <ImageCropDialog
+          open
+          imageSrc={coverCropSourceUrl}
+          fileName={coverCropSourceName || 'cover.jpg'}
+          title="Edit cover image"
+          description="Drag to reposition. Use the slider to zoom. Cover uses a 16:9 crop."
+          aspect={16 / 9}
+          cropShape="rect"
+          confirmLabel="Use cover"
+          maxOutputDimension={1920}
+          onCancel={closeCoverCropDialog}
+          onConfirm={handleCoverCropConfirm}
+        />
+      ) : null}
 
       <div className="space-y-3" data-testid="project-cover-upload">
         <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Cover image</h3>

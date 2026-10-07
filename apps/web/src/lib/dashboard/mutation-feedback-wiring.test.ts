@@ -18,11 +18,14 @@ describe('WS09-T012 mutation feedback wiring', () => {
     expect(provider).toContain("role={isError ? 'alert' : 'status'}");
     expect(provider).toContain("aria-live={isError ? 'assertive' : 'polite'}");
     expect(provider).toContain('Dismiss notification');
+    expect(provider).toContain('Learn more');
+    expect(provider).toContain('MUTATION_FEEDBACK_LEARN_MORE_BY_MESSAGE');
     expect(provider).toContain('DEDUPE_WINDOW_MS');
     expect(css).toContain('.cc-mutation-toast-region');
     expect(css).toContain('overflow-wrap: anywhere');
     expect(css).toContain('prefers-reduced-motion: reduce');
     expect(css).toContain('safe-area-inset-bottom');
+    expect(css).toContain('.cc-mutation-toast__learn-more');
   });
 
   it('wires profile save and publish feedback', () => {

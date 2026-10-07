@@ -1910,15 +1910,30 @@ html.dark .cc-app-badge--blush {
   border-color: color-mix(in srgb, #c04545 45%, var(--app-border));
 }
 
-.cc-mutation-toast__message {
+.cc-mutation-toast__body {
+  display: flex;
   flex: 1 1 auto;
   min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cc-mutation-toast__message {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
+.cc-mutation-toast__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cc-mutation-toast__learn-more,
 .cc-mutation-toast__dismiss {
   flex: 0 0 auto;
   margin: 0;
@@ -1933,6 +1948,11 @@ html.dark .cc-app-badge--blush {
   cursor: pointer;
 }
 
+.cc-mutation-toast__learn-more {
+  color: var(--app-ink);
+}
+
+.cc-mutation-toast__learn-more:focus-visible,
 .cc-mutation-toast__dismiss:focus-visible {
   outline: 2px solid var(--app-iris);
   outline-offset: 2px;

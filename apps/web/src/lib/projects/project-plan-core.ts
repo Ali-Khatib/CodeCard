@@ -14,14 +14,15 @@ export async function resolveTenantPlanId(
   supabase: SupabaseClient,
   tenantId: string,
 ): Promise<TenantPlanId> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('subscriptions')
     .select('status, stripe_price_id')
     .eq('tenant_id', tenantId)
     .in('status', ['active', 'trialing'])
     .maybeSingle();
 
-  if (!data) return 'free';
+  // Missing billing tables or transient read failures must not block Free-plan use.
+  if (error || !data) return 'free';
   return grantsProEntitlement(data.status, data.stripe_price_id) ? 'pro' : 'free';
 }
 

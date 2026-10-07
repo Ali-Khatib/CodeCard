@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AccountExportAction } from '@/components/dashboard/account-export-action';
 import { GithubConnectionAction } from '@/components/dashboard/github-connection-action';
@@ -52,6 +52,7 @@ export type SettingsSnapshot = {
   hasPassword?: boolean;
   googleConnected?: boolean;
   githubConnected?: boolean;
+  isSuspended?: boolean;
 };
 
 function profileEditorHref(hash?: string, live = true) {
@@ -64,6 +65,7 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
   const plan = snapshot.plan ?? 'free';
   const slug = snapshot.profileSlug?.trim() || null;
   const isPublic = Boolean(snapshot.isPublic);
+  const isSuspended = Boolean(snapshot.isSuspended);
   const email = snapshot.email ?? (live ? 'Not set' : 'demo@codecard.app');
   const username = slug ?? (live ? 'Not set yet' : 'demo');
   const billingHref = live
@@ -171,6 +173,36 @@ function buildSections(snapshot: SettingsSnapshot, live: boolean): SettingSectio
           action: plan === 'pro' ? 'Manage billing' : 'Upgrade',
           href: billingHref,
           control: 'value-edit',
+        },
+      ],
+    },
+    {
+      id: 'publishing-restrictions',
+      eyebrow: 'Publishing',
+      title: 'Publishing restrictions',
+      navHint: 'Suspension and publish blocks',
+      description:
+        'Suspension is a moderation action after a report review. It blocks publishing your profile, projects, and research. You can still edit drafts. If you were not suspended and still see a block, try again — a temporary status check can also pause publishing.',
+      rows: [
+        {
+          label: 'Account status',
+          hint: isSuspended
+            ? 'An admin marked this account suspended. Publishing stays off until that is lifted.'
+            : 'No active suspension on this account. You can publish when your content is ready.',
+          value: isSuspended ? 'Suspended' : 'In good standing',
+          control: 'status',
+        },
+        {
+          label: 'What is blocked',
+          hint: 'Making a profile public, or publishing projects and research papers.',
+          value: isSuspended ? 'Publishing blocked' : 'Nothing blocked',
+          control: 'status',
+        },
+        {
+          label: 'Need help',
+          hint: 'If this looks wrong, contact support with your username and what you were trying to publish.',
+          value: 'support@codecard.app',
+          control: 'status',
         },
       ],
     },
@@ -289,6 +321,7 @@ export function DashboardSettingsView({
   hasPassword = true,
   googleConnected = false,
   githubConnected = false,
+  isSuspended = false,
   signOutAction,
   accountControls = 'demo',
   deletionAuth = { hasPassword: true, oauthProvider: null },
@@ -302,11 +335,12 @@ export function DashboardSettingsView({
   hasPassword?: boolean;
   googleConnected?: boolean;
   githubConnected?: boolean;
+  isSuspended?: boolean;
   signOutAction?: () => Promise<void>;
   accountControls?: 'live' | 'demo';
   deletionAuth?: AccountDeletionAuthMode;
   openDeletionOnMount?: boolean;
-  initialSection?: 'profile' | 'account' | 'billing' | 'danger';
+  initialSection?: 'profile' | 'account' | 'billing' | 'publishing-restrictions' | 'danger';
 }) {
   const [openId, setOpenId] = useState<string>(
     initialSection ?? (openDeletionOnMount ? 'danger' : 'profile'),
@@ -326,9 +360,25 @@ export function DashboardSettingsView({
       hasPassword: live ? hasPassword : true,
       googleConnected: live ? googleConnected : true,
       githubConnected: live ? githubConnected : false,
+      isSuspended: live ? isSuspended : false,
     },
     live,
   );
+
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return;
+    const known = new Set([
+      'profile',
+      'account',
+      'billing',
+      'publishing-restrictions',
+      'danger',
+    ]);
+    if (known.has(hash)) {
+      setOpenId(hash);
+    }
+  }, []);
 
   const active = sections.find((s) => s.id === openId) ?? sections[0];
 
@@ -349,7 +399,11 @@ export function DashboardSettingsView({
             {sections.map((section) => {
               const isOpen = openId === section.id;
               return (
-                <div key={section.id} className="cc-settings-accordion-item">
+                <div
+                  key={section.id}
+                  id={section.id}
+                  className="cc-settings-accordion-item scroll-mt-24"
+                >
                   <button
                     type="button"
                     onClick={(event) => {
