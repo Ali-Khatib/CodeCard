@@ -309,14 +309,14 @@ export function AvatarUpload({
   return (
     <div id="photo" className="space-y-3 scroll-mt-28" aria-busy={pending} data-testid="avatar-upload">
       <div className="flex flex-wrap items-center gap-4">
-        <div className="relative h-20 w-20 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-bone)]">
+        <div className="relative aspect-[4/5] h-28 overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-bone)]">
           {displayUrl ? (
             <Image
               src={displayUrl}
               alt={altText}
               fill
-              className="object-cover"
-              sizes="80px"
+              className="object-contain object-center"
+              sizes="120px"
               unoptimized={!!previewUrl}
             />
           ) : (
@@ -395,9 +395,10 @@ export function AvatarUpload({
           imageSrc={cropSourceUrl}
           fileName={cropSourceName || 'avatar.jpg'}
           title="Edit profile photo"
-          description="Drag to reposition. Use the slider to zoom. Your photo is cropped to a circle."
-          aspect={1}
-          cropShape="round"
+          description="Drag to reposition. Zoom all the way out to fit more of the photo in the frame."
+          aspect={4 / 5}
+          cropShape="rect"
+          minZoom={0.35}
           confirmLabel="Save photo"
           maxOutputDimension={1024}
           onCancel={closeCropDialog}

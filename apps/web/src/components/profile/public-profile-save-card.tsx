@@ -33,7 +33,7 @@ export function PublicProfileSaveCard({
     <div className="space-y-4">
       <div className="cc-app-card cc-app-card--rose !p-8 text-center">
         <p className="cc-app-mono">Save this CodeCard</p>
-        <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+        <h2 className="cc-public-display mt-3 text-[28px] text-[var(--app-ink)]">
           Keep {firstName}&apos;s work handy
         </h2>
         <p className="mx-auto mt-2 max-w-md text-[15px] text-[var(--app-smoke)]">

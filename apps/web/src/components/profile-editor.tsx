@@ -230,8 +230,12 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
             className="cc-app-input"
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
-            placeholder="e.g. San Francisco, CA"
+            placeholder="City, optional"
+            aria-describedby="location-hint"
           />
+          <p id="location-hint" className="text-[12px] text-[var(--app-smoke)]">
+            Optional. Leave it blank and your card simply will not show a city.
+          </p>
         </div>
 
         <div className="space-y-2 scroll-mt-28" id="skills-field">

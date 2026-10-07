@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Cropper, { type Area, type Point } from 'react-easy-crop';
-import { getCroppedImageFile } from '@/lib/storage/crop-image';
+import { getCroppedImageFile, sampleImageEdgeColor } from '@/lib/storage/crop-image';
 
 export type ImageCropDialogProps = {
   open: boolean;
@@ -14,6 +14,8 @@ export type ImageCropDialogProps = {
   cropShape?: 'rect' | 'round';
   confirmLabel?: string;
   maxOutputDimension?: number;
+  /** Lowest slider value. Below 1 lets the photo sit inside the frame instead of filling it. */
+  minZoom?: number;
   onCancel: () => void;
   onConfirm: (file: File) => void;
 };
@@ -31,6 +33,7 @@ export function ImageCropDialog({
   cropShape = 'rect',
   confirmLabel = 'Use photo',
   maxOutputDimension,
+  minZoom = 1,
   onCancel,
   onConfirm,
 }: ImageCropDialogProps) {
@@ -45,6 +48,7 @@ export function ImageCropDialog({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState('');
+  const [matte, setMatte] = useState('#161616');
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +57,23 @@ export function ImageCropDialog({
     setCroppedAreaPixels(null);
     setApplying(false);
     setError('');
+    setMatte('#161616');
   }, [open, imageSrc]);
+
+  useEffect(() => {
+    if (!open || minZoom >= 1) return;
+    let cancelled = false;
+    void sampleImageEdgeColor(imageSrc)
+      .then((color) => {
+        if (!cancelled) setMatte(color);
+      })
+      .catch(() => {
+        if (!cancelled) setMatte('#161616');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageSrc, minZoom, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -150,7 +170,11 @@ export function ImageCropDialog({
           </p>
         </div>
 
-        <div className="relative mx-5 mt-4 h-64 overflow-hidden rounded-xl bg-black sm:h-72">
+        <div
+          className={`relative mx-5 mt-4 overflow-hidden rounded-xl bg-black ${
+            aspect < 1 ? 'h-80 sm:h-[24rem]' : 'h-64 sm:h-72'
+          }`}
+        >
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -158,10 +182,14 @@ export function ImageCropDialog({
             aspect={aspect}
             cropShape={cropShape}
             showGrid={cropShape === 'rect'}
+            minZoom={minZoom}
+            maxZoom={3}
+            restrictPosition={minZoom >= 1}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={handleCropComplete}
             objectFit="contain"
+            style={{ containerStyle: { backgroundColor: matte } }}
           />
         </div>
 
@@ -172,14 +200,14 @@ export function ImageCropDialog({
           <input
             id={zoomId}
             type="range"
-            min={1}
+            min={minZoom}
             max={3}
-            step={0.05}
+            step={0.01}
             value={zoom}
             disabled={applying}
             onChange={(event) => setZoom(Number(event.target.value))}
             className="mt-2 w-full accent-[var(--app-ink)]"
-            aria-valuemin={1}
+            aria-valuemin={minZoom}
             aria-valuemax={3}
             aria-valuenow={zoom}
           />

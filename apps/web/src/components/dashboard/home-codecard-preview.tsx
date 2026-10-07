@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { Briefcase, MapPin } from 'lucide-react';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
@@ -78,18 +79,24 @@ export function HomeCodeCardPreview({
             {displayName}
           </p>
           {role ? (
-            <p className="cc-public-hero__meta mt-1.5 break-words text-[13px]">
-              {role}
-              {company ? (
-                <>
-                  <span aria-hidden> · </span>
-                  {company}
-                </>
-              ) : null}
+            <p className="cc-public-hero__headline">
+              <Briefcase className="cc-public-hero__line-icon" aria-hidden />
+              <span>
+                {role}
+                {company ? (
+                  <>
+                    <span aria-hidden> · </span>
+                    {company}
+                  </>
+                ) : null}
+              </span>
             </p>
           ) : null}
           {location ? (
-            <p className="cc-public-hero__meta mt-1 break-words text-[13px]">{location}</p>
+            <p className="cc-public-hero__place">
+              <MapPin className="cc-public-hero__line-icon" aria-hidden />
+              <span className="break-words">{location}</span>
+            </p>
           ) : null}
           <p className="cc-public-hero__bio mt-3 line-clamp-4 break-words text-[13px] leading-relaxed">
             {intro}

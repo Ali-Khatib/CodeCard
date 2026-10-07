@@ -6953,6 +6953,44 @@ html.dark .cc-public-atmosphere__grain {
   color: var(--hero-ink) !important;
 }
 
+.cc-public-hero__title,
+.cc-public-display {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.cc-public-hero__headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--hero-ink) !important;
+}
+
+.cc-public-hero__place {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--hero-muted) !important;
+}
+
+.cc-public-hero__line-icon {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  opacity: 0.88;
+}
+
 /*
   Hero panel is always a dark elevated surface (even when the page is light).
   Force chip tokens here so icons never become dark-on-dark when html is light.
@@ -7735,14 +7773,10 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-public-profile--founder .cc-public-hero__panel {
-  background:
-    radial-gradient(80% 55% at 0% 0%, rgba(232, 197, 71, 0.22), transparent 52%),
-    radial-gradient(70% 60% at 100% 100%, rgba(168, 85, 247, 0.24), transparent 58%),
-    linear-gradient(165deg, #1a1610 0%, #14111a 58%, #10161a 100%);
+  background: linear-gradient(180deg, #171512 0%, #12110f 100%);
   box-shadow:
-    0 0 0 1px rgba(232, 197, 71, 0.55),
-    0 0 0 5px rgba(124, 58, 237, 0.14),
-    0 28px 60px -28px rgba(0, 0, 0, 0.7);
+    0 0 0 1px rgba(201, 162, 39, 0.42),
+    0 24px 48px -28px rgba(0, 0, 0, 0.62);
 }
 
 .cc-public-profile--founder .cc-public-hero__eyebrow {
@@ -7753,94 +7787,45 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-public-profile--founder .cc-public-hero__title {
-  font-family: var(--font-cyber-display), var(--app-display), Georgia, serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  background: linear-gradient(
-    118deg,
-    var(--founder-gold-soft) 0%,
-    var(--founder-gold) 28%,
-    #fff6d6 48%,
-    var(--founder-gold-deep) 72%,
-    var(--founder-gold) 100%
-  );
-  background-size: 180% 180%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent !important;
-  -webkit-text-fill-color: transparent;
-  animation: cc-founder-gold-shift 8s ease-in-out infinite alternate;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #f4e7c8 !important;
+  -webkit-text-fill-color: #f4e7c8;
+  background: none;
 }
 
-.cc-founder-roles {
+.cc-public-profile--founder .cc-founder-roles {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
+  align-items: center;
+  gap: 0.35rem 0.15rem;
+  margin: 12px 0 0;
+  max-width: 100%;
+  color: rgba(247, 242, 235, 0.92);
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
 }
 
-.cc-founder-role {
+.cc-public-profile--founder .cc-founder-roles > span {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  max-width: 100%;
-  padding: 7px 12px 7px 10px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
+  gap: 0.35rem;
+  white-space: nowrap;
 }
 
-.cc-founder-role::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 999px;
+.cc-founder-roles__lead {
+  color: #f4e7c8;
+  font-weight: 560;
 }
 
-.cc-founder-role--0 {
-  color: #2a1c04 !important;
-  background: linear-gradient(128deg, #fff7d6 0%, #f0d36a 38%, #c49214 72%, #fff1bc 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 10px 22px -12px rgba(232, 197, 71, 0.95);
-}
-
-.cc-founder-role--0::before {
-  background: #7a5410;
-  box-shadow: 0 0 0 2px rgba(255, 247, 214, 0.8);
-}
-
-.cc-founder-role--1 {
-  color: #dffbff !important;
-  background: linear-gradient(160deg, rgba(8, 48, 58, 0.96), rgba(7, 16, 28, 0.94));
-  border: 1px solid rgba(120, 236, 255, 0.62);
-  box-shadow:
-    inset 0 0 16px rgba(80, 220, 255, 0.16),
-    0 0 18px -6px rgba(80, 230, 255, 0.9);
-}
-
-.cc-founder-role--1::before {
-  background: #67f3ff;
-  box-shadow: 0 0 8px #67f3ff;
-}
-
-.cc-founder-role--2 {
-  color: #f8ecff !important;
-  background: linear-gradient(145deg, #4c1d78 0%, #1c0d30 62%, #6d28a8 100%);
-  border: 1px solid rgba(226, 176, 255, 0.5);
-  box-shadow:
-    inset 0 0 14px rgba(190, 90, 255, 0.2),
-    0 0 20px -6px rgba(186, 90, 255, 0.95);
-}
-
-.cc-founder-role--2::before {
-  background: #f0b4ff;
-  box-shadow: 0 0 8px #d070ff;
+.cc-founder-roles__sep {
+  margin-inline: 0.45rem;
+  color: rgba(201, 162, 39, 0.7);
+  font-weight: 400;
 }
 
 .cc-public-profile--founder .cc-public-hero__meta {
@@ -7855,15 +7840,15 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-public-profile--founder .cc-public-hero__portrait-frame {
+  background: #ece7df;
   box-shadow:
-    0 0 0 1px rgba(232, 197, 71, 0.55),
-    0 0 0 6px rgba(232, 197, 71, 0.12),
-    0 24px 60px rgba(0, 0, 0, 0.45);
+    0 0 0 1px rgba(201, 162, 39, 0.4),
+    0 22px 48px -24px rgba(0, 0, 0, 0.45);
 }
 
 .cc-public-profile--founder #projects > h2,
 .cc-public-profile--founder .cc-public-research h2 {
-  font-family: var(--font-cyber-display), var(--app-display), Georgia, serif;
+  font-family: var(--font-instrument), Georgia, serif;
   background: linear-gradient(100deg, #7a5a10, var(--founder-gold-deep), #c9a227);
   -webkit-background-clip: text;
   background-clip: text;
@@ -7874,15 +7859,6 @@ html.dark .cc-public-atmosphere__grain {
 .cc-public-profile--founder .cc-public-research .cc-app-mono {
   color: var(--founder-gold-deep);
   letter-spacing: 0.14em;
-}
-
-@keyframes cc-founder-gold-shift {
-  from {
-    background-position: 0% 40%;
-  }
-  to {
-    background-position: 100% 60%;
-  }
 }
 
 .cc-founder-greeting {

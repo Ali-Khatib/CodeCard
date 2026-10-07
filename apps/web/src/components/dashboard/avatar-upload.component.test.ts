@@ -27,7 +27,8 @@ describe('AvatarUpload component', () => {
     expect(component).toContain('finalizeAvatarUploadAction');
     expect(component).toContain('uploadAvatarToSignedUrl');
     expect(component).toContain('ImageCropDialog');
-    expect(component).toContain('cropShape="round"');
+    expect(component).toContain('aspect={4 / 5}');
+    expect(component).toContain('minZoom={0.35}');
     expect(component).toContain('Crop and adjust before it uploads');
     expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toMatch(/service.?role/i);

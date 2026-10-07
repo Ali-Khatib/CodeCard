@@ -16,7 +16,7 @@ export function PublicResearchSection({
   return (
     <section id="research" className="mt-16 scroll-mt-28">
       <p className="cc-app-mono">Research</p>
-      <h2 className="mt-3 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+      <h2 className="cc-public-display mt-3 text-[28px] text-[var(--app-ink)] md:text-[34px]">
         Papers &amp; publications
       </h2>
       <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">

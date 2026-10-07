@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { Briefcase, Code2, FlaskConical, MapPin, type LucideIcon } from 'lucide-react';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
@@ -37,6 +38,12 @@ const PublicProfileDock = dynamic(
   () => import('./public-profile-dock').then((m) => m.PublicProfileDock),
   { ssr: true },
 );
+
+const FOUNDER_ROLE_ICONS: LucideIcon[] = [Briefcase, Code2, FlaskConical];
+
+function LineIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return <Icon className="cc-public-hero__line-icon" aria-hidden />;
+}
 
 /**
  * Public profile view — Server Component shell so the above-fold bio (LCP)
@@ -127,7 +134,7 @@ export function PublicProfileFocused({
                     fill
                     // LCP on `/demo` is the bio text, not the avatar — avoid high-priority
                     // image decode competing with text paint (Phase 0C).
-                    className="object-cover"
+                    className="object-cover object-center"
                     sizes="(max-width: 640px) 92vw, 440px"
                     quality={90}
                   />
@@ -160,26 +167,41 @@ export function PublicProfileFocused({
                 {displayName}
               </h1>
               {founder && founderRoles.length > 0 ? (
-                <ul className="cc-founder-roles" aria-label="Roles">
-                  {founderRoles.map((part, index) => (
-                    <li key={part} className={`cc-founder-role cc-founder-role--${index}`}>
-                      {part}
-                    </li>
-                  ))}
-                </ul>
+                <p className="cc-founder-roles">
+                  {founderRoles.map((part, index) => {
+                    const Icon = FOUNDER_ROLE_ICONS[index] ?? Briefcase;
+                    return (
+                      <span key={part}>
+                        <LineIcon icon={Icon} />
+                        <span className={index === 0 ? 'cc-founder-roles__lead' : undefined}>{part}</span>
+                        {index < founderRoles.length - 1 ? (
+                          <span className="cc-founder-roles__sep" aria-hidden>
+                            ·
+                          </span>
+                        ) : null}
+                      </span>
+                    );
+                  })}
+                </p>
               ) : role ? (
-                <p className="cc-public-hero__meta mt-2 break-words text-[15px] md:text-[16px]">
-                  {role}
-                  {company ? (
-                    <>
-                      <span aria-hidden> · </span>
-                      {company}
-                    </>
-                  ) : null}
+                <p className="cc-public-hero__headline">
+                  <LineIcon icon={Briefcase} />
+                  <span>
+                    {role}
+                    {company ? (
+                      <>
+                        <span aria-hidden> · </span>
+                        {company}
+                      </>
+                    ) : null}
+                  </span>
                 </p>
               ) : null}
               {location ? (
-                <p className="cc-public-hero__meta mt-1 break-words text-[14px]">{location}</p>
+                <p className="cc-public-hero__place">
+                  <LineIcon icon={MapPin} />
+                  <span className="break-words">{location}</span>
+                </p>
               ) : null}
               <p className="cc-public-hero__bio mt-4 max-w-md break-words text-[15px] leading-relaxed md:text-[16px]">
                 {intro}
@@ -193,7 +215,7 @@ export function PublicProfileFocused({
 
         <section id="projects" className="mt-10 scroll-mt-28 md:mt-14">
           <p className="cc-app-mono">{founder ? 'Founder builds' : 'Featured work'}</p>
-          <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)] md:text-[28px]">
+          <h2 className="cc-public-display mt-3 break-words text-[28px] text-[var(--app-ink)] md:text-[34px]">
             {founder ? 'The work behind CodeCard' : `What ${firstName} built`}
           </h2>
           <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
