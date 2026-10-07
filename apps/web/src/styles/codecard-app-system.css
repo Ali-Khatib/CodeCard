@@ -7713,3 +7713,167 @@ html.dark .cc-public-atmosphere__grain {
   line-height: 1.2;
   color: var(--app-ink);
 }
+
+/* ?? Founder-only public card (hard-gated) ?? */
+.cc-public-profile--founder {
+  --app-atmosphere-a: rgba(201, 162, 39, 0.55);
+  --app-atmosphere-b: rgba(255, 214, 110, 0.38);
+  --app-atmosphere-c: rgba(120, 80, 20, 0.22);
+  --app-iris: #c9a227;
+  --app-hero-panel: #14110c;
+  --founder-gold: #e8c547;
+  --founder-gold-deep: #a67c00;
+  --founder-gold-soft: #f5e6b8;
+}
+
+.cc-public-profile--founder .cc-public-hero__eyebrow {
+  color: var(--founder-gold);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.cc-public-profile--founder .cc-public-hero__title {
+  font-family: var(--font-cyber-display), var(--app-display), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: linear-gradient(
+    118deg,
+    var(--founder-gold-soft) 0%,
+    var(--founder-gold) 28%,
+    #fff6d6 48%,
+    var(--founder-gold-deep) 72%,
+    var(--founder-gold) 100%
+  );
+  background-size: 180% 180%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cc-founder-gold-shift 8s ease-in-out infinite alternate;
+}
+
+.cc-public-profile--founder .cc-public-hero__meta {
+  color: rgba(245, 230, 184, 0.88);
+}
+
+.cc-public-profile--founder .cc-public-hero__bio {
+  color: rgba(247, 242, 235, 0.94);
+  font-family: var(--app-display), Georgia, serif;
+  font-size: clamp(15px, 1.7vw, 17px);
+  line-height: 1.55;
+}
+
+.cc-public-profile--founder .cc-public-hero__portrait-frame {
+  box-shadow:
+    0 0 0 1px rgba(232, 197, 71, 0.55),
+    0 0 0 6px rgba(232, 197, 71, 0.12),
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.cc-public-profile--founder #projects > h2,
+.cc-public-profile--founder .cc-public-research h2 {
+  font-family: var(--font-cyber-display), var(--app-display), Georgia, serif;
+  background: linear-gradient(100deg, #7a5a10, var(--founder-gold-deep), #c9a227);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cc-public-profile--founder #projects > .cc-app-mono,
+.cc-public-profile--founder .cc-public-research .cc-app-mono {
+  color: var(--founder-gold-deep);
+  letter-spacing: 0.14em;
+}
+
+@keyframes cc-founder-gold-shift {
+  from {
+    background-position: 0% 40%;
+  }
+  to {
+    background-position: 100% 60%;
+  }
+}
+
+.cc-founder-greeting {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(20, 14, 6, 0.72), rgba(8, 6, 4, 0.88));
+  backdrop-filter: blur(10px);
+  animation: cc-founder-greeting-in 0.45s ease-out both;
+}
+
+.cc-founder-greeting--out {
+  animation: cc-founder-greeting-out 0.5s ease-in both;
+}
+
+.cc-founder-greeting__panel {
+  max-width: 420px;
+  text-align: center;
+  padding: 28px 26px 30px;
+  border-radius: 22px;
+  border: 1px solid rgba(232, 197, 71, 0.42);
+  background: linear-gradient(160deg, rgba(28, 22, 12, 0.96), rgba(12, 10, 8, 0.98));
+  box-shadow:
+    0 0 0 1px rgba(255, 246, 214, 0.06) inset,
+    0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.cc-founder-greeting__mark {
+  margin: 0;
+  font-family: var(--font-eyebrow), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--founder-gold, #e8c547);
+}
+
+.cc-founder-greeting__title {
+  margin: 14px 0 0;
+  font-family: var(--font-cyber-display), var(--font-instrument), Georgia, serif;
+  font-size: clamp(1.55rem, 5vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, #f5e6b8, #e8c547, #fff6d6, #a67c00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cc-founder-greeting__body {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(247, 242, 235, 0.82);
+}
+
+@keyframes cc-founder-greeting-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cc-founder-greeting-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-public-profile--founder .cc-public-hero__title,
+  .cc-founder-greeting,
+  .cc-founder-greeting--out {
+    animation: none;
+  }
+}

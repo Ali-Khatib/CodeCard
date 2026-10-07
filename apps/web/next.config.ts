@@ -24,7 +24,7 @@ function contentSecurityPolicy(frameAncestors: "'none'" | "'self'"): string {
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://va.vercel-scripts.com",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com",
+    "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://*.vercel.app",
     "media-src 'self' blob: https://cdn.coverr.co https://videos.pexels.com",
     "font-src 'self' data:",
     `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com ${sentryConnect}`,
@@ -96,6 +96,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'codecard-mvp.vercel.app' },
+      { protocol: 'https', hostname: '*.vercel.app' },
     ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200],

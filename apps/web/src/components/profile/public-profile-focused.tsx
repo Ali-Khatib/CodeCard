@@ -13,6 +13,7 @@ import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
 import { PublicHeroFlipPanel } from './public-hero-flip-panel';
 import { ProfileSectionHashScroll } from './profile-section-hash-scroll';
+import { isFounderProfile } from '@/lib/profile/founder';
 
 /** Below-fold client islands — keep ATF bio free of their hydration cost. */
 const PublicProjectStack = dynamic(
@@ -34,6 +35,10 @@ const PublicProfileAtmosphere = dynamic(
 const PublicProfileDock = dynamic(
   () => import('./public-profile-dock').then((m) => m.PublicProfileDock),
   { ssr: true },
+);
+const FounderGreeting = dynamic(
+  () => import('./founder-greeting').then((m) => m.FounderGreeting),
+  { ssr: false },
 );
 
 /**
@@ -82,6 +87,7 @@ export function PublicProfileFocused({
     bio ??
     'I build developer tools that make complex workflows feel simple.';
   const firstName = displayName.split(' ')[0];
+  const founder = isFounderProfile({ profileId, profileSlug });
   const backHref =
     profileSlug === 'demo' ? '/demo' : connectionControl?.isOwnProfile ? '/dashboard' : '/';
   const backLabel =
@@ -90,8 +96,9 @@ export function PublicProfileFocused({
       : 'Back to CodeCard';
 
   return (
-    <div className="cc-public-profile">
+    <div className={`cc-public-profile${founder ? ' cc-public-profile--founder' : ''}`}>
       <PublicProfileAtmosphere />
+      {founder ? <FounderGreeting displayName={displayName} /> : null}
       <ProfileSectionHashScroll />
       <PublicProfileDock
         backHref={backHref}
@@ -145,7 +152,9 @@ export function PublicProfileFocused({
                 />
               }
             >
-              <p className="cc-app-mono cc-public-hero__eyebrow">CodeCard</p>
+              <p className="cc-app-mono cc-public-hero__eyebrow">
+                {founder ? 'Founder · CodeCard' : 'CodeCard'}
+              </p>
               <h1 className="cc-public-hero__title mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em]">
                 {displayName}
               </h1>
@@ -174,12 +183,14 @@ export function PublicProfileFocused({
         </header>
 
         <section id="projects" className="mt-10 scroll-mt-28 md:mt-14">
-          <p className="cc-app-mono">Featured work</p>
+          <p className="cc-app-mono">{founder ? 'Founder builds' : 'Featured work'}</p>
           <h2 className="mt-3 break-words text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)] md:text-[28px]">
-            What {firstName} built
+            {founder ? 'The work behind CodeCard' : `What ${firstName} built`}
           </h2>
           <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-            Scroll to stack projects — the quickest way to see the work.
+            {founder
+              ? 'Product, research, and systems — the stack that made this card possible.'
+              : 'Scroll to stack projects — the quickest way to see the work.'}
           </p>
 
           <div className="mt-6 md:mt-8">
