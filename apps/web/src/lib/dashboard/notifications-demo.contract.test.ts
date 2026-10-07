@@ -19,6 +19,7 @@ describe('dashboard notifications', () => {
     expect(component).toContain("basePath === '/dashboard/preview'");
     expect(component).toContain('demoMode ? DEMO_NOTIFICATIONS : []');
     expect(component).toContain('listPendingScanOffersAction');
+    expect(component).toContain('listDueFollowUpRemindersAction');
     expect(component).toContain('scanOffersToNotifications');
     expect(component).toContain('You’re all caught up');
   });

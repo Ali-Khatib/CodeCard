@@ -20,6 +20,7 @@ export type ScanOfferCard = {
   scannerHeadline: string | null;
   scannerSlug: string | null;
   scannerAvatarUrl: string | null;
+  scannerAudienceRole: string | null;
   createdAt: string;
 };
 
@@ -104,7 +105,7 @@ export async function listPendingScanOffers(
   const profileIds = rows.map((row) => row.scanner_profile_id);
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, slug, display_name, headline, avatar_url')
+    .select('id, slug, display_name, headline, avatar_url, audience_role')
     .in('id', profileIds);
 
   const byId = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
@@ -119,6 +120,8 @@ export async function listPendingScanOffers(
         scannerHeadline: profile?.headline ?? null,
         scannerSlug: profile?.slug ?? null,
         scannerAvatarUrl: profile?.avatar_url ?? null,
+        scannerAudienceRole:
+          typeof profile?.audience_role === 'string' ? profile.audience_role : null,
         createdAt: row.created_at,
       };
     }),

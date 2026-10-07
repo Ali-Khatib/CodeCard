@@ -12,6 +12,7 @@ const offer: ScanOfferCard = {
   scannerHeadline: null,
   scannerSlug: 'li-hatib',
   scannerAvatarUrl: null,
+  scannerAudienceRole: 'founder',
   createdAt: '2026-10-07T18:00:00.000Z',
 };
 
@@ -24,8 +25,8 @@ describe('live notifications', () => {
       {
         id: 'scan-offer-1',
         type: 'activity',
-        title: 'Ali Khatib scanned your card',
-        body: 'Accept to add them to Connections.',
+        title: 'Ali Khatib sent a connection request',
+        body: 'Open the corner card to accept or decline.',
         time: '30m ago',
         unread: true,
         href: '/dashboard/connections',

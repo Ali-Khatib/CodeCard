@@ -10,7 +10,9 @@ import {
   type CSSProperties,
 } from 'react';
 import { listPendingScanOffersAction } from '@/app/actions/scan-offers';
+import { listDueFollowUpRemindersAction } from '@/app/actions/follow-up-reminders';
 import { scanOffersToNotifications } from '@/lib/dashboard/live-notifications';
+import { followUpsToNotifications } from '@/lib/connections/follow-up-reminders';
 import { DEMO_NOTIFICATIONS, type DashboardNotification } from '@/lib/dashboard/notifications-demo';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 
@@ -43,9 +45,18 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
 
     const load = async () => {
       try {
-        const result = await listPendingScanOffersAction();
-        if (cancelled || result.error) return;
-        setItems(scanOffersToNotifications(result.offers, basePath));
+        const [offersResult, followUpsResult] = await Promise.all([
+          listPendingScanOffersAction(),
+          listDueFollowUpRemindersAction(),
+        ]);
+        if (cancelled) return;
+        const offerItems = offersResult.error
+          ? []
+          : scanOffersToNotifications(offersResult.offers, basePath);
+        const followUpItems = followUpsResult.error
+          ? []
+          : followUpsToNotifications(followUpsResult.reminders, basePath);
+        setItems([...offerItems, ...followUpItems]);
       } catch {
         // Network blip / aborted POST while navigating — leave bell empty.
       }

@@ -31,8 +31,10 @@ export function scanOffersToNotifications(
   return offers.map((offer) => ({
     id: `scan-${offer.id}`,
     type: 'activity',
-    title: `${offer.scannerName} scanned your card`,
-    body: 'Accept to add them to Connections.',
+    title: `${offer.scannerName} sent a connection request`,
+    body: offer.scannerHeadline
+      ? `${offer.scannerHeadline} — open the corner card to accept.`
+      : 'Open the corner card to accept or decline.',
     time: formatNotificationTime(offer.createdAt, now),
     unread: true,
     href: `${basePath}/connections`,

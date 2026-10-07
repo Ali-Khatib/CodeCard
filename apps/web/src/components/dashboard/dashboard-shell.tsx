@@ -7,6 +7,7 @@ import { DASH_NAV_ICONS } from './dashboard-nav-icons';
 import { EmailVerificationBanner } from './email-verification-banner';
 import { DashboardPageTransition } from './dashboard-page-transition';
 import { DashboardNotifications } from './dashboard-notifications';
+import { ConnectionRequestHost } from './connection-request-host';
 import { AppButton } from './ui/dashboard-ui';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -548,6 +549,9 @@ export function DashboardShell({
           );
         })}
       </nav>
+      {!preview && !embedded && !isDemoWorkspacePath(basePath) ? (
+        <ConnectionRequestHost enabled />
+      ) : null}
     </div>
     </MutationFeedbackProvider>
   );
