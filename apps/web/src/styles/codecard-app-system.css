@@ -1173,18 +1173,76 @@ button.cc-app-nav-link:focus-visible {
 }
 
 .cc-app-user-card__view {
-  display: inline-flex;
-  margin-top: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--app-iris);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--app-iris);
+  color: #1a120c;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   text-decoration: none;
+  box-shadow: 0 8px 16px -12px color-mix(in srgb, var(--app-iris) 80%, transparent);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+  animation: cc-view-card-pulse 2.6s ease-in-out infinite;
+}
+
+.cc-app-user-card__view-arrow {
+  display: inline-block;
+  transition: transform 180ms ease;
 }
 
 .cc-app-user-card__view:hover,
 .cc-app-user-card__view:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
+  background: color-mix(in srgb, var(--app-iris) 82%, #fff);
+  color: #1a120c;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--app-iris) 28%, transparent),
+    0 12px 20px -12px color-mix(in srgb, var(--app-iris) 70%, transparent);
+}
+
+.cc-app-user-card__view:hover .cc-app-user-card__view-arrow,
+.cc-app-user-card__view:focus-visible .cc-app-user-card__view-arrow {
+  transform: translateX(4px);
+}
+
+.cc-app-user-card__view:focus-visible {
+  outline: 2px solid #1a120c;
+  outline-offset: 2px;
+}
+
+@keyframes cc-view-card-pulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 16px -12px color-mix(in srgb, var(--app-iris) 80%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--app-iris) 24%, transparent),
+      0 10px 18px -12px color-mix(in srgb, var(--app-iris) 75%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-app-user-card__view {
+    animation: none;
+  }
+
+  .cc-app-user-card__view,
+  .cc-app-user-card__view-arrow {
+    transition: none;
+  }
 }
 
 /* ?? Inputs ?? */

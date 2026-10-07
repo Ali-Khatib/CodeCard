@@ -372,7 +372,10 @@ export function DashboardShell({
           </Link>
           {cardHref ? (
             <Link href={cardHref} className="cc-app-user-card__view">
-              View card
+              <span>View card</span>
+              <span className="cc-app-user-card__view-arrow" aria-hidden>
+                →
+              </span>
             </Link>
           ) : null}
         </div>
