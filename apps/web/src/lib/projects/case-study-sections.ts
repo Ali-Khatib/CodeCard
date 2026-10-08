@@ -21,7 +21,7 @@ export const CASE_STUDY_SECTIONS: CaseStudySectionConfig[] = [
     eyebrow: 'Before',
     summary: 'The pain, friction, or gap you set out to fix.',
     addHint:
-      'Optional. Turn this on if you want a “Problem” tab on the project page. Write 2–4 sentences someone can read in under 10 seconds.',
+      'Optional. Turn this on if you want a Problem tab on the project page. Write 2 to 4 sentences someone can read in under 10 seconds.',
     prompt:
       'What was broken, slow, confusing, or missing before you built this? Name the people affected and the concrete friction.',
     placeholder:
@@ -34,9 +34,9 @@ export const CASE_STUDY_SECTIONS: CaseStudySectionConfig[] = [
     id: 'approach',
     label: 'Approach',
     eyebrow: 'How',
-    summary: 'Your strategy — plain English, not a full write-up.',
+    summary: 'Your strategy, in plain English, not a full write-up.',
     addHint:
-      'Optional. Explain how you tackled the problem in plain English — strategy, not a step-by-step diary.',
+      'Optional. Explain how you tackled the problem in plain English. Strategy, not a step by step diary.',
     prompt:
       'What was your angle? Mention the key idea, stack choice, or constraint that shaped the solution.',
     placeholder:
@@ -49,11 +49,11 @@ export const CASE_STUDY_SECTIONS: CaseStudySectionConfig[] = [
     id: 'results',
     label: 'Results',
     eyebrow: 'Proof',
-    summary: 'What changed — speed, adoption, quality, or user wins.',
+    summary: 'What changed: speed, adoption, quality, or user wins.',
     addHint:
-      'Optional. Write the outcome in numbers or clear before/after language. Prefer one sharp result over a long list.',
+      'Optional. Write the outcome in numbers or clear before and after language. Prefer one sharp result over a long list.',
     prompt:
-      'What measurable or visible difference did this create? Include a metric, adoption note, or before→after if you have one.',
+      'What measurable or visible difference did this create? Include a metric, adoption note, or a before and after if you have one.',
     placeholder:
       'e.g. Cut deploy time from 45 minutes to under 8, with preview URLs on every PR.',
     inputKind: 'text',
@@ -64,9 +64,9 @@ export const CASE_STUDY_SECTIONS: CaseStudySectionConfig[] = [
     id: 'product',
     label: 'Experience',
     eyebrow: 'Interface',
-    summary: 'What someone actually uses — screens, flows, or the live feel in words.',
+    summary: 'What someone actually uses: screens, flows, or the live feel in words.',
     addHint:
-      'Optional. Describe what using this feels like — main screens, actions, or moments. Not the pitch; the interface.',
+      'Optional. Describe what using this feels like. Main screens, actions, or moments. Not the pitch. The interface.',
     prompt:
       'What does a user see or do? Name the main screens, actions, or moments that make it click.',
     placeholder:
@@ -79,11 +79,11 @@ export const CASE_STUDY_SECTIONS: CaseStudySectionConfig[] = [
     id: 'architecture',
     label: 'Architecture',
     eyebrow: 'Stack',
-    summary: 'How it is wired — services, data flow, or technical shape in plain language.',
+    summary: 'How it is wired: services, data flow, or technical shape in plain language.',
     addHint:
       'Optional. Sketch how the pieces connect so a technical reader gets the shape without a full design doc.',
     prompt:
-      'How is it wired? Mention major services, data stores, or boundaries — skip the novel.',
+      'How is it wired? Mention major services, data stores, or boundaries. Skip the novel.',
     placeholder:
       'e.g. Next.js app → API routes → Postgres for state, with workers watching GitHub webhooks for preview spins.',
     inputKind: 'text',

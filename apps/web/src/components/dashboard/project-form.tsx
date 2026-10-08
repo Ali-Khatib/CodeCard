@@ -439,7 +439,7 @@ export function ProjectForm({
                       aria-describedby={joinDescribedBy(promptId, helpId)}
                     />
                     <p id={helpId} className="cc-project-form__note">
-                      Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
+                      Aim for 2 to 4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
                     </p>
 
                     <div className="mt-3 space-y-2 border-t border-charcoal/60 pt-3">
@@ -451,7 +451,7 @@ export function ProjectForm({
                       </label>
                       <p id={imageHelpId} className="cc-project-form__hint">
                         Optional. This sits behind the tab text with a dark overlay so the words stay
-                        readable. JPEG, PNG, or WebP — it is compressed automatically.
+                        readable. JPEG, PNG, or WebP. It is compressed automatically.
                       </p>
                       {sectionImage ? (
                         <div className="flex flex-wrap items-center gap-3">

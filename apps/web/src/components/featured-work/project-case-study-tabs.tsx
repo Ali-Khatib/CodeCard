@@ -90,7 +90,7 @@ export function ProjectCaseStudyTabs({
           </p>
         ) : (
           <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-[var(--app-muted,#5c5856)] md:text-[15px]">
-            Optional story beats — tap through each section of the work.
+            Optional story beats. Tap through each section of the work.
           </p>
         )}
       </div>

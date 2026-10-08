@@ -24,10 +24,10 @@ import {
 const ICONS: { id: HeadlineIconId; label: string; Icon: LucideIcon }[] = [
   { id: 'work', label: 'Work', Icon: Briefcase },
   { id: 'code', label: 'Code', Icon: Code2 },
-  { id: 'lab', label: 'Research', Icon: FlaskConical },
   { id: 'design', label: 'Design', Icon: Palette },
   { id: 'product', label: 'Product', Icon: Layers },
   { id: 'data', label: 'Data', Icon: BarChart3 },
+  { id: 'lab', label: 'Research', Icon: FlaskConical },
   { id: 'write', label: 'Writing', Icon: PenLine },
   { id: 'teach', label: 'Teaching', Icon: GraduationCap },
   { id: 'lead', label: 'Leadership', Icon: Users },
@@ -74,10 +74,9 @@ export function HeadlineField({
         Headline
       </label>
       <p className="text-[12px] text-[var(--app-smoke)]">
-        The first line stands on its own when you add a third. The other lines share the row under
-        it. Pick an icon for any line.
+        Pick an icon, then write the line. With three lines, the first stands on its own.
       </p>
-      <div className="space-y-3">
+      <div className="cc-headline-field__lines">
         {parts.map((part, index) => (
           <div key={index} className="cc-headline-field__line">
             <div className="cc-headline-field__icons" role="group" aria-label={`Icons for line ${index + 1}`}>
@@ -89,7 +88,7 @@ export function HeadlineField({
                     type="button"
                     className={`cc-headline-field__icon${selected ? ' is-selected' : ''}`}
                     aria-pressed={selected}
-                    aria-label={`${label} icon`}
+                    aria-label={label}
                     title={label}
                     disabled={disabled}
                     onClick={() => {
@@ -98,8 +97,7 @@ export function HeadlineField({
                       commit(next);
                     }}
                   >
-                    <Icon className="h-3.5 w-3.5" aria-hidden />
-                    <span>{label}</span>
+                    <Icon className="h-4 w-4" aria-hidden />
                   </button>
                 );
               })}
