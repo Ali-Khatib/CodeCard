@@ -50,7 +50,7 @@ export function ProjectDetailLoading() {
         </header>
 
         <div className="relative w-full overflow-hidden">
-          <div className="relative aspect-[16/9] min-h-[min(52vh,520px)] max-h-[min(78vh,880px)] w-full bg-deep-indigo">
+          <div className="relative aspect-[4/1] w-full bg-[#141311]">
             {snapshot.posterUrl && (
               <ProjectMedia src={snapshot.posterUrl} priority className="object-cover object-center" />
             )}

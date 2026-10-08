@@ -3498,17 +3498,18 @@ html.dark .cc-connection-tag.cc-app-badge--mint {
 .cc-app-project-card__media {
   position: relative;
   width: 100%;
-  /* Cap media so media + identity footer fit in one viewport scroll */
-  height: clamp(180px, min(36vw, 42dvh), 340px);
+  aspect-ratio: 4 / 1;
+  height: auto;
   flex: 0 0 auto;
   overflow: hidden;
-  background: var(--app-bone);
+  background: #141311;
 }
 
 .cc-app-project-card__media-inner {
   height: 100%;
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform 160ms ease;
 }
 
@@ -6481,7 +6482,8 @@ html.dark .cc-share-qr-pattern__scan {
   }
 
   .cc-app-project-card__media {
-    height: min(38dvh, 240px);
+    aspect-ratio: 4 / 1;
+    height: auto;
   }
 
   .cc-app-project-card__body {
@@ -7438,9 +7440,10 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-stacking-card__project .cc-app-project-card__media {
-  height: clamp(160px, 28dvh, 280px) !important;
-  flex: 0 1 auto;
-  max-height: 34dvh;
+  aspect-ratio: 4 / 1;
+  height: auto !important;
+  flex: 0 0 auto;
+  max-height: none;
   border-top-left-radius: 31px;
   border-top-right-radius: 31px;
 }
@@ -7518,7 +7521,8 @@ html.dark .cc-public-atmosphere__grain {
   }
 
   .cc-stacking-card__project .cc-app-project-card__media {
-    height: clamp(120px, 22dvh, 200px) !important;
+    aspect-ratio: 4 / 1;
+    height: auto !important;
   }
 
   .cc-stacking-card__project .cc-app-project-card__body {
@@ -7528,7 +7532,8 @@ html.dark .cc-public-atmosphere__grain {
 
 @media (max-height: 720px) {
   .cc-stacking-card__project .cc-app-project-card__media {
-    height: clamp(96px, 18dvh, 150px) !important;
+    aspect-ratio: 4 / 1;
+    height: auto !important;
   }
 
   .cc-stacking-card__project .cc-work-title {

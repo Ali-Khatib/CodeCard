@@ -225,13 +225,13 @@ export function ProjectDetailView({
         )}
 
         <div className="relative w-full overflow-hidden">
-          <div className="relative aspect-[16/9] min-h-[min(52vh,520px)] max-h-[min(78vh,880px)] w-full bg-deep-indigo">
+          <div className="relative aspect-[4/1] w-full bg-[#141311]">
             {project.posterUrl && (
               <ProjectMedia
                 src={project.posterUrl}
                 alt={projectCoverAlt({ projectTitle: project.title, titleAdjacent: true })}
                 priority
-                className="object-cover object-center"
+                className="object-contain object-center"
               />
             )}
 
@@ -262,20 +262,18 @@ export function ProjectDetailView({
                 }}
               />
             )}
+          </div>
 
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(5,3,15,0.9)_0%,rgba(5,3,15,0.62)_40%,rgba(5,3,15,0.28)_72%,rgba(5,3,15,0.1)_100%),linear-gradient(90deg,rgba(5,3,15,0.68)_0%,rgba(5,3,15,0.34)_42%,rgba(5,3,15,0.1)_100%)]" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-lavender/50 to-transparent" />
-
-            <div className="absolute inset-x-0 bottom-0 cc-container max-w-full pb-8 pt-24 sm:pb-10 sm:pt-28 md:pb-14 md:pt-36">
-              <div className="max-w-[min(680px,100%)] rounded-[26px] border border-white/22 bg-black/55 p-4 shadow-[0_22px_70px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-5 md:p-6">
-                <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
+          <div className="cc-container max-w-full pb-2 pt-8">
+            <div className="max-w-[min(680px,100%)]">
+                <p className="font-eyebrow text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-smoke)]">
                   Featured project
                 </p>
-                <h1 className="cc-fit-title mt-3 max-w-full break-words font-display text-[clamp(1.55rem,7vw,3.4rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.72)] md:max-w-[14ch]">
+                <h1 className="cc-fit-title cc-public-display mt-3 max-w-full break-words text-[clamp(1.85rem,6vw,3.2rem)] leading-[0.95] tracking-[-0.04em] text-[var(--app-ink)]">
                   {project.title}
                 </h1>
                 {project.tagline && (
-                  <p className="mt-3 max-w-[42ch] break-words text-[15px] font-semibold leading-snug text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.62)] sm:mt-4 sm:text-[17px] md:text-[18px]">
+                  <p className="mt-3 max-w-[42ch] break-words text-[15px] leading-snug text-[var(--app-ink)] sm:mt-4 sm:text-[17px] md:text-[18px]">
                     {project.tagline}
                   </p>
                 )}
@@ -284,7 +282,7 @@ export function ProjectDetailView({
                     {[...project.domains, ...project.focusAreas].map((tag) => (
                       <span
                         key={tag}
-                        className="max-w-full break-words rounded-full border border-white/40 bg-black/55 px-3 py-1.5 text-[12px] font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-sm sm:text-[13px]"
+                        className="cc-app-tech-tag max-w-full break-words"
                       >
                         {tag}
                       </span>
@@ -295,9 +293,8 @@ export function ProjectDetailView({
                   project={project}
                   profileId={profileId}
                   resumeUrl={resumeUrl}
-                  variant="hero"
+                  variant="panel"
                 />
-              </div>
             </div>
           </div>
         </div>

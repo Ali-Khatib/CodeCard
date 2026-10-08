@@ -10,8 +10,8 @@ describe('ProjectMediaUpload component', () => {
     );
 
     expect(component).toContain('export function ProjectMediaUpload');
-    expect(component).toContain('Choose project cover image');
-    expect(component).toContain('Replace cover');
+    expect(component).toContain('Choose project banner');
+    expect(component).toContain('Replace banner');
     expect(component).toContain('Upload replacement');
     expect(component).toContain('Choose project screenshots');
     expect(component).toContain('accept="image/jpeg,image/png,image/webp"');
@@ -26,8 +26,8 @@ describe('ProjectMediaUpload component', () => {
     expect(component).toContain('progressPercent');
     expect(component).toContain("'optimizing'");
     expect(component).toContain('ImageCropDialog');
-    expect(component).toContain('Edit cover image');
-    expect(component).toContain('aspect={16 / 9}');
+    expect(component).toContain('Edit banner');
+    expect(component).toContain('aspect={4 / 1}');
     expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toMatch(/service.?role/i);
   });

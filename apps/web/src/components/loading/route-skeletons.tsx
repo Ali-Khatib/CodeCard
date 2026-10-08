@@ -91,7 +91,7 @@ export function ProjectDetailSkeleton() {
       </header>
 
       <div className="relative w-full overflow-hidden">
-        <ThemedSkeleton className="aspect-[16/9] min-h-[min(52vh,520px)] w-full rounded-none" />
+        <ThemedSkeleton className="aspect-[4/1] w-full rounded-none" />
         <div className="absolute inset-x-0 bottom-0 cc-container pb-10 pt-28 md:pb-14 md:pt-36">
           <p className={TYPE.eyebrow}>Featured project</p>
           <ThemedSkeleton className="mt-3 h-12 w-[min(360px,75%)]" />

@@ -556,8 +556,8 @@ export function ProjectMediaUpload({
           Project media
         </h2>
         <p id="project-media-constraints" className="mt-2 text-[14px] text-[var(--app-smoke)]">
-          Add a cover image and screenshots for this project. JPEG, PNG, or WebP up to 5 MB each.
-          Cover images can be cropped before upload.
+          Add a wide banner above the project, plus screenshots for the gallery. JPEG, PNG, or
+          WebP up to 5 MB each. The banner crop is 4:1 so the card does not cut it off.
         </p>
       </div>
 
@@ -566,11 +566,11 @@ export function ProjectMediaUpload({
           open
           imageSrc={coverCropSourceUrl}
           fileName={coverCropSourceName || 'cover.jpg'}
-          title="Edit cover image"
-          description="Drag to reposition. Use the slider to zoom. Cover uses a 16:9 crop."
-          aspect={16 / 9}
+          title="Edit banner"
+          description="Drag to reposition. Use the slider to zoom. The banner is a wide 4:1 frame."
+          aspect={4 / 1}
           cropShape="rect"
-          confirmLabel="Use cover"
+          confirmLabel="Use banner"
           maxOutputDimension={1920}
           onCancel={closeCoverCropDialog}
           onConfirm={handleCoverCropConfirm}
@@ -578,28 +578,28 @@ export function ProjectMediaUpload({
       ) : null}
 
       <div className="space-y-3" data-testid="project-cover-upload">
-        <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Cover image</h3>
+        <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Banner</h3>
         <div className="flex flex-wrap items-start gap-4">
-          <div className="relative h-36 w-56 overflow-hidden rounded-xl border border-[var(--app-border)] bg-[var(--app-bone)]">
+          <div className="relative aspect-[4/1] w-full max-w-[28rem] overflow-hidden rounded-xl border border-[var(--app-border)] bg-[#141311]">
             {displayCoverUrl ? (
               <Image
                 src={displayCoverUrl}
-                alt="Project cover preview"
+                alt="Project banner preview"
                 fill
-                className="object-cover"
-                sizes="224px"
+                className="object-contain object-center"
+                sizes="448px"
                 unoptimized={!!coverPreviewUrl}
               />
             ) : (
               <span className="flex h-full w-full items-center justify-center px-4 text-center text-[13px] text-[var(--app-smoke)]">
-                No cover yet
+                No banner yet
               </span>
             )}
           </div>
 
           <div className="flex min-w-0 flex-col gap-2">
             <label htmlFor={coverInputId} className="sr-only">
-              {hasCover ? 'Choose replacement project cover image' : 'Choose project cover image'}
+              {hasCover ? 'Choose replacement project banner' : 'Choose project banner'}
             </label>
             <input
               ref={coverInputRef}
@@ -620,7 +620,7 @@ export function ProjectMediaUpload({
                   disabled || coverPending ? undefined : () => coverInputRef.current?.click()
                 }
               >
-                {hasCover ? 'Replace cover' : 'Choose cover'}
+                {hasCover ? 'Replace banner' : 'Choose banner'}
               </AppButton>
               {coverFile && !coverPending && coverStage !== 'failed' && coverStage !== 'cancelled' && (
                 <>
@@ -657,7 +657,7 @@ export function ProjectMediaUpload({
             </div>
             {hasCover && !coverFile ? (
               <p className="text-[13px] text-[var(--app-smoke)]">
-                The current cover stays visible until the replacement uploads successfully.
+                The current banner stays visible until the replacement uploads successfully.
               </p>
             ) : null}
           </div>
