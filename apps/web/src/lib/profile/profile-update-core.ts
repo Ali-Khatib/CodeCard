@@ -35,7 +35,17 @@ export type ProfileUpdateState = {
 
 export type OwnedProfileRow = Pick<
   Profile,
-  'id' | 'tenant_id' | 'owner_user_id' | 'slug' | 'display_name' | 'headline' | 'bio' | 'location' | 'skills' | 'is_public'
+  | 'id'
+  | 'tenant_id'
+  | 'owner_user_id'
+  | 'slug'
+  | 'display_name'
+  | 'headline'
+  | 'bio'
+  | 'location'
+  | 'card_history'
+  | 'skills'
+  | 'is_public'
 >;
 
 const profileEditSchema = updateProfileSchema.omit({ is_public: true }).extend({
