@@ -139,7 +139,7 @@ describe('validateProfileEditPayload', () => {
       slug: 'alex-chen',
       bio: 'Builder',
       location: 'San Francisco, CA',
-      card_history: { before: '', studied: '' },
+      card_history: { working: '', before: '', studying: '', studied: '' },
       skills: ['TypeScript', 'Next.js'],
       audience_role: 'engineer',
     });
@@ -153,7 +153,7 @@ describe('validateProfileEditPayload', () => {
       slug: 'alex-chen',
       bio: null,
       location: '',
-      card_history: { before: '', studied: '' },
+      card_history: { working: '', before: '', studying: '', studied: '' },
       skills: [],
       audience_role: 'engineer',
     });
@@ -167,7 +167,7 @@ describe('validateProfileEditPayload', () => {
       slug: 'ab',
       bio: null,
       location: '',
-      card_history: { before: '', studied: '' },
+      card_history: { working: '', before: '', studying: '', studied: '' },
       skills: [],
       audience_role: 'engineer',
     });
@@ -181,7 +181,7 @@ describe('validateProfileEditPayload', () => {
       slug: 'alex-chen',
       bio: '',
       location: '   ',
-      card_history: { before: '', studied: '' },
+      card_history: { working: '', before: '', studying: '', studied: '' },
       skills: [],
       audience_role: 'founder',
     });
