@@ -736,6 +736,101 @@ html.dark .cc-app-btn--primary:hover {
   border-color: #ffffff;
 }
 
+.cc-profile-save {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--app-ink);
+  color: var(--app-paper);
+  padding: 0 22px;
+  font-family: var(--app-font);
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--app-ink) 22%, transparent);
+  cursor: pointer;
+}
+
+.cc-profile-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.cc-profile-save:disabled {
+  cursor: default;
+}
+
+.cc-profile-save--yes {
+  animation: cc-save-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-profile-save__check {
+  display: flex;
+  height: 22px;
+  width: 22px;
+}
+
+.cc-profile-save__check svg {
+  height: 22px;
+  width: 22px;
+  overflow: visible;
+}
+
+.cc-profile-save__ring,
+.cc-profile-save__tick {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cc-profile-save__ring {
+  stroke-dasharray: 64;
+  stroke-dashoffset: 64;
+  animation: cc-save-ring 0.45s ease forwards;
+}
+
+.cc-profile-save__tick {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: cc-save-tick 0.32s 0.28s ease forwards;
+}
+
+html.dark .cc-profile-save {
+  background: #efedeb;
+  color: #111111;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes cc-save-ring {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cc-save-tick {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cc-save-pop {
+  0% {
+    transform: scale(0.97);
+  }
+  45% {
+    transform: scale(1.035);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .cc-app-btn--ghost {
   background: transparent;
   color: var(--app-ink);
@@ -1935,6 +2030,18 @@ html.dark .cc-app-badge--blush {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cc-profile-save,
+  .cc-profile-save--yes,
+  .cc-profile-save__ring,
+  .cc-profile-save__tick {
+    animation: none;
+  }
+
+  .cc-profile-save__ring,
+  .cc-profile-save__tick {
+    stroke-dashoffset: 0;
+  }
+
   .cc-app-route-progress__bar {
     transform: scaleX(0.86);
   }

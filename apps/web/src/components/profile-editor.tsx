@@ -67,17 +67,21 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     message: string;
   } | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const notifiedErrorRef = useRef<string | null>(null);
+  const celebratedStateRef = useRef<ProfileUpdateState | null>(null);
   const onDraftChangeRef = useRef(onDraftChange);
   onDraftChangeRef.current = onDraftChange;
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
 
   useEffect(() => {
-    if (!state.success) return;
+    if (!state.success || celebratedStateRef.current === state) return;
+    celebratedStateRef.current = state;
     setSaveSuccess(true);
+    setCelebrating(true);
     notifySuccess(MUTATION_FEEDBACK.profile.saved);
     router.refresh();
-  }, [state.success, router, notifySuccess]);
+  }, [state, router, notifySuccess]);
 
   useEffect(() => {
     if (!state.error && !state.fieldErrors) {
@@ -95,6 +99,15 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     if (!saveSuccess) return;
     setForm(profileToFormState(profile));
   }, [profile, saveSuccess]);
+
+  useEffect(() => {
+    if (!celebrating) return;
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timeout = window.setTimeout(() => setCelebrating(false), reduced ? 1400 : 2200);
+    return () => window.clearTimeout(timeout);
+  }, [celebrating]);
 
   useEffect(() => {
     const errors = state.fieldErrors ?? {};
@@ -124,6 +137,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     setClientError('');
     setClientFieldError(null);
     setSaveSuccess(false);
+    setCelebrating(false);
 
     if (!form.audience_role) {
       const message = 'Choose what you are.';
@@ -154,7 +168,13 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
       {/* The links editor renders its own <form>; nesting forms is invalid
           HTML (the browser drops the inner tag during SSR), so the profile
           form must close before it. */}
-      <form onSubmit={handleSubmit} className="space-y-5" aria-busy={pending} noValidate>
+      <form
+        id="profile-editor"
+        onSubmit={handleSubmit}
+        className="space-y-5"
+        aria-busy={pending}
+        noValidate
+      >
         <div id="audience_role" className="scroll-mt-28">
           <AudienceRoleField
             value={form.audience_role}
@@ -295,28 +315,6 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           <p className="text-[12px] text-[var(--app-smoke)]">Separate skills with commas.</p>
         </div>
 
-        {displayError ? (
-          <p className="text-sm text-red-600" role="alert">
-            {displayError}
-          </p>
-        ) : null}
-
-        <div aria-live="polite">
-          {pending ? (
-            <p className="text-sm text-[var(--app-smoke)]" role="status">
-              Saving your profile…
-            </p>
-          ) : null}
-        </div>
-
-        <button
-          type="submit"
-          className="cc-app-btn cc-app-btn--primary"
-          disabled={pending}
-          aria-busy={pending}
-        >
-          {pending ? 'Saving…' : 'Save changes'}
-        </button>
       </form>
 
       <ProfileLinksEditor links={links} />
@@ -339,6 +337,44 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           ) : null}
         </p>
       ) : null}
+
+      {displayError ? (
+        <p className="text-sm text-red-600" role="alert">
+          {displayError}
+        </p>
+      ) : null}
+
+      <div aria-live="polite">
+        {pending ? (
+          <p className="text-sm text-[var(--app-smoke)]" role="status">
+            Saving your profile…
+          </p>
+        ) : null}
+      </div>
+
+      <button
+        type="submit"
+        form="profile-editor"
+        className={`cc-profile-save${celebrating ? ' cc-profile-save--yes' : ''}`}
+        disabled={pending}
+        aria-busy={pending}
+      >
+        {celebrating ? (
+          <>
+            <span className="cc-profile-save__check" aria-hidden>
+              <svg viewBox="0 0 24 24">
+                <circle className="cc-profile-save__ring" cx="12" cy="12" r="10" />
+                <path className="cc-profile-save__tick" d="M7 12.5 10.2 16 17 8.5" />
+              </svg>
+            </span>
+            <span>Yes. Saved.</span>
+          </>
+        ) : pending ? (
+          'Saving…'
+        ) : (
+          'Save changes'
+        )}
+      </button>
     </div>
   );
 }
