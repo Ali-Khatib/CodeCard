@@ -109,6 +109,8 @@ export function DashboardShell({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [routeProgress, setRouteProgress] = useState<'idle' | 'loading' | 'done'>('idle');
+  const routeLoadingRef = useRef(false);
   const [embedded, setEmbedded] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -144,7 +146,22 @@ export function DashboardShell({
 
   useEffect(() => {
     setPendingHref(null);
+    if (!routeLoadingRef.current) return;
+    routeLoadingRef.current = false;
+    setRouteProgress('done');
   }, [pathname]);
+
+  useEffect(() => {
+    if (!pendingHref || embedded) return;
+    routeLoadingRef.current = true;
+    setRouteProgress('loading');
+  }, [pendingHref, embedded]);
+
+  useEffect(() => {
+    if (routeProgress !== 'done') return;
+    const timeout = window.setTimeout(() => setRouteProgress('idle'), 420);
+    return () => window.clearTimeout(timeout);
+  }, [routeProgress]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -305,7 +322,14 @@ export function DashboardShell({
   return (
     <MutationFeedbackProvider>
     <div className={`cc-app-root ${sidebarOpen ? '' : 'cc-app-root--sidebar-collapsed'} ${preview ? 'cc-app-root--preview' : ''} ${pendingHref && !embedded ? 'cc-app-root--route-pending' : ''} ${embedded ? 'cc-app-root--embedded' : ''}`}>
-      {pendingHref && !embedded && <div className="cc-app-route-progress" aria-hidden />}
+      {!embedded && (pendingHref || routeProgress === 'done') ? (
+        <div
+          className={`cc-app-route-progress${routeProgress === 'done' ? ' cc-app-route-progress--done' : ''}`}
+          aria-hidden
+        >
+          <span className="cc-app-route-progress__bar" />
+        </div>
+      ) : null}
       {isDemoWorkspacePath(basePath) && !embedded ? (
         <Link
           href={MARKETING_HOME_HREF}
@@ -512,7 +536,6 @@ export function DashboardShell({
         <main id={MAIN_CONTENT_ID} tabIndex={-1} className="cc-app-content">
           {pendingHref && !embedded && (
             <div className="cc-app-route-pending" role="status" aria-live="polite">
-              <span className="cc-app-route-pending__pulse" aria-hidden />
               Loading next view
             </div>
           )}
