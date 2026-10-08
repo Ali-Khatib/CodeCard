@@ -70,7 +70,7 @@ export function PublicProfileDock({ backHref, backLabel, hasResearch }: PublicPr
       >
         <PublicProfileBackLink
           href={backHref}
-          className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)] sm:px-3"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-[var(--app-ink)] transition-colors hover:bg-[var(--app-bone)] sm:px-3"
         >
           <span aria-hidden>←</span>
           <span className="hidden truncate sm:inline">{backLabel}</span>
@@ -87,7 +87,7 @@ export function PublicProfileDock({ backHref, backLabel, hasResearch }: PublicPr
               type="button"
               onClick={() => jump(item.id)}
               className={cn(
-                'min-h-9 shrink-0 rounded-full px-2.5 text-[12px] font-medium transition-colors sm:px-3 sm:text-[13px]',
+                'min-h-11 shrink-0 rounded-full px-2.5 text-[13px] font-medium transition-colors sm:px-3.5',
                 active === item.id
                   ? 'bg-[var(--app-ink)] text-[var(--app-paper)]'
                   : 'text-[var(--app-smoke)] hover:bg-[var(--app-bone)] hover:text-[var(--app-ink)]',

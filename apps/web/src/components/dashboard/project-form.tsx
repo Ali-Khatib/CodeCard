@@ -647,7 +647,7 @@ export function ProjectForm({
             </span>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="cc-project-form__tech">
           <input
             id="project-technologies"
             value={techInput}
