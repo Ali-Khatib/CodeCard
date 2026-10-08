@@ -28,6 +28,8 @@ describe('ProjectMediaUpload component', () => {
     expect(component).toContain('ImageCropDialog');
     expect(component).toContain('Edit banner');
     expect(component).toContain('aspect={4 / 1}');
+    expect(component).toContain('ProjectBannerEditor');
+    expect(component).toContain('handleGeneratedBanner');
     expect(component).not.toMatch(/setInterval\s*\([^)]*progress/i);
     expect(component).not.toMatch(/service.?role/i);
   });

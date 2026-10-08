@@ -26,10 +26,10 @@ describe('live notifications', () => {
         id: 'scan-offer-1',
         type: 'activity',
         title: 'Ali Khatib sent a connection request',
-        body: 'Open the corner card to accept or decline.',
+        body: 'Accept, refuse, or decide later.',
         time: '30m ago',
         unread: true,
-        href: '/dashboard/connections',
+        href: 'scan:offer-1',
       },
     ]);
   });

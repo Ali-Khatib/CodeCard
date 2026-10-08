@@ -1182,17 +1182,18 @@ button.cc-app-nav-link:focus-visible {
   min-height: 36px;
   padding: 8px 14px;
   border-radius: 999px;
-  background: var(--app-iris);
-  color: #1a120c;
+  background: var(--app-ink);
+  color: var(--app-paper);
   font-size: 13px;
   font-weight: 650;
   letter-spacing: -0.01em;
   text-decoration: none;
-  box-shadow: 0 8px 16px -12px color-mix(in srgb, var(--app-iris) 80%, transparent);
+  box-shadow: 0 8px 16px -12px rgba(34, 34, 34, 0.45);
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
-    background-color 180ms ease;
+    background-color 180ms ease,
+    color 180ms ease;
   animation: cc-view-card-pulse 2.6s ease-in-out infinite;
 }
 
@@ -1203,13 +1204,13 @@ button.cc-app-nav-link:focus-visible {
 
 .cc-app-user-card__view:hover,
 .cc-app-user-card__view:focus-visible {
-  background: color-mix(in srgb, var(--app-iris) 82%, #fff);
-  color: #1a120c;
+  background: color-mix(in srgb, var(--app-ink) 86%, #fff);
+  color: var(--app-paper);
   text-decoration: none;
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--app-iris) 28%, transparent),
-    0 12px 20px -12px color-mix(in srgb, var(--app-iris) 70%, transparent);
+    0 0 0 3px color-mix(in srgb, var(--app-ink) 14%, transparent),
+    0 12px 20px -12px rgba(34, 34, 34, 0.4);
 }
 
 .cc-app-user-card__view:hover .cc-app-user-card__view-arrow,
@@ -1218,19 +1219,34 @@ button.cc-app-nav-link:focus-visible {
 }
 
 .cc-app-user-card__view:focus-visible {
-  outline: 2px solid #1a120c;
-  outline-offset: 2px;
+  outline: 2px solid var(--app-ink);
+  outline-offset: 3px;
+}
+
+html.dark .cc-app-user-card__view {
+  background: #efedeb;
+  color: #111111;
+}
+
+html.dark .cc-app-user-card__view:hover,
+html.dark .cc-app-user-card__view:focus-visible {
+  background: #ffffff;
+  color: #111111;
+}
+
+html.dark .cc-app-user-card__view:focus-visible {
+  outline-color: #efedeb;
 }
 
 @keyframes cc-view-card-pulse {
   0%,
   100% {
-    box-shadow: 0 8px 16px -12px color-mix(in srgb, var(--app-iris) 80%, transparent);
+    box-shadow: 0 8px 16px -14px rgba(34, 34, 34, 0.35);
   }
   50% {
     box-shadow:
-      0 0 0 4px color-mix(in srgb, var(--app-iris) 24%, transparent),
-      0 10px 18px -12px color-mix(in srgb, var(--app-iris) 75%, transparent);
+      0 0 0 4px color-mix(in srgb, var(--app-ink) 10%, transparent),
+      0 10px 18px -12px rgba(34, 34, 34, 0.32);
   }
 }
 
@@ -3517,6 +3533,13 @@ html.dark .cc-connection-tag.cc-app-badge--mint {
   transform: scale(1.02);
 }
 
+@media (max-width: 720px), (hover: none) {
+  .cc-app-project-card:hover .cc-app-project-card__media-inner,
+  .cc-app-project-card .cc-app-project-card__media-inner {
+    transform: none !important;
+  }
+}
+
 .cc-app-project-card__body {
   padding: 28px;
 }
@@ -5506,31 +5529,42 @@ html.dark .cc-analytics-paper-table__signal-chip {
 }
 
 .cc-home-codecard__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   margin-top: 16px;
   max-width: min(280px, 100%);
   margin-inline: auto;
 }
 
+.cc-home-codecard .cc-public-hero__portrait,
 .cc-home-codecard .cc-public-hero__portrait-frame {
-  max-width: min(280px, 100%);
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+.cc-home-codecard .cc-public-hero__portrait-frame {
   border-radius: 22px;
 }
 
-.cc-home-codecard__panel {
-  margin-top: -2.4rem;
-  margin-inline: 0.5rem;
+.cc-home-codecard .cc-public-hero__panel.cc-home-codecard__panel {
+  width: 100%;
+  max-width: none;
+  margin-top: -2.25rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-inline: 0;
   padding: 1.05rem 1rem 1.15rem;
 }
 
-@container app-main (max-width: 879px) {
-  .cc-home-codecard .cc-public-hero__portrait-frame {
-    max-width: min(220px, 72%);
-  }
+.cc-home-codecard__action {
+  width: 100%;
+  margin-top: 12px;
+}
 
-  .cc-home-codecard__panel {
-    margin-top: -1.5rem;
-    margin-inline: 0;
-  }
+.cc-home-codecard__action .cc-app-btn {
+  width: 100%;
 }
 
 .cc-your-work__header {
@@ -6979,6 +7013,8 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-public-hero__panel {
+  min-width: 0;
+  max-width: 100%;
   /* Isolate panel tokens so light-mode --app-ink never leaks onto the dark card */
   --hero-ink: #f7f2eb;
   /* Near-opaque secondary copy — was ~0.72 and washed out on mid-gray */
@@ -7025,6 +7061,8 @@ html.dark .cc-public-atmosphere__grain {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
+  max-width: 100%;
+  min-width: 0;
   margin-top: 0.7rem;
   font-family: var(--font-instrument), Georgia, serif;
   font-size: clamp(17px, 2vw, 20px);
@@ -7328,9 +7366,32 @@ html.dark .cc-public-atmosphere__grain {
 .cc-public-hero__history-value {
   display: block;
   margin-top: 0.15rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-size: 15px;
   line-height: 1.35;
   color: var(--hero-ink);
+}
+
+/* Size the flip to whichever face is taller so phone history is never clipped. */
+.cc-public-hero__flip-scene .cc-flip-card__rotator {
+  display: grid;
+}
+
+.cc-public-hero__flip-scene .cc-flip-card__face--front,
+.cc-public-hero__flip-scene .cc-flip-card__face--back {
+  grid-area: 1 / 1;
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+.cc-public-hero__flip-scene .cc-public-hero__eyebrow {
+  max-width: 100%;
+  padding-right: 3.4rem;
 }
 
 .cc-public-hero__flip-footer {
@@ -7873,11 +7934,88 @@ html.dark .cc-public-atmosphere__grain {
   letter-spacing: -0.02em;
 }
 
-.cc-public-profile--founder .cc-founder-roles > span {
+.cc-headline-roles--stacked,
+.cc-public-profile--founder .cc-founder-roles.cc-headline-roles--stacked {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.cc-headline-roles,
+.cc-headline-roles__rest,
+.cc-headline-roles__inline {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cc-headline-roles__rest,
+.cc-headline-roles__inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 0.2rem;
+}
+
+.cc-headline-roles__pair,
+.cc-headline-roles__item {
+  display: inline-flex;
+  align-items: flex-start;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cc-headline-roles__item {
+  gap: 0.35rem;
+}
+
+.cc-headline-roles__item > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cc-headline-roles__sep {
+  margin-inline: 0.45rem;
+  opacity: 0.7;
+}
+
+.cc-headline-field__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cc-headline-field__line .cc-app-input {
+  flex: 1 1 10rem;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cc-headline-field__icon {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: transparent;
+  color: var(--app-smoke);
+}
+
+.cc-headline-field__icon.is-selected {
+  border-color: var(--app-ink);
+  color: var(--app-ink);
+  background: color-mix(in srgb, var(--app-ink) 8%, transparent);
+}
+
+.cc-headline-field__icon:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: 2px;
 }
 
 .cc-founder-roles__lead {
@@ -7885,9 +8023,9 @@ html.dark .cc-public-atmosphere__grain {
   font-weight: 560;
 }
 
-.cc-founder-roles__sep {
-  margin-inline: 0.45rem;
+.cc-public-profile--founder .cc-headline-roles__sep {
   color: rgba(201, 162, 39, 0.7);
+  opacity: 1;
   font-weight: 400;
 }
 
@@ -8006,4 +8144,31 @@ html.dark .cc-public-atmosphere__grain {
   .cc-founder-greeting--out {
     animation: none;
   }
+}
+
+/* Face-to-face handshake. Always centered on a phone, above the tab bar. */
+.cc-handshake-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    16px
+    max(16px, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, #100e0c 42%, transparent);
+  overflow: auto;
+}
+
+.cc-handshake-sheet {
+  width: min(22.5rem, 100%);
+  max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)) - 32px);
+  overflow: auto;
+  border-radius: 1.25rem;
+  border: 1px solid var(--app-border, rgba(0, 0, 0, 0.08));
+  background: var(--app-paper, #fff);
+  color: var(--app-ink, #232324);
+  box-shadow: 0 24px 60px rgba(16, 14, 12, 0.28);
 }

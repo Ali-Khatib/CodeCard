@@ -20,6 +20,7 @@ import {
 } from '@/lib/profile/update-profile-action';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
+import { HeadlineField } from '@/components/profile/headline-field';
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -33,6 +34,8 @@ const PROFILE_FIELD_IDS: Record<string, string> = {
   headline: 'headline',
   bio: 'bio',
   location: 'location',
+  history_before: 'history_before',
+  history_studied: 'history_studied',
   skills: 'skills',
   audience_role: 'audience_role',
 };
@@ -179,17 +182,11 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           ) : null}
         </div>
 
-        <div className="space-y-2 scroll-mt-28" id="headline-field">
-          <FieldLabel htmlFor="headline">Headline</FieldLabel>
-          <input
-            id="headline"
-            name="headline"
-            className="cc-app-input scroll-mt-28"
-            value={form.headline}
-            onChange={(e) => setForm({ ...form, headline: e.target.value })}
-            placeholder="e.g. Full-stack engineer building developer tools"
-          />
-        </div>
+        <HeadlineField
+          value={form.headline}
+          disabled={pending}
+          onChange={(headline) => setForm({ ...form, headline })}
+        />
 
         <div className="space-y-2 scroll-mt-28">
           <FieldLabel htmlFor="slug">Profile URL</FieldLabel>
@@ -237,6 +234,53 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
             Optional. Leave it blank and your card simply will not show a city.
           </p>
         </div>
+
+        <fieldset className="m-0 w-full min-w-0 space-y-3 rounded-xl border border-[var(--app-border)] p-3">
+          <legend className="px-1 text-[13px] font-medium text-[var(--app-ink)]">Card history</legend>
+          <p id="history-hint" className="text-[12px] leading-relaxed text-[var(--app-smoke)]">
+            Optional, and worth filling in. Spin the card and these lines show on the back, under
+            your name. Your headline is Now and your city is Based, so you only add what is missing.
+            Leave them blank and the back stays a short snapshot.
+          </p>
+          <div className="space-y-2">
+            <FieldLabel htmlFor="history_before">Before</FieldLabel>
+            <input
+              id="history_before"
+              name="history_before"
+              className="cc-app-input"
+              value={form.history_before}
+              maxLength={80}
+              onChange={(e) => setForm({ ...form, history_before: e.target.value })}
+              placeholder="Early engineer at a startup"
+              aria-invalid={Boolean(fieldErrors.history_before)}
+              aria-describedby="history-hint"
+            />
+            {fieldErrors.history_before ? (
+              <p className="text-sm text-red-600" role="alert">
+                {fieldErrors.history_before}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-2">
+            <FieldLabel htmlFor="history_studied">Studied</FieldLabel>
+            <input
+              id="history_studied"
+              name="history_studied"
+              className="cc-app-input"
+              value={form.history_studied}
+              maxLength={80}
+              onChange={(e) => setForm({ ...form, history_studied: e.target.value })}
+              placeholder="B.S. Computer Science"
+              aria-invalid={Boolean(fieldErrors.history_studied)}
+              aria-describedby="history-hint"
+            />
+            {fieldErrors.history_studied ? (
+              <p className="text-sm text-red-600" role="alert">
+                {fieldErrors.history_studied}
+              </p>
+            ) : null}
+          </div>
+        </fieldset>
 
         <div className="space-y-2 scroll-mt-28" id="skills-field">
           <FieldLabel htmlFor="skills">Skills</FieldLabel>

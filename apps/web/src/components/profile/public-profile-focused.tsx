@@ -1,14 +1,14 @@
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Briefcase, Code2, FlaskConical, MapPin, type LucideIcon } from 'lucide-react';
-import { parseHeadline } from '@/lib/profile/parse-headline';
+import { MapPin, type LucideIcon } from 'lucide-react';
+import { HeadlineRoles } from '@/components/profile/headline-roles';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { MAIN_CONTENT_ID } from '@/lib/a11y/main-content';
-import { profileQuickHistory } from '@/lib/profile/quick-history';
+import { profileQuickHistory, type CardHistory } from '@/lib/profile/quick-history';
 import { PublicProfileBackLink } from './public-profile-back-link';
 import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
@@ -39,8 +39,6 @@ const PublicProfileDock = dynamic(
   { ssr: true },
 );
 
-const FOUNDER_ROLE_ICONS: LucideIcon[] = [Briefcase, Code2, FlaskConical];
-
 function LineIcon({ icon: Icon }: { icon: LucideIcon }) {
   return <Icon className="cc-public-hero__line-icon" aria-hidden />;
 }
@@ -60,6 +58,7 @@ export function PublicProfileFocused({
   researchPapers = [],
   profileId,
   location,
+  cardHistory,
   connectionControl,
 }: {
   profileSlug: string;
@@ -72,6 +71,7 @@ export function PublicProfileFocused({
   researchPapers?: ResearchPaper[];
   profileId?: string;
   location?: string | null;
+  cardHistory?: CardHistory | null;
   connectionControl?: {
     isOwnProfile: boolean;
     isAuthenticated: boolean;
@@ -79,19 +79,13 @@ export function PublicProfileFocused({
     initialConnectionId: string | null;
   } | null;
 }) {
-  const { role, company } = parseHeadline(headline);
   const founder = isFounderProfile({ profileId, profileSlug });
-  const founderRoles = founder
-    ? (headline ?? '')
-        .split('·')
-        .map((part) => part.trim())
-        .filter(Boolean)
-    : [];
   const history = profileQuickHistory({
     profileSlug,
     headline,
     location,
     bio,
+    history: cardHistory,
   });
   const safeLinks = toSafeProfileLinkItems(links);
   const intro =
@@ -166,37 +160,7 @@ export function PublicProfileFocused({
               <h1 className="cc-public-hero__title mt-2 break-words text-[clamp(1.85rem,6vw,2.65rem)] font-medium tracking-[-0.035em]">
                 {displayName}
               </h1>
-              {founder && founderRoles.length > 0 ? (
-                <p className="cc-founder-roles">
-                  {founderRoles.map((part, index) => {
-                    const Icon = FOUNDER_ROLE_ICONS[index] ?? Briefcase;
-                    return (
-                      <span key={part}>
-                        <LineIcon icon={Icon} />
-                        <span className={index === 0 ? 'cc-founder-roles__lead' : undefined}>{part}</span>
-                        {index < founderRoles.length - 1 ? (
-                          <span className="cc-founder-roles__sep" aria-hidden>
-                            ·
-                          </span>
-                        ) : null}
-                      </span>
-                    );
-                  })}
-                </p>
-              ) : role ? (
-                <p className="cc-public-hero__headline">
-                  <LineIcon icon={Briefcase} />
-                  <span>
-                    {role}
-                    {company ? (
-                      <>
-                        <span aria-hidden> · </span>
-                        {company}
-                      </>
-                    ) : null}
-                  </span>
-                </p>
-              ) : null}
+              <HeadlineRoles headline={headline} founder={founder} />
               {location ? (
                 <p className="cc-public-hero__place">
                   <LineIcon icon={MapPin} />

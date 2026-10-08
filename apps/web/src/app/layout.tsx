@@ -4,6 +4,7 @@ import { Instrument_Serif, Inter, Orbitron, Share_Tech_Mono, Space_Mono } from '
 import { SkipToContentLink } from '@/components/a11y/skip-to-content';
 import { AuthHashRecoveryCatcher } from '@/components/auth/auth-hash-recovery-catcher';
 import { SessionLeaseKeeper } from '@/components/auth/session-lease-keeper';
+import { AuthenticatedConnectionHost } from '@/components/dashboard/authenticated-connection-host';
 import { DeferredVercelTelemetry } from '@/components/telemetry/deferred-vercel-telemetry';
 import './globals.css';
 
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContentLink />
         <SessionLeaseKeeper />
         <AuthHashRecoveryCatcher />
+        <AuthenticatedConnectionHost />
         {children}
         <DeferredVercelTelemetry />
       </body>

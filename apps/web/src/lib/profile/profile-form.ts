@@ -12,6 +12,8 @@ export type ProfileFormState = {
   slug: string;
   bio: string;
   location: string;
+  history_before: string;
+  history_studied: string;
   skillsInput: string;
   is_public: boolean;
   audience_role: string;
@@ -24,6 +26,8 @@ export function profileToFormState(profile: Profile): ProfileFormState {
     slug: profile.slug,
     bio: profile.bio ?? '',
     location: profile.location ?? '',
+    history_before: profile.card_history?.before ?? '',
+    history_studied: profile.card_history?.studied ?? '',
     skillsInput: (profile.skills ?? []).join(', '),
     is_public: profile.is_public,
     audience_role: profile.audience_role ?? '',
@@ -39,6 +43,10 @@ export function formStateToUpdatePayload(
     slug: form.slug,
     bio: form.bio || null,
     location: form.location,
+    card_history: {
+      before: form.history_before,
+      studied: form.history_studied,
+    },
     skills: parseCommaSeparatedSkills(form.skillsInput),
     is_public: form.is_public,
     audience_role: isAudienceRole(form.audience_role) ? form.audience_role : null,
@@ -54,7 +62,12 @@ export function parseProfileUpdate(
   const parsed = updateProfileSchema.safeParse(payload);
   if (!parsed.success) {
     const first = parsed.error.errors[0];
-    const field = first?.path[0];
+    const path = first?.path ?? [];
+    const field = path.includes('before')
+      ? 'history_before'
+      : path.includes('studied')
+        ? 'history_studied'
+        : path[0];
     return {
       success: false,
       message: first?.message ?? 'Invalid input',

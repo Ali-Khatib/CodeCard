@@ -13,8 +13,6 @@ import { listCircleFeed } from '@/lib/circle/circle-feed-core';
 import { getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 import { loadHomeSchedule } from '@/lib/schedule/home-schedule-core';
-import { listPendingScanOffers } from '@/lib/connections/scan-offers-core';
-import { HomeScanOffers } from '@/components/dashboard/home-scan-offers';
 import { loadOwnerProfile, OWNER_HOME_PROFILE_COLUMNS } from '@/lib/profile/owner-profile';
 import type { Profile } from '@codecard/types';
 
@@ -38,14 +36,13 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult, contentResult, circleFeed, schedule, scanOffers] =
+  const [completionResult, analyticsResult, contentResult, circleFeed, schedule] =
     await Promise.all([
     loadProfileCompletion(supabase, profile),
     loadOwnerAnalytics(supabase, user!.id),
     loadOwnerOverviewContent(supabase, user!.id),
     listCircleFeed(supabase, { limit: 3, filter: 'all' }),
     loadHomeSchedule(supabase, { user: user! }),
-    listPendingScanOffers(supabase, { user: user! }),
   ]);
 
   if (!completionResult.ok) {
@@ -105,7 +102,6 @@ export default async function DashboardHomePage() {
 
   return (
     <>
-      <HomeScanOffers initialOffers={scanOffers.offers} />
       <DashboardOverviewView
       greeting={greetingForHour()}
       displayName={displayName}

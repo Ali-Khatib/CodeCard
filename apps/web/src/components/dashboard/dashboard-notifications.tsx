@@ -10,9 +10,13 @@ import {
   type CSSProperties,
 } from 'react';
 import { listPendingScanOffersAction } from '@/app/actions/scan-offers';
-import { listDueFollowUpRemindersAction } from '@/app/actions/follow-up-reminders';
+import { listConnectionDetailNudgesAction, listDueFollowUpRemindersAction } from '@/app/actions/follow-up-reminders';
 import { scanOffersToNotifications } from '@/lib/dashboard/live-notifications';
-import { followUpsToNotifications } from '@/lib/connections/follow-up-reminders';
+import { clearScanOfferSnooze } from '@/lib/connections/scan-offer-snooze';
+import {
+  detailNudgesToNotifications,
+  followUpsToNotifications,
+} from '@/lib/connections/follow-up-reminders';
 import { DEMO_NOTIFICATIONS, type DashboardNotification } from '@/lib/dashboard/notifications-demo';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 
@@ -45,9 +49,10 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
 
     const load = async () => {
       try {
-        const [offersResult, followUpsResult] = await Promise.all([
+        const [offersResult, followUpsResult, nudgesResult] = await Promise.all([
           listPendingScanOffersAction(),
           listDueFollowUpRemindersAction(),
+          listConnectionDetailNudgesAction(),
         ]);
         if (cancelled) return;
         const offerItems = offersResult.error
@@ -56,15 +61,23 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
         const followUpItems = followUpsResult.error
           ? []
           : followUpsToNotifications(followUpsResult.reminders, basePath);
-        setItems([...offerItems, ...followUpItems]);
+        const nudgeItems = nudgesResult.error
+          ? []
+          : detailNudgesToNotifications(nudgesResult.reminders);
+        setItems([...offerItems, ...nudgeItems, ...followUpItems]);
       } catch {
         // Network blip / aborted POST while navigating — leave bell empty.
       }
     };
 
     void load();
+    const id = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
+      void load();
+    }, 8_000);
     return () => {
       cancelled = true;
+      window.clearInterval(id);
     };
   }, [basePath, demoMode]);
 
@@ -106,6 +119,28 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
 
   const markAllRead = () => {
     setItems((prev) => prev.map((n) => ({ ...n, unread: false })));
+  };
+
+  const openItem = (href: string | undefined) => {
+    if (!href) return false;
+    if (href.startsWith('scan:')) {
+      clearScanOfferSnooze(href.slice(5));
+      window.dispatchEvent(new CustomEvent('cc-open-scan-offer', { detail: href.slice(5) }));
+      setOpen(false);
+      return true;
+    }
+    if (href.startsWith('details:')) {
+      const [, id, encodedName] = href.split(':');
+      if (!id) return false;
+      window.dispatchEvent(
+        new CustomEvent('cc-open-connection-details', {
+          detail: { id, name: decodeURIComponent(encodedName ?? '') },
+        }),
+      );
+      setOpen(false);
+      return true;
+    }
+    return false;
   };
 
   const resolveHref = (href?: string) => {
@@ -185,8 +220,11 @@ export function DashboardNotifications({ basePath = '/dashboard' }: { basePath?:
                 {items.map((n) => (
                   <li key={n.id}>
                     <Link
-                      href={resolveHref(n.href)}
-                      onClick={() => setOpen(false)}
+                      href={n.href?.startsWith('scan:') || n.href?.startsWith('details:') ? '#' : resolveHref(n.href)}
+                      onClick={(event) => {
+                        if (openItem(n.href)) event.preventDefault();
+                        else setOpen(false);
+                      }}
                       className={`flex gap-3 px-4 py-3 transition-colors hover:bg-[var(--app-bone)] ${
                         n.unread ? 'bg-[var(--app-rose-mist)]' : ''
                       }`}

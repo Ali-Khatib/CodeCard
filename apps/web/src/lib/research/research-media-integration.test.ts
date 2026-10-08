@@ -16,6 +16,7 @@ describe('WS05-T011 research media integration', () => {
     expect(page).toContain('ResearchMediaSection');
     expect(media).toContain('CodeCard-hosted PDF uploads are unavailable');
     expect(media).toContain('ResearchFigureManager');
+    expect(media).toContain('ResearchBannerUpload');
     expect(media).toContain('Open external paper');
     expect(media).not.toContain('private-doc');
     expect(media).not.toContain('dangerouslySetInnerHTML');

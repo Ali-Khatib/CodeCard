@@ -33,10 +33,10 @@ export function scanOffersToNotifications(
     type: 'activity',
     title: `${offer.scannerName} sent a connection request`,
     body: offer.scannerHeadline
-      ? `${offer.scannerHeadline} — open the corner card to accept.`
-      : 'Open the corner card to accept or decline.',
+      ? `${offer.scannerHeadline} — accept, refuse, or decide later.`
+      : 'Accept, refuse, or decide later.',
     time: formatNotificationTime(offer.createdAt, now),
     unread: true,
-    href: `${basePath}/connections`,
+    href: `scan:${offer.id}`,
   }));
 }

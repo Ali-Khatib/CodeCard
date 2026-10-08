@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROJECT_SCREENSHOT_MAX_COUNT } from '@codecard/validation';
 import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
+import { ProjectBannerEditor } from '@/components/dashboard/project-banner-editor';
 import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import { AppButton } from '@/components/dashboard/ui/dashboard-ui';
@@ -36,6 +37,8 @@ type ProjectMediaUploadProps = {
   screenshots: ProjectMediaAssetRecord[];
   coverUrl: string | null;
   screenshotUrls: Record<string, string>;
+  projectTitle?: string;
+  projectTagline?: string;
   disabled?: boolean;
 };
 
@@ -76,6 +79,8 @@ export function ProjectMediaUpload({
   coverUrl,
   screenshots,
   screenshotUrls,
+  projectTitle = '',
+  projectTagline = '',
   disabled = false,
 }: ProjectMediaUploadProps) {
   const router = useRouter();
@@ -232,8 +237,8 @@ export function ProjectMediaUpload({
     [coverPreviewUrl, revokeCoverCropSource, revokePreviewUrl, trackPreviewUrl],
   );
 
-  const handleCoverUpload = useCallback(async () => {
-    if (coverPending || disabled || !coverFile || coverInFlightRef.current) return;
+  const uploadCoverFile = useCallback(async (file: File, previewUrl: string | null) => {
+    if (coverPending || disabled || coverInFlightRef.current) return;
 
     coverInFlightRef.current = true;
     setCoverError('');
@@ -243,7 +248,6 @@ export function ProjectMediaUpload({
     setCoverOptimizationNote(null);
     setCoverProgress(null);
 
-    const file = coverFile;
     const controller = new AbortController();
     coverAbortRef.current = controller;
 
@@ -287,8 +291,8 @@ export function ProjectMediaUpload({
     setCoverFile(null);
     if (coverInputRef.current) coverInputRef.current.value = '';
 
-    if (coverPreviewUrl) {
-      setSavedCoverUrl(coverPreviewUrl);
+    if (previewUrl) {
+      setSavedCoverUrl(previewUrl);
     }
     setSavedCover({
       id: result.assetId,
@@ -310,7 +314,28 @@ export function ProjectMediaUpload({
       setCoverOptimizationNote(null);
       setCoverStage('idle');
     }, 2500);
-  }, [coverFile, coverPending, coverPreviewUrl, disabled, projectId, router]);
+  }, [coverPending, disabled, projectId, router]);
+
+  const handleCoverUpload = useCallback(async () => {
+    if (!coverFile) return;
+    await uploadCoverFile(coverFile, coverPreviewUrl);
+  }, [coverFile, coverPreviewUrl, uploadCoverFile]);
+
+  const handleGeneratedBanner = useCallback(
+    async (file: File) => {
+      if (coverPreviewUrl) revokePreviewUrl(coverPreviewUrl);
+      const objectUrl = URL.createObjectURL(file);
+      trackPreviewUrl(objectUrl);
+      setCoverPreviewUrl(objectUrl);
+      setCoverFile(file);
+      setCoverStage('idle');
+      setCoverError('');
+      setCoverRetryable(false);
+      setCoverSuccess(false);
+      await uploadCoverFile(file, objectUrl);
+    },
+    [coverPreviewUrl, revokePreviewUrl, trackPreviewUrl, uploadCoverFile],
+  );
 
   const handleCancelCoverUpload = useCallback(() => {
     if (!coverPending) return;
@@ -556,8 +581,8 @@ export function ProjectMediaUpload({
           Project media
         </h2>
         <p id="project-media-constraints" className="mt-2 text-[14px] text-[var(--app-smoke)]">
-          Add a wide banner above the project, plus screenshots for the gallery. JPEG, PNG, or
-          WebP up to 5 MB each. The banner crop is 4:1 so the card does not cut it off.
+          Design a banner with your own words and colors, or upload a wide image. Screenshots stay
+          in the gallery. JPEG, PNG, or WebP up to 5 MB each.
         </p>
       </div>
 
@@ -579,6 +604,13 @@ export function ProjectMediaUpload({
 
       <div className="space-y-3" data-testid="project-cover-upload">
         <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Banner</h3>
+        <ProjectBannerEditor
+          defaultTitle={projectTitle}
+          defaultSubtitle={projectTagline}
+          disabled={disabled || coverPending}
+          onSave={handleGeneratedBanner}
+        />
+        <p className="text-[13px] text-[var(--app-smoke)]">Or upload your own image.</p>
         <div className="flex flex-wrap items-start gap-4">
           <div className="relative aspect-[4/1] w-full max-w-[28rem] overflow-hidden rounded-xl border border-[var(--app-border)] bg-[#141311]">
             {displayCoverUrl ? (
@@ -625,7 +657,7 @@ export function ProjectMediaUpload({
               {coverFile && !coverPending && coverStage !== 'failed' && coverStage !== 'cancelled' && (
                 <>
                   <AppButton type="button" variant="primary" onClick={handleCoverUpload}>
-                    {hasCover ? 'Upload replacement' : 'Upload cover'}
+                    {hasCover ? 'Upload replacement' : 'Upload banner'}
                   </AppButton>
                   <AppButton type="button" variant="ghost" onClick={resetCoverSelection}>
                     Cancel
@@ -687,8 +719,8 @@ export function ProjectMediaUpload({
                   ? coverCleanupWarning
                     ? messageForUploadFailure('cleanup_warning')
                     : coverOptimizationNote
-                      ? `Cover saved. ${coverOptimizationNote}.`
-                      : 'Cover saved.'
+                      ? `Banner saved. ${coverOptimizationNote}.`
+                      : 'Banner saved.'
                   : coverCleanupWarning
                     ? messageForUploadFailure('cleanup_warning')
                     : '')}

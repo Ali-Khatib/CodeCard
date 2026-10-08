@@ -1,10 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { createClient } from '@/lib/supabase/client';
 import { PublicProfileBackLink } from './public-profile-back-link';
 import { cn } from '@/lib/utils';
 import { scrollBehaviorForPreference } from '@/hooks/use-reduced-motion';
+
+const DashboardNotifications = dynamic(
+  () =>
+    import('@/components/dashboard/dashboard-notifications').then(
+      (mod) => mod.DashboardNotifications,
+    ),
+  { ssr: false },
+);
 
 const SECTIONS = [
   { id: 'profile-hero', label: 'Profile' },
@@ -89,10 +99,36 @@ export function PublicProfileDock({ backHref, backLabel, hasResearch }: PublicPr
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center">
+        <div className="flex shrink-0 items-center gap-0.5">
+          <DockNotifications />
           <ThemeToggle className="shrink-0" />
         </div>
       </div>
     </div>
   );
+}
+
+function DockNotifications() {
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!cancelled) setSignedIn(Boolean(user));
+      } catch {
+        if (!cancelled) setSignedIn(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!signedIn) return null;
+  return <DashboardNotifications basePath="/dashboard" />;
 }

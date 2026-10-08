@@ -24,9 +24,28 @@ describe('profileQuickHistory', () => {
     });
 
     expect(lines).toEqual([
-      { label: 'Now', value: 'Staff Engineer · Notion' },
-      { label: 'Based', value: 'NYC' },
-      { label: 'Before', value: 'Founding engineer at a data startup' },
+      { label: 'Now', value: 'Staff Engineer · Notion', icon: 'now' },
+      { label: 'Before', value: 'Founding engineer at a data startup', icon: 'before' },
+      { label: 'Based', value: 'NYC', icon: 'based' },
+    ]);
+  });
+
+  it('shows saved history on the back and skips blank lines', () => {
+    const lines = profileQuickHistory({
+      profileSlug: 'maya',
+      headline: 'Staff Engineer',
+      location: '',
+      bio: 'Previously founding engineer at a data startup.',
+      history: {
+        before: 'Research intern',
+        studied: 'M.S. Computer Science',
+      },
+    });
+
+    expect(lines).toEqual([
+      { label: 'Now', value: 'Staff Engineer', icon: 'now' },
+      { label: 'Before', value: 'Research intern', icon: 'before' },
+      { label: 'Studied', value: 'M.S. Computer Science', icon: 'studied' },
     ]);
   });
 });

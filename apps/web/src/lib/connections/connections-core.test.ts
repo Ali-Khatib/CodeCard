@@ -4,6 +4,7 @@ import {
   executeAddConnection,
   executeConnectionStatus,
   executeRemoveConnection,
+  executeRequestQrConnection,
   listOwnerConnections,
 } from './connections-core';
 
@@ -288,6 +289,22 @@ function createMockSupabase(options: MockOptions = {}) {
     connections,
   };
 }
+
+describe('executeRequestQrConnection', () => {
+  it('asks the other person without creating a saved connection', async () => {
+    const { client, insert } = createMockSupabase({
+      targetById: { [TARGET_PROFILE_ID]: publishedTarget },
+    });
+    const result = await executeRequestQrConnection(
+      client,
+      { targetProfileId: TARGET_PROFILE_ID, source: 'qr' },
+      { user: { id: OWNER_USER } },
+    );
+    expect(result.success).toBe(true);
+    expect(result.requested).toBe(true);
+    expect(insert).not.toHaveBeenCalled();
+  });
+});
 
 describe('executeAddConnection', () => {
   it('rejects anonymous users', async () => {

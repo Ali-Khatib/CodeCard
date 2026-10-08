@@ -8,6 +8,7 @@ import { normalizeResearchPaper } from '@/lib/research/research';
 import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
 import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
 import { PublicProfileExperience } from '@/components/profile/public-profile-experience';
+import { readCardHistory } from '@/lib/profile/quick-history';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import Link from 'next/link';
@@ -111,6 +112,7 @@ export default async function OwnerProfilePreviewPage() {
         researchPapers={publishedResearch}
         profileId={profile.id}
         location={profile.location}
+        cardHistory={readCardHistory(profile.card_history)}
       />
     </>
   );

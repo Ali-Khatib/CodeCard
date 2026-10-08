@@ -1,3 +1,4 @@
+import { headlinePlainText } from '@/lib/profile/headline-roles';
 import {
   normalizePublicMetadataText,
   PUBLIC_OG_IMAGE_HEIGHT,
@@ -40,7 +41,7 @@ export function buildPublicProfileOgCard(input: {
   return {
     eyebrow: 'CodeCard profile',
     title: safeOgLine(input.displayName, 48) || 'CodeCard',
-    subtitle: safeOgLine(input.headline, 90) || null,
+    subtitle: safeOgLine(headlinePlainText(input.headline), 90) || null,
     handle: handle ? `@${handle}` : null,
   };
 }

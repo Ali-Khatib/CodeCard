@@ -77,6 +77,10 @@ export default async function EditResearchPage({
         researchPaperId={id}
         pdfUrl={loaded.paper.pdf_url}
         figures={figures}
+        title={loaded.paper.title}
+        venue={loaded.paper.venue}
+        publicationStatus={loaded.paper.publication_status}
+        coverUrl={loaded.paper.cover_image_url}
       />
       <ResearchDeleteDialog researchPaperId={id} paperTitle={loaded.paper.title} />
     </div>

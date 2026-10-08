@@ -2,6 +2,7 @@ import { PublicProfileFocused } from './public-profile-focused';
 import type { FeaturedProject } from '@/lib/projects/featured';
 import type { ResearchPaper } from '@/lib/research/research';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
+import type { CardHistory } from '@/lib/profile/quick-history';
 
 interface PublicProfileExperienceProps {
   profileSlug: string;
@@ -15,6 +16,7 @@ interface PublicProfileExperienceProps {
   profileId?: string;
   accentColor?: string;
   location?: string | null;
+  cardHistory?: CardHistory | null;
   connectionControl?: {
     isOwnProfile: boolean;
     isAuthenticated: boolean;
@@ -35,6 +37,7 @@ export function PublicProfileExperience({
   researchPapers = [],
   profileId,
   location,
+  cardHistory,
   connectionControl,
 }: PublicProfileExperienceProps) {
   return (
@@ -49,6 +52,7 @@ export function PublicProfileExperience({
       researchPapers={researchPapers}
       profileId={profileId}
       location={location}
+      cardHistory={cardHistory}
       connectionControl={connectionControl}
     />
   );

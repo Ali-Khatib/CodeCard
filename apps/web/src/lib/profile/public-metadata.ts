@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headlinePlainText } from '@/lib/profile/headline-roles';
 import { stripControlChars } from '@/lib/security/sanitize';
 import { buildPublicProjectDetailHref } from '@/lib/projects/project-navigation';
 
@@ -71,10 +72,11 @@ export function buildPublicProfileMetadata(input: {
   bio?: string | null;
 }): Metadata {
   const displayName = normalizePublicMetadataText(input.displayName, 80) || 'CodeCard';
-  const headline = normalizePublicMetadataText(input.headline, PUBLIC_METADATA_DESCRIPTION_MAX);
+  const plainHeadline = headlinePlainText(input.headline);
+  const headline = normalizePublicMetadataText(plainHeadline, PUBLIC_METADATA_DESCRIPTION_MAX);
   const bio = normalizePublicMetadataText(input.bio, PUBLIC_METADATA_DESCRIPTION_MAX);
   const description = headline || bio || `${displayName} on CodeCard`;
-  const titleRole = normalizePublicMetadataText(input.headline, 60);
+  const titleRole = normalizePublicMetadataText(plainHeadline, 60);
   const title = titleRole ? `${displayName} — ${titleRole}` : displayName;
   const canonical = buildPublicProfilePath(input.profileSlug);
   const image = socialImageEntry(canonical);

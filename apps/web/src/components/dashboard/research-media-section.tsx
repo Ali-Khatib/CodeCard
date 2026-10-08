@@ -1,6 +1,7 @@
 'use client';
 
 import { externalPdfHostname } from '@codecard/validation';
+import { ResearchBannerUpload } from '@/components/dashboard/research-banner-upload';
 import { ResearchFigureManager } from '@/components/dashboard/research-figure-manager';
 import type { ResearchFigureRecord } from '@/lib/research/research-figure-core';
 
@@ -8,10 +9,18 @@ export function ResearchMediaSection({
   researchPaperId,
   pdfUrl,
   figures,
+  title,
+  venue,
+  publicationStatus,
+  coverUrl,
 }: {
   researchPaperId: string;
   pdfUrl: string | null;
   figures: ResearchFigureRecord[];
+  title: string;
+  venue: string | null;
+  publicationStatus: string | null;
+  coverUrl: string | null;
 }) {
   const host = pdfUrl ? externalPdfHostname(pdfUrl) : null;
 
@@ -53,6 +62,14 @@ export function ResearchMediaSection({
           above.
         </p>
       </div>
+
+      <ResearchBannerUpload
+        researchPaperId={researchPaperId}
+        title={title}
+        venue={venue}
+        publicationStatus={publicationStatus}
+        coverUrl={coverUrl}
+      />
 
       <ResearchFigureManager researchPaperId={researchPaperId} initialFigures={figures} />
     </section>

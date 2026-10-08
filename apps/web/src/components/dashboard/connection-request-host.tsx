@@ -6,12 +6,19 @@ import { AUDIENCE_ROLE_LABELS, isAudienceRole } from '@codecard/validation';
 import {
   acceptScanOfferAction,
   dismissScanOfferAction,
+  finalizeAcceptedScanConnectionsAction,
   listPendingScanOffersAction,
   type ScanOfferCard,
 } from '@/app/actions/scan-offers';
 import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
+import { HandshakePortal } from '@/components/connections/handshake-portal';
 import { IncomingCall } from '@/components/ui/card-16';
 import { Button } from '@/components/ui/button';
+import {
+  clearScanOfferSnooze,
+  isScanOfferSnoozed,
+  snoozeScanOffer,
+} from '@/lib/connections/scan-offer-snooze';
 import { toDateInputValue } from '@/lib/schedule/datetime';
 
 type Stage = 'alert' | 'decision' | 'details';
@@ -28,10 +35,10 @@ function tomorrowIsoDate(): string {
 }
 
 /**
- * Corner connection-request experience:
- * 1) Fun alert toast → OK
- * 2) Incoming-call style card with Accept / Decline
- * 3) Where / when / note, or Do later (follow-up reminder)
+ * Phone handshake for a connection request:
+ * 1) Incoming-call card — Accept, Refuse, or Decide later
+ * 2) Where / when / note, or Do later (bell reminder)
+ * Decide later keeps the request in the top-right notifications box.
  */
 export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean }) {
   const [offers, setOffers] = useState<ScanOfferCard[]>([]);
@@ -45,10 +52,16 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
   const [when, setWhen] = useState(toDateInputValue(new Date().toISOString()));
   const [note, setNote] = useState('');
 
-  const active = useMemo(
-    () => offers.find((offer) => offer.id === activeId) ?? offers[0] ?? null,
-    [offers, activeId],
-  );
+  const active = useMemo(() => {
+    const pinned = offers.find((offer) => offer.id === activeId);
+    if (pinned) return pinned;
+    return offers.find((offer) => !isScanOfferSnoozed(offer.id)) ?? null;
+  }, [offers, activeId]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    void finalizeAcceptedScanConnectionsAction();
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -60,8 +73,10 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
         if (cancelled || result.error) return;
         setOffers(result.offers);
         setActiveId((prev) => {
-          if (prev && result.offers.some((o) => o.id === prev)) return prev;
-          return result.offers[0]?.id ?? null;
+          if (prev && result.offers.some((o) => o.id === prev) && !isScanOfferSnoozed(prev)) {
+            return prev;
+          }
+          return result.offers.find((offer) => !isScanOfferSnoozed(offer.id))?.id ?? null;
         });
       } catch {
         // ignore transient failures
@@ -70,8 +85,9 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
 
     void load();
     const id = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
       void load();
-    }, 10_000);
+    }, 3_000);
     return () => {
       cancelled = true;
       window.clearInterval(id);
@@ -79,12 +95,43 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
   }, [enabled]);
 
   useEffect(() => {
+    if (!enabled) return;
+    const onOpenOffer = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      if (!id) return;
+      clearScanOfferSnooze(id);
+      setActiveId(id);
+      setStage('decision');
+      setError(null);
+    };
+    const onOpenDetails = (event: Event) => {
+      const detail = (event as CustomEvent<{ id: string; name: string }>).detail;
+      if (!detail?.id) return;
+      setAcceptedConnectionId(detail.id);
+      setAcceptedName(detail.name || 'them');
+      setWhere('');
+      setWhen(toDateInputValue(new Date().toISOString()));
+      setNote('');
+      setStage('details');
+      setError(null);
+    };
+    window.addEventListener('cc-open-scan-offer', onOpenOffer);
+    window.addEventListener('cc-open-connection-details', onOpenDetails);
+    return () => {
+      window.removeEventListener('cc-open-scan-offer', onOpenOffer);
+      window.removeEventListener('cc-open-connection-details', onOpenDetails);
+    };
+  }, [enabled]);
+
+  useEffect(() => {
+    if (stage === 'details') return;
     if (!active) {
       setStage('alert');
-      setAcceptedConnectionId(null);
-      setError(null);
+      return;
     }
-  }, [active?.id]);
+    if (isScanOfferSnoozed(active.id)) return;
+    setStage('decision');
+  }, [active?.id, stage]);
 
   const closeCurrent = useCallback(() => {
     if (!active) return;
@@ -93,6 +140,14 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
     setAcceptedConnectionId(null);
     setError(null);
   }, [active]);
+
+  const decideLater = useCallback(() => {
+    if (!active || pending) return;
+    snoozeScanOffer(active.id);
+    setActiveId(null);
+    setStage('alert');
+    setError(null);
+  }, [active, pending]);
 
   const decline = useCallback(() => {
     if (!active || pending) return;
@@ -163,75 +218,45 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
 
   if (!enabled) return null;
 
-  const showAlert = Boolean(active) && stage === 'alert';
-  const showDecision = Boolean(active) && stage === 'decision';
+  const showDecision = Boolean(active) && stage === 'decision' && !isScanOfferSnoozed(active?.id ?? '');
   const showDetails = Boolean(acceptedConnectionId) && stage === 'details';
 
   return (
     <>
-      <AnimatePresence>
-        {showAlert && active ? (
-          <motion.div
-            key={`alert-${active.id}`}
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-5 right-5 z-[70] w-[calc(100vw-2.5rem)] max-w-sm rounded-2xl border border-[var(--app-border)] bg-[var(--app-paper)] p-4 shadow-2xl"
-            role="status"
-            aria-live="polite"
-          >
-            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--app-iris)]">
-              New connection request
-            </p>
-            <p className="mt-2 text-[16px] font-medium leading-snug text-[var(--app-ink)]">
-              A {roleLabel(active.scannerAudienceRole).toLowerCase()} sent you a connection
-              request
-            </p>
-            <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
-              {active.scannerName}
-              {active.scannerHeadline ? ` · ${active.scannerHeadline}` : ''}
-            </p>
-            <div className="mt-4 flex justify-end">
-              <Button
-                size="sm"
-                className="rounded-full px-5"
-                onClick={() => setStage('decision')}
-              >
-                OK
-              </Button>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
       <IncomingCall
         mode="connection"
         isOpen={showDecision && Boolean(active)}
         callerName={active?.scannerName ?? ''}
         callerInfo={active?.scannerHeadline ?? roleLabel(active?.scannerAudienceRole) ?? undefined}
         statusText="wants to connect with you"
-        avatarUrl={
-          active?.scannerAvatarUrl ??
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80'
-        }
+        avatarUrl={active?.scannerAvatarUrl ?? undefined}
         onAccept={accept}
         onDecline={decline}
-        onClose={() => setStage('alert')}
+        onLater={decideLater}
+        onClose={decideLater}
         busy={pending}
         acceptLabel={pending ? 'Adding…' : 'Accept'}
-        declineLabel="Decline"
+        declineLabel="Refuse"
+        laterLabel="Decide later"
+        error={error}
       />
 
+      <HandshakePortal>
       <AnimatePresence>
         {showDetails ? (
           <motion.div
             key={`details-${acceptedConnectionId}`}
-            initial={{ opacity: 0, y: 40, scale: 0.94 }}
+            className="cc-handshake-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-5 right-5 z-[70] w-[calc(100vw-2.5rem)] max-w-sm rounded-2xl border border-[var(--app-border)] bg-[var(--app-paper)] p-5 shadow-2xl"
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="cc-handshake-sheet p-5"
             role="dialog"
             aria-modal="true"
             aria-labelledby="connection-details-title"
@@ -288,9 +313,9 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
               </p>
             ) : null}
 
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="mt-4 flex flex-col gap-2">
               <Button
-                className="w-full rounded-full"
+                className="h-12 w-full rounded-full"
                 onClick={() => saveDetails()}
                 disabled={pending}
               >
@@ -298,7 +323,7 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
               </Button>
               <Button
                 variant="outline"
-                className="w-full rounded-full"
+                className="h-12 w-full rounded-full"
                 onClick={() => saveDetails({ doLater: true })}
                 disabled={pending}
               >
@@ -306,19 +331,11 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
               </Button>
             </div>
           </motion.div>
+          </motion.div>
         ) : null}
       </AnimatePresence>
+      </HandshakePortal>
 
-      {error && (showDecision || showAlert) ? (
-        <p className="sr-only" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {error && showDecision ? (
-        <div className="fixed bottom-[22rem] right-5 z-[71] max-w-sm rounded-xl bg-[var(--app-paper)] px-3 py-2 text-[13px] text-[var(--app-error)] shadow-lg">
-          {error}
-        </div>
-      ) : null}
     </>
   );
 }

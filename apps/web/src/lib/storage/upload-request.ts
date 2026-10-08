@@ -7,6 +7,7 @@ export const uploadRequestSchema = z.object({
   resourceType: z.enum(STORAGE_RESOURCE_TYPES),
   resourceId: z.string().uuid().optional(),
   mediaRole: projectMediaRoleSchema.optional(),
+  purpose: z.enum(['figure', 'cover']).optional(),
   filename: z.string().trim().min(1).max(255),
   mimeType: z.string().trim().min(1).max(255),
   size: z.number().int().positive(),

@@ -19,10 +19,11 @@ import {
 } from '@/lib/research/research';
 import { sortResearchBySortOrder } from '@/lib/research/research-order-core';
 import { createResearchFigureUrlResolver } from '@/lib/research/research-figure-url';
+import { readCardHistory, type CardHistory } from '@/lib/profile/quick-history';
 
 /** Explicit public profile columns — never select `profiles.*` for visitor pages. */
 export const PUBLIC_PROFILE_SELECT =
-  'id, slug, display_name, headline, bio, avatar_url, location, is_public';
+  'id, slug, display_name, headline, bio, avatar_url, location, card_history, is_public';
 
 export const PUBLIC_PROFILE_LINK_SELECT = 'type, label, url, sort_order';
 
@@ -60,6 +61,7 @@ export type PublicProfilePayload = {
   avatarUrl: string | null;
   bio: string | null;
   location: string | null;
+  cardHistory: CardHistory | null;
   links: ProfileLinkItem[];
   projects: FeaturedProject[];
   researchPapers: ResearchPaper[];
@@ -178,6 +180,7 @@ export async function loadPublicProfileBySlug(
     avatarUrl: profile.avatar_url ?? null,
     bio: profile.bio ?? null,
     location: profile.location ?? null,
+    cardHistory: readCardHistory(profile.card_history),
     links,
     projects,
     researchPapers,

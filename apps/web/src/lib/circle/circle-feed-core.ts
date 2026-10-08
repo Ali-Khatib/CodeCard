@@ -16,6 +16,7 @@ import {
 } from '@/lib/circle/circle-activity-contract';
 import { resolveProjectMediaDisplayUrl } from '@/lib/projects/project-media-url';
 import { collapseCircleUpdateGroups } from '@/lib/circle/circle-group';
+import { headlinePlainText } from '@/lib/profile/headline-roles';
 
 type ActivityRow = {
   id: string;
@@ -244,7 +245,7 @@ export async function listCircleFeed(
           profileId: actor.id,
           slug: actor.slug,
           displayName: actor.display_name,
-          headline: actor.headline,
+          headline: headlinePlainText(actor.headline) || null,
           avatarPublicUrl: actor.avatar_url,
         },
         target: {
@@ -272,7 +273,7 @@ export async function listCircleFeed(
           profileId: actor.id,
           slug: actor.slug,
           displayName: actor.display_name,
-          headline: actor.headline,
+          headline: headlinePlainText(actor.headline) || null,
           avatarPublicUrl: actor.avatar_url,
         },
         target: {

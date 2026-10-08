@@ -439,12 +439,41 @@ export const audienceRoleSchema = z.enum(AUDIENCE_ROLES, {
   errorMap: () => ({ message: 'Choose what you are.' }),
 });
 
+const optionalHistoryLine = z
+  .string()
+  .max(80, 'Keep this to 80 characters so it fits the back of the card.')
+  .trim()
+  .optional()
+  .nullable()
+  .transform((value) => {
+    if (value == null) return null;
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  });
+
+/** Back-of-card lines. Empty input is stored as null. */
+export const cardHistorySchema = z
+  .object({
+    before: optionalHistoryLine,
+    studied: optionalHistoryLine,
+  })
+  .nullable()
+  .optional()
+  .transform((value) => {
+    if (!value) return null;
+    const before = value.before ?? null;
+    const studied = value.studied ?? null;
+    if (!before && !studied) return null;
+    return { before, studied };
+  });
+
 export const createProfileSchema = z.object({
   display_name: z.string().min(1).max(80).trim(),
   headline: z.string().max(120).trim().optional().nullable(),
   slug: slugSchema,
   bio: z.string().max(2000).trim().optional().nullable(),
   location: profileLocationSchema,
+  card_history: cardHistorySchema,
   skills: profileSkillsSchema.default([]).optional(),
   is_public: z.boolean().default(false),
   audience_role: z

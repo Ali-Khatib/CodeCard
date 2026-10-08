@@ -5,11 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
-import {
-  HiOutlineArrowLeft,
-  HiOutlineDocumentText,
-  HiOutlineLink,
-} from 'react-icons/hi2';
+import { HiOutlineArrowLeft, HiOutlineLink } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
 import { describeExternalPdfSource } from '@/lib/research/research-external-pdf';
 import { resolveResearchDetailBack } from '@/lib/marketing/demo-url';
@@ -122,39 +118,34 @@ export function ResearchPaperDetail({
         </header>
 
         <section className="cc-container cc-project-detail-body pb-12 pt-10 md:pb-16 md:pt-14">
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div>
-              <p className={TYPE.eyebrow}>Research paper</p>
-              <h1 className={`${TYPE.contentHeroTitle} break-words`}>
-                {paper.title}
-              </h1>
-              <p className="mt-5 break-words text-[17px] leading-relaxed text-ash md:text-[19px]">
-                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
-              </p>
-              <p className="mt-2 text-[15px] text-text-secondary">
-                {metadataLine(paper) || 'Publication details pending'}
-              </p>
-              {externalPdfLabel && (
-                <p className="mt-3 text-[13px] text-text-secondary">
-                  {externalPdfLabel}. CodeCard does not host or verify this file.
-                </p>
-              )}
+          {paper.coverImageUrl ? (
+            <div className="relative mb-8 aspect-[4/1] w-full overflow-hidden rounded-card bg-[#141311]">
+              <Image
+                src={paper.coverImageUrl}
+                alt=""
+                fill
+                className="object-contain"
+                sizes="(max-width: 1024px) 100vw, 960px"
+                priority
+              />
             </div>
-
-            <div className="relative aspect-[16/11] overflow-hidden rounded-card border border-border/40 bg-midnight shadow-rim">
-              {paper.coverImageUrl ? (
-                <Image src={paper.coverImageUrl} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 520px" priority />
-              ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(233,90,11,0.22),transparent_32%),linear-gradient(135deg,#2a1206,#1a0f08)]" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-void-canvas/70 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 rounded-[18px] border border-white/12 bg-black/30 p-4 backdrop-blur-md">
-                <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-lilac-white">
-                  <HiOutlineDocumentText className="h-4 w-4" aria-hidden />
-                  Publication preview
-                </div>
-              </div>
-            </div>
+          ) : null}
+          <div className="max-w-[760px]">
+            <p className={TYPE.eyebrow}>Research paper</p>
+            <h1 className={`${TYPE.contentHeroTitle} break-words`}>
+              {paper.title}
+            </h1>
+            <p className="mt-5 break-words text-[17px] leading-relaxed text-ash md:text-[19px]">
+              {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
+            </p>
+            <p className="mt-2 text-[15px] text-text-secondary">
+              {metadataLine(paper) || 'Publication details pending'}
+            </p>
+            {externalPdfLabel && (
+              <p className="mt-3 text-[13px] text-text-secondary">
+                {externalPdfLabel}. CodeCard does not host or verify this file.
+              </p>
+            )}
           </div>
         </section>
 

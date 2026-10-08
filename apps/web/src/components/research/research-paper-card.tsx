@@ -55,10 +55,6 @@ export function ResearchPaperCard({
           ) : (
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(233,90,11,0.22),transparent_30%),linear-gradient(135deg,#2a1206,#1a0f08)]" />
           )}
-          <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-lilac-white backdrop-blur-md">
-            <HiOutlineDocumentText className="h-4 w-4" aria-hidden />
-            Research
-          </div>
         </ContentOpeningLink>
 
         <div className="cc-app-project-card__body">
@@ -78,9 +74,15 @@ export function ResearchPaperCard({
                 {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
               </p>
             </div>
-            <span className="cc-app-badge cc-app-badge--mint">
-              {paper.year ?? 'Year TBA'}
-            </span>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <span className="cc-app-badge inline-flex items-center gap-1.5">
+                <HiOutlineDocumentText className="h-3.5 w-3.5" aria-hidden />
+                Research
+              </span>
+              <span className="cc-app-badge cc-app-badge--mint">
+                {paper.year ?? 'Year TBA'}
+              </span>
+            </div>
           </div>
 
           <p className="mt-3 max-w-[720px] text-[15px] leading-relaxed text-[var(--app-smoke)]">

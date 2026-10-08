@@ -90,6 +90,8 @@ export default async function EditProjectPage({
       </div>
       <ProjectMediaUpload
         projectId={id}
+        projectTitle={loaded.project.title}
+        projectTagline={loaded.project.tagline ?? ''}
         cover={cover}
         coverUrl={cover ? resolveMediaUrl(cover.storage_path) : null}
         screenshots={screenshots}

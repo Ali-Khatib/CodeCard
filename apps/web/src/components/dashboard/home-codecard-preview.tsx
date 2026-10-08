@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { Briefcase, MapPin } from 'lucide-react';
-import { parseHeadline } from '@/lib/profile/parse-headline';
+import { MapPin } from 'lucide-react';
+import { HeadlineRoles } from '@/components/profile/headline-roles';
+import { isFounderProfile } from '@/lib/profile/founder';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -38,7 +39,6 @@ export function HomeCodeCardPreview({
 }: HomeCodeCardPreviewProps) {
   const viewHref =
     slug === 'demo' ? LIVE_DEMO_PROFILE_HREF : getSavedProfilePreviewHref({ slug, is_public: isPublic });
-  const { role, company } = parseHeadline(headline ?? null);
   const safeLinks = toSafeProfileLinkItems(links);
   const intro = bio?.trim() || 'Add a short bio so visitors know who you are.';
 
@@ -78,20 +78,7 @@ export function HomeCodeCardPreview({
           <p className="cc-public-hero__title mt-1 break-words text-[1.45rem] font-medium tracking-[-0.035em] md:text-[1.65rem]">
             {displayName}
           </p>
-          {role ? (
-            <p className="cc-public-hero__headline">
-              <Briefcase className="cc-public-hero__line-icon" aria-hidden />
-              <span>
-                {role}
-                {company ? (
-                  <>
-                    <span aria-hidden> · </span>
-                    {company}
-                  </>
-                ) : null}
-              </span>
-            </p>
-          ) : null}
+          <HeadlineRoles headline={headline} founder={isFounderProfile({ profileSlug: slug })} />
           {location ? (
             <p className="cc-public-hero__place">
               <MapPin className="cc-public-hero__line-icon" aria-hidden />
@@ -107,6 +94,12 @@ export function HomeCodeCardPreview({
             </div>
           ) : null}
         </div>
+
+        <div className="cc-home-codecard__action">
+          <AppButton variant="primary" href={viewHref}>
+            View CodeCard ↗
+          </AppButton>
+        </div>
       </div>
 
       {!isPublic ? (
@@ -114,12 +107,6 @@ export function HomeCodeCardPreview({
           Profile is private. Publish it so shared links and QR codes work for visitors.
         </p>
       ) : null}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <AppButton variant="primary" href={viewHref}>
-          View CodeCard ↗
-        </AppButton>
-      </div>
     </aside>
   );
 }

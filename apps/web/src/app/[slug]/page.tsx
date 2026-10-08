@@ -95,6 +95,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         researchPapers={payload.researchPapers}
         profileId={payload.profileId}
         location={payload.location}
+        cardHistory={payload.cardHistory}
         connectionControl={null}
       />
     </>

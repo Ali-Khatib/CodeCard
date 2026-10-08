@@ -62,6 +62,8 @@ export interface Profile {
   is_public: boolean;
   /** Recruiter, engineer, founder, manager, or student. Null until they choose. */
   audience_role?: string | null;
+  /** Optional back-of-card lines. Null when the owner leaves history blank. */
+  card_history?: { before?: string | null; studied?: string | null } | null;
   created_at: string;
   updated_at: string;
 }

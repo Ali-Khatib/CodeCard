@@ -4,9 +4,15 @@ import { useState, type ReactNode } from 'react';
 import { Briefcase, GraduationCap, MapPin, Sparkles } from 'lucide-react';
 import { FlipCard } from '@/components/ui/flip-card';
 import { cn } from '@/lib/utils';
-import type { ProfileHistoryLine } from '@/lib/profile/quick-history';
+import type { ProfileHistoryIcon, ProfileHistoryLine } from '@/lib/profile/quick-history';
 
-const ICONS = [Sparkles, Briefcase, GraduationCap, MapPin];
+const ICONS: Record<ProfileHistoryIcon, typeof Sparkles> = {
+  now: Sparkles,
+  before: Briefcase,
+  studied: GraduationCap,
+  based: MapPin,
+};
+const FALLBACK_ICONS = [Sparkles, Briefcase, GraduationCap, MapPin];
 
 /**
  * Public identity panel with a 3D flip. Front is the live profile;
@@ -51,7 +57,7 @@ export function PublicHeroFlipPanel({
             </p>
             <ul className="cc-public-hero__history">
               {history.map((line, index) => {
-                const Icon = ICONS[index % ICONS.length];
+                const Icon = ICONS[line.icon] ?? FALLBACK_ICONS[index % FALLBACK_ICONS.length];
                 return (
                   <li key={line.label} className="cc-public-hero__history-item">
                     <span className="cc-public-hero__history-icon" aria-hidden>

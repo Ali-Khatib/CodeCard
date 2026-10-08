@@ -180,7 +180,6 @@ export async function executeAcceptScanOffer(
         saved_profile_id: scanner.id,
         source: CONNECTION_CREATE_SOURCE,
         connected_at: now,
-        met_at: now,
       })
       .select('id')
       .single();
@@ -202,6 +201,75 @@ export async function executeAcceptScanOffer(
   }
 
   return { success: true, connectionId };
+}
+
+/**
+ * If the scanner left the page before the accept landed, create their row
+ * the next time their app opens. The other person's row already exists.
+ */
+export async function finalizeAcceptedScanConnections(
+  supabase: SupabaseClient,
+  options?: { user?: AuthUser | null },
+): Promise<{ created: number }> {
+  const user = await getAuthenticatedUser(supabase, options);
+  if (!user) return { created: 0 };
+
+  const owned = await resolveOwnedProfile(supabase, user);
+  if ('error' in owned) return { created: 0 };
+
+  const { data: offers } = await supabase
+    .from(SCAN_OFFERS_TABLE)
+    .select('scanned_profile_id')
+    .eq('scanner_user_id', user.id)
+    .eq('status', 'accepted')
+    .limit(8);
+
+  let created = 0;
+  for (const offer of offers ?? []) {
+    const scannedProfileId = offer.scanned_profile_id as string;
+    const { data: existing } = await supabase
+      .from(CONNECTIONS_TABLE)
+      .select('id')
+      .eq('owner_user_id', user.id)
+      .eq('saved_profile_id', scannedProfileId)
+      .maybeSingle();
+    if (existing?.id) continue;
+
+    const { error } = await supabase.from(CONNECTIONS_TABLE).insert({
+      tenant_id: owned.profile.tenant_id,
+      owner_user_id: user.id,
+      saved_profile_id: scannedProfileId,
+      source: CONNECTION_CREATE_SOURCE,
+      connected_at: new Date().toISOString(),
+    });
+    if (!error) created += 1;
+  }
+
+  return { created };
+}
+
+/** Scanner watches this until the other person accepts or refuses. */
+export async function getOutgoingScanStatus(
+  supabase: SupabaseClient,
+  scannedProfileId: string,
+  options?: { user?: AuthUser | null },
+): Promise<{ status: ScanOfferStatus | null; error?: string }> {
+  const user = await getAuthenticatedUser(supabase, options);
+  if (!user) return { status: null, error: 'UNAUTHENTICATED' };
+
+  const { data, error } = await supabase
+    .from(SCAN_OFFERS_TABLE)
+    .select('status')
+    .eq('scanner_user_id', user.id)
+    .eq('scanned_profile_id', scannedProfileId)
+    .maybeSingle();
+
+  if (error) return { status: null, error: 'TEMPORARY_FAILURE' };
+  const status = data?.status;
+  if (status === 'pending' || status === 'accepted' || status === 'dismissed') {
+    return { status };
+  }
+  return { status: null };
 }
 
 export async function executeDismissScanOffer(

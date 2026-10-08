@@ -8,6 +8,7 @@ import {
   executeAddConnection,
   executeConnectionStatus,
   executeRemoveConnection,
+  executeRequestQrConnection,
   listOwnerConnections,
   type ConnectionMutationState,
   type ConnectionStatusResult,
@@ -39,6 +40,30 @@ function revalidateConnectionPaths(targetSlug?: string | null) {
   if (targetSlug) {
     revalidatePath(`/${targetSlug}`);
   }
+}
+
+/** Ask only. The connection is created when the other person accepts. */
+export async function requestQrConnectionAction(input: {
+  targetProfileId?: string;
+  targetSlug?: string;
+  source: 'qr';
+}): Promise<ConnectionMutationState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error: connectionErrorMessage('UNAUTHENTICATED'),
+      code: 'UNAUTHENTICATED',
+    };
+  }
+
+  const limited = await withConnectionRateLimit(user.id);
+  if (limited) return limited;
+
+  return executeRequestQrConnection(supabase, input, { user });
 }
 
 export async function addConnectionAction(input: {

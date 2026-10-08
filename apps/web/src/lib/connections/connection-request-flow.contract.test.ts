@@ -18,6 +18,7 @@ describe('connection request corner flow', () => {
     expect(card).toContain("mode === 'connection'");
     expect(host).toContain('connection request');
     expect(host).toContain('Do later');
+    expect(host).toContain('Decide later');
     expect(host).toContain('acceptScanOfferAction');
     expect(host).toContain('updateConnectionMetadataAction');
     expect(shell).toContain('ConnectionRequestHost');

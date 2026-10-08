@@ -14,6 +14,7 @@ import { FEATURE_DISABLED_MESSAGE, isFeatureBlocked } from '@/lib/security/kill-
 import { rateLimit } from '@/lib/rate-limit';
 import { assertProjectMediaUploadAllowed } from '@/lib/projects/project-media-core';
 import { assertResearchFigureUploadAllowed } from '@/lib/research/research-figure-core';
+import { assertResearchCoverUploadAllowed } from '@/lib/research/research-cover-core';
 import { createSignedUploadIntent } from '@/lib/storage/upload-core';
 import { resolveUploadOwnership } from '@/lib/storage/upload-ownership';
 import { uploadRequestSchema } from '@/lib/storage/upload-request';
@@ -179,10 +180,16 @@ export async function POST(request: Request) {
   }
 
   if (validated.data.resourceType === 'research-figure' && validated.data.resourceId) {
-    const allowed = await assertResearchFigureUploadAllowed(supabase, {
-      userId: user.id,
-      researchPaperId: validated.data.resourceId,
-    });
+    const allowed =
+      validated.data.purpose === 'cover'
+        ? await assertResearchCoverUploadAllowed(supabase, {
+            userId: user.id,
+            researchPaperId: validated.data.resourceId,
+          })
+        : await assertResearchFigureUploadAllowed(supabase, {
+            userId: user.id,
+            researchPaperId: validated.data.resourceId,
+          });
     if (!allowed.ok) {
       return jsonNoStore({ error: allowed.message }, allowed.status);
     }

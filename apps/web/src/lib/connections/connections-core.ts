@@ -37,6 +37,8 @@ const CONNECTION_SELECT =
 export type ConnectionMutationState = {
   success?: boolean;
   alreadyConnected?: boolean;
+  /** QR ask was sent. The connection does not exist until the other person accepts. */
+  requested?: boolean;
   error?: string;
   code?: ConnectionMutationErrorCode;
   connection?: {
@@ -194,6 +196,69 @@ async function findOwnedConnection(
   }
 
   return null;
+}
+
+/**
+ * Face-to-face ask. Creates only a pending scan offer.
+ * Neither saved_connections row exists until the card owner accepts.
+ */
+export async function executeRequestQrConnection(
+  supabase: SupabaseClient,
+  raw: unknown,
+  options?: { user?: AuthUser | null },
+): Promise<ConnectionMutationState> {
+  const parsed = addConnectionInputSchema.safeParse(raw);
+  if (!parsed.success) {
+    const sourceIssue = parsed.error.issues.some((issue) => issue.path.includes('source'));
+    return fail(sourceIssue ? 'QR_REQUIRED' : 'INVALID_TARGET');
+  }
+  if (parsed.data.source !== CONNECTION_CREATE_SOURCE) {
+    return fail('QR_REQUIRED');
+  }
+
+  const user = await getAuthenticatedUser(supabase, options);
+  if (!user) return fail('UNAUTHENTICATED');
+
+  const owned = await resolveOwnedProfile(supabase, user);
+  if ('error' in owned) return fail('UNAUTHENTICATED');
+
+  const targetResult = await resolvePublishedTarget(supabase, parsed.data);
+  if (!targetResult.ok) return fail(targetResult.code);
+
+  const target = targetResult.target;
+  const identity = assertConnectionIdentity({
+    ownerUserId: user.id,
+    savedProfileId: target.id,
+    targetOwnerUserId: target.owner_user_id,
+  });
+  if (!identity.ok) return fail(identity.code);
+  if (target.id === owned.profile.id) return fail('SELF_CONNECTION');
+
+  const existing = await findOwnedConnection(supabase, user.id, { targetProfileId: target.id });
+  if (existing) {
+    return {
+      success: true,
+      alreadyConnected: true,
+      code: 'ALREADY_CONNECTED',
+      connection: {
+        id: existing.id,
+        savedProfileId: existing.saved_profile_id,
+        connectedAt: null,
+        createdAt: '',
+        source: CONNECTION_DEFAULT_SOURCE,
+      },
+    };
+  }
+
+  await notifyCardOwnerOfScan(supabase, {
+    scannerUserId: user.id,
+    scannerProfileId: owned.profile.id,
+    scannedUserId: target.owner_user_id,
+    scannedProfileId: target.id,
+    scannedTenantId: target.tenant_id,
+  });
+
+  return { success: true, requested: true };
 }
 
 export async function executeAddConnection(

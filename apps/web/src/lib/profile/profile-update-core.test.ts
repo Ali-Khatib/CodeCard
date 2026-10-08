@@ -124,6 +124,7 @@ describe('parseTrustedProfileFormData', () => {
       slug: 'alex',
       bio: 'About',
       location: 'NYC',
+      card_history: { before: '', studied: '' },
       skills: ['Go', 'Rust'],
       audience_role: '',
     });
@@ -209,6 +210,7 @@ describe('pickAllowedProfileUpdate', () => {
       slug: 'alex',
       bio: null,
       location: null,
+      card_history: null,
       skills: ['Go'],
       audience_role: 'founder',
     });
@@ -271,8 +273,38 @@ describe('executeProfileUpdate', () => {
       bio: 'Updated bio',
       location: 'London, UK',
       skills: ['TypeScript', 'Go'],
+      card_history: null,
       audience_role: 'engineer',
     });
+  });
+
+  it('saves optional history and drops blank lines', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Senior Engineer',
+        slug: 'alex-chen',
+        bio: 'Updated bio',
+        location: 'London, UK',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+        history_before: '  Early engineer  ',
+        history_studied: '   ',
+      }),
+    );
+
+    expect(result.success).toBe(true);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        card_history: { before: 'Early engineer', studied: null },
+      }),
+    );
   });
 
   it('ignores client-supplied ownership fields in form data', async () => {
