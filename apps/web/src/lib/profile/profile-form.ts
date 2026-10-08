@@ -12,7 +12,9 @@ export type ProfileFormState = {
   slug: string;
   bio: string;
   location: string;
+  history_working: string;
   history_before: string;
+  history_studying: string;
   history_studied: string;
   skillsInput: string;
   is_public: boolean;
@@ -26,7 +28,9 @@ export function profileToFormState(profile: Profile): ProfileFormState {
     slug: profile.slug,
     bio: profile.bio ?? '',
     location: profile.location ?? '',
+    history_working: profile.card_history?.working ?? '',
     history_before: profile.card_history?.before ?? '',
+    history_studying: profile.card_history?.studying ?? '',
     history_studied: profile.card_history?.studied ?? '',
     skillsInput: (profile.skills ?? []).join(', '),
     is_public: profile.is_public,
@@ -44,7 +48,9 @@ export function formStateToUpdatePayload(
     bio: form.bio || null,
     location: form.location,
     card_history: {
+      working: form.history_working,
       before: form.history_before,
+      studying: form.history_studying,
       studied: form.history_studied,
     },
     skills: parseCommaSeparatedSkills(form.skillsInput),
@@ -63,11 +69,7 @@ export function parseProfileUpdate(
   if (!parsed.success) {
     const first = parsed.error.errors[0];
     const path = first?.path ?? [];
-    const field = path.includes('before')
-      ? 'history_before'
-      : path.includes('studied')
-        ? 'history_studied'
-        : path[0];
+    const field = historyFieldFromPath(path) ?? path[0];
     return {
       success: false,
       message: first?.message ?? 'Invalid input',
@@ -75,4 +77,12 @@ export function parseProfileUpdate(
     };
   }
   return { success: true, data: parsed.data };
+}
+
+export function historyFieldFromPath(path: ReadonlyArray<PropertyKey>): string | undefined {
+  if (path.includes('working')) return 'history_working';
+  if (path.includes('before')) return 'history_before';
+  if (path.includes('studying')) return 'history_studying';
+  if (path.includes('studied')) return 'history_studied';
+  return undefined;
 }

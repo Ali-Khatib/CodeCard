@@ -48,4 +48,27 @@ describe('profileQuickHistory', () => {
       { label: 'Studied', value: 'M.S. Computer Science', icon: 'studied' },
     ]);
   });
+
+  it('shows current and past employment and education when they are filled in', () => {
+    const lines = profileQuickHistory({
+      profileSlug: 'maya',
+      headline: 'Staff Engineer',
+      location: 'NYC',
+      history: {
+        working: 'Staff engineer at Notion',
+        before: 'Research intern',
+        studying: 'M.S. Computer Science, in progress',
+        studied: 'B.S. Computer Science',
+      },
+    });
+
+    expect(lines).toEqual([
+      { label: 'Now', value: 'Staff Engineer', icon: 'now' },
+      { label: 'Working', value: 'Staff engineer at Notion', icon: 'working' },
+      { label: 'Before', value: 'Research intern', icon: 'before' },
+      { label: 'Studying', value: 'M.S. Computer Science, in progress', icon: 'studying' },
+      { label: 'Studied', value: 'B.S. Computer Science', icon: 'studied' },
+      { label: 'Based', value: 'NYC', icon: 'based' },
+    ]);
+  });
 });

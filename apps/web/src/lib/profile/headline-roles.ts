@@ -1,4 +1,14 @@
-export const HEADLINE_ICON_IDS = ['work', 'code', 'lab'] as const;
+export const HEADLINE_ICON_IDS = [
+  'work',
+  'code',
+  'lab',
+  'design',
+  'product',
+  'data',
+  'write',
+  'teach',
+  'lead',
+] as const;
 
 export type HeadlineIconId = (typeof HEADLINE_ICON_IDS)[number];
 
@@ -7,7 +17,7 @@ export type HeadlinePart = {
   icon: HeadlineIconId | null;
 };
 
-const ICON_PREFIX = /^\[(work|code|lab)\]\s+/;
+const ICON_PREFIX = new RegExp(`^\\[(${HEADLINE_ICON_IDS.join('|')})\\]\\s+`);
 const FOUNDER_DEFAULTS: HeadlineIconId[] = ['work', 'code', 'lab'];
 
 export function isHeadlineIconId(value: string): value is HeadlineIconId {

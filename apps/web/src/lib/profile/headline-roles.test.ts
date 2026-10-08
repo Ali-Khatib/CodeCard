@@ -42,6 +42,17 @@ describe('headline roles', () => {
     expect(founder[0]?.text).toBe('Founder of CodeCard');
   });
 
+  it('round-trips the extra headline icons', () => {
+    const stored = serializeHeadlineParts([
+      { text: 'Product designer', icon: 'design' },
+      { text: 'Writes in public', icon: 'write' },
+    ]);
+    expect(parseHeadlineParts(stored)).toEqual([
+      { text: 'Product designer', icon: 'design' },
+      { text: 'Writes in public', icon: 'write' },
+    ]);
+  });
+
   it('strips icon tokens before role and company are split', () => {
     expect(
       parseHeadline('[work] Founder of CodeCard · [code] Software Engineer · [lab] AI/ML Researcher'),

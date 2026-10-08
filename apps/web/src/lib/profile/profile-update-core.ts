@@ -7,8 +7,9 @@ import {
   parseCommaSeparatedSkills,
   type AudienceRole,
 } from '@codecard/validation';
-import type { Profile } from '@codecard/types';
+import type { CardHistory, Profile } from '@codecard/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { historyFieldFromPath } from '@/lib/profile/profile-form';
 
 export type ProfileUpdateFieldErrors = Partial<
   Record<
@@ -16,7 +17,9 @@ export type ProfileUpdateFieldErrors = Partial<
     | 'headline'
     | 'bio'
     | 'location'
+    | 'history_working'
     | 'history_before'
+    | 'history_studying'
     | 'history_studied'
     | 'skills'
     | 'slug'
@@ -60,7 +63,9 @@ export function parseTrustedProfileFormData(formData: FormData) {
     bio: String(formData.get('bio') ?? '') || null,
     location: String(formData.get('location') ?? ''),
     card_history: {
+      working: String(formData.get('history_working') ?? ''),
       before: String(formData.get('history_before') ?? ''),
+      studying: String(formData.get('history_studying') ?? ''),
       studied: String(formData.get('history_studied') ?? ''),
     },
     skills: parseCommaSeparatedSkills(String(formData.get('skills') ?? '')),
@@ -76,7 +81,9 @@ export function buildProfileFormData(form: {
   location: string;
   skillsInput: string;
   audience_role: string;
+  history_working?: string;
   history_before?: string;
+  history_studying?: string;
   history_studied?: string;
 }): FormData {
   const fd = new FormData();
@@ -85,7 +92,9 @@ export function buildProfileFormData(form: {
   fd.set('slug', form.slug);
   fd.set('bio', form.bio);
   fd.set('location', form.location);
+  fd.set('history_working', form.history_working ?? '');
   fd.set('history_before', form.history_before ?? '');
+  fd.set('history_studying', form.history_studying ?? '');
   fd.set('history_studied', form.history_studied ?? '');
   fd.set('skills', form.skillsInput);
   fd.set('audience_role', form.audience_role);
@@ -103,9 +112,7 @@ export function pickAllowedProfileUpdate(
     slug: data.slug as string,
     bio: (data.bio as string | null | undefined) ?? null,
     location: (data.location as string | null | undefined) ?? null,
-    card_history:
-      (data.card_history as { before: string | null; studied: string | null } | null | undefined) ??
-      null,
+    card_history: (data.card_history as CardHistory | null | undefined) ?? null,
     skills: (data.skills as string[]) ?? [],
     audience_role: data.audience_role as AudienceRole,
   };
@@ -192,11 +199,7 @@ export async function executeProfileUpdate(
   if (!parsed.success) {
     const first = parsed.error.errors[0];
     const path = first?.path ?? [];
-    const field = path.includes('before')
-      ? 'history_before'
-      : path.includes('studied')
-        ? 'history_studied'
-        : path[0];
+    const field = historyFieldFromPath(path) ?? path[0];
     const message = first?.message ?? 'Invalid profile details.';
     if (typeof field === 'string') {
       return {

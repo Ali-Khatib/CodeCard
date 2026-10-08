@@ -34,7 +34,9 @@ const PROFILE_FIELD_IDS: Record<string, string> = {
   headline: 'headline',
   bio: 'bio',
   location: 'location',
+  history_working: 'history_working',
   history_before: 'history_before',
+  history_studying: 'history_studying',
   history_studied: 'history_studied',
   skills: 'skills',
   audience_role: 'audience_role',
@@ -258,48 +260,55 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
         <fieldset className="m-0 w-full min-w-0 space-y-3 rounded-xl border border-[var(--app-border)] p-3">
           <legend className="px-1 text-[13px] font-medium text-[var(--app-ink)]">Card history</legend>
           <p id="history-hint" className="text-[12px] leading-relaxed text-[var(--app-smoke)]">
-            Optional, and worth filling in. Spin the card and these lines show on the back, under
-            your name. Your headline is Now and your city is Based, so you only add what is missing.
-            Leave them blank and the back stays a short snapshot.
+            Optional. These lines show on the back of the card, under your name. Your headline
+            already appears as Now, and your city as Based. Current employment shows as Working,
+            past employment as Before, current education as Studying, and a finished degree as
+            Studied. Leave a line blank and it stays off the card.
           </p>
-          <div className="space-y-2">
-            <FieldLabel htmlFor="history_before">Before</FieldLabel>
-            <input
-              id="history_before"
-              name="history_before"
-              className="cc-app-input"
-              value={form.history_before}
-              maxLength={80}
-              onChange={(e) => setForm({ ...form, history_before: e.target.value })}
-              placeholder="Early engineer at a startup"
-              aria-invalid={Boolean(fieldErrors.history_before)}
-              aria-describedby="history-hint"
-            />
-            {fieldErrors.history_before ? (
-              <p className="text-sm text-red-600" role="alert">
-                {fieldErrors.history_before}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <FieldLabel htmlFor="history_studied">Studied</FieldLabel>
-            <input
-              id="history_studied"
-              name="history_studied"
-              className="cc-app-input"
-              value={form.history_studied}
-              maxLength={80}
-              onChange={(e) => setForm({ ...form, history_studied: e.target.value })}
-              placeholder="B.S. Computer Science"
-              aria-invalid={Boolean(fieldErrors.history_studied)}
-              aria-describedby="history-hint"
-            />
-            {fieldErrors.history_studied ? (
-              <p className="text-sm text-red-600" role="alert">
-                {fieldErrors.history_studied}
-              </p>
-            ) : null}
-          </div>
+          {(
+            [
+              {
+                id: 'history_working',
+                label: 'Current employment',
+                placeholder: 'Software engineer at Stripe',
+              },
+              {
+                id: 'history_before',
+                label: 'Past employment',
+                placeholder: 'Early engineer at a startup',
+              },
+              {
+                id: 'history_studying',
+                label: 'Current education',
+                placeholder: 'M.S. Computer Science, in progress',
+              },
+              {
+                id: 'history_studied',
+                label: 'Past education',
+                placeholder: 'B.S. Computer Science',
+              },
+            ] as const
+          ).map((field) => (
+            <div key={field.id} className="space-y-2">
+              <FieldLabel htmlFor={field.id}>{field.label}</FieldLabel>
+              <input
+                id={field.id}
+                name={field.id}
+                className="cc-app-input"
+                value={form[field.id]}
+                maxLength={80}
+                onChange={(e) => setForm({ ...form, [field.id]: e.target.value })}
+                placeholder={field.placeholder}
+                aria-invalid={Boolean(fieldErrors[field.id])}
+                aria-describedby="history-hint"
+              />
+              {fieldErrors[field.id] ? (
+                <p className="text-sm text-red-600" role="alert">
+                  {fieldErrors[field.id]}
+                </p>
+              ) : null}
+            </div>
+          ))}
         </fieldset>
 
         <div className="space-y-2 scroll-mt-28" id="skills-field">
@@ -367,7 +376,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
                 <path className="cc-profile-save__tick" d="M7 12.5 10.2 16 17 8.5" />
               </svg>
             </span>
-            <span>Yes. Saved.</span>
+            <span>Saved successfully</span>
           </>
         ) : pending ? (
           'Saving…'

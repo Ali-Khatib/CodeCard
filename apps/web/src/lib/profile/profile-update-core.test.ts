@@ -124,7 +124,7 @@ describe('parseTrustedProfileFormData', () => {
       slug: 'alex',
       bio: 'About',
       location: 'NYC',
-      card_history: { before: '', studied: '' },
+      card_history: { working: '', before: '', studying: '', studied: '' },
       skills: ['Go', 'Rust'],
       audience_role: '',
     });
@@ -306,7 +306,12 @@ describe('executeProfileUpdate', () => {
     expect(result.success).toBe(true);
     expect(update).toHaveBeenCalledWith(
       expect.objectContaining({
-        card_history: { before: 'Early engineer', studied: null },
+        card_history: {
+          working: null,
+          before: 'Early engineer',
+          studying: null,
+          studied: null,
+        },
       }),
     );
   });

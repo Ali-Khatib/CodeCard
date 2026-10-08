@@ -331,7 +331,7 @@ export function ProjectForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-[720px] space-y-8 pb-16"
+      className="cc-project-form mx-auto w-full max-w-[720px] space-y-8 pb-16"
       aria-busy={pending}
       noValidate
     >
@@ -351,13 +351,13 @@ export function ProjectForm({
       )}
       <section className="space-y-4" aria-labelledby="project-showcase-heading">
         <div>
-          <h2 id="project-showcase-heading" className="text-[15px] font-semibold text-graphite">
+          <h2 id="project-showcase-heading" className="text-[18px] font-semibold text-[var(--app-ink)]">
             Showcase story (optional)
           </h2>
-          <p id="project-showcase-help" className="mt-1 text-[13px] leading-relaxed text-ash">
-            Add up to five short written tabs on your project page. Write what a visitor should
-            read when they tap that tab, and optionally add a background image behind the text —
-            the text always stays readable on top. Skip any you do not need.
+          <p id="project-showcase-help" className="cc-project-form__hint mt-2">
+            Add up to five tabs on your project page. Press Add tab on any you want, write what a
+            visitor should read, and add a background image if you have one. The text stays readable
+            on top. Skip any you do not need.
           </p>
         </div>
         <div className="space-y-4">
@@ -381,8 +381,8 @@ export function ProjectForm({
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[14px] font-medium text-vellum">{section.label}</p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-ash">{section.addHint}</p>
+                    <p className="text-[16px] font-semibold text-[var(--app-ink)]">{section.label}</p>
+                    <p className="cc-project-form__hint mt-1">{section.addHint}</p>
                   </div>
                   <button
                     type="button"
@@ -404,7 +404,7 @@ export function ProjectForm({
                       setSectionImageErrors((prev) => ({ ...prev, [section.id]: '' }));
                     }}
                   >
-                    {enabled ? 'Remove' : 'Add'}
+                    {enabled ? 'Remove tab' : 'Add tab'}
                   </button>
                 </div>
                 {enabled ? (
@@ -412,7 +412,7 @@ export function ProjectForm({
                     <label htmlFor={fieldId} className="text-[13px] font-medium text-graphite">
                       {section.label} text
                     </label>
-                    <p id={promptId} className="text-[12px] leading-relaxed text-lichen">
+                    <p id={promptId} className="cc-project-form__hint">
                       {section.prompt}
                     </p>
                     <textarea
@@ -438,7 +438,7 @@ export function ProjectForm({
                       placeholder={section.placeholder}
                       aria-describedby={joinDescribedBy(promptId, helpId)}
                     />
-                    <p id={helpId} className="text-[12px] text-ash">
+                    <p id={helpId} className="cc-project-form__note">
                       Aim for 2–4 sentences. Max {PROJECT_FORM_LIMITS.caseStudySection} characters.
                     </p>
 
@@ -449,8 +449,8 @@ export function ProjectForm({
                       >
                         Background image <span className="text-ash">(optional)</span>
                       </label>
-                      <p id={imageHelpId} className="text-[12px] leading-relaxed text-ash">
-                        Shown behind this tab&apos;s text with a dark overlay so the words stay
+                      <p id={imageHelpId} className="cc-project-form__hint">
+                        Optional. This sits behind the tab text with a dark overlay so the words stay
                         readable. JPEG, PNG, or WebP — it is compressed automatically.
                       </p>
                       {sectionImage ? (
@@ -491,7 +491,7 @@ export function ProjectForm({
                           accept={CASE_STUDY_IMAGE_ACCEPT}
                           disabled={imageBusy}
                           aria-describedby={imageHelpId}
-                          className="block w-full text-[13px] text-ash file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-[10px] file:border file:border-charcoal/70 file:bg-charcoal/40 file:px-4 file:py-2 file:text-[13px] file:text-vellum"
+                          className="cc-project-form__file block w-full text-[14px] text-[var(--app-ink)] file:mr-3 file:inline-flex file:min-h-11 file:cursor-pointer file:items-center file:rounded-full file:border file:border-[var(--app-ink)] file:bg-[var(--app-ink)] file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-[var(--app-paper)]"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             e.target.value = '';
@@ -575,8 +575,8 @@ export function ProjectForm({
               fieldErrors.slug && 'project-slug-error',
             )}
           />
-          <p id="project-slug-hint" className="text-[12px] text-ash">
-            Lowercase letters, numbers, and hyphens only.
+          <p id="project-slug-hint" className="cc-project-form__note">
+            Lowercase letters, numbers, and hyphens only. This becomes the project link.
           </p>
           <FieldError id="project-slug-error" message={fieldErrors.slug} />
         </div>
@@ -625,11 +625,11 @@ export function ProjectForm({
 
       <section className="space-y-3">
         <div>
-          <label htmlFor="project-technologies" className="text-[13px] font-medium text-graphite">
+          <label htmlFor="project-technologies" className="text-[15px] font-semibold text-[var(--app-ink)]">
             Technologies
           </label>
-          <p id="project-technologies-hint" className="text-[12px] text-ash">
-            Add tools and languages, then press Enter.
+          <p id="project-technologies-hint" className="cc-project-form__hint mt-1">
+            Type a tool or language, then press Add. Enter works too.
           </p>
         </div>
         <div className="flex flex-wrap gap-2" role="list" aria-label="Selected technologies">
@@ -638,7 +638,7 @@ export function ProjectForm({
               {tech}
               <button
                 type="button"
-                className="text-ash hover:text-vellum"
+                className="cc-project-form__chip-remove"
                 onClick={() => removeTechnology(tech)}
                 aria-label={`Remove technology ${tech}`}
               >
@@ -647,24 +647,29 @@ export function ProjectForm({
             </span>
           ))}
         </div>
-        <input
-          id="project-technologies"
-          value={techInput}
-          onChange={(e) => setTechInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addTechnology();
-            }
-          }}
-          className="cc-input w-full"
-          placeholder="TypeScript, Next.js, C++"
-          aria-invalid={Boolean(fieldErrors.technologies)}
-          aria-describedby={joinDescribedBy(
-            'project-technologies-hint',
-            fieldErrors.technologies && 'project-technologies-error',
-          )}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            id="project-technologies"
+            value={techInput}
+            onChange={(e) => setTechInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addTechnology();
+              }
+            }}
+            className="cc-input min-w-[12rem] flex-1"
+            placeholder="TypeScript, Next.js, C++"
+            aria-invalid={Boolean(fieldErrors.technologies)}
+            aria-describedby={joinDescribedBy(
+              'project-technologies-hint',
+              fieldErrors.technologies && 'project-technologies-error',
+            )}
+          />
+          <button type="button" className="cc-app-btn cc-app-btn--primary shrink-0" onClick={addTechnology}>
+            Add
+          </button>
+        </div>
         <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
       </section>
 
@@ -673,7 +678,8 @@ export function ProjectForm({
         aria-invalid={fieldErrors.domains ? true : undefined}
         aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
       >
-        <legend className="cc-app-field-label">Domains</legend>
+        <legend className="cc-app-field-label text-[15px]">Domains</legend>
+        <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
         <div id="project-domains" className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
             <ToggleChip
@@ -692,7 +698,8 @@ export function ProjectForm({
         aria-invalid={fieldErrors.focus_areas ? true : undefined}
         aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
       >
-        <legend className="cc-app-field-label">Focus areas</legend>
+        <legend className="cc-app-field-label text-[15px]">Focus areas</legend>
+        <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
         <div id="project-focus-areas" className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
             <ToggleChip
@@ -829,11 +836,11 @@ export function ProjectForm({
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="cc-project-form__actions">
         <button
           type="submit"
           disabled={pending || (mode === 'create' && limitReached) || (mode === 'create' && completedRef.current)}
-          className="cc-btn-pill-primary inline-flex h-11 items-center px-6 text-[14px] disabled:opacity-60"
+          className="cc-app-btn cc-app-btn--primary cc-project-form__submit"
         >
           {pending
             ? mode === 'edit'
@@ -843,7 +850,7 @@ export function ProjectForm({
               ? 'Save changes'
               : 'Create project'}
         </button>
-        <Link href="/dashboard/projects" className="cc-btn-pill-ghost inline-flex h-11 items-center px-6 text-[14px]">
+        <Link href="/dashboard/projects" className="cc-app-btn cc-app-btn--ghost cc-project-form__cancel">
           Cancel
         </Link>
       </div>

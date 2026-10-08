@@ -454,17 +454,21 @@ const optionalHistoryLine = z
 /** Back-of-card lines. Empty input is stored as null. */
 export const cardHistorySchema = z
   .object({
+    working: optionalHistoryLine,
     before: optionalHistoryLine,
+    studying: optionalHistoryLine,
     studied: optionalHistoryLine,
   })
   .nullable()
   .optional()
   .transform((value) => {
     if (!value) return null;
+    const working = value.working ?? null;
     const before = value.before ?? null;
+    const studying = value.studying ?? null;
     const studied = value.studied ?? null;
-    if (!before && !studied) return null;
-    return { before, studied };
+    if (!working && !before && !studying && !studied) return null;
+    return { working, before, studying, studied };
   });
 
 export const createProfileSchema = z.object({

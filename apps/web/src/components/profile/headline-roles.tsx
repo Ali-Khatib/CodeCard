@@ -1,4 +1,15 @@
-import { Briefcase, Code2, FlaskConical, type LucideIcon } from 'lucide-react';
+import {
+  BarChart3,
+  Briefcase,
+  Code2,
+  FlaskConical,
+  GraduationCap,
+  Layers,
+  Palette,
+  PenLine,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import {
   displayHeadlineParts,
   type HeadlineIconId,
@@ -9,6 +20,12 @@ const ICONS: Record<HeadlineIconId, LucideIcon> = {
   work: Briefcase,
   code: Code2,
   lab: FlaskConical,
+  design: Palette,
+  product: Layers,
+  data: BarChart3,
+  write: PenLine,
+  teach: GraduationCap,
+  lead: Users,
 };
 
 function RoleItem({ part, lead }: { part: HeadlinePart; lead?: boolean }) {

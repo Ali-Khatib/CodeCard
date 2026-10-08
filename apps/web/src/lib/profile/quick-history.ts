@@ -1,11 +1,9 @@
+import type { CardHistory } from '@codecard/types';
 import { parseHeadline } from '@/lib/profile/parse-headline';
 
-export type ProfileHistoryIcon = 'now' | 'before' | 'studied' | 'based';
+export type { CardHistory };
 
-export type CardHistory = {
-  before?: string | null;
-  studied?: string | null;
-};
+export type ProfileHistoryIcon = 'now' | 'working' | 'before' | 'studying' | 'studied' | 'based';
 
 export type ProfileHistoryLine = {
   label: string;
@@ -13,13 +11,24 @@ export type ProfileHistoryLine = {
   icon: ProfileHistoryIcon;
 };
 
+function historyLine(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 export function readCardHistory(value: unknown): CardHistory | null {
   if (!value || typeof value !== 'object') return null;
-  const row = value as { before?: unknown; studied?: unknown };
-  const before = typeof row.before === 'string' ? row.before.trim() : '';
-  const studied = typeof row.studied === 'string' ? row.studied.trim() : '';
-  if (!before && !studied) return null;
-  return { before: before || null, studied: studied || null };
+  const row = value as Record<string, unknown>;
+  const working = historyLine(row.working);
+  const before = historyLine(row.before);
+  const studying = historyLine(row.studying);
+  const studied = historyLine(row.studied);
+  if (!working && !before && !studying && !studied) return null;
+  return {
+    working: working || null,
+    before: before || null,
+    studying: studying || null,
+    studied: studied || null,
+  };
 }
 
 /** Short reverse-side facts for the public identity card. */
@@ -48,8 +57,14 @@ export function profileQuickHistory(input: {
     },
   ];
 
+  const working = input.history?.working?.trim();
+  if (working) lines.push({ label: 'Working', value: working, icon: 'working' });
+
   const before = input.history?.before?.trim() || previousFromBio(input.bio);
   if (before) lines.push({ label: 'Before', value: before, icon: 'before' });
+
+  const studying = input.history?.studying?.trim();
+  if (studying) lines.push({ label: 'Studying', value: studying, icon: 'studying' });
 
   const studied = input.history?.studied?.trim();
   if (studied) lines.push({ label: 'Studied', value: studied, icon: 'studied' });

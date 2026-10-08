@@ -1,18 +1,20 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { Briefcase, GraduationCap, MapPin, Sparkles } from 'lucide-react';
+import { BookOpen, Briefcase, GraduationCap, History, MapPin, Sparkles } from 'lucide-react';
 import { FlipCard } from '@/components/ui/flip-card';
 import { cn } from '@/lib/utils';
 import type { ProfileHistoryIcon, ProfileHistoryLine } from '@/lib/profile/quick-history';
 
 const ICONS: Record<ProfileHistoryIcon, typeof Sparkles> = {
   now: Sparkles,
-  before: Briefcase,
+  working: Briefcase,
+  before: History,
+  studying: BookOpen,
   studied: GraduationCap,
   based: MapPin,
 };
-const FALLBACK_ICONS = [Sparkles, Briefcase, GraduationCap, MapPin];
+const FALLBACK_ICONS = [Sparkles, Briefcase, History, BookOpen, GraduationCap, MapPin];
 
 /**
  * Public identity panel with a 3D flip. Front is the live profile;

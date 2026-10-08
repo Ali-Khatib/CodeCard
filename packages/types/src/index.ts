@@ -48,6 +48,18 @@ export interface TenantMembership {
   updated_at: string;
 }
 
+/** Optional lines on the back of a public card. */
+export interface CardHistory {
+  /** Current employment. */
+  working?: string | null;
+  /** Past employment. */
+  before?: string | null;
+  /** Education in progress. */
+  studying?: string | null;
+  /** Education already finished. */
+  studied?: string | null;
+}
+
 export interface Profile {
   id: UUID;
   tenant_id: UUID;
@@ -63,7 +75,7 @@ export interface Profile {
   /** Recruiter, engineer, founder, manager, or student. Null until they choose. */
   audience_role?: string | null;
   /** Optional back-of-card lines. Null when the owner leaves history blank. */
-  card_history?: { before?: string | null; studied?: string | null } | null;
+  card_history?: CardHistory | null;
   created_at: string;
   updated_at: string;
 }

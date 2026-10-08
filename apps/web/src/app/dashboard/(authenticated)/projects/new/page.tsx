@@ -39,15 +39,18 @@ export default async function NewProjectPage() {
         <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
           Create a project card
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Start with showcase images, fill in the project details, then create at the bottom. You
-          will land on the editor next — then return to Home to publish your CodeCard.
+        <p className="mt-3 text-[16px] leading-relaxed text-[var(--app-ink)]">
+          Title and URL are required. The rest is optional. After you create the project, you land
+          on the editor, then go Home to publish your CodeCard.
         </p>
-        <p className="mt-4">
-          <Link
-            href="/dashboard"
-            className="text-[14px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
-          >
+        <ul className="cc-project-create-guide">
+          <li>Add a showcase tab for Problem, Approach, Results, Experience, or Architecture.</li>
+          <li>Add technologies with the Add button. Enter works too.</li>
+          <li>Tap domain and focus chips. You can pick more than one.</li>
+          <li>Press Create project at the bottom when the card is ready.</li>
+        </ul>
+        <p className="mt-5">
+          <Link href="/dashboard" className="cc-app-btn cc-app-btn--ghost">
             ← Back to Home
           </Link>
         </p>
