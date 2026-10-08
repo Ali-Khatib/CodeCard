@@ -30,7 +30,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `tenants` | ✅ | ❌ | ❌ | SELECT; UPDATE if owner/admin | SELECT if same tenant | Membership via `user_tenant_ids()` |
 | `tenant_memberships` | ✅ | ❌ | ❌ | SELECT | SELECT if same tenant | No client INSERT/UPDATE/DELETE |
 | `profiles` | ✅ | published only | ❌ | full | published only; inbound scan offer / saved Connection snapshot | Drafts private |
-| `profile_links` | ✅ | if profile public | ❌ | full | if profile public | |
+| `profile_links` | ✅ | if profile public | ❌ | full | if profile public; inbound scan offer / saved Connection | |
 | `projects` | ✅ | published+public profile | ❌ | full | published+public | Drafts private |
 | `project_domains` | ✅ | via project visibility | ❌ | full | via project visibility | |
 | `project_focus_areas` | ✅ | via project visibility | ❌ | full | via project visibility | |

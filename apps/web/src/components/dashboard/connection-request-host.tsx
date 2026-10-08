@@ -51,6 +51,7 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
   const [where, setWhere] = useState('');
   const [when, setWhen] = useState(toDateInputValue(new Date().toISOString()));
   const [note, setNote] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const active = useMemo(() => {
     const pinned = offers.find((offer) => offer.id === activeId);
@@ -112,6 +113,7 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
       setWhere('');
       setWhen(toDateInputValue(new Date().toISOString()));
       setNote('');
+      setSaving(false);
       setStage('details');
       setError(null);
     };
@@ -181,6 +183,7 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
         setWhere('');
         setWhen(toDateInputValue(new Date().toISOString()));
         setNote('');
+        setSaving(false);
         setStage('details');
         setOffers((prev) => prev.filter((o) => o.id !== active.id));
       } catch {
@@ -191,17 +194,23 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
 
   const saveDetails = useCallback(
     (opts?: { doLater?: boolean }) => {
-      if (!acceptedConnectionId || pending) return;
+      if (!acceptedConnectionId || saving) return;
       setError(null);
-      startTransition(async () => {
+      setSaving(true);
+      void (async () => {
         try {
-          const result = await updateConnectionMetadataAction({
-            connectionId: acceptedConnectionId,
-            context: opts?.doLater ? where || null : where === '' ? null : where,
-            metAt: opts?.doLater || when === '' ? null : `${when}T12:00:00.000Z`,
-            privateNote: opts?.doLater ? note || null : note === '' ? null : note,
-            followUpAt: opts?.doLater ? tomorrowIsoDate() : null,
-          });
+          const result = await Promise.race([
+            updateConnectionMetadataAction({
+              connectionId: acceptedConnectionId,
+              context: opts?.doLater ? where || null : where === '' ? null : where,
+              metAt: opts?.doLater || when === '' ? null : `${when}T12:00:00.000Z`,
+              privateNote: opts?.doLater ? note || null : note === '' ? null : note,
+              followUpAt: opts?.doLater ? tomorrowIsoDate() : null,
+            }),
+            new Promise<never>((_, reject) => {
+              window.setTimeout(() => reject(new Error('timeout')), 15_000);
+            }),
+          ]);
           if (!result.success) {
             setError(result.error ?? 'Could not save details.');
             return;
@@ -210,10 +219,12 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
           setStage('alert');
         } catch {
           setError('Could not save details. Try again.');
+        } finally {
+          setSaving(false);
         }
-      });
+      })();
     },
-    [acceptedConnectionId, pending, where, when, note],
+    [acceptedConnectionId, saving, where, when, note],
   );
 
   if (!enabled) return null;
@@ -228,6 +239,10 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
         isOpen={showDecision && Boolean(active)}
         callerName={active?.scannerName ?? ''}
         callerInfo={active?.scannerHeadline ?? roleLabel(active?.scannerAudienceRole) ?? undefined}
+        headline={active?.scannerHeadline}
+        bio={active?.scannerBio}
+        location={active?.scannerLocation}
+        links={active?.scannerLinks}
         statusText="wants to connect with you"
         avatarUrl={active?.scannerAvatarUrl ?? undefined}
         onAccept={accept}
@@ -251,12 +266,8 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="cc-handshake-sheet p-5"
+          <div
+            className="cc-handshake-sheet cc-handshake-sheet--form p-5"
             role="dialog"
             aria-modal="true"
             aria-labelledby="connection-details-title"
@@ -274,63 +285,72 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
               Add where you met, when, and a private note — or do it later.
             </p>
 
-            <div className="mt-4 space-y-3">
+            <form
+              className="mt-4 space-y-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                saveDetails();
+              }}
+            >
               <label className="block text-[12px] font-medium text-[var(--app-smoke)]">
                 Where
                 <input
+                  type="text"
+                  name="where"
                   className="cc-app-input mt-1"
                   value={where}
                   onChange={(e) => setWhere(e.target.value)}
                   placeholder="Conference, campus, café…"
-                  disabled={pending}
+                  autoFocus
+                  autoComplete="off"
+                  enterKeyHint="next"
                 />
               </label>
               <label className="block text-[12px] font-medium text-[var(--app-smoke)]">
                 When
                 <input
                   type="date"
+                  name="when"
                   className="cc-app-input mt-1"
                   value={when}
                   onChange={(e) => setWhen(e.target.value)}
-                  disabled={pending}
                 />
               </label>
               <label className="block text-[12px] font-medium text-[var(--app-smoke)]">
                 Note
                 <textarea
+                  name="note"
                   className="cc-app-input mt-1 min-h-[72px] resize-y"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="What to remember…"
-                  disabled={pending}
+                  autoComplete="off"
+                  enterKeyHint="done"
                 />
               </label>
-            </div>
 
-            {error ? (
-              <p className="mt-3 text-[13px] text-[var(--app-error)]" role="alert">
-                {error}
-              </p>
-            ) : null}
+              {error ? (
+                <p className="text-[13px] text-[var(--app-error)]" role="alert">
+                  {error}
+                </p>
+              ) : null}
 
-            <div className="mt-4 flex flex-col gap-2">
-              <Button
-                className="h-12 w-full rounded-full"
-                onClick={() => saveDetails()}
-                disabled={pending}
-              >
-                {pending ? 'Saving…' : 'Save'}
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12 w-full rounded-full"
-                onClick={() => saveDetails({ doLater: true })}
-                disabled={pending}
-              >
-                Do later
-              </Button>
-            </div>
-          </motion.div>
+              <div className="flex flex-col gap-2 pt-1">
+                <Button type="submit" className="h-12 w-full rounded-full" disabled={saving}>
+                  {saving ? 'Saving…' : 'Save'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 w-full rounded-full"
+                  onClick={() => saveDetails({ doLater: true })}
+                  disabled={saving}
+                >
+                  Do later
+                </Button>
+              </div>
+            </form>
+          </div>
           </motion.div>
         ) : null}
       </AnimatePresence>

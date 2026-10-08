@@ -16,7 +16,11 @@ describe('connection request corner flow', () => {
     expect(avatar).toContain('@radix-ui/react-avatar');
     expect(card).toContain('IncomingCall');
     expect(card).toContain("mode === 'connection'");
+    expect(card).toContain('ConnectionCallCard');
     expect(host).toContain('connection request');
+    expect(host).toContain('scannerBio');
+    expect(host).toContain('cc-handshake-sheet--form');
+    expect(host).not.toContain('disabled={pending}');
     expect(host).toContain('Do later');
     expect(host).toContain('Decide later');
     expect(host).toContain('acceptScanOfferAction');

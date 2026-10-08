@@ -8533,6 +8533,8 @@ html.dark .cc-public-atmosphere__grain {
     max(16px, env(safe-area-inset-bottom));
   background: color-mix(in srgb, #100e0c 42%, transparent);
   overflow: auto;
+  /* A transformed ancestor blocks mobile keyboards inside the note form. */
+  transform: none !important;
 }
 
 .cc-handshake-sheet {
@@ -8544,4 +8546,182 @@ html.dark .cc-public-atmosphere__grain {
   background: var(--app-paper, #fff);
   color: var(--app-ink, #232324);
   box-shadow: 0 24px 60px rgba(16, 14, 12, 0.28);
+}
+
+/* Keep the note form out of a transformed layer so mobile keyboards can type. */
+.cc-handshake-sheet--form {
+  transform: none;
+}
+
+.cc-handshake-sheet--form .cc-app-input {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Incoming connection: the person's CodeCard, with call actions pinned below. */
+.cc-handshake-sheet.cc-call-card {
+  display: flex;
+  flex-direction: column;
+  width: min(22.5rem, 100%);
+  padding: 0;
+  overflow: hidden;
+  background: #f4efe8;
+  color: #232324;
+}
+
+.cc-call-card__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #232324;
+  box-shadow: 0 6px 16px rgba(16, 14, 12, 0.18);
+  cursor: pointer;
+}
+
+.cc-call-card__close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cc-call-card__scroll {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 10px 10px 0;
+}
+
+.cc-call-card__portrait {
+  position: relative;
+}
+
+.cc-call-card__frame {
+  position: relative;
+  aspect-ratio: 5 / 4;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #d7d2cc 0%, #efeae4 100%);
+}
+
+.cc-call-card__frame img,
+.cc-call-card__fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.cc-call-card__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-instrument), Georgia, serif;
+  font-size: 3rem;
+  color: #232324;
+}
+
+.cc-call-card__live {
+  position: absolute;
+  left: 12px;
+  bottom: 3.4rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: rgba(28, 26, 25, 0.72);
+  padding: 5px 10px 5px 8px;
+  color: #f7f2eb;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cc-call-card__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #3dd68c;
+  box-shadow: 0 0 0 0 rgba(61, 214, 140, 0.7);
+  animation: cc-call-card-pulse 1.6s ease-out infinite;
+}
+
+@keyframes cc-call-card-pulse {
+  70% {
+    box-shadow: 0 0 0 7px rgba(61, 214, 140, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(61, 214, 140, 0);
+  }
+}
+
+.cc-call-card .cc-public-hero__panel.cc-call-card__panel {
+  width: auto;
+  max-width: none;
+  margin-top: -2.6rem;
+  margin-inline: 8px;
+  margin-bottom: 8px;
+  padding: 1rem 1rem 1.05rem;
+}
+
+.cc-call-card__name {
+  margin-top: 0.15rem;
+  font-size: 1.65rem;
+  line-height: 1.1;
+}
+
+.cc-call-card .cc-public-hero__headline {
+  margin-top: 0.55rem;
+  font-size: 15px;
+}
+
+.cc-call-card__bio {
+  margin-top: 0.7rem;
+  font-size: 13.5px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cc-call-card__social .cc-public-social-row {
+  margin-top: 0.85rem;
+}
+
+.cc-call-card__actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 14px 14px;
+  background: #f4efe8;
+}
+
+.cc-call-card__status {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: #5c5856;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-call-card__dot {
+    animation: none;
+  }
 }

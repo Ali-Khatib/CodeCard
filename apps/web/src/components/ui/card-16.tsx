@@ -8,6 +8,8 @@ import { Clock, Phone, PhoneOff, UserPlus, UserX, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ConnectionCallCard } from '@/components/connections/connection-call-card';
+import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 
 export interface IncomingCallProps {
   callerName: string;
@@ -27,6 +29,11 @@ export interface IncomingCallProps {
   laterLabel?: string;
   busy?: boolean;
   error?: string | null;
+  /** CodeCard fields shown on an incoming connection. */
+  headline?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  links?: ProfileLinkItem[];
 }
 
 const IncomingCall = React.forwardRef<HTMLDivElement, IncomingCallProps>(
@@ -48,6 +55,10 @@ const IncomingCall = React.forwardRef<HTMLDivElement, IncomingCallProps>(
       laterLabel,
       busy = false,
       error,
+      headline,
+      bio,
+      location,
+      links,
       ...props
     },
     ref,
@@ -82,12 +93,37 @@ const IncomingCall = React.forwardRef<HTMLDivElement, IncomingCallProps>(
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className={cn('cc-handshake-sheet relative p-6 text-[var(--app-ink)]', className)}
+            className={cn(
+              'cc-handshake-sheet relative text-[var(--app-ink)]',
+              mode === 'connection' ? 'cc-call-card' : 'p-6',
+              className,
+            )}
             role="dialog"
             aria-modal="true"
             aria-labelledby="incoming-call-name"
             {...props}
           >
+            {mode === 'connection' ? (
+              <ConnectionCallCard
+                name={callerName}
+                headline={headline ?? callerInfo}
+                bio={bio}
+                location={location}
+                avatarUrl={avatarUrl}
+                links={links}
+                statusText={statusText}
+                error={error}
+                busy={busy}
+                onAccept={onAccept}
+                onDecline={onDecline}
+                onLater={onLater}
+                onClose={onClose}
+                acceptLabel={acceptLabel}
+                declineLabel={declineLabel}
+                laterLabel={laterLabel}
+              />
+            ) : (
+            <>
             <Button
               variant="ghost"
               size="icon"
@@ -168,6 +204,8 @@ const IncomingCall = React.forwardRef<HTMLDivElement, IncomingCallProps>(
                 </div>
               </div>
             </div>
+            </>
+            )}
           </motion.div>
           </motion.div>
         ) : null}

@@ -8,16 +8,26 @@ import {
   resolveOwnedProfile,
   type AuthUser,
 } from '@/lib/profile/profile-auth-core';
+import { toSafeProfileLinkItems } from '@/lib/profile/safe-profile-link-url';
 
 export const SCAN_OFFERS_TABLE = 'connection_scan_offers' as const;
 
 export type ScanOfferStatus = 'pending' | 'accepted' | 'dismissed';
+
+export type ScanOfferLink = {
+  type: string;
+  label: string | null;
+  url: string;
+};
 
 export type ScanOfferCard = {
   id: string;
   scannerProfileId: string;
   scannerName: string;
   scannerHeadline: string | null;
+  scannerBio: string | null;
+  scannerLocation: string | null;
+  scannerLinks: ScanOfferLink[];
   scannerSlug: string | null;
   scannerAvatarUrl: string | null;
   scannerAudienceRole: string | null;
@@ -105,10 +115,29 @@ export async function listPendingScanOffers(
   const profileIds = rows.map((row) => row.scanner_profile_id);
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, slug, display_name, headline, avatar_url, audience_role')
+    .select('id, slug, display_name, headline, bio, avatar_url, location, audience_role')
     .in('id', profileIds);
 
+  const { data: linkRows } = await supabase
+    .from('profile_links')
+    .select('profile_id, type, label, url, sort_order')
+    .in('profile_id', profileIds);
+
   const byId = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+  const linksByProfile = new Map<string, ScanOfferLink[]>();
+  for (const link of [...(linkRows ?? [])].sort(
+    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+  )) {
+    const profileId = typeof link.profile_id === 'string' ? link.profile_id : '';
+    if (!profileId) continue;
+    const list = linksByProfile.get(profileId) ?? [];
+    list.push({
+      type: typeof link.type === 'string' ? link.type : 'website',
+      label: typeof link.label === 'string' ? link.label : null,
+      url: typeof link.url === 'string' ? link.url : '',
+    });
+    linksByProfile.set(profileId, list);
+  }
 
   return {
     offers: rows.map((row) => {
@@ -118,6 +147,9 @@ export async function listPendingScanOffers(
         scannerProfileId: row.scanner_profile_id,
         scannerName: profile?.display_name?.trim() || 'Someone',
         scannerHeadline: profile?.headline ?? null,
+        scannerBio: profile?.bio ?? null,
+        scannerLocation: profile?.location ?? null,
+        scannerLinks: toSafeProfileLinkItems(linksByProfile.get(row.scanner_profile_id) ?? []),
         scannerSlug: profile?.slug ?? null,
         scannerAvatarUrl: profile?.avatar_url ?? null,
         scannerAudienceRole:
