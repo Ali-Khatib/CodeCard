@@ -8379,6 +8379,30 @@ html.dark .cc-public-atmosphere__grain {
   margin-inline: auto;
 }
 
+.cc-composer__back {
+  display: inline-flex;
+  margin-bottom: 18px;
+  font-family: var(--app-font);
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--app-smoke);
+  text-decoration: none;
+}
+
+.cc-composer__back:hover {
+  color: var(--app-ink);
+}
+
+.cc-composer__title {
+  margin: 8px 0 0;
+  font-family: var(--app-display), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 460;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--app-ink);
+}
+
 .cc-composer__steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -9130,29 +9154,29 @@ html.dark .cc-public-atmosphere__grain {
     min-width: 0;
   }
 
-  /* Calendar and CodeCard on one row. The event editor sits under both, in the middle. */
+  /* Calendar and the event form stack on the left. The CodeCard sits beside them. */
   .cc-home-desk__split > .cc-home-schedule,
-  .cc-home-desk__split .cc-profile-home__zone,
-  .cc-home-desk__split .cc-home-calendar {
+  .cc-home-desk__split .cc-profile-home__zone {
     display: contents;
   }
 
-  .cc-home-desk__split .cc-home-calendar__month {
+  .cc-home-desk__split .cc-home-calendar {
+    display: flex;
     grid-column: 1;
     grid-row: 1;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .cc-home-desk__split .cc-home-calendar__month,
+  .cc-home-desk__split .cc-home-calendar__day-panel {
     width: 100%;
   }
 
   .cc-home-desk__split > .cc-home-desk__card {
     grid-column: 2;
     grid-row: 1;
-  }
-
-  .cc-home-desk__split .cc-home-calendar__day-panel {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    width: min(820px, 100%);
-    justify-self: center;
+    align-self: start;
   }
 
   .cc-home-desk__split .cc-home-desk__dock {

@@ -33,10 +33,11 @@ export default async function NewProjectPage() {
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="cc-composer">
+        <Link href="/dashboard/work" className="cc-composer__back">
+          ← Back to Work
+        </Link>
         <p className="cc-create-intro__kicker">New project</p>
-        <h1 className="mt-2 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
-          Create a project card
-        </h1>
+        <h1 className="cc-composer__title">Create a project card</h1>
         <ol className="cc-composer__steps">
           <li>
             <span>1</span>
@@ -57,11 +58,6 @@ export default async function NewProjectPage() {
             </p>
           </li>
         </ol>
-        <p className="mb-6">
-          <Link href="/dashboard" className="cc-app-btn cc-app-btn--ghost">
-            ← Back to Home
-          </Link>
-        </p>
       </div>
       <ProjectCreateForm usage={usage} />
     </div>

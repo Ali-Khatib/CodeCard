@@ -67,25 +67,16 @@ export default async function EditProjectPage({
 
   return (
     <div className="cc-container cc-content py-8 md:py-12">
-      <div className="mx-auto mb-8 w-full max-w-[720px]">
-        <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
-          Edit project
-        </p>
-        <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
-          {loaded.project.title}
-        </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ash">
+      <div className="cc-composer mb-8">
+        <Link href="/dashboard/work" className="cc-composer__back">
+          ← Back to Work
+        </Link>
+        <p className="cc-create-intro__kicker">Edit project</p>
+        <h1 className="cc-composer__title">{loaded.project.title}</h1>
+        <p className="cc-create-intro__after">
           {fromFirstProject
-            ? 'This is your first project. Finish the details here, then go Home — publishing your CodeCard is the next step.'
-            : 'Start with cover art and screenshots, then update the details and save at the bottom. When you are ready, go Home to publish and share your CodeCard.'}
-        </p>
-        <p className="mt-4">
-          <Link
-            href="/dashboard"
-            className="text-[14px] font-medium text-[var(--app-ink)] underline-offset-2 hover:underline"
-          >
-            ← Back to Home
-          </Link>
+            ? 'This is your first project. Finish the details here, then open Work. Publishing your CodeCard is the next step.'
+            : 'Cover and screenshots first, then the details. Save at the bottom.'}
         </p>
       </div>
       <ProjectMediaUpload
