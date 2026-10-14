@@ -100,6 +100,7 @@ describe('rateLimit when Redis is configured but unreachable', () => {
     vi.unstubAllEnvs();
     vi.resetModules();
     vi.doUnmock('@upstash/ratelimit');
+    vi.doUnmock('@upstash/redis');
   });
 
   async function importWithFailingLimiter() {
@@ -166,6 +167,33 @@ describe('rateLimit when Redis is configured but unreachable', () => {
     await vi.advanceTimersByTimeAsync(1500);
     await expect(pending).resolves.toEqual({ success: false, denial: 'unavailable' });
     vi.useRealTimers();
+  });
+
+  it('strips wrapping quotes so a shell-style Vercel value still constructs', async () => {
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', '"https://example.upstash.io"');
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '"placeholder-token"');
+    const { getRedis } = await import('@/lib/rate-limit');
+    expect(getRedis()).not.toBeNull();
+  });
+
+  it('turns an invalid Redis URL into a closed denial instead of a throw', async () => {
+    vi.doMock('@upstash/redis', () => ({
+      Redis: class {
+        constructor() {
+          throw new Error('Upstash Redis client was passed an invalid URL');
+        }
+      },
+    }));
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('CODECARD_E2E', '');
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'not-a-url');
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', 'placeholder-token');
+    const { rateLimit } = await import('@/lib/rate-limit');
+    await expect(rateLimit('t', 'upload')).resolves.toEqual({
+      success: false,
+      denial: 'misconfigured',
+    });
+    vi.doUnmock('@upstash/redis');
   });
 
   it('never logs the Redis URL or token', async () => {

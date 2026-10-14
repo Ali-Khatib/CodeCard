@@ -19,15 +19,37 @@ export type RateLimitResult = {
   retryAfterSeconds?: number;
 };
 
+/**
+ * Vercel values are often pasted from a shell assignment (`KEY="value"`), so
+ * the stored string includes the quote characters. The Upstash client throws
+ * on that URL before any request, which became an empty HTTP 500.
+ */
+function readRedisEnv(name: 'UPSTASH_REDIS_REST_URL' | 'UPSTASH_REDIS_REST_TOKEN'): string {
+  let value = (process.env[name] ?? '').trim();
+  if (
+    (value.startsWith('"') && value.endsWith('"') && value.length >= 2) ||
+    (value.startsWith("'") && value.endsWith("'") && value.length >= 2)
+  ) {
+    value = value.slice(1, -1).trim();
+  }
+  return value;
+}
+
 export function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = readRedisEnv('UPSTASH_REDIS_REST_URL');
+  const token = readRedisEnv('UPSTASH_REDIS_REST_TOKEN');
   if (!url || !token) return null;
-  return new Redis({
-    url,
-    token,
-    retry: { retries: 0 },
-  });
+  try {
+    return new Redis({
+      url,
+      token,
+      retry: { retries: 0 },
+    });
+  } catch {
+    /* Invalid URL/token shape. Do not log the value. */
+    console.error('[rate-limit] Redis client rejected its configuration');
+    return null;
+  }
 }
 
 function withDeadline<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -89,14 +111,14 @@ export async function rateLimit(
   }
 
   const config = RATE_LIMITS[type];
-  const limiter = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(config.requests, config.window),
-    analytics: true,
-    prefix: 'codecard',
-  });
 
   try {
+    const limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(config.requests, config.window),
+      analytics: true,
+      prefix: 'codecard',
+    });
     const result = await withDeadline(limiter.limit(key), REDIS_ATTEMPT_MS);
     if (!result.success) {
       const retryAfterSeconds =
@@ -137,13 +159,12 @@ export async function rateLimitTokenBucket(
     return { success: true };
   }
 
-  const limiter = new Ratelimit({
-    redis,
-    limiter: Ratelimit.tokenBucket(tokens, refill, tokens),
-    prefix: 'codecard:ai',
-  });
-
   try {
+    const limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.tokenBucket(tokens, refill, tokens),
+      prefix: 'codecard:ai',
+    });
     const result = await limiter.limit(key);
     return { success: result.success };
   } catch {

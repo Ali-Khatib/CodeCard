@@ -26,9 +26,11 @@ Do not put complete emails, tokens, or raw cookies in Redis keys. Prefer opaque 
 
 | Variable | Visibility | Scopes | Notes |
 |----------|------------|--------|-------|
-| `UPSTASH_REDIS_REST_URL` | server-only | Production, Preview | REST URL from Upstash console |
+| `UPSTASH_REDIS_REST_URL` | server-only | Production, Preview | REST URL from Upstash console, `https://…` only |
 | `UPSTASH_REDIS_REST_TOKEN` | server-only | Production, Preview | REST token — never `NEXT_PUBLIC_` |
 | `CODECARD_RATE_LIMIT_VERIFY` | server | temporary only | Set to `1` for the bounded 429 probe, then **unset** |
+
+Paste the URL and token alone. A shell-style value that still has `"` around it is invalid, and the Upstash client throws before the route can answer. The app strips one wrapping pair of quotes and surrounding whitespace, then treats any remaining invalid value as Redis missing (503 on upload, not an empty 500).
 
 Never set Upstash credentials on Production from the isolated E2E project. For MVP, `codecard-mvp` may share one non-prod Upstash database across Preview + Production of that project.
 
