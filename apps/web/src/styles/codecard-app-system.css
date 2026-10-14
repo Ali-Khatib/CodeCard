@@ -8975,7 +8975,33 @@ html.dark .cc-public-atmosphere__grain {
   display: flex;
   flex-direction: column;
   gap: 28px;
-  max-width: 920px;
+  width: 100%;
+  max-width: none;
+}
+
+.cc-home-desk__split {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+/* Laptop and wider: the desk was a 920px column, so the rest of the main pane sat empty. */
+@container app-main (min-width: 1040px) {
+  .cc-home-desk__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    align-items: start;
+    gap: 24px;
+  }
+
+  .cc-home-desk__split > * {
+    min-width: 0;
+  }
+
+  .cc-home-desk__split .cc-home-desk__dock {
+    width: 100%;
+  }
 }
 
 .cc-home-desk__hello {

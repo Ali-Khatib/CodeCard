@@ -175,6 +175,7 @@ export function HomeDesk({
 
       {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
 
+      <div className="cc-home-desk__split">
       <HomeScheduleSection
         events={events}
         followUps={followUps}
@@ -291,6 +292,7 @@ export function HomeDesk({
           </HomeCodeCardPreview>
         ) : null}
       </section>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   SESSION_LEASE_CLOSE_MAX_AGE_SECONDS,
@@ -21,6 +23,12 @@ describe('session lease', () => {
     expect(serializeSessionLeaseCookie(SESSION_LEASE_CLOSE_MAX_AGE_SECONDS)).toContain(
       'Max-Age=3',
     );
+  });
+
+  it('does not rewrite the lease on every dashboard request', () => {
+    const proxy = readFileSync(resolve(process.cwd(), 'src/proxy.ts'), 'utf8');
+    expect(proxy).toContain('!hasSessionLease(request.cookies.getAll())');
+    expect(proxy).not.toMatch(/if \(user\) \{\s*rememberOpenTab/);
   });
 
   it('finds chunked Supabase auth cookies', () => {

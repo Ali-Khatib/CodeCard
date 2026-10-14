@@ -149,7 +149,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user) {
+  // The browser already refreshes this lease. Setting it again on every
+  // dashboard request attaches Set-Cookie to the RSC flight, and the App
+  // Router then sits on the loading bar instead of committing the next tab.
+  if (user && !hasSessionLease(request.cookies.getAll())) {
     rememberOpenTab(supabaseResponse);
   }
 
