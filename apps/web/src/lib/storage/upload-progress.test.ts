@@ -29,6 +29,12 @@ describe('upload failure classification', () => {
     expect(isRetryableUploadFailure('network')).toBe(true);
     expect(isRetryableUploadFailure('signed_upload_expired')).toBe(true);
     expect(isRetryableUploadFailure('authentication')).toBe(false);
+    expect(classifyInitFailure(429, 'Too many requests', 'rate_limited').failureClass).toBe('rate_limited');
+    expect(classifyInitFailure(429, 'Too many requests').message).not.toMatch(/too many requests/i);
+    expect(classifyInitFailure(503, 'Photo upload is temporarily unavailable. Try again shortly.', 'upload_unavailable').failureClass).toBe(
+      'service_unavailable',
+    );
+    expect(classifyInitFailure(503, 'redis token leaked').message).not.toMatch(/redis|token/i);
   });
 });
 

@@ -11,6 +11,84 @@ export interface ResearchSource {
 }
 
 export const RESEARCH_SOURCES: Record<string, ResearchSource> = {
+  'guillory-linkedin-deception': {
+    id: 'guillory-linkedin-deception',
+    title: 'The Effect of LinkedIn on Deception in Resumes',
+    authors: 'Guillory & Hancock',
+    year: 2012,
+    studyType: 'Between-subjects experiment',
+    sampleSize: '119 participants writing résumés',
+    finding:
+      'Public LinkedIn résumés were not less deceptive overall. People lied less about work experience and responsibilities, and more about interests and hobbies, than on a traditional résumé.',
+    limitation:
+      'A lab résumé task, not a field study of real hiring. It shows how a public profile changes the kind of deception, not that every LinkedIn connection is false.',
+    url: 'https://doi.org/10.1089/cyber.2011.0389',
+  },
+  'van-dijck-linkedin-identity': {
+    id: 'van-dijck-linkedin-identity',
+    title: 'Performing the Self on Facebook and LinkedIn',
+    authors: 'van Dijck',
+    year: 2013,
+    studyType: 'Interface analysis',
+    sampleSize: 'Comparative reading of two platform interfaces',
+    finding:
+      'LinkedIn’s interface pushes a single professional persona: skills, recommendations, and a narrative written to be evaluated by people who do not know you.',
+    limitation:
+      'This is an interface analysis, not a survey of how often those connections are strangers.',
+    url: 'https://doi.org/10.1177/0163443712468605',
+  },
+  'nisbett-wilson-halo': {
+    id: 'nisbett-wilson-halo',
+    title: 'The Halo Effect',
+    authors: 'Nisbett & Wilson',
+    year: 1977,
+    studyType: 'Experiment',
+    sampleSize: 'Viewers of staged warm and cold interviews with the same instructor',
+    finding:
+      'A global impression changed ratings of appearance, manner, and accent. People who disliked the instructor still believed those details had caused the dislike, not the other way around.',
+    limitation:
+      'A classroom interview, not a hiring or conference study. The mechanism is the point: one strong impression spills onto everything else.',
+    url: 'https://doi.org/10.1037/0022-3514.35.4.250',
+  },
+  'gopalakrishna-trade-show': {
+    id: 'gopalakrishna-trade-show',
+    title: 'A Three-Stage Model of Industrial Trade Show Performance',
+    authors: 'Gopalakrishna & Lilien',
+    year: 1995,
+    studyType: 'Field model of exhibitors',
+    sampleSize: '85 firms at one major trade show',
+    finding:
+      'A booth has to attract someone, get a real conversation, and then convert that contact. Attraction, contact, and conversion are different problems, and a crowded floor makes the middle step the fragile one.',
+    limitation:
+      'One 1991 industrial show. It measures exhibitor performance, not how a visitor remembers a person they met.',
+    url: 'https://doi.org/10.1287/mksc.14.1.22',
+  },
+  'smith-trade-show-followup': {
+    id: 'smith-trade-show-followup',
+    title: 'The Complementary Effect of Trade Shows on Personal Selling',
+    authors: 'Smith, Gopalakrishna & Smith',
+    year: 2004,
+    studyType: 'Field study',
+    sampleSize: 'Industrial distributors, attendees compared with non-attendees',
+    finding:
+      'Follow-up selling was more productive when the customer had already seen the product at the show. The booth did not replace the later conversation. It made that conversation work better.',
+    limitation:
+      'Business-to-business selling, not a study of personal networking cards. The result is about following up a meeting, not about collecting contacts.',
+    url: 'https://doi.org/10.1016/j.ijresmar.2003.04.003',
+  },
+  'larkin-simon-diagrams': {
+    id: 'larkin-simon-diagrams',
+    title: 'Why a Diagram Is (Sometimes) Worth Ten Thousand Words',
+    authors: 'Larkin & Simon',
+    year: 1987,
+    studyType: 'Cognitive model',
+    sampleSize: 'Worked problems in mathematics and physics',
+    finding:
+      'A diagram can put the relation you need in one place, so a person recognizes it instead of searching through a paragraph. A sentence and a picture can say the same thing and still not be equally easy to use.',
+    limitation:
+      'The examples are textbook problems, not project cards. It supports showing the work, not a claim that every image persuades.',
+    url: 'https://doi.org/10.1111/j.1551-6708.1987.tb00863.x',
+  },
   'pina-eye-tracking': {
     id: 'pina-eye-tracking',
     title: 'Recruiter Eye-Tracking During Résumé Screening',

@@ -47,6 +47,9 @@ describe('profile editor route states', () => {
     );
 
     expect(editor).toContain('aria-busy={pending}');
+    expect(editor).not.toContain('router.refresh');
+    expect(editor).not.toContain('setForm(profileToFormState(profile))');
+    expect(editor).toContain('onPersistedRef.current?.(formRef.current)');
     expect(editor).toContain('role="status"');
     expect(links).toContain('aria-busy={busy}');
     expect(links).toContain('role="status"');

@@ -7,12 +7,12 @@ function read(rel: string) {
 }
 
 describe('inline research PDF reader contracts', () => {
-  it('wires Read paper on card and detail without navigating away as primary action', () => {
+  it('wires Read paper on the paper page without navigating away as primary action', () => {
     const card = read('src/components/research/research-paper-card.tsx');
     const detail = read('src/components/research/research-paper-detail.tsx');
     const reader = read('src/components/research/research-pdf-reader.tsx');
 
-    expect(card).toContain('ResearchPdfReadButton');
+    expect(card).not.toContain('ResearchPdfReadButton');
     expect(detail).toContain('ResearchPdfReadButton');
     expect(card).not.toContain('Open paper');
     expect(detail).not.toContain('Open paper');
@@ -49,9 +49,9 @@ describe('inline research PDF reader contracts', () => {
   it('tracks paper_download once on open via onOpenTrack', () => {
     const card = read('src/components/research/research-paper-card.tsx');
     const detail = read('src/components/research/research-paper-detail.tsx');
-    expect(card).toContain("eventType: 'paper_download'");
+    expect(card).not.toContain("eventType: 'paper_download'");
     expect(detail).toContain("eventType: 'paper_download'");
-    expect(card).toContain('onOpenTrack');
+    expect(card).not.toContain('onOpenTrack');
     expect(detail).toContain('onOpenTrack');
   });
 

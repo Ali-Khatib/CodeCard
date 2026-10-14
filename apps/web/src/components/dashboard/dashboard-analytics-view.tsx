@@ -15,7 +15,6 @@ import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 import { FadeInView } from './fade-in-view';
 import { AnalyticsAiInsights } from './analytics/analytics-ai-insights';
 import { AnalyticsCoachChat } from './analytics/analytics-coach-chat';
-import { AnalyticsAudiencePanel } from './analytics/analytics-audience-panel';
 import { AnalyticsTrendChart } from './analytics/analytics-trend-chart';
 import {
   AppButton,
@@ -87,7 +86,7 @@ export function DashboardAnalyticsView({
             <p className="mt-2 text-[15px] text-[var(--app-smoke)]">
               Public audience analytics stay at zero until you publish your CodeCard.
             </p>
-            <AppButton variant="ghost" href="/dashboard#profile" className="mt-3">
+            <AppButton variant="ghost" href="/dashboard/profile" className="mt-3">
               Open profile settings
             </AppButton>
           </AppCard>
@@ -148,7 +147,8 @@ export function DashboardAnalyticsView({
                   Ask what to change. A coach that turns views into a decision.
                 </p>
                 <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-[var(--app-muted)]">
-                  Try the sample conversation in the live demo, then unlock it here.
+                  Free includes a limited analytics chat. Pro includes extended use of that chat.
+                  It only answers from the numbers on this page, and it is not an unlimited assistant.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <AppButton variant="soft" href="/dashboard/billing">
@@ -191,18 +191,6 @@ export function DashboardAnalyticsView({
             </div>
           </FadeInView>
 
-          <FadeInView delay={0.05}>
-            <AnalyticsAudiencePanel
-              roles={summary.viewerRoles}
-              description="From what signed-in visitors chose on create account or their profile. Guests are not included."
-              emptyLabel={
-                summary.viewerRoleSampleSize === 0
-                  ? 'Nobody who viewed this card has said what they are yet. Recruiters, engineers, founders, managers, and students show up here after they choose.'
-                  : undefined
-              }
-            />
-          </FadeInView>
-
           <FadeInView delay={0.06}>
             <AnalyticsTrendChart
               trends={trends}
@@ -214,8 +202,15 @@ export function DashboardAnalyticsView({
           <FadeInView delay={0.12}>
             <section>
               <SectionLabel>What people open</SectionLabel>
-              <p className="cc-app-section-subtitle">Most viewed projects from recorded events</p>
-              {summary.topProjects.length === 0 ? (
+              <p className="cc-app-section-subtitle">
+                Per-project analytics are a Pro feature. Free keeps the project-views total above.
+              </p>
+              {!entitlement.perProject ? (
+                <ProUpgradeCard
+                  title="Per-project analytics"
+                  body="Views, link clicks, and time on each project are included with Pro. Free shows the combined project-views total only."
+                />
+              ) : summary.topProjects.length === 0 ? (
                 <AppCard className="mt-4 !p-5">
                   <p className="text-[14px] text-[var(--app-smoke)]">
                     No project engagement recorded yet.

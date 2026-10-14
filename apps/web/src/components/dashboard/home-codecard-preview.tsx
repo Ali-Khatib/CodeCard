@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import { HeadlineRoles } from '@/components/profile/headline-roles';
@@ -21,6 +22,9 @@ type HomeCodeCardPreviewProps = {
   slug: string;
   isPublic: boolean;
   links?: ProfileLinkItem[];
+  /** Home embeds the card under its own heading. */
+  embedded?: boolean;
+  children?: ReactNode;
 };
 
 /**
@@ -36,6 +40,8 @@ export function HomeCodeCardPreview({
   slug,
   isPublic,
   links = [],
+  embedded = false,
+  children,
 }: HomeCodeCardPreviewProps) {
   const viewHref =
     slug === 'demo' ? LIVE_DEMO_PROFILE_HREF : getSavedProfilePreviewHref({ slug, is_public: isPublic });
@@ -43,13 +49,20 @@ export function HomeCodeCardPreview({
   const intro = bio?.trim() || 'Add a short bio so visitors know who you are.';
 
   return (
-    <aside className="cc-home-codecard" aria-labelledby="home-codecard-heading">
-      <p className="cc-workspace-section__eyebrow" id="home-codecard-heading">
-        Your CodeCard
-      </p>
-      <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-        Live preview of the card people open from your link or QR.
-      </p>
+    <aside
+      className={embedded ? 'cc-home-codecard cc-home-codecard--embedded' : 'cc-home-codecard'}
+      aria-labelledby={embedded ? undefined : 'home-codecard-heading'}
+    >
+      {embedded ? null : (
+        <>
+          <p className="cc-workspace-section__eyebrow" id="home-codecard-heading">
+            Your CodeCard
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
+            Live preview of the card people open from your link or QR.
+          </p>
+        </>
+      )}
 
       <div className="cc-home-codecard__stage cc-public-hero cc-app-profile-preview cc-app-profile-preview--hero">
         <div className="cc-public-hero__portrait">
@@ -101,6 +114,7 @@ export function HomeCodeCardPreview({
           </AppButton>
         </div>
       </div>
+      {children}
 
       {!isPublic ? (
         <p className="mt-3 text-[12px] leading-relaxed text-[var(--app-smoke)]">

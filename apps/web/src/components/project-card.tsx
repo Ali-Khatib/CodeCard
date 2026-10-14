@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { Badge } from '@codecard/ui';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 
 interface ProjectCardProps {
   project: {
@@ -16,8 +16,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, profileSlug }: ProjectCardProps) {
-  const poster = project.project_media_assets?.find((a) => a.type === 'poster');
-  const heroVideo = project.project_media_assets?.find((a) => a.type === 'hero_video');
+  const poster = project.project_media_assets?.find((asset) => asset.type === 'poster');
   const href = `/${profileSlug}/projects/${project.id}`;
 
   return (
@@ -25,33 +24,23 @@ export function ProjectCard({ project, profileSlug }: ProjectCardProps) {
       href={href}
       kind="project"
       itemTitle={project.title}
-      className="group block animate-slide-up overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 transition-all duration-300 hover:border-zinc-600 hover:shadow-lg hover:shadow-violet-500/5"
+      aria-label={`Open project: ${project.title}`}
+      className="group block overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40 outline-none transition-colors duration-200 hover:border-zinc-600 focus-visible:ring-2 focus-visible:ring-violet-400"
     >
-      {(poster || heroVideo) && (
-        <div className="relative aspect-video overflow-hidden bg-zinc-800">
-          {poster && (
-            <Image
-              src={poster.storage_path}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-              sizes="(max-width: 768px) 100vw, 672px"
-            />
-          )}
-        </div>
-      )}
-      <div className="p-6">
-        <h3 className="text-xl font-semibold transition-colors group-hover:text-violet-300">
-          {project.title}
-        </h3>
-        {project.tagline && <p className="mt-2 text-sm text-zinc-400">{project.tagline}</p>}
-        {project.technologies.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.technologies.slice(0, 6).map((tech) => (
-              <Badge key={tech}>{tech}</Badge>
-            ))}
-          </div>
-        )}
+      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-800">
+        {poster ? (
+          <Image
+            src={poster.storage_path}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 672px"
+          />
+        ) : null}
+      </div>
+      <div className="px-3.5 py-3">
+        <h3 className="break-words text-[17px] font-medium leading-snug">{project.title}</h3>
+        <ProjectTechLine technologies={project.technologies} className="mt-1 text-zinc-400" />
       </div>
     </ContentOpeningLink>
   );

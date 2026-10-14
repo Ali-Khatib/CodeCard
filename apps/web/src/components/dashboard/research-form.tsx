@@ -278,7 +278,7 @@ export function ResearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-[720px] space-y-6"
+      className="cc-research-form mx-auto max-w-[720px] space-y-6"
       aria-busy={pending}
       data-testid="research-form"
       data-mode={mode}
@@ -295,8 +295,8 @@ export function ResearchForm({
       ) : null}
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-title`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          Title
+        <label htmlFor={`${formId}-title`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          Title <span className="cc-field-mark cc-field-mark--required">Required</span>
         </label>
         <input
           id={`${formId}-title`}
@@ -313,8 +313,8 @@ export function ResearchForm({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-slug`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          URL slug
+        <label htmlFor={`${formId}-slug`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          URL slug <span className="cc-field-mark cc-field-mark--required">Required</span>
         </label>
         <input
           ref={slugInputRef}
@@ -331,17 +331,17 @@ export function ResearchForm({
             `${formId}-slug-help`,
             fieldErrors.slug ? `${formId}-slug-error` : undefined,
           )}
-          className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 font-mono text-[14px] text-[var(--app-ink)]"
+          className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 font-mono text-[16px] text-[var(--app-ink)]"
         />
-        <p id={`${formId}-slug-help`} className="text-[13px] text-[var(--app-smoke)]">
+        <p id={`${formId}-slug-help`} className="text-[16px] leading-snug text-[var(--app-ink)]">
           Preview: /research/{form.slug || 'your-paper'}
         </p>
         <FieldError id={`${formId}-slug-error`} message={fieldErrors.slug} />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-abstract`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          Abstract
+        <label htmlFor={`${formId}-abstract`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          Abstract <span className="cc-field-mark">Optional</span>
         </label>
         <textarea
           id={`${formId}-abstract`}
@@ -358,8 +358,10 @@ export function ResearchForm({
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-[14px] font-medium text-[var(--app-ink)]">Authors</legend>
-        <p className="text-[13px] text-[var(--app-smoke)]">
+        <legend className="text-[17px] font-semibold text-[var(--app-ink)]">
+          Authors <span className="cc-field-mark">Optional</span>
+        </legend>
+        <p className="text-[16px] leading-snug text-[var(--app-ink)]">
           Plain-text author names only. Order is preserved. Max {RESEARCH_FORM_LIMITS.authorsMax}.
         </p>
         <ul className="space-y-2">
@@ -400,8 +402,8 @@ export function ResearchForm({
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <label htmlFor={`${formId}-venue`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-            Venue
+          <label htmlFor={`${formId}-venue`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+            Venue <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id={`${formId}-venue`}
@@ -415,8 +417,8 @@ export function ResearchForm({
           <FieldError id={`${formId}-venue-error`} message={fieldErrors.venue} />
         </div>
         <div className="space-y-2">
-          <label htmlFor={`${formId}-year`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-            Year
+          <label htmlFor={`${formId}-year`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+            Year <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id={`${formId}-year`}
@@ -431,7 +433,7 @@ export function ResearchForm({
             aria-invalid={Boolean(fieldErrors.year)}
             className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
           />
-          <p id={`${formId}-year-help`} className="text-[13px] text-[var(--app-smoke)]">
+          <p id={`${formId}-year-help`} className="text-[16px] leading-snug text-[var(--app-ink)]">
             Publication year only ({RESEARCH_FORM_LIMITS.yearMin}–{RESEARCH_FORM_LIMITS.yearMax}). Not filled
             automatically.
           </p>
@@ -442,9 +444,9 @@ export function ResearchForm({
       <div className="space-y-2">
         <label
           htmlFor={`${formId}-publication-status`}
-          className="block text-[14px] font-medium text-[var(--app-ink)]"
+          className="block text-[17px] font-semibold text-[var(--app-ink)]"
         >
-          Publication status
+          Publication status <span className="cc-field-mark">Optional</span>
         </label>
         <input
           id={`${formId}-publication-status`}
@@ -468,8 +470,8 @@ export function ResearchForm({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-doi`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          DOI
+        <label htmlFor={`${formId}-doi`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          DOI <span className="cc-field-mark">Optional</span>
         </label>
         <input
           id={`${formId}-doi`}
@@ -483,15 +485,15 @@ export function ResearchForm({
           aria-invalid={Boolean(fieldErrors.doi_url)}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
-        <p id={`${formId}-doi-help`} className="text-[13px] text-[var(--app-smoke)]">
+        <p id={`${formId}-doi-help`} className="text-[16px] leading-snug text-[var(--app-ink)]">
           Optional. No remote DOI lookup is performed.
         </p>
         <FieldError id={`${formId}-doi-error`} message={fieldErrors.doi_url} />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-pdf-url`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          External paper URL
+        <label htmlFor={`${formId}-pdf-url`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          External paper URL <span className="cc-field-mark">Optional</span>
         </label>
         <input
           id={`${formId}-pdf-url`}
@@ -508,7 +510,7 @@ export function ResearchForm({
           aria-invalid={Boolean(fieldErrors.pdf_url)}
           className="w-full rounded-xl border border-[var(--app-border)] bg-white px-3 py-2.5 text-[15px]"
         />
-        <p id={`${formId}-pdf-url-help`} className="text-[13px] text-[var(--app-smoke)]">
+        <p id={`${formId}-pdf-url-help`} className="text-[16px] leading-snug text-[var(--app-ink)]">
           Optional HTTPS link to an externally hosted paper or PDF. Clear the field to remove it.
           CodeCard does not host, scan, or verify this file. Private PDF uploads stay disabled.
         </p>
@@ -516,8 +518,8 @@ export function ResearchForm({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${formId}-citation`} className="block text-[14px] font-medium text-[var(--app-ink)]">
-          Citation text
+        <label htmlFor={`${formId}-citation`} className="block text-[17px] font-semibold text-[var(--app-ink)]">
+          Citation text <span className="cc-field-mark">Optional</span>
         </label>
         <textarea
           id={`${formId}-citation`}
@@ -537,9 +539,9 @@ export function ResearchForm({
       <div className="space-y-2">
         <label
           htmlFor={`${formId}-related-project`}
-          className="block text-[14px] font-medium text-[var(--app-ink)]"
+          className="block text-[17px] font-semibold text-[var(--app-ink)]"
         >
-          Related project
+          Related project <span className="cc-field-mark">Optional</span>
         </label>
         <select
           id={`${formId}-related-project`}
@@ -563,7 +565,7 @@ export function ResearchForm({
             </option>
           ))}
         </select>
-        <p id={`${formId}-related-project-help`} className="text-[13px] text-[var(--app-smoke)]">
+        <p id={`${formId}-related-project-help`} className="text-[16px] leading-snug text-[var(--app-ink)]">
           {relatedProjectOptions.length === 0
             ? 'You have no projects yet. You can still save this paper and link a project later.'
             : 'Optional. Only your own projects appear here. Draft projects stay private on public pages.'}
@@ -580,7 +582,7 @@ export function ResearchForm({
         </p>
       ) : null}
 
-      <p className="text-[13px] text-[var(--app-smoke)]" role="status" aria-live="polite">
+      <p className="cc-create-usage" role="status" aria-live="polite">
         {pending
           ? mode === 'edit'
             ? 'Saving research paper…'

@@ -52,6 +52,7 @@ export function HeadlineField({
 }) {
   const [parts, setParts] = useState<HeadlinePart[]>(() => partsFromValue(value));
   const [stored, setStored] = useState(() => serializeHeadlineParts(partsFromValue(value)));
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (value === stored) return;
@@ -73,36 +74,23 @@ export function HeadlineField({
       <label className="text-[13px] font-medium text-[var(--app-ink)]" htmlFor="headline">
         Headline
       </label>
-      <p className="text-[12px] text-[var(--app-smoke)]">
-        Pick an icon, then write the line. With three lines, the first stands on its own.
-      </p>
       <div className="cc-headline-field__lines">
-        {parts.map((part, index) => (
+        {parts.map((part, index) => {
+          const selectedIcon = ICONS.find((icon) => icon.id === part.icon);
+          const SelectedIcon = selectedIcon?.Icon;
+          return (
           <div key={index} className="cc-headline-field__line">
-            <div className="cc-headline-field__icons" role="group" aria-label={`Icons for line ${index + 1}`}>
-              {ICONS.map(({ id, label, Icon }) => {
-                const selected = part.icon === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    className={`cc-headline-field__icon${selected ? ' is-selected' : ''}`}
-                    aria-pressed={selected}
-                    aria-label={label}
-                    title={label}
-                    disabled={disabled}
-                    onClick={() => {
-                      const next = parts.slice();
-                      next[index] = { ...part, icon: selected ? null : id };
-                      commit(next);
-                    }}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden />
-                  </button>
-                );
-              })}
-            </div>
             <div className="cc-headline-field__entry">
+              <button
+                type="button"
+                className="cc-headline-field__picker"
+                aria-expanded={openIndex === index}
+                aria-label={selectedIcon ? `Change icon, ${selectedIcon.label}` : 'Choose an icon'}
+                disabled={disabled}
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+              >
+                {SelectedIcon ? <SelectedIcon className="h-4 w-4" aria-hidden /> : <Plus className="h-4 w-4" aria-hidden />}
+              </button>
               <input
                 id={index === 0 ? 'headline' : undefined}
                 className="cc-app-input min-w-0 flex-1"
@@ -115,6 +103,31 @@ export function HeadlineField({
                   commit(next);
                 }}
               />
+              {openIndex === index ? (
+                <div className="cc-headline-field__icons" role="group" aria-label={`Icons for line ${index + 1}`}>
+                  {ICONS.map(({ id, label, Icon }) => {
+                    const selected = part.icon === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        className={`cc-headline-field__icon${selected ? ' is-selected' : ''}`}
+                        aria-pressed={selected}
+                        aria-label={label}
+                        disabled={disabled}
+                        onClick={() => {
+                          const next = parts.slice();
+                          next[index] = { ...part, icon: selected ? null : id };
+                          commit(next);
+                          setOpenIndex(null);
+                        }}
+                      >
+                        <Icon className="h-4 w-4" aria-hidden />
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
               {parts.length > 1 ? (
                 <button
                   type="button"
@@ -127,7 +140,8 @@ export function HeadlineField({
               ) : null}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
       {parts.length < MAX_LINES ? (
         <button

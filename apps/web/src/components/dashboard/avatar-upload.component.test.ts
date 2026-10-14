@@ -25,6 +25,9 @@ describe('AvatarUpload component', () => {
     expect(component).toContain("'optimizing'");
     expect(component).toContain('URL.revokeObjectURL');
     expect(component).toContain('finalizeAvatarUploadAction');
+    expect(component).toContain('publishProfileAvatarSaved');
+    expect(component).toContain('createLatestUploadGuard');
+    expect(component).not.toContain('router.refresh');
     expect(component).toContain('uploadAvatarToSignedUrl');
     expect(component).toContain('ImageCropDialog');
     expect(component).toContain('aspect={4 / 5}');

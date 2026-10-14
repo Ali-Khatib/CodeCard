@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { FILE_LIMITS } from '@codecard/config';
 import {
   AVATAR_UPLOAD_BUCKET,
+  createLatestUploadGuard,
   executeAvatarUploadFlow,
   mapAvatarValidationMessage,
   requestAvatarUploadInit,
@@ -87,6 +88,85 @@ describe('requestAvatarUploadInit', () => {
     expect(body.filename).toBe('avatar.png');
     expect(typeof body.contentPrefixBase64).toBe('string');
     expect(body.contentPrefixBase64.length).toBeGreaterThanOrEqual(8);
+  });
+});
+
+describe('avatar upload failure classification', () => {
+  it('distinguishes quota exhaustion from an unavailable upload service', async () => {
+    const limited = await requestAvatarUploadInit(
+      makeFile('avatar.png', 'image/png', 1024),
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 429,
+        json: async () => ({ error: 'Too many requests', code: 'rate_limited' }),
+      }),
+    );
+    expect(limited.ok).toBe(false);
+    if (!limited.ok) {
+      expect(limited.failureClass).toBe('rate_limited');
+      expect(limited.message).toMatch(/too many files this hour/i);
+      expect(limited.message).not.toMatch(/too many requests/i);
+    }
+
+    const unavailable = await requestAvatarUploadInit(
+      makeFile('avatar.png', 'image/png', 1024),
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+        json: async () => ({
+          error: 'Photo upload is temporarily unavailable. Try again shortly.',
+          code: 'upload_unavailable',
+        }),
+      }),
+    );
+    expect(unavailable.ok).toBe(false);
+    if (!unavailable.ok) {
+      expect(unavailable.failureClass).toBe('service_unavailable');
+      expect(unavailable.message).toMatch(/temporarily unavailable/i);
+    }
+  });
+
+  it('lets a newer upload win when two finishes arrive out of order', () => {
+    const guard = createLatestUploadGuard();
+    const first = guard.begin();
+    const second = guard.begin();
+    expect(first.isCurrent()).toBe(false);
+    expect(second.isCurrent()).toBe(true);
+  });
+
+  it('records stage timings and keeps the saved url when persistence succeeds', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+    const phases: string[] = [];
+    const result = await executeAvatarUploadFlow({
+      file: makeFile('avatar.png', 'image/png', 1024),
+      optimizeImage: async (file) => ({
+        ok: true,
+        file,
+        transformed: false,
+        originalWidth: 10,
+        originalHeight: 10,
+        outputWidth: 10,
+        outputHeight: 10,
+        originalBytes: file.size,
+        outputBytes: file.size,
+        mimeType: 'image/png',
+        skippedReason: 'within_limits',
+      }),
+      requestInit: async () => ({ ok: true, init: initResponse }),
+      uploadToStorage: async () => ({ ok: true }),
+      finalizeUpload: async () => ({ success: true, avatarUrl: 'https://example.supabase.co/public/avatar.png' }),
+      onPhaseChange: (phase) => phases.push(phase),
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.avatarUrl).toContain('avatar.png');
+      expect(result.timings?.optimizingMs).toEqual(expect.any(Number));
+      expect(result.timings?.authorizingMs).toEqual(expect.any(Number));
+      expect(result.timings?.uploadingMs).toEqual(expect.any(Number));
+      expect(result.timings?.finalizingMs).toEqual(expect.any(Number));
+    }
+    expect(phases).toEqual(['optimizing', 'authorizing', 'uploading', 'finalizing', 'complete']);
+    info.mockRestore();
   });
 });
 

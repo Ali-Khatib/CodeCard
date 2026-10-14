@@ -4,16 +4,22 @@
  * failure instead of a runtime surprise.
  */
 import 'server-only';
+import { cache } from 'react';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { toSessionOnlyCookieOptions } from '@/lib/auth/session-cookie-options';
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/supabase/public-key';
 
-export async function createClient() {
+/**
+ * One cookie-backed client per server request.
+ * `getUser()` validates the session with Auth once; later calls in the same
+ * request reuse that result instead of repeating the network round trip.
+ */
+export const createClient = cache(async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  const supabase = createServerClient(
     getSupabaseUrl()!,
     getSupabasePublicKey()!,
     {
@@ -33,7 +39,17 @@ export async function createClient() {
       },
     },
   );
-}
+
+  const getUser = supabase.auth.getUser.bind(supabase.auth);
+  let userLookup: ReturnType<typeof getUser> | null = null;
+  supabase.auth.getUser = ((jwt?: string) => {
+    if (typeof jwt === 'string') return getUser(jwt);
+    userLookup ??= getUser();
+    return userLookup;
+  }) as typeof supabase.auth.getUser;
+
+  return supabase;
+});
 
 /**
  * Cookie-free anon client for public ISR routes (WS14-T019).

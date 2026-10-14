@@ -34,10 +34,13 @@ describe('WS12-T008 touch interaction fallbacks', () => {
     expect(source).toContain("(hover: hover) and (pointer: fine)");
   });
 
-  it('project card overlays remain available without hover', () => {
+  it('project cards are one keyboard-focusable control', () => {
     const rich = read('components/dashboard/project-card-rich.tsx');
-    expect(rich).toContain('group-focus-within:opacity-100');
-    expect(rich).toContain('[@media(hover:none)]:opacity-100');
+    expect(rich).toContain('ContentOpeningLink');
+    expect(rich).toContain('aria-label={`Open project: ${card.title}`}');
+    expect(rich).toContain('focus-visible:ring-2');
+    expect(rich).not.toContain('group-focus-within:opacity-100');
+    expect(rich).not.toContain('[@media(hover:none)]:opacity-100');
   });
 
   it('manage cards preview video on focus as well as hover', () => {

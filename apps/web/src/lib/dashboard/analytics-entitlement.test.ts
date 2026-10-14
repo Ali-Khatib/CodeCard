@@ -52,7 +52,8 @@ describe('analyticsEntitlementFor', () => {
   it('grants no Pro analytics sections on the free plan', () => {
     expect(analyticsEntitlementFor('free')).toEqual({
       planId: 'free',
-      visitorInsights: false,
+      visitorInsights: true,
+      perProject: false,
       perResearchPaper: false,
       aiReview: false,
     });
@@ -62,6 +63,7 @@ describe('analyticsEntitlementFor', () => {
     expect(analyticsEntitlementFor('pro')).toEqual({
       planId: 'pro',
       visitorInsights: true,
+      perProject: true,
       perResearchPaper: true,
       aiReview: true,
     });
@@ -74,7 +76,8 @@ describe('applyAnalyticsEntitlement', () => {
       summaryFixture(),
       analyticsEntitlementFor('free'),
     );
-    expect(gated.sources).toEqual([]);
+    expect(gated.sources).toHaveLength(1);
+    expect(gated.topProjects).toEqual([]);
     expect(gated.topResearch).toEqual([]);
   });
 
@@ -86,7 +89,6 @@ describe('applyAnalyticsEntitlement', () => {
     expect(gated.profileViews).toBe(10);
     expect(gated.projectViews).toBe(4);
     expect(gated.researchViews).toBe(3);
-    expect(gated.topProjects).toHaveLength(1);
   });
 
   it('preserves Pro sections on pro', () => {
@@ -162,13 +164,13 @@ describe('loadOwnerAnalytics plan gating', () => {
     else process.env.STRIPE_PRO_PRICE_ID = previous;
   });
 
-  it('withholds visitor insights from a free tenant', async () => {
+  it('includes visitor insights on a free tenant', async () => {
     const result = await loadOwnerAnalytics(supabaseFor(null), OWNER_ID);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.entitlement.planId).toBe('free');
-    expect(result.entitlement.visitorInsights).toBe(false);
-    expect(result.summary.sources).toEqual([]);
+    expect(result.entitlement.visitorInsights).toBe(true);
+    expect(result.summary.sources.length).toBeGreaterThan(0);
   });
 
   it('serves visitor insights to an active Pro tenant', async () => {
@@ -186,7 +188,8 @@ describe('loadOwnerAnalytics plan gating', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.entitlement.planId).toBe('free');
-    expect(result.summary.sources).toEqual([]);
+    expect(result.entitlement.perProject).toBe(false);
+    expect(result.summary.sources.length).toBeGreaterThan(0);
   });
 
   it('does not grant Pro for a canceled subscription on the allowlisted price', async () => {

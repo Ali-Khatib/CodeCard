@@ -21,6 +21,21 @@ import type { UploadStage } from '@/lib/storage/upload-progress';
 
 export const AVATAR_UPLOAD_BUCKET = STORAGE_BUCKETS.avatars;
 
+/** Later selections win. An older in-flight upload must not overwrite them. */
+export function createLatestUploadGuard() {
+  let latest = 0;
+  return {
+    begin() {
+      latest += 1;
+      const id = latest;
+      return {
+        id,
+        isCurrent: () => id === latest,
+      };
+    },
+  };
+}
+
 /** Prefer UploadStage; legacy aliases kept for existing tests/components. */
 export type AvatarUploadPhase =
   | UploadStage
@@ -43,6 +58,7 @@ export type AvatarUploadFlowResult =
       cleanupWarning?: boolean;
       optimizationNote?: string | null;
       uploadFileBytes?: number;
+      timings?: Record<string, number>;
     }
   | {
       ok: false;
@@ -144,8 +160,8 @@ export async function requestAvatarUploadInit(
   }
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null;
-    const failure = classifyInitFailure(response.status, body?.error);
+    const body = (await response.json().catch(() => null)) as { error?: string; code?: string } | null;
+    const failure = classifyInitFailure(response.status, body?.error, body?.code);
     return { ok: false as const, ...failure };
   }
 
@@ -240,9 +256,16 @@ export async function executeAvatarUploadFlow(input: {
     };
   }
 
+  const timings: Record<string, number> = {};
+  const mark = (stage: string, startedAt: number) => {
+    timings[stage] = Math.round(performance.now() - startedAt);
+  };
+
   input.onPhaseChange?.('optimizing');
+  const optimizeStarted = performance.now();
   const optimize = input.optimizeImage ?? optimizeImageForUpload;
   const optimized = await optimize(input.file, { signal: input.signal });
+  mark('optimizingMs', optimizeStarted);
   if (!optimized.ok) {
     if (optimized.cancelled) {
       return {
@@ -294,8 +317,10 @@ export async function executeAvatarUploadFlow(input: {
   }
 
   input.onPhaseChange?.('authorizing');
+  const authorizeStarted = performance.now();
   const requestInit = input.requestInit ?? ((file: File) => requestAvatarUploadInit(file, fetch, input.signal));
   const initResult = await requestInit(uploadFile);
+  mark('authorizingMs', authorizeStarted);
   if (!initResult.ok) {
     const failureClass = initResult.failureClass ?? 'upload_authorization';
     return {
@@ -320,10 +345,12 @@ export async function executeAvatarUploadFlow(input: {
   }
 
   input.onPhaseChange?.('uploading');
+  const uploadStarted = performance.now();
   const uploadResult = await input.uploadToStorage(initResult.init, uploadFile, {
     onProgress: input.onProgress,
     signal: input.signal,
   });
+  mark('uploadingMs', uploadStarted);
   if (!uploadResult.ok) {
     const failureClass = uploadResult.failureClass ?? 'network';
     return {
@@ -337,7 +364,9 @@ export async function executeAvatarUploadFlow(input: {
   }
 
   input.onPhaseChange?.('finalizing');
+  const finalizeStarted = performance.now();
   const finalizeResult = await input.finalizeUpload(initResult.init.path);
+  mark('finalizingMs', finalizeStarted);
   if (!finalizeResult.success) {
     return {
       ok: false,
@@ -349,6 +378,9 @@ export async function executeAvatarUploadFlow(input: {
   }
 
   input.onPhaseChange?.('complete');
+  if (process.env.NODE_ENV === 'development') {
+    console.info('[avatar-upload]', timings);
+  }
   return {
     ok: true,
     avatarUrl: finalizeResult.avatarUrl,
@@ -356,5 +388,6 @@ export async function executeAvatarUploadFlow(input: {
     cleanupWarning: finalizeResult.cleanupWarning,
     optimizationNote,
     uploadFileBytes: uploadFile.size,
+    timings,
   };
 }

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { HiOutlineArrowTopRightOnSquare, HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
+import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import type { PortfolioProject } from '@/lib/dashboard/portfolio';
 import {
   InteractiveImageAccordion,
@@ -17,7 +18,6 @@ function toAccordionItems(projects: PortfolioProject[], colorOffset: number): Im
   return projects.map((p, i) => ({
     id: p.id,
     title: p.title,
-    subtitle: p.tagline,
     imageUrl: p.posterUrl ?? FALLBACK_POSTER,
     colorIndex: colorOffset + i,
   }));
@@ -45,8 +45,6 @@ export function ProjectsImageAccordion({
 
   if (!active || items.length === 0) return null;
 
-  const githubClicks = Math.round((active.views ?? 0) * 0.28);
-
   return (
     <div className="flex flex-col gap-6">
       <InteractiveImageAccordion
@@ -59,19 +57,10 @@ export function ProjectsImageAccordion({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <AppMono>{hideHero ? 'Selected project' : 'Project details'}</AppMono>
-              <h3 className="mt-2 text-[24px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
+              <h3 className="mt-2 break-words text-[20px] font-medium tracking-[-0.025em] text-[var(--app-ink)]">
                 {active.title}
               </h3>
-              {active.tagline && (
-                <p className="mt-2 text-[15px] text-[var(--app-smoke)]">{active.tagline}</p>
-              )}
-              <p className="mt-3 text-[14px] text-[var(--app-smoke)]">
-                <strong className="font-medium text-[var(--app-ink)]">{active.views ?? 0}</strong> views
-                {' · '}
-                <strong className="font-medium text-[var(--app-ink)]">{active.saves ?? 0}</strong> saves
-                {' · '}
-                <strong className="font-medium text-[var(--app-ink)]">{githubClicks}</strong> GitHub clicks
-              </p>
+              <ProjectTechLine technologies={active.technologies} className="mt-1.5" />
             </div>
             <span
               className={
@@ -82,17 +71,7 @@ export function ProjectsImageAccordion({
             </span>
           </div>
 
-          {active.technologies.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {active.technologies.slice(0, 6).map((tech) => (
-                <span key={tech} className="cc-app-tech-tag">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap gap-2">
             <Link href={`${basePath}/projects/${active.id}/edit`}>
               <AppButton variant="primary">
                 <HiOutlinePencil className="h-4 w-4" aria-hidden />
@@ -105,19 +84,6 @@ export function ProjectsImageAccordion({
                 Preview
               </AppButton>
             </Link>
-            {active.liveUrl && (
-              <a href={active.liveUrl} target="_blank" rel="noreferrer">
-                <AppButton variant="ghost">
-                  <HiOutlineArrowTopRightOnSquare className="h-4 w-4" aria-hidden />
-                  Live demo
-                </AppButton>
-              </a>
-            )}
-            {active.repoUrl && (
-              <a href={active.repoUrl} target="_blank" rel="noreferrer">
-                <AppButton variant="ghost">GitHub</AppButton>
-              </a>
-            )}
           </div>
         </AppCard>
     </div>

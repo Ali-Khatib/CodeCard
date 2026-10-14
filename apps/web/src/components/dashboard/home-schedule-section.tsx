@@ -34,6 +34,8 @@ export type HomeScheduleSectionProps = {
   scheduleError?: boolean;
   preview?: boolean;
   basePath?: string;
+  /** Home: month, selection, and the day’s items. Creating stays on the full calendar. */
+  compact?: boolean;
 };
 
 const MINUTES = [0, 15, 30, 45];
@@ -50,6 +52,7 @@ export function HomeScheduleSection({
   scheduleError = false,
   preview = false,
   basePath = '/dashboard',
+  compact = false,
 }: HomeScheduleSectionProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const now = new Date();
@@ -274,19 +277,23 @@ export function HomeScheduleSection({
     setMonthIndex(next.monthIndex);
   };
 
+  const showComposer = !compact || Boolean(editingId || editingFollowUpId);
+
   return (
     <FadeInView delay={0.14}>
-      <section className="cc-profile-home__zone" aria-label="Calendar and follow-ups">
+      <section id="schedule" className="cc-profile-home__zone" aria-label="Calendar and follow-ups">
         <div className="cc-profile-home__zone-head">
           <div>
             <p className="cc-workspace-section__eyebrow">Your calendar</p>
             <h2 className="cc-workspace-section__title">Events and follow-ups</h2>
-            <p className="cc-workspace-section__copy">
-              Pick a day. See what is already planned. Add, edit, or delete events and follow-ups.
-            </p>
+            {compact ? null : (
+              <p className="cc-workspace-section__copy">
+                Pick a day. See what is already planned. Add, edit, or delete events and follow-ups.
+              </p>
+            )}
           </div>
-          <AppButton variant="ghost" href={`${basePath}/connections`}>
-            Open Connections →
+          <AppButton variant="ghost" href={compact ? `${basePath}/calendar` : `${basePath}/connections`}>
+            {compact ? 'Full calendar' : 'Open Connections →'}
           </AppButton>
         </div>
 
@@ -406,7 +413,9 @@ export function HomeScheduleSection({
 
               {dayEvents.length === 0 && dayFollowUps.length === 0 ? (
                 <p className="mt-3 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-                  Nothing planned this day. Add an event below, or set a follow-up from Connections.
+                  {compact
+                    ? 'Nothing planned this day.'
+                    : 'Nothing planned this day. Add an event below, or set a follow-up from Connections.'}
                 </p>
               ) : null}
 
@@ -470,7 +479,15 @@ export function HomeScheduleSection({
                 </p>
               ) : null}
 
-              {editingFollowUpId ? (
+              {compact && !showComposer ? (
+                <p className="mt-4">
+                  <Link href={`${basePath}/calendar`} className="cc-home-desk__text-link">
+                    Add or edit on the full calendar
+                  </Link>
+                </p>
+              ) : null}
+
+              {showComposer ? (editingFollowUpId ? (
                 <form
                   className="cc-home-calendar__form"
                   onSubmit={(e) => {
@@ -607,7 +624,7 @@ export function HomeScheduleSection({
                     </button>
                   </div>
                 </form>
-              )}
+              )) : null}
             </AppCard>
           </div>
         )}

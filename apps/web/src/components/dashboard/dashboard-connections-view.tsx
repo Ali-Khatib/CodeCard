@@ -4,7 +4,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import Image from 'next/image';
 import { LayoutGrid, Rows3 } from 'lucide-react';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
-import { getUpcomingFollowUps } from '@/lib/dashboard/connections-summary';
 import {
   connectionMeetingPointValue,
   filterAndSortConnections,
@@ -21,7 +20,7 @@ import { moveIndex, weaveVisibleOrder } from '@/lib/connections/connections-orde
 import { FadeInView } from './fade-in-view';
 import { ReactiveBorder } from './reactive-border';
 import { AsyncActionButton } from '@/components/ui/async-action-button';
-import { AppButton, AppCard, PageHeader, SectionLabel } from './ui/dashboard-ui';
+import { AppButton, PageHeader } from './ui/dashboard-ui';
 
 const CONNECTION_VIEW_MODES = [
   { id: 'list' as const, label: 'List view', icon: Rows3 },
@@ -36,6 +35,13 @@ type ViewConnection = WorkspaceConnection & {
   privateNote?: string | null;
   connectedAtIso?: string | null;
 };
+
+function upcomingFollowUpLabel(connection: ViewConnection): string | null {
+  if (connection.followUp !== 'scheduled') return null;
+  return connection.followUpDate
+    ? `Upcoming follow-up · ${connection.followUpDate}`
+    : 'Upcoming follow-up';
+}
 
 function displayMeetingPoint(connection: ViewConnection): string {
   return connectionMeetingPointValue(connection) || 'Unassigned';
@@ -317,64 +323,6 @@ function ConnectionExpandedBody({
   );
 }
 
-function ConnectionsFollowUps({
-  followUps,
-  onSelect,
-}: {
-  followUps: WorkspaceConnection[];
-  onSelect: (event: MouseEvent<HTMLButtonElement>, id: string) => void;
-}) {
-  if (followUps.length === 0) return null;
-
-  return (
-    <AppCard tone="meringue" className="cc-connection-followups !p-6 md:!p-8">
-      <div className="cc-connection-followups__head">
-        <div>
-          <SectionLabel>Upcoming follow-ups</SectionLabel>
-          <p className="mt-2 text-[15px] leading-relaxed text-[var(--app-smoke)]">
-            {followUps.length} scheduled — don&apos;t let warm intros go cold.
-          </p>
-        </div>
-        <span className="cc-connection-followups__count">{followUps.length} due</span>
-      </div>
-
-      <ul className="cc-connection-followups__grid">
-        {followUps.map((c) => (
-          <li key={c.id}>
-            <button
-              type="button"
-              className="cc-connection-followup-card"
-              onClick={(event) => onSelect(event, c.id)}
-            >
-              <div className="cc-connection-followup-card__avatar">
-                {c.avatarUrl ? (
-                  <Image src={c.avatarUrl} alt="" fill className="object-cover" sizes="48px" />
-                ) : (
-                  <span>{c.name[0]}</span>
-                )}
-              </div>
-
-              <div className="cc-connection-followup-card__body">
-                <div className="cc-connection-followup-card__top">
-                  <div className="min-w-0">
-                    <p className="cc-connection-followup-card__name">{c.name}</p>
-                    <p className="cc-connection-followup-card__role">
-                      {c.role} · {c.company}
-                    </p>
-                  </div>
-                  <time className="cc-connection-followup-card__date">{c.followUpDate}</time>
-                </div>
-                <p className="cc-connection-followup-card__note">{c.note}</p>
-                <span className="cc-connection-followup-card__cta">Open connection →</span>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </AppCard>
-  );
-}
-
 function ConnectionCard({
   connection,
   expanded,
@@ -404,6 +352,7 @@ function ConnectionCard({
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
+  const followUpLabel = upcomingFollowUpLabel(connection);
 
   useLayoutEffect(() => {
     const el = bodyRef.current;
@@ -416,7 +365,7 @@ function ConnectionCard({
       as="article"
       id={`connection-${connection.id}`}
       data-connection-id={connection.id}
-      className={`cc-connection-blob${expanded ? ' cc-connection-blob--open' : ''}`}
+      className={`cc-connection-blob${expanded ? ' cc-connection-blob--open' : ''}${followUpLabel ? ' cc-connection-blob--followup' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
     >
@@ -442,6 +391,9 @@ function ConnectionCard({
         <div className="cc-connection-blob__identity">
           <div className="cc-connection-blob__name-row">
             <p className="cc-connection-blob__name">{connection.name}</p>
+            {followUpLabel ? (
+              <span className="cc-connection-followup-beside">{followUpLabel}</span>
+            ) : null}
           </div>
           <p className="cc-connection-blob__role">
             {connection.role}
@@ -518,6 +470,7 @@ function ConnectionGridCard({
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [panelHeight, setPanelHeight] = useState(0);
+  const followUpLabel = upcomingFollowUpLabel(connection);
 
   useLayoutEffect(() => {
     const el = bodyRef.current;
@@ -530,7 +483,7 @@ function ConnectionGridCard({
       as="article"
       id={`connection-${connection.id}`}
       data-connection-id={connection.id}
-      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}`}
+      className={`cc-connection-grid-card${expanded ? ' cc-connection-grid-card--open' : ''}${followUpLabel ? ' cc-connection-grid-card--followup' : ''}`}
       liftOnHover={!expanded}
       pressOnTap={false}
     >
@@ -555,7 +508,12 @@ function ConnectionGridCard({
             <span className="cc-connection-grid-card__avatar-fallback">{connection.name[0]}</span>
           )}
         </div>
-        <p className="cc-connection-grid-card__name">{connection.name}</p>
+        <p className="cc-connection-grid-card__name">
+          {connection.name}
+          {followUpLabel ? (
+            <span className="cc-connection-followup-beside">{followUpLabel}</span>
+          ) : null}
+        </p>
         <p className="cc-connection-grid-card__role">{connection.role}</p>
       </div>
       {connectionCodeCardHref(connection, variant) ? (
@@ -679,38 +637,6 @@ export function DashboardConnectionsView({
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const listPinTokenRef = useRef(0);
   const pendingListPinRef = useRef<{ id: string; top: number } | null>(null);
-
-  const openConnection = useCallback((event: MouseEvent<HTMLButtonElement>, id: string) => {
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.blur();
-
-    // Cancel any list pin loop so it cannot fight this follow-up scroll.
-    listPinTokenRef.current += 1;
-    pendingListPinRef.current = null;
-    setSelectedId(id);
-
-    // Follow-ups only: scroll DOWN to the matching card. Never scroll upward.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const headerOffset = 112;
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const target =
-          document.querySelector<HTMLElement>(`[data-connection-id="${CSS.escape(id)}"]`) ??
-          document.getElementById(`connection-${id}`);
-        if (!target) return;
-
-        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-        if (top <= window.scrollY + 1) return;
-
-        window.scrollTo({
-          top,
-          behavior: reduceMotion ? 'instant' : 'smooth',
-        });
-      });
-    });
-  }, []);
 
   const toggleConnection = useCallback((event: MouseEvent<HTMLElement>, id: string) => {
     event.preventDefault();
@@ -908,11 +834,6 @@ export function DashboardConnectionsView({
     setSort('custom');
   };
 
-  const upcomingFollowUps = useMemo(
-    () => (variant === 'demo' ? getUpcomingFollowUps(connections) : []),
-    [connections, variant],
-  );
-
   if (variant === 'authenticated' && connections.length === 0) {
     return <ConnectionsEmptyState profileSlug={profileSlug} />;
   }
@@ -1108,15 +1029,6 @@ export function DashboardConnectionsView({
             </div>
           </div>
         </FadeInView>
-
-        {variant === 'demo' ? (
-          <FadeInView delay={0.08} className="cc-connections-followups-section">
-            <ConnectionsFollowUps
-              followUps={upcomingFollowUps}
-              onSelect={openConnection}
-            />
-          </FadeInView>
-        ) : null}
 
         <FadeInView delay={0.06} className="cc-connections-results-section">
           {viewMode === 'list' ? (

@@ -1,11 +1,11 @@
 'use client';
 
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import DraggableWidgetGrid, {
   type WidgetItem,
 } from '@/components/ui/draggable-widget-grid';
 import type { PortfolioOpenTransition, PortfolioProject } from '@/lib/dashboard/portfolio';
-import { FolderKanban } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo } from 'react';
 
@@ -44,7 +44,6 @@ export function ProjectsWidgetGrid({
       renderItem={(item) => {
         const project = byId.get(item.id);
         if (!project) return null;
-        const isPublished = project.isPublished !== false;
         return (
           <ContentOpeningLink
             href={project.href}
@@ -52,29 +51,20 @@ export function ProjectsWidgetGrid({
             itemTitle={project.title}
             className="cc-workspace-project-widget group"
             title={project.title}
-            aria-label={`View ${project.title}`}
+            aria-label={`Open project: ${project.title}`}
           >
             <div className="cc-workspace-project-widget__thumb">
               <Image
                 src={project.posterUrl ?? FALLBACK}
                 alt=""
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02] motion-reduce:group-hover:scale-100"
                 sizes="(max-width: 640px) 90vw, 320px"
               />
-              <span className="cc-workspace-project-widget__glyph" aria-hidden>
-                <FolderKanban className="h-4 w-4" />
-              </span>
             </div>
             <div className="cc-workspace-project-widget__meta">
               <p className="cc-fit-title cc-workspace-project-widget__title">{project.title}</p>
-              <span
-                className={`cc-projects-bubble__badge ${
-                  isPublished ? 'cc-projects-bubble__badge--live' : ''
-                }`}
-              >
-                {isPublished ? 'Live' : 'Draft'}
-              </span>
+              <ProjectTechLine technologies={project.technologies} className="mt-1 line-clamp-2" />
             </div>
           </ContentOpeningLink>
         );

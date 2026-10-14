@@ -33,22 +33,27 @@ export default async function NewProjectPage() {
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
-        <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
-          New project
-        </p>
-        <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
+        <p className="cc-create-intro__kicker">New project</p>
+        <h1 className="mt-3 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
           Create a project card
         </h1>
-        <p className="mt-3 text-[16px] leading-relaxed text-[var(--app-ink)]">
-          Title and URL are required. The rest is optional. After you create the project, you land
-          on the editor, then go Home to publish your CodeCard.
+        <div className="cc-create-steps">
+          <div className="cc-create-step cc-create-step--required">
+            <span className="cc-create-step__label">Required</span>
+            <p>Title and project URL. The form will not save without both.</p>
+          </div>
+          <div className="cc-create-step">
+            <span className="cc-create-step__label">Optional, easy to miss</span>
+            <ul>
+              <li>Showcase tabs: Problem, Approach, Results, Experience, or Architecture.</li>
+              <li>Technologies. Type one, then press Add.</li>
+              <li>Domain and focus chips. You can pick more than one.</li>
+            </ul>
+          </div>
+        </div>
+        <p className="cc-create-intro__after">
+          After you create the project, you land on the editor. Publish the card from Home.
         </p>
-        <ul className="cc-project-create-guide">
-          <li>Add a showcase tab for Problem, Approach, Results, Experience, or Architecture.</li>
-          <li>Add technologies with the Add button. Enter works too.</li>
-          <li>Tap domain and focus chips. You can pick more than one.</li>
-          <li>Press Create project at the bottom when the card is ready.</li>
-        </ul>
         <p className="mt-5">
           <Link href="/dashboard" className="cc-app-btn cc-app-btn--ghost">
             ← Back to Home

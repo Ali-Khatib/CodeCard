@@ -165,6 +165,7 @@ function SignUpForm() {
         return;
       }
 
+      const started = performance.now();
       const supabase = createClient();
       const { data, error: authError } = await withAuthNetworkRetry(() =>
         supabase.auth.signUp({
@@ -186,6 +187,13 @@ function SignUpForm() {
         error: authError,
         email: parsed.data.email,
       });
+
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[signup]', {
+          ms: Math.round(performance.now() - started),
+          outcome: outcome.kind,
+        });
+      }
 
       if (outcome.kind === 'error') {
         setError(outcome.message);

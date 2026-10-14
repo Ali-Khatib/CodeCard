@@ -5,11 +5,6 @@ import {
   DashboardOverviewLoadErrorState,
   DashboardOverviewMissingState,
 } from '@/components/dashboard/dashboard-overview-route-states';
-import { loadOwnerAnalytics } from '@/lib/dashboard/analytics-queries';
-import { loadOwnerOverviewContent } from '@/lib/dashboard/overview-queries';
-import { overviewCircleWorksFromAuthFeed } from '@/lib/dashboard/overview-circle-works';
-import type { OverviewCircleWorksEmpty } from '@/lib/dashboard/overview-circle-works';
-import { listCircleFeed } from '@/lib/circle/circle-feed-core';
 import { getHomeWorkspaceNextStep } from '@/lib/profile/completion';
 import { loadProfileCompletion } from '@/lib/profile/completion-data';
 import { loadHomeSchedule } from '@/lib/schedule/home-schedule-core';
@@ -36,24 +31,25 @@ export default async function DashboardHomePage() {
     return <DashboardOverviewMissingState />;
   }
 
-  const [completionResult, analyticsResult, contentResult, circleFeed, schedule] =
-    await Promise.all([
+  const [completionResult, schedule, linksResult, connectionsResult] = await Promise.all([
     loadProfileCompletion(supabase, profile),
-    loadOwnerAnalytics(supabase, user!.id),
-    loadOwnerOverviewContent(supabase, user!.id),
-    listCircleFeed(supabase, { limit: 3, filter: 'all' }),
     loadHomeSchedule(supabase, { user: user! }),
+    supabase
+      .from('profile_links')
+      .select('id, type, label, url, sort_order')
+      .eq('profile_id', profile.id)
+      .order('sort_order', { ascending: true }),
+    supabase
+      .from('saved_connections')
+      .select('saved_profile_id', { count: 'exact', head: true })
+      .eq('owner_user_id', user!.id),
   ]);
 
   if (!completionResult.ok) {
     return <DashboardOverviewLoadErrorState />;
   }
 
-  const { data: linkRows } = await supabase
-    .from('profile_links')
-    .select('id, type, label, url, sort_order')
-    .eq('profile_id', profile.id)
-    .order('sort_order', { ascending: true });
+  const linkRows = linksResult.data;
 
   const profileLinks = linkRows ?? [];
   const links = profileLinks.map((l) => ({
@@ -69,40 +65,8 @@ export default async function DashboardHomePage() {
   });
   const displayName = profile.display_name ?? user?.email?.split('@')[0] ?? 'there';
 
-  const statsError = !analyticsResult.ok;
-  const stats = analyticsResult.ok
-    ? {
-        profileViews: analyticsResult.summary.profileViews,
-        projectOpens: analyticsResult.summary.projectViews,
-        linkClicks: analyticsResult.summary.linkClicks,
-        qrDownloads: analyticsResult.summary.qrDownloads,
-      }
-    : null;
-
-  const contentError = !contentResult.ok;
-  const projectsSummary = contentResult.ok ? contentResult.projects : null;
-  const researchSummary = contentResult.ok ? contentResult.research : null;
-
-  const circleWorks = overviewCircleWorksFromAuthFeed(
-    circleFeed.status === 'feed' ? circleFeed.items : [],
-    3,
-  );
-  let circleWorksEmpty: OverviewCircleWorksEmpty = 'none';
-  if (circleWorks.length === 0) {
-    if (circleFeed.status === 'no_connections') {
-      circleWorksEmpty = 'no_connections';
-    } else if (
-      circleFeed.status === 'temporary_failure' ||
-      circleFeed.status === 'unauthenticated' ||
-      circleFeed.status === 'invalid_cursor'
-    ) {
-      circleWorksEmpty = 'error';
-    }
-  }
-
   return (
-    <>
-      <DashboardOverviewView
+    <DashboardOverviewView
       greeting={greetingForHour()}
       displayName={displayName}
       completion={completion}
@@ -110,23 +74,18 @@ export default async function DashboardHomePage() {
       avatarUrl={profile.avatar_url}
       headline={profile.headline}
       bio={profile.bio}
-      profileViews={stats?.profileViews}
       links={links}
       profileLinks={profileLinks}
       profile={profile}
-      stats={stats}
-      statsError={statsError}
-      projectsSummary={projectsSummary}
-      researchSummary={researchSummary}
-      contentError={contentError}
-      circleWorks={circleWorks}
-      circleWorksEmpty={circleWorksEmpty}
+      stats={null}
+      projectsSummary={null}
+      researchSummary={null}
       suggested={suggested}
       hasAnyProject={completionResult.hasAnyProject}
       events={schedule.events}
       followUps={schedule.followUps}
       scheduleError={Boolean(schedule.code)}
+      connectionCount={connectionsResult.error ? null : (connectionsResult.count ?? 0)}
     />
-    </>
   );
 }

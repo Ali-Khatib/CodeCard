@@ -60,6 +60,7 @@ describe('Work workspace', () => {
     expect(work).toContain('View public CodeCard');
     expect(work).toContain('publicDemoProfileBasePath');
     expect(work).not.toContain('chroma-work-section');
-    expect(stack).toContain('Appears on your public CodeCard');
+    expect(work).toContain('Published items appear on your public CodeCard');
+    expect(stack).not.toContain('Appears on your public CodeCard');
   });
 });

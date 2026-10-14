@@ -46,7 +46,8 @@ export function AnalyticsProjectPanel({ projects }: { projects: ProjectAnalytics
     <section className="cc-analytics-project-panel">
       <SectionLabel>Per-project analytics</SectionLabel>
       <SectionSubtitle>
-        Time on page, downloads, GitHub clicks, and how people found each project
+        Per-project analytics are a Pro feature. This sample is not included on Free. It shows
+        time on page, downloads, and clicks for each project.
       </SectionSubtitle>
 
       <div className="mt-6 space-y-5">

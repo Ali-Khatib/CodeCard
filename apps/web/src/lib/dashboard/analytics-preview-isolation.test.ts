@@ -29,7 +29,7 @@ describe('WS08-T011 preview analytics isolation', () => {
     }
 
     expect(authPage).toContain('loadOwnerAnalytics');
-    expect(homePage).toContain('loadOwnerAnalytics');
+    expect(homePage).not.toContain('loadOwnerAnalytics');
   });
 
   it('keeps preview sample analytics labeled and off real query helpers', () => {

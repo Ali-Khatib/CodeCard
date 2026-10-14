@@ -79,7 +79,7 @@ describe('Analytics product contract', () => {
 
   it('keeps Pro gating truthful for visitor insights, per-paper rows, and the review', () => {
     expect(PRO_ANALYTICS_SECTIONS).toEqual([
-      'visitorInsights',
+      'perProject',
       'perResearchPaper',
       'aiReview',
     ]);
@@ -95,7 +95,9 @@ describe('Analytics product contract', () => {
     expect(view).toContain('LIVE_DEMO_WORKSPACE_HREF');
     expect(view).not.toContain('Upgrade to Pro');
     expect(PLANS.pro.features).toContain(ANALYTICS_REVIEW_FEATURE);
-    expect(PLANS.pro.features).toContain(ANALYTICS_COACH_FEATURE);
+    expect(PLANS.pro.features).not.toContain(ANALYTICS_COACH_FEATURE);
+    expect(PLANS.pro.features).not.toContain('Visitor insights');
+    expect(PLANS.pro.features).not.toContain('Per-research-paper analytics');
   });
 
   it('keeps trend ranges to query-backed 7 and 30 UTC days', () => {

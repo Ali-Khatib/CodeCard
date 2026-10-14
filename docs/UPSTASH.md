@@ -67,10 +67,16 @@ Do not blast production with bulk traffic. Do not claim Upstash is verified usin
 
 | Condition | Behavior |
 |-----------|----------|
-| Redis URL/token missing, production, type `ai`/`upload`/`auth` | Deny (`success: false`) |
+| Redis URL/token missing, production, type `ai`/`upload`/`auth` | Deny (`success: false`, `denial: misconfigured`). Not a quota hit. |
+| Redis configured but unreachable or slower than 1.5s, same strict types | Deny (`success: false`, `denial: unavailable`). Not a quota hit. |
+| Real sliding-window exhaustion | Deny (`success: false`, `denial: quota`) plus `retryAfterSeconds` when Upstash returns a reset time |
+| `POST /api/upload` with `misconfigured` or `unavailable` | HTTP 503 `{ code: "upload_unavailable" }`. Do not return 429. |
+| `POST /api/upload` with `quota` | HTTP 429 `{ code: "rate_limited" }` and `Retry-After` when known. Budget stays 20 requests / 1 hour per trusted IP and per account. |
 | Redis missing, other types | Allow (fail open) |
 | `strictRateLimit` route, URL missing | HTTP 503 |
 | `CODECARD_E2E=1` | Fail-open exception for local production builds against isolated E2E |
+
+`POST /api/upload` still requires `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` on the live Vercel project (Production and Preview). Without them, photo upload is refused with 503 until those two variables are set and the project is redeployed. Do not put the token in `NEXT_PUBLIC_` or in git.
 
 ---
 

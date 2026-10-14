@@ -2,16 +2,17 @@
 
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { ImageCropDialog } from '@/components/dashboard/image-crop-dialog';
 import { StatusFeedbackIcon } from '@/components/dashboard/status-feedback-icon';
 import { UploadProgressIndicator } from '@/components/dashboard/upload-progress-indicator';
 import {
+  createLatestUploadGuard,
   executeAvatarUploadFlow,
   mapAvatarValidationMessage,
   uploadAvatarToSignedUrl,
   validateAvatarFile,
 } from '@/lib/profile/avatar-upload-client';
+import { publishProfileAvatarSaved } from '@/lib/profile/avatar-live-sync';
 import { finalizeAvatarUploadAction } from '@/lib/profile/finalize-avatar-upload-action';
 import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { messageForUploadFailure } from '@/lib/storage/upload-failure';
@@ -30,7 +31,6 @@ type AvatarUploadProps = {
     cleanupWarning?: boolean;
     error?: string;
   }>;
-  refreshAfterSave?: boolean;
 };
 
 function normalizeStage(phase: string): UploadStage {
@@ -58,15 +58,13 @@ export function AvatarUpload({
   disabled = false,
   onAvatarSaved,
   finalizeUpload,
-  refreshAfterSave = true,
 }: AvatarUploadProps) {
-  const router = useRouter();
   const { notifySuccess, notifyError } = useMutationFeedback();
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const inFlightRef = useRef(false);
+  const uploadGuardRef = useRef(createLatestUploadGuard());
 
   const [savedAvatarUrl, setSavedAvatarUrl] = useState(initialAvatarUrl);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -139,9 +137,10 @@ export function AvatarUpload({
 
   const runUpload = useCallback(
     async (file: File) => {
-      if (disabled || inFlightRef.current) return;
+      if (disabled) return;
 
-      inFlightRef.current = true;
+      const attempt = uploadGuardRef.current.begin();
+      abortRef.current?.abort();
       setError('');
       setRetryable(false);
       setSuccess(false);
@@ -175,7 +174,8 @@ export function AvatarUpload({
       });
 
       abortRef.current = null;
-      inFlightRef.current = false;
+
+      if (!attempt.isCurrent()) return;
 
       if (!result.ok) {
         setStage(result.cancelled ? 'cancelled' : 'failed');
@@ -202,10 +202,8 @@ export function AvatarUpload({
       setStage('complete');
       setProgressPercent(null);
       notifySuccess(MUTATION_FEEDBACK.profile.photoUpdated);
+      publishProfileAvatarSaved(result.avatarUrl);
       onAvatarSaved?.(result.avatarUrl);
-      if (refreshAfterSave) {
-        router.refresh();
-      }
 
       window.setTimeout(() => {
         setSuccess(false);
@@ -219,9 +217,7 @@ export function AvatarUpload({
       notifyError,
       notifySuccess,
       onAvatarSaved,
-      refreshAfterSave,
       revokePreviewUrl,
-      router,
     ],
   );
 
@@ -312,6 +308,7 @@ export function AvatarUpload({
         <div className="relative aspect-[4/5] h-28 overflow-hidden rounded-2xl border border-[var(--app-border)] bg-[var(--app-bone)]">
           {displayUrl ? (
             <Image
+              key={displayUrl}
               src={displayUrl}
               alt={altText}
               fill

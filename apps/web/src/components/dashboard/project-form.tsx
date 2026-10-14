@@ -336,23 +336,73 @@ export function ProjectForm({
       noValidate
     >
       {usage?.limit != null && mode === 'create' && (
-        <p className="rounded-[12px] border border-charcoal/70 bg-charcoal/30 px-4 py-3 text-[13px] text-lichen">
+        <p className="cc-create-usage">
           {usage.count} of {usage.limit} projects used on the Free plan.
         </p>
       )}
 
       {limitReached && mode === 'create' && (
-        <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-vellum" role="alert">
+        <div className="rounded-[12px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[16px] text-[var(--app-ink)]" role="alert">
           <p>{createState.error ?? `You've reached the ${usage?.limit}-project limit on the Free plan.`}</p>
-          <Link href={createState.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-reactorBright underline underline-offset-2">
+          <Link href={createState.upgradeTo ?? '/dashboard/billing'} className="mt-2 inline-block font-medium text-[var(--app-ink)] underline underline-offset-2">
             View upgrade options
           </Link>
         </div>
       )}
+
+      <section className="space-y-5" aria-labelledby="project-required-heading">
+        <h2 id="project-required-heading" className="text-[22px] font-semibold text-[var(--app-ink)]">
+          Required
+        </h2>
+        <div className="space-y-2">
+          <label htmlFor="project-title" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Project title <span className="cc-field-mark cc-field-mark--required">Required</span>
+          </label>
+          <input
+            id="project-title"
+            name="title"
+            required
+            value={form.title}
+            onChange={(e) => updateTitle(e.target.value)}
+            maxLength={PROJECT_FORM_LIMITS.title}
+            className="cc-input w-full"
+            placeholder="DevFlow"
+            aria-invalid={Boolean(fieldErrors.title)}
+            aria-describedby={fieldErrors.title ? 'project-title-error' : undefined}
+          />
+          <FieldError id="project-title-error" message={fieldErrors.title} />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="project-slug" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Project URL <span className="cc-field-mark cc-field-mark--required">Required</span>
+          </label>
+          <input
+            id="project-slug"
+            name="slug"
+            required
+            ref={slugInputRef}
+            value={form.slug}
+            onChange={(e) => updateSlug(e.target.value)}
+            className="cc-input w-full"
+            placeholder="dev-flow"
+            aria-invalid={Boolean(fieldErrors.slug)}
+            aria-describedby={joinDescribedBy(
+              'project-slug-hint',
+              fieldErrors.slug && 'project-slug-error',
+            )}
+          />
+          <p id="project-slug-hint" className="cc-project-form__note">
+            Lowercase letters, numbers, and hyphens only. This becomes the project link.
+          </p>
+          <FieldError id="project-slug-error" message={fieldErrors.slug} />
+        </div>
+      </section>
+
       <section className="space-y-4" aria-labelledby="project-showcase-heading">
         <div>
-          <h2 id="project-showcase-heading" className="text-[18px] font-semibold text-[var(--app-ink)]">
-            Showcase story (optional)
+          <h2 id="project-showcase-heading" className="text-[22px] font-semibold text-[var(--app-ink)]">
+            Showcase story <span className="cc-field-mark">Optional</span>
           </h2>
           <p id="project-showcase-help" className="cc-project-form__hint mt-2">
             Add up to five tabs on your project page. Press Add tab on any you want, write what a
@@ -538,52 +588,8 @@ export function ProjectForm({
 
       <section className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="project-title" className="text-[13px] font-medium text-graphite">
-            Project title <span className="text-reactor">*</span>
-          </label>
-          <input
-            id="project-title"
-            name="title"
-            required
-            value={form.title}
-            onChange={(e) => updateTitle(e.target.value)}
-            maxLength={PROJECT_FORM_LIMITS.title}
-            className="cc-input w-full"
-            placeholder="DevFlow"
-            aria-invalid={Boolean(fieldErrors.title)}
-            aria-describedby={fieldErrors.title ? 'project-title-error' : undefined}
-          />
-          <FieldError id="project-title-error" message={fieldErrors.title} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-slug" className="text-[13px] font-medium text-graphite">
-            Project URL <span className="text-reactor">*</span>
-          </label>
-          <input
-            id="project-slug"
-            name="slug"
-            required
-            ref={slugInputRef}
-            value={form.slug}
-            onChange={(e) => updateSlug(e.target.value)}
-            className="cc-input w-full"
-            placeholder="dev-flow"
-            aria-invalid={Boolean(fieldErrors.slug)}
-            aria-describedby={joinDescribedBy(
-              'project-slug-hint',
-              fieldErrors.slug && 'project-slug-error',
-            )}
-          />
-          <p id="project-slug-hint" className="cc-project-form__note">
-            Lowercase letters, numbers, and hyphens only. This becomes the project link.
-          </p>
-          <FieldError id="project-slug-error" message={fieldErrors.slug} />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="project-tagline" className="text-[13px] font-medium text-graphite">
-            Tagline <span className="text-ash">(optional)</span>
+          <label htmlFor="project-tagline" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Tagline <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id="project-tagline"
@@ -602,8 +608,8 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="project-description" className="text-[13px] font-medium text-graphite">
-            Description <span className="text-ash">(optional)</span>
+          <label htmlFor="project-description" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Description <span className="cc-field-mark">Optional</span>
           </label>
           <textarea
             id="project-description"
@@ -625,8 +631,8 @@ export function ProjectForm({
 
       <section className="space-y-3">
         <div>
-          <label htmlFor="project-technologies" className="text-[15px] font-semibold text-[var(--app-ink)]">
-            Technologies
+          <label htmlFor="project-technologies" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Technologies <span className="cc-field-mark">Optional</span>
           </label>
           <p id="project-technologies-hint" className="cc-project-form__hint mt-1">
             Type a tool or language, then press Add. Enter works too.
@@ -678,7 +684,7 @@ export function ProjectForm({
         aria-invalid={fieldErrors.domains ? true : undefined}
         aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
       >
-        <legend className="cc-app-field-label text-[15px]">Domains</legend>
+        <legend className="cc-app-field-label text-[17px]">Domains <span className="cc-field-mark">Optional</span></legend>
         <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
         <div id="project-domains" className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
@@ -698,7 +704,7 @@ export function ProjectForm({
         aria-invalid={fieldErrors.focus_areas ? true : undefined}
         aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
       >
-        <legend className="cc-app-field-label text-[15px]">Focus areas</legend>
+        <legend className="cc-app-field-label text-[17px]">Focus areas <span className="cc-field-mark">Optional</span></legend>
         <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
         <div id="project-focus-areas" className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
@@ -715,8 +721,8 @@ export function ProjectForm({
 
       <section className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <label htmlFor="project-user-role" className="text-[13px] font-medium text-graphite">
-            Your role <span className="text-ash">(optional)</span>
+          <label htmlFor="project-user-role" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Your role <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id="project-user-role"
@@ -735,8 +741,8 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="project-status" className="text-[13px] font-medium text-graphite">
-            Lifecycle status
+          <label htmlFor="project-status" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Lifecycle status <span className="cc-field-mark">Optional</span>
           </label>
           <select
             id="project-status"
@@ -762,8 +768,8 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="project-started-at" className="text-[13px] font-medium text-graphite">
-            Started <span className="text-ash">(optional)</span>
+          <label htmlFor="project-started-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Started <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id="project-started-at"
@@ -781,8 +787,8 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="project-ended-at" className="text-[13px] font-medium text-graphite">
-            Ended <span className="text-ash">(optional)</span>
+          <label htmlFor="project-ended-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
+            Ended <span className="cc-field-mark">Optional</span>
           </label>
           <input
             id="project-ended-at"

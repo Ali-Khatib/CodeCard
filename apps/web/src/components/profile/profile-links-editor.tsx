@@ -160,15 +160,14 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
 
   return (
     <section
-      id="links"
-      className="space-y-4 scroll-mt-28 rounded-[16px] border border-[var(--app-border)] bg-[var(--app-paper)] p-5"
+      className="space-y-3 scroll-mt-28"
       aria-label="Profile links"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-[15px] font-medium text-[var(--app-ink)]">Profile links</h3>
           <p className="mt-1 text-[13px] text-[var(--app-smoke)]">
-            GitHub, LinkedIn, and X must use the matching site URL. A personal website is optional.
+            Use the site that matches the network.
           </p>
         </div>
         {mode.kind === 'idle' ? (
@@ -212,45 +211,41 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                     <p className="truncate text-xs text-[var(--app-smoke)]">{link.url}</p>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="cc-app-btn cc-app-btn--ghost"
-                    disabled={busy || index === 0 || isPending}
-                    aria-busy={busy}
-                    onClick={() => handleMove(link, 'up')}
-                    aria-label={`Move ${getProfileLinkAria(link.type, link.label)} up`}
-                  >
-                    Up
-                  </button>
-                  <button
-                    type="button"
-                    className="cc-app-btn cc-app-btn--ghost"
-                    disabled={busy || index === sortedLinks.length - 1 || isPending}
-                    aria-busy={busy}
-                    onClick={() => handleMove(link, 'down')}
-                    aria-label={`Move ${getProfileLinkAria(link.type, link.label)} down`}
-                  >
-                    Down
-                  </button>
-                  <button
-                    type="button"
-                    className="cc-app-btn cc-app-btn--ghost"
-                    disabled={busy}
-                    onClick={() => openEdit(link)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="cc-app-btn cc-app-btn--ghost text-[var(--app-error)]"
-                    disabled={busy}
-                    aria-busy={busy}
-                    onClick={() => handleDelete(link)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                <details className="cc-link-menu" aria-busy={busy}>
+                  <summary aria-label={`Actions for ${getProfileLinkAria(link.type, link.label)}`}>
+                    More
+                  </summary>
+                  <div className="cc-link-menu__panel">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => openEdit(link)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy || index === 0 || isPending}
+                      onClick={() => handleMove(link, 'up')}
+                    >
+                      Move up
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy || index === sortedLinks.length - 1 || isPending}
+                      onClick={() => handleMove(link, 'down')}
+                    >
+                      Move down
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => handleDelete(link)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </details>
               </li>
             );
           })}

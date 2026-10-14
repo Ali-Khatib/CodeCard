@@ -1,4 +1,17 @@
 import type { FeaturedProject } from '@/lib/projects/featured';
+import { PROJECT_BANNER_PRESETS, projectBannerDataUrl } from '@/lib/projects/project-banner';
+
+function demoProjectBanner(title: string, subtitle: string, presetId: string) {
+  const preset = PROJECT_BANNER_PRESETS.find((item) => item.id === presetId) ?? PROJECT_BANNER_PRESETS[0]!;
+  return projectBannerDataUrl({
+    eyebrow: 'Project',
+    title,
+    subtitle,
+    accent: preset.accent,
+    background: preset.background,
+    backgroundBottom: preset.backgroundBottom,
+  });
+}
 
 /** Product-style mock screenshots — fallback when no photo URL */
 const mock = (title: string, subtitle: string) =>
@@ -55,7 +68,11 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
     technologies: ['React', 'TypeScript', 'Python', 'PyTorch', 'FastAPI', 'Java', 'Spring Boot', 'PostgreSQL'],
     domains: ['Artificial Intelligence'],
     focusAreas: ['Emotion Recognition'],
-    posterUrl: '/showcase/emotion/interface-stages.png',
+    posterUrl: demoProjectBanner(
+      'Context-Aware Emotion Recognition',
+      'Group photos, read face by face, then as a scene',
+      'ink',
+    ),
     videoUrl: null,
     links: [],
     screenshots: [
@@ -94,7 +111,7 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
     ],
     domains: ['Cloud Computing'],
     focusAreas: ['DevOps', 'CI/CD'],
-    posterUrl: unsplash('1555066931-4365d14bab8c'),
+    posterUrl: demoProjectBanner('DevFlow', 'CI/CD pipelines that actually make sense', 'sea'),
     videoUrl: 'https://cdn.coverr.co/videos/coverr-software-developer-working-on-code-5635/1080p.mp4',
     links: [
       { type: 'repo', label: 'GitHub', url: 'https://github.com' },
@@ -134,7 +151,7 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
     technologies: ['Rust', 'PostgreSQL', 'SQLite', 'Docker', 'gRPC', 'CLI'],
     domains: ['Cloud Computing'],
     focusAreas: ['Databases'],
-    posterUrl: mock('SchemaSync', 'Schema diff'),
+    posterUrl: demoProjectBanner('SchemaSync', 'Database migrations without the drama', 'forest'),
     videoUrl: 'https://cdn.coverr.co/videos/coverr-typing-on-a-computer-keyboard-8445/1080p.mp4',
     links: [
       { type: 'live', label: 'Demo', url: 'https://example.com' },
@@ -166,7 +183,7 @@ export const DEMO_FEATURED_PROJECTS: FeaturedProject[] = [
     ],
     domains: ['Artificial Intelligence'],
     focusAreas: ['Observability', 'LLMs'],
-    posterUrl: unsplash('1551288049-bebda4e38f71'),
+    posterUrl: demoProjectBanner('Pulse', 'Observability for small teams', 'violet'),
     videoUrl: 'https://cdn.coverr.co/videos/coverr-data-center-servers-5695/1080p.mp4',
     links: [
       { type: 'repo', label: 'GitHub', url: 'https://github.com' },

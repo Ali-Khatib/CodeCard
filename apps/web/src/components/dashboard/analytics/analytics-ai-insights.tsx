@@ -33,22 +33,14 @@ export function AnalyticsAiInsights({
           </p>
         </div>
       ) : null}
-      <div className="mt-5">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--app-muted)]">
-          What the traffic means
-        </p>
-        <p className="mt-2 text-[15px] leading-relaxed text-[var(--app-smoke)]">
-          {insights.trafficMeaning}
-        </p>
-      </div>
       {insights.lines.length > 0 ? (
-        <ul className="mt-5 space-y-2.5">
+        <ul className="mt-6 space-y-4">
           {insights.lines.map((line) => (
             <li
               key={line}
-              className="flex gap-2.5 text-[14px] leading-relaxed text-[var(--app-smoke)]"
+              className="flex items-start gap-3 text-[16px] font-medium leading-snug text-[var(--app-ink)]"
             >
-              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--app-iris)]" aria-hidden />
+              <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-[var(--app-iris)]" aria-hidden />
               {line}
             </li>
           ))}

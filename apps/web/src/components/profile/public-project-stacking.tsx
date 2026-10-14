@@ -25,17 +25,13 @@ type PublicProjectStackingProps = {
   displayName: string;
   profileId?: string;
   profileSlug?: string;
-  demoViews?: Record<string, { views: number; saves: number }>;
 };
 
 function StackingCard({
   i,
   project,
-  displayName,
   profileId,
   profileSlug,
-  views,
-  saves,
   progress,
   range,
   targetScale,
@@ -43,11 +39,8 @@ function StackingCard({
 }: {
   i: number;
   project: FeaturedProject;
-  displayName: string;
   profileId?: string;
   profileSlug?: string;
-  views: number;
-  saves: number;
   progress: MotionValue<number>;
   range: [number, number];
   targetScale: number;
@@ -81,11 +74,8 @@ function StackingCard({
         >
           <PublicProjectCard
             project={project}
-            displayName={displayName}
             profileId={profileId}
             profileSlug={profileSlug}
-            views={views}
-            saves={saves}
             className="cc-stacking-card__project cc-glass-card"
             mediaClassName="overflow-hidden"
           />
@@ -97,22 +87,17 @@ function StackingCard({
 
 function FlatProjectList({
   projects,
-  displayName,
   profileId,
   profileSlug,
-  demoViews,
 }: PublicProjectStackingProps) {
   return (
-    <div className="flex flex-col gap-8">
-      {projects.map((project, index) => (
+    <div className="flex flex-col gap-5">
+      {projects.map((project) => (
         <PublicProjectCard
           key={project.id}
           project={project}
-          displayName={displayName}
           profileId={profileId}
           profileSlug={profileSlug}
-          views={demoViews?.[project.id]?.views ?? 280 + index * 40}
-          saves={demoViews?.[project.id]?.saves ?? 24 + index * 8}
           className="cc-glass-card"
         />
       ))}
@@ -121,7 +106,7 @@ function FlatProjectList({
 }
 
 function StackedProjectList(props: PublicProjectStackingProps) {
-  const { projects, displayName, profileId, profileSlug = 'demo', demoViews } = props;
+  const { projects, profileId, profileSlug = 'demo' } = props;
   const container = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: container,
@@ -138,11 +123,8 @@ function StackedProjectList(props: PublicProjectStackingProps) {
             key={project.id}
             i={i}
             project={project}
-            displayName={displayName}
             profileId={profileId}
             profileSlug={profileSlug}
-            views={demoViews?.[project.id]?.views ?? 280 + i * 40}
-            saves={demoViews?.[project.id]?.saves ?? 24 + i * 8}
             progress={scrollYProgress}
             range={[i * step, 1]}
             targetScale={targetScale}

@@ -1,4 +1,22 @@
+import { PROJECT_BANNER_PRESETS, projectBannerDataUrl } from '@/lib/projects/project-banner';
 import type { ResearchPaper } from './research';
+
+function demoResearchBanner(
+  title: string,
+  venue: string,
+  status: string,
+  presetId: string,
+) {
+  const preset = PROJECT_BANNER_PRESETS.find((item) => item.id === presetId) ?? PROJECT_BANNER_PRESETS[5]!;
+  return projectBannerDataUrl({
+    eyebrow: 'Research',
+    title,
+    subtitle: [venue, status].filter(Boolean).join(' · '),
+    accent: preset.accent,
+    background: preset.background,
+    backgroundBottom: preset.backgroundBottom,
+  });
+}
 
 const figure = (title: string, subtitle: string, accent = '#e95a0b') =>
   `data:image/svg+xml,${encodeURIComponent(`
@@ -18,6 +36,66 @@ const figure = (title: string, subtitle: string, accent = '#e95a0b') =>
 
 export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
   {
+    id: 'research-demo-3',
+    slug: 'pairing-notes',
+    title: 'Notes on Pairing for Small Engineering Teams',
+    abstract:
+      'A short write-up of how a four-person team paired on incident reviews for six weeks, and what they kept afterward.',
+    authors: ['Alex Chen'],
+    venue: 'Lab note',
+    publicationStatus: 'Draft',
+    year: 2026,
+    pdfUrl: null,
+    doiUrl: null,
+    citationText: 'Chen, A. (2026). Notes on Pairing for Small Engineering Teams. Lab note.',
+    tags: ['Teams', 'Process'],
+    coverImageUrl: demoResearchBanner(
+      'Notes on Pairing for Small Engineering Teams',
+      'Lab note',
+      'Draft',
+      'paper',
+    ),
+    relatedProjectId: null,
+    relatedProjectTitle: null,
+    relatedProjectHref: null,
+    figures: [
+      {
+        imageUrl: figure('Review Pairing', 'Who joined which incident review', '#e95a0b'),
+        caption: 'A sketch of who joined which review.',
+      },
+    ],
+  },
+  {
+    id: 'research-demo-4',
+    slug: 'shortcut-study',
+    title: 'A Short Study of Keyboard Shortcuts',
+    abstract:
+      'We timed twelve people completing the same editor tasks with and without a printed shortcut card on the desk.',
+    authors: ['Alex Chen', 'Maya Patel'],
+    venue: 'Class project',
+    publicationStatus: 'Poster',
+    year: 2025,
+    pdfUrl: null,
+    doiUrl: null,
+    citationText: 'Chen, A. & Patel, M. (2025). A Short Study of Keyboard Shortcuts. Class project.',
+    tags: ['Tools', 'Timing'],
+    coverImageUrl: demoResearchBanner(
+      'A Short Study of Keyboard Shortcuts',
+      'Class project',
+      'Poster',
+      'night',
+    ),
+    relatedProjectId: null,
+    relatedProjectTitle: null,
+    relatedProjectHref: null,
+    figures: [
+      {
+        imageUrl: figure('Task Times', 'With the card, and without it', '#c084fc'),
+        caption: 'Task times with and without the printed card.',
+      },
+    ],
+  },
+  {
     id: 'research-demo-1',
     slug: 'retrieval-evaluation-for-dev-tools',
     title: 'Retrieval Evaluation for Developer Tooling Agents',
@@ -32,7 +110,12 @@ export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
     citationText:
       'Chen, A., Patel, M., & Lee, J. (2026). Retrieval Evaluation for Developer Tooling Agents. Preprint.',
     tags: ['RAG', 'Evaluation', 'Developer Tools', 'AI Agents'],
-    coverImageUrl: figure('Retrieval Evaluation', 'Benchmark flow for developer tooling agents'),
+    coverImageUrl: demoResearchBanner(
+      'Retrieval Evaluation for Developer Tooling Agents',
+      'Preprint',
+      'Under review',
+      'ink',
+    ),
     relatedProjectId: 'demo-1',
     relatedProjectTitle: 'DevFlow',
     relatedProjectHref: '/demo/card/projects/demo-1',
@@ -64,7 +147,12 @@ export const DEMO_RESEARCH_PAPERS: ResearchPaper[] = [
     citationText:
       'Chen, A. & Rivera, S. (2025). Reducing Alert Fatigue with Lightweight Trace Summaries. Systems for Small Teams Workshop.',
     tags: ['Observability', 'Tracing', 'Incident Response'],
-    coverImageUrl: figure('Trace Summaries', 'Incident context without dashboard overload', '#34d399'),
+    coverImageUrl: demoResearchBanner(
+      'Reducing Alert Fatigue with Lightweight Trace Summaries',
+      'Systems for Small Teams Workshop',
+      'Accepted poster',
+      'forest',
+    ),
     relatedProjectId: 'demo-3',
     relatedProjectTitle: 'Pulse',
     relatedProjectHref: '/demo/card/projects/demo-3',

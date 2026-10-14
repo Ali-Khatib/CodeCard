@@ -44,7 +44,7 @@ describe('citation copy wiring', () => {
     expect(button).toContain("Couldn't copy citation");
     expect(button).not.toContain('dangerouslySetInnerHTML');
     expect(detail).toContain('CitationCopyButton');
-    expect(card).toContain('CitationCopyButton');
+    expect(card).not.toContain('CitationCopyButton');
     expect(detail).not.toContain('dangerouslySetInnerHTML');
     expect(card).not.toContain('dangerouslySetInnerHTML');
   });

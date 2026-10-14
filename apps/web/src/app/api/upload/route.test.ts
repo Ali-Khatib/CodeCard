@@ -63,6 +63,7 @@ function makeRequest(body: unknown, headers: Record<string, string> = {}) {
       'content-type': 'application/json',
       origin: 'https://codecard.app',
       'sec-fetch-site': 'same-origin',
+      'x-forwarded-for': '203.0.113.10',
       ...headers,
     },
     body: JSON.stringify(payload),
@@ -184,8 +185,8 @@ describe('POST /api/upload', () => {
     expect(mockCreateSignedUploadUrl).toHaveBeenCalledTimes(1);
   });
 
-  it('returns 429 when rate limited', async () => {
-    mockRateLimit.mockResolvedValueOnce({ success: false });
+  it('returns 429 when the hourly quota is exhausted', async () => {
+    mockRateLimit.mockResolvedValueOnce({ success: false, denial: 'quota', retryAfterSeconds: 120 });
     const response = await POST(
       makeRequest({
         resourceType: 'avatar',
@@ -196,7 +197,113 @@ describe('POST /api/upload', () => {
     );
 
     expect(response.status).toBe(429);
+    expect(response.headers.get('retry-after')).toBe('120');
+    const body = await response.json();
+    expect(body.code).toBe('rate_limited');
+    expect(body.error).toBe('Too many requests');
+    expect(JSON.stringify(body)).not.toMatch(/redis|upstash|token/i);
     expect(mockCreateSignedUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 when Redis is missing instead of a quota error', async () => {
+    mockRateLimit.mockResolvedValue({ success: false, denial: 'misconfigured' });
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body.code).toBe('upload_unavailable');
+    expect(body.error).not.toMatch(/too many requests/i);
+    expect(JSON.stringify(body)).not.toMatch(/redis|upstash/i);
+    expect(mockCreateSignedUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 when Redis is unreachable', async () => {
+    mockRateLimit.mockResolvedValueOnce({ success: false, denial: 'unavailable' });
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    expect((await response.json()).code).toBe('upload_unavailable');
+  });
+
+  it('does not put every request with a missing IP into one shared bucket', async () => {
+    const response = await POST(
+      makeRequest(
+        {
+          resourceType: 'avatar',
+          filename: 'avatar.png',
+          mimeType: 'image/png',
+          size: 1024,
+        },
+        { 'x-forwarded-for': '' },
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    const keys = mockRateLimit.mock.calls.map((call) => String(call[0]));
+    expect(keys.some((key) => key.includes('unknown'))).toBe(false);
+    expect(keys).toContain(`upload:user:${profile.owner_user_id}`);
+  });
+
+  it('rejects an oversized avatar before signing', async () => {
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 5 * 1024 * 1024 + 1,
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    expect(mockCreateSignedUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it('rejects an avatar when the signed-in user has no owned profile', async () => {
+    mockResolveOwnedProfile.mockResolvedValueOnce({ error: 'Profile not found' });
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(mockCreateSignedUploadUrl).not.toHaveBeenCalled();
+  });
+
+  it('hides storage preparation failures', async () => {
+    mockCreateSignedUploadUrl.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'bucket avatars secret-path failed' },
+    });
+    const response = await POST(
+      makeRequest({
+        resourceType: 'avatar',
+        filename: 'avatar.png',
+        mimeType: 'image/png',
+        size: 1024,
+      }),
+    );
+
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error).not.toMatch(/secret-path|bucket/i);
   });
 
   it('sets cache-control to no-store', async () => {

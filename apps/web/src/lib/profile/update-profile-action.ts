@@ -14,8 +14,16 @@ export async function updateProfileAction(
   _prev: ProfileUpdateState,
   formData: FormData,
 ): Promise<ProfileUpdateState> {
+  const started = performance.now();
   const supabase = await createClient();
   const result = await executeProfileUpdate(supabase, formData);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.info('[profile-update]', {
+      ms: Math.round(performance.now() - started),
+      ok: Boolean(result.success),
+    });
+  }
 
   if (result.success) {
     revalidatePath('/dashboard');

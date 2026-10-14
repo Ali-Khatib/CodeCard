@@ -16,7 +16,6 @@ import { AnalyticsGuestStats } from './analytics/analytics-guest-stats';
 import { AnalyticsGeoPanel } from './analytics/analytics-geo-panel';
 import { AnalyticsProjectPanel } from './analytics/analytics-project-panel';
 import { AnalyticsResearchPanel } from './analytics/analytics-research-panel';
-import { AnalyticsAudiencePanel } from './analytics/analytics-audience-panel';
 import { AppCard, FilterBar, MetricCard, MetricLabel, PageHeader, SectionLabel } from './ui/dashboard-ui';
 
 const RANGES: TimeRange[] = ['7d', '30d', '90d', 'lifetime'];
@@ -134,15 +133,7 @@ export function PreviewAnalyticsView({
       ) : null}
 
       {showAudience ? (
-      <>
       <FadeInView delay={0.32}>
-        <AnalyticsAudiencePanel
-          roles={data.roles}
-          description="Sample mix. On a live card this is what signed-in visitors chose when they created their CodeCard."
-        />
-      </FadeInView>
-
-      <FadeInView delay={0.36}>
         <AppCard>
           <SectionLabel>Recent activity</SectionLabel>
           <ul className="mt-4 divide-y divide-[var(--app-border)]">
@@ -155,7 +146,6 @@ export function PreviewAnalyticsView({
           </ul>
         </AppCard>
       </FadeInView>
-      </>
       ) : null}
     </div>
   );

@@ -183,7 +183,7 @@ describe('public rendering XSS contracts', () => {
 
   it('keeps external public links on noopener noreferrer and safe project helpers', () => {
     const stack = readFileSync(
-      resolve(process.cwd(), 'src/components/profile/public-project-card.tsx'),
+      resolve(process.cwd(), 'src/components/featured-work/project-detail-actions.tsx'),
       'utf8',
     );
     const detail = readFileSync(

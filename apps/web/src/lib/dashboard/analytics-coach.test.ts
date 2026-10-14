@@ -39,9 +39,10 @@ describe('analytics coach', () => {
     expect(thread[1]?.text).toContain('DevFlow');
   });
 
-  it('lists the coach on the paid plan', () => {
+  it('does not sell the coach as its own pricing line', () => {
     expect(ANALYTICS_COACH_PROMPTS.length).toBeGreaterThanOrEqual(3);
-    expect(PLANS.pro.features).toContain(ANALYTICS_COACH_FEATURE);
+    expect(PLANS.pro.features).toContain('AI review of your analytics');
+    expect(PLANS.pro.features).not.toContain(ANALYTICS_COACH_FEATURE);
     expect(PLANS.free.features).not.toContain(ANALYTICS_COACH_FEATURE);
   });
 });

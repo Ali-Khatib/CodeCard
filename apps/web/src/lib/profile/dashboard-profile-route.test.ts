@@ -3,15 +3,14 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 describe('canonical dashboard profile route', () => {
-  it('folds the old profile destination into Home while preserving hash', () => {
+  it('hosts profile editing on its own route', () => {
     const src = readFileSync(
       resolve(process.cwd(), 'src/app/dashboard/(authenticated)/profile/page.tsx'),
       'utf8',
     );
 
-    expect(src).toContain('WorkspaceHashRedirect');
-    expect(src).toContain('to="/dashboard"');
-    expect(src).not.toContain('DashboardProfileView');
+    expect(src).toContain('ProfileEditorScreen');
+    expect(src).not.toContain('WorkspaceHashRedirect');
     expect(src).not.toContain('notFound()');
   });
 
@@ -21,11 +20,6 @@ describe('canonical dashboard profile route', () => {
       resolve(process.cwd(), 'src/components/dashboard/dashboard-overview-view.tsx'),
       'utf8',
     );
-    const identity = readFileSync(
-      resolve(process.cwd(), 'src/components/dashboard/home-identity-section.tsx'),
-      'utf8',
-    );
-
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
     const navBlock = navMatch![1];
@@ -37,8 +31,8 @@ describe('canonical dashboard profile route', () => {
     expect(shell).toContain('View card');
     expect(shell).toContain('publicDemoProfileBasePath');
     expect(shell).toContain('{completion}% ready');
-    expect(overview).toContain('HomeIdentitySection');
-    expect(identity).toContain('How people see you');
+    expect(overview).toContain('HomeDesk');
+    expect(shell).toContain('/profile');
   });
 
   it('hosts the full profile editor on the dashboard overview', () => {
@@ -51,9 +45,13 @@ describe('canonical dashboard profile route', () => {
       'utf8',
     );
 
-    expect(overview).toContain('HomeIdentitySection');
+    expect(overview).toContain('HomeDesk');
     expect(identity).toContain('ProfileEditor');
-    expect(identity).toContain('HomeCodeCardPreview');
+    const editor = readFileSync(
+      resolve(process.cwd(), 'src/components/dashboard/profile-editor-screen.tsx'),
+      'utf8',
+    );
+    expect(editor).toContain('ProfileEditor');
   });
 
   it('redirects /demo/profile into the demo Home identity section', () => {
@@ -62,8 +60,8 @@ describe('canonical dashboard profile route', () => {
       'utf8',
     );
 
-    expect(src).toContain('WorkspaceHashRedirect');
-    expect(src).toContain('LIVE_DEMO_WORKSPACE_HREF');
-    expect(src).not.toContain('DashboardProfileView');
+    expect(src).toContain('Edit CodeCard');
+    expect(src).toContain('href="/demo"');
+    expect(src).not.toContain('WorkspaceHashRedirect');
   });
 });

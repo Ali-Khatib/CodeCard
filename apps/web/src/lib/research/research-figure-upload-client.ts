@@ -153,13 +153,15 @@ export async function requestResearchFigureUploadInit(
 
     if (!response.ok) {
       let bodyError: string | undefined;
+      let bodyCode: string | undefined;
       try {
-        const body = (await response.json()) as { error?: string };
+        const body = (await response.json()) as { error?: string; code?: string };
         bodyError = body.error;
+        bodyCode = body.code;
       } catch {
         bodyError = undefined;
       }
-      const failure = classifyInitFailure(response.status, bodyError);
+      const failure = classifyInitFailure(response.status, bodyError, bodyCode);
       return { ok: false, ...failure };
     }
 

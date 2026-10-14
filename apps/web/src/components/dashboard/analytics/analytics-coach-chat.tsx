@@ -48,7 +48,8 @@ export function AnalyticsCoachChat({
         Ask what to change
       </h2>
       <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-        Type a question, or tap one below. Answers stay on the numbers on this page.
+        Free includes a limited analytics chat. Pro includes extended use of this chat. Answers
+        stay on the numbers on this page. This is not an unlimited assistant.
       </p>
 
       <ul className="cc-analytics-coach__thread" aria-live="polite">

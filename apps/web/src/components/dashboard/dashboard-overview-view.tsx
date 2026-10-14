@@ -9,6 +9,7 @@ import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import type { Profile } from '@codecard/types';
 import { Sparkline } from './sparkline';
 import { FadeInView } from './fade-in-view';
+import { HomeDesk } from './home-desk';
 import { HomeIdentitySection } from './home-identity-section';
 import { HomeScheduleSection } from './home-schedule-section';
 import { ProfileShareHero } from './profile-share-hero';
@@ -79,6 +80,8 @@ export type OverviewProps = {
   events?: OwnerEvent[];
   followUps?: HomeFollowUp[];
   scheduleError?: boolean;
+  /** Saved connections already loaded for this viewer. Null when the count failed. */
+  connectionCount?: number | null;
   /** Guide snapshots: show one Home zone instead of the full desk. */
   guideFocus?: 'desk' | 'share' | 'identity' | 'calendar' | 'work' | 'reach' | 'circle';
 };
@@ -93,6 +96,8 @@ export function DashboardOverviewView({
   displayName,
   completion,
   profileSlug,
+  avatarUrl,
+  headline,
   profileViews,
   links = [],
   profileLinks = [],
@@ -111,6 +116,7 @@ export function DashboardOverviewView({
   events = [],
   followUps = [],
   scheduleError = false,
+  connectionCount = null,
   guideFocus,
 }: OverviewProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
@@ -171,6 +177,31 @@ export function DashboardOverviewView({
     }
     document.getElementById('share')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [notifySuccess, notifyError, isProfilePublic]);
+
+  if (!focused) {
+    return (
+      <HomeDesk
+        greeting={greeting}
+        displayName={displayName}
+        headline={headline ?? profile?.headline}
+        avatarUrl={avatarUrl ?? profile?.avatar_url}
+        bio={profile?.bio}
+        location={profile?.location}
+        isPublic={isProfilePublic}
+        profileSlug={profileSlug ?? profile?.slug}
+        profile={profile}
+        links={links}
+        profileLinks={profileLinks}
+        preview={preview}
+        connectionCount={connectionCount}
+        scheduleError={scheduleError}
+        events={events}
+        followUps={followUps}
+        suggested={suggested}
+        basePath={basePath}
+      />
+    );
+  }
 
   return (
     <div className="cc-profile-home">

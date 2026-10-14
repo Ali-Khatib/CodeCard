@@ -74,7 +74,7 @@ describe('workspace-first public route alignment', () => {
 
   it('keeps authenticated dashboard routes on owner data, not Alex Chen demo imports', () => {
     const authHome = read('src/app/dashboard/(authenticated)/page.tsx');
-    expect(authHome).toContain('loadOwnerOverviewContent');
+    expect(authHome).toContain('loadHomeSchedule');
     expect(authHome).toContain("eq('owner_user_id', user!.id)");
     expect(authHome).not.toContain('DEMO_PROFILE');
     expect(authHome).not.toContain('Alex Chen');

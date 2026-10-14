@@ -9,15 +9,8 @@ import {
   ContentOpeningLink,
   useContentOpeningOptional,
 } from '@/components/navigation/content-opening-transition';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import { AppButton } from './ui/dashboard-ui';
-
-function firstSentence(text?: string): string | null {
-  if (!text) return null;
-  const line = text.split('\n').find((l) => l.trim())?.trim();
-  if (!line) return null;
-  const match = line.match(/^[^.!?]+[.!?]?/);
-  return match?.[0]?.trim() ?? line;
-}
 
 export function DashboardProjectManageCard({
   project,
@@ -29,8 +22,6 @@ export function DashboardProjectManageCard({
   const opening = useContentOpeningOptional();
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
-  const impact = firstSentence(project.description);
-  const githubClicks = Math.round((project.views ?? 0) * 0.28);
   const editLink = editHref ?? `${project.href}/edit`;
 
   const openProject = () => {
@@ -95,7 +86,8 @@ export function DashboardProjectManageCard({
       </div>
 
       <div className="cc-app-project-card__body">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <h3 className="cc-fit-title cc-work-title min-w-0 flex-1 break-words">{project.title}</h3>
           <span
             className={
               project.isPublished !== false ? 'cc-app-badge cc-app-badge--mint' : 'cc-app-badge cc-app-badge--blush'
@@ -104,41 +96,10 @@ export function DashboardProjectManageCard({
             {project.isPublished !== false ? 'Published' : 'Draft'}
           </span>
         </div>
-
-        <h3 className="cc-fit-title cc-work-title mt-4">{project.title}</h3>
-
-        {project.tagline && (
-          <p className="mt-2 text-[16px] text-[var(--app-ink)]">{project.tagline}</p>
-        )}
-
-        {impact && (
-          <p className="mt-2 max-w-[640px] text-[15px] leading-relaxed text-[var(--app-smoke)]">{impact}</p>
-        )}
-
-        {project.technologies.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {project.technologies.slice(0, 6).map((tech) => (
-              <span key={tech} className="cc-app-tech-tag">
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
-          <span className="cc-app-inline-metric">
-            <strong>{project.views ?? 0}</strong> views
-          </span>
-          <span className="cc-app-inline-metric">
-            <strong>{project.saves ?? 0}</strong> saves
-          </span>
-          <span className="cc-app-inline-metric">
-            <strong>{githubClicks}</strong> GitHub clicks
-          </span>
-        </div>
+        <ProjectTechLine technologies={project.technologies} className="mt-1.5" />
 
         <div
-          className="mt-6 flex flex-wrap gap-2"
+          className="mt-4 flex flex-wrap gap-2"
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
@@ -148,16 +109,6 @@ export function DashboardProjectManageCard({
           <ContentOpeningLink href={project.href} kind="project" itemTitle={project.title}>
             <AppButton variant="ghost">Preview</AppButton>
           </ContentOpeningLink>
-          {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer">
-              <AppButton variant="ghost">Live demo</AppButton>
-            </a>
-          )}
-          {project.repoUrl && (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer">
-              <AppButton variant="ghost">GitHub</AppButton>
-            </a>
-          )}
         </div>
       </div>
     </article>

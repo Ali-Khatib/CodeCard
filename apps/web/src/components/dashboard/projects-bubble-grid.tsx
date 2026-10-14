@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { PortfolioOpenTransition, PortfolioProject } from '@/lib/dashboard/portfolio';
 import { motion } from 'motion/react';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 const FALLBACK =
@@ -28,7 +29,6 @@ export function ProjectsBubbleGrid({
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       {projects.map((project, index) => {
-        const isPublished = project.isPublished !== false;
         return (
           <motion.div
             key={project.id}
@@ -43,7 +43,7 @@ export function ProjectsBubbleGrid({
               itemTitle={project.title}
               className="cc-projects-bubble group"
               title={project.title}
-              aria-label={`View ${project.title}`}
+              aria-label={`Open project: ${project.title}`}
             >
               <div className="cc-projects-bubble__thumb">
                 <Image
@@ -56,21 +56,8 @@ export function ProjectsBubbleGrid({
               </div>
               <div className="cc-projects-bubble__meta">
                 <p className="cc-fit-title cc-projects-bubble__title">{project.title}</p>
-                <span
-                  className={`cc-projects-bubble__badge ${isPublished ? 'cc-projects-bubble__badge--live' : ''}`}
-                >
-                  {isPublished ? 'Live' : 'Draft'}
-                </span>
+                <ProjectTechLine technologies={project.technologies} className="mt-1" />
               </div>
-              {project.technologies.length > 0 && (
-                <div className="cc-projects-bubble__tech-stack" aria-label={`${project.title} tech stack`}>
-                  {project.technologies.slice(0, 4).map((tech) => (
-                    <span key={tech} className="cc-projects-bubble__tech-chip">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              )}
             </ContentOpeningLink>
           </motion.div>
         );

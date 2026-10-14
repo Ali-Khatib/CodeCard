@@ -179,8 +179,8 @@ export async function requestProjectMediaUploadInit(
   }
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null;
-    const failure = classifyInitFailure(response.status, body?.error);
+    const body = (await response.json().catch(() => null)) as { error?: string; code?: string } | null;
+    const failure = classifyInitFailure(response.status, body?.error, body?.code);
     return { ok: false as const, ...failure };
   }
 

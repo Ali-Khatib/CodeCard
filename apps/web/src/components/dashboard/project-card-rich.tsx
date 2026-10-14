@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 export type RichProjectCard = {
@@ -26,84 +27,35 @@ export function ProjectCardRich({ card, index = 0 }: { card: RichProjectCard; in
 
   return (
     <motion.article
-      initial={reduced ? false : { opacity: 0, y: 20 }}
+      initial={reduced ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ delay: index * 0.04, duration: reduced ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="cc-dash-project-card group"
     >
       <ContentOpeningLink
         href={card.href}
         kind="project"
         itemTitle={card.title}
-        className="block overflow-hidden rounded-[14px]"
+        aria-label={`Open project: ${card.title}`}
+        className="block overflow-hidden rounded-[14px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
       >
-        <div className="cc-dash-project-card__media relative aspect-[16/10] overflow-hidden">
+        <div className="cc-dash-project-card__media relative aspect-[16/10] overflow-hidden bg-midnight">
           {card.posterUrl ? (
             <Image
               src={card.posterUrl}
               alt=""
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.02] motion-reduce:group-hover:scale-100"
               sizes="(max-width: 768px) 100vw, 400px"
             />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-reactor/30 via-midnight to-void-canvas" />
-          )}
-          {card.videoUrl && !reduced && (
-            <video
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100"
-              src={card.videoUrl}
-              muted
-              loop
-              playsInline
-              preload="none"
-              onMouseEnter={(e) => void e.currentTarget.play().catch(() => {})}
-              onFocus={(e) => void e.currentTarget.play().catch(() => {})}
-              onMouseLeave={(e) => {
-                e.currentTarget.pause();
-                e.currentTarget.currentTime = 0;
-              }}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-void-canvas via-void-canvas/20 to-transparent opacity-80" />
-          <div className="absolute inset-0 bg-reactor/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100" />
-
-          <div className="absolute left-3 top-3 flex gap-2">
-            <span className="cc-dash-chip cc-dash-chip--status">{card.subtitle}</span>
-            {card.updatedAt && <span className="cc-dash-chip">{card.updatedAt}</span>}
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 translate-y-3 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
-            <div className="flex flex-wrap gap-2">
-              {card.liveUrl && <span className="cc-dash-chip cc-dash-chip--action">Live demo</span>}
-              {card.repoUrl && <span className="cc-dash-chip cc-dash-chip--action">GitHub</span>}
-              <span className="cc-dash-chip cc-dash-chip--action">Edit</span>
-            </div>
-          </div>
+          ) : null}
         </div>
 
-        <div className="cc-dash-project-card__body p-4">
-          <h3 className="break-words font-display text-[20px] leading-tight text-vellum transition-colors group-hover:text-reactorBright">
+        <div className="cc-dash-project-card__body px-3.5 py-3">
+          <h3 className="break-words font-display text-[17px] leading-snug text-vellum">
             {card.title}
           </h3>
-          {card.tagline && (
-            <p className="mt-1 break-words text-[14px] leading-snug text-lichen">{card.tagline}</p>
-          )}
-
-          {card.technologies && card.technologies.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {card.technologies.slice(0, 5).map((tech) => (
-                <span key={tech} className="cc-dash-tech-chip">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="mt-4 flex items-center gap-4 text-[12px] text-graphite">
-            {card.views != null && <span>{card.views.toLocaleString()} views</span>}
-            {card.stars != null && <span>★ {card.stars}</span>}
-          </div>
+          <ProjectTechLine technologies={card.technologies ?? []} className="mt-1 text-lichen" />
         </div>
       </ContentOpeningLink>
     </motion.article>

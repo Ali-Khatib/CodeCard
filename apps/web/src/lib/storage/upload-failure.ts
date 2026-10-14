@@ -3,6 +3,8 @@ export type UploadFailureClass =
   | 'authentication'
   | 'authorization'
   | 'upload_authorization'
+  | 'rate_limited'
+  | 'service_unavailable'
   | 'network'
   | 'signed_upload_expired'
   | 'finalization'
@@ -23,6 +25,8 @@ const MESSAGES = {
   sessionExpired: 'Your session expired. Sign in and try again.',
   interrupted: 'The upload was interrupted. Try again.',
   authzFailed: 'You do not have permission to upload this file.',
+  rateLimited: 'You have uploaded too many files this hour. Try again later.',
+  unavailable: 'Photo upload is temporarily unavailable. Try again shortly.',
   signedExpired: 'The upload authorization expired. Try again.',
   finalizeFailed: 'The upload finished, but saving it failed. Try again.',
   generic: 'Could not upload image. Please try again.',
@@ -38,6 +42,10 @@ export function messageForUploadFailure(failureClass: UploadFailureClass, fallba
       return MESSAGES.sessionExpired;
     case 'authorization':
       return MESSAGES.authzFailed;
+    case 'rate_limited':
+      return MESSAGES.rateLimited;
+    case 'service_unavailable':
+      return fallback ?? MESSAGES.unavailable;
     case 'upload_authorization':
       return fallback ?? MESSAGES.generic;
     case 'network':
@@ -85,7 +93,31 @@ export function classifyHttpUploadFailure(status: number): UploadFailureInfo {
   };
 }
 
-export function classifyInitFailure(status: number, bodyError?: string): UploadFailureInfo {
+function safeClientMessage(bodyError: string | undefined, fallback: string): string {
+  if (!bodyError) return fallback;
+  if (/redis|upstash|token|stack|sql|supabase/i.test(bodyError)) return fallback;
+  return bodyError;
+}
+
+export function classifyInitFailure(
+  status: number,
+  bodyError?: string,
+  code?: string,
+): UploadFailureInfo {
+  if (status === 429 || code === 'rate_limited') {
+    return {
+      failureClass: 'rate_limited',
+      message: messageForUploadFailure('rate_limited'),
+      retryable: true,
+    };
+  }
+  if (status === 503 || code === 'upload_unavailable') {
+    return {
+      failureClass: 'service_unavailable',
+      message: safeClientMessage(bodyError, messageForUploadFailure('service_unavailable')),
+      retryable: true,
+    };
+  }
   if (status === 401) {
     return {
       failureClass: 'authentication',
@@ -121,6 +153,8 @@ export function isRetryableUploadFailure(failureClass: UploadFailureClass): bool
     failureClass === 'network' ||
     failureClass === 'signed_upload_expired' ||
     failureClass === 'upload_authorization' ||
+    failureClass === 'rate_limited' ||
+    failureClass === 'service_unavailable' ||
     failureClass === 'finalization' ||
     failureClass === 'persistence' ||
     failureClass === 'cancelled'

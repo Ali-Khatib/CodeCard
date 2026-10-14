@@ -398,6 +398,30 @@ describe('executeProfileUpdate', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
+  it('does not look up slug ownership when the public URL is unchanged', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: ownedProfile,
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'alex-chen',
+        bio: 'Updated bio',
+        location: 'SF',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+      }),
+    );
+
+    expect(result.success).toBe(true);
+    expect(update).toHaveBeenCalled();
+    expect(supabase.from).not.toHaveBeenCalledWith('tenants');
+  });
+
   it('rejects duplicate slugs with a friendly field error', async () => {
     const { supabase, update } = createMockSupabase({
       user: { id: 'user-1' },

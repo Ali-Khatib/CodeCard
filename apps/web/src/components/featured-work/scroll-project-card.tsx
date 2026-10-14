@@ -12,6 +12,7 @@ import { centerProximity, lerp } from '@/lib/projects/featured';
 import { prefetchProjectRoute } from '@/hooks/use-view-transition-navigate';
 import { saveScrollForProfile } from '@/hooks/use-scroll-restore';
 import { TYPE } from '@/lib/design/tokens';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -149,7 +150,6 @@ export function ScrollProjectCard({
         filter: reducedMotion ? undefined : `saturate(${saturation}) brightness(${isCentered ? 1.02 : 0.96})`,
         willChange: reducedMotion ? 'auto' : 'transform, opacity, filter',
         transition: reducedMotion ? undefined : 'transform 0.08s ease-out, filter 0.2s',
-        minHeight: 'min(68vh, 780px)',
       }}
       data-active={isActive}
     >
@@ -163,7 +163,7 @@ export function ScrollProjectCard({
         }}
       >
         <div
-          className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10]"
+          className="relative aspect-[16/10] w-full overflow-hidden"
           style={{ borderRadius: `${borderRadius}px` }}
         >
           <div ref={mediaRef} className="absolute inset-0">
@@ -198,23 +198,12 @@ export function ScrollProjectCard({
             style={{ borderRadius: `${borderRadius}px` }}
           />
 
-          <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
+          <div className="absolute inset-x-0 bottom-0 z-10 p-4 md:p-6">
             <h3 className={`cc-fit-title ${TYPE.projectTitle} text-lilac-white`}>{project.title}</h3>
-            {project.tagline && (
-              <p className="mt-3 max-w-[680px] text-[17px] font-medium leading-relaxed text-white/92 drop-shadow-[0_2px_12px_rgba(0,0,0,0.58)] md:text-[18px]">{project.tagline}</p>
-            )}
-            {(project.domains.length > 0 || project.technologies.length > 0) && (
-              <div className="mt-5 flex flex-wrap gap-2">
-                {[...project.domains, ...project.technologies].slice(0, 6).map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-white/35 bg-black/38 px-3 py-1.5 text-[12px] font-semibold text-white/90 shadow-[0_10px_26px_rgba(0,0,0,0.24)] backdrop-blur-md"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            <ProjectTechLine
+              technologies={project.technologies}
+              className="mt-1.5 text-[13px] text-white/75"
+            />
           </div>
         </div>
       </div>

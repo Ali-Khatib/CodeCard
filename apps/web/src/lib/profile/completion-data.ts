@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   calculateProfileCompletion,
@@ -22,7 +23,7 @@ export type LoadProfileCompletionResult =
       error: string;
     };
 
-export async function loadProfileCompletionFlags(
+export const loadProfileCompletionFlags = cache(async function loadProfileCompletionFlags(
   supabase: SupabaseClient,
   profileId: string,
 ): Promise<ProfileCompletionFlags & { error?: string }> {
@@ -56,7 +57,7 @@ export async function loadProfileCompletionFlags(
     hasPublishedProject: (publishedResult.count ?? 0) > 0,
     hasAnyProject: (anyProjectResult.count ?? 0) > 0,
   };
-}
+});
 
 export async function loadProfileCompletion(
   supabase: SupabaseClient,

@@ -33,7 +33,6 @@ export function UploadProgressHarness() {
             <AvatarUpload
               displayName="Upload Test User"
               initialAvatarUrl={null}
-              refreshAfterSave={false}
               finalizeUpload={async () => ({
                 success: true,
                 avatarUrl: '/auth-collage/avatar.jpg',

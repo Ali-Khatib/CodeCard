@@ -30,6 +30,10 @@ const PublicProfileSaveCard = dynamic(
   () => import('./public-profile-save-card').then((m) => m.PublicProfileSaveCard),
   { ssr: true },
 );
+const PublicProfileProductNote = dynamic(
+  () => import('./public-profile-product-note').then((m) => m.PublicProfileProductNote),
+  { ssr: true },
+);
 const PublicProfileAtmosphere = dynamic(
   () => import('./public-profile-atmosphere').then((m) => m.PublicProfileAtmosphere),
   { ssr: true },
@@ -182,11 +186,11 @@ export function PublicProfileFocused({
           <h2 className="cc-public-display mt-3 break-words text-[28px] text-[var(--app-ink)] md:text-[34px]">
             {founder ? 'The work behind CodeCard' : `What ${firstName} built`}
           </h2>
-          <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
-            {founder
-              ? 'Product, research, and systems — the stack that made this card possible.'
-              : 'Scroll to stack projects — the quickest way to see the work.'}
-          </p>
+          {founder ? (
+            <p className="mt-2 max-w-lg text-[15px] text-[var(--app-smoke)]">
+              Product, research, and systems — the stack that made this card possible.
+            </p>
+          ) : null}
 
           <div className="mt-6 md:mt-8">
             {projects.length > 0 ? (
@@ -215,6 +219,7 @@ export function PublicProfileFocused({
         <div className="mt-16">
           <PublicProfileSaveCard profileSlug={profileSlug} displayName={displayName} />
         </div>
+        <PublicProfileProductNote />
         <footer className="mt-16 border-t border-[var(--app-border)] pt-8 text-center">
           <PublicProfileBackLink
             href="/"

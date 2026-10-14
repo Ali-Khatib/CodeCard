@@ -42,16 +42,23 @@ export default async function NewResearchPage() {
   return (
     <div className="cc-container cc-content py-8 md:py-12">
       <div className="mb-8 max-w-[720px]">
-        <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
-          New research
-        </p>
-        <h1 className="mt-3 text-[28px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[36px]">
+        <p className="cc-create-intro__kicker">New research</p>
+        <h1 className="mt-3 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
           Add a research paper
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ash">
-          Create the paper first, then add its PDF and figures. After saving, you can attach an
-          external HTTPS paper link and upload research figures on the edit page.
-        </p>
+        <div className="cc-create-steps">
+          <div className="cc-create-step cc-create-step--required">
+            <span className="cc-create-step__label">Required</span>
+            <p>Title and URL slug. Everything else on this page can wait.</p>
+          </div>
+          <div className="cc-create-step">
+            <span className="cc-create-step__label">After you save</span>
+            <p>
+              The paper stays unpublished. Add the PDF link, figures, and a related project on the
+              edit page when you are ready.
+            </p>
+          </div>
+        </div>
       </div>
       <ResearchCreateForm relatedProjectOptions={relatedProjectOptions} />
     </div>

@@ -21,8 +21,29 @@ export function unauthorized() {
   return apiError('Unauthorized', 401);
 }
 
-export function rateLimited() {
-  return apiError('Too many requests', 429);
+export function rateLimited(retryAfterSeconds?: number) {
+  return NextResponse.json(
+    { error: 'Too many requests' },
+    {
+      status: 429,
+      headers: retryAfterSeconds && retryAfterSeconds > 0
+        ? { 'Retry-After': String(retryAfterSeconds) }
+        : undefined,
+    },
+  );
+}
+
+/** Quota stays 429. Missing or unreachable Redis is a service failure, not a quota hit. */
+export function responseForDeniedRateLimit(decision: {
+  success: boolean;
+  denial?: 'quota' | 'misconfigured' | 'unavailable';
+  retryAfterSeconds?: number;
+}) {
+  if (decision.success) return null;
+  if (decision.denial === 'misconfigured' || decision.denial === 'unavailable') {
+    return apiError('Service temporarily unavailable', 503);
+  }
+  return rateLimited(decision.retryAfterSeconds);
 }
 
 export function getClientIp(request: Request): string {

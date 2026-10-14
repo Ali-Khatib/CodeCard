@@ -12,20 +12,17 @@ describe('WS08-T008 / WS09-T003 authenticated dashboard home stats', () => {
     const view = read('src/components/dashboard/dashboard-overview-view.tsx');
     const preview = read('src/app/demo/page.tsx');
 
-    expect(page).toContain('loadOwnerAnalytics');
-    expect(page).toContain('loadOwnerOverviewContent');
-    expect(page).toContain('listCircleFeed');
+    expect(page).toContain('loadHomeSchedule');
+    expect(page).toContain('saved_connections');
+    expect(page).not.toContain('listCircleFeed');
     expect(page).not.toContain('DEMO_OVERVIEW_ACTIVITY');
     expect(page).not.toContain('DEMO_CIRCLE_FEED');
     expect(page).not.toContain('1284');
     expect(page).not.toContain('128');
     expect(page).not.toContain('47');
     expect(page).not.toContain('342');
-    expect(page).toContain('circleWorks');
-    expect(page).toContain('statsError');
-    expect(page).toContain('contentError');
-    expect(page).toContain('projectsSummary');
-    expect(page).toContain('researchSummary');
+    expect(page).toContain('connectionCount');
+    expect(page).not.toContain('circleWorks');
 
     expect(view).not.toContain('saves');
     expect(view).not.toContain('qrScans');

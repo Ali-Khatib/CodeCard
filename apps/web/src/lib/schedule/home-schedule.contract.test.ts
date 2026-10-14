@@ -13,9 +13,13 @@ describe('Home calendar and follow-ups', () => {
     const page = read('src/app/dashboard/(authenticated)/page.tsx');
     expect(shell).not.toContain("label: 'Events'");
     expect(shell).not.toContain("label: 'Calendar'");
-    expect(overview).toContain('HomeScheduleSection');
-    expect(overview).toContain('HomeIdentitySection');
-    expect(overview).toContain('This is where you edit your card and manage your calendar.');
+    expect(overview).toContain('HomeDesk');
+    const desk = read('src/components/dashboard/home-desk.tsx');
+    expect(desk).toContain('HomeScheduleSection');
+    expect(desk).toContain('compact');
+    const calendarPage = read('src/app/dashboard/(authenticated)/calendar/page.tsx');
+    expect(calendarPage).toContain('HomeScheduleSection');
+    expect(calendarPage).toContain('loadHomeSchedule');
     expect(page).toContain('loadHomeSchedule');
     const calendar = read('src/components/dashboard/home-schedule-section.tsx');
     expect(calendar).toContain('cc-home-calendar');

@@ -13,6 +13,7 @@ import { AsyncActionButton } from '@/components/ui/async-action-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { applyDarkMode, readDarkPreference } from '@/lib/dashboard/appearance';
 import { useDashboardSessionGuard } from '@/hooks/use-dashboard-session-guard';
+import { subscribeProfileAvatarSaved } from '@/lib/profile/avatar-live-sync';
 import { MARKETING_HOME_HREF } from '@/lib/marketing/site-routes';
 import {
   isDemoWorkspacePath,
@@ -44,7 +45,8 @@ const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
   work: 'Your Work',
-  profile: 'Home',
+  profile: 'Edit CodeCard',
+  calendar: 'Calendar',
   projects: 'Your Work',
   research: 'Your Work',
   circle: 'Circle',
@@ -113,12 +115,20 @@ export function DashboardShell({
   const routeLoadingRef = useRef(false);
   const [embedded, setEmbedded] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [avatarOverride, setAvatarOverride] = useState<string | null>(null);
+  const shownAvatarUrl = avatarOverride ?? avatarUrl ?? null;
   const navRef = useRef<HTMLElement>(null);
   const activePillRef = useRef<HTMLSpanElement>(null);
   const cardHref = profileSlug ? publicDemoProfileBasePath(profileSlug) : null;
   const isLiveDemo = preview || isDemoWorkspacePath(basePath);
 
   useDashboardSessionGuard();
+
+  useEffect(() => {
+    setAvatarOverride(null);
+  }, [avatarUrl]);
+
+  useEffect(() => subscribeProfileAvatarSaved(setAvatarOverride), []);
 
   useLayoutEffect(() => {
     try {
@@ -330,14 +340,6 @@ export function DashboardShell({
           <span className="cc-app-route-progress__bar" />
         </div>
       ) : null}
-      {isDemoWorkspacePath(basePath) && !embedded ? (
-        <Link
-          href={MARKETING_HOME_HREF}
-          className="cc-app-demo-back-to-landing"
-        >
-          Back to landing
-        </Link>
-      ) : null}
       <button
         type="button"
         className="cc-app-sidebar-toggle cc-app-sidebar-toggle--fixed"
@@ -364,15 +366,15 @@ export function DashboardShell({
 
         <div className="cc-app-user-card mt-4">
           <Link
-            href={`${basePath}#profile`}
+            href={`${basePath}/profile`}
             className="cc-app-user-card--link block"
             aria-label="Edit profile"
           >
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--app-border)] bg-[var(--app-paper)]">
-                {avatarUrl ? (
+                {shownAvatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={shownAvatarUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-[11px] font-medium">
                     {initials}
@@ -459,9 +461,9 @@ export function DashboardShell({
               aria-expanded={userMenuOpen}
               aria-label="User menu"
             >
-              {avatarUrl ? (
+              {shownAvatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                <img src={shownAvatarUrl} alt="" className="h-full w-full object-cover" />
               ) : (
                 <span className="text-[10px] font-medium">{initials}</span>
               )}
@@ -481,7 +483,7 @@ export function DashboardShell({
                   </Link>
                 ) : null}
                 <Link
-                  href={`${basePath}#profile`}
+                  href={`${basePath}/profile`}
                   className="block px-3 py-2 text-[14px] text-[var(--app-ink)] hover:bg-[var(--app-bone)]"
                   onClick={() => setUserMenuOpen(false)}
                 >

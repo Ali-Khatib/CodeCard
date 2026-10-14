@@ -1,7 +1,6 @@
 'use client';
 
 import { startTransition, useActionState, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { ProfileLinksEditor } from '@/components/profile/profile-links-editor';
@@ -26,6 +25,8 @@ interface ProfileEditorProps {
   profile: Profile;
   links?: ProfileLinkRow[];
   onDraftChange?: (form: ProfileFormState) => void;
+  /** Fired after the server confirms the save. The form already holds those values. */
+  onPersisted?: (form: ProfileFormState) => void;
 }
 
 const PROFILE_FIELD_IDS: Record<string, string> = {
@@ -46,7 +47,10 @@ function focusProfileField(field?: string) {
   if (!field) return;
   const id = PROFILE_FIELD_IDS[field] ?? field;
   const el = document.getElementById(id);
-  if (el instanceof HTMLElement) el.focus();
+  if (!(el instanceof HTMLElement)) return;
+  const details = el.closest('details');
+  if (details) details.open = true;
+  el.focus();
 }
 
 const initialState: ProfileUpdateState = {};
@@ -59,8 +63,7 @@ function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.Re
   );
 }
 
-export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEditorProps) {
-  const router = useRouter();
+export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted }: ProfileEditorProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [form, setForm] = useState(() => profileToFormState(profile));
   const [clientError, setClientError] = useState('');
@@ -68,22 +71,24 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     field?: string;
     message: string;
   } | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const notifiedErrorRef = useRef<string | null>(null);
   const celebratedStateRef = useRef<ProfileUpdateState | null>(null);
   const onDraftChangeRef = useRef(onDraftChange);
   onDraftChangeRef.current = onDraftChange;
+  const onPersistedRef = useRef(onPersisted);
+  onPersistedRef.current = onPersisted;
+  const formRef = useRef(form);
+  formRef.current = form;
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
 
   useEffect(() => {
     if (!state.success || celebratedStateRef.current === state) return;
     celebratedStateRef.current = state;
-    setSaveSuccess(true);
     setCelebrating(true);
     notifySuccess(MUTATION_FEEDBACK.profile.saved);
-    router.refresh();
-  }, [state, router, notifySuccess]);
+    onPersistedRef.current?.(formRef.current);
+  }, [state, notifySuccess]);
 
   useEffect(() => {
     if (!state.error && !state.fieldErrors) {
@@ -96,11 +101,6 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
       notifyError(state.error, MUTATION_FEEDBACK.profile.saveFailed);
     }
   }, [state.error, state.fieldErrors, notifyError]);
-
-  useEffect(() => {
-    if (!saveSuccess) return;
-    setForm(profileToFormState(profile));
-  }, [profile, saveSuccess]);
 
   useEffect(() => {
     if (!celebrating) return;
@@ -138,7 +138,6 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
     if (pending) return;
     setClientError('');
     setClientFieldError(null);
-    setSaveSuccess(false);
     setCelebrating(false);
 
     if (!form.audience_role) {
@@ -177,6 +176,11 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
         aria-busy={pending}
         noValidate
       >
+        <details className="cc-editor-section" open>
+          <summary>
+            <span>Basic information</span>
+            <span>Name, headline, bio, location</span>
+          </summary>
         <div id="audience_role" className="scroll-mt-28">
           <AudienceRoleField
             value={form.audience_role}
@@ -250,20 +254,17 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
             placeholder="City, optional"
-            aria-describedby="location-hint"
           />
-          <p id="location-hint" className="text-[12px] text-[var(--app-smoke)]">
-            Optional. Leave it blank and your card simply will not show a city.
-          </p>
         </div>
+        </details>
 
-        <fieldset className="m-0 w-full min-w-0 space-y-3 rounded-xl border border-[var(--app-border)] p-3">
-          <legend className="px-1 text-[13px] font-medium text-[var(--app-ink)]">Card history</legend>
-          <p id="history-hint" className="text-[12px] leading-relaxed text-[var(--app-smoke)]">
-            Optional. These lines show on the back of the card, under your name. Your headline
-            already appears as Now, and your city as Based. Current employment shows as Working,
-            past employment as Before, current education as Studying, and a finished degree as
-            Studied. Leave a line blank and it stays off the card.
+        <details className="cc-editor-section">
+          <summary>
+            <span>Experience and education</span>
+            <span>Work and academic history</span>
+          </summary>
+          <p id="history-hint" className="text-[12px] text-[var(--app-smoke)]">
+            These lines appear on the back of your card. Leave a line blank to hide it.
           </p>
           {(
             [
@@ -309,9 +310,13 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
               ) : null}
             </div>
           ))}
-        </fieldset>
+        </details>
 
-        <div className="space-y-2 scroll-mt-28" id="skills-field">
+        <details className="cc-editor-section" id="skills-field">
+          <summary>
+            <span>Skills</span>
+            <span>Technologies and expertise</span>
+          </summary>
           <FieldLabel htmlFor="skills">Skills</FieldLabel>
           <input
             id="skills"
@@ -322,12 +327,23 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
             placeholder="TypeScript, Next.js, C++"
           />
           <p className="text-[12px] text-[var(--app-smoke)]">Separate skills with commas.</p>
-        </div>
+        </details>
 
       </form>
 
-      <ProfileLinksEditor links={links} />
-      <ProfilePublishControls isPublic={profile.is_public} />
+      <details className="cc-editor-section" id="links">
+        <summary>
+          <span>Social links</span>
+          <span>GitHub, LinkedIn, website</span>
+        </summary>
+        <ProfileLinksEditor links={links} />
+      </details>
+      <details className="cc-editor-section" id="visibility">
+        <summary>
+          <span>Visibility</span>
+          <span>Publishing and public URL</span>
+        </summary>
+        <ProfilePublishControls isPublic={profile.is_public} />
 
       {profile.slug ? (
         <p className="text-sm">
@@ -346,6 +362,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           ) : null}
         </p>
       ) : null}
+      </details>
 
       {displayError ? (
         <p className="text-sm text-red-600" role="alert">
@@ -361,6 +378,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
         ) : null}
       </div>
 
+      <div className="cc-profile-save-bar">
       <button
         type="submit"
         form="profile-editor"
@@ -384,6 +402,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange }: ProfileEdi
           'Save changes'
         )}
       </button>
+      </div>
     </div>
   );
 }

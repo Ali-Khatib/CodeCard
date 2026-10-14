@@ -5,7 +5,7 @@ import {
   apiError,
   getClientIp,
   internalError,
-  rateLimited,
+  responseForDeniedRateLimit,
   unauthorized,
   validationError,
 } from '@/lib/api-utils';
@@ -61,8 +61,9 @@ export async function secureJsonRoute<T, R>(
     const ip = getClientIp(request);
     const rlKey = `${options.rateLimitType}:${ip}`;
 
-    const { success } = await rateLimit(rlKey, options.rateLimitType);
-    if (!success) return rateLimited();
+    const ipDecision = await rateLimit(rlKey, options.rateLimitType);
+    const ipDenied = responseForDeniedRateLimit(ipDecision);
+    if (ipDenied) return ipDenied;
     // Strict Redis requirement applies in production, except in the isolated
     // E2E backend mode (CODECARD_E2E=1, server-only) where the app is a
     // production build served locally without Upstash.
@@ -93,7 +94,8 @@ export async function secureJsonRoute<T, R>(
       if (recoveryBlocked) return recoveryBlocked;
 
       const userRl = await rateLimit(`${options.rateLimitType}:user:${user.id}`, options.rateLimitType);
-      if (!userRl.success) return rateLimited();
+      const userDenied = responseForDeniedRateLimit(userRl);
+      if (userDenied) return userDenied;
     }
 
     const parsed = await parseJsonBody(request, options.maxBodyBytes);

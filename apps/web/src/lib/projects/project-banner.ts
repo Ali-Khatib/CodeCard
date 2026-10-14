@@ -241,6 +241,73 @@ export function drawProjectBanner(
   ctx.textAlign = 'left';
 }
 
+function escapeBannerText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function bannerTitleLines(title: string): string[] {
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  if (words.length <= 2 && title.trim().length <= 22) return [title.trim()];
+
+  let bestSplit = 1;
+  let bestScore = Number.POSITIVE_INFINITY;
+  for (let split = 1; split < words.length; split += 1) {
+    const first = words.slice(0, split).join(' ');
+    const second = words.slice(split).join(' ');
+    const score = Math.abs(first.length - second.length) + Math.max(first.length, second.length) * 0.15;
+    if (score < bestScore) {
+      bestScore = score;
+      bestSplit = split;
+    }
+  }
+  return [words.slice(0, bestSplit).join(' '), words.slice(bestSplit).join(' ')];
+}
+
+/** Same banner as the project and research editor, as an image URL for previews. */
+export function projectBannerDataUrl(draft: ProjectBannerDraft): string {
+  const accent = draft.accent.trim() || '#e95a0b';
+  const background = draft.background.trim() || '#1c1612';
+  const bottom = draft.backgroundBottom?.trim() || '#100e0c';
+  const eyebrow = draft.eyebrow.trim().toUpperCase().slice(0, PROJECT_BANNER_LIMITS.eyebrow);
+  const title = draft.title.trim().slice(0, PROJECT_BANNER_LIMITS.title);
+  const subtitle = draft.subtitle.trim().slice(0, PROJECT_BANNER_LIMITS.subtitle);
+  const lines = bannerTitleLines(title);
+  const titleSize = lines.length > 1 ? 52 : 72;
+  const titleStart = lines.length > 1 ? 128 : 150;
+  const lineGap = Math.round(titleSize * 1.08);
+  const titleSvg = lines
+    .map(
+      (line, index) =>
+        `<text x="800" y="${titleStart + index * lineGap}" fill="#f7f2eb" font-family="Georgia, 'Times New Roman', serif" font-size="${titleSize}" text-anchor="middle">${escapeBannerText(line)}</text>`,
+    )
+    .join('');
+  const subtitleY = lines.length > 1 ? 268 : 252;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${escapeBannerText(background)}"/>
+      <stop offset="1" stop-color="${escapeBannerText(bottom)}"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="400" fill="url(#bg)"/>
+  <ellipse cx="170" cy="200" rx="350" ry="280" fill="${escapeBannerText(accent)}" opacity="0.11"/>
+  <ellipse cx="1370" cy="180" rx="390" ry="340" fill="#ffffff" opacity="0.04"/>
+  <rect x="72" y="118" width="46" height="6" rx="3" fill="${escapeBannerText(accent)}"/>
+  ${eyebrow ? `<text x="132" y="122" fill="${escapeBannerText(accent)}" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600" letter-spacing="3">${escapeBannerText(eyebrow)}</text>` : ''}
+  ${titleSvg}
+  ${subtitle ? `<text x="800" y="${subtitleY}" fill="#d6cec4" font-family="Segoe UI, sans-serif" font-size="26" text-anchor="middle">${escapeBannerText(subtitle)}</text>` : ''}
+  <rect x="660" y="331" width="280" height="2" fill="${escapeBannerText(accent)}"/>
+</svg>`;
+
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 export async function projectBannerFile(draft: ProjectBannerDraft): Promise<File> {
   const canvas = document.createElement('canvas');
   canvas.width = PROJECT_BANNER_WIDTH;

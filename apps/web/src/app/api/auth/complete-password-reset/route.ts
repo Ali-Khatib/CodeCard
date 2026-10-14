@@ -8,7 +8,7 @@ import { parseJsonBody } from '@/lib/security/request';
 import { isSameOriginMutation } from '@/lib/security/same-origin';
 import { logSecurityEvent } from '@/lib/security/security-events';
 import { rateLimit } from '@/lib/rate-limit';
-import { getClientIp, rateLimited } from '@/lib/api-utils';
+import { getClientIp, responseForDeniedRateLimit } from '@/lib/api-utils';
 
 /**
  * Complete password reset under recovery privilege:
@@ -21,8 +21,9 @@ export async function POST(request: Request) {
   }
 
   const ip = getClientIp(request);
-  const { success } = await rateLimit(`auth:reset:${ip}`, 'auth');
-  if (!success) return rateLimited();
+  const resetLimit = await rateLimit(`auth:reset:${ip}`, 'auth');
+  const resetDenied = responseForDeniedRateLimit(resetLimit);
+  if (resetDenied) return resetDenied;
 
   const parsedBody = await parseJsonBody(request, 4 * 1024);
   if (!parsedBody.ok) return parsedBody.response;

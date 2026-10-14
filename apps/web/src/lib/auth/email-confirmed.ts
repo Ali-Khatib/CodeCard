@@ -8,7 +8,7 @@ export const NEW_ACCOUNT_SETUP_GUIDE = [
   {
     id: 'profile',
     where: 'Home',
-    href: '/dashboard#profile',
+    href: '/dashboard/profile',
     what: 'Add your photo, headline, bio, and links so your card looks finished.',
   },
   {

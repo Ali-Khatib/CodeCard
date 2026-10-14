@@ -1,169 +1,47 @@
 'use client';
 
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'motion/react';
-import { HiOutlineDocumentText } from 'react-icons/hi2';
 import type { ResearchPaper } from '@/lib/research/research';
-import { HUME_EASE, HUME_MOTION } from '@/lib/motion/hume-motion';
-import { AppReveal } from '@/components/ui/app-reveal';
-import { CitationCopyButton } from '@/components/research/citation-copy-button';
-import { ResearchPdfReadButton } from '@/components/research/research-pdf-reader';
 import { ContentOpeningLink } from '@/components/navigation/content-opening-transition';
-import { trackResearchEvent } from './research-analytics';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 
-function abstractPreview(abstract: string | null) {
-  if (!abstract) return 'No abstract provided.';
-  return abstract.length > 220 ? `${abstract.slice(0, 220).trim()}...` : abstract;
-}
-
+/** Gallery card: cover, title, and a compact topic line. Details live on the paper page. */
 export function ResearchPaperCard({
   paper,
   href,
-  profileId,
-  delay = 0,
 }: {
   paper: ResearchPaper;
   href: string;
   profileId?: string;
   delay?: number;
 }) {
-  const reduced = useReducedMotion();
-
   return (
-    <AppReveal delay={delay}>
-      <motion.article
-        layout
-        className="cc-app-project-card cc-glass-card"
-        whileTap={reduced ? undefined : { scale: 0.985 }}
-        transition={{ duration: HUME_MOTION.press, ease: HUME_EASE }}
+    <article className="cc-app-project-card">
+      <ContentOpeningLink
+        href={href}
+        kind="research"
+        itemTitle={paper.title}
+        className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
+        aria-label={`Open research paper: ${paper.title}`}
       >
-        <ContentOpeningLink
-          href={href}
-          kind="research"
-          itemTitle={paper.title}
-          className="cc-app-project-card__media cc-app-project-card__media--public group block outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
-          aria-label={`Open research paper: ${paper.title}`}
-        >
+        <div className="cc-app-project-card__media relative">
           {paper.coverImageUrl ? (
             <Image
               src={paper.coverImageUrl}
               alt=""
               fill
-              className="cc-app-project-card__media-inner transition-transform duration-500 group-hover:scale-[1.02]"
+              className="cc-app-project-card__media-inner object-cover"
               sizes="(max-width: 920px) 100vw, 920px"
             />
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(233,90,11,0.22),transparent_30%),linear-gradient(135deg,#2a1206,#1a0f08)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,#2a1206,#1a0f08)]" />
           )}
-        </ContentOpeningLink>
-
-        <div className="cc-app-project-card__body">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <ContentOpeningLink
-                href={href}
-                kind="research"
-                itemTitle={paper.title}
-                className="outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
-              >
-                <h3 className="cc-fit-title cc-work-title cc-research-paper-card__title">
-                  {paper.title}
-                </h3>
-              </ContentOpeningLink>
-              <p className="mt-2 text-[14px] text-[var(--app-smoke)]">
-                {paper.authors.length > 0 ? paper.authors.join(', ') : 'Authors not listed'}
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <span className="cc-app-badge inline-flex items-center gap-1.5">
-                <HiOutlineDocumentText className="h-3.5 w-3.5" aria-hidden />
-                Research
-              </span>
-              <span className="cc-app-badge cc-app-badge--mint">
-                {paper.year ?? 'Year TBA'}
-              </span>
-            </div>
-          </div>
-
-          <p className="mt-3 max-w-[720px] text-[15px] leading-relaxed text-[var(--app-smoke)]">
-            {abstractPreview(paper.abstract)}
-          </p>
-
-          <p className="mt-3 text-[14px] text-[var(--app-smoke)]">
-            {[paper.venue, paper.publicationStatus].filter(Boolean).join(' · ') || 'Publication details pending'}
-          </p>
-
-          {paper.tags.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {paper.tags.slice(0, 7).map((tag) => (
-                <span key={tag} className="cc-app-tech-tag">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {paper.downloadCount != null ? (
-            <p className="mt-4 text-[14px] text-[var(--app-smoke)]">
-              <strong className="font-medium text-[var(--app-ink)]">{paper.downloadCount}</strong> downloads
-            </p>
-          ) : null}
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <ContentOpeningLink
-              href={href}
-              kind="research"
-              itemTitle={paper.title}
-              className="cc-app-btn cc-app-btn--primary"
-            >
-              Open research
-            </ContentOpeningLink>
-            {paper.pdfUrl && (
-              <ResearchPdfReadButton
-                paper={paper}
-                profileId={profileId}
-                className="cc-app-btn cc-app-btn--ghost"
-                onOpenTrack={() =>
-                  trackResearchEvent({
-                    eventType: 'paper_download',
-                    profileId,
-                    researchPaperId: paper.id,
-                  })
-                }
-              />
-            )}
-            {paper.citationText && (
-              <CitationCopyButton
-                citationText={paper.citationText}
-                compactLabel="Citation"
-                onCopied={() =>
-                  trackResearchEvent({
-                    eventType: 'citation_copy',
-                    profileId,
-                    researchPaperId: paper.id,
-                  })
-                }
-              />
-            )}
-            {paper.relatedProjectHref && (
-              <ContentOpeningLink
-                href={paper.relatedProjectHref}
-                kind="project"
-                className="cc-app-btn cc-app-btn--ghost"
-                onClick={() =>
-                  trackResearchEvent({
-                    eventType: 'related_project_click',
-                    profileId,
-                    researchPaperId: paper.id,
-                  })
-                }
-              >
-                Related project
-              </ContentOpeningLink>
-            )}
-          </div>
         </div>
-      </motion.article>
-    </AppReveal>
+        <div className="cc-app-project-card__body">
+          <h3 className="cc-fit-title cc-work-title break-words">{paper.title}</h3>
+          <ProjectTechLine technologies={paper.tags} className="mt-1.5" />
+        </div>
+      </ContentOpeningLink>
+    </article>
   );
 }

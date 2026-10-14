@@ -141,25 +141,22 @@ export async function checkProfileSlugAvailability(
     return RESERVED_PROFILE_SLUG_MESSAGE;
   }
 
-  const { data: otherProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('slug', slug)
-    .neq('id', profile.id)
-    .maybeSingle();
+  const [{ data: otherProfile }, { data: otherTenant }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', slug)
+      .neq('id', profile.id)
+      .maybeSingle(),
+    supabase
+      .from('tenants')
+      .select('id')
+      .eq('slug', slug)
+      .neq('id', profile.tenant_id)
+      .maybeSingle(),
+  ]);
 
-  if (otherProfile) {
-    return PROFILE_SLUG_TAKEN_MESSAGE;
-  }
-
-  const { data: otherTenant } = await supabase
-    .from('tenants')
-    .select('id')
-    .eq('slug', slug)
-    .neq('id', profile.tenant_id)
-    .maybeSingle();
-
-  if (otherTenant) {
+  if (otherProfile || otherTenant) {
     return PROFILE_SLUG_TAKEN_MESSAGE;
   }
 
@@ -212,8 +209,11 @@ export async function executeProfileUpdate(
 
   const updatePayload = pickAllowedProfileUpdate(parsed.data);
   const previousSlug = profile.slug;
+  const slugChanged = updatePayload.slug !== previousSlug;
 
-  const slugIssue = await checkProfileSlugAvailability(supabase, updatePayload.slug, profile);
+  const slugIssue = slugChanged
+    ? await checkProfileSlugAvailability(supabase, updatePayload.slug, profile)
+    : null;
   if (slugIssue) {
     return {
       fieldErrors: { slug: slugIssue },

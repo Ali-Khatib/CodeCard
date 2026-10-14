@@ -128,11 +128,7 @@ export const PLANS = {
       'AI-generated presentation and writing inside projects',
       'Per-project peer research analysis',
       'Per-project peer project analysis',
-      'Premium analytics',
       'AI review of your analytics',
-      'Analytics coach for your card',
-      'Per-research-paper analytics',
-      'Visitor insights',
     ],
   },
 } as const;

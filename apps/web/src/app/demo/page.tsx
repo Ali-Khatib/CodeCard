@@ -118,6 +118,7 @@ export default function DemoWorkspaceOverviewPage() {
         basePath={basePath}
         events={DEMO_OWNER_EVENTS}
         followUps={followUpsToHomeItems(DEMO_CONNECTIONS)}
+        connectionCount={DEMO_CONNECTIONS.length}
       />
     </DemoWorkspaceFrame>
   );

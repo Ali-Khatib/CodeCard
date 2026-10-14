@@ -10,7 +10,7 @@ describe('WS08-T002 public link click wiring', () => {
   it('tracks profile and project external links without replacing anchors', () => {
     const profile = read('src/components/profile/public-profile-focused.tsx');
     const social = read('src/components/profile/public-profile-social-links.tsx');
-    const stack = read('src/components/profile/public-project-card.tsx');
+    const stack = read('src/components/featured-work/project-detail-actions.tsx');
     const route = read('src/app/api/analytics/route.ts');
     const helper = read('src/lib/analytics/link-click.ts');
 
@@ -25,8 +25,8 @@ describe('WS08-T002 public link click wiring', () => {
     expect(stack).toContain('trackLinkClick');
     expect(stack).toContain("kind: 'project'");
     expect(stack).toContain('profileId?: string');
-    expect(stack).toContain('href={liveUrl}');
-    expect(stack).toContain('href={repoUrl}');
+    expect(stack).toContain('href={liveLink.url}');
+    expect(stack).toContain('href={repoLink.url}');
     expect(stack).toContain('rel="noopener noreferrer"');
     expect(stack).not.toContain('preventDefault');
     expect(stack).not.toContain('window.location');
@@ -55,10 +55,12 @@ describe('WS08-T002 public link click wiring', () => {
     expect(shared).toContain('export function isApprovedLinkCategory');
   });
 
-  it('does not treat internal open-project toggles as link_click', () => {
-    const stack = read('src/components/profile/public-project-card.tsx');
-    expect(stack).toContain('setOpen(!isOpen)');
-    expect(stack).not.toMatch(/setOpen[\s\S]{0,120}trackLinkClick/);
-    expect(stack).toContain('trackLinkClick');
+  it('does not treat opening a project card as a link_click', () => {
+    const card = read('src/components/profile/public-project-card.tsx');
+    expect(card).not.toContain('trackLinkClick');
+    expect(card).not.toContain('setOpen');
+    const actions = read('src/components/featured-work/project-detail-actions.tsx');
+    expect(actions).toContain('trackLinkClick');
+    expect(actions).not.toContain('setOpen');
   });
 });

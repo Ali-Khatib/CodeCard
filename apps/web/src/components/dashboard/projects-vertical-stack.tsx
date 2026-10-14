@@ -1,13 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HiOutlineEye, HiOutlinePencil } from 'react-icons/hi2';
-import { TechLogoRow } from '@/components/profile/tech-logo-row';
+import { ProjectTechLine } from '@/components/projects/project-tech-line';
 import { RevealProjectImages } from '@/components/ui/reveal-images';
 import { useContentOpeningOptional } from '@/components/navigation/content-opening-transition';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import type { PortfolioOpenTransition, PortfolioProject } from '@/lib/dashboard/portfolio';
 import { FadeInView } from './fade-in-view';
 import { ProjectHoverCard } from './project-hover-card';
@@ -16,20 +14,6 @@ import { ProjectReorderToolbar } from './project-reorder-toolbar';
 
 const FALLBACK =
   'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80';
-
-const PROJECT_STATUS_LABELS: Record<string, string> = {
-  draft: 'Draft',
-  active: 'Active',
-  completed: 'Completed',
-  on_hold: 'On hold',
-};
-
-function formatProjectUpdatedAt(value?: string | null): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-}
 
 function ProjectRow({
   project,
@@ -45,12 +29,6 @@ function ProjectRow({
   openTransition?: PortfolioOpenTransition;
 }) {
   const isPublished = project.isPublished === true;
-  const statusLabel =
-    project.status && project.status !== 'draft'
-      ? PROJECT_STATUS_LABELS[project.status] ?? project.status
-      : null;
-  const updatedLabel = formatProjectUpdatedAt(project.updatedAt);
-  const reduced = useReducedMotion();
   const router = useRouter();
   const opening = useContentOpeningOptional();
   const viewHref = project.href;
@@ -81,7 +59,7 @@ function ProjectRow({
         className="group/project cc-project-row-card cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-iris)]"
         role="button"
         tabIndex={0}
-        aria-label={`View ${project.title}`}
+        aria-label={`View project: ${project.title}`}
         onClick={() => openProjectView()}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -115,51 +93,7 @@ function ProjectRow({
               </span>
             </div>
 
-            {project.tagline && (
-              <p className="cc-project-hover-card__tagline mt-2 max-w-2xl text-[15px] leading-relaxed text-[var(--app-smoke)]">
-                {project.tagline}
-              </p>
-            )}
-
-            {statusLabel || updatedLabel ? (
-              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-                {[statusLabel, updatedLabel ? `Updated ${updatedLabel}` : null]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
-            ) : null}
-
-            {project.publicHref ? (
-              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">Appears on your public CodeCard</p>
-            ) : isPublished ? (
-              <p className="mt-2 text-[13px] text-[var(--app-smoke)]">
-                Published — visitors see it after your CodeCard is public
-              </p>
-            ) : null}
-
-            {typeof project.views === 'number' || typeof project.saves === 'number' ? (
-              <p className="cc-project-hover-card__stats mt-3 text-[13px] text-[var(--app-smoke)]">
-                {typeof project.views === 'number' ? `${project.views} views` : null}
-                {typeof project.views === 'number' && typeof project.saves === 'number' ? ' · ' : null}
-                {typeof project.saves === 'number' ? `${project.saves} saves` : null}
-              </p>
-            ) : null}
-
-            <div className="cc-project-hover-card__cta-slot">
-              <Link href={viewHref} className="cc-project-hover-card__cta" tabIndex={-1}>
-                View project →
-              </Link>
-            </div>
-
-            {project.technologies.length > 0 && (
-              <TechLogoRow
-                technologies={project.technologies.slice(0, 8)}
-                size="md"
-                variant="chip"
-                className="mt-4 gap-2"
-                pop={!reduced}
-              />
-            )}
+            <ProjectTechLine technologies={project.technologies} className="mt-1.5" />
 
             <div
               className="cc-project-card-actions mt-5 flex flex-col gap-3"

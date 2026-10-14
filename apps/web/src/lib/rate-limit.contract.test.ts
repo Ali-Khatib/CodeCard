@@ -64,9 +64,9 @@ describe('WS14-T016 rateLimit fail-closed behavior', () => {
     vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '');
 
     const { rateLimit } = await import('@/lib/rate-limit');
-    await expect(rateLimit('t', 'upload')).resolves.toEqual({ success: false });
-    await expect(rateLimit('t', 'auth')).resolves.toEqual({ success: false });
-    await expect(rateLimit('t', 'ai')).resolves.toEqual({ success: false });
+    await expect(rateLimit('t', 'upload')).resolves.toEqual({ success: false, denial: 'misconfigured' });
+    await expect(rateLimit('t', 'auth')).resolves.toEqual({ success: false, denial: 'misconfigured' });
+    await expect(rateLimit('t', 'ai')).resolves.toEqual({ success: false, denial: 'misconfigured' });
   });
 
   it('allows non-strict types without Redis', async () => {
@@ -136,7 +136,7 @@ describe('rateLimit when Redis is configured but unreachable', () => {
     vi.stubEnv('CODECARD_E2E', '');
     const { rateLimit } = await importWithFailingLimiter();
     for (const type of ['upload', 'auth', 'ai'] as const) {
-      await expect(rateLimit('t', type)).resolves.toEqual({ success: false });
+      await expect(rateLimit('t', type)).resolves.toEqual({ success: false, denial: 'unavailable' });
     }
   });
 
@@ -144,6 +144,28 @@ describe('rateLimit when Redis is configured but unreachable', () => {
     vi.stubEnv('NODE_ENV', 'production');
     const { rateLimitTokenBucket } = await importWithFailingLimiter();
     await expect(rateLimitTokenBucket('t', 5, '1 m')).resolves.toEqual({ success: false });
+  });
+
+  it('classifies a hung limiter as unavailable for strict uploads', async () => {
+    vi.useFakeTimers();
+    vi.doMock('@upstash/ratelimit', () => ({
+      Ratelimit: class {
+        static slidingWindow = () => ({});
+        static tokenBucket = () => ({});
+        limit() {
+          return new Promise(() => {});
+        }
+      },
+    }));
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('CODECARD_E2E', '');
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'https://unreachable.example');
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', 'placeholder-token');
+    const { rateLimit } = await import('@/lib/rate-limit');
+    const pending = rateLimit('t', 'upload');
+    await vi.advanceTimersByTimeAsync(1500);
+    await expect(pending).resolves.toEqual({ success: false, denial: 'unavailable' });
+    vi.useRealTimers();
   });
 
   it('never logs the Redis URL or token', async () => {
