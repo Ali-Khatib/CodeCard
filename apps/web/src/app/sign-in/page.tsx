@@ -19,7 +19,6 @@ import { signInStatusMessage } from '@/lib/auth/session-expiry';
 import { mapAuthFormError } from '@/lib/auth/map-auth-form-error';
 import { startGithubOAuth } from '@/lib/auth/github-oauth';
 import { isAuthNavigationAbort, withAuthNetworkRetry } from '@/lib/auth/auth-network-retry';
-import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 import { serializeSessionLeaseCookie } from '@/lib/auth/session-lease';
 
 const SETUP_MSG =
@@ -222,13 +221,6 @@ function SignInForm() {
           <div ref={errorRef} tabIndex={-1} className="mb-3 outline-none">
             <AuthErrorAlert message={alertMessage ?? ''} />
           </div>
-
-          {emailLoading || fadingOut ? (
-            <AuthBusyNotice>Signing you in…</AuthBusyNotice>
-          ) : null}
-          {oauthLoading === 'github' ? (
-            <AuthBusyNotice>Connecting to GitHub…</AuthBusyNotice>
-          ) : null}
 
           <AuthPrimaryButton
             pending={emailLoading || fadingOut}

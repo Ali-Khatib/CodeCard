@@ -22,7 +22,6 @@ import {
   resolveSignUpOutcome,
   signupConfirmationBody,
 } from '@/lib/auth/signup-result';
-import { AuthBusyNotice } from '@/components/auth/auth-busy-notice';
 import { serializeSessionLeaseCookie } from '@/lib/auth/session-lease';
 import { AuthSignupConsent } from '@/components/auth/auth-signup-consent';
 import { AudienceRoleField } from '@/components/profile/audience-role-field';
@@ -314,10 +313,6 @@ function SignUpForm() {
 
           {!authConfigured && !error ? (
             <p className="mb-3 text-[13px] leading-relaxed text-smoke">{SETUP_MSG}</p>
-          ) : null}
-
-          {loading || fadingOut ? (
-            <AuthBusyNotice>Creating your account…</AuthBusyNotice>
           ) : null}
 
           <AuthSignupConsent

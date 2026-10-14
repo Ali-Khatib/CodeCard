@@ -40,7 +40,7 @@ export function AuthGithubButton({
             aria-hidden
           />
         )}
-        <span>{label}</span>
+        <span aria-live="polite">{label}</span>
       </span>
     </motion.button>
   );

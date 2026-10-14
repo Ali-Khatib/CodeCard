@@ -12,8 +12,10 @@ import { profileToFormState, type ProfileFormState } from '@/lib/profile/profile
 import type { HomeFollowUp } from '@/lib/schedule/home-schedule-core';
 import type { OwnerEvent } from '@/lib/schedule/owner-events-core';
 import { localDateKeyFromIso, todayDateKey } from '@/lib/schedule/calendar-month';
+import type { ProfileCompletionResult } from '@/lib/profile/completion';
 import { HomeCodeCardPreview } from './home-codecard-preview';
 import { HomeScheduleSection } from './home-schedule-section';
+import { ProfileCompletionIndicator } from './profile-completion-indicator';
 
 function nudgeHref(href: string, basePath: string): string {
   if (href.includes('#profile') || href.includes('#visibility') || href.includes('#share')) {
@@ -58,6 +60,7 @@ export function HomeDesk({
   events,
   followUps,
   suggested,
+  completion = null,
   basePath = '/dashboard',
 }: {
   greeting: string;
@@ -77,6 +80,8 @@ export function HomeDesk({
   events: OwnerEvent[];
   followUps: HomeFollowUp[];
   suggested?: { title: string; href: string } | null;
+  /** Hidden by the indicator once every criterion is done. */
+  completion?: ProfileCompletionResult | null;
   basePath?: string;
 }) {
   const firstName = displayName.split(' ')[0] || displayName;
@@ -167,6 +172,8 @@ export function HomeDesk({
           <Link href={nudgeHref(suggested.href, basePath)}>{suggested.title}</Link>
         </p>
       ) : null}
+
+      {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
 
       <HomeScheduleSection
         events={events}

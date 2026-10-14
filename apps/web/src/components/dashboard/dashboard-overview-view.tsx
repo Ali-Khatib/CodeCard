@@ -198,6 +198,7 @@ export function DashboardOverviewView({
         events={events}
         followUps={followUps}
         suggested={suggested}
+        completion={completion}
         basePath={basePath}
       />
     );

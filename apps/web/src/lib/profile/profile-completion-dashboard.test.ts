@@ -41,6 +41,7 @@ describe('dashboard profile completion integration', () => {
     const completion = read('src/lib/profile/completion.ts');
 
     expect(overview).toContain('ProfileCompletionIndicator');
+    expect(read('src/components/dashboard/home-desk.tsx')).toContain('ProfileCompletionIndicator');
     expect(overview).toContain('completion.percentage');
     expect(overview).not.toContain('% ready');
     expect(indicator).toContain('role="progressbar"');

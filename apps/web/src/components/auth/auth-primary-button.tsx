@@ -39,7 +39,7 @@ export function AuthPrimaryButton({
         reduced || pending || disabled ? undefined : { scale: 0.995, y: 0, transition: { duration: 0.08 } }
       }
     >
-      <span className="inline-flex items-center justify-center gap-2">
+      <span className="inline-flex items-center justify-center gap-2" aria-live="polite">
         {pending ? <Spinner /> : null}
         {pending ? pendingLabel : idleLabel}
       </span>
