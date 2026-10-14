@@ -93,6 +93,112 @@ function ToggleChip({
   );
 }
 
+function ChipGroup({
+  legend,
+  options,
+  selected,
+  onChange,
+  listId,
+  inputId,
+  error,
+  errorId,
+}: {
+  legend: string;
+  options: readonly string[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+  listId: string;
+  inputId: string;
+  error?: string;
+  errorId: string;
+}) {
+  const [otherOpen, setOtherOpen] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [localError, setLocalError] = useState('');
+  const optionSet = new Set<string>(options);
+  const custom = selected.filter((item) => !optionSet.has(item));
+
+  function toggle(label: string) {
+    onChange(selected.includes(label) ? selected.filter((item) => item !== label) : [...selected, label]);
+  }
+
+  function addCustom() {
+    const trimmed = draft.trim();
+    if (!trimmed) return;
+    if (trimmed.length > 40) {
+      setLocalError('Keep it to 40 characters.');
+      return;
+    }
+    const canonical = options.find((option) => option.toLowerCase() === trimmed.toLowerCase());
+    const label = canonical ?? trimmed;
+    if (selected.some((item) => item.toLowerCase() === label.toLowerCase())) {
+      setDraft('');
+      setLocalError('');
+      return;
+    }
+    if (selected.length >= 10) {
+      setLocalError('You can choose up to 10.');
+      return;
+    }
+    onChange([...selected, label]);
+    setDraft('');
+    setLocalError('');
+  }
+
+  return (
+    <fieldset
+      className="space-y-3 border-0 p-0"
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
+    >
+      <legend className="cc-app-field-label text-[17px]">{legend}</legend>
+      <p className="cc-project-form__hint">Choose any that fit, or add your own.</p>
+      <div id={listId} className="flex flex-wrap gap-2">
+        {options.map((option) => (
+          <ToggleChip
+            key={option}
+            label={option}
+            selected={selected.includes(option)}
+            onToggle={() => toggle(option)}
+          />
+        ))}
+        {custom.map((label) => (
+          <ToggleChip key={label} label={label} selected onToggle={() => toggle(label)} />
+        ))}
+        <ToggleChip label="Other" selected={otherOpen} onToggle={() => setOtherOpen((open) => !open)} />
+      </div>
+      {otherOpen ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            id={inputId}
+            value={draft}
+            maxLength={40}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                addCustom();
+              }
+            }}
+            className="cc-input min-w-[12rem] flex-1"
+            placeholder="Write your own"
+            aria-label={`${legend} other`}
+          />
+          <button type="button" className="cc-app-btn cc-app-btn--primary shrink-0" onClick={addCustom}>
+            Add
+          </button>
+        </div>
+      ) : null}
+      {localError ? (
+        <p className="text-sm text-red-600" role="alert">
+          {localError}
+        </p>
+      ) : null}
+      <FieldError id={errorId} message={error} />
+    </fieldset>
+  );
+}
+
 export function ProjectForm({
   mode,
   initialUsage = null,
@@ -115,6 +221,9 @@ export function ProjectForm({
   const notifiedErrorRef = useRef<string | null>(null);
   const [form, setForm] = useState<ProjectFormValues>(
     () => initialValues ?? createEmptyProjectFormValues(),
+  );
+  const [stillInProgress, setStillInProgress] = useState(
+    () => !(initialValues ?? createEmptyProjectFormValues()).ended_at,
   );
   const [slugEdited, setSlugEdited] = useState(mode === 'edit' || Boolean(initialValues));
   const [techInput, setTechInput] = useState('');
@@ -246,24 +355,6 @@ export function ProjectForm({
     setForm((prev) => ({
       ...prev,
       technologies: prev.technologies.filter((item) => item !== tech),
-    }));
-  }
-
-  function toggleDomain(domain: string) {
-    setForm((prev) => ({
-      ...prev,
-      domains: prev.domains.includes(domain)
-        ? prev.domains.filter((item) => item !== domain)
-        : [...prev.domains, domain],
-    }));
-  }
-
-  function toggleFocusArea(area: string) {
-    setForm((prev) => ({
-      ...prev,
-      focus_areas: prev.focus_areas.includes(area)
-        ? prev.focus_areas.filter((item) => item !== area)
-        : [...prev.focus_areas, area],
     }));
   }
 
@@ -673,45 +764,27 @@ export function ProjectForm({
         <FieldError id="project-technologies-error" message={fieldErrors.technologies} />
       </section>
 
-      <fieldset
-        className="space-y-3 border-0 p-0"
-        aria-invalid={fieldErrors.domains ? true : undefined}
-        aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
-      >
-        <legend className="cc-app-field-label text-[17px]">Domains</legend>
-        <p className="cc-project-form__hint">Choose any that fit.</p>
-        <div id="project-domains" className="flex flex-wrap gap-2">
-          {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
-            <ToggleChip
-              key={domain}
-              label={domain}
-              selected={form.domains.includes(domain)}
-              onToggle={() => toggleDomain(domain)}
-            />
-          ))}
-        </div>
-        <FieldError id="project-domains-error" message={fieldErrors.domains} />
-      </fieldset>
+      <ChipGroup
+        legend="Domains"
+        options={PROJECT_FORM_DOMAIN_OPTIONS}
+        selected={form.domains}
+        onChange={(domains) => setForm((prev) => ({ ...prev, domains }))}
+        listId="project-domains"
+        inputId="project-domain-other"
+        error={fieldErrors.domains}
+        errorId="project-domains-error"
+      />
 
-      <fieldset
-        className="space-y-3 border-0 p-0"
-        aria-invalid={fieldErrors.focus_areas ? true : undefined}
-        aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
-      >
-        <legend className="cc-app-field-label text-[17px]">Focus areas</legend>
-        <p className="cc-project-form__hint">Choose any that fit.</p>
-        <div id="project-focus-areas" className="flex flex-wrap gap-2">
-          {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
-            <ToggleChip
-              key={area}
-              label={area}
-              selected={form.focus_areas.includes(area)}
-              onToggle={() => toggleFocusArea(area)}
-            />
-          ))}
-        </div>
-        <FieldError id="project-focus-areas-error" message={fieldErrors.focus_areas} />
-      </fieldset>
+      <ChipGroup
+        legend="Focus areas"
+        options={PROJECT_FORM_FOCUS_AREA_OPTIONS}
+        selected={form.focus_areas}
+        onChange={(focus_areas) => setForm((prev) => ({ ...prev, focus_areas }))}
+        listId="project-focus-areas"
+        inputId="project-focus-other"
+        error={fieldErrors.focus_areas}
+        errorId="project-focus-areas-error"
+      />
 
       <section className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
@@ -778,15 +851,32 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="project-ended-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Ended</label>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label htmlFor="project-ended-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
+              Ended
+            </label>
+            <label className="inline-flex items-center gap-2 text-[14px] font-medium text-[var(--app-ink)]">
+              <input
+                type="checkbox"
+                className="size-4 accent-[var(--app-ink)]"
+                checked={stillInProgress}
+                onChange={(e) => {
+                  const on = e.target.checked;
+                  setStillInProgress(on);
+                  if (on) setForm((prev) => ({ ...prev, ended_at: '' }));
+                }}
+              />
+              Still in progress
+            </label>
+          </div>
           <input
             id="project-ended-at"
             name="ended_at"
             type="date"
-            value={form.ended_at}
+            value={stillInProgress ? '' : form.ended_at}
+            disabled={stillInProgress}
             onChange={(e) => setForm((prev) => ({ ...prev, ended_at: e.target.value }))}
-            className="cc-input w-full"
+            className="cc-input w-full disabled:cursor-not-allowed disabled:opacity-50"
             aria-invalid={Boolean(fieldErrors.ended_at)}
             aria-describedby={fieldErrors.ended_at ? 'project-ended-at-error' : undefined}
           />

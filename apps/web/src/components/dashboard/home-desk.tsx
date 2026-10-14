@@ -184,6 +184,11 @@ export function HomeDesk({
           <h1 className="cc-home-desk__title">
             {greeting}, {firstName}.
           </h1>
+          {suggested ? (
+            <Link href={nudgeHref(suggested.href, basePath)} className="cc-home-desk__nudge">
+              {suggested.title}
+            </Link>
+          ) : null}
         </div>
         <div className="cc-home-desk__stats" aria-label="Overview">
           {typeof connectionCount === 'number' ? (
@@ -200,12 +205,6 @@ export function HomeDesk({
           ) : null}
         </div>
       </header>
-
-      {suggested ? (
-        <p className="cc-home-desk__nudge">
-          <Link href={nudgeHref(suggested.href, basePath)}>{suggested.title}</Link>
-        </p>
-      ) : null}
 
       {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
 

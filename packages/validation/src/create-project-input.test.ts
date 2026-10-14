@@ -74,18 +74,23 @@ describe('createProjectInputSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects unsupported domain', () => {
+  it('accepts a custom domain and focus area', () => {
     const result = createProjectInputSchema.safeParse({
       ...validPayload,
-      domains: ['Unknown Domain'],
+      domains: ['Robotics'],
+      focus_areas: ['Edge devices'],
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.domains).toEqual(['Robotics']);
+      expect(result.data.focus_areas).toEqual(['Edge devices']);
+    }
   });
 
-  it('rejects unsupported focus area', () => {
+  it('rejects a domain that is too long', () => {
     const result = createProjectInputSchema.safeParse({
       ...validPayload,
-      focus_areas: ['Unknown Area'],
+      domains: ['x'.repeat(41)],
     });
     expect(result.success).toBe(false);
   });

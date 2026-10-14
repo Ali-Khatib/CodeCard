@@ -1,6 +1,7 @@
 'use client';
 
-import { startTransition, useActionState, useEffect, useRef, useState } from 'react';
+import { startTransition, useActionState, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { ProfileLinksEditor } from '@/components/profile/profile-links-editor';
@@ -20,6 +21,46 @@ import {
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { HeadlineField } from '@/components/profile/headline-field';
+
+function EditorSection({
+  title,
+  hint,
+  children,
+  defaultOpen = false,
+  id,
+}: {
+  title: string;
+  hint: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  id?: string;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const panelId = useId();
+
+  return (
+    <section className={`cc-editor-section${open ? ' is-open' : ''}`} id={id}>
+      <button
+        type="button"
+        className="cc-editor-section__toggle"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span className="cc-editor-section__copy">
+          <span>{title}</span>
+          <span>{hint}</span>
+        </span>
+        <ChevronDown className="cc-editor-section__chevron" aria-hidden />
+      </button>
+      <div id={panelId} className={`cc-editor-section__panel${open ? ' is-open' : ''}`}>
+        <div className="cc-editor-section__panel-inner" inert={!open}>
+          {children}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -176,11 +217,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
         aria-busy={pending}
         noValidate
       >
-        <details className="cc-editor-section" open>
-          <summary>
-            <span>Basic information</span>
-            <span>Name, headline, bio, location</span>
-          </summary>
+        <EditorSection title="Basic information" hint="Name, headline, bio, location" defaultOpen>
         <div id="audience_role" className="scroll-mt-28">
           <AudienceRoleField
             value={form.audience_role}
@@ -256,13 +293,9 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
             placeholder="City, optional"
           />
         </div>
-        </details>
+        </EditorSection>
 
-        <details className="cc-editor-section">
-          <summary>
-            <span>Experience and education</span>
-            <span>Work and academic history</span>
-          </summary>
+        <EditorSection title="Experience and education" hint="Work and academic history">
           <p id="history-hint" className="text-[12px] text-[var(--app-smoke)]">
             These lines appear on the back of your card. Leave a line blank to hide it.
           </p>
@@ -310,13 +343,9 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
               ) : null}
             </div>
           ))}
-        </details>
+        </EditorSection>
 
-        <details className="cc-editor-section" id="skills-field">
-          <summary>
-            <span>Skills</span>
-            <span>Technologies and expertise</span>
-          </summary>
+        <EditorSection id="skills-field" title="Skills" hint="Technologies and expertise">
           <FieldLabel htmlFor="skills">Skills</FieldLabel>
           <input
             id="skills"
@@ -327,22 +356,14 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
             placeholder="TypeScript, Next.js, C++"
           />
           <p className="text-[12px] text-[var(--app-smoke)]">Separate skills with commas.</p>
-        </details>
+        </EditorSection>
 
       </form>
 
-      <details className="cc-editor-section" id="links">
-        <summary>
-          <span>Social links</span>
-          <span>GitHub, LinkedIn, website</span>
-        </summary>
+      <EditorSection id="links" title="Social links" hint="GitHub, LinkedIn, website">
         <ProfileLinksEditor links={links} />
-      </details>
-      <details className="cc-editor-section" id="visibility">
-        <summary>
-          <span>Visibility</span>
-          <span>Publishing and public URL</span>
-        </summary>
+      </EditorSection>
+      <EditorSection id="visibility" title="Visibility" hint="Publishing and public URL">
         <ProfilePublishControls isPublic={profile.is_public} />
 
       {profile.slug ? (
@@ -362,7 +383,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
           ) : null}
         </p>
       ) : null}
-      </details>
+      </EditorSection>
 
       {displayError ? (
         <p className="text-sm text-red-600" role="alert">

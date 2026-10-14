@@ -283,22 +283,20 @@ export function HomeScheduleSection({
   return (
     <FadeInView delay={0.14} className={compact ? 'cc-home-schedule' : undefined}>
       <section id="schedule" className="cc-profile-home__zone" aria-label="Calendar and follow-ups">
-        <div className="cc-profile-home__zone-head">
-          <div>
-            <p className="cc-workspace-section__eyebrow">Your calendar</p>
-            <h2 className="cc-workspace-section__title">Events and follow-ups</h2>
-            {compact ? null : (
+        {compact ? null : (
+          <div className="cc-profile-home__zone-head">
+            <div>
+              <p className="cc-workspace-section__eyebrow">Your calendar</p>
+              <h2 className="cc-workspace-section__title">Events and follow-ups</h2>
               <p className="cc-workspace-section__copy">
                 Pick a day. See what is already planned. Add, edit, or delete events and follow-ups.
               </p>
-            )}
-          </div>
-          {compact ? null : (
+            </div>
             <AppButton variant="ghost" href={`${basePath}/connections`}>
               Open Connections →
             </AppButton>
-          )}
-        </div>
+          </div>
+        )}
 
         {scheduleError ? (
           <AppCard tone="meringue" className="!p-5">

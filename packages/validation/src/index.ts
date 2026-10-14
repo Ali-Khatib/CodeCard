@@ -1,13 +1,6 @@
 import { z } from 'zod';
 import { profileLinkTypeSchema } from './profile-links';
 import { projectLinkTypeSchema } from './project-links';
-import {
-  isAllowedProjectDomain,
-  isAllowedProjectFocusArea,
-  PROJECT_DOMAIN_OPTIONS,
-  PROJECT_FOCUS_AREA_OPTIONS,
-} from './project-options';
-
 export {
   PROJECT_DOMAIN_OPTIONS,
   PROJECT_FOCUS_AREA_OPTIONS,
@@ -204,8 +197,8 @@ export const projectDomainsInputSchema = z
     `At most ${PROJECT_DOMAIN_MAX_COUNT} domains allowed`,
   )
   .refine(
-    (items) => items.every(isAllowedProjectDomain),
-    'Unsupported domain',
+    (items) => items.every((item) => item.length <= 40),
+    'Each domain must be 40 characters or fewer',
   );
 
 export const projectFocusAreasInputSchema = z
@@ -216,8 +209,8 @@ export const projectFocusAreasInputSchema = z
     `At most ${PROJECT_FOCUS_AREA_MAX_COUNT} focus areas allowed`,
   )
   .refine(
-    (items) => items.every(isAllowedProjectFocusArea),
-    'Unsupported focus area',
+    (items) => items.every((item) => item.length <= 40),
+    'Each focus area must be 40 characters or fewer',
   );
 
 export const FORBIDDEN_CREATE_PROJECT_FIELDS = [

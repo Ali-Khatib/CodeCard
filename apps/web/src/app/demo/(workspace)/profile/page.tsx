@@ -19,8 +19,10 @@ export default function DemoWorkspaceProfilePage() {
       </p>
       <details className="cc-editor-section" open>
         <summary>
-          <span>Basic information</span>
-          <span>Name, headline, bio, location</span>
+          <span className="cc-editor-section__copy">
+            <span>Basic information</span>
+            <span>Name, headline, bio, location</span>
+          </span>
         </summary>
         <p className="text-[15px]">{DEMO_WORKSPACE.displayName}</p>
         <p className="text-[14px] text-[var(--app-smoke)]">{DEMO_PROFILE.headline}</p>

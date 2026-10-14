@@ -440,9 +440,7 @@ export function DashboardShell({
           <div className="cc-app-mobile-theme-toggle md:hidden">
             <ThemeToggle />
           </div>
-          <h1 className="cc-app-topbar-title min-w-0 break-words text-[18px] font-medium text-[var(--app-ink)]">
-            {pageTitle}
-          </h1>
+          <h1 className="sr-only">{pageTitle}</h1>
           <div className="flex-1" />
           {!embedded ? <DashboardNotifications basePath={basePath} /> : null}
           <AppButton

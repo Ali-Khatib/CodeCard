@@ -9137,25 +9137,20 @@ html.dark .cc-public-atmosphere__grain {
     display: contents;
   }
 
-  .cc-home-desk__split .cc-profile-home__zone-head {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
   .cc-home-desk__split .cc-home-calendar__month {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
     width: 100%;
   }
 
   .cc-home-desk__split > .cc-home-desk__card {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1;
   }
 
   .cc-home-desk__split .cc-home-calendar__day-panel {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 2;
     width: min(820px, 100%);
     justify-self: center;
   }
@@ -9228,8 +9223,15 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-home-desk__nudge {
-  margin: 0;
+  display: inline-flex;
+  margin-top: 10px;
   font-size: 14px;
+  color: var(--app-smoke);
+  text-decoration: none;
+}
+
+.cc-home-desk__nudge:hover {
+  color: var(--app-ink);
 }
 
 .cc-home-desk__text-link {
@@ -9459,33 +9461,141 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-editor-section {
   border-top: 1px solid var(--app-border);
-  padding: 12px 0;
+  padding: 4px 0;
 }
 
+.cc-editor-section__toggle,
 .cc-editor-section summary {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: calc(100% + 8px);
+  margin: 0 -4px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
   cursor: pointer;
   list-style: none;
+  transition: background 180ms ease;
+}
+
+.cc-editor-section__toggle:hover,
+.cc-editor-section summary:hover {
+  background: var(--app-bone);
+}
+
+.cc-editor-section__toggle:focus-visible,
+.cc-editor-section summary:focus-visible {
+  outline: 2px solid var(--app-iris);
+  outline-offset: 2px;
 }
 
 .cc-editor-section summary::-webkit-details-marker {
   display: none;
 }
 
-.cc-editor-section summary span:first-child {
-  font-size: 15px;
-  font-weight: 560;
+.cc-editor-section__copy,
+.cc-editor-section summary {
+  min-width: 0;
 }
 
-.cc-editor-section summary span:last-child {
+.cc-editor-section__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cc-editor-section summary {
+  flex-wrap: nowrap;
+}
+
+.cc-editor-section__copy span:first-child,
+.cc-editor-section summary > span:first-child {
+  font-size: 15px;
+  font-weight: 560;
+  color: var(--app-ink);
+}
+
+.cc-editor-section__copy span:last-child,
+.cc-editor-section summary > span:last-child {
   font-size: 13px;
   color: var(--app-smoke);
 }
 
-.cc-editor-section > :not(summary) {
+.cc-editor-section__chevron,
+.cc-editor-section summary::after {
+  flex: none;
+  color: var(--app-ink);
+  transition: transform 400ms ease;
+}
+
+.cc-editor-section__chevron {
+  width: 18px;
+  height: 18px;
+}
+
+.cc-editor-section summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.cc-editor-section.is-open .cc-editor-section__chevron {
+  transform: rotate(180deg);
+}
+
+.cc-editor-section[open] summary::after {
+  transform: rotate(225deg) translateY(-1px);
+}
+
+.cc-editor-section__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top center;
+  transition:
+    grid-template-rows 500ms ease-out,
+    opacity 500ms ease-out,
+    transform 500ms ease-out;
+}
+
+.cc-editor-section__panel.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: none;
+}
+
+.cc-editor-section__panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cc-editor-section__panel-inner > * {
   margin-top: 12px;
+}
+
+.cc-editor-section > :not(summary):not(.cc-editor-section__toggle):not(.cc-editor-section__panel) {
+  margin-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-editor-section__toggle,
+  .cc-editor-section summary,
+  .cc-editor-section__chevron,
+  .cc-editor-section summary::after,
+  .cc-editor-section__panel {
+    transition: none;
+  }
 }
 
 .cc-profile-save-bar {
