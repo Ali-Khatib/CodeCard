@@ -144,12 +144,13 @@ describe('WS15-T007 connections search filter sort', () => {
       'utf8',
     );
     expect(view).toContain('filterAndSortConnections');
-    expect(view).toContain('Filter by collection');
-    expect(view).toContain('Filter by meeting point');
-    expect(view).toContain('Filter by country or location');
+    expect(view).toContain('Filter by date');
+    expect(view).toContain('Filter by location');
     expect(view).toContain('connections-location-filter');
-    expect(view).toContain('connections-meeting-point-filter');
-    expect(view).toContain('Your order');
+    expect(view).toContain('connections-date-filter');
+    expect(view).not.toContain('Your order');
+    expect(view).not.toContain('Filter by meeting point');
+    expect(view).not.toContain('Filter by collection');
     expect(view).toContain('ConnectionDragHandle');
     expect(view).toContain('cc-connection-drag min-h-11 min-w-11');
     expect(view).toContain('onReorderConnections');
@@ -157,7 +158,7 @@ describe('WS15-T007 connections search filter sort', () => {
     expect(view).toContain('No Connections match these filters.');
     expect(view).toContain('EMPTY_STATE_COPY.connections');
     expect(view).toContain('Clear filters');
-    expect(view).toContain('uncategorized');
+    expect(view).not.toContain('uncategorized');
     expect(view).not.toContain('DashFilterBar');
   });
 });

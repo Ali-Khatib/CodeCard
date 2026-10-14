@@ -2700,6 +2700,37 @@ html.dark .cc-app-badge--blush {
   padding-left: 2.5rem;
 }
 
+.cc-connections-toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cc-connections-toolbar__filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cc-connections-toolbar__filter-icon {
+  position: absolute;
+  left: 12px;
+  width: 15px;
+  height: 15px;
+  color: var(--app-smoke);
+  pointer-events: none;
+}
+
+.cc-connections-toolbar__select {
+  width: auto;
+  min-width: 9.25rem;
+  max-width: 14rem;
+  padding-left: 2.15rem;
+  border-radius: 999px;
+  background: var(--app-paper);
+}
+
 .cc-connection-list {
   display: flex;
   flex-direction: column;
@@ -3706,9 +3737,24 @@ html.dark .cc-connection-tag.cc-app-badge--mint {
 .cc-profile-product-note__title {
   margin: 0;
   font-size: 15px;
-  font-weight: 520;
+  font-weight: 560;
   letter-spacing: -0.02em;
   color: var(--app-ink);
+}
+
+.cc-profile-product-note__lead {
+  margin: 0.35rem 0 0;
+  max-width: 40rem;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--app-smoke);
+}
+
+.cc-profile-product-note__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.15rem;
 }
 
 .cc-profile-product-note__list {

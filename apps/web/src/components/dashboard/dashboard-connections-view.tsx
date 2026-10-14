@@ -2,16 +2,13 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import Image from 'next/image';
-import { LayoutGrid, Rows3 } from 'lucide-react';
+import { Calendar, LayoutGrid, MapPin, Rows3 } from 'lucide-react';
 import type { WorkspaceConnection } from '@/lib/dashboard/workspace-demo';
 import {
   connectionMeetingPointValue,
   filterAndSortConnections,
   uniqueConnectionLocations,
-  uniqueConnectionMeetingPoints,
-  type ConnectionsCollectionFilter,
   type ConnectionsLocationFilter,
-  type ConnectionsMeetingPointFilter,
   type ConnectionsSortId,
 } from '@/lib/connections/connections-filter';
 import { EMPTY_STATE_COPY } from '@/lib/dashboard/empty-state-copy';
@@ -72,12 +69,9 @@ function scrollByDelta(scroller: HTMLElement | Window, delta: number) {
   (scroller as HTMLElement).scrollTop += delta;
 }
 
-const SORT_OPTIONS: Array<{ id: ConnectionsSortId; label: string }> = [
-  { id: 'custom', label: 'Your order' },
-  { id: 'newest', label: 'Newest connected' },
-  { id: 'oldest', label: 'Oldest connected' },
-  { id: 'name_asc', label: 'Name A–Z' },
-  { id: 'name_desc', label: 'Name Z–A' },
+const DATE_OPTIONS: Array<{ id: 'newest' | 'oldest'; label: string }> = [
+  { id: 'newest', label: 'Newest' },
+  { id: 'oldest', label: 'Oldest' },
 ];
 
 function connectionCodeCardHref(
@@ -628,11 +622,8 @@ export function DashboardConnectionsView({
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
   const [viewMode, setViewMode] = useState<ConnectionsViewMode>('list');
-  const [collectionFilter, setCollectionFilter] = useState<ConnectionsCollectionFilter>('all');
   const [locationFilter, setLocationFilter] = useState<ConnectionsLocationFilter>('all');
-  const [meetingPointFilter, setMeetingPointFilter] =
-    useState<ConnectionsMeetingPointFilter>('all');
-  const [sort, setSort] = useState<ConnectionsSortId>('custom');
+  const [sort, setSort] = useState<ConnectionsSortId>('newest');
   const [demoOrder, setDemoOrder] = useState<string[] | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const listPinTokenRef = useRef(0);
@@ -698,41 +689,18 @@ export function DashboardConnectionsView({
     });
   }, [connections, demoOrder]);
 
-  const collectionIds = useMemo(() => new Set(collections.map((c) => c.id)), [collections]);
   const locationOptions = useMemo(
     () => uniqueConnectionLocations(orderedConnections),
-    [orderedConnections],
-  );
-  const meetingPointOptions = useMemo(
-    () => uniqueConnectionMeetingPoints(orderedConnections),
     [orderedConnections],
   );
   const locationOptionKeys = useMemo(
     () => new Set(locationOptions.map((loc) => loc.toLowerCase())),
     [locationOptions],
   );
-  const meetingPointOptionKeys = useMemo(
-    () => new Set(meetingPointOptions.map((p) => p.toLowerCase())),
-    [meetingPointOptions],
-  );
   const hasUnknownLocations = useMemo(
     () => orderedConnections.some((c) => !(c.country ?? c.company ?? '').trim()),
     [orderedConnections],
   );
-  const hasUnassignedMeetingPoints = useMemo(
-    () => orderedConnections.some((c) => !connectionMeetingPointValue(c)),
-    [orderedConnections],
-  );
-
-  useEffect(() => {
-    if (
-      collectionFilter !== 'all' &&
-      collectionFilter !== 'uncategorized' &&
-      !collectionIds.has(collectionFilter)
-    ) {
-      setCollectionFilter('all');
-    }
-  }, [collectionFilter, collectionIds]);
 
   useEffect(() => {
     if (locationFilter === 'all') return;
@@ -745,38 +713,18 @@ export function DashboardConnectionsView({
     }
   }, [locationFilter, locationOptionKeys, hasUnknownLocations]);
 
-  useEffect(() => {
-    if (meetingPointFilter === 'all') return;
-    if (meetingPointFilter === 'unassigned') {
-      if (!hasUnassignedMeetingPoints) setMeetingPointFilter('all');
-      return;
-    }
-    if (!meetingPointOptionKeys.has(meetingPointFilter.toLowerCase())) {
-      setMeetingPointFilter('all');
-    }
-  }, [meetingPointFilter, meetingPointOptionKeys, hasUnassignedMeetingPoints]);
-
   const filtered = useMemo(
     () =>
       filterAndSortConnections({
         connections: orderedConnections,
         query,
-        collectionFilter: variant === 'authenticated' ? collectionFilter : 'all',
+        collectionFilter: 'all',
         locationFilter,
-        meetingPointFilter,
+        meetingPointFilter: 'all',
         memberships: variant === 'authenticated' ? memberships : {},
         sort,
       }),
-    [
-      orderedConnections,
-      query,
-      variant,
-      collectionFilter,
-      locationFilter,
-      meetingPointFilter,
-      memberships,
-      sort,
-    ],
+    [orderedConnections, query, variant, locationFilter, memberships, sort],
   );
 
   const commitOrder = useCallback(
@@ -820,18 +768,12 @@ export function DashboardConnectionsView({
   );
 
   const filtersActive =
-    Boolean(query.trim()) ||
-    meetingPointFilter !== 'all' ||
-    locationFilter !== 'all' ||
-    (variant === 'authenticated' && collectionFilter !== 'all') ||
-    sort !== 'custom';
+    Boolean(query.trim()) || locationFilter !== 'all' || (sort !== 'newest' && sort !== 'custom');
 
   const clearFilters = () => {
     setQuery('');
-    setCollectionFilter('all');
     setLocationFilter('all');
-    setMeetingPointFilter('all');
-    setSort('custom');
+    setSort('newest');
   };
 
   if (variant === 'authenticated' && connections.length === 0) {
@@ -882,132 +824,44 @@ export function DashboardConnectionsView({
                   aria-label="Search connections"
                 />
               </div>
-
-              {variant === 'authenticated' ? (
-                <div className="flex flex-wrap gap-2">
-                  <label className="sr-only" htmlFor="connections-meeting-point-filter">
-                    Filter by meeting point
-                  </label>
+              <div className="cc-connections-toolbar__filters">
+                <label className="cc-connections-toolbar__filter">
+                  <Calendar className="cc-connections-toolbar__filter-icon" aria-hidden />
+                  <span className="sr-only">Filter by date</span>
                   <select
-                    id="connections-meeting-point-filter"
-                    className="cc-app-input w-auto min-w-[10rem]"
-                    value={meetingPointFilter}
-                    onChange={(e) =>
-                      setMeetingPointFilter(e.target.value as ConnectionsMeetingPointFilter)
-                    }
+                    id="connections-date-filter"
+                    className="cc-app-input cc-connections-toolbar__select"
+                    value={sort === 'oldest' ? 'oldest' : 'newest'}
+                    onChange={(e) => setSort(e.target.value as 'newest' | 'oldest')}
                   >
-                    <option value="all">All meeting points</option>
-                    {hasUnassignedMeetingPoints ? (
-                      <option value="unassigned">Unassigned</option>
-                    ) : null}
-                    {meetingPointOptions.map((point) => (
-                      <option key={point.toLowerCase()} value={point}>
-                        {point}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="sr-only" htmlFor="connections-location-filter">
-                    Filter by country or location
-                  </label>
-                  <select
-                    id="connections-location-filter"
-                    className="cc-app-input w-auto min-w-[10rem]"
-                    value={locationFilter}
-                    onChange={(e) =>
-                      setLocationFilter(e.target.value as ConnectionsLocationFilter)
-                    }
-                  >
-                    <option value="all">All countries / locations</option>
-                    {hasUnknownLocations ? (
-                      <option value="unknown">No location</option>
-                    ) : null}
-                    {locationOptions.map((loc) => (
-                      <option key={loc.toLowerCase()} value={loc}>
-                        {loc}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="sr-only" htmlFor="connections-collection-filter">
-                    Filter by collection
-                  </label>
-                  <select
-                    id="connections-collection-filter"
-                    className="cc-app-input w-auto min-w-[10rem]"
-                    value={collectionFilter}
-                    onChange={(e) =>
-                      setCollectionFilter(e.target.value as ConnectionsCollectionFilter)
-                    }
-                  >
-                    <option value="all">All Connections</option>
-                    <option value="uncategorized">Uncategorized</option>
-                    {collections.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="sr-only" htmlFor="connections-sort">
-                    Sort Connections
-                  </label>
-                  <select
-                    id="connections-sort"
-                    className="cc-app-input w-auto min-w-[10rem]"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as ConnectionsSortId)}
-                  >
-                    {SORT_OPTIONS.map((opt) => (
+                    {DATE_OPTIONS.map((opt) => (
                       <option key={opt.id} value={opt.id}>
                         {opt.label}
                       </option>
                     ))}
                   </select>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  <label className="sr-only" htmlFor="connections-meeting-point-filter">
-                    Filter by meeting point
-                  </label>
-                  <select
-                    id="connections-meeting-point-filter"
-                    className="cc-app-input w-auto min-w-[10rem]"
-                    value={meetingPointFilter}
-                    onChange={(e) =>
-                      setMeetingPointFilter(e.target.value as ConnectionsMeetingPointFilter)
-                    }
-                  >
-                    <option value="all">All meeting points</option>
-                    {hasUnassignedMeetingPoints ? (
-                      <option value="unassigned">Unassigned</option>
-                    ) : null}
-                    {meetingPointOptions.map((point) => (
-                      <option key={point.toLowerCase()} value={point}>
-                        {point}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="sr-only" htmlFor="connections-location-filter">
-                    Filter by country or location
-                  </label>
+                </label>
+                <label className="cc-connections-toolbar__filter">
+                  <MapPin className="cc-connections-toolbar__filter-icon" aria-hidden />
+                  <span className="sr-only">Filter by location</span>
                   <select
                     id="connections-location-filter"
-                    className="cc-app-input w-auto min-w-[10rem]"
+                    className="cc-app-input cc-connections-toolbar__select"
                     value={locationFilter}
                     onChange={(e) =>
                       setLocationFilter(e.target.value as ConnectionsLocationFilter)
                     }
                   >
-                    <option value="all">All countries / locations</option>
-                    {hasUnknownLocations ? (
-                      <option value="unknown">No location</option>
-                    ) : null}
+                    <option value="all">All locations</option>
+                    {hasUnknownLocations ? <option value="unknown">No location</option> : null}
                     {locationOptions.map((loc) => (
                       <option key={loc.toLowerCase()} value={loc}>
                         {loc}
                       </option>
                     ))}
                   </select>
-                </div>
-              )}
+                </label>
+              </div>
 
               <div className="cc-projects-view-toggle" role="group" aria-label="Connections view">
                 {CONNECTION_VIEW_MODES.map(({ id, label, icon: Icon }) => (

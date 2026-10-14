@@ -51,12 +51,11 @@ test.describe('WS15 Connections management (mocked browser)', () => {
     await page.getByLabel('Search connections').fill('DevConf');
     await expect(page.getByText('Bob Smith').first()).toBeVisible();
 
-    await page.getByLabel('Filter by collection').selectOption('e2e-col-recruiters');
+    await page.getByLabel('Filter by location').selectOption('all');
     await expect(page.getByText('Bob Smith').first()).toBeVisible();
 
-    // Clear search/filter before unassign so the card is not remounted mid-click.
+    // Clear search before unassign so the card is not remounted mid-click.
     await page.getByLabel('Search connections').fill('');
-    await page.getByLabel('Filter by collection').selectOption('all');
     await expect(page.locator('main')).toHaveAttribute('data-e2e-memberships', '1');
 
     const trigger = page.locator('.cc-connection-blob__trigger').first();

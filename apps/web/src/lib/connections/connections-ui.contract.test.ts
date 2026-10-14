@@ -157,8 +157,11 @@ describe('WS15-T004 real Connections save flow', () => {
     expect(view).not.toContain('DraggableWidgetGrid');
     expect(view).not.toContain('DashFilterBar');
     expect(view).not.toContain("SOURCES = ['All', 'QR']");
-    expect(view).toContain('All meeting points');
-    expect(view).toContain('All countries / locations');
+    expect(view).toContain('Filter by date');
+    expect(view).toContain('Filter by location');
+    expect(view).toContain('All locations');
+    expect(view).not.toContain('All meeting points');
+    expect(view).not.toContain('All Connections');
     expect(view).not.toContain('cc-connection-blob__source-badge');
   });
 
