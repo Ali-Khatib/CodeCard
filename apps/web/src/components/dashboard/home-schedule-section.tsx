@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from 'react';
 import Link from 'next/link';
 import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
 import {
@@ -34,8 +34,10 @@ export type HomeScheduleSectionProps = {
   scheduleError?: boolean;
   preview?: boolean;
   basePath?: string;
-  /** Home: calendar sits beside the CodeCard. The editor is the band underneath. */
+  /** Home: calendar sits beside the CodeCard. The event form sits under both. */
   compact?: boolean;
+  /** Replaces the add-event card. Used when Edit card is open. */
+  replacement?: ReactNode;
 };
 
 const MINUTES = [0, 15, 30, 45];
@@ -53,6 +55,7 @@ export function HomeScheduleSection({
   preview = false,
   basePath = '/dashboard',
   compact = false,
+  replacement = null,
 }: HomeScheduleSectionProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const now = new Date();
@@ -408,6 +411,8 @@ export function HomeScheduleSection({
             </AppCard>
 
             <AppCard className="cc-home-calendar__day-panel cc-home-calendar__editor !p-6 sm:!p-8">
+              {replacement ?? (
+              <>
               {dayEvents.length === 0 && dayFollowUps.length === 0 ? null : (
                 <h3 className="cc-home-calendar__day-title">{formatDayHeading(selectedKey)}</h3>
               )}
@@ -611,6 +616,8 @@ export function HomeScheduleSection({
                   Demo calendar. Changes stay on this page. Sign in to save events and follow-ups to your account.
                 </p>
               ) : null}
+              </>
+              )}
             </AppCard>
           </div>
         )}

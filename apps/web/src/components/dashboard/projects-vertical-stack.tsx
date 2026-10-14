@@ -74,7 +74,7 @@ function ProjectRow({
               src={project.posterUrl ?? FALLBACK}
               alt=""
               fill
-              className="cc-project-hover-card__image object-cover"
+              className="cc-project-hover-card__image object-contain"
               sizes="(max-width: 768px) 100vw, 1040px"
               priority={index === 0}
             />

@@ -32,29 +32,32 @@ export default async function NewProjectPage() {
 
   return (
     <div className="cc-container cc-content py-8 md:py-12">
-      <div className="mx-auto mb-8 w-full max-w-[720px]">
+      <div className="cc-composer">
         <p className="cc-create-intro__kicker">New project</p>
-        <h1 className="mt-3 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
+        <h1 className="mt-2 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
           Create a project card
         </h1>
-        <div className="cc-create-steps">
-          <div className="cc-create-step cc-create-step--required">
-            <span className="cc-create-step__label">Required</span>
-            <p>Title and project URL. The form will not save without both.</p>
-          </div>
-          <div className="cc-create-step">
-            <span className="cc-create-step__label">Optional, easy to miss</span>
-            <ul>
-              <li>Showcase tabs: Problem, Approach, Results, Experience, or Architecture.</li>
-              <li>Technologies. Type one, then press Add.</li>
-              <li>Domain and focus chips. You can pick more than one.</li>
-            </ul>
-          </div>
-        </div>
-        <p className="cc-create-intro__after">
-          After you create the project, you land on the editor. Publish the card from Home.
-        </p>
-        <p className="mt-5">
+        <ol className="cc-composer__steps">
+          <li>
+            <span>1</span>
+            <p>
+              <strong>Name and link.</strong> Save the card with both.
+            </p>
+          </li>
+          <li>
+            <span>2</span>
+            <p>
+              <strong>Story.</strong> Add the tabs you want on the project page.
+            </p>
+          </li>
+          <li>
+            <span>3</span>
+            <p>
+              <strong>Stack.</strong> Technologies, domain, and focus.
+            </p>
+          </li>
+        </ol>
+        <p className="mb-6">
           <Link href="/dashboard" className="cc-app-btn cc-app-btn--ghost">
             ← Back to Home
           </Link>

@@ -30,7 +30,8 @@ export function ResearchPaperCard({
               src={paper.coverImageUrl}
               alt=""
               fill
-              className="cc-app-project-card__media-inner object-cover"
+              className="cc-app-project-card__media-inner object-contain"
+              quality={90}
               sizes="(max-width: 920px) 100vw, 920px"
             />
           ) : (

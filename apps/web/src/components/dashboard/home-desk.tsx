@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import Link from 'next/link';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -93,6 +94,7 @@ export function HomeDesk({
   const [dirty, setDirty] = useState(false);
   const [savedForm, setSavedForm] = useState<ProfileFormState | null>(null);
   const [liveAvatar, setLiveAvatar] = useState(avatarUrl ?? null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const slug = profileSlug || profile?.slug || '';
 
   useEffect(() => {
@@ -118,6 +120,33 @@ export function HomeDesk({
     window.addEventListener('beforeunload', onLeave);
     return () => window.removeEventListener('beforeunload', onLeave);
   }, [dirty]);
+
+  useEffect(() => {
+    const node = editorRef.current;
+    if (!editorOpen || !node) return;
+    const motion = gsap.matchMedia();
+    motion.add(
+      {
+        reduceMotion: '(prefers-reduced-motion: reduce)',
+        motionOk: '(prefers-reduced-motion: no-preference)',
+      },
+      (context) => {
+        const reduce = Boolean(context.conditions?.reduceMotion);
+        gsap.fromTo(
+          node,
+          { autoAlpha: 0, y: reduce ? 0 : 16 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: reduce ? 0 : 0.4,
+            ease: 'power2.out',
+            clearProps: 'transform',
+          },
+        );
+      },
+    );
+    return () => motion.revert();
+  }, [editorOpen]);
 
   const openEditor = () => {
     setQrOpen(false);
@@ -188,6 +217,56 @@ export function HomeDesk({
         preview={preview}
         basePath={basePath}
         compact
+        replacement={
+          editorOpen ? (
+            <div id="home-card-editor" ref={editorRef} className="cc-home-desk__editor">
+              {editorMounted ? (
+                preview || !profile ? (
+                  <div className="space-y-3">
+                    <label className="block text-[13px] text-[var(--app-smoke)]">
+                      Display name
+                      <input className="cc-app-input mt-1" readOnly value={displayName} />
+                    </label>
+                    <label className="block text-[13px] text-[var(--app-smoke)]">
+                      Headline
+                      <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
+                    </label>
+                    <label className="block text-[13px] text-[var(--app-smoke)]">
+                      Bio
+                      <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
+                    </label>
+                    <p className="text-[14px] text-[var(--app-smoke)]">
+                      <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
+                        Create an account
+                      </Link>{' '}
+                      to edit and save this card.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="cc-home-calendar__form-title">Edit card</h3>
+                    <AvatarUpload
+                      displayName={displayName}
+                      initialAvatarUrl={liveAvatar}
+                      onAvatarSaved={setLiveAvatar}
+                    />
+                    <ProfileEditor
+                      profile={profile}
+                      links={profileLinks}
+                      onDraftChange={(form) =>
+                        setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
+                      }
+                      onPersisted={(form) => {
+                        setSavedForm(form);
+                        setDirty(false);
+                      }}
+                    />
+                  </>
+                )
+              ) : null}
+            </div>
+          ) : null
+        }
       />
 
       <section className="cc-home-desk__card" aria-labelledby="home-codecard-shortcut">
@@ -199,17 +278,7 @@ export function HomeDesk({
         </div>
 
         {slug ? (
-          <HomeCodeCardPreview
-            embedded
-            displayName={displayName}
-            headline={headline}
-            bio={bio}
-            location={location}
-            avatarUrl={liveAvatar}
-            slug={slug}
-            isPublic={isPublic}
-            links={links}
-          >
+          <>
             <div className="cc-home-desk__dock">
               <div className="cc-home-desk__actions">
                 <button
@@ -219,7 +288,7 @@ export function HomeDesk({
                   aria-controls="home-card-editor"
                   onClick={() => (editorOpen ? closeEditor() : openEditor())}
                 >
-                  Edit card
+                  {editorOpen ? 'Close editor' : 'Edit card'}
                 </button>
                 <button
                   type="button"
@@ -227,6 +296,7 @@ export function HomeDesk({
                   aria-expanded={qrOpen}
                   aria-controls="home-card-qr"
                   onClick={toggleQr}
+                  disabled={editorOpen}
                 >
                   Share QR
                 </button>
@@ -240,63 +310,21 @@ export function HomeDesk({
                 </div>
               </div>
             </div>
-          </HomeCodeCardPreview>
+
+            <HomeCodeCardPreview
+              embedded
+              displayName={displayName}
+              headline={headline}
+              bio={bio}
+              location={location}
+              avatarUrl={liveAvatar}
+              slug={slug}
+              isPublic={isPublic}
+              links={links}
+            />
+          </>
         ) : null}
       </section>
-      </div>
-
-      <div
-        id="home-card-editor"
-        className={`cc-home-desk__editor-band cc-home-desk__drop${editorOpen ? ' is-open' : ''}`}
-        inert={!editorOpen}
-      >
-        <div className="cc-home-desk__drop-inner">
-          {editorMounted ? (
-            <div className="cc-home-desk__editor">
-              {preview || !profile ? (
-                <div className="space-y-3">
-                  <label className="block text-[13px] text-[var(--app-smoke)]">
-                    Display name
-                    <input className="cc-app-input mt-1" readOnly value={displayName} />
-                  </label>
-                  <label className="block text-[13px] text-[var(--app-smoke)]">
-                    Headline
-                    <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
-                  </label>
-                  <label className="block text-[13px] text-[var(--app-smoke)]">
-                    Bio
-                    <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
-                  </label>
-                  <p className="text-[14px] text-[var(--app-smoke)]">
-                    <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
-                      Create an account
-                    </Link>{' '}
-                    to edit and save this card.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <AvatarUpload
-                    displayName={displayName}
-                    initialAvatarUrl={liveAvatar}
-                    onAvatarSaved={setLiveAvatar}
-                  />
-                  <ProfileEditor
-                    profile={profile}
-                    links={profileLinks}
-                    onDraftChange={(form) =>
-                      setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
-                    }
-                    onPersisted={(form) => {
-                      setSavedForm(form);
-                      setDirty(false);
-                    }}
-                  />
-                </>
-              )}
-            </div>
-          ) : null}
-        </div>
       </div>
     </div>
   );

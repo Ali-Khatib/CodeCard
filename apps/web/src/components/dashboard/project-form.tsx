@@ -352,12 +352,12 @@ export function ProjectForm({
 
       <section className="space-y-5" aria-labelledby="project-required-heading">
         <h2 id="project-required-heading" className="text-[22px] font-semibold text-[var(--app-ink)]">
-          Required
+          Name and link
         </h2>
         <div className="space-y-2">
           <label htmlFor="project-title" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Project title <span className="cc-field-mark cc-field-mark--required">Required</span>
-          </label>
+            Project title <abbr className="cc-req" title="Required">*</abbr>
+</label>
           <input
             id="project-title"
             name="title"
@@ -375,8 +375,8 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <label htmlFor="project-slug" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Project URL <span className="cc-field-mark cc-field-mark--required">Required</span>
-          </label>
+            Project URL <abbr className="cc-req" title="Required">*</abbr>
+</label>
           <input
             id="project-slug"
             name="slug"
@@ -402,12 +402,10 @@ export function ProjectForm({
       <section className="space-y-4" aria-labelledby="project-showcase-heading">
         <div>
           <h2 id="project-showcase-heading" className="text-[22px] font-semibold text-[var(--app-ink)]">
-            Showcase story <span className="cc-field-mark">Optional</span>
+            Story
           </h2>
           <p id="project-showcase-help" className="cc-project-form__hint mt-2">
-            Add up to five tabs on your project page. Press Add tab on any you want, write what a
-            visitor should read, and add a background image if you have one. The text stays readable
-            on top. Skip any you do not need.
+            These become tabs on the project page. Add the ones you want, and skip the rest.
           </p>
         </div>
         <div className="space-y-4">
@@ -461,7 +459,7 @@ export function ProjectForm({
                   <div className="mt-4 space-y-2">
                     <label htmlFor={fieldId} className="text-[13px] font-medium text-graphite">
                       {section.label} text
-                    </label>
+          </label>
                     <p id={promptId} className="cc-project-form__hint">
                       {section.prompt}
                     </p>
@@ -498,10 +496,9 @@ export function ProjectForm({
                         className="text-[13px] font-medium text-graphite"
                       >
                         Background image <span className="text-ash">(optional)</span>
-                      </label>
+            </label>
                       <p id={imageHelpId} className="cc-project-form__hint">
-                        Optional. This sits behind the tab text with a dark overlay so the words stay
-                        readable. JPEG, PNG, or WebP. It is compressed automatically.
+                        Background for this tab. JPEG, PNG, or WebP.
                       </p>
                       {sectionImage ? (
                         <div className="flex flex-wrap items-center gap-3">
@@ -589,8 +586,7 @@ export function ProjectForm({
       <section className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="project-tagline" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Tagline <span className="cc-field-mark">Optional</span>
-          </label>
+            Tagline</label>
           <input
             id="project-tagline"
             name="tagline"
@@ -609,8 +605,7 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <label htmlFor="project-description" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Description <span className="cc-field-mark">Optional</span>
-          </label>
+            Description</label>
           <textarea
             id="project-description"
             name="description"
@@ -632,8 +627,7 @@ export function ProjectForm({
       <section className="space-y-3">
         <div>
           <label htmlFor="project-technologies" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Technologies <span className="cc-field-mark">Optional</span>
-          </label>
+            Technologies</label>
           <p id="project-technologies-hint" className="cc-project-form__hint mt-1">
             Type a tool or language, then press Add. Enter works too.
           </p>
@@ -684,8 +678,8 @@ export function ProjectForm({
         aria-invalid={fieldErrors.domains ? true : undefined}
         aria-describedby={fieldErrors.domains ? 'project-domains-error' : undefined}
       >
-        <legend className="cc-app-field-label text-[17px]">Domains <span className="cc-field-mark">Optional</span></legend>
-        <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
+        <legend className="cc-app-field-label text-[17px]">Domains</legend>
+        <p className="cc-project-form__hint">Choose any that fit.</p>
         <div id="project-domains" className="flex flex-wrap gap-2">
           {PROJECT_FORM_DOMAIN_OPTIONS.map((domain) => (
             <ToggleChip
@@ -704,8 +698,8 @@ export function ProjectForm({
         aria-invalid={fieldErrors.focus_areas ? true : undefined}
         aria-describedby={fieldErrors.focus_areas ? 'project-focus-areas-error' : undefined}
       >
-        <legend className="cc-app-field-label text-[17px]">Focus areas <span className="cc-field-mark">Optional</span></legend>
-        <p className="cc-project-form__hint">Tap every chip that fits. You can choose more than one.</p>
+        <legend className="cc-app-field-label text-[17px]">Focus areas</legend>
+        <p className="cc-project-form__hint">Choose any that fit.</p>
         <div id="project-focus-areas" className="flex flex-wrap gap-2">
           {PROJECT_FORM_FOCUS_AREA_OPTIONS.map((area) => (
             <ToggleChip
@@ -722,8 +716,7 @@ export function ProjectForm({
       <section className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="project-user-role" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Your role <span className="cc-field-mark">Optional</span>
-          </label>
+            Your role</label>
           <input
             id="project-user-role"
             name="user_role"
@@ -742,8 +735,7 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <label htmlFor="project-status" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Lifecycle status <span className="cc-field-mark">Optional</span>
-          </label>
+            Lifecycle status</label>
           <select
             id="project-status"
             name="status"
@@ -769,8 +761,7 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <label htmlFor="project-started-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Started <span className="cc-field-mark">Optional</span>
-          </label>
+            Started</label>
           <input
             id="project-started-at"
             name="started_at"
@@ -788,8 +779,7 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <label htmlFor="project-ended-at" className="text-[17px] font-semibold text-[var(--app-ink)]">
-            Ended <span className="cc-field-mark">Optional</span>
-          </label>
+            Ended</label>
           <input
             id="project-ended-at"
             name="ended_at"

@@ -35,7 +35,7 @@ describe('dashboard new project route', () => {
     expect(form).toContain('PROJECT_FORM_FOCUS_AREA_OPTIONS');
     expect(form).not.toContain('is_published');
     expect(form).toContain('case_study');
-    expect(form).toContain('Showcase story');
+    expect(form).toContain('These become tabs on the project page.');
     expect(form).not.toContain('section_media');
     expect(form).toContain('suggestProjectSlugFromTitle');
     expect(form).toContain('slugEdited');

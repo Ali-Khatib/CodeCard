@@ -3694,7 +3694,7 @@ html.dark .cc-connection-tag.cc-app-badge--mint {
 .cc-app-project-card__media {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 1;
   height: auto;
   flex: 0 0 auto;
   overflow: hidden;
@@ -3704,13 +3704,8 @@ html.dark .cc-connection-tag.cc-app-badge--mint {
 .cc-app-project-card__media-inner {
   height: 100%;
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
-  transition: transform 160ms ease;
-}
-
-.cc-app-project-card:hover .cc-app-project-card__media-inner {
-  transform: scale(1.02);
 }
 
 @media (max-width: 720px), (hover: none) {
@@ -6661,7 +6656,7 @@ html.dark .cc-share-qr-pattern__scan {
 
 .cc-project-hover-card__media {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 1;
   width: 100%;
   max-height: min(48dvh, 380px);
   overflow: hidden;
@@ -6670,16 +6665,10 @@ html.dark .cc-share-qr-pattern__scan {
 }
 
 .cc-project-hover-card__image {
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.cc-project-hover-card:hover .cc-project-hover-card__image {
-  transform: scale(1.06)
-    translate(
-      calc((var(--mx) - 50) * -0.12%),
-      calc((var(--my) - 50) * -0.12%)
-    );
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .cc-project-hover-card__body {
@@ -6819,7 +6808,7 @@ html.dark .cc-share-qr-pattern__scan {
     flex: 0 1 auto;
     min-height: 140px;
     max-height: min(40dvh, 280px);
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 1;
   }
 
   .cc-project-hover-card__body,
@@ -6852,7 +6841,7 @@ html.dark .cc-share-qr-pattern__scan {
   }
 
   .cc-app-project-card__media {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 1;
     height: auto;
   }
 
@@ -7851,7 +7840,7 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-stacking-card__project .cc-app-project-card__media {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 1;
   height: auto !important;
   flex: 0 0 auto;
   max-height: none;
@@ -7932,7 +7921,7 @@ html.dark .cc-public-atmosphere__grain {
   }
 
   .cc-stacking-card__project .cc-app-project-card__media {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 1;
     height: auto !important;
   }
 
@@ -7943,7 +7932,7 @@ html.dark .cc-public-atmosphere__grain {
 
 @media (max-height: 720px) {
   .cc-stacking-card__project .cc-app-project-card__media {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 1;
     height: auto !important;
   }
 
@@ -8385,6 +8374,81 @@ html.dark .cc-public-atmosphere__grain {
   color: var(--app-iris);
 }
 
+.cc-composer {
+  width: min(720px, 100%);
+  margin-inline: auto;
+}
+
+.cc-composer__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 22px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-composer__steps li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.cc-composer__steps span {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--app-ink);
+  color: var(--app-paper);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.cc-composer__steps p {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--app-ink);
+}
+
+.cc-composer__steps strong {
+  font-weight: 650;
+}
+
+.cc-req {
+  margin-left: 2px;
+  color: #b42318;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .cc-composer__steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cc-project-form {
+  margin-top: 8px;
+  padding: 8px 28px 28px;
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.cc-project-form > section {
+  padding: 24px 0;
+  border-top: 1px solid var(--app-border);
+}
+
+.cc-project-form > section:first-of-type {
+  border-top: 0;
+}
+
 .cc-create-steps {
   display: grid;
   gap: 12px;
@@ -8570,7 +8634,8 @@ html.dark .cc-public-atmosphere__grain {
 .cc-project-form input.cc-input,
 .cc-project-form select.cc-input {
   height: auto;
-  min-height: 48px;
+  min-height: 52px;
+  font-size: 16px;
 }
 
 .cc-project-form__actions {
