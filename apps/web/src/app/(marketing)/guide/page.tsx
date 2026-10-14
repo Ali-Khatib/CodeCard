@@ -6,7 +6,7 @@ export const metadata = buildIndexablePageMetadata({
   path: MARKETING_GUIDE_HREF,
   title: 'Guide',
   description:
-    'A walkthrough of the CodeCard workspace: Home, Your Work, Connections, Circle, Analytics, and Settings.',
+    'A walkthrough of the CodeCard workspace: Home, Work, Connections, Circle, Analytics, and Settings.',
 });
 
 export default function GuideRoute() {

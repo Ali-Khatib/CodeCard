@@ -130,10 +130,10 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     id: 'work',
     nav: 'Work',
     kicker: '02 · Work',
-    glanceTitle: 'Your Work',
+    glanceTitle: 'Work',
     glance: 'Projects and research',
     title: 'Show what you actually do.',
-    lead: 'Saying “I am an AI engineer” is a label. Your Work is the proof: projects you built and research you published. Open a project to edit it, attach slides, and keep it a draft or publish it.',
+    lead: 'Saying “I am an AI engineer” is a label. Work is the proof: projects you built and research you published. Open a project to edit it, attach slides, and keep it a draft or publish it.',
     canDoHeading: 'What you can do',
     canDo: [
       { title: 'Projects', body: 'Add the things you have built, with links and media.' },

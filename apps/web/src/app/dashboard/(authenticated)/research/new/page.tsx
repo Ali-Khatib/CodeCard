@@ -41,7 +41,7 @@ export default async function NewResearchPage() {
 
   return (
     <div className="cc-container cc-content py-8 md:py-12">
-      <div className="mb-8 max-w-[720px]">
+      <div className="mx-auto mb-8 w-full max-w-[720px]">
         <p className="cc-create-intro__kicker">New research</p>
         <h1 className="mt-3 text-[32px] font-medium tracking-[-0.03em] text-[var(--app-ink)] md:text-[40px]">
           Add a research paper

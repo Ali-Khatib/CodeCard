@@ -21,7 +21,7 @@ describe('WS09-T011 mobile dashboard navigation', () => {
     expect(cssNorm).toContain('.cc-app-root--embedded .cc-app-sidebar {\n    display: none;');
     expect(shell).toContain('aria-label="Mobile"');
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Your Work'");
+    expect(shell).toContain("label: 'Work'");
     expect(shell).not.toContain("label: 'Profile'");
     expect(shell).not.toContain("label: 'Projects'");
     expect(shell).not.toContain("label: 'Research'");

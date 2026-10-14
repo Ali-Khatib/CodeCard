@@ -14,7 +14,7 @@ describe('Phase 1 web app IA freeze', () => {
     const navBlock = navMatch![1];
 
     expect(navBlock).toContain("label: 'Home'");
-    expect(navBlock).toContain("label: 'Your Work'");
+    expect(navBlock).toContain("label: 'Work'");
     expect(navBlock).toContain("segment: 'work'");
     expect(navBlock).toContain("label: 'Connections'");
     expect(navBlock).toContain("label: 'Circle'");

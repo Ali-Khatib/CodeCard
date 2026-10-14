@@ -36,7 +36,7 @@ describe('authenticated dashboard isolation from Alex Chen demo', () => {
     const shell = readFileSync(resolve(WEB, 'src/components/dashboard/dashboard-shell.tsx'), 'utf8');
     expect(shell).not.toMatch(/label:\s*['"]My Profile['"]/);
     expect(shell).toContain("label: 'Home'");
-    expect(shell).toContain("label: 'Your Work'");
+    expect(shell).toContain("label: 'Work'");
   });
 
   it('puts Back to landing on the demo workspace only, not signed-in accounts', () => {

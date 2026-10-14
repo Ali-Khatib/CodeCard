@@ -34,7 +34,7 @@ export type HomeScheduleSectionProps = {
   scheduleError?: boolean;
   preview?: boolean;
   basePath?: string;
-  /** Home: month, selection, and the day’s items. Creating stays on the full calendar. */
+  /** Home: calendar sits beside the CodeCard. The editor is the band underneath. */
   compact?: boolean;
 };
 
@@ -277,10 +277,8 @@ export function HomeScheduleSection({
     setMonthIndex(next.monthIndex);
   };
 
-  const showComposer = !compact || Boolean(editingId || editingFollowUpId);
-
   return (
-    <FadeInView delay={0.14}>
+    <FadeInView delay={0.14} className={compact ? 'cc-home-schedule' : undefined}>
       <section id="schedule" className="cc-profile-home__zone" aria-label="Calendar and follow-ups">
         <div className="cc-profile-home__zone-head">
           <div>
@@ -292,9 +290,11 @@ export function HomeScheduleSection({
               </p>
             )}
           </div>
-          <AppButton variant="ghost" href={compact ? `${basePath}/calendar` : `${basePath}/connections`}>
-            {compact ? 'Full calendar' : 'Open Connections →'}
-          </AppButton>
+          {compact ? null : (
+            <AppButton variant="ghost" href={`${basePath}/connections`}>
+              Open Connections →
+            </AppButton>
+          )}
         </div>
 
         {scheduleError ? (
@@ -407,17 +407,10 @@ export function HomeScheduleSection({
               </ul>
             </AppCard>
 
-            <AppCard className="cc-home-calendar__day-panel !p-4 sm:!p-5">
-              <p className="cc-home-calendar__day-kicker">Selected day</p>
-              <h3 className="cc-home-calendar__day-title">{formatDayHeading(selectedKey)}</h3>
-
-              {dayEvents.length === 0 && dayFollowUps.length === 0 ? (
-                <p className="mt-3 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-                  {compact
-                    ? 'Nothing planned this day.'
-                    : 'Nothing planned this day. Add an event below, or set a follow-up from Connections.'}
-                </p>
-              ) : null}
+            <AppCard className="cc-home-calendar__day-panel cc-home-calendar__editor !p-6 sm:!p-8">
+              {dayEvents.length === 0 && dayFollowUps.length === 0 ? null : (
+                <h3 className="cc-home-calendar__day-title">{formatDayHeading(selectedKey)}</h3>
+              )}
 
               {dayEvents.length > 0 ? (
                 <ul className="cc-home-calendar__items">
@@ -473,21 +466,7 @@ export function HomeScheduleSection({
                 </ul>
               ) : null}
 
-              {preview ? (
-                <p className="mt-4 text-[12px] text-[var(--app-smoke)]">
-                  Demo calendar. Changes stay on this page. Sign in to save events and follow-ups to your account.
-                </p>
-              ) : null}
-
-              {compact && !showComposer ? (
-                <p className="mt-4">
-                  <Link href={`${basePath}/calendar`} className="cc-home-desk__text-link">
-                    Add or edit on the full calendar
-                  </Link>
-                </p>
-              ) : null}
-
-              {showComposer ? (editingFollowUpId ? (
+              {editingFollowUpId ? (
                 <form
                   className="cc-home-calendar__form"
                   onSubmit={(e) => {
@@ -539,6 +518,7 @@ export function HomeScheduleSection({
                   <p className="cc-home-calendar__form-title">
                     {editingId ? 'Edit event' : 'Add event'}
                   </p>
+                  <p className="cc-home-calendar__form-day">{formatDayHeading(selectedKey)}</p>
                   <label className="cc-home-calendar__label" htmlFor="home-cal-title">
                     Event title
                   </label>
@@ -624,7 +604,13 @@ export function HomeScheduleSection({
                     </button>
                   </div>
                 </form>
-              )) : null}
+              )}
+
+              {preview ? (
+                <p className="mt-4 text-[12px] text-[var(--app-smoke)]">
+                  Demo calendar. Changes stay on this page. Sign in to save events and follow-ups to your account.
+                </p>
+              ) : null}
             </AppCard>
           </div>
         )}

@@ -5461,15 +5461,18 @@ html.dark .cc-analytics-paper-table__signal-chip {
 }
 
 .cc-home-calendar {
-  display: grid;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-@media (min-width: 900px) {
-  .cc-home-calendar {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    align-items: start;
-  }
+.cc-home-calendar__month {
+  width: min(640px, 100%);
+}
+
+.cc-home-calendar__day-panel {
+  width: min(820px, 100%);
 }
 
 .cc-home-calendar__nav {
@@ -5729,6 +5732,23 @@ html.dark .cc-analytics-paper-table__signal-chip {
 .cc-home-calendar__item-actions button:hover,
 .cc-home-calendar__open:hover {
   color: var(--app-ink);
+}
+
+.cc-home-calendar__editor .cc-home-calendar__form {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+  gap: 12px;
+}
+
+.cc-home-calendar__editor .cc-app-input {
+  min-height: 48px;
+}
+
+.cc-home-calendar__form-day {
+  margin: -2px 0 8px;
+  color: var(--app-smoke);
+  font-size: 14px;
 }
 
 .cc-home-calendar__form {
@@ -9045,6 +9065,36 @@ html.dark .cc-public-atmosphere__grain {
     min-width: 0;
   }
 
+  /* Calendar and CodeCard on one row. The event editor sits under both, in the middle. */
+  .cc-home-desk__split > .cc-home-schedule,
+  .cc-home-desk__split .cc-profile-home__zone,
+  .cc-home-desk__split .cc-home-calendar {
+    display: contents;
+  }
+
+  .cc-home-desk__split .cc-profile-home__zone-head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .cc-home-desk__split .cc-home-calendar__month {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .cc-home-desk__split > .cc-home-desk__card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .cc-home-desk__split .cc-home-calendar__day-panel {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    width: min(820px, 100%);
+    justify-self: center;
+  }
+
   .cc-home-desk__split .cc-home-desk__dock {
     width: 100%;
   }
@@ -9214,6 +9264,23 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-home-codecard--embedded .cc-home-codecard__stage {
   margin-top: 0;
+}
+
+.cc-home-desk__editor-band.cc-home-desk__drop {
+  width: min(640px, 100%);
+  margin-inline: auto;
+}
+
+.cc-home-desk__editor-band.is-open .cc-home-desk__editor {
+  margin-top: 4px;
+  padding: 22px 24px 8px;
+  border: 1px solid var(--app-border);
+  border-radius: 22px;
+  background: var(--app-paper, #fffaf4);
+}
+
+.cc-home-desk__editor .max-w-xl {
+  max-width: none;
 }
 
 .cc-home-desk__editor {

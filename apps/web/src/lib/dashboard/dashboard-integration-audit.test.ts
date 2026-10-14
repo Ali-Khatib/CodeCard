@@ -62,7 +62,7 @@ describe('WS09-T002 truthful MVP dashboard navigation', () => {
     const navBlock = navMatch![1];
 
     expect(navBlock).toContain("label: 'Home'");
-    expect(navBlock).toContain("label: 'Your Work'");
+    expect(navBlock).toContain("label: 'Work'");
     expect(navBlock).toContain("segment: 'work'");
     expect(navBlock).not.toContain("label: 'Profile'");
     expect(navBlock).not.toContain("segment: 'profile'");

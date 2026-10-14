@@ -13,7 +13,7 @@ export const NEW_ACCOUNT_SETUP_GUIDE = [
   },
   {
     id: 'projects',
-    where: 'Your Work',
+    where: 'Work',
     href: '/dashboard/projects/new',
     what: 'Create your first project with demo, stack, and outcome up front.',
   },

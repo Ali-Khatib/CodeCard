@@ -62,7 +62,7 @@ export function DashboardYourWorkView({
     <div className="cc-app-page cc-app-page--1040 cc-your-work">
       <header className="cc-your-work__header">
         <div>
-          <p className="cc-workspace-section__eyebrow">Your Work</p>
+          <p className="cc-workspace-section__eyebrow">Work</p>
           <h1 className="cc-workspace-section__title">What appears on your CodeCard</h1>
           <p className="cc-workspace-section__copy">
             Build projects and research here. Published items appear on your public CodeCard.

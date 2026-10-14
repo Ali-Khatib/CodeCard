@@ -12,7 +12,7 @@ describe('Work workspace', () => {
     const work = read('src/components/dashboard/dashboard-your-work-view.tsx');
     const navMatch = shell.match(/const NAV_ITEMS = \[([\s\S]*?)\] as const/);
     expect(navMatch).toBeTruthy();
-    expect(navMatch![1]).toContain("label: 'Your Work'");
+    expect(navMatch![1]).toContain("label: 'Work'");
     expect(navMatch![1]).not.toContain("label: 'Projects'");
     expect(navMatch![1]).not.toContain("label: 'Research'");
     expect(work).toContain('id="projects"');

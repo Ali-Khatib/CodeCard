@@ -359,13 +359,13 @@ export function DashboardOverviewView({
               </p>
             </div>
             <AppButton variant="ghost" href={workspaceWorkHref(basePath)}>
-              Open Your Work →
+              Open Work →
             </AppButton>
           </div>
           {contentError || !projectsSummary || !researchSummary ? (
             <AppCard tone="meringue" className="!p-5">
               <p className="text-[15px] text-[var(--app-ink)]">
-                Project and research summaries could not be loaded. Open Your Work to continue
+                Project and research summaries could not be loaded. Open Work to continue
                 editing.
               </p>
             </AppCard>

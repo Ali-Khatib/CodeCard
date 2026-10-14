@@ -67,7 +67,7 @@ export default async function EditProjectPage({
 
   return (
     <div className="cc-container cc-content py-8 md:py-12">
-      <div className="mb-8 max-w-[720px]">
+      <div className="mx-auto mb-8 w-full max-w-[720px]">
         <p className="font-eyebrow text-[10px] uppercase tracking-[0.18em] text-lavender/80">
           Edit project
         </p>

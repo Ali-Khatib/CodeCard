@@ -28,7 +28,7 @@ describe('marketing Guide walkthrough', () => {
     ]);
     expect(GUIDE_SECTIONS.map((section) => section.glanceTitle)).toEqual([
       'Your Card',
-      'Your Work',
+      'Work',
       'Connections',
       'Circle',
       'Analytics',

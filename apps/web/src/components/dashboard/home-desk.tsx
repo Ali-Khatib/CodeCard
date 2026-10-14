@@ -122,7 +122,12 @@ export function HomeDesk({
   const openEditor = () => {
     setQrOpen(false);
     setEditorMounted(true);
-    requestAnimationFrame(() => setEditorOpen(true));
+    requestAnimationFrame(() => {
+      setEditorOpen(true);
+      requestAnimationFrame(() => {
+        document.getElementById('home-card-editor')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
   };
 
   const closeEditor = () => {
@@ -234,64 +239,64 @@ export function HomeDesk({
                   </div>
                 </div>
               </div>
-
-              <div
-                id="home-card-editor"
-                className={`cc-home-desk__drop${editorOpen ? ' is-open' : ''}`}
-                inert={!editorOpen}
-              >
-                <div className="cc-home-desk__drop-inner">
-                  {editorMounted ? (
-                    <div className="cc-home-desk__editor">
-                      {preview || !profile ? (
-                        <div className="space-y-3">
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Display name
-                            <input className="cc-app-input mt-1" readOnly value={displayName} />
-                          </label>
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Headline
-                            <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
-                          </label>
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Bio
-                            <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
-                          </label>
-                          <p className="text-[14px] text-[var(--app-smoke)]">
-                            <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
-                              Create an account
-                            </Link>{' '}
-                            to edit and save this card.
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          <AvatarUpload
-                            displayName={displayName}
-                            initialAvatarUrl={liveAvatar}
-                            onAvatarSaved={setLiveAvatar}
-                          />
-                          <ProfileEditor
-                            profile={profile}
-                            links={profileLinks}
-                            onDraftChange={(form) =>
-                              setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
-                            }
-                            onPersisted={(form) => {
-                              setSavedForm(form);
-                              setDirty(false);
-                            }}
-                          />
-                        </>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
             </div>
           </HomeCodeCardPreview>
         ) : null}
       </section>
+      </div>
+
+      <div
+        id="home-card-editor"
+        className={`cc-home-desk__editor-band cc-home-desk__drop${editorOpen ? ' is-open' : ''}`}
+        inert={!editorOpen}
+      >
+        <div className="cc-home-desk__drop-inner">
+          {editorMounted ? (
+            <div className="cc-home-desk__editor">
+              {preview || !profile ? (
+                <div className="space-y-3">
+                  <label className="block text-[13px] text-[var(--app-smoke)]">
+                    Display name
+                    <input className="cc-app-input mt-1" readOnly value={displayName} />
+                  </label>
+                  <label className="block text-[13px] text-[var(--app-smoke)]">
+                    Headline
+                    <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
+                  </label>
+                  <label className="block text-[13px] text-[var(--app-smoke)]">
+                    Bio
+                    <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
+                  </label>
+                  <p className="text-[14px] text-[var(--app-smoke)]">
+                    <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
+                      Create an account
+                    </Link>{' '}
+                    to edit and save this card.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <AvatarUpload
+                    displayName={displayName}
+                    initialAvatarUrl={liveAvatar}
+                    onAvatarSaved={setLiveAvatar}
+                  />
+                  <ProfileEditor
+                    profile={profile}
+                    links={profileLinks}
+                    onDraftChange={(form) =>
+                      setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
+                    }
+                    onPersisted={(form) => {
+                      setSavedForm(form);
+                      setDirty(false);
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

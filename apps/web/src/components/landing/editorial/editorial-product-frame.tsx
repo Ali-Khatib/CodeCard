@@ -325,7 +325,7 @@ export function EditorialProductFrame({
                 projects={DEMO_FEATURED_PROJECTS}
                 resumeUrl={DEMO_RESUME_URL}
                 backHref={`${LIVE_DEMO_WORKSPACE_HREF}/work`}
-                backLabel="Your Work"
+                backLabel="Work"
               />
             </Suspense>
           ) : null}

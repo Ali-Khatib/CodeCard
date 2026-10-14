@@ -13,7 +13,7 @@ describe('content opening wiring', () => {
     expect(navMatch).toBeTruthy();
     expect(navMatch![1]).not.toMatch(/My profile|My Profile/);
     expect(navMatch![1]).toContain("segment: 'work'");
-    expect(navMatch![1]).toContain("label: 'Your Work'");
+    expect(navMatch![1]).toContain("label: 'Work'");
     expect(navMatch![1]).not.toContain("segment: 'profile'");
     expect(navMatch![1]).not.toContain("label: 'Profile'");
   });

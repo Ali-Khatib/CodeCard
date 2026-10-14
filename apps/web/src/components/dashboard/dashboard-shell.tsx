@@ -33,7 +33,7 @@ import {
 
 const NAV_ITEMS = [
   { segment: '', label: 'Home', short: 'Home', icon: 'home' as const },
-  { segment: 'work', label: 'Your Work', short: 'Work', icon: 'work' as const },
+  { segment: 'work', label: 'Work', short: 'Work', icon: 'work' as const },
   { segment: 'connections', label: 'Connections', short: 'Connect', icon: 'connections' as const },
   { segment: 'circle', label: 'Circle', short: 'Circle', icon: 'circle' as const },
   { segment: 'analytics', label: 'Analytics', short: 'Analytics', icon: 'analytics' as const },
@@ -44,11 +44,11 @@ const DEMO_SIGN_IN_HREF = `/sign-in?redirect=${encodeURIComponent('/dashboard')}
 
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
-  work: 'Your Work',
+  work: 'Work',
   profile: 'Edit CodeCard',
   calendar: 'Calendar',
-  projects: 'Your Work',
-  research: 'Your Work',
+  projects: 'Work',
+  research: 'Work',
   circle: 'Circle',
   analytics: 'Analytics',
   connections: 'Connections',
