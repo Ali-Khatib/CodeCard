@@ -9220,6 +9220,16 @@ html.dark .cc-public-atmosphere__grain {
     align-self: start;
   }
 
+  .cc-home-desk__split > .cc-home-desk__editor {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .cc-home-desk__split:has(> .cc-home-desk__editor) > .cc-home-desk__card {
+    grid-row: 1 / span 2;
+  }
+
   .cc-home-desk__split .cc-home-desk__dock {
     width: 100%;
   }
@@ -9416,7 +9426,10 @@ html.dark .cc-public-atmosphere__grain {
 }
 
 .cc-home-desk__editor {
-  padding-top: 4px;
+  padding: 22px 20px 8px;
+  border: 1px solid var(--app-border);
+  border-radius: 22px;
+  background: var(--app-paper, #fffaf4);
 }
 
 .cc-home-desk__dock {
