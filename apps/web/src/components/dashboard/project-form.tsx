@@ -427,9 +427,27 @@ export function ProjectForm({
       noValidate
     >
       {usage?.limit != null && mode === 'create' && (
-        <p className="cc-create-usage">
-          {usage.count} of {usage.limit} projects used on the Free plan.
-        </p>
+        <div
+          className={`cc-plan-meter${usage.count >= usage.limit ? ' is-full' : ''}`}
+          role="meter"
+          aria-valuemin={0}
+          aria-valuemax={usage.limit}
+          aria-valuenow={usage.count}
+          aria-label={`${usage.count} of ${usage.limit} projects used on the Free plan`}
+        >
+          <div className="cc-plan-meter__row">
+            <span>Free plan</span>
+            <span>
+              {usage.count} of {usage.limit} projects
+            </span>
+          </div>
+          <div className="cc-plan-meter__track">
+            <div
+              className="cc-plan-meter__fill"
+              style={{ width: `${Math.min(100, Math.round((usage.count / usage.limit) * 100))}%` }}
+            />
+          </div>
+        </div>
       )}
 
       {limitReached && mode === 'create' && (

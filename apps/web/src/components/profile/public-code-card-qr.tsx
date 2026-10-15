@@ -7,9 +7,12 @@ import { generateProfileQrPreview, getPublicProfileLinkForClipboard } from '@/li
 export function PublicCodeCardQr({
   profileSlug,
   className = '',
+  showLink = true,
 }: {
   profileSlug: string;
   className?: string;
+  /** Home share keeps the address behind a copy button. */
+  showLink?: boolean;
 }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
@@ -53,9 +56,11 @@ export function PublicCodeCardQr({
           {error ?? 'Generating QR…'}
         </p>
       )}
-      <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-ink,#1a191c)]">
-        {qrUrl ?? displayUrl ?? `/${profileSlug}`}
-      </p>
+      {showLink ? (
+        <p className="mt-3 max-w-full break-all text-[14px] text-[var(--app-ink,#1a191c)]">
+          {qrUrl ?? displayUrl ?? `/${profileSlug}`}
+        </p>
+      ) : null}
     </div>
   );
 }

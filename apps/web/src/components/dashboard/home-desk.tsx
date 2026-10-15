@@ -7,6 +7,7 @@ import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { PublicCodeCardQr } from '@/components/profile/public-code-card-qr';
+import { getPublicProfileLinkForClipboard } from '@/lib/sharing/qr';
 import { ProfileEditor } from '@/components/profile-editor';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { profileToFormState, type ProfileFormState } from '@/lib/profile/profile-form';
@@ -89,6 +90,7 @@ export function HomeDesk({
   const upcoming = scheduleError ? null : upcomingCount(events, followUps);
   const [dateLabel, setDateLabel] = useState('');
   const [qrOpen, setQrOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMounted, setEditorMounted] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -168,12 +170,18 @@ export function HomeDesk({
   };
 
   const toggleQr = () => {
-    if (qrOpen) {
-      setQrOpen(false);
-      return;
+    setQrOpen((open) => !open);
+  };
+
+  const copyCardLink = async () => {
+    const url = getPublicProfileLinkForClipboard(slug) ?? `${window.location.origin}/${slug}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 1600);
+    } catch {
+      setLinkCopied(false);
     }
-    if (editorOpen && !closeEditor()) return;
-    setQrOpen(true);
   };
 
   return (
@@ -295,7 +303,6 @@ export function HomeDesk({
                   aria-expanded={qrOpen}
                   aria-controls="home-card-qr"
                   onClick={toggleQr}
-                  disabled={editorOpen}
                 >
                   Share QR
                 </button>
@@ -303,8 +310,23 @@ export function HomeDesk({
 
               <div id="home-card-qr" className={`cc-home-desk__drop${qrOpen ? ' is-open' : ''}`} inert={!qrOpen}>
                 <div className="cc-home-desk__drop-inner">
-                  <div className="cc-home-desk__qr">
-                    <PublicCodeCardQr profileSlug={slug} />
+                  <div className="cc-home-qr">
+                    <PublicCodeCardQr profileSlug={slug} showLink={false} />
+                    <button
+                      type="button"
+                      className={`cc-home-qr__copy${linkCopied ? ' is-copied' : ''}`}
+                      onClick={() => void copyCardLink()}
+                    >
+                      {linkCopied ? (
+                        <span className="cc-profile-save__check" aria-hidden>
+                          <svg viewBox="0 0 24 24">
+                            <circle className="cc-profile-save__ring" cx="12" cy="12" r="10" />
+                            <path className="cc-profile-save__tick" d="M7 12.5 10.2 16 17 8.5" />
+                          </svg>
+                        </span>
+                      ) : null}
+                      {linkCopied ? 'Copied' : 'Copy link'}
+                    </button>
                   </div>
                 </div>
               </div>

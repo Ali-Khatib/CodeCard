@@ -8524,6 +8524,47 @@ html.dark .cc-public-atmosphere__grain {
   color: var(--app-ink);
 }
 
+.cc-plan-meter {
+  display: grid;
+  gap: 8px;
+}
+
+.cc-plan-meter__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--app-smoke);
+}
+
+.cc-plan-meter__row span:last-child {
+  color: var(--app-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-plan-meter__track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-ink) 10%, var(--app-bone));
+}
+
+.cc-plan-meter__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--app-ink);
+}
+
+.cc-plan-meter.is-full .cc-plan-meter__fill {
+  background: #9a3412;
+}
+
+.cc-plan-meter.is-full .cc-plan-meter__row span:last-child {
+  color: #9a3412;
+}
+
 .cc-create-usage {
   margin: 0;
   padding: 14px 16px;
@@ -9422,6 +9463,61 @@ html.dark .cc-public-atmosphere__grain {
   overflow: visible;
   opacity: 1;
   transform: none;
+}
+
+.cc-home-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--app-bone) 55%, #fff);
+}
+
+.cc-home-qr img {
+  display: block;
+  width: 168px;
+  height: 168px;
+  padding: 10px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--app-ink) 6%, transparent);
+}
+
+.cc-home-qr__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  background: var(--app-paper, #fff);
+  color: var(--app-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cc-home-qr__copy:hover {
+  background: var(--app-bone);
+}
+
+.cc-home-qr__copy.is-copied {
+  border-color: transparent;
+  background: var(--app-ink);
+  color: var(--app-paper, #fff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-home-qr__copy.is-copied .cc-profile-save__ring,
+  .cc-home-qr__copy.is-copied .cc-profile-save__tick {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
