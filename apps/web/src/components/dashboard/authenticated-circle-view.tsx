@@ -416,7 +416,7 @@ export function AuthenticatedCircleView({
     <div className="cc-app-page cc-app-page--1040 overflow-x-hidden">
       <PageHeader
         title="Circle"
-        description="Public projects and research from people you’ve saved as Connections."
+        description="From people you connect with."
       />
 
       {showFilters ? (

@@ -110,7 +110,7 @@ export function DashboardResearchView({
               const publicHref = paperPublicHref(paper, profileSlug, isProfilePublic);
               return (
                 <div key={paper.id} className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="cc-research-paper-bar">
                     {!isDemoWorkspace ? (
                       <ResearchReorderToolbar
                         paperId={paper.id}
@@ -120,41 +120,38 @@ export function DashboardResearchView({
                         orderedPaperIds={orderedPaperIds}
                       />
                     ) : (
-                      <p className="text-[12px] text-[var(--app-smoke)]">
+                      <p className="cc-research-paper-bar__note">
                         Sign in to reorder and edit research.
                       </p>
                     )}
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="cc-research-paper-bar__meta">
                       <span
                         className={`cc-app-badge text-[11px] ${paper.isPublished ? 'cc-app-badge--mint' : 'cc-app-badge--blush'}`}
                       >
                         {paper.isPublished ? 'Published' : 'Draft'}
                       </span>
-                      {publicHref ? (
-                        <span className="text-[12px] text-[var(--app-smoke)]">
-                          On your public CodeCard
-                        </span>
-                      ) : null}
-                      <Link
-                        href={editHref}
-                        className="cc-app-btn cc-app-btn--ghost text-[13px]"
-                        aria-label={
-                          isDemoWorkspace
-                            ? `Sign in to edit ${paper.title}`
-                            : `Edit research paper ${paper.title}`
-                        }
-                      >
-                        {isDemoWorkspace ? 'Sign in to edit' : 'Edit'}
-                      </Link>
-                      {publicHref ? (
+                      <div className="cc-research-paper-bar__actions">
                         <Link
-                          href={publicHref}
-                          className="cc-app-btn cc-app-btn--ghost text-[13px]"
-                          aria-label={`View ${paper.title} publicly`}
+                          href={editHref}
+                          className="cc-app-btn cc-app-btn--ghost"
+                          aria-label={
+                            isDemoWorkspace
+                              ? `Sign in to edit ${paper.title}`
+                              : `Edit research paper ${paper.title}`
+                          }
                         >
-                          View public
+                          {isDemoWorkspace ? 'Sign in to edit' : 'Edit'}
                         </Link>
-                      ) : null}
+                        {publicHref ? (
+                          <Link
+                            href={publicHref}
+                            className="cc-app-btn cc-app-btn--ghost"
+                            aria-label={`View ${paper.title} publicly`}
+                          >
+                            View public
+                          </Link>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   <ResearchPaperCard

@@ -38,7 +38,7 @@ export function DashboardCircleView({ items = DEMO_CIRCLE_FEED }: { items?: Circ
     <div className="cc-app-page cc-app-page--1040">
       <PageHeader
         title="Circle"
-        description="Projects from people you've saved or connected with."
+        description="From people you connect with."
       />
 
       <FadeInView delay={0}>
