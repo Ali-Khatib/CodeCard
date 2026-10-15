@@ -55,8 +55,6 @@ export function DashboardYourWorkView({
   const showProjects = !guideFocus || guideFocus === 'projects';
   const showResearch = !guideFocus || guideFocus === 'research';
   const publicCardHref = profileSlug ? publicDemoProfileBasePath(profileSlug) : null;
-  const projectCountLabel = `${projects.length} project${projects.length === 1 ? '' : 's'}`;
-  const paperCountLabel = `${papers.length} paper${papers.length === 1 ? '' : 's'}`;
 
   return (
     <div className="cc-app-page cc-app-page--1040 cc-your-work">
@@ -139,10 +137,6 @@ export function DashboardYourWorkView({
               <h2 id="your-work-projects" className="cc-workspace-section__title">
                 Projects
               </h2>
-              <p className="cc-workspace-section__copy">
-                Things you have built. {hasProjects ? `${projectCountLabel}. ` : ''}
-                Published projects can appear on your public CodeCard.
-              </p>
             </div>
             <DashboardProjectsPortfolio
               creator={creator}
@@ -167,10 +161,6 @@ export function DashboardYourWorkView({
               <h2 id="your-work-research" className="cc-workspace-section__title">
                 Research
               </h2>
-              <p className="cc-workspace-section__copy">
-                Things you have investigated. {hasPapers ? `${paperCountLabel}. ` : ''}
-                Published research can appear on your public CodeCard.
-              </p>
             </div>
             <DashboardResearchView
               papers={papers}
