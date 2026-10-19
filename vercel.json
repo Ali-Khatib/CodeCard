@@ -3,9 +3,21 @@
   "ignoreCommand": "node apps/web/scripts/vercel-ignore-build.mjs",
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "code-card-web.vercel.app" }],
+      "destination": "https://codecard-mvp.vercel.app/",
+      "permanent": false
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "code-card-web.vercel.app" }],
       "destination": "https://codecard-mvp.vercel.app/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "codecard.vercel.app" }],
+      "destination": "https://codecard-mvp.vercel.app/",
       "permanent": false
     },
     {
