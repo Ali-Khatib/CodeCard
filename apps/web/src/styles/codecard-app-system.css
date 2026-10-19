@@ -9266,16 +9266,6 @@ html.dark .cc-public-atmosphere__grain {
     align-self: start;
   }
 
-  .cc-home-desk__split > .cc-home-desk__editor {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
-  }
-
-  .cc-home-desk__split:has(> .cc-home-desk__editor) > .cc-home-desk__card {
-    grid-row: 1 / span 2;
-  }
-
   .cc-home-desk__split .cc-home-desk__dock {
     width: 100%;
   }
@@ -9454,17 +9444,35 @@ html.dark .cc-public-atmosphere__grain {
   margin-top: 0;
 }
 
-.cc-home-desk__editor-band.cc-home-desk__drop {
-  width: min(640px, 100%);
-  margin-inline: auto;
+/* Edit card — same open/close motion as profile-completion “View progress”. */
+.cc-home-desk__editor-drop {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top center;
+  transition:
+    grid-template-rows 500ms ease-out,
+    opacity 500ms ease-out,
+    margin 500ms ease-out,
+    transform 500ms ease-out;
 }
 
-.cc-home-desk__editor-band.is-open .cc-home-desk__editor {
-  margin-top: 4px;
-  padding: 22px 24px 8px;
-  border: 1px solid var(--app-border);
-  border-radius: 22px;
-  background: var(--app-paper, #fffaf4);
+.cc-home-desk__editor-drop.is-open {
+  grid-template-rows: 1fr;
+  margin-top: 16px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.cc-home-desk__editor-drop-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cc-home-desk__editor-drop.is-open .cc-home-desk__editor-drop-inner {
+  overflow: visible;
 }
 
 .cc-home-desk__editor .max-w-xl {
@@ -9476,6 +9484,12 @@ html.dark .cc-public-atmosphere__grain {
   border: 1px solid var(--app-border);
   border-radius: 22px;
   background: var(--app-paper, #fffaf4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-home-desk__editor-drop {
+    transition: none;
+  }
 }
 
 .cc-home-desk__dock {

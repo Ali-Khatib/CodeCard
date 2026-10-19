@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
@@ -96,7 +95,6 @@ export function HomeDesk({
   const [dirty, setDirty] = useState(false);
   const [savedForm, setSavedForm] = useState<ProfileFormState | null>(null);
   const [liveAvatar, setLiveAvatar] = useState(avatarUrl ?? null);
-  const editorRef = useRef<HTMLDivElement>(null);
   const slug = profileSlug || profile?.slug || '';
 
   useEffect(() => {
@@ -122,33 +120,6 @@ export function HomeDesk({
     window.addEventListener('beforeunload', onLeave);
     return () => window.removeEventListener('beforeunload', onLeave);
   }, [dirty]);
-
-  useEffect(() => {
-    const node = editorRef.current;
-    if (!editorOpen || !node) return;
-    const motion = gsap.matchMedia();
-    motion.add(
-      {
-        reduceMotion: '(prefers-reduced-motion: reduce)',
-        motionOk: '(prefers-reduced-motion: no-preference)',
-      },
-      (context) => {
-        const reduce = Boolean(context.conditions?.reduceMotion);
-        gsap.fromTo(
-          node,
-          { autoAlpha: 0, y: reduce ? 0 : 16 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: reduce ? 0 : 0.4,
-            ease: 'power2.out',
-            clearProps: 'transform',
-          },
-        );
-      },
-    );
-    return () => motion.revert();
-  }, [editorOpen]);
 
   const openEditor = () => {
     setQrOpen(false);
@@ -214,138 +185,145 @@ export function HomeDesk({
         </div>
       </header>
 
-      {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
-
       <div className="cc-home-desk__split">
-      <HomeScheduleSection
-        events={events}
-        followUps={followUps}
-        scheduleError={scheduleError}
-        preview={preview}
-        basePath={basePath}
-        compact
-        hideDayPanel={editorOpen}
-      />
+        <section className="cc-home-desk__card" aria-labelledby="home-codecard-shortcut">
+          <div className="cc-home-desk__card-head">
+            <h2 id="home-codecard-shortcut" className="cc-home-desk__section-title">
+              Your CodeCard
+            </h2>
+            <span className="cc-home-desk__status">{isPublic ? 'Published' : 'Private'}</span>
+          </div>
 
-      <section className="cc-home-desk__card" aria-labelledby="home-codecard-shortcut">
-        <div className="cc-home-desk__card-head">
-          <h2 id="home-codecard-shortcut" className="cc-home-desk__section-title">
-            Your CodeCard
-          </h2>
-          <span className="cc-home-desk__status">{isPublic ? 'Published' : 'Private'}</span>
-        </div>
+          {slug ? (
+            <>
+              <div className="cc-home-desk__dock">
+                <div className="cc-home-desk__actions">
+                  <button
+                    type="button"
+                    className="cc-app-btn cc-app-btn--primary"
+                    aria-expanded={editorOpen}
+                    aria-controls="home-card-editor"
+                    onClick={() => (editorOpen ? closeEditor() : openEditor())}
+                  >
+                    {editorOpen ? 'Close editor' : 'Edit card'}
+                  </button>
+                  <button
+                    type="button"
+                    className="cc-app-btn cc-app-btn--ghost"
+                    aria-expanded={qrOpen}
+                    aria-controls="home-card-qr"
+                    onClick={toggleQr}
+                  >
+                    Share QR
+                  </button>
+                </div>
 
-        {slug ? (
-          <>
-            <div className="cc-home-desk__dock">
-              <div className="cc-home-desk__actions">
-                <button
-                  type="button"
-                  className="cc-app-btn cc-app-btn--primary"
-                  aria-expanded={editorOpen}
-                  aria-controls="home-card-editor"
-                  onClick={() => (editorOpen ? closeEditor() : openEditor())}
-                >
-                  {editorOpen ? 'Close editor' : 'Edit card'}
-                </button>
-                <button
-                  type="button"
-                  className="cc-app-btn cc-app-btn--ghost"
-                  aria-expanded={qrOpen}
-                  aria-controls="home-card-qr"
-                  onClick={toggleQr}
-                >
-                  Share QR
-                </button>
-              </div>
-
-              <div id="home-card-qr" className={`cc-home-desk__drop${qrOpen ? ' is-open' : ''}`} inert={!qrOpen}>
-                <div className="cc-home-desk__drop-inner">
-                  <div className="cc-home-qr">
-                    <PublicCodeCardQr profileSlug={slug} showLink={false} />
-                    <button
-                      type="button"
-                      className={`cc-home-qr__copy${linkCopied ? ' is-copied' : ''}`}
-                      onClick={() => void copyCardLink()}
-                    >
-                      {linkCopied ? (
-                        <span className="cc-profile-save__check" aria-hidden>
-                          <svg viewBox="0 0 24 24">
-                            <circle className="cc-profile-save__ring" cx="12" cy="12" r="10" />
-                            <path className="cc-profile-save__tick" d="M7 12.5 10.2 16 17 8.5" />
-                          </svg>
-                        </span>
-                      ) : null}
-                      {linkCopied ? 'Copied' : 'Copy link'}
-                    </button>
+                <div id="home-card-qr" className={`cc-home-desk__drop${qrOpen ? ' is-open' : ''}`} inert={!qrOpen}>
+                  <div className="cc-home-desk__drop-inner">
+                    <div className="cc-home-qr">
+                      <PublicCodeCardQr profileSlug={slug} showLink={false} />
+                      <button
+                        type="button"
+                        className={`cc-home-qr__copy${linkCopied ? ' is-copied' : ''}`}
+                        onClick={() => void copyCardLink()}
+                      >
+                        {linkCopied ? (
+                          <span className="cc-profile-save__check" aria-hidden>
+                            <svg viewBox="0 0 24 24">
+                              <circle className="cc-profile-save__ring" cx="12" cy="12" r="10" />
+                              <path className="cc-profile-save__tick" d="M7 12.5 10.2 16 17 8.5" />
+                            </svg>
+                          </span>
+                        ) : null}
+                        {linkCopied ? 'Copied' : 'Copy link'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <HomeCodeCardPreview
-              embedded
-              displayName={displayName}
-              headline={headline}
-              bio={bio}
-              location={location}
-              avatarUrl={liveAvatar}
-              slug={slug}
-              isPublic={isPublic}
-              links={links}
-            />
-          </>
-        ) : null}
-      </section>
-      {editorOpen ? (
-        <div id="home-card-editor" ref={editorRef} className="cc-home-desk__editor">
-          {editorMounted ? (
-            preview || !profile ? (
-              <div className="space-y-3">
-                <label className="block text-[13px] text-[var(--app-smoke)]">
-                  Display name
-                  <input className="cc-app-input mt-1" readOnly value={displayName} />
-                </label>
-                <label className="block text-[13px] text-[var(--app-smoke)]">
-                  Headline
-                  <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
-                </label>
-                <label className="block text-[13px] text-[var(--app-smoke)]">
-                  Bio
-                  <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
-                </label>
-                <p className="text-[14px] text-[var(--app-smoke)]">
-                  <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
-                    Create an account
-                  </Link>{' '}
-                  to edit and save this card.
-                </p>
+              <div
+                id="home-card-editor"
+                aria-hidden={!editorOpen}
+                className={`cc-home-desk__editor-drop${editorOpen ? ' is-open' : ''}`}
+                inert={!editorOpen}
+              >
+                <div className="cc-home-desk__editor-drop-inner">
+                  {editorMounted ? (
+                    <div className="cc-home-desk__editor">
+                      {preview || !profile ? (
+                        <div className="space-y-3">
+                          <label className="block text-[13px] text-[var(--app-smoke)]">
+                            Display name
+                            <input className="cc-app-input mt-1" readOnly value={displayName} />
+                          </label>
+                          <label className="block text-[13px] text-[var(--app-smoke)]">
+                            Headline
+                            <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
+                          </label>
+                          <label className="block text-[13px] text-[var(--app-smoke)]">
+                            Bio
+                            <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
+                          </label>
+                          <p className="text-[14px] text-[var(--app-smoke)]">
+                            <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
+                              Create an account
+                            </Link>{' '}
+                            to edit and save this card.
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 className="cc-home-calendar__form-title">Edit card</h3>
+                          <AvatarUpload
+                            displayName={displayName}
+                            initialAvatarUrl={liveAvatar}
+                            onAvatarSaved={setLiveAvatar}
+                          />
+                          <ProfileEditor
+                            profile={profile}
+                            links={profileLinks}
+                            onDraftChange={(form) =>
+                              setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
+                            }
+                            onPersisted={(form) => {
+                              setSavedForm(form);
+                              setDirty(false);
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            ) : (
-              <>
-                <h3 className="cc-home-calendar__form-title">Edit card</h3>
-                <AvatarUpload
-                  displayName={displayName}
-                  initialAvatarUrl={liveAvatar}
-                  onAvatarSaved={setLiveAvatar}
-                />
-                <ProfileEditor
-                  profile={profile}
-                  links={profileLinks}
-                  onDraftChange={(form) =>
-                    setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
-                  }
-                  onPersisted={(form) => {
-                    setSavedForm(form);
-                    setDirty(false);
-                  }}
-                />
-              </>
-            )
+
+              <HomeCodeCardPreview
+                embedded
+                displayName={displayName}
+                headline={headline}
+                bio={bio}
+                location={location}
+                avatarUrl={liveAvatar}
+                slug={slug}
+                isPublic={isPublic}
+                links={links}
+              />
+            </>
           ) : null}
-        </div>
-      ) : null}
+        </section>
+
+        <HomeScheduleSection
+          events={events}
+          followUps={followUps}
+          scheduleError={scheduleError}
+          preview={preview}
+          basePath={basePath}
+          compact
+        />
       </div>
+
+      {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
     </div>
   );
 }
