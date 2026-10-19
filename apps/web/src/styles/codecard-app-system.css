@@ -9707,11 +9707,19 @@ html.dark .cc-public-atmosphere__grain {
   flex-wrap: nowrap;
 }
 
+.cc-editor-section__title,
 .cc-editor-section__copy span:first-child,
 .cc-editor-section summary > span:first-child {
-  font-size: 15px;
-  font-weight: 560;
+  font-size: 18px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
   color: var(--app-ink);
+}
+
+html.dark .cc-editor-section__title,
+html.dark .cc-editor-section__copy span:first-child,
+html.dark .cc-editor-section summary > span:first-child {
+  color: #ffffff;
 }
 
 .cc-editor-section__copy span:last-child,

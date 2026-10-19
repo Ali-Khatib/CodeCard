@@ -48,7 +48,7 @@ function EditorSection({
         onClick={() => setOpen((value) => !value)}
       >
         <span className="cc-editor-section__copy">
-          <span>{title}</span>
+          <span className="cc-editor-section__title">{title}</span>
           <span>{hint}</span>
         </span>
         <ChevronDown className="cc-editor-section__chevron" aria-hidden />
@@ -217,7 +217,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
         aria-busy={pending}
         noValidate
       >
-        <EditorSection title="Basic information" hint="Name, headline, bio, location" defaultOpen>
+        <EditorSection title="Basic information" hint="Name, headline, bio, location">
         <div id="audience_role" className="scroll-mt-28">
           <AudienceRoleField
             value={form.audience_role}
