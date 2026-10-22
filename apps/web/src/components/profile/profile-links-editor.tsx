@@ -1,21 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition, useActionState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
   PROFILE_LINK_SELECTABLE_TYPES,
   profileLinkUrlHelp,
   profileLinkUrlPlaceholder,
 } from '@codecard/validation';
 import type { ProfileLinkType } from '@codecard/types';
-import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
-import {
-  createProfileLinkAction,
-  deleteProfileLinkAction,
-  moveProfileLinkAction,
-  updateProfileLinkAction,
-  type ProfileLinkMutationState,
-} from '@/lib/profile/profile-link-actions';
+import type { ProfileLinkMutationState, ProfileLinkRow } from '@/lib/profile/profile-link-core';
+import { postOwnedForm } from '@/lib/dashboard/post-owned-form';
 import { getProfileLinkAria, resolveProfileLinkIcon } from '@/lib/icons/profile-links';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
@@ -31,21 +24,27 @@ type EditorMode =
 
 const emptyForm = { type: 'website', label: '', url: '' };
 
+function withSortOrder(items: ProfileLinkRow[]) {
+  return items.map((link, index) => ({ ...link, sort_order: index }));
+}
+
 export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
-  const router = useRouter();
   const { notifySuccess, notifyError } = useMutationFeedback();
+  const [items, setItems] = useState(links);
   const [mode, setMode] = useState<EditorMode>({ kind: 'idle' });
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<ProfileLinkMutationState['fieldErrors']>({});
   const [pendingAction, setPendingAction] = useState<string | null>(null);
-  const [createState, createAction, createPending] = useActionState(createProfileLinkAction, {});
-  const [updateState, updateAction, updatePending] = useActionState(updateProfileLinkAction, {});
-  const [isPending, startTransition] = useTransition();
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setItems(links);
+  }, [links]);
 
   const sortedLinks = useMemo(
-    () => [...links].sort((a, b) => a.sort_order - b.sort_order),
-    [links],
+    () => [...items].sort((a, b) => a.sort_order - b.sort_order),
+    [items],
   );
 
   const typeOptions = useMemo((): ProfileLinkType[] => {
@@ -81,31 +80,33 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     setFieldErrors({});
   }
 
-  useEffect(() => {
-    const state = mode.kind === 'edit' ? updateState : createState;
-    if (!state.success && !state.error && !state.fieldErrors) return;
-    if (state.success) {
+  function applyLinkResult(result: ProfileLinkMutationState, kind: EditorMode['kind']) {
+    if (result.success && result.link) {
+      setItems((current) =>
+        kind === 'edit'
+          ? current.map((item) => (item.id === result.link!.id ? result.link! : item))
+          : [...current, result.link!],
+      );
       resetEditor();
       notifySuccess(
-        mode.kind === 'edit'
+        kind === 'edit'
           ? MUTATION_FEEDBACK.profile.linkUpdated
           : MUTATION_FEEDBACK.profile.linkAdded,
       );
-      router.refresh();
       return;
     }
-    if (state.error) {
-      setError(state.error);
-      if (!state.fieldErrors) {
-        notifyError(state.error, MUTATION_FEEDBACK.profile.linkFailed);
+    if (result.error) {
+      setError(result.error);
+      if (!result.fieldErrors) {
+        notifyError(result.error, MUTATION_FEEDBACK.profile.linkFailed);
       }
     }
-    if (state.fieldErrors) setFieldErrors(state.fieldErrors);
-  }, [createState, updateState, mode.kind, router, notifySuccess, notifyError]);
+    if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+  }
 
-  function submitLink(e: React.FormEvent) {
+  async function submitLink(e: React.FormEvent) {
     e.preventDefault();
-    if (createPending || updatePending) return;
+    if (saving || mode.kind === 'idle') return;
     setError('');
     setFieldErrors({});
 
@@ -113,49 +114,75 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
     fd.set('type', form.type);
     fd.set('label', form.label);
     fd.set('url', form.url);
-    if (mode.kind === 'edit') {
-      fd.set('link_id', mode.link.id);
-      startTransition(() => {
-        updateAction(fd);
-      });
-      return;
+    const kind = mode.kind;
+    const path =
+      kind === 'edit' ? '/api/profile/links?op=update' : '/api/profile/links?op=create';
+    if (kind === 'edit') fd.set('link_id', mode.link.id);
+
+    setSaving(true);
+    try {
+      const result = await postOwnedForm<ProfileLinkMutationState>(path, fd);
+      applyLinkResult(result, kind);
+    } finally {
+      setSaving(false);
     }
-    startTransition(() => {
-      createAction(fd);
-    });
   }
 
-  function handleDelete(link: ProfileLinkRow) {
-    if (pendingAction) return;
+  async function handleDelete(link: ProfileLinkRow) {
+    if (pendingAction || saving) return;
     if (!window.confirm('Delete this profile link?')) return;
     setPendingAction(`delete:${link.id}`);
-    startTransition(async () => {
-      const result = await deleteProfileLinkAction(link.id);
-      if (result.error) {
+    const fd = new FormData();
+    fd.set('link_id', link.id);
+    try {
+      const result = await postOwnedForm<ProfileLinkMutationState>(
+        '/api/profile/links?op=delete',
+        fd,
+      );
+      if (result.success) {
+        setItems((current) =>
+          withSortOrder(current.filter((item) => item.id !== link.id)),
+        );
+        notifySuccess(MUTATION_FEEDBACK.profile.linkDeleted);
+      } else if (result.error) {
         setError(result.error);
         notifyError(result.error, MUTATION_FEEDBACK.profile.linkFailed);
-      } else {
-        notifySuccess(MUTATION_FEEDBACK.profile.linkDeleted);
-        router.refresh();
       }
+    } finally {
       setPendingAction(null);
-    });
+    }
   }
 
-  function handleMove(link: ProfileLinkRow, direction: 'up' | 'down') {
-    if (pendingAction) return;
+  async function handleMove(link: ProfileLinkRow, direction: 'up' | 'down') {
+    if (pendingAction || saving) return;
     setPendingAction(`move:${link.id}:${direction}`);
-    startTransition(async () => {
-      const result = await moveProfileLinkAction(link.id, direction);
-      if (result.error) {
+    const fd = new FormData();
+    fd.set('link_id', link.id);
+    fd.set('direction', direction);
+    try {
+      const result = await postOwnedForm<ProfileLinkMutationState>(
+        '/api/profile/links?op=move',
+        fd,
+      );
+      if (result.success) {
+        setItems((current) => {
+          const ordered = [...current].sort((a, b) => a.sort_order - b.sort_order);
+          const index = ordered.findIndex((item) => item.id === link.id);
+          const target = direction === 'up' ? index - 1 : index + 1;
+          if (index < 0 || target < 0 || target >= ordered.length) return current;
+          const next = [...ordered];
+          const [moved] = next.splice(index, 1);
+          next.splice(target, 0, moved!);
+          return withSortOrder(next);
+        });
+        notifySuccess(MUTATION_FEEDBACK.profile.linkOrderUpdated);
+      } else if (result.error) {
         setError(result.error);
         notifyError(result.error, MUTATION_FEEDBACK.profile.linkFailed);
-      } else {
-        notifySuccess(MUTATION_FEEDBACK.profile.linkOrderUpdated);
-        router.refresh();
       }
+    } finally {
       setPendingAction(null);
-    });
+    }
   }
 
   return (
@@ -178,7 +205,7 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
       </div>
 
       <div aria-live="polite">
-        {isPending ? (
+        {saving || pendingAction ? (
           <p className="text-sm text-[var(--app-smoke)]" role="status">
             Updating links…
           </p>
@@ -225,14 +252,14 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
                     </button>
                     <button
                       type="button"
-                      disabled={busy || index === 0 || isPending}
+                      disabled={busy || index === 0 || saving}
                       onClick={() => handleMove(link, 'up')}
                     >
                       Move up
                     </button>
                     <button
                       type="button"
-                      disabled={busy || index === sortedLinks.length - 1 || isPending}
+                      disabled={busy || index === sortedLinks.length - 1 || saving}
                       onClick={() => handleMove(link, 'down')}
                     >
                       Move down
@@ -329,10 +356,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
             <button
               type="submit"
               className="cc-app-btn cc-app-btn--primary"
-              disabled={createPending || updatePending}
-              aria-busy={createPending || updatePending}
+              disabled={saving}
+              aria-busy={saving}
             >
-              {createPending || updatePending ? 'Saving…' : 'Save link'}
+              {saving ? 'Saving…' : 'Save link'}
             </button>
             <button type="button" className="cc-app-btn cc-app-btn--ghost" onClick={resetEditor}>
               Cancel

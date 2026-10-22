@@ -20,8 +20,14 @@ Central guard: `isSameOriginMutation` in `apps/web/src/lib/security/same-origin.
 | Surface | Classification | Enforcement |
 |---------|----------------|-------------|
 | `POST /api/upload` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/profile` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/profile/links` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/projects` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/research` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/schedule/events` | Browser cookie mutation | `isSameOriginMutation` |
 | `POST /api/auth/forgot-password` | Public ingest (email send) | `isSameOriginMutation` |
 | `POST /api/auth/complete-password-reset` | Browser cookie mutation | `isSameOriginMutation` |
+| `POST /api/auth/sign-out` | Browser cookie mutation | `isSameOriginMutation` |
 | `POST /api/account/export` | Browser cookie sensitive read | `isSameOriginMutation` |
 | `POST /api/account/delete` | Browser cookie mutation | `isSameOriginMutation` |
 | Profile / project / research / Connections / Circle / billing Server Actions | Server Action | Next.js Origin check + explicit empty `allowedOrigins` |

@@ -1,13 +1,9 @@
 'use client';
 
-import { useActionState, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  createResearchAction,
-  updateResearchAction,
-  type ResearchCreateState,
-  type ResearchUpdateState,
-} from '@/app/actions/research';
+import type { ResearchCreateState, ResearchUpdateState } from '@/app/actions/research';
+import { postOwnedForm } from '@/lib/dashboard/post-owned-form';
 import { handleSessionExpired } from '@/lib/auth/session-expiry';
 import {
   buildCreateResearchFormData,
@@ -133,17 +129,11 @@ export function ResearchForm({
     field?: string;
     message: string;
   } | null>(null);
-  const [createState, createAction, createPending] = useActionState(
-    createResearchAction,
-    initialCreateState,
-  );
-  const [updateState, updateAction, updatePending] = useActionState(
-    updateResearchAction,
-    initialUpdateState,
-  );
+  const [createState, setCreateState] = useState<ResearchCreateState>(initialCreateState);
+  const [updateState, setUpdateState] = useState<ResearchUpdateState>(initialUpdateState);
+  const [pending, setPending] = useState(false);
 
   const state = mode === 'edit' ? updateState : createState;
-  const pending = mode === 'edit' ? updatePending : createPending;
   const fieldErrors = {
     ...(state.fieldErrors ?? {}),
     ...(clientFieldError?.field
@@ -168,7 +158,6 @@ export function ResearchForm({
 
     if (mode === 'edit') {
       notifySuccess(MUTATION_FEEDBACK.research.saved);
-      router.refresh();
     }
   }, [mode, state, router, notifySuccess]);
 
@@ -238,7 +227,7 @@ export function ResearchForm({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (submitLockRef.current || pending || (mode === 'create' && completedRef.current)) {
@@ -261,16 +250,24 @@ export function ResearchForm({
     setClientError('');
     setClientFieldError(null);
     submitLockRef.current = true;
+    setPending(true);
 
-    if (mode === 'edit' && researchPaperId) {
-      updateAction(buildUpdateResearchFormData(researchPaperId, form));
-    } else {
-      createAction(buildCreateResearchFormData(form));
-    }
-
-    window.setTimeout(() => {
+    try {
+      const payload =
+        mode === 'edit' && researchPaperId
+          ? buildUpdateResearchFormData(researchPaperId, form)
+          : buildCreateResearchFormData(form);
+      const result = await postOwnedForm<ResearchCreateState | ResearchUpdateState>(
+        mode === 'edit' ? '/api/research?op=update' : '/api/research?op=create',
+        payload,
+      );
+      notifiedSuccessRef.current = false;
+      if (mode === 'edit') setUpdateState(result as ResearchUpdateState);
+      else setCreateState(result as ResearchCreateState);
+    } finally {
       submitLockRef.current = false;
-    }, 400);
+      setPending(false);
+    }
   }
 
   const generalError = clientError || (!state.fieldErrors ? state.error : undefined);

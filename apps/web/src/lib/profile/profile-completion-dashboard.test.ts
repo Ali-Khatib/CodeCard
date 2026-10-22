@@ -77,13 +77,17 @@ describe('dashboard profile completion integration', () => {
   });
 
   it('revalidates dashboard completion after profile, link, avatar, and project mutations', () => {
-    const updateProfile = read('src/lib/profile/update-profile-action.ts');
+    const updateProfile = read('src/lib/profile/profile-update-revalidate.ts');
+    const profileRoute = read('src/app/api/profile/route.ts');
     const finalizeAvatar = read('src/lib/profile/finalize-avatar-upload-action.ts');
     const profileLinks = read('src/lib/profile/profile-link-actions.ts');
     const projectRevalidate = read('src/lib/projects/project-revalidate.ts');
 
     expect(updateProfile).toContain("revalidatePath('/dashboard')");
     expect(updateProfile).toContain("revalidatePath('/dashboard/profile')");
+    expect(profileRoute).toContain('revalidateOwnedProfileCaches');
+    expect(profileRoute).not.toContain('loadHomeSchedule');
+    expect(profileRoute).not.toContain('getCircleUnreadSummary');
     expect(finalizeAvatar).toContain("revalidatePath('/dashboard')");
     expect(profileLinks).toContain("revalidatePath('/dashboard')");
     expect(projectRevalidate).toContain("revalidatePath('/dashboard')");

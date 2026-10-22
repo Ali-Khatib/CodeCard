@@ -3,18 +3,14 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { updateConnectionMetadataAction } from '@/app/actions/connection-metadata';
-import {
-  createOwnerEventAction,
-  deleteOwnerEventAction,
-  updateOwnerEventAction,
-} from '@/app/actions/owner-events';
 import { AppButton, AppCard } from '@/components/dashboard/ui/dashboard-ui';
 import { FadeInView } from '@/components/dashboard/fade-in-view';
+import { postOwnedForm } from '@/lib/dashboard/post-owned-form';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { sanitizeMutationError } from '@/lib/dashboard/mutation-feedback';
 import type { HomeFollowUp } from '@/lib/schedule/home-schedule-core';
-import type { OwnerEvent } from '@/lib/schedule/owner-events-core';
+import type { OwnerEvent, OwnerEventMutationState } from '@/lib/schedule/owner-events-core';
 import {
   formatDayHeading,
   isoFromLocalParts,
@@ -72,6 +68,7 @@ export function HomeScheduleSection({
   const [followUpDate, setFollowUpDate] = useState('');
   const [localEvents, setLocalEvents] = useState(events);
   const [localFollowUps, setLocalFollowUps] = useState(followUps);
+  const [savingEvent, setSavingEvent] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -82,7 +79,7 @@ export function HomeScheduleSection({
     setLocalFollowUps(followUps);
   }, [followUps]);
 
-  const listedEvents = preview ? localEvents : events;
+  const listedEvents = localEvents;
   const listedFollowUps = preview ? localFollowUps : followUps;
   const cells = useMemo(() => monthCells(year, monthIndex), [year, monthIndex]);
 
@@ -146,8 +143,8 @@ export function HomeScheduleSection({
     setSelectedKey(key);
   };
 
-  const saveEvent = () => {
-    if (pending) return;
+  const saveEvent = async () => {
+    if (savingEvent || pending) return;
     const startsAt = isoFromLocalParts(selectedKey, hour12, minute, meridiem);
     if (!startsAt || !title.trim()) {
       notifyError(MUTATION_FEEDBACK.schedule.createFailed);
@@ -179,26 +176,42 @@ export function HomeScheduleSection({
       resetForm(selectedKey);
       return;
     }
-    startTransition(async () => {
-      const result = editingId
-        ? await updateOwnerEventAction({ eventId: editingId, ...payload })
-        : await createOwnerEventAction(payload);
-      if (!result.success) {
+    const body = new FormData();
+    body.set('title', payload.title);
+    body.set('startsAt', payload.startsAt);
+    if (payload.location) body.set('location', payload.location);
+    const editing = editingId;
+    if (editing) body.set('eventId', editing);
+    setSavingEvent(true);
+    try {
+      const result = await postOwnedForm<OwnerEventMutationState>(
+        editing ? '/api/schedule/events?op=update' : '/api/schedule/events?op=create',
+        body,
+      );
+      if (!result.success || !result.event) {
         notifyError(
           sanitizeMutationError(
             result.error,
-            editingId ? MUTATION_FEEDBACK.schedule.updateFailed : MUTATION_FEEDBACK.schedule.createFailed,
+            editing ? MUTATION_FEEDBACK.schedule.updateFailed : MUTATION_FEEDBACK.schedule.createFailed,
           ),
         );
         return;
       }
-      notifySuccess(editingId ? MUTATION_FEEDBACK.schedule.updated : MUTATION_FEEDBACK.schedule.created);
+      const saved = result.event;
+      setLocalEvents((current) =>
+        editing
+          ? current.map((event) => (event.id === saved.id ? saved : event))
+          : [...current, saved],
+      );
+      notifySuccess(editing ? MUTATION_FEEDBACK.schedule.updated : MUTATION_FEEDBACK.schedule.created);
       resetForm(selectedKey);
-    });
+    } finally {
+      setSavingEvent(false);
+    }
   };
 
-  const removeEvent = (event: OwnerEvent) => {
-    if (pending) return;
+  const removeEvent = async (event: OwnerEvent) => {
+    if (savingEvent || pending) return;
     if (!window.confirm(`Remove "${event.title}" from your calendar?`)) return;
     if (preview) {
       setLocalEvents((current) => current.filter((item) => item.id !== event.id));
@@ -206,15 +219,24 @@ export function HomeScheduleSection({
       notifySuccess(MUTATION_FEEDBACK.schedule.deleted);
       return;
     }
-    startTransition(async () => {
-      const result = await deleteOwnerEventAction({ eventId: event.id });
+    const body = new FormData();
+    body.set('eventId', event.id);
+    setSavingEvent(true);
+    try {
+      const result = await postOwnedForm<OwnerEventMutationState>(
+        '/api/schedule/events?op=delete',
+        body,
+      );
       if (!result.success) {
         notifyError(sanitizeMutationError(result.error, MUTATION_FEEDBACK.schedule.deleteFailed));
         return;
       }
+      setLocalEvents((current) => current.filter((item) => item.id !== event.id));
       if (editingId === event.id) resetForm(selectedKey);
       notifySuccess(MUTATION_FEEDBACK.schedule.deleted);
-    });
+    } finally {
+      setSavingEvent(false);
+    }
   };
 
   const saveFollowUp = () => {
@@ -427,10 +449,10 @@ export function HomeScheduleSection({
                         </p>
                       </div>
                       <div className="cc-home-calendar__item-actions">
-                        <button type="button" onClick={() => startEdit(event)} disabled={pending}>
+                        <button type="button" onClick={() => startEdit(event)} disabled={savingEvent}>
                           Edit
                         </button>
-                        <button type="button" onClick={() => removeEvent(event)} disabled={pending}>
+                        <button type="button" onClick={() => removeEvent(event)} disabled={savingEvent}>
                           Delete
                         </button>
                       </div>
@@ -532,7 +554,7 @@ export function HomeScheduleSection({
                     maxLength={120}
                     required
                     placeholder="Conference, meetup, coffee"
-                    disabled={pending}
+                    disabled={savingEvent}
                   />
                   <div className="cc-home-calendar__time">
                     <label className="cc-home-calendar__label" htmlFor="home-cal-hour">
@@ -544,7 +566,7 @@ export function HomeScheduleSection({
                         className="cc-app-input"
                         value={hour12}
                         onChange={(e) => setHour12(Number(e.target.value))}
-                        disabled={pending}
+                        disabled={savingEvent}
                       >
                         {HOURS.map((h) => (
                           <option key={h} value={h}>
@@ -558,7 +580,7 @@ export function HomeScheduleSection({
                         aria-label="Minutes"
                         value={minute}
                         onChange={(e) => setMinute(Number(e.target.value))}
-                        disabled={pending}
+                        disabled={savingEvent}
                       >
                         {minuteOptions(minute).map((m) => (
                           <option key={m} value={m}>
@@ -571,7 +593,7 @@ export function HomeScheduleSection({
                         aria-label="AM or PM"
                         value={meridiem}
                         onChange={(e) => setMeridiem(e.target.value as 'AM' | 'PM')}
-                        disabled={pending}
+                        disabled={savingEvent}
                       >
                         <option value="AM">AM</option>
                         <option value="PM">PM</option>
@@ -588,7 +610,7 @@ export function HomeScheduleSection({
                     onChange={(e) => setLocation(e.target.value)}
                     maxLength={200}
                     placeholder="Optional"
-                    disabled={pending}
+                    disabled={savingEvent}
                   />
                   <div className="cc-home-calendar__form-actions">
                     {editingId ? (
@@ -596,12 +618,12 @@ export function HomeScheduleSection({
                         type="button"
                         className="cc-app-btn cc-app-btn--ghost"
                         onClick={() => resetForm(selectedKey)}
-                        disabled={pending}
+                        disabled={savingEvent}
                       >
                         Cancel
                       </button>
                     ) : null}
-                    <button type="submit" className="cc-app-btn cc-app-btn--primary" disabled={pending}>
+                    <button type="submit" className="cc-app-btn cc-app-btn--primary" disabled={savingEvent}>
                       {editingId ? 'Save event' : 'Add event'}
                     </button>
                   </div>

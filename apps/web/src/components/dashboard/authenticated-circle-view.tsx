@@ -60,7 +60,7 @@ function CircleEmptyNoConnections() {
           Open Connections
         </AppButton>
         <AppButton variant="ghost" href="/dashboard#profile">
-          Share your CodeCard
+          Edit your CodeCard
         </AppButton>
       </div>
     </section>

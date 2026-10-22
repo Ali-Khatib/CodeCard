@@ -22,7 +22,8 @@ describe('dashboard new project route', () => {
     );
 
     expect(form).toContain("from '@/app/actions/projects'");
-    expect(form).toContain('createProjectAction');
+    expect(form).toContain('postOwnedForm');
+    expect(form).toContain("'/api/projects?op=create'");
     expect(form).toContain('project-title');
     expect(form).toContain('project-slug');
     expect(form).toContain('project-tagline');

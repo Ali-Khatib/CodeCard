@@ -23,9 +23,15 @@ Cookie-authenticated mutations require same-origin checks. Ordinary JSON APIs us
 | `/api/admin/content/hide` | POST | Canonical global admin | Strict report/target UUID + profile/project allowlist | **same-origin** | `admin` | Private no-store JSON | Atomic hold + unpublish + audit; public cache invalidation |
 | `/api/admin/users/[id]/suspend` | POST | Canonical global admin | Path user UUID + optional report UUID | **same-origin** | `admin` | Private no-store JSON | Durable suspension + Auth ban; partial-failure retryable; no Stripe changes |
 | `/api/upload` | POST | Required | Custom JSON schema | **same-origin** | upload IP+user | JSON | MIME/size/ownership; not `secureJsonRoute` |
+| `/api/profile` | POST (GET→405) | Required | Allowlisted profile fields via `executeProfileUpdate` | **same-origin** | Session + RLS. Redis is not on this path | Private no-store JSON | One owner write. Does not render the dashboard. Optimistic `updated_at` |
+| `/api/profile/links` | POST (GET→405) | Required | Existing profile-link checks via `execute*ProfileLink` | **same-origin** | Session + RLS. Redis is not on this path | Private no-store JSON | Create, update, delete, or move. Does not render Home. |
+| `/api/projects` | POST (GET→405) | Required | Existing project form checks via `executeCreateProject` / `executeUpdateProject` | **same-origin** | Session + RLS. Redis is not on this path | Private no-store JSON | `op=create` or `op=update`. Does not render the editor. |
+| `/api/research` | POST (GET→405) | Required | Existing research form checks via `executeCreateResearch` / `executeUpdateResearch` | **same-origin** | Session + RLS. Redis is not on this path | Private no-store JSON | `op=create` or `op=update`. Does not render the editor. |
+| `/api/schedule/events` | POST (GET→405) | Required | Existing owner-event checks via `executeCreateOwnerEvent` / `executeUpdateOwnerEvent` / `executeDeleteOwnerEvent` | **same-origin** | `connections` after auth | Private no-store JSON | `op=create`, `op=update`, or `op=delete`. Does not re-render the calendar page. |
 | `/api/public/research/[paperId]/pdf` | GET | Public | UUID param | N/A | PDF IP | PDF binary | SSRF-hardened proxy; no URL query |
 | `/api/webhooks/stripe` | POST | Stripe signature | Raw body + event | Signature (not browser origin) | body limit only | JSON | Raw body + `billing_events` claim (`processing`→`completed`/`failed`); see `STRIPE_WEBHOOK_SECURITY.md` |
 | `/api/auth/forgot-password` | POST | Public | Zod email | **same-origin** | `auth` fail-closed | Constant success JSON | Supabase Auth `/auth/v1/recover`; no link in response |
+| `/api/auth/sign-out` | POST | Session cookie | None | **same-origin** | None | JSON | Idle sign-out beacon. Global `signOut`. No body. |
 | `/api/auth/complete-password-reset` | POST | Recovery session | Zod password | **same-origin** | `auth` fail-closed | JSON | Clears recovery privilege then global sign-out |
 | `/api/internal/rate-limit-verify` | GET | Env flag `CODECARD_RATE_LIMIT_VERIFY=1` | None | N/A | Dedicated 3/1m probe | JSON | Publicly callable while the flag is set; unset in production |
 | `/api/internal/sentry-verify` | GET | Env flag `CODECARD_SENTRY_VERIFY=1` | None | N/A | None | JSON | Publicly callable while the flag is set; unset in production |
@@ -45,6 +51,7 @@ No QR API route — QR is generated client/server-side locally; downloads record
 3. **Public research PDF** — binary stream + SSRF controls.
 4. **Account export** — uses `secureJsonRoute` for auth/validation then returns attachment bytes.
 5. **Admin routes** — canonical global-admin authorization followed by narrowly scoped T002 readers/actions; mutation uses same-origin CSRF.
+6. **Profile, link, project, and research saves** — cookie session plus same-origin, then the existing owner-scoped write. Upstash is intentionally not consulted: its attempt budget can stall the save, and these mutations were not rate-limited as Server Actions either.
 
 ### Removed
 

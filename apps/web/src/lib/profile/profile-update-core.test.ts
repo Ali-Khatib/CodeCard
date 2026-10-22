@@ -7,6 +7,7 @@ import {
   mapProfileUpdateDbError,
   parseTrustedProfileFormData,
   pickAllowedProfileUpdate,
+  PROFILE_SAVE_CONFLICT_MESSAGE,
   validateProfileEditPayload,
 } from './profile-update-core';
 import { PROFILE_SLUG_TAKEN_MESSAGE } from '@codecard/validation';
@@ -23,10 +24,12 @@ function createMockSupabase(options: {
   user?: { id: string } | null;
   profile?: Record<string, unknown> | null;
   updateError?: { code?: string; message?: string } | null;
+  updateMiss?: boolean;
+  nextUpdatedAt?: string;
   slugTakenByProfileId?: string | null;
   slugTakenByTenantId?: string | null;
 }) {
-  const update = vi.fn().mockResolvedValue({ error: options.updateError ?? null });
+  const update = vi.fn();
 
   const from = vi.fn((table: string) => {
     if (table === 'profiles') {
@@ -53,12 +56,24 @@ function createMockSupabase(options: {
             })),
           };
         }),
-        update: vi.fn((payload: unknown) => ({
-          eq: vi.fn(() => {
-            update(payload);
-            return Promise.resolve({ error: options.updateError ?? null });
-          }),
-        })),
+        update: vi.fn((payload: unknown) => {
+          update(payload);
+          const result = options.updateError
+            ? { data: null, error: options.updateError }
+            : options.updateMiss
+              ? { data: null, error: null }
+              : {
+                  data: { updated_at: options.nextUpdatedAt ?? '2026-10-22T00:00:01.000Z' },
+                  error: null,
+                };
+          const chain = {
+            eq: vi.fn(() => chain),
+            select: vi.fn(() => ({
+              maybeSingle: vi.fn().mockResolvedValue(result),
+            })),
+          };
+          return chain;
+        }),
       };
     }
 
@@ -467,6 +482,120 @@ describe('executeProfileUpdate', () => {
     );
 
     expect(result.fieldErrors?.slug).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
+  });
+
+  it('does not write or report a new version when the saved fields already match', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: {
+        ...ownedProfile,
+        audience_role: 'engineer',
+        card_history: null,
+        updated_at: '2026-01-01T00:00:00.000Z',
+      },
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'alex-chen',
+        bio: 'Bio',
+        location: 'SF',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+        updated_at: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.unchanged).toBe(true);
+    expect(result.updatedAt).toBe('2026-01-01T00:00:00.000Z');
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('refuses a stale edit without writing over the newer row', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: {
+        ...ownedProfile,
+        audience_role: 'engineer',
+        updated_at: '2026-02-01T00:00:00.000Z',
+      },
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'alex-chen',
+        bio: 'Changed bio',
+        location: 'SF',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+        updated_at: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    expect(result.success).toBeUndefined();
+    expect(result.code).toBe('conflict');
+    expect(result.error).toBe(PROFILE_SAVE_CONFLICT_MESSAGE);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('writes once and returns the stored timestamp for the next save', async () => {
+    const { supabase, update } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: { ...ownedProfile, updated_at: '2026-01-01T00:00:00.000Z' },
+      nextUpdatedAt: '2026-03-01T00:00:00.000Z',
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'alex-chen',
+        bio: 'Updated bio',
+        location: 'London, UK',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+        updated_at: '2026-01-01T00:00:00.000Z',
+      }),
+      { user: { id: 'user-1' } },
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.updatedAt).toBe('2026-03-01T00:00:00.000Z');
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(supabase.auth.getUser).not.toHaveBeenCalled();
+  });
+
+  it('does not report success when the versioned write matches no row', async () => {
+    const { supabase } = createMockSupabase({
+      user: { id: 'user-1' },
+      profile: { ...ownedProfile, updated_at: '2026-01-01T00:00:00.000Z' },
+      updateMiss: true,
+    });
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'alex-chen',
+        bio: 'Updated bio',
+        location: 'SF',
+        skills: 'TypeScript',
+        audience_role: 'engineer',
+        updated_at: '2026-01-01T00:00:00.000Z',
+      }),
+    );
+
+    expect(result.success).toBeUndefined();
+    expect(result.code).toBe('conflict');
   });
 });
 describe('checkProfileSlugAvailability', () => {

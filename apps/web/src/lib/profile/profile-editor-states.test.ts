@@ -37,6 +37,10 @@ describe('profile editor route states', () => {
 
   it('exposes pending, success, and accessible feedback in the editor', () => {
     const editor = readFileSync(resolve(process.cwd(), 'src/components/profile-editor.tsx'), 'utf8');
+    const saveClient = readFileSync(
+      resolve(process.cwd(), 'src/lib/profile/save-profile-client.ts'),
+      'utf8',
+    );
     const links = readFileSync(
       resolve(process.cwd(), 'src/components/profile/profile-links-editor.tsx'),
       'utf8',
@@ -47,11 +51,19 @@ describe('profile editor route states', () => {
     );
 
     expect(editor).toContain('aria-busy={pending}');
+    expect(editor).toContain('postProfileSave');
+    expect(editor).toContain('submitLockRef');
+    expect(saveClient).toContain("fetch('/api/profile'");
+    expect(saveClient).toContain('body?.success !== true');
+    expect(editor).not.toContain('useActionState');
     expect(editor).not.toContain('router.refresh');
     expect(editor).not.toContain('setForm(profileToFormState(profile))');
     expect(editor).toContain('onPersistedRef.current?.(formRef.current)');
     expect(editor).toContain('role="status"');
     expect(links).toContain('aria-busy={busy}');
+    expect(links).toContain("'/api/profile/links?op=create'");
+    expect(links).not.toContain('useActionState');
+    expect(links).not.toContain('router.refresh');
     expect(links).toContain('role="status"');
     expect(publish).toContain('aria-busy={pending}');
   });

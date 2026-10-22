@@ -36,21 +36,33 @@ describe('WS11-T007 CSRF posture contracts', () => {
   });
 
   it('declares explicit empty Server Action allowedOrigins (no wildcards)', () => {
-    expect(nextConfig).toMatch(/serverActions:\s*\{[\s\S]*allowedOrigins:\s*\[\s*\]/);
-    expect(nextConfig).not.toContain('"*"');
-    expect(nextConfig).not.toContain("'*.vercel.app'");
+    const serverActions = nextConfig.match(/serverActions:\s*\{[\s\S]*?\}/)?.[0] ?? '';
+    expect(serverActions).toMatch(/allowedOrigins:\s*\[\s*\]/);
+    expect(serverActions).not.toContain('*');
     expect(docs).toContain('allowedOrigins: []');
   });
 
   it('keeps cookie-authenticated mutations behind the central guard', () => {
+    const ownedForm = readWeb('src/lib/dashboard/owned-form-request.ts');
+    expect(ownedForm).toContain('isSameOriginMutation');
+    expect(ownedForm).toMatch(/403|Forbidden/);
+
     for (const rel of [
       'src/app/api/upload/route.ts',
       'src/app/api/account/export/route.ts',
       'src/app/api/account/delete/route.ts',
+      'src/app/api/profile/route.ts',
+      'src/app/api/profile/links/route.ts',
+      'src/app/api/projects/route.ts',
+      'src/app/api/research/route.ts',
+      'src/app/api/schedule/events/route.ts',
+      'src/app/api/auth/sign-out/route.ts',
     ]) {
       const src = readWeb(rel);
-      expect(src).toContain('isSameOriginMutation');
-      expect(src).toMatch(/403|Forbidden/);
+      const guardedHere = src.includes('isSameOriginMutation');
+      const guardedByOwnedForm = src.includes('readOwnedFormPost');
+      expect(guardedHere || guardedByOwnedForm).toBe(true);
+      if (guardedHere) expect(src).toMatch(/403|Forbidden/);
     }
   });
 

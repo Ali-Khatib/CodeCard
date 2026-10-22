@@ -9249,6 +9249,7 @@ html.dark .cc-public-atmosphere__grain {
 
   .cc-home-desk__split .cc-home-calendar {
     display: flex;
+    flex-direction: column;
     grid-column: 1;
     grid-row: 1;
     align-items: stretch;

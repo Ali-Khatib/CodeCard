@@ -127,7 +127,7 @@ describe('public cache wiring contracts', () => {
       'utf8',
     );
     const update = readFileSync(
-      resolve(process.cwd(), 'src/lib/profile/update-profile-action.ts'),
+      resolve(process.cwd(), 'src/lib/profile/profile-update-revalidate.ts'),
       'utf8',
     );
     const projectRevalidate = readFileSync(

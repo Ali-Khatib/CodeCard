@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createProjectAction, updateProjectAction, type ProjectCreateState, type ProjectUpdateState } from '@/app/actions/projects';
+import type { ProjectCreateState, ProjectUpdateState } from '@/app/actions/projects';
+import { postOwnedForm } from '@/lib/dashboard/post-owned-form';
 import { handleSessionExpired } from '@/lib/auth/session-expiry';
 import {
   buildCreateProjectFormData,
@@ -239,18 +240,11 @@ export function ProjectForm({
     message: string;
   } | null>(null);
   const [recoverableError, setRecoverableError] = useState('');
-  const [createState, createAction, createPending] = useActionState(
-    createProjectAction,
-    initialCreateState,
-  );
-  const [updateState, updateAction, updatePending] = useActionState(
-    updateProjectAction,
-    initialUpdateState,
-  );
+  const [createState, setCreateState] = useState<ProjectCreateState>(initialCreateState);
+  const [updateState, setUpdateState] = useState<ProjectUpdateState>(initialUpdateState);
+  const [pending, setPending] = useState(false);
 
   const state = mode === 'edit' ? updateState : createState;
-  const formAction = mode === 'edit' ? updateAction : createAction;
-  const pending = mode === 'edit' ? updatePending : createPending;
   const usage = mode === 'create' ? (createState.usage ?? initialUsage) : null;
   const limitReached =
     mode === 'create' && usage?.limit != null && usage.count >= usage.limit;
@@ -272,7 +266,6 @@ export function ProjectForm({
 
     if (mode === 'edit') {
       notifySuccess(MUTATION_FEEDBACK.project.saved);
-      router.refresh();
     }
   }, [mode, state, router, notifySuccess]);
 
@@ -377,18 +370,26 @@ export function ProjectForm({
       return;
     }
 
+    setPending(true);
     try {
       const payload =
         mode === 'edit'
           ? buildUpdateProjectFormData(projectId!, form)
           : buildCreateProjectFormData(form);
-      await formAction(payload);
+      const result = await postOwnedForm<ProjectCreateState | ProjectUpdateState>(
+        mode === 'edit' ? '/api/projects?op=update' : '/api/projects?op=create',
+        payload,
+      );
+      notifiedSuccessRef.current = false;
+      if (mode === 'edit') setUpdateState(result as ProjectUpdateState);
+      else setCreateState(result as ProjectCreateState);
     } catch {
       setRecoverableError(
         'We could not reach the server. Your entries are still here — try again.',
       );
     } finally {
       submitLockRef.current = false;
+      setPending(false);
     }
   }
 

@@ -25,6 +25,12 @@ function nudgeHref(href: string, basePath: string): string {
   return href;
 }
 
+/** These hashes open the card editor, so the label has to say that. */
+function nudgeLabel(title: string, href: string): string {
+  if (href.includes('#share')) return 'Edit your CodeCard';
+  return title;
+}
+
 function upcomingCount(events: OwnerEvent[], followUps: HomeFollowUp[]): number {
   const today = todayDateKey();
   let count = 0;
@@ -85,7 +91,6 @@ export function HomeDesk({
   completion?: ProfileCompletionResult | null;
   basePath?: string;
 }) {
-  const firstName = displayName.split(' ')[0] || displayName;
   const upcoming = scheduleError ? null : upcomingCount(events, followUps);
   const [dateLabel, setDateLabel] = useState('');
   const [qrOpen, setQrOpen] = useState(false);
@@ -95,7 +100,13 @@ export function HomeDesk({
   const [dirty, setDirty] = useState(false);
   const [savedForm, setSavedForm] = useState<ProfileFormState | null>(null);
   const [liveAvatar, setLiveAvatar] = useState(avatarUrl ?? null);
-  const slug = profileSlug || profile?.slug || '';
+  const [liveName, setLiveName] = useState(displayName);
+  const [liveHeadline, setLiveHeadline] = useState(headline ?? '');
+  const [liveBio, setLiveBio] = useState(bio ?? '');
+  const [liveLocation, setLiveLocation] = useState(location ?? '');
+  const [liveSlug, setLiveSlug] = useState(profileSlug || profile?.slug || '');
+  const slug = liveSlug || profileSlug || profile?.slug || '';
+  const firstName = (liveName || displayName).split(' ')[0] || displayName;
 
   useEffect(() => {
     setDateLabel(
@@ -110,6 +121,14 @@ export function HomeDesk({
   useEffect(() => {
     setLiveAvatar(avatarUrl ?? null);
   }, [avatarUrl]);
+
+  useEffect(() => {
+    setLiveName(displayName);
+    setLiveHeadline(headline ?? '');
+    setLiveBio(bio ?? '');
+    setLiveLocation(location ?? '');
+    setLiveSlug(profileSlug || profile?.slug || '');
+  }, [bio, displayName, headline, location, profile?.slug, profileSlug]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -165,7 +184,7 @@ export function HomeDesk({
           </h1>
           {suggested ? (
             <Link href={nudgeHref(suggested.href, basePath)} className="cc-home-desk__nudge">
-              {suggested.title}
+              {nudgeLabel(suggested.title, suggested.href)}
             </Link>
           ) : null}
         </div>
@@ -289,6 +308,11 @@ export function HomeDesk({
                             onPersisted={(form) => {
                               setSavedForm(form);
                               setDirty(false);
+                              setLiveName(form.display_name);
+                              setLiveHeadline(form.headline);
+                              setLiveBio(form.bio);
+                              setLiveLocation(form.location);
+                              setLiveSlug(form.slug);
                             }}
                           />
                         </>
@@ -300,10 +324,10 @@ export function HomeDesk({
 
               <HomeCodeCardPreview
                 embedded
-                displayName={displayName}
-                headline={headline}
-                bio={bio}
-                location={location}
+                displayName={liveName || displayName}
+                headline={liveHeadline}
+                bio={liveBio}
+                location={liveLocation}
                 avatarUrl={liveAvatar}
                 slug={slug}
                 isPublic={isPublic}

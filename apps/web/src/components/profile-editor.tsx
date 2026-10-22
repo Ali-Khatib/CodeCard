@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useActionState, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
@@ -10,14 +10,11 @@ import {
   profileToFormState,
   type ProfileFormState,
 } from '@/lib/profile/profile-form';
-import { buildProfileFormData } from '@/lib/profile/profile-update-core';
+import { buildProfileFormData, type ProfileUpdateState } from '@/lib/profile/profile-update-core';
+import { postProfileSave } from '@/lib/profile/save-profile-client';
 import { AudienceRoleField } from '@/components/profile/audience-role-field';
 import { ProfilePublishControls } from '@/components/profile/profile-publish-controls';
 import { getSavedProfilePreviewHref } from '@/lib/profile/profile-preview';
-import {
-  updateProfileAction,
-  type ProfileUpdateState,
-} from '@/lib/profile/update-profile-action';
 import { useMutationFeedback } from '@/components/dashboard/mutation-feedback-provider';
 import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 import { HeadlineField } from '@/components/profile/headline-field';
@@ -121,11 +118,20 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
   onPersistedRef.current = onPersisted;
   const formRef = useRef(form);
   formRef.current = form;
-  const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
+  const versionRef = useRef(profile.updated_at);
+  const submitLockRef = useRef(false);
+  const [pending, setPending] = useState(false);
+  const [state, setState] = useState<ProfileUpdateState>(initialState);
+
+  useEffect(() => {
+    if (submitLockRef.current) return;
+    versionRef.current = profile.updated_at;
+  }, [profile.updated_at]);
 
   useEffect(() => {
     if (!state.success || celebratedStateRef.current === state) return;
     celebratedStateRef.current = state;
+    if (state.updatedAt) versionRef.current = state.updatedAt;
     setCelebrating(true);
     notifySuccess(MUTATION_FEEDBACK.profile.saved);
     onPersistedRef.current?.(formRef.current);
@@ -174,9 +180,9 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
     (!fieldErrors.slug && !fieldErrors.display_name ? state.error : undefined) ||
     '';
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (pending) return;
+    if (pending || submitLockRef.current) return;
     setClientError('');
     setClientFieldError(null);
     setCelebrating(false);
@@ -199,10 +205,18 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
       return;
     }
 
-    // useActionState dispatch must run inside a transition when called manually.
-    startTransition(() => {
-      formAction(buildProfileFormData(form));
-    });
+    submitLockRef.current = true;
+    setPending(true);
+    try {
+      const result = await postProfileSave(
+        buildProfileFormData({ ...form, updatedAt: versionRef.current }),
+      );
+      if (result.updatedAt) versionRef.current = result.updatedAt;
+      setState(result);
+    } finally {
+      submitLockRef.current = false;
+      setPending(false);
+    }
   }
 
   return (

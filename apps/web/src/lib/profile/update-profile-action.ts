@@ -1,12 +1,11 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import {
   executeProfileUpdate,
   type ProfileUpdateState,
 } from '@/lib/profile/profile-update-core';
-import { revalidatePublicProfileSlugChange } from '@/lib/profile/public-cache';
+import { revalidateOwnedProfileCaches } from '@/lib/profile/profile-update-revalidate';
 
 export type { ProfileUpdateState };
 
@@ -17,23 +16,25 @@ export async function updateProfileAction(
   const started = performance.now();
   const supabase = await createClient();
   const result = await executeProfileUpdate(supabase, formData);
+  const { diagnostics, ...clientResult } = result;
 
-  if (process.env.NODE_ENV === 'development') {
-    console.info('[profile-update]', {
-      ms: Math.round(performance.now() - started),
-      ok: Boolean(result.success),
-    });
-  }
+  console.info('[profile-update]', {
+    requestId: crypto.randomUUID(),
+    totalMs: Math.round(performance.now() - started),
+    authMs: diagnostics?.authMs ?? null,
+    readMs: diagnostics?.readMs ?? null,
+    writeMs: diagnostics?.writeMs ?? null,
+    ok: Boolean(result.success),
+    unchanged: Boolean(result.unchanged),
+    code: result.code ?? null,
+  });
 
-  if (result.success) {
-    revalidatePath('/dashboard');
-    revalidatePath('/dashboard/profile');
-    revalidatePath('/dashboard/profile/preview');
-    revalidatePublicProfileSlugChange({
+  if (result.success && !result.unchanged) {
+    revalidateOwnedProfileCaches({
       previousSlug: result.previousSlug,
       nextSlug: result.nextSlug,
     });
   }
 
-  return result;
+  return clientResult;
 }

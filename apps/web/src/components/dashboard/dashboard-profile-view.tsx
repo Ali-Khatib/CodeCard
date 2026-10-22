@@ -36,10 +36,23 @@ export function DashboardProfileView({
   preview = false,
 }: DashboardProfileViewProps) {
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
+  const [liveName, setLiveName] = useState(profile.display_name);
+  const [liveHeadline, setLiveHeadline] = useState(profile.headline ?? '');
+  const [liveBio, setLiveBio] = useState(profile.bio ?? '');
+  const [liveLocation, setLiveLocation] = useState(profile.location ?? '');
+  const [liveSlug, setLiveSlug] = useState(profile.slug);
 
   useEffect(() => {
     setAvatarUrl(profile.avatar_url);
   }, [profile.avatar_url]);
+
+  useEffect(() => {
+    setLiveName(profile.display_name);
+    setLiveHeadline(profile.headline ?? '');
+    setLiveBio(profile.bio ?? '');
+    setLiveLocation(profile.location ?? '');
+    setLiveSlug(profile.slug);
+  }, [profile.bio, profile.display_name, profile.headline, profile.location, profile.slug]);
 
   return (
     <div className="cc-app-page cc-app-page--1120">
@@ -80,7 +93,17 @@ export function DashboardProfileView({
           )}
 
           {!preview ? (
-            <ProfileEditor profile={profile} links={profileLinks} />
+            <ProfileEditor
+              profile={profile}
+              links={profileLinks}
+              onPersisted={(form) => {
+                setLiveName(form.display_name);
+                setLiveHeadline(form.headline);
+                setLiveBio(form.bio);
+                setLiveLocation(form.location);
+                setLiveSlug(form.slug);
+              }}
+            />
           ) : (
             <div className="space-y-4">
               <label className="block">
@@ -130,12 +153,12 @@ export function DashboardProfileView({
         <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
           <AppCard>
             <ProfileVisitorPreview
-              displayName={profile.display_name}
-              headline={profile.headline}
-              bio={profile.bio}
-              location={profile.location}
+              displayName={liveName}
+              headline={liveHeadline}
+              bio={liveBio}
+              location={liveLocation}
               avatarUrl={avatarUrl}
-              slug={profile.slug}
+              slug={liveSlug}
               isPublic={profile.is_public === true}
               links={links}
             />

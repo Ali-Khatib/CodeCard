@@ -29,7 +29,8 @@ describe('Home calendar and follow-ups', () => {
     const calendar = read('src/components/dashboard/home-schedule-section.tsx');
     expect(calendar).toContain('cc-home-calendar');
     expect(calendar).toContain('data-calendar-day');
-    expect(calendar).toContain('updateOwnerEventAction');
+    expect(calendar).toContain("'/api/schedule/events?op=create'");
+    expect(calendar).toContain('postOwnedForm');
     expect(calendar).toContain('updateConnectionMetadataAction');
     expect(calendar).toContain('Follow-up');
     expect(calendar).toContain('cc-home-calendar__legend');

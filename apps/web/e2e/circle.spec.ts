@@ -18,7 +18,7 @@ test.describe('WS16 Circle feed (mocked browser)', () => {
     await expect(
       page.getByRole('heading', { name: 'Circle needs people first' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Share your CodeCard' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Edit your CodeCard' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Open Connections' })).toBeVisible();
     await expect(page.getByText('Jordan Lee')).toHaveCount(0);
     await expect(page.getByText('Alex Chen')).toHaveCount(0);

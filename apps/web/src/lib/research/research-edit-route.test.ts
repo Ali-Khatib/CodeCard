@@ -90,7 +90,8 @@ describe('dashboard research edit route', () => {
       'utf8',
     );
 
-    expect(form).toContain('updateResearchAction');
+    expect(form).toContain('postOwnedForm');
+    expect(form).toContain("'/api/research?op=update'");
     expect(form).toContain('buildUpdateResearchFormData');
     expect(form).toContain("mode === 'edit'");
     expect(form).toContain('Save changes');

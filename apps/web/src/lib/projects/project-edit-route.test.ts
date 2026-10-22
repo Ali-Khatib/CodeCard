@@ -59,7 +59,8 @@ describe('dashboard project edit route', () => {
       'utf8',
     );
 
-    expect(form).toContain('updateProjectAction');
+    expect(form).toContain('postOwnedForm');
+    expect(form).toContain("'/api/projects?op=update'");
     expect(form).toContain('buildUpdateProjectFormData');
     expect(form).toContain("mode === 'edit'");
     expect(form).not.toContain('ProjectCreateForm');
