@@ -75,6 +75,7 @@ export async function buildAccountExportDocument(
     circle_activity: [],
     circle_viewer_state: null,
     owner_events: [],
+    ai_owner_results: [],
   };
 
   if (!profile) {
@@ -470,7 +471,7 @@ async function loadAdditionalOwnerData(
   | { ok: true; data: AccountExportDocument['additional_account_data'] }
   | { ok: false; error: 'query_failed' }
 > {
-  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes, viewerStateRes, eventsRes] =
+  const [connectionsRes, notesRes, collectionsRes, subscriptionRes, reportsRes, circleRes, viewerStateRes, eventsRes, aiResultsRes] =
     await Promise.all([
       supabase
         .from('saved_connections')
@@ -516,6 +517,11 @@ async function loadAdditionalOwnerData(
         .select('id, title, location, starts_at, ends_at, notes, created_at, updated_at')
         .eq('owner_user_id', ownerUserId)
         .order('starts_at', { ascending: true }),
+      supabase
+        .from('ai_owner_results')
+        .select('id, kind, title, body, created_at, updated_at')
+        .eq('owner_user_id', ownerUserId)
+        .order('created_at', { ascending: true }),
     ]);
 
   if (
@@ -526,7 +532,8 @@ async function loadAdditionalOwnerData(
     reportsRes.error ||
     circleRes.error ||
     viewerStateRes.error ||
-    eventsRes.error
+    eventsRes.error ||
+    (aiResultsRes.error && !isMissingRelation(aiResultsRes.error))
   ) {
     return { ok: false, error: 'query_failed' };
   }
@@ -627,8 +634,29 @@ async function loadAdditionalOwnerData(
         created_at: requireIso(row.created_at, generatedAt),
         updated_at: requireIso(row.updated_at, generatedAt),
       })),
+      ai_owner_results: aiResultsRes.error
+        ? []
+        : (aiResultsRes.data ?? []).flatMap((row) => {
+            if (!row.body || typeof row.body !== 'object' || Array.isArray(row.body)) return [];
+            if (row.kind !== 'project_draft' && row.kind !== 'analytics_review') return [];
+            return [
+              {
+                id: row.id,
+                kind: row.kind,
+                title: row.title,
+                body: row.body as Record<string, unknown>,
+                created_at: requireIso(row.created_at, generatedAt),
+                updated_at: requireIso(row.updated_at, generatedAt),
+              },
+            ];
+          }),
     },
   };
+}
+
+function isMissingRelation(error: { code?: string; message?: string }): boolean {
+  if (error.code === '42P01' || error.code === 'PGRST205') return true;
+  return /does not exist|schema cache/i.test(error.message ?? '');
 }
 
 function groupBy<T extends Record<string, unknown>>(

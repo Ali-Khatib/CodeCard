@@ -211,6 +211,14 @@ export async function executeLocalAccountContentDeletion(
     .eq('owner_user_id', ctx.ownerUserId);
   if (eventsError) return { ok: false, reason: 'delete_failed' };
 
+  const { error: aiResultsError } = await supabase
+    .from('ai_owner_results')
+    .delete()
+    .eq('owner_user_id', ctx.ownerUserId);
+  if (aiResultsError && !isMissingRelation(aiResultsError)) {
+    return { ok: false, reason: 'delete_failed' };
+  }
+
   const { error: connectionsError } = await supabase
     .from('saved_connections')
     .delete()
@@ -284,4 +292,9 @@ export async function executeLocalAccountContentDeletion(
     cleanupJobId,
     objectCount,
   };
+}
+
+function isMissingRelation(error: { code?: string; message?: string }): boolean {
+  if (error.code === '42P01' || error.code === 'PGRST205') return true;
+  return /does not exist|schema cache/i.test(error.message ?? '');
 }

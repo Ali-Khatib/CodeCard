@@ -36,6 +36,7 @@ RLS enable statements exist for each of these. Policies were not re-audited line
 | Identity | `tenants`, `tenant_memberships`, `profiles`, `profile_links` | Account shell and public card |
 | Work | `projects`, `project_domains`, `project_focus_areas`, `project_media_assets`, `project_links`, `project_orderings`, `research_papers`, `research_figures` | Showcase |
 | People | `saved_connections`, `connection_notes`, `collections`, `collection_items`, `connection_scan_offers`, `owner_events` | Connections, QR handshake, calendar |
+| AI results | `ai_owner_results` | Owner-private saved project drafts and Analysis reviews. Pro is checked in the server before the write |
 | Circle | `circle_activity`, `circle_viewer_state` | Activity feed and unread cursor |
 | Analytics | `public_profile_events`, `project_view_events`, `analytics_events` | Events. Retention is a product decision, not a new table. |
 | Billing | `subscription_customers`, `subscriptions`, `billing_events` | Stripe |
@@ -44,6 +45,8 @@ RLS enable statements exist for each of these. Policies were not re-audited line
 
 `storage.objects` RLS is enabled from `20250627000008_storage_buckets_rls.sql`. Buckets in app config: `avatars`, `project-media`, `private-docs`.
 
-## Not created
+## AI results
 
-No migration was added. No speculative table was added. Generated database types are not checked into the repo; the app uses hand-written types in `packages/types`.
+`supabase/migrations/20261022160000_ai_owner_results.sql` adds `ai_owner_results`. `kind` is `project_draft` or `analytics_review`. Authenticated clients can select and delete their own rows. They cannot insert or update. `saveAiOwnerResult` writes with the service role after `resolveTenantPlanId` returns `pro`. This migration has not been applied to the remote database.
+
+Generated database types are not checked into the repo; the app uses hand-written types in `packages/types`.

@@ -51,6 +51,7 @@ export const RLS_APPLICATION_TABLES = [
   'account_deletion_operations',
   'waitlist_signups',
   'owner_events',
+  'ai_owner_results',
 ] as const;
 
 /** Owner-private tables: no anonymous SELECT policies. */
@@ -64,6 +65,7 @@ const OWNER_PRIVATE_TABLES = [
   'subscriptions',
   'project_orderings',
   'owner_events',
+  'ai_owner_results',
 ] as const;
 
 /** Tables with no client policies (service-role / revoked grants). */

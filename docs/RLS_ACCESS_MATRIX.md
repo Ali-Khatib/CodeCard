@@ -43,6 +43,7 @@ Legend: ✅ allowed · ❌ denied · — N/A · 🔒 service/trusted path only
 | `connection_scan_offers` | ✅ | ❌ | ❌ | scanned user SELECT/UPDATE; scanner INSERT, SELECT, UPDATE to pending | ❌ | Pending QR handshake only |
 | `connection_notes` | ✅ | ❌ | ❌ | full | ❌ | Private to saver |
 | `owner_events` | ✅ | ❌ | ❌ | full | ❌ | Owner-private calendar; Home only |
+| `ai_owner_results` | ✅ | ❌ | ❌ | SELECT + DELETE own rows | ❌ | Saved AI project drafts and Analysis reviews. No client INSERT or UPDATE. Server writes with the service role only after a Pro check |
 | `collections` | ✅ | ❌ | ❌ | full | ❌ | |
 | `collection_items` | ✅ | ❌ | ❌ | full (same-owner membership) | ❌ | Parent + Connection ownership |
 | `circle_activity` | ✅ | ❌ | ❌ | SELECT via Connection / own actor; INSERT/DELETE own actor | SELECT only if Connection | No UPDATE; feed also filters published |

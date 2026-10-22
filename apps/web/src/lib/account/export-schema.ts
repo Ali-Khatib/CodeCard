@@ -314,6 +314,18 @@ const additionalAccountDataSchema = z
         })
         .strict(),
     ),
+    ai_owner_results: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          kind: z.enum(['project_draft', 'analytics_review']),
+          title: z.string(),
+          body: z.record(z.unknown()),
+          created_at: isoTimestamp,
+          updated_at: isoTimestamp,
+        })
+        .strict(),
+    ),
   })
   .strict();
 
