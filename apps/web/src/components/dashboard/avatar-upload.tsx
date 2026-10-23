@@ -24,6 +24,8 @@ type AvatarUploadProps = {
   displayName: string;
   initialAvatarUrl: string | null;
   disabled?: boolean;
+  /** Show the same photo control without uploading. */
+  preview?: boolean;
   onAvatarSaved?: (avatarUrl: string) => void;
   finalizeUpload?: (path: string) => Promise<{
     success: boolean;
@@ -56,6 +58,7 @@ export function AvatarUpload({
   displayName,
   initialAvatarUrl,
   disabled = false,
+  preview = false,
   onAvatarSaved,
   finalizeUpload,
 }: AvatarUploadProps) {
@@ -223,7 +226,7 @@ export function AvatarUpload({
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (pending) {
+      if (preview || pending) {
         event.target.value = '';
         return;
       }
@@ -256,7 +259,7 @@ export function AvatarUpload({
       setCropSourceUrl(objectUrl);
       setCropSourceName(file.name);
     },
-    [pending, resetSelection, revokeCropSourceUrl],
+    [pending, preview, resetSelection, revokeCropSourceUrl],
   );
 
   const handleCropConfirm = useCallback(
@@ -342,7 +345,13 @@ export function AvatarUpload({
               type="button"
               className={`cc-app-btn cc-app-btn--ghost ${disabled || pending ? 'opacity-50' : ''}`}
               disabled={disabled || pending}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => {
+                if (preview) {
+                  setError('Create an account to edit and save this card.');
+                  return;
+                }
+                fileInputRef.current?.click();
+              }}
             >
               {pending
                 ? 'Uploading…'

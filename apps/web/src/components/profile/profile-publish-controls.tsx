@@ -11,9 +11,11 @@ import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProfilePublishControlsProps = {
   isPublic: boolean;
+  /** Show the same publish controls without changing a real card. */
+  preview?: boolean;
 };
 
-export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps) {
+export function ProfilePublishControls({ isPublic, preview = false }: ProfilePublishControlsProps) {
   const router = useRouter();
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [pending, startTransition] = useTransition();
@@ -21,6 +23,10 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
   const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
 
   function runPublish() {
+    if (preview) {
+      setError('Create an account to edit and save this card.');
+      return;
+    }
     if (pending) return;
     setError('');
     startTransition(async () => {
@@ -38,6 +44,10 @@ export function ProfilePublishControls({ isPublic }: ProfilePublishControlsProps
   }
 
   function runUnpublish() {
+    if (preview) {
+      setError('Create an account to edit and save this card.');
+      return;
+    }
     if (pending) return;
     setError('');
     startTransition(async () => {

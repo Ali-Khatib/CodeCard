@@ -15,6 +15,8 @@ import { MUTATION_FEEDBACK } from '@/lib/dashboard/mutation-feedback';
 
 type ProfileLinksEditorProps = {
   links: ProfileLinkRow[];
+  /** Show the same link controls without writing them to an account. */
+  preview?: boolean;
 };
 
 type EditorMode =
@@ -28,7 +30,7 @@ function withSortOrder(items: ProfileLinkRow[]) {
   return items.map((link, index) => ({ ...link, sort_order: index }));
 }
 
-export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
+export function ProfileLinksEditor({ links, preview = false }: ProfileLinksEditorProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [items, setItems] = useState(links);
   const [mode, setMode] = useState<EditorMode>({ kind: 'idle' });
@@ -106,6 +108,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
 
   async function submitLink(e: React.FormEvent) {
     e.preventDefault();
+    if (preview) {
+      setError('Create an account to edit and save this card.');
+      return;
+    }
     if (saving || mode.kind === 'idle') return;
     setError('');
     setFieldErrors({});
@@ -129,6 +135,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   }
 
   async function handleDelete(link: ProfileLinkRow) {
+    if (preview) {
+      setError('Create an account to edit and save this card.');
+      return;
+    }
     if (pendingAction || saving) return;
     if (!window.confirm('Delete this profile link?')) return;
     setPendingAction(`delete:${link.id}`);
@@ -154,6 +164,10 @@ export function ProfileLinksEditor({ links }: ProfileLinksEditorProps) {
   }
 
   async function handleMove(link: ProfileLinkRow, direction: 'up' | 'down') {
+    if (preview) {
+      setError('Create an account to edit and save this card.');
+      return;
+    }
     if (pendingAction || saving) return;
     setPendingAction(`move:${link.id}:${direction}`);
     const fd = new FormData();

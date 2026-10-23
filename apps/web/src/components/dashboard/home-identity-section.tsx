@@ -1,12 +1,9 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
-import { profileAvatarAltText } from '@/lib/profile/avatar-url';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
 import { ProfileEditor } from '@/components/profile-editor';
 import type { ProfileFormState } from '@/lib/profile/profile-form';
@@ -57,101 +54,27 @@ export function HomeIdentitySection({
 
       <div className="cc-home-identity__layout">
         <div className="cc-app-card cc-home-identity__editor space-y-6">
-          {!preview ? (
-            <AvatarUpload
-              displayName={draft.displayName}
-              initialAvatarUrl={avatarUrl}
-              onAvatarSaved={setAvatarUrl}
-            />
-          ) : (
-            <div id="photo" className="flex items-center gap-4 scroll-mt-28">
-              <div className="relative h-20 w-20 overflow-hidden rounded-full border border-[var(--app-border)]">
-                {avatarUrl ? (
-                  <Image
-                    src={avatarUrl}
-                    alt={profileAvatarAltText(profile.display_name)}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[var(--app-bone)] text-2xl">
-                    {profile.display_name[0]}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          <AvatarUpload
+            displayName={draft.displayName}
+            initialAvatarUrl={avatarUrl}
+            preview={preview}
+            onAvatarSaved={preview ? undefined : setAvatarUrl}
+          />
 
-          {!preview ? (
-            <ProfileEditor
-              profile={profile}
-              links={profileLinks}
-              onDraftChange={(form: ProfileFormState) => {
-                setDraft({
-                  displayName: form.display_name,
-                  headline: form.headline || null,
-                  bio: form.bio || null,
-                  location: form.location || null,
-                  slug: form.slug,
-                });
-              }}
-            />
-          ) : (
-            <div className="space-y-4">
-              <label className="block" htmlFor="display_name">
-                <span className="cc-app-mono">Display name</span>
-                <input
-                  id="display_name"
-                  className="cc-app-input mt-2"
-                  defaultValue={profile.display_name}
-                  readOnly
-                />
-              </label>
-              <label className="block" htmlFor="headline">
-                <span className="cc-app-mono">Headline</span>
-                <input
-                  id="headline"
-                  className="cc-app-input mt-2 scroll-mt-28"
-                  defaultValue={profile.headline ?? ''}
-                  readOnly
-                />
-              </label>
-              <label className="block" htmlFor="bio">
-                <span className="cc-app-mono">Bio</span>
-                <textarea
-                  id="bio"
-                  className="cc-app-input mt-2 min-h-[100px] resize-y scroll-mt-28"
-                  defaultValue={profile.bio ?? ''}
-                  readOnly
-                />
-              </label>
-              <label className="block" htmlFor="location">
-                <span className="cc-app-mono">Location</span>
-                <input
-                  id="location"
-                  className="cc-app-input mt-2 scroll-mt-28"
-                  defaultValue={profile.location ?? ''}
-                  readOnly
-                />
-              </label>
-              <label className="block" htmlFor="skills">
-                <span className="cc-app-mono">Skills</span>
-                <input
-                  id="skills"
-                  className="cc-app-input mt-2 scroll-mt-28"
-                  defaultValue={(profile.skills ?? []).join(', ')}
-                  readOnly
-                />
-              </label>
-              <p className="text-[14px] text-[var(--app-smoke)]">
-                <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
-                  Create an account
-                </Link>{' '}
-                to save changes.
-              </p>
-            </div>
-          )}
+          <ProfileEditor
+            profile={profile}
+            links={profileLinks}
+            preview={preview}
+            onDraftChange={(form: ProfileFormState) => {
+              setDraft({
+                displayName: form.display_name,
+                headline: form.headline || null,
+                bio: form.bio || null,
+                location: form.location || null,
+                slug: form.slug,
+              });
+            }}
+          />
         </div>
 
         <div className="cc-home-identity__preview">

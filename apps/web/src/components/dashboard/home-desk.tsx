@@ -271,41 +271,30 @@ export function HomeDesk({
                 <div className="cc-home-desk__editor-drop-inner">
                   {editorMounted ? (
                     <div className="cc-home-desk__editor">
-                      {preview || !profile ? (
-                        <div className="space-y-3">
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Display name
-                            <input className="cc-app-input mt-1" readOnly value={displayName} />
-                          </label>
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Headline
-                            <input className="cc-app-input mt-1" readOnly value={headline ?? ''} />
-                          </label>
-                          <label className="block text-[13px] text-[var(--app-smoke)]">
-                            Bio
-                            <textarea className="cc-app-input mt-1 min-h-[88px]" readOnly value={bio ?? ''} />
-                          </label>
-                          <p className="text-[14px] text-[var(--app-smoke)]">
-                            <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
-                              Create an account
-                            </Link>{' '}
-                            to edit and save this card.
-                          </p>
-                        </div>
-                      ) : (
+                      {profile ? (
                         <>
                           <h3 className="cc-home-calendar__form-title">Edit card</h3>
                           <AvatarUpload
                             displayName={displayName}
                             initialAvatarUrl={liveAvatar}
-                            onAvatarSaved={setLiveAvatar}
+                            preview={preview}
+                            onAvatarSaved={preview ? undefined : setLiveAvatar}
                           />
                           <ProfileEditor
                             profile={profile}
                             links={profileLinks}
-                            onDraftChange={(form) =>
-                              setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)))
-                            }
+                            preview={preview}
+                            onDraftChange={(form) => {
+                              if (preview) {
+                                setLiveName(form.display_name);
+                                setLiveHeadline(form.headline);
+                                setLiveBio(form.bio);
+                                setLiveLocation(form.location);
+                                setLiveSlug(form.slug);
+                                return;
+                              }
+                              setDirty(formIsDirty(form, savedForm ?? profileToFormState(profile)));
+                            }}
                             onPersisted={(form) => {
                               setSavedForm(form);
                               setDirty(false);
@@ -317,6 +306,13 @@ export function HomeDesk({
                             }}
                           />
                         </>
+                      ) : (
+                        <p className="text-[14px] text-[var(--app-smoke)]">
+                          <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
+                            Create an account
+                          </Link>{' '}
+                          to edit and save this card.
+                        </p>
                       )}
                     </div>
                   ) : null}

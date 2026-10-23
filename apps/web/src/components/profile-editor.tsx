@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import type { Profile } from '@codecard/types';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
@@ -65,6 +66,8 @@ interface ProfileEditorProps {
   onDraftChange?: (form: ProfileFormState) => void;
   /** Fired after the server confirms the save. The form already holds those values. */
   onPersisted?: (form: ProfileFormState) => void;
+  /** Same editor accounts see, without writing to an account. */
+  preview?: boolean;
 }
 
 const PROFILE_FIELD_IDS: Record<string, string> = {
@@ -101,7 +104,13 @@ function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.Re
   );
 }
 
-export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted }: ProfileEditorProps) {
+export function ProfileEditor({
+  profile,
+  links = [],
+  onDraftChange,
+  onPersisted,
+  preview = false,
+}: ProfileEditorProps) {
   const { notifySuccess, notifyError } = useMutationFeedback();
   const [form, setForm] = useState(() => profileToFormState(profile));
   const [clientError, setClientError] = useState('');
@@ -182,6 +191,7 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (preview) return;
     if (pending || submitLockRef.current) return;
     setClientError('');
     setClientFieldError(null);
@@ -375,10 +385,10 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
       </form>
 
       <EditorSection id="links" title="Social links" hint="GitHub, LinkedIn, website">
-        <ProfileLinksEditor links={links} />
+        <ProfileLinksEditor links={links} preview={preview} />
       </EditorSection>
       <EditorSection id="visibility" title="Visibility" hint="Publishing and public URL">
-        <ProfilePublishControls isPublic={profile.is_public} />
+        <ProfilePublishControls isPublic={profile.is_public} preview={preview} />
 
       {profile.slug ? (
         <p className="text-sm">
@@ -412,6 +422,15 @@ export function ProfileEditor({ profile, links = [], onDraftChange, onPersisted 
           </p>
         ) : null}
       </div>
+
+      {preview ? (
+        <p className="text-[14px] text-[var(--app-smoke)]">
+          <Link href="/sign-up" className="font-medium text-[var(--app-ink)] underline">
+            Create an account
+          </Link>{' '}
+          to edit and save this card.
+        </p>
+      ) : null}
 
       <div className="cc-profile-save-bar">
       <button
