@@ -38,15 +38,19 @@ export function ProfileCompletionIndicator({
 
   if (percentage >= 100) return null;
 
-  const details = (
+  const details = (fit: boolean) => (
     <div
       id={detailsId}
       aria-hidden={!expanded}
-      className={`grid origin-top-right transition-[grid-template-rows,opacity,margin,transform] duration-500 ease-out ${
-        expanded
-          ? 'mt-4 grid-rows-[1fr] translate-y-0 scale-100 opacity-100'
-          : 'mt-0 grid-rows-[0fr] -translate-y-2 scale-[0.98] opacity-0'
-      }`}
+      className={
+        fit
+          ? `cc-profile-completion-card__drop${expanded ? ' is-open' : ''}`
+          : `grid origin-top-right transition-[grid-template-rows,opacity,margin,transform] duration-500 ease-out ${
+              expanded
+                ? 'mt-4 grid-rows-[1fr] translate-y-0 scale-100 opacity-100'
+                : 'mt-0 grid-rows-[0fr] -translate-y-2 scale-[0.98] opacity-0'
+            }`
+      }
     >
       <div className="min-h-0 overflow-hidden">
         <div
@@ -127,7 +131,7 @@ export function ProfileCompletionIndicator({
             />
           </button>
         </div>
-        {details}
+        {details(true)}
       </AppCard>
     );
   }
@@ -162,7 +166,7 @@ export function ProfileCompletionIndicator({
         </button>
       </div>
 
-      {details}
+      {details(false)}
     </AppCard>
   );
 }

@@ -9277,22 +9277,39 @@ html.dark .cc-public-atmosphere__grain {
 
 .cc-home-desk__hello {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(220px, 1fr) auto;
   align-items: end;
   gap: 16px 12px;
 }
 
-.cc-profile-completion-card--header {
-  width: min(100%, 232px);
-  margin: 0;
-  padding: 8px 10px 8px 12px;
-  justify-self: end;
+.cc-home-desk__hello:has(.cc-profile-completion-card--header.is-open) {
+  align-items: start;
 }
 
-.cc-profile-completion-card--header.is-open {
-  grid-column: 1 / -1;
-  width: 100%;
+.cc-profile-completion-card--header {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px 10px 14px;
   justify-self: stretch;
+}
+
+.cc-profile-completion-card__drop {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  opacity: 0;
+  transform-origin: top center;
+  transition:
+    grid-template-rows 420ms ease,
+    opacity 420ms ease,
+    margin-top 420ms ease;
+}
+
+.cc-profile-completion-card__drop.is-open {
+  grid-template-rows: 1fr;
+  margin-top: 12px;
+  opacity: 1;
 }
 
 .cc-profile-completion-card__row {
@@ -9349,7 +9366,7 @@ html.dark .cc-public-atmosphere__grain {
   }
 
   .cc-profile-completion-card--header {
-    width: min(100%, 280px);
+    width: 100%;
   }
 }
 
