@@ -211,21 +211,33 @@ export async function checkProfileSlugAvailability(
   slug: string,
   profile: { id: string; tenant_id: string },
 ): Promise<string | null> {
-  if (isReservedProfileSlug(slug)) {
+  const normalized = slug.trim().toLowerCase();
+  if (isReservedProfileSlug(normalized)) {
     return RESERVED_PROFILE_SLUG_MESSAGE;
+  }
+
+  // Sees private cards too. A normal select cannot, because other drafts are hidden.
+  if (typeof supabase.rpc === 'function') {
+    const { data, error } = await supabase.rpc('profile_slug_is_taken', {
+      candidate: normalized,
+      except_profile_id: profile.id,
+    });
+    if (!error && data === true) {
+      return PROFILE_SLUG_TAKEN_MESSAGE;
+    }
   }
 
   const [{ data: otherProfile }, { data: otherTenant }] = await Promise.all([
     supabase
       .from('profiles')
       .select('id')
-      .eq('slug', slug)
+      .eq('slug', normalized)
       .neq('id', profile.id)
       .maybeSingle(),
     supabase
       .from('tenants')
       .select('id')
-      .eq('slug', slug)
+      .eq('slug', normalized)
       .neq('id', profile.tenant_id)
       .maybeSingle(),
   ]);

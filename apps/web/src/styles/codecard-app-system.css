@@ -1388,18 +1388,21 @@ html.dark .cc-app-input::placeholder {
   color: var(--app-ink);
 }
 
-.cc-app-input:focus {
-  outline: 2px solid var(--app-iris);
-  outline-offset: 1px;
-  border-color: transparent;
-  /* Never hardcode white — dark mode ink is light and becomes invisible */
+.cc-app-input:focus,
+.cc-app-input:focus-visible {
+  /* Inset ring stays inside the field. An outside outline is clipped by the editor panel. */
+  outline: none;
+  outline-offset: 0;
+  border-color: var(--app-iris);
+  box-shadow: inset 0 0 0 1px var(--app-iris);
   background: var(--app-paper);
   color: var(--app-ink);
 }
 
-.cc-app-input:focus-visible {
-  outline: 3px solid var(--app-iris);
-  outline-offset: 2px;
+textarea.cc-app-input {
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .cc-app-input:disabled {

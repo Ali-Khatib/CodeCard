@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   buildProfileFormData,
@@ -461,6 +463,67 @@ describe('executeProfileUpdate', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
+  it('treats a private account slug as taken', async () => {
+    const from = vi.fn((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: vi.fn((columns?: string) => {
+            if (columns === 'id') {
+              return {
+                eq: vi.fn(() => ({
+                  neq: vi.fn(() => ({
+                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                  })),
+                })),
+              };
+            }
+            return {
+              eq: vi.fn(() => ({
+                single: vi.fn().mockResolvedValue({ data: ownedProfile, error: null }),
+              })),
+            };
+          }),
+        };
+      }
+      if (table === 'tenants') {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              neq: vi.fn(() => ({
+                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+              })),
+            })),
+          })),
+        };
+      }
+      throw new Error(`Unexpected table ${table}`);
+    });
+    const supabase = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }) },
+      from,
+      rpc: vi.fn().mockResolvedValue({ data: true, error: null }),
+    } as unknown as SupabaseClient;
+
+    const result = await executeProfileUpdate(
+      supabase,
+      makeFormData({
+        display_name: 'Alex Chen',
+        headline: 'Engineer',
+        slug: 'Ali-The-Founder',
+        bio: 'Bio',
+        location: '',
+        skills: '',
+        audience_role: 'manager',
+      }),
+    );
+
+    expect(result.fieldErrors?.slug).toBe(PROFILE_SLUG_TAKEN_MESSAGE);
+    expect(supabase.rpc).toHaveBeenCalledWith('profile_slug_is_taken', {
+      candidate: 'ali-the-founder',
+      except_profile_id: 'profile-1',
+    });
+  });
+
   it('falls back to database uniqueness when a race occurs', async () => {
     const { supabase } = createMockSupabase({
       user: { id: 'user-1' },
@@ -626,5 +689,20 @@ describe('buildProfileFormData', () => {
     });
     expect(fd.get('skills')).toBe('Go, Rust');
     expect(fd.get('slug')).toBe('alex');
+  });
+});
+
+describe('profile slug uniqueness migration', () => {
+  const sql = readFileSync(
+    resolve(process.cwd(), '../../supabase/migrations/20261023160000_profile_slug_globally_unique.sql'),
+    'utf8',
+  );
+
+  it('keeps one lowercase profile URL for the whole product', () => {
+    expect(sql).toContain('CREATE UNIQUE INDEX IF NOT EXISTS profiles_slug_lower_key');
+    expect(sql).toContain('ON public.profiles (lower(slug))');
+    expect(sql).toContain('profile_slug_is_taken');
+    expect(sql).toContain('lower(slug) = lower(candidate)');
+    expect(sql).toContain('REVOKE ALL ON FUNCTION public.profile_slug_is_taken(text, uuid) FROM PUBLIC, anon');
   });
 });
