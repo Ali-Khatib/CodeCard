@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { CalendarClock, FolderKanban, Users, type LucideIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabasePublicKeyConfigured } from '@/lib/supabase/public-key';
+import { LIVE_DEMO_WORKSPACE_HREF } from '@/lib/marketing/demo-url';
 
 type Feature = {
   title: string;
   body: string;
-  signedInHref: string;
+  href: string;
   icon: LucideIcon;
 };
 
@@ -17,24 +18,24 @@ const FEATURES: Feature[] = [
   {
     title: 'Share your work',
     body: 'Put the projects and research you want someone to see on one card, and hand it over when you meet.',
-    signedInHref: '/dashboard/work',
+    href: `${LIVE_DEMO_WORKSPACE_HREF}/work`,
     icon: FolderKanban,
   },
   {
     title: 'Meet in person',
     body: 'Save an authentic connection with the person in front of you, and keep their CodeCard after you leave.',
-    signedInHref: '/dashboard/connections',
+    href: `${LIVE_DEMO_WORKSPACE_HREF}/connections`,
     icon: Users,
   },
   {
     title: 'Follow up',
     body: 'Remember who to reconnect with, and manage those follow-ups from the same place.',
-    signedInHref: '/dashboard/calendar',
+    href: `${LIVE_DEMO_WORKSPACE_HREF}/calendar`,
     icon: CalendarClock,
   },
 ];
 
-/** Quiet product note under a public CodeCard. Signed-out visitors get the product, not the owner's tools. */
+/** Quiet product note under a public CodeCard. Each example opens the live demo in a new tab. */
 export function PublicProfileProductNote() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
@@ -73,13 +74,14 @@ export function PublicProfileProductNote() {
           );
           return (
             <li key={feature.title}>
-              {signedIn ? (
-                <Link href={feature.signedInHref} className="cc-profile-product-note__item">
-                  {copy}
-                </Link>
-              ) : (
-                <div className="cc-profile-product-note__item">{copy}</div>
-              )}
+              <Link
+                href={feature.href}
+                className="cc-profile-product-note__item"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {copy}
+              </Link>
             </li>
           );
         })}
