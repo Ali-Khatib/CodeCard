@@ -18,6 +18,11 @@ describe('Home calendar and follow-ups', () => {
     expect(desk).toContain('HomeScheduleSection');
     expect(desk).toContain('compact');
     expect(desk).toContain('cc-home-desk__editor-drop');
+    expect(desk).toContain('variant="header"');
+    const completionAt = desk.indexOf('ProfileCompletionIndicator');
+    const splitAt = desk.indexOf('cc-home-desk__split');
+    expect(completionAt).toBeGreaterThan(-1);
+    expect(splitAt).toBeGreaterThan(completionAt);
     const cardAt = desk.indexOf('cc-home-desk__card');
     const scheduleAt = desk.indexOf('<HomeScheduleSection');
     expect(cardAt).toBeGreaterThan(-1);

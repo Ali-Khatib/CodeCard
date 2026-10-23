@@ -188,6 +188,7 @@ export function HomeDesk({
             </Link>
           ) : null}
         </div>
+        {completion ? <ProfileCompletionIndicator completion={completion} variant="header" /> : null}
         <div className="cc-home-desk__stats" aria-label="Overview">
           {typeof connectionCount === 'number' ? (
             <Link href={`${basePath}/connections`} className="cc-home-desk__stat cc-home-desk__stat--connections">
@@ -346,8 +347,6 @@ export function HomeDesk({
           compact
         />
       </div>
-
-      {completion ? <ProfileCompletionIndicator completion={completion} /> : null}
     </div>
   );
 }

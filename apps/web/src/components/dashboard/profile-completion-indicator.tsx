@@ -10,7 +10,7 @@ import { AppCard, AppMono } from './ui/dashboard-ui';
 
 type ProfileCompletionIndicatorProps = {
   completion: ProfileCompletionResult;
-  variant?: 'full' | 'compact';
+  variant?: 'full' | 'compact' | 'header';
 };
 
 export function ProfileCompletionIndicator({
@@ -37,6 +37,100 @@ export function ProfileCompletionIndicator({
   }
 
   if (percentage >= 100) return null;
+
+  const details = (
+    <div
+      id={detailsId}
+      aria-hidden={!expanded}
+      className={`grid origin-top-right transition-[grid-template-rows,opacity,margin,transform] duration-500 ease-out ${
+        expanded
+          ? 'mt-4 grid-rows-[1fr] translate-y-0 scale-100 opacity-100'
+          : 'mt-0 grid-rows-[0fr] -translate-y-2 scale-[0.98] opacity-0'
+      }`}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div
+          className="h-2 overflow-hidden rounded-full bg-[var(--app-bone)]"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percentage}
+          aria-label={`Profile ${percentage}% complete`}
+        >
+          <div
+            className="h-full rounded-full bg-[var(--app-iris)] transition-[width] duration-500 ease-out"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+
+        <ul className="mt-4 space-y-2" aria-label="Profile completion checklist">
+          {criteria.map((item) => (
+            <li
+              key={item.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px]"
+            >
+              <span className="font-medium text-[var(--app-ink)]">{item.label}</span>
+              <span className="flex items-center gap-2">
+                {item.complete ? (
+                  <StatusFeedbackIcon variant="success" size={18} label="Complete" />
+                ) : (
+                  <StatusFeedbackIcon variant="neutral" size={18} label="Incomplete" />
+                )}
+                <span className={item.complete ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'}>
+                  {item.complete ? 'Complete' : 'Incomplete'}
+                </span>
+                {!item.complete ? (
+                  <Link
+                    href={item.href}
+                    tabIndex={expanded ? undefined : -1}
+                    className="font-medium text-[var(--app-iris)] underline underline-offset-2"
+                    aria-label={`${item.label}: incomplete. Go to complete.`}
+                  >
+                    Fix
+                  </Link>
+                ) : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
+  if (variant === 'header') {
+    return (
+      <AppCard
+        className={`cc-profile-completion-card cc-profile-completion-card--header relative overflow-hidden${expanded ? ' is-open' : ''}`}
+      >
+        <div className="cc-profile-completion-card__row">
+          <div className="min-w-0">
+            <AppMono>Profile</AppMono>
+            <p className="cc-profile-completion-card__value">
+              <CountUp value={percentage} />%
+            </p>
+            <p className="cc-profile-completion-card__meta">
+              {completedCount} of {totalCount} complete
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={detailsId}
+            aria-label={expanded ? 'Hide profile completion progress' : 'View profile completion progress'}
+            onClick={() => setExpanded((open) => !open)}
+            className="cc-profile-completion-card__toggle"
+          >
+            <span>{expanded ? 'Hide' : 'View'}</span>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          </button>
+        </div>
+        {details}
+      </AppCard>
+    );
+  }
 
   return (
     <AppCard className="cc-profile-completion-card relative overflow-hidden">
@@ -68,66 +162,7 @@ export function ProfileCompletionIndicator({
         </button>
       </div>
 
-      <div
-        id={detailsId}
-        aria-hidden={!expanded}
-        className={`grid origin-top-right transition-[grid-template-rows,opacity,margin,transform] duration-500 ease-out ${
-          expanded
-            ? 'mt-5 grid-rows-[1fr] translate-y-0 scale-100 opacity-100'
-            : 'mt-0 grid-rows-[0fr] -translate-y-2 scale-[0.98] opacity-0'
-        }`}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div
-            className="h-2 overflow-hidden rounded-full bg-[var(--app-bone)]"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={percentage}
-            aria-label={`Profile ${percentage}% complete`}
-          >
-            <div
-              className="h-full rounded-full bg-[var(--app-iris)] transition-[width] duration-500 ease-out"
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-
-          <ul className="mt-5 space-y-2" aria-label="Profile completion checklist">
-            {criteria.map((item) => (
-              <li
-                key={item.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-[12px] border border-[var(--app-border)] px-3 py-2 text-[14px]"
-              >
-                <span className="font-medium text-[var(--app-ink)]">{item.label}</span>
-                <span className="flex items-center gap-2">
-                  {item.complete ? (
-                    <StatusFeedbackIcon variant="success" size={18} label="Complete" />
-                  ) : (
-                    <StatusFeedbackIcon variant="neutral" size={18} label="Incomplete" />
-                  )}
-                  <span
-                    className={
-                      item.complete ? 'text-[var(--app-ink)]' : 'text-[var(--app-smoke)]'
-                    }
-                  >
-                    {item.complete ? 'Complete' : 'Incomplete'}
-                  </span>
-                  {!item.complete ? (
-                    <Link
-                      href={item.href}
-                      tabIndex={expanded ? undefined : -1}
-                      className="font-medium text-[var(--app-iris)] underline underline-offset-2"
-                      aria-label={`${item.label}: incomplete. Go to complete.`}
-                    >
-                      Fix
-                    </Link>
-                  ) : null}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      {details}
     </AppCard>
   );
 }
