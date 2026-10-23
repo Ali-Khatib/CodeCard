@@ -14,7 +14,6 @@ import { PublicProfileHeroActions } from './public-profile-hero-actions';
 import { PublicProfileSocialLinks } from './public-profile-social-links';
 import { PublicHeroFlipPanel } from './public-hero-flip-panel';
 import { ProfileSectionHashScroll } from './profile-section-hash-scroll';
-import { FounderGreeting } from './founder-greeting';
 import { isFounderProfile } from '@/lib/profile/founder';
 
 /** Below-fold client islands — keep ATF bio free of their hydration cost. */
@@ -106,7 +105,6 @@ export function PublicProfileFocused({
   return (
     <div className={`cc-public-profile${founder ? ' cc-public-profile--founder' : ''}`}>
       <PublicProfileAtmosphere />
-      {founder ? <FounderGreeting displayName={displayName} /> : null}
       <ProfileSectionHashScroll />
       <PublicProfileDock
         backHref={backHref}

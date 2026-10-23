@@ -8925,86 +8925,8 @@ html.dark .cc-public-atmosphere__grain {
   letter-spacing: 0.14em;
 }
 
-.cc-founder-greeting {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(20, 14, 6, 0.72), rgba(8, 6, 4, 0.88));
-  backdrop-filter: blur(10px);
-  animation: cc-founder-greeting-in 0.45s ease-out both;
-}
-
-.cc-founder-greeting--out {
-  animation: cc-founder-greeting-out 0.5s ease-in both;
-}
-
-.cc-founder-greeting__panel {
-  max-width: 420px;
-  text-align: center;
-  padding: 28px 26px 30px;
-  border-radius: 22px;
-  border: 1px solid rgba(232, 197, 71, 0.42);
-  background: linear-gradient(160deg, rgba(28, 22, 12, 0.96), rgba(12, 10, 8, 0.98));
-  box-shadow:
-    0 0 0 1px rgba(255, 246, 214, 0.06) inset,
-    0 30px 80px rgba(0, 0, 0, 0.5);
-}
-
-.cc-founder-greeting__mark {
-  margin: 0;
-  font-family: var(--font-eyebrow), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--founder-gold, #e8c547);
-}
-
-.cc-founder-greeting__title {
-  margin: 14px 0 0;
-  font-family: var(--font-cyber-display), var(--font-instrument), Georgia, serif;
-  font-size: clamp(1.55rem, 5vw, 2rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  background: linear-gradient(120deg, #f5e6b8, #e8c547, #fff6d6, #a67c00);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.cc-founder-greeting__body {
-  margin: 12px 0 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(247, 242, 235, 0.82);
-}
-
-@keyframes cc-founder-greeting-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes cc-founder-greeting-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .cc-public-profile--founder .cc-public-hero__title,
-  .cc-founder-greeting,
-  .cc-founder-greeting--out {
+  .cc-public-profile--founder .cc-public-hero__title {
     animation: none;
   }
 }
