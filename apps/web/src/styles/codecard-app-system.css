@@ -8931,6 +8931,22 @@ html.dark .cc-public-atmosphere__grain {
   }
 }
 
+/* Status and ask sit above the page. The page behind them stays usable. */
+.cc-handshake-toast {
+  position: fixed;
+  z-index: 80;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cc-handshake-toast .cc-handshake-sheet {
+  pointer-events: auto;
+}
+
 /* Face-to-face handshake. Always centered on a phone, above the tab bar. */
 .cc-handshake-overlay {
   position: fixed;

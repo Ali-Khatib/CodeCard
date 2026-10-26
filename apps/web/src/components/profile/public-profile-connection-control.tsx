@@ -47,6 +47,8 @@ export function PublicProfileConnectionControl({
   const [promptReady, setPromptReady] = useState(false);
   const [asked, setAsked] = useState(false);
   const [declined, setDeclined] = useState(false);
+  const [promptDismissed, setPromptDismissed] = useState(false);
+  const [waitingDismissed, setWaitingDismissed] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [where, setWhere] = useState('');
   const [when, setWhen] = useState(() => toDateInputValue(new Date().toISOString()));
@@ -287,21 +289,30 @@ export function PublicProfileConnectionControl({
     );
   }
 
-  const showPrompt = promptReady && !asked && !declined;
+  const showPrompt = promptReady && !asked && !declined && !promptDismissed;
 
   return (
     <>
       <p className="sr-only" role="status" aria-live="polite">
         {pending ? 'Updating connection' : statusMessage ?? ''}
       </p>
+      {promptDismissed && !asked && !declined ? (
+        <button
+          type="button"
+          className="cc-app-btn cc-app-btn--primary !h-10"
+          onClick={() => setPromptDismissed(false)}
+        >
+          Connect
+        </button>
+      ) : null}
       {showPrompt ? (
         <HandshakePortal>
-        <div className="cc-handshake-overlay">
-          <div className="cc-handshake-sheet p-6" role="dialog" aria-modal="true" aria-labelledby="qr-connect-title">
+        <div className="cc-handshake-toast">
+          <div className="cc-handshake-sheet p-5" role="dialog" aria-labelledby="qr-connect-title">
             <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--app-iris)]">
               In person
             </p>
-            <h2 id="qr-connect-title" className="mt-2 font-serif text-[1.65rem] leading-tight text-[var(--app-ink)]">
+            <h2 id="qr-connect-title" className="mt-2 font-serif text-[1.45rem] leading-tight text-[var(--app-ink)]">
               Connect with {displayName}?
             </h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
@@ -312,36 +323,55 @@ export function PublicProfileConnectionControl({
                 {error}
               </p>
             ) : null}
+            <div className="mt-4 flex flex-col gap-2">
+              <button
+                type="button"
+                className="cc-app-btn cc-app-btn--primary !h-12 w-full"
+                onClick={onAsk}
+                disabled={pending}
+                aria-busy={pending}
+                aria-label={`Connect from QR with ${displayName}`}
+              >
+                {pending ? 'Sending…' : 'Connect'}
+              </button>
+              <button
+                type="button"
+                className="cc-app-btn cc-app-btn--ghost !h-12 w-full"
+                onClick={() => setPromptDismissed(true)}
+                disabled={pending}
+              >
+                Not now
+              </button>
+            </div>
+          </div>
+        </div>
+        </HandshakePortal>
+      ) : null}
+      {asked && !connected && !waitingDismissed ? (
+        <HandshakePortal>
+        <div className="cc-handshake-toast">
+          <div className="cc-handshake-sheet p-5" role="status" aria-live="polite">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--app-iris)]">
+              Request sent
+            </p>
+            <p className="mt-2 text-[15px] leading-snug text-[var(--app-ink)]">
+              Waiting for {displayName} to accept. You can keep using this page.
+            </p>
             <button
               type="button"
-              className="cc-app-btn cc-app-btn--primary mt-5 !h-12 w-full"
-              onClick={onAsk}
-              disabled={pending}
-              aria-busy={pending}
-              aria-label={`Connect from QR with ${displayName}`}
+              className="cc-app-btn cc-app-btn--ghost mt-4 !h-11 w-full"
+              onClick={() => setWaitingDismissed(true)}
             >
-              {pending ? 'Sending…' : 'Connect'}
+              Close
             </button>
           </div>
         </div>
         </HandshakePortal>
       ) : null}
-      {asked && !connected ? (
-        <HandshakePortal>
-        <div className="cc-handshake-overlay">
-          <div className="cc-handshake-sheet p-6" role="status" aria-live="polite">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--app-iris)]">
-              Waiting
-            </p>
-            <h2 className="mt-2 font-serif text-[1.65rem] leading-tight text-[var(--app-ink)]">
-              {displayName}
-            </h2>
-            <p className="mt-2 text-[14px] leading-relaxed text-[var(--app-smoke)]">
-              Waiting for them to accept. Keep this screen open.
-            </p>
-          </div>
-        </div>
-        </HandshakePortal>
+      {asked && !connected && waitingDismissed ? (
+        <p className="text-[13px] text-[var(--app-smoke)]">
+          Request sent. Waiting for {displayName} to accept.
+        </p>
       ) : null}
       {declined ? (
         <p className="text-[13px] text-[var(--app-smoke)]">They said not this time.</p>
