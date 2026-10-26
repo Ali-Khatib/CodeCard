@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { rateLimit } from '@/lib/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -50,10 +49,7 @@ export async function updateConnectionMetadataAction(input: {
   const limited = await withRateLimit(user.id);
   if (limited) return limited;
 
-  const result = await executeUpdateConnectionMetadata(supabase, input, { user });
-  if (result.success) {
-    revalidatePath('/dashboard/connections');
-    revalidatePath('/dashboard');
-  }
-  return result;
+  // Return as soon as the row is saved. Refreshing Home here re-renders the
+  // whole dashboard before the button can close, so the save looks failed.
+  return executeUpdateConnectionMetadata(supabase, input, { user });
 }

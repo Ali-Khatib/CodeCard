@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import {
   executeAcceptScanOffer,
@@ -39,22 +38,12 @@ export async function acceptScanOfferAction(
   offerId: string,
 ): Promise<ScanOfferMutationState> {
   const supabase = await createClient();
-  const result = await executeAcceptScanOffer(supabase, offerId);
-  if (result.success) {
-    revalidatePath('/dashboard');
-    revalidatePath('/dashboard/connections');
-  }
-  return result;
+  return executeAcceptScanOffer(supabase, offerId);
 }
 
 export async function dismissScanOfferAction(
   offerId: string,
 ): Promise<ScanOfferMutationState> {
   const supabase = await createClient();
-  const result = await executeDismissScanOffer(supabase, offerId);
-  if (result.success) {
-    revalidatePath('/dashboard');
-    revalidatePath('/dashboard/connections');
-  }
-  return result;
+  return executeDismissScanOffer(supabase, offerId);
 }

@@ -199,18 +199,13 @@ export function ConnectionRequestHost({ enabled = true }: { enabled?: boolean })
       setSaving(true);
       void (async () => {
         try {
-          const result = await Promise.race([
-            updateConnectionMetadataAction({
-              connectionId: acceptedConnectionId,
-              context: opts?.doLater ? where || null : where === '' ? null : where,
-              metAt: opts?.doLater || when === '' ? null : `${when}T12:00:00.000Z`,
-              privateNote: opts?.doLater ? note || null : note === '' ? null : note,
-              followUpAt: opts?.doLater ? tomorrowIsoDate() : null,
-            }),
-            new Promise<never>((_, reject) => {
-              window.setTimeout(() => reject(new Error('timeout')), 15_000);
-            }),
-          ]);
+          const result = await updateConnectionMetadataAction({
+            connectionId: acceptedConnectionId,
+            context: opts?.doLater ? where || null : where === '' ? null : where,
+            metAt: opts?.doLater || when === '' ? null : `${when}T12:00:00.000Z`,
+            privateNote: opts?.doLater ? note || null : note === '' ? null : note,
+            followUpAt: opts?.doLater ? tomorrowIsoDate() : null,
+          });
           if (!result.success) {
             setError(result.error ?? 'Could not save details.');
             return;
