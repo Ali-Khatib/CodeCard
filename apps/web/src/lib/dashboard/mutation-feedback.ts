@@ -27,6 +27,8 @@ export const MUTATION_FEEDBACK = {
     published: 'Profile published',
     unpublished: 'Profile unpublished',
     photoUpdated: 'Profile photo updated',
+    resumeUpdated: 'CV saved',
+    resumeRemoved: 'CV removed',
     linkAdded: 'Link added',
     linkUpdated: 'Link updated',
     linkDeleted: 'Link deleted',

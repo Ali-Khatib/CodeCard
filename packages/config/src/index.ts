@@ -78,6 +78,8 @@ export const STORAGE_BUCKETS = {
   avatars: 'avatars',
   projectMedia: 'project-media',
   privateDocs: 'private-docs',
+  /** Owner CV/resume PDFs. Private; public download uses signed URLs. */
+  resumes: 'resumes',
 } as const;
 
 export const PAYMENT_PROVIDERS = {

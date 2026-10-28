@@ -5,8 +5,10 @@ import type { Profile } from '@codecard/types';
 import type { ProfileLinkItem } from '@/lib/icons/profile-links';
 import type { ProfileLinkRow } from '@/lib/profile/profile-link-core';
 import { AvatarUpload } from '@/components/dashboard/avatar-upload';
+import { ResumeUpload } from '@/components/dashboard/resume-upload';
 import { ProfileEditor } from '@/components/profile-editor';
 import type { ProfileFormState } from '@/lib/profile/profile-form';
+import { buildPublicResumePath } from '@/lib/profile/resume-core';
 import { HomeCodeCardPreview } from './home-codecard-preview';
 
 type HomeIdentitySectionProps = {
@@ -59,6 +61,12 @@ export function HomeIdentitySection({
             initialAvatarUrl={avatarUrl}
             preview={preview}
             onAvatarSaved={preview ? undefined : setAvatarUrl}
+          />
+
+          <ResumeUpload
+            initialHasResume={Boolean(profile.resume_url?.trim())}
+            publicResumePath={buildPublicResumePath(profile.slug)}
+            preview={preview}
           />
 
           <ProfileEditor

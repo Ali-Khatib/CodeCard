@@ -76,6 +76,10 @@ export interface Profile {
   audience_role?: string | null;
   /** Optional back-of-card lines. Null when the owner leaves history blank. */
   card_history?: CardHistory | null;
+  /** Private storage path for the owner's uploaded CV PDF, when present. */
+  resume_url?: string | null;
+  /** When true, public resume download is hidden even if a CV is uploaded. */
+  hide_resume?: boolean | null;
   created_at: string;
   updated_at: string;
 }

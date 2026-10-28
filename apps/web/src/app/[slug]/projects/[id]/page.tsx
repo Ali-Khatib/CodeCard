@@ -13,6 +13,7 @@ import {
   buildUnavailablePublicMetadata,
 } from '@/lib/profile/public-metadata';
 import { normalizePublicProfileSlug } from '@/lib/profile/public-profile';
+import { buildPublicResumeAbsoluteUrl } from '@/lib/profile/resume-core';
 import { ProjectDetailView } from '@/components/featured-work/project-detail-view';
 import { ProfileAnalytics } from '@/components/profile-analytics';
 import { VisitorConversionMarker } from '@/components/visitor-conversion/visitor-conversion-marker';
@@ -73,7 +74,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, slug')
+    .select('id, display_name, slug, resume_url, hide_resume')
     .eq('slug', slug)
     .eq('is_public', true)
     .maybeSingle();
@@ -104,6 +105,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       .maybeSingle(),
   ]);
 
+  const resumeUrl =
+    resumeLink?.url?.trim() ||
+    (!profile.hide_resume && profile.resume_url?.trim()
+      ? buildPublicResumeAbsoluteUrl(profile.slug)
+      : null);
+
   const orderings = await loadProfileProjectOrderings(supabase, profile.id);
   const orderedRows = sortProjectsByEffectiveOrder(projectRows ?? [], orderings);
 
@@ -131,7 +138,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           profileId={profile.id}
           displayName={profile.display_name}
           projects={featuredProjects}
-          resumeUrl={resumeLink?.url ?? null}
+          resumeUrl={resumeUrl}
         />
       </Suspense>
     </>
