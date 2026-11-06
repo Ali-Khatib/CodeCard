@@ -1,5 +1,5 @@
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
-import { Cc2Pricing } from '@/components/cc2/pricing';
+import { PricingLandingPage } from '@/components/landing/pricing-landing-page';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/pricing',
@@ -8,5 +8,5 @@ export const metadata = buildIndexablePageMetadata({
 });
 
 export default function PricingPage() {
-  return <Cc2Pricing />;
+  return <PricingLandingPage />;
 }
