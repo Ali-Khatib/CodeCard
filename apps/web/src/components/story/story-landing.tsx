@@ -218,54 +218,26 @@ export function StoryLanding() {
 
       gsap.set(card, { transformPerspective: 1400 });
 
-      tl.fromTo(
-        q('.st-intro__meta > *'),
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
-        0.1,
-      )
-        .fromTo(
-          q('.st-intro__word .st-ch > span'),
-          { yPercent: 108 },
-          { yPercent: 0, duration: 1, stagger: 0.045, ease: 'power4.out' },
-          0.2,
-        )
-        .fromTo(
-          card,
-          { yPercent: 14, opacity: 0, scale: 0.94, rotationY: -24, rotationX: 10 },
-          { yPercent: 0, opacity: 1, scale: 1, rotationY: -13, rotationX: 5, duration: 1.3, ease: 'power3.out' },
-          0.45,
-        )
-        .fromTo(
-          q('.st-card__mark, .st-card__foot > *'),
-          { opacity: 0 },
-          { opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
-          1.1,
-        )
-        .fromTo(
-          q('.st-card__sheen'),
-          { xPercent: -140 },
-          { xPercent: 140, duration: 1.25, ease: 'power2.inOut' },
-          1.15,
-        )
-        .to(
-          num,
-          {
-            v: 100,
-            duration: 2.3,
-            ease: 'power2.inOut',
-            onUpdate: () => {
-              if (counter) counter.textContent = `${Math.round(num.v)}%`;
-            },
+      tl.to(
+        num,
+        {
+          v: 100,
+          duration: 2.2,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            if (counter) counter.textContent = `${Math.round(num.v)}%`;
           },
-          0.2,
-        )
+        },
+        0,
+      )
+        /* light sweeps the card's surface */
+        .fromTo(q('.st-card__sheen'), { xPercent: -140 }, { xPercent: 140, duration: 1.3, ease: 'power2.inOut' }, 0.35)
         /* the card squares up to the viewer, ready to open */
-        .to(card, { rotationY: 0, rotationX: 0, duration: 0.85, ease: 'power3.inOut' }, 2.1)
-        .addLabel('open', 2.85)
-        /* everything on the field clears, the card takes the screen */
-        .to(q('.st-intro__word .st-ch > span'), { yPercent: -108, duration: 0.75, stagger: 0.035, ease: 'power3.in' }, 'open-=0.25')
-        .to(q('.st-intro__meta > *'), { opacity: 0, duration: 0.45, ease: 'power2.out' }, 'open-=0.2')
+        .to(card, { rotationY: 0, rotationX: 0, duration: 0.9, ease: 'power3.inOut' }, 1.5)
+        .addLabel('open', 2.3)
+        /* the field clears and the card takes the screen */
+        .to(q('.st-intro__word'), { yPercent: -16, opacity: 0, duration: 0.8, ease: 'power3.in' }, 'open-=0.3')
+        .to(q('.st-intro__meta'), { opacity: 0, duration: 0.45, ease: 'power2.out' }, 'open-=0.25')
         .to(q('.st-card__foot > *, .st-card__edge'), { opacity: 0, duration: 0.4 }, 'open')
         .to(
           card,
@@ -273,7 +245,7 @@ export function StoryLanding() {
             scale: cover,
             borderRadius: 0,
             boxShadow: '0 0 0 0 rgba(18, 13, 10, 0)',
-            duration: 1.45,
+            duration: 1.5,
             ease: 'power4.inOut',
           },
           'open',
@@ -298,29 +270,29 @@ export function StoryLanding() {
             x: b.left + b.width / 2 - (a.left + a.width / 2) - 7,
             y: b.top + b.height / 2 - (a.top + a.height / 2),
             scale: Math.max(0.08, (b.height * 0.78) / a.height),
-            duration: 1.25,
+            duration: 1.3,
             ease: 'power4.inOut',
           });
-        }, 'open+=0.15')
+        }, 'open+=0.2')
         /* the hero settles underneath, then the card dissolves into it */
-        .fromTo('.st-hero__field', { scale: 1.14 }, { scale: 1, duration: 2.4, ease: 'power3.out' }, 'open+=0.3')
-        .to(veil, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 'open+=1.2')
+        .fromTo('.st-hero__field', { scale: 1.14 }, { scale: 1, duration: 2.4, ease: 'power3.out' }, 'open+=0.35')
+        .to(veil, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 'open+=1.25')
         .add(() => {
           delete html.dataset.stIntro;
-        }, 'open+=1.2')
+        }, 'open+=1.25')
         .fromTo(
           q('.st-stmt:first-child .st-ln > span'),
           { yPercent: 110 },
           { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' },
-          'open+=1.25',
+          'open+=1.3',
         )
         .fromTo(
           q('.st-stmt:first-child .st-sub, .st-hero__cta'),
           { opacity: 0, y: 14 },
           { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' },
-          'open+=1.6',
+          'open+=1.65',
         )
-        .to(mark, { opacity: 0, duration: 0.3 }, 'open+=1.5');
+        .to(mark, { opacity: 0, duration: 0.3 }, 'open+=1.55');
 
       const skip = () => tl.progress(1);
       const onKey = (e: KeyboardEvent) => {
@@ -578,22 +550,24 @@ export function StoryLanding() {
 
           <p className="st-intro__word">
             {'CODECARD'.split('').map((c, i) => (
-              <span key={`${c}-${i}`} className="st-ch">
+              <span key={`${c}-${i}`} className="st-ch" style={{ ['--i' as string]: i }}>
                 <span>{c}</span>
               </span>
             ))}
           </p>
 
-          <div className="st-card">
-            <div className="st-card__field">
-              <StoryField colors={EMBER} />
-            </div>
-            <span className="st-card__sheen" />
-            <span className="st-card__edge" />
-            <CodeCardMark className="st-card__mark" />
-            <div className="st-card__foot">
-              <span>Show your work.</span>
-              <span>Keep the connection.</span>
+          <div className="st-card__rise">
+            <div className="st-card">
+              <div className="st-card__field">
+                <StoryField colors={EMBER} />
+              </div>
+              <span className="st-card__sheen" />
+              <span className="st-card__edge" />
+              <CodeCardMark className="st-card__mark" />
+              <div className="st-card__foot">
+                <span>Show your work.</span>
+                <span>Keep the connection.</span>
+              </div>
             </div>
           </div>
 
