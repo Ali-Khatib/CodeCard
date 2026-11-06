@@ -8,7 +8,7 @@ import { ensureGsapPlugins, gsap, refreshScrollTrigger, ScrollTrigger } from '@/
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { MeshGradient } from '@paper-design/shaders-react';
 import { EditorialLiveDemoPreview } from '@/components/landing/editorial/editorial-live-demo-preview';
-import { CodeCardMark } from '@/components/brand/codecard-mark';
+import { CODECARD_MARK_PATH } from '@/components/brand/codecard-mark';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
 import {
@@ -81,6 +81,33 @@ function StoryField({ colors }: { colors: string[] }) {
 
 const EMBER = ['#120d0a', '#2a0f05', '#f25c05', '#ff9d5c', '#f4ecdc'];
 const DEEP = ['#120d0a', '#1a0b05', '#c7480a', '#120d0a'];
+
+/**
+ * The real CodeCard mark, drawn. A wide stroked arc sweeps counter-clockwise
+ * through the mark's own outline as a mask, so the ink appears the way the two
+ * C's are written. No approximation of the logo: this is the shipped path.
+ */
+function DrawnMark({ className }: { className?: string }) {
+  const id = useId().replace(/:/g, '');
+  return (
+    <svg className={className} viewBox="0 0 64 64" aria-hidden focusable="false">
+      <defs>
+        <mask id={`pen-${id}`} maskUnits="userSpaceOnUse" x="-10" y="-10" width="84" height="84">
+          <path
+            className="st-pen"
+            d="M 50 12 A 24 24 0 1 0 50 52"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="54"
+            strokeLinecap="butt"
+            pathLength={1}
+          />
+        </mask>
+      </defs>
+      <path d={CODECARD_MARK_PATH} fillRule="evenodd" fill="currentColor" mask={`url(#pen-${id})`} />
+    </svg>
+  );
+}
 
 function Words({ text }: { text: string }) {
   return (
@@ -223,14 +250,20 @@ export function StoryLanding() {
         .addLabel('go', 2.05)
         /* the mark takes its place in the corner */
         .add(() => {
-          const slot = document.querySelector<HTMLElement>('.cc-ed-mark-logo');
-          if (!slot || !logo) return;
+          const glyph =
+            document.querySelector<HTMLElement>('.cc-ed-mark-logo__c--first') ??
+            document.querySelector<HTMLElement>('.cc-ed-mark-logo');
+          if (!glyph || !logo) return;
           const a = logo.getBoundingClientRect();
-          const b = slot.getBoundingClientRect();
+          const b = glyph.getBoundingClientRect();
+          /* the drawn mark's ink fills ~84% of its box; the glyph's cap height
+             fills ~70% of its line box, so match the ink, not the boxes */
+          const scale = Math.max(0.05, (b.height * 0.7) / (a.height * 0.845));
+          const inkShift = a.height * scale * 0.025;
           gsap.to(logo, {
-            x: b.left + b.width / 2 - (a.left + a.width / 2) - 6,
-            y: b.top + b.height / 2 - (a.top + a.height / 2),
-            scale: Math.max(0.06, (b.height * 0.74) / a.height),
+            x: b.right - (a.left + a.width / 2),
+            y: b.top + b.height * 0.5 - (a.top + a.height / 2) - inkShift,
+            scale,
             duration: 1.15,
             ease: 'power4.inOut',
           });
@@ -531,10 +564,7 @@ export function StoryLanding() {
             <i>%</i>
           </p>
           <div className="st-boot__logo">
-            <svg viewBox="0 0 136 120" className="st-draw">
-              <path d="M 65.5 32.1 A 34 34 0 1 0 65.5 87.9" pathLength={1} />
-              <path d="M 93.5 32.1 A 34 34 0 1 0 93.5 87.9" pathLength={1} />
-            </svg>
+            <DrawnMark className="st-draw" />
           </div>
         </div>
       ) : null}
