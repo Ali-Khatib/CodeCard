@@ -176,50 +176,32 @@ export function HomeDesk({
 
   return (
     <div className="cc-home-desk">
-      <header className="cc-hx">
-        <div className="cc-hx__glow" aria-hidden />
-        <div className="cc-hx__main">
-          {dateLabel ? <p className="cc-hx__date">{dateLabel}</p> : null}
-          <h1 className="cc-hx__title">
-            <span className="cc-hx__line">
-              <span>{greeting},</span>
-            </span>
-            <span className="cc-hx__line cc-hx__line--name">
-              <span>{firstName}.</span>
-            </span>
+      <header className="cc-home-desk__hello">
+        <div>
+          {dateLabel ? <p className="cc-app-mono cc-home-desk__date">{dateLabel}</p> : null}
+          <h1 className="cc-home-desk__title">
+            {greeting}, {firstName}.
           </h1>
           {suggested ? (
-            <Link href={nudgeHref(suggested.href, basePath)} className="cc-hx__next">
-              <span className="cc-hx__next-k">Next up</span>
-              <span className="cc-hx__next-v">{nudgeLabel(suggested.title, suggested.href)}</span>
-              <span className="cc-hx__next-arrow" aria-hidden>
-                →
-              </span>
+            <Link href={nudgeHref(suggested.href, basePath)} className="cc-home-desk__nudge">
+              {nudgeLabel(suggested.title, suggested.href)}
             </Link>
           ) : null}
         </div>
-        <div className="cc-hx__side">
-          {completion ? <ProfileCompletionIndicator completion={completion} variant="hero" /> : null}
-          <div className="cc-hx__tiles" aria-label="Overview">
-            {typeof connectionCount === 'number' ? (
-              <Link href={`${basePath}/connections`} className="cc-hx__tile cc-hx__tile--hot">
-                <span className="cc-hx__tile-label">Connections</span>
-                <span className="cc-hx__tile-value">{connectionCount}</span>
-                <span className="cc-hx__tile-go" aria-hidden>
-                  ↗
-                </span>
-              </Link>
-            ) : null}
-            {upcoming != null ? (
-              <Link href={`${basePath}/calendar`} className="cc-hx__tile cc-hx__tile--mint">
-                <span className="cc-hx__tile-label">Upcoming</span>
-                <span className="cc-hx__tile-value">{upcoming}</span>
-                <span className="cc-hx__tile-go" aria-hidden>
-                  ↗
-                </span>
-              </Link>
-            ) : null}
-          </div>
+        {completion ? <ProfileCompletionIndicator completion={completion} variant="header" /> : null}
+        <div className="cc-home-desk__stats" aria-label="Overview">
+          {typeof connectionCount === 'number' ? (
+            <Link href={`${basePath}/connections`} className="cc-home-desk__stat cc-home-desk__stat--connections">
+              <span className="cc-home-desk__stat-value">{connectionCount}</span>
+              <span className="cc-home-desk__stat-label">Connections</span>
+            </Link>
+          ) : null}
+          {upcoming != null ? (
+            <Link href={`${basePath}/calendar`} className="cc-home-desk__stat cc-home-desk__stat--upcoming">
+              <span className="cc-home-desk__stat-value">{upcoming}</span>
+              <span className="cc-home-desk__stat-label">Upcoming</span>
+            </Link>
+          ) : null}
         </div>
       </header>
 
