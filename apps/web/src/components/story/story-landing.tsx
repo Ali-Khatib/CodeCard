@@ -7,7 +7,7 @@ import { useGSAP } from '@gsap/react';
 import { ensureGsapPlugins, gsap, refreshScrollTrigger, ScrollTrigger } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
 import { MeshGradient } from '@paper-design/shaders-react';
-import { EditorialLiveDemoPreview } from '@/components/landing/editorial/editorial-live-demo-preview';
+import dynamic from 'next/dynamic';
 import { CODECARD_MARK_PATH } from '@/components/brand/codecard-mark';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
@@ -18,6 +18,16 @@ import {
 } from '@/lib/waitlist/submit-waitlist';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
+
+/* The workspace preview is the heaviest thing on the page. Keep it out of the
+   first bundle so the opening is not waiting on it to hydrate. */
+const EditorialLiveDemoPreview = dynamic(
+  () =>
+    import('@/components/landing/editorial/editorial-live-demo-preview').then(
+      (m) => m.EditorialLiveDemoPreview,
+    ),
+  { ssr: false, loading: () => <div className="st-open__holding" /> },
+);
 
 const SEEN_KEY = 'cc.story.seen';
 const GATE = `try{var d=document.documentElement,q=location.search.indexOf('intro')>-1;if(q){sessionStorage.removeItem('${SEEN_KEY}')}if(!q&&(sessionStorage.getItem('${SEEN_KEY}')||matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('st-seen')}}catch(e){}`;

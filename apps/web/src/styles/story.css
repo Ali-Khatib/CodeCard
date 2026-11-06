@@ -95,7 +95,7 @@ html.st-seen .st-boot { display: none; }
 @keyframes st-in { from { opacity: 0; transform: translate3d(0, 10px, 0); } }
 
 .st-boot__logo {
-  position: absolute; inset: 0; margin: auto; width: clamp(8.5rem, 17vw, 14rem); height: clamp(8.5rem, 17vw, 14rem);
+  position: absolute; inset: 0; margin: auto; width: clamp(10rem, 21vw, 17rem); height: clamp(10rem, 21vw, 17rem);
   will-change: transform;
 }
 .st-draw { width: 100%; height: 100%; overflow: visible; color: var(--st-ink); }
@@ -259,6 +259,7 @@ html.st-seen .st-boot { display: none; }
 @media (min-width: 900px) { .st-disc { position: absolute; right: 0; top: 0; margin-top: 0; } }
 .st-disc:active { transform: scale(0.96); }
 @media (hover: hover) and (pointer: fine) { .st-disc:hover { transform: scale(1.08); } }
+.st-open__holding { min-height: 60vh; border-radius: inherit; background: rgba(18, 13, 10, 0.25); }
 .st-zoom { position: fixed; inset: 0; z-index: 9990; display: none; background: #f7f0e8; pointer-events: none; }
 
 /* ───── finale ───── */
