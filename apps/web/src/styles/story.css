@@ -318,3 +318,13 @@ html:not(.st-seen) .st-hero__window { clip-path: inset(34% 40% 34% 40% round 999
 .cc-marketing-shell:has(.st-root) .cc-nav-veil a,
 .cc-marketing-shell:has(.st-root) .cc-nav-veil button,
 .cc-marketing-shell:has(.st-root) .cc-nav-veil span { color: #120d0a !important; text-shadow: none !important; }
+
+/* ───── intro: drawn gyroscope + traced mark ───── */
+.st-orb { position: absolute; inset: 0; margin: auto; width: min(92vmin, 62rem); height: min(92vmin, 62rem); perspective: 1100px; pointer-events: none; }
+.st-orb__g { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+.st-orb__ring { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateY(calc(var(--i) * 36deg)); }
+.st-orb__ring svg { width: 100%; height: 100%; overflow: visible; }
+.st-orb__line { fill: none; stroke: rgba(18, 13, 10, 0.7); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+.st-orb__dot { fill: var(--st-cream); }
+.st-intro__mark--line, .st-intro__mark--line path { fill: none !important; stroke: var(--st-ink); stroke-width: 0.9; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.st-intro__markwrap { z-index: 1; }

@@ -210,13 +210,25 @@ export function StoryLanding() {
 
       const win = el.querySelector<HTMLElement>('.st-hero__window');
       const tl = gsap.timeline({ onComplete: finish });
+      const linePath = el.querySelector<SVGPathElement>('.st-intro__mark--line path');
+      linePath?.setAttribute('pathLength', '1');
+      gsap.set(linePath, { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set(q('.st-orb__line'), { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set('.st-orb__dot', { opacity: 0 });
+      gsap.set('.st-orb__g', { rotationX: 62, rotationY: -30, transformPerspective: 1100 });
+
       tl.fromTo(q('.st-intro__meta > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out' }, 0.15)
-        .fromTo(fill, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 2.2, ease: 'power2.inOut' }, 0.2)
+        .to(q('.st-orb__line'), { strokeDashoffset: 0, duration: 1.5, stagger: 0.14, ease: 'power2.inOut' }, 0.1)
+        .to(q('.st-orb__dot'), { opacity: 1, duration: 0.4, stagger: 0.1 }, 0.9)
+        .to(q('.st-orb__ring svg'), { rotation: 360, duration: 3.4, ease: 'none', transformOrigin: '50% 50%' }, 0.2)
+        .to('.st-orb__g', { rotationY: 150, rotationX: 22, duration: 3.4, ease: 'power2.inOut' }, 0.1)
+        .to(linePath, { strokeDashoffset: 0, duration: 1.7, ease: 'power2.inOut' }, 0.5)
+        .fromTo(fill, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.7, ease: 'power2.inOut' }, 1.3)
         .to(
           num,
           {
             v: 100,
-            duration: 2.2,
+            duration: 2.8,
             ease: 'power2.inOut',
             onUpdate: () => {
               if (counter) counter.textContent = `${Math.round(num.v)}%`;
@@ -224,7 +236,8 @@ export function StoryLanding() {
           },
           0.2,
         )
-        .addLabel('open', 2.7)
+        .to(q('.st-orb__g'), { scale: 0.12, opacity: 0, duration: 0.9, ease: 'power3.in' }, 2.7)
+        .addLabel('open', 3.1)
         .to(q('.st-intro__meta > *'), { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'open-=0.1')
         .to(win, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1.6, ease: 'power4.inOut' }, 'open')
         .to(q('.st-intro__mark--base'), { color: 'rgba(244,236,220,0.25)', duration: 0.6 }, 'open')
@@ -257,7 +270,7 @@ export function StoryLanding() {
       };
       window.addEventListener('keydown', onKey);
       veil?.addEventListener('click', skip);
-      const safety = window.setTimeout(skip, 7000);
+      const safety = window.setTimeout(skip, 9000);
       return () => {
         window.clearTimeout(safety);
         window.removeEventListener('keydown', onKey);
@@ -504,8 +517,21 @@ export function StoryLanding() {
             <span className="st-intro__num">0%</span>
             <span>2026</span>
           </div>
+          <div className="st-orb" aria-hidden>
+            <div className="st-orb__g">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="st-orb__ring" style={{ ['--i' as string]: i }}>
+                  <svg viewBox="-100 -100 200 200">
+                    <circle className="st-orb__line" cx="0" cy="0" r="96" pathLength={1} />
+                    <circle className="st-orb__dot" cx="96" cy="0" r="2.6" />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="st-intro__markwrap">
             <CodeCardMark className="st-intro__mark st-intro__mark--base" />
+            <CodeCardMark className="st-intro__mark st-intro__mark--line" />
             <CodeCardMark className="st-intro__mark st-intro__mark--fill" />
           </div>
           <div className="st-intro__meta st-intro__bottom">
