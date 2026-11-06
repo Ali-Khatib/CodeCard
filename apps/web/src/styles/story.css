@@ -221,7 +221,7 @@
 }
 .pl-nav[data-tone='light'] { color: #ffffff; }
 .pl-nav[data-tone='light'] .pl-nav__strip {
-  background: rgba(10, 9, 8, 0.34);
+  background: rgba(10, 9, 8, 0.42);
   border-bottom-color: rgba(255, 255, 255, 0.14);
 }
 .pl-nav[data-tone='dark'] { color: var(--ink); }
@@ -244,7 +244,20 @@
 .pl-nav__left { display: flex; align-items: center; gap: var(--s18); min-width: 0; }
 .pl-nav__right { display: flex; align-items: center; gap: var(--s12); }
 .pl-nav__mark { display: inline-flex; color: inherit; text-decoration: none; }
-.pl-nav__mark { padding: 0; }
+/* The shared mark stylesheet pins the landing logo to the viewport. Inside
+   this bar it is an ordinary flex child, so that placement is undone here —
+   at a specificity that beats the landing rules whatever the import order. */
+.cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo,
+.cc-marketing-shell .pl .pl-foot__mark.cc-ed-mark-logo,
+html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
+  position: static;
+  inset: auto;
+  padding: 0;
+  z-index: auto;
+  color: inherit;
+  text-shadow: none;
+  filter: none;
+}
 .pl-nav__mark .cc-ed-mark-logo__inner { font-size: 30px; }
 .pl-nav__mark .cc-ed-mark-logo__fill { font-weight: 500; }
 .pl-nav__link {
@@ -485,7 +498,7 @@
   color: #fff;
   will-change: transform;
 }
-.pl-hero__title { color: #fff; font-size: clamp(40px, 6.2vw, 84px); line-height: 1.04; }
+.pl-hero__title { color: #fff; font-size: clamp(42px, 7vw, 100px); line-height: 1.04; letter-spacing: -0.03em; }
 .pl-hero__w { display: inline; }
 .pl-hero__sub {
   margin: var(--s24) auto 0;
