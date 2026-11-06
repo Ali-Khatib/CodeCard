@@ -6,7 +6,8 @@ import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type M
 import { useGSAP } from '@gsap/react';
 import { ensureGsapPlugins, gsap, refreshScrollTrigger, ScrollTrigger } from '@/components/motion/gsap-runtime';
 import { useMotionPreferences } from '@/components/motion/motion-preferences-provider';
-import { ShaderHeroBackdrop } from '@/components/ui/shader-hero';
+import { MeshGradient } from '@paper-design/shaders-react';
+import { EditorialLiveDemoPreview } from '@/components/landing/editorial/editorial-live-demo-preview';
 import { CodeCardMark } from '@/components/brand/codecard-mark';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
@@ -15,6 +16,7 @@ import {
   validateWaitlistEmail,
   waitlistValidationMessage,
 } from '@/lib/waitlist/submit-waitlist';
+import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
 const SEEN_KEY = 'cc.story.seen';
@@ -59,6 +61,26 @@ const INDEX = [
   { name: 'Events', text: 'Meetings and follow-ups on one calendar, tied to the person.' },
   { name: 'Analytics', text: 'See which projects and papers they opened after the scan.' },
 ] as const;
+
+/** Warm ember field: ink into orange into peach. No green in the mix, so it never muddies. */
+function StoryField({ colors }: { colors: string[] }) {
+  return (
+    <div className="st-field" aria-hidden>
+      <MeshGradient
+        className="st-field__mesh"
+        colors={colors}
+        speed={0.7}
+        distortion={0.7}
+        swirl={0.35}
+        grainMixer={0.06}
+        grainOverlay={0.05}
+      />
+    </div>
+  );
+}
+
+const EMBER = ['#120d0a', '#2a0f05', '#f25c05', '#ff9d5c', '#f4ecdc'];
+const DEEP = ['#120d0a', '#1a0b05', '#c7480a', '#120d0a'];
 
 function Words({ text }: { text: string }) {
   return (
@@ -169,6 +191,7 @@ export function StoryLanding() {
       const num = { v: 0 };
       const counter = el.querySelector<HTMLElement>('.st-intro__num');
       const fill = el.querySelector<HTMLElement>('.st-intro__mark--fill');
+      void fill;
       const mark = el.querySelector<HTMLElement>('.st-intro__markwrap');
       const veil = el.querySelector<HTMLElement>('.st-intro');
 
@@ -185,23 +208,28 @@ export function StoryLanding() {
         refreshScrollTrigger({ safe: true });
       };
 
+      const win = el.querySelector<HTMLElement>('.st-hero__window');
       const tl = gsap.timeline({ onComplete: finish });
-      tl.fromTo(q('.st-intro__tag > span'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out' }, 0.2)
-        .fromTo(fill, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 2.1, ease: 'power2.inOut' }, 0.2)
+      tl.fromTo(q('.st-intro__meta > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out' }, 0.15)
+        .fromTo(fill, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 2.2, ease: 'power2.inOut' }, 0.2)
         .to(
           num,
           {
             v: 100,
-            duration: 2.1,
+            duration: 2.2,
             ease: 'power2.inOut',
             onUpdate: () => {
-              if (counter) counter.textContent = String(Math.round(num.v)).padStart(2, '0');
+              if (counter) counter.textContent = `${Math.round(num.v)}%`;
             },
           },
           0.2,
         )
-        .addLabel('fly', 2.5)
-        .to(q('.st-intro__count, .st-intro__tag'), { opacity: 0, duration: 0.35, ease: 'power2.out' }, 'fly')
+        .addLabel('open', 2.7)
+        .to(q('.st-intro__meta > *'), { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'open-=0.1')
+        .to(win, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1.6, ease: 'power4.inOut' }, 'open')
+        .to(q('.st-intro__mark--base'), { color: 'rgba(244,236,220,0.25)', duration: 0.6 }, 'open')
+        .to(q('.st-intro__mark--fill'), { color: '#f4ecdc', duration: 0.6 }, 'open')
+        .fromTo('.st-hero__field', { scale: 1.15 }, { scale: 1, duration: 2.2, ease: 'power3.out' }, 'open')
         .add(() => {
           const slot = document.querySelector<HTMLElement>('.cc-ed-mark-logo');
           if (!slot || !mark) return;
@@ -212,18 +240,16 @@ export function StoryLanding() {
             x: b.left + b.width / 2 - (a.left + a.width / 2) - 8,
             y: b.top + b.height / 2 - (a.top + a.height / 2),
             scale: s,
-            duration: 1.15,
+            duration: 1.2,
             ease: 'power4.inOut',
           });
-        }, 'fly')
-        .to(veil, { backgroundColor: 'rgba(8,10,9,0)', duration: 1, ease: 'power2.inOut' }, 'fly+=0.15')
-        .fromTo('.st-hero__shader', { scale: 1.12 }, { scale: 1, duration: 1.8, ease: 'power3.out' }, 'fly')
-        .fromTo(q('.st-stmt:first-child .st-ln > span'), { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' }, 'fly+=0.55')
-        .fromTo(q('.st-stmt:first-child .st-sub, .st-hero__cta, .st-hero__cue'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' }, 'fly+=1')
-        .to(mark, { opacity: 0, duration: 0.25 }, 'fly+=1.12')
+        }, 'open+=0.5')
+        .fromTo(q('.st-stmt:first-child .st-ln > span'), { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' }, 'open+=1.0')
+        .fromTo(q('.st-stmt:first-child .st-sub, .st-hero__cta'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' }, 'open+=1.4')
         .add(() => {
           delete html.dataset.stIntro;
-        }, 'fly+=1');
+        }, 'open+=1.5')
+        .to(mark, { opacity: 0, duration: 0.25 }, 'open+=1.65');
 
       const skip = () => tl.progress(1);
       const onKey = (e: KeyboardEvent) => {
@@ -302,7 +328,6 @@ export function StoryLanding() {
         gsap.set([...lines(1), ...lines(2)], { yPercent: 110 });
         gsap.set([...sub(1), ...sub(2)], { opacity: 0, y: 14 });
         hero
-          .to('.st-hero__cue', { opacity: 0, duration: 0.2 }, 0.05)
           .to([...lines(0), ...sub(0)], { yPercent: -110, opacity: 0, stagger: 0.06, duration: 0.5, ease: 'power2.in' }, 1)
           .to('.st-hero__tint--a', { opacity: 1, duration: 1 }, 1)
           .to(lines(1), { yPercent: 0, stagger: 0.08, duration: 0.7, ease: 'power3.out' }, 1.5)
@@ -313,7 +338,8 @@ export function StoryLanding() {
           .to(lines(2), { yPercent: 0, stagger: 0.08, duration: 0.7, ease: 'power3.out' }, 3)
           .to(sub(2), { opacity: 1, y: 0, duration: 0.5 }, 3.4)
           .to('.st-hero__bar > i', { scaleX: 1, duration: 4 }, 0)
-          .to({}, { duration: 0.6 }, 3.9);
+          .to('.st-hero__window', { clipPath: 'inset(5% 3% 5% 3% round 44px)', duration: 0.7, ease: 'power2.inOut' }, 4)
+          .to({}, { duration: 0.8 }, 4);
         hero.eventCallback('onUpdate', () => {
           const t = hero.time();
           const n = t < 1.5 ? 1 : t < 3 ? 2 : 3;
@@ -363,6 +389,7 @@ export function StoryLanding() {
           if (i < steps.length - 1) {
             journey.to(ln, { yPercent: -110, duration: 0.4, ease: 'power2.in' }, i + 0.75);
             journey.to(tx, { opacity: 0, duration: 0.25 }, i + 0.75);
+            journey.to(s, { opacity: 0, duration: 0.2 }, i + 0.98);
           }
         });
 
@@ -467,18 +494,17 @@ export function StoryLanding() {
 
       {!introGone ? (
         <div className="st-intro" aria-hidden="true">
+          <div className="st-intro__meta st-intro__top">
+            <span>CodeCard</span>
+            <span className="st-intro__num">0%</span>
+            <span>2026</span>
+          </div>
           <div className="st-intro__markwrap">
             <CodeCardMark className="st-intro__mark st-intro__mark--base" />
             <CodeCardMark className="st-intro__mark st-intro__mark--fill" />
           </div>
-          <p className="st-intro__tag">
-            <span>Show your work.</span>
-            <span>Make the introduction.</span>
-            <span>Keep the connection.</span>
-          </p>
-          <div className="st-intro__count">
-            <span className="st-intro__num">00</span>
-            <span className="st-intro__pct">%</span>
+          <div className="st-intro__meta st-intro__bottom">
+            <span>Show your work. Keep the connection.</span>
           </div>
         </div>
       ) : null}
@@ -486,45 +512,44 @@ export function StoryLanding() {
       {/* 1 — hero */}
       <section className="st-hero" data-tone="dark" data-chap="0" aria-label="CodeCard">
         <div className="st-hero__stage">
-          <div className="st-hero__shader" aria-hidden>
-            <ShaderHeroBackdrop />
-            <div className="st-hero__shade" />
-            <div className="st-hero__tint st-hero__tint--a" />
-            <div className="st-hero__tint st-hero__tint--b" />
-          </div>
           <h1 className="sr-only">Show your work. Make the introduction. Keep the connection.</h1>
-          <div className="st-hero__stmts">
-            {STATEMENTS.map((s) => (
-              <div key={s.lines.join(' ')} className="st-stmt" aria-hidden>
-                <p className="st-h">
-                  {s.lines.map((l) => (
-                    <span key={l} className="st-ln">
-                      <span>{l}</span>
-                    </span>
-                  ))}
-                </p>
-                <p className="st-sub">{s.sub}</p>
-              </div>
-            ))}
+          <div className="st-hero__window">
+            <div className="st-hero__field" aria-hidden>
+              <StoryField colors={EMBER} />
+              <div className="st-hero__shade" />
+              <div className="st-hero__tint st-hero__tint--a" />
+              <div className="st-hero__tint st-hero__tint--b" />
+            </div>
+            <div className="st-hero__stmts">
+              {STATEMENTS.map((s) => (
+                <div key={s.lines.join(' ')} className="st-stmt" aria-hidden>
+                  <p className="st-h">
+                    {s.lines.map((l) => (
+                      <span key={l} className="st-ln">
+                        <span>{l}</span>
+                      </span>
+                    ))}
+                  </p>
+                  <p className="st-sub">{s.sub}</p>
+                </div>
+              ))}
+            </div>
+            <div className="st-hero__cta">
+              <Link href="/sign-up" className="st-btn st-btn--hot" data-testid="hero-primary-cta">
+                Create your CodeCard
+              </Link>
+              <a href={LIVE_DEMO_PROFILE_HREF} className="st-btn st-btn--ghost">
+                See a live card
+              </a>
+            </div>
+            <div className="st-hero__meta" aria-hidden>
+              <span className="st-hero__count">01</span>
+              <span className="st-hero__bar">
+                <i />
+              </span>
+              <span>03</span>
+            </div>
           </div>
-          <div className="st-hero__cta">
-            <Link href="/sign-up" className="st-btn st-btn--hot" data-testid="hero-primary-cta">
-              Create your CodeCard
-            </Link>
-            <a href={LIVE_DEMO_PROFILE_HREF} className="st-btn st-btn--ghost">
-              See a live card
-            </a>
-          </div>
-          <div className="st-hero__meta" aria-hidden>
-            <span className="st-hero__count">01</span>
-            <span className="st-hero__bar">
-              <i />
-            </span>
-            <span>03</span>
-          </div>
-          <p className="st-hero__cue" aria-hidden>
-            Scroll
-          </p>
         </div>
       </section>
 
@@ -672,27 +697,32 @@ export function StoryLanding() {
         </ol>
       </section>
 
-      {/* 6 — open the workspace */}
+      {/* 6 — the live demo, back as the showcase */}
       <section className="st-open" data-tone="dark" data-chap="5" aria-labelledby="st-open-h">
-        <p className="st-eyebrow st-eyebrow--ink">Live workspace</p>
-        <h2 id="st-open-h" className="st-h st-h--xl st-rise">
-          <span className="st-ln">
-            <span>Open the</span>
-          </span>
-          <span className="st-ln">
-            <span>workspace.</span>
-          </span>
-        </h2>
-        <p className="st-open__lede">Projects, research, connections, Circle, events and analytics. The real product, on real demo data.</p>
-        <a href={LIVE_DEMO_HREF} onClick={openWorkspace} className="st-disc" data-testid="story-open-workspace">
-          <span>Enter the live demo</span>
-        </a>
+        <div className="st-open__head">
+          <p className="st-eyebrow st-eyebrow--ink">Live workspace</p>
+          <h2 id="st-open-h" className="st-h st-h--lg st-rise">
+            <span className="st-ln">
+              <span>Open the workspace</span>
+            </span>
+            <span className="st-ln">
+              <span>they would see.</span>
+            </span>
+          </h2>
+          <p className="st-open__lede">Projects, research, connections, Circle, events and analytics. The real product, on demo data. Scroll inside it, switch to mobile, or step all the way in.</p>
+          <a href={LIVE_DEMO_HREF} onClick={openWorkspace} className="st-disc" data-testid="story-open-workspace">
+            <span>Enter the live demo</span>
+          </a>
+        </div>
+        <div className="cc-ed st-open__stage">
+          <EditorialLiveDemoPreview />
+        </div>
       </section>
 
       {/* 7 — finale */}
       <section className="st-close" id="start" data-tone="dark" data-chap="6" aria-labelledby="st-close-h">
         <div className="st-close__shader" aria-hidden>
-          <ShaderHeroBackdrop />
+          <StoryField colors={DEEP} />
           <div className="st-hero__shade" />
         </div>
         <p className="st-close__old">The missing piece in every introduction.</p>
