@@ -277,3 +277,44 @@ html.st-seen .st-intro { display: none; }
   .st-hero__cue::after { animation: none; }
   .st-idx__text { opacity: 1; transform: none; }
 }
+
+/* ───── chapter rail ───── */
+.st-rail {
+  position: fixed; left: 0.9rem; top: 50%; z-index: 60; display: none; align-items: center; gap: 0.7rem;
+  writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg);
+  font-family: var(--font-space-mono), monospace; font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--st-cream); transition: opacity 0.5s, color 0.4s; pointer-events: none;
+}
+.st-rail[data-ink='dark'] { color: var(--st-ink); }
+.st-rail[data-hidden='true'] { opacity: 0; }
+.st-rail__n { color: var(--st-orange); }
+@media (min-width: 1000px) { .st-live .st-rail { display: flex; } }
+
+/* ───── marquee ───── */
+.st-marq { background: var(--st-ink); overflow: hidden; padding: clamp(3rem, 9vh, 6rem) 0; display: grid; gap: clamp(0.5rem, 2vh, 1.25rem); }
+.st-marq__row { display: flex; width: max-content; will-change: transform; }
+.st-marq__row > span {
+  display: flex; align-items: center; gap: 0 clamp(1.5rem, 4vw, 4rem); padding-right: clamp(1.5rem, 4vw, 4rem); white-space: nowrap;
+  font-size: clamp(3.5rem, 11vw, 10rem); font-weight: 600; letter-spacing: -0.055em; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1.5px rgba(252, 241, 231, 0.55);
+}
+.st-marq__row--b > span { -webkit-text-stroke-color: rgba(252, 241, 231, 0.28); }
+.st-marq__row i { display: inline-block; width: 0.28em; height: 0.28em; margin-left: clamp(1.5rem, 4vw, 4rem); border-radius: 50%; background: var(--st-orange); -webkit-text-stroke: 0; }
+
+/* ───── finale: steerable light ───── */
+.st-close { --mx: 30%; --my: 50%; }
+.st-close__stack { position: relative; }
+.st-close__stack > h2.st-close__title { color: rgba(252, 241, 231, 0.14); }
+.st-close__stack > h2.st-close__title em { color: rgba(233, 90, 11, 0.26); }
+.st-close__lit {
+  position: absolute; inset: 0; color: var(--st-cream); pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle clamp(11rem, 24vw, 22rem) at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%);
+  mask-image: radial-gradient(circle clamp(11rem, 24vw, 22rem) at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%);
+}
+.st-close__lit em { color: var(--st-orange); }
+@media (prefers-reduced-motion: reduce) {
+  .st-close__stack > h2.st-close__title { color: var(--st-cream); }
+  .st-close__stack > h2.st-close__title em { color: var(--st-orange); }
+  .st-close__lit { display: none; }
+  .st-marq__row { transform: none !important; }
+}

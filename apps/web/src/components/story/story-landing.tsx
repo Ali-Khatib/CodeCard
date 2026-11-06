@@ -39,6 +39,8 @@ const STEPS = [
   { word: 'Keep.', text: 'Who they are, where you met, what you said and the next step stay on one private record.' },
 ] as const;
 
+const CHAPTERS = ['Open', 'The idea', 'The handshake', 'The category', 'Inside', 'The workspace', 'Start'] as const;
+
 const PRODUCTS = ['CodeCard', 'LinkedIn', 'GitHub', 'Peerlist'] as const;
 const FEATURES = [
   'Open the work in the room, on your phone or with a QR',
@@ -259,7 +261,18 @@ export function StoryLanding() {
           start: 'top 56px',
           end: 'bottom 56px',
           onToggle: (self) => {
-            if (self.isActive) applyLandingChromeInk(tone);
+            if (!self.isActive) return;
+            applyLandingChromeInk(tone);
+            const rail = el.querySelector<HTMLElement>('.st-rail');
+            const n = Number(sec.dataset.chap ?? 0);
+            if (rail) {
+              rail.dataset.ink = tone;
+              rail.dataset.hidden = n === 0 ? 'true' : 'false';
+              const num = rail.querySelector('.st-rail__n');
+              const txt = rail.querySelector('.st-rail__t');
+              if (num) num.textContent = `0${n}`;
+              if (txt) txt.textContent = CHAPTERS[n] ?? '';
+            }
           },
         });
       });
@@ -375,6 +388,42 @@ export function StoryLanding() {
           { scale: 1.12 },
           { scale: 1, ease: 'none', scrollTrigger: { trigger: '.st-close', start: 'top bottom', end: 'top 20%', scrub: 0.5 } },
         );
+        /* the marquee drifts with the page and leans into the scroll speed */
+        gsap.fromTo('.st-marq__row--a', { xPercent: 0 }, { xPercent: -50, ease: 'none', scrollTrigger: { trigger: '.st-marq', start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
+        gsap.fromTo('.st-marq__row--b', { xPercent: -50 }, { xPercent: 0, ease: 'none', scrollTrigger: { trigger: '.st-marq', start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
+        const lean = gsap.quickTo('.st-marq__row', 'skewX', { duration: 0.6, ease: 'power3.out' });
+        ScrollTrigger.create({
+          trigger: '.st-marq',
+          start: 'top bottom',
+          end: 'bottom top',
+          onUpdate: (self) => lean(gsap.utils.clamp(-9, 9, self.getVelocity() / -260)),
+          onLeave: () => lean(0),
+          onLeaveBack: () => lean(0),
+        });
+
+        /* the finale: a light you steer across the type (drifts on its own on touch) */
+        const close = el.querySelector<HTMLElement>('.st-close');
+        if (close) {
+          const pos = { x: 0.3, y: 0.5 };
+          const paint = () => {
+            close.style.setProperty('--mx', `${pos.x * 100}%`);
+            close.style.setProperty('--my', `${pos.y * 100}%`);
+          };
+          paint();
+          const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+          if (fine) {
+            const mx = gsap.quickTo(pos, 'x', { duration: 0.7, ease: 'power3.out', onUpdate: paint });
+            const my = gsap.quickTo(pos, 'y', { duration: 0.7, ease: 'power3.out', onUpdate: paint });
+            const move = (e: PointerEvent) => {
+              const r = close.getBoundingClientRect();
+              mx((e.clientX - r.left) / r.width);
+              my((e.clientY - r.top) / r.height);
+            };
+            close.addEventListener('pointermove', move);
+          } else {
+            gsap.to(pos, { x: 0.75, y: 0.45, duration: 5, ease: 'sine.inOut', yoyo: true, repeat: -1, onUpdate: paint });
+          }
+        }
         refreshScrollTrigger({ safe: true });
       }
 
@@ -430,7 +479,7 @@ export function StoryLanding() {
       ) : null}
 
       {/* 1 — hero */}
-      <section className="st-hero" data-tone="dark" aria-label="CodeCard">
+      <section className="st-hero" data-tone="dark" data-chap="0" aria-label="CodeCard">
         <div className="st-hero__stage">
           <div className="st-hero__shader" aria-hidden>
             <ShaderHeroBackdrop />
@@ -475,7 +524,7 @@ export function StoryLanding() {
       </section>
 
       {/* 2 — three ideas */}
-      <section className="st-ideas" data-tone="light" aria-label="Why CodeCard">
+      <section className="st-ideas" data-tone="light" data-chap="1" aria-label="Why CodeCard">
         <div className="st-ideas__stage">
           <p className="st-eyebrow">The idea</p>
           <div className="st-ideas__text">
@@ -491,8 +540,26 @@ export function StoryLanding() {
         </div>
       </section>
 
+      {/* the three lines, moving with the scroll */}
+      <div className="st-marq" data-tone="dark" aria-hidden>
+        <div className="st-marq__row st-marq__row--a">
+          {[0, 1].map((k) => (
+            <span key={k}>
+              Show your work<i /> Make the introduction<i /> Keep the connection<i />
+            </span>
+          ))}
+        </div>
+        <div className="st-marq__row st-marq__row--b">
+          {[0, 1].map((k) => (
+            <span key={k}>
+              Keep the connection<i /> Make the introduction<i /> Show your work<i />
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* 3 — the handshake */}
-      <section className="st-journey" data-tone="dark" aria-label="How an introduction works">
+      <section className="st-journey" data-tone="dark" data-chap="2" aria-label="How an introduction works">
         <div className="st-journey__stage">
           <p className="st-eyebrow">One introduction, start to finish</p>
           <div className="st-rings" aria-hidden>
@@ -525,7 +592,7 @@ export function StoryLanding() {
       </section>
 
       {/* 4 — comparison */}
-      <section className="st-compare" id="how-it-compares" data-tone="light" aria-labelledby="st-compare-h">
+      <section className="st-compare" id="how-it-compares" data-tone="light" data-chap="3" aria-labelledby="st-compare-h">
         <p className="st-eyebrow">The category</p>
         <h2 id="st-compare-h" className="st-h st-h--lg st-rise">
           <span className="st-ln">
@@ -580,7 +647,7 @@ export function StoryLanding() {
       </section>
 
       {/* 5 — what is inside */}
-      <section className="st-idx" data-tone="dark" aria-labelledby="st-idx-h">
+      <section className="st-idx" data-tone="dark" data-chap="4" aria-labelledby="st-idx-h">
         <p className="st-eyebrow">What is inside</p>
         <h2 id="st-idx-h" className="sr-only">
           What is inside CodeCard
@@ -601,7 +668,7 @@ export function StoryLanding() {
       </section>
 
       {/* 6 — open the workspace */}
-      <section className="st-open" data-tone="dark" aria-labelledby="st-open-h">
+      <section className="st-open" data-tone="dark" data-chap="5" aria-labelledby="st-open-h">
         <p className="st-eyebrow st-eyebrow--ink">Live workspace</p>
         <h2 id="st-open-h" className="st-h st-h--xl st-rise">
           <span className="st-ln">
@@ -618,16 +685,22 @@ export function StoryLanding() {
       </section>
 
       {/* 7 — finale */}
-      <section className="st-close" id="start" data-tone="dark" aria-labelledby="st-close-h">
+      <section className="st-close" id="start" data-tone="dark" data-chap="6" aria-labelledby="st-close-h">
         <div className="st-close__shader" aria-hidden>
           <ShaderHeroBackdrop />
           <div className="st-hero__shade" />
         </div>
         <p className="st-close__old">The missing piece in every introduction.</p>
-        <h2 id="st-close-h" className="st-close__title">
-          <span>Here&rsquo;s my</span>
-          <em>CodeCard.</em>
-        </h2>
+        <div className="st-close__stack">
+          <h2 id="st-close-h" className="st-close__title">
+            <span>Here&rsquo;s my</span>
+            <em>CodeCard.</em>
+          </h2>
+          <p className="st-close__title st-close__lit" aria-hidden>
+            <span>Here&rsquo;s my</span>
+            <em>CodeCard.</em>
+          </p>
+        </div>
         <div className="st-close__actions">
           <Link href="/sign-up" className="st-btn st-btn--hot" data-testid="finale-primary-cta">
             Create your CodeCard
@@ -639,6 +712,10 @@ export function StoryLanding() {
         <Waitlist />
       </section>
 
+      <div className="st-rail" data-ink="light" data-hidden="true" aria-hidden>
+        <span className="st-rail__n">00</span>
+        <span className="st-rail__t">Open</span>
+      </div>
       <div ref={zoomRef} className="st-zoom" aria-hidden />
     </div>
   );
