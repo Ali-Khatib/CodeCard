@@ -48,7 +48,7 @@ export function StoryHero({
         gsap.set(canvas, { clipPath: `inset(${top}px ${padX} ${padB} ${padX} round ${radius}px)` });
       }
       el.dataset.open = 'false';
-      gsap.set(parts, { opacity: 0.24 });
+      gsap.set(parts, { opacity: 0.5 });
 
       const tl = gsap.timeline({
         defaults: { ease: 'none' },

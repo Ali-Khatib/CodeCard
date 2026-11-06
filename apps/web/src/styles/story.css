@@ -190,7 +190,7 @@
 .pl-nav__left { display: flex; align-items: center; gap: var(--s24); min-width: 0; }
 .pl-nav__right { display: flex; align-items: center; gap: var(--s12); }
 .pl-nav__mark { display: inline-flex; color: inherit; text-decoration: none; }
-.pl-nav__mark .cc-ed-mark-logo__inner { font-size: 1.7rem; }
+.pl-nav__mark .cc-ed-mark-logo__inner { font-size: 28px; }
 .pl-nav__link {
   display: inline-flex;
   align-items: center;
@@ -216,7 +216,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--s10) var(--s18);
-  border-radius: var(--s8);
+  border-radius: var(--s12);
   background: var(--graphite);
   color: #fff;
   font-size: 14px;
@@ -324,11 +324,16 @@
   padding-top: var(--s100);
 }
 .pl-hero__canvas { position: absolute; inset: 0; clip-path: inset(0% round 0px); will-change: clip-path; }
+/* The reference is a cinematic crop: deep blacks with amber-warm light and no
+   second hue. The field keeps its own motion, graded to that. */
+.pl-hero__canvas > :first-child { filter: saturate(0.42) sepia(0.22) contrast(1.22) brightness(0.62); }
 .pl-hero[data-expand='false'] .pl-hero__canvas { clip-path: inset(3.4% 4.2% 3.4% 4.2% round 20px); }
 .pl-hero__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(5, 5, 5, 0.52), rgba(5, 5, 5, 0.26) 40%, rgba(5, 5, 5, 0.66));
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgba(5, 5, 5, 0.1), rgba(5, 5, 5, 0.72) 100%),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.58), rgba(5, 5, 5, 0.3) 42%, rgba(5, 5, 5, 0.74));
 }
 .pl-hero__inner {
   position: relative;
@@ -372,22 +377,26 @@
 .pl-panel {
   display: flex;
   flex-direction: column;
+  min-height: 300px;
   padding: var(--s32);
   border-radius: 20px;
   background: var(--white);
   box-shadow: var(--shadow);
 }
-.pl-panel__art {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: var(--s12);
-  background: var(--paper);
-  margin-bottom: var(--s24);
-}
 .pl-shot { position: absolute; top: 0; left: 0; transform-origin: top left; pointer-events: none; }
 .pl-shot .cc-ed__frame { margin: 0; max-width: none; }
-.pl-panel__art--qr { display: grid; place-items: center; background: var(--graphite); }
+.pl-panel__n {
+  display: flex;
+  align-items: center;
+  gap: var(--s10);
+  margin: 0 0 var(--s58);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--stone);
+}
+.pl-emb { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ember); }
+.pl-emb--period { display: inline-block; margin-left: 4px; width: 10px; height: 10px; vertical-align: baseline; }
 .pl-panel .pl-sub { margin-bottom: var(--s10); }
 .pl-panel__p { margin: 0 0 var(--s24); font-size: 16px; line-height: 1.5; letter-spacing: -0.02em; color: var(--slate); }
 .pl-panel .pl-link { margin-top: auto; align-self: flex-start; }
@@ -414,24 +423,13 @@
 /* ── editorial brand statement ────────────────────────────────────────── */
 .pl-say__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 0.8fr);
-  gap: clamp(var(--s32), 4vw, var(--s72));
-  align-items: center;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: clamp(var(--s40), 7vw, var(--s122));
+  align-items: end;
 }
-.pl-say__art {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--white);
-  box-shadow: var(--shadow);
-  aspect-ratio: 3 / 4;
-}
-
+.pl-say__grid .pl-display { max-width: 13ch; }
 .pl-say__side .pl-btn { margin-top: var(--s32); }
-@media (max-width: 1000px) {
-  .pl-say__grid { grid-template-columns: 1fr; }
-  .pl-say__art { aspect-ratio: 16 / 10; max-width: 560px; }
-}
+@media (max-width: 1000px) { .pl-say__grid { grid-template-columns: 1fr; align-items: start; } }
 
 /* ── how it works: alternating rows ───────────────────────────────────── */
 .pl-steps { display: grid; gap: clamp(var(--s72), 11vh, var(--s122)); }

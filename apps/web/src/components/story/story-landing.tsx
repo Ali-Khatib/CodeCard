@@ -1,36 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { StoryNav, StoryFooter } from './story-chrome';
 import { StoryHero } from './story-hero';
-import { useChromeTone, useFitShots, useReveal } from './story-hooks';
+import { useChromeTone, useReveal } from './story-hooks';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
 /* Real product surfaces, loaded after first paint so the hero never waits. */
-const EditorialProductFrame = dynamic(
-  () =>
-    import('@/components/landing/editorial/editorial-product-frame').then(
-      (m) => m.EditorialProductFrame,
-    ),
-  { ssr: false, loading: () => <div className="pl-hold" /> },
-);
-
-const PublicCodeCardQr = dynamic(
-  () => import('@/components/profile/public-code-card-qr').then((m) => m.PublicCodeCardQr),
-  { ssr: false, loading: () => <div className="pl-hold" /> },
-);
-
 const HERO_WORDS = ['Your', 'work', 'deserves', 'more', 'than', 'a', 'handshake.'] as const;
 
 export function StoryLanding() {
   const root = useRef<HTMLDivElement>(null);
   useReveal(root);
   useChromeTone(root);
-  useFitShots(root);
 
   useEffect(() => () => applyLandingChromeInk('dark'), []);
 
@@ -62,17 +47,13 @@ export function StoryLanding() {
 
           <div className="pl-panels">
             <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art">
-                <div className="pl-shot" data-w="1180">
-
-                  <EditorialProductFrame state="profile" />
-
-                </div>
-              </div>
+              <p className="pl-panel__n">
+                01 <span className="pl-emb" aria-hidden />
+              </p>
               <h3 className="pl-sub">Show your work.</h3>
               <p className="pl-panel__p">
-                Bring your professional identity, projects and research together in one place. Give people a reason to
-                discover what you do.
+                Bring your professional identity, projects and research together in one place. Give people a reason
+                to discover what you do.
               </p>
               <Link href="/sign-up" className="pl-link">
                 Create your profile <span aria-hidden>→</span>
@@ -80,12 +61,9 @@ export function StoryLanding() {
             </article>
 
             <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art pl-panel__art--qr">
-                <div className="pl-qr">
-                  <PublicCodeCardQr profileSlug="demo" showLink={false} />
-                  <p className="pl-qr__cap">Scan to open the card</p>
-                </div>
-              </div>
+              <p className="pl-panel__n">
+                02 <span className="pl-emb" aria-hidden />
+              </p>
               <h3 className="pl-sub">Share instantly.</h3>
               <p className="pl-panel__p">
                 One CodeCard. One QR code. Share your professional identity whenever an introduction happens.
@@ -96,13 +74,9 @@ export function StoryLanding() {
             </article>
 
             <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art">
-                <div className="pl-shot" data-w="1180">
-
-                  <EditorialProductFrame state="connections" />
-
-                </div>
-              </div>
+              <p className="pl-panel__n">
+                03 <span className="pl-emb" aria-hidden />
+              </p>
               <h3 className="pl-sub">Keep the connection.</h3>
               <p className="pl-panel__p">
                 Remember who you met, where you met and what you discussed. Keep the context that makes a connection
@@ -120,16 +94,9 @@ export function StoryLanding() {
       <section className="pl-band pl-say" data-band="light" aria-labelledby="pl-say-h">
         <div className="pl-wrap pl-say__grid">
           <h2 id="pl-say-h" className="pl-display" data-reveal>
-            CodeCard is where introductions become connections.
+            CodeCard is where introductions become connections
+            <span className="pl-emb pl-emb--period" aria-hidden />
           </h2>
-
-          <div className="pl-say__art" data-reveal>
-            <div className="pl-shot" data-w="1180">
-
-              <EditorialProductFrame state="profile" />
-
-            </div>
-          </div>
 
           <div className="pl-say__side" data-reveal>
             <p className="pl-p">The best opportunities often begin with a conversation.</p>
