@@ -37,18 +37,34 @@ export function StoryHero({
       const canvas = el.querySelector<HTMLElement>('.pl-hero__canvas');
       const parts = Array.from(el.querySelectorAll<HTMLElement>('.pl-hero__w'));
       const small = window.matchMedia('(max-width: 760px)').matches;
-      const padY = small ? '1.6%' : '3.6%';
-      const padX = small ? '2.6%' : '4.4%';
-      const radius = small ? 20 : 28;
+      /* The top inset clears the bar, so the bar sits on paper while the hero
+         is contained and only turns light once the canvas reaches it. */
+      const top = small ? 78 : 88;
+      const padB = small ? '2%' : '3.4%';
+      const padX = small ? '3%' : '4.2%';
+      const radius = small ? 16 : 20;
 
       if (canvas) {
-        gsap.set(canvas, { clipPath: `inset(${padY} ${padX} ${padY} ${padX} round ${radius}px)` });
+        gsap.set(canvas, { clipPath: `inset(${top}px ${padX} ${padB} ${padX} round ${radius}px)` });
       }
+      el.dataset.open = 'false';
       gsap.set(parts, { opacity: 0.24 });
 
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
-        scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 0.4 },
+        scrollTrigger: {
+          trigger: el,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.4,
+          onUpdate: (self) => {
+            const open = self.progress > 0.34 ? 'true' : 'false';
+            if (el.dataset.open !== open) {
+              el.dataset.open = open;
+              window.dispatchEvent(new Event('pl:tone'));
+            }
+          },
+        },
       });
       if (canvas) tl.to(canvas, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0);
       tl.fromTo('.pl-hero__inner', { scale: 0.962 }, { scale: 1, duration: 0.5 }, 0);

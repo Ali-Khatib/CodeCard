@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRef } from 'react';
 import { StoryNav, StoryFooter } from './story-chrome';
 import { StoryHero } from './story-hero';
-import { useChromeTone, useReveal } from './story-hooks';
+import { useChromeTone, useFitShots, useReveal } from './story-hooks';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
@@ -28,6 +28,7 @@ export function StoryHow() {
   const root = useRef<HTMLDivElement>(null);
   useReveal(root);
   useChromeTone(root);
+  useFitShots(root);
 
   return (
     <div ref={root} className="pl" data-testid="story-how">
@@ -56,7 +57,11 @@ export function StoryHow() {
               <p className="pl-p">Give people a clear picture of who you are and what you do.</p>
             </div>
             <div className="pl-stepRow__art">
-              <EditorialProductFrame state="profile" size="lg" />
+              <div className="pl-shot" data-w="1180">
+
+                <EditorialProductFrame state="profile" />
+
+              </div>
             </div>
           </article>
 
@@ -85,7 +90,11 @@ export function StoryHow() {
               <p className="pl-p">Remember where you met, what you discussed and what comes next.</p>
             </div>
             <div className="pl-stepRow__art">
-              <EditorialProductFrame state="connections" size="lg" />
+              <div className="pl-shot" data-w="1180">
+
+                <EditorialProductFrame state="connections" />
+
+              </div>
             </div>
           </article>
         </div>

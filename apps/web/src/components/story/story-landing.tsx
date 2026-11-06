@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { StoryNav, StoryFooter } from './story-chrome';
 import { StoryHero } from './story-hero';
-import { useChromeTone, useReveal } from './story-hooks';
+import { useChromeTone, useFitShots, useReveal } from './story-hooks';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
@@ -30,6 +30,7 @@ export function StoryLanding() {
   const root = useRef<HTMLDivElement>(null);
   useReveal(root);
   useChromeTone(root);
+  useFitShots(root);
 
   useEffect(() => () => applyLandingChromeInk('dark'), []);
 
@@ -62,7 +63,11 @@ export function StoryLanding() {
           <div className="pl-panels">
             <article className="pl-panel" data-reveal>
               <div className="pl-panel__art">
-                <EditorialProductFrame state="profile" />
+                <div className="pl-shot" data-w="1180">
+
+                  <EditorialProductFrame state="profile" />
+
+                </div>
               </div>
               <h3 className="pl-sub">Show your work.</h3>
               <p className="pl-panel__p">
@@ -92,7 +97,11 @@ export function StoryLanding() {
 
             <article className="pl-panel" data-reveal>
               <div className="pl-panel__art">
-                <EditorialProductFrame state="connections" />
+                <div className="pl-shot" data-w="1180">
+
+                  <EditorialProductFrame state="connections" />
+
+                </div>
               </div>
               <h3 className="pl-sub">Keep the connection.</h3>
               <p className="pl-panel__p">
@@ -115,7 +124,11 @@ export function StoryLanding() {
           </h2>
 
           <div className="pl-say__art" data-reveal>
-            <EditorialProductFrame state="profile" />
+            <div className="pl-shot" data-w="1180">
+
+              <EditorialProductFrame state="profile" />
+
+            </div>
           </div>
 
           <div className="pl-say__side" data-reveal>

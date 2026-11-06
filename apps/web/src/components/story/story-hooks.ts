@@ -30,6 +30,32 @@ export function useReveal(root: RefObject<HTMLElement | null>) {
   }, [canEnhanceMotion, root]);
 }
 
+/**
+ * Product shots render at a real screen width and are scaled down to their
+ * frame, so each panel reads as a screenshot instead of a squeezed app.
+ */
+export function useFitShots(root: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const shots = Array.from(el.querySelectorAll<HTMLElement>('.pl-shot'));
+    if (!shots.length) return;
+    const fit = () => {
+      for (const shot of shots) {
+        const box = shot.parentElement;
+        if (!box) continue;
+        const design = Number(shot.dataset.w ?? 1120);
+        shot.style.width = `${design}px`;
+        shot.style.transform = `scale(${box.clientWidth / design})`;
+      }
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    shots.forEach((s) => s.parentElement && ro.observe(s.parentElement));
+    return () => ro.disconnect();
+  }, [root]);
+}
+
 /** The bar reads whichever band sits under it and flips its ink to match. */
 export function useChromeTone(root: RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -47,7 +73,10 @@ export function useChromeTone(root: RefObject<HTMLElement | null>) {
         const r = b.getBoundingClientRect();
         if (r.top <= 58 && r.bottom > 58) hit = b;
       }
-      const tone = (hit ?? bands[0])?.dataset.band === 'dark' ? 'light' : 'dark';
+      const band = hit ?? bands[0];
+      /* A contained hero still shows paper behind the bar, so it reads light. */
+      const dark = band?.dataset.band === 'dark' && band.dataset.open !== 'false';
+      const tone = dark ? 'light' : 'dark';
       if (tone === last) return;
       last = tone;
       applyLandingChromeInk(tone);
@@ -63,9 +92,11 @@ export function useChromeTone(root: RefObject<HTMLElement | null>) {
     sync();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+    window.addEventListener('pl:tone', onScroll);
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      window.removeEventListener('pl:tone', onScroll);
     };
   }, [root]);
 }
