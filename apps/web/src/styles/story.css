@@ -50,7 +50,7 @@
 }
 .cc-d1 {
   margin: 0;
-  font-size: clamp(2.6rem, 6.4vw, 5.6rem);
+  font-size: clamp(2.6rem, 5.2vw, 4.9rem);
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.045em;
@@ -305,7 +305,7 @@ html[data-cc-opening='run'] .cc-marketing-nav-shell { opacity: 0; }
 /* ── 01 hero ──────────────────────────────────────────────────────────── */
 .cc-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(2rem, 5vw, 5rem);
   padding: clamp(7rem, 16vh, 11rem) var(--pad) clamp(4rem, 10vh, 7rem);
@@ -320,6 +320,8 @@ html[data-cc-opening='run'] .cc-marketing-nav-shell { opacity: 0; }
   box-shadow: 0 40px 80px -50px rgba(36, 28, 23, 0.45);
 }
 .cc-hero__product .cc-ed__frame { margin: 0; max-width: none; }
+.cc-hero__product { max-height: 34rem; }
+.cc-hero__copy .cc-d1 { max-width: 13ch; }
 @media (max-width: 900px) {
   .cc-hero { grid-template-columns: 1fr; padding-top: clamp(6rem, 14vh, 8rem); }
 }
