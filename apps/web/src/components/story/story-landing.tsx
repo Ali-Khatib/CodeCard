@@ -312,11 +312,13 @@ export function StoryLanding() {
     { scope: root, dependencies: [canEnhanceMotion] },
   );
 
-  /* ───────── Scroll story ───────── */
+  /* ───────── Scroll story ─────────
+     Built only once the intro has handed over, so the scrubbed timelines
+     record their start values from the page at rest, not mid-reveal. */
   useGSAP(
     () => {
       const el = root.current;
-      if (!el || !canEnhanceMotion) return;
+      if (!el || !canEnhanceMotion || !introGone) return;
       ensureGsapPlugins();
       el.classList.add('st-live');
       const q = gsap.utils.selector(el);
@@ -371,7 +373,12 @@ export function StoryLanding() {
         gsap.set([...lines(1), ...lines(2)], { yPercent: 110 });
         gsap.set([...sub(1), ...sub(2)], { opacity: 0, y: 14 });
         hero
-          .to([...lines(0), ...sub(0)], { yPercent: -110, opacity: 0, stagger: 0.06, duration: 0.5, ease: 'power2.in' }, 1)
+          .fromTo(
+            [...lines(0), ...sub(0)],
+            { yPercent: 0, opacity: 1 },
+            { yPercent: -110, opacity: 0, stagger: 0.06, duration: 0.5, ease: 'power2.in', immediateRender: false },
+            1,
+          )
           .to('.st-hero__tint--a', { opacity: 1, duration: 1 }, 1)
           .to(lines(1), { yPercent: 0, stagger: 0.08, duration: 0.7, ease: 'power3.out' }, 1.5)
           .to(sub(1), { opacity: 1, y: 0, duration: 0.5 }, 1.9)
@@ -509,7 +516,7 @@ export function StoryLanding() {
 
       return () => el.classList.remove('st-live');
     },
-    { scope: root, dependencies: [canEnhanceMotion] },
+    { scope: root, dependencies: [canEnhanceMotion, introGone] },
   );
 
   /* The workspace link opens with a circle that grows from the click. */
