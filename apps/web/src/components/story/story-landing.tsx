@@ -204,95 +204,56 @@ export function StoryLanding() {
         refreshScrollTrigger({ safe: true });
       };
 
-      const card = el.querySelector<HTMLElement>('.st-card');
-      const mark = el.querySelector<HTMLElement>('.st-card__mark');
-      const veil = el.querySelector<HTMLElement>('.st-intro');
+      const logo = el.querySelector<HTMLElement>('.st-boot__logo');
+      const veil = el.querySelector<HTMLElement>('.st-boot');
       const tl = gsap.timeline({ onComplete: finish });
-
-      /* How far the card has to grow to swallow the viewport. */
-      const cover = () => {
-        if (!card) return 6;
-        const r = card.getBoundingClientRect();
-        return Math.max(window.innerWidth / r.width, window.innerHeight / r.height) * 1.04;
-      };
-
-      gsap.set(card, { transformPerspective: 1400 });
 
       tl.to(
         num,
         {
           v: 100,
-          duration: 2.2,
+          duration: 1.9,
           ease: 'power2.inOut',
           onUpdate: () => {
-            if (counter) counter.textContent = `${Math.round(num.v)}%`;
+            if (counter) counter.textContent = String(Math.round(num.v));
           },
         },
         0,
       )
-        /* light sweeps the card's surface */
-        .fromTo(q('.st-card__sheen'), { xPercent: -140 }, { xPercent: 140, duration: 1.3, ease: 'power2.inOut' }, 0.35)
-        /* the card squares up to the viewer, ready to open */
-        .to(card, { rotationY: 0, rotationX: 0, duration: 0.9, ease: 'power3.inOut' }, 1.5)
-        .addLabel('open', 2.3)
-        /* the field clears and the card takes the screen */
-        .to(q('.st-intro__word'), { yPercent: -16, opacity: 0, duration: 0.8, ease: 'power3.in' }, 'open-=0.3')
-        .to(q('.st-intro__meta'), { opacity: 0, duration: 0.45, ease: 'power2.out' }, 'open-=0.25')
-        .to(q('.st-card__foot > *, .st-card__edge'), { opacity: 0, duration: 0.4 }, 'open')
-        .to(
-          card,
-          {
-            scale: cover,
-            borderRadius: 0,
-            boxShadow: '0 0 0 0 rgba(18, 13, 10, 0)',
-            duration: 1.5,
-            ease: 'power4.inOut',
-          },
-          'open',
-        )
-        /* the mark leaves the card mid-flight and lands in the nav */
+        .addLabel('go', 2.05)
+        /* the mark takes its place in the corner */
         .add(() => {
           const slot = document.querySelector<HTMLElement>('.cc-ed-mark-logo');
-          if (!slot || !mark) return;
-          const a = mark.getBoundingClientRect();
+          if (!slot || !logo) return;
+          const a = logo.getBoundingClientRect();
           const b = slot.getBoundingClientRect();
-          gsap.set(mark, {
-            position: 'fixed',
-            left: a.left,
-            top: a.top,
-            width: a.width,
-            height: a.height,
-            margin: 0,
-            zIndex: 10000,
-            scale: 1,
-          });
-          gsap.to(mark, {
-            x: b.left + b.width / 2 - (a.left + a.width / 2) - 7,
+          gsap.to(logo, {
+            x: b.left + b.width / 2 - (a.left + a.width / 2) - 6,
             y: b.top + b.height / 2 - (a.top + a.height / 2),
-            scale: Math.max(0.08, (b.height * 0.78) / a.height),
-            duration: 1.3,
+            scale: Math.max(0.06, (b.height * 0.74) / a.height),
+            duration: 1.15,
             ease: 'power4.inOut',
           });
-        }, 'open+=0.2')
-        /* the hero settles underneath, then the card dissolves into it */
-        .fromTo('.st-hero__field', { scale: 1.14 }, { scale: 1, duration: 2.4, ease: 'power3.out' }, 'open+=0.35')
-        .to(veil, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 'open+=1.25')
+        }, 'go')
+        .to(q('.st-boot__count'), { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'go')
+        .to(q('.st-boot__field'), { opacity: 0, duration: 0.8, ease: 'power2.inOut' }, 'go+=0.25')
+        .fromTo('.st-hero__field', { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'power3.out' }, 'go+=0.25')
         .add(() => {
           delete html.dataset.stIntro;
-        }, 'open+=1.25')
+        }, 'go+=0.5')
         .fromTo(
           q('.st-stmt:first-child .st-ln > span'),
           { yPercent: 110 },
-          { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' },
-          'open+=1.3',
+          { yPercent: 0, duration: 1.05, stagger: 0.1, ease: 'power4.out' },
+          'go+=0.55',
         )
         .fromTo(
           q('.st-stmt:first-child .st-sub, .st-hero__cta'),
           { opacity: 0, y: 14 },
-          { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' },
-          'open+=1.65',
+          { opacity: 1, y: 0, duration: 0.85, stagger: 0.09, ease: 'power3.out' },
+          'go+=0.85',
         )
-        .to(mark, { opacity: 0, duration: 0.3 }, 'open+=1.55');
+        .to(logo, { opacity: 0, duration: 0.3 }, 'go+=1.05');
 
       const skip = () => tl.progress(1);
       const onKey = (e: KeyboardEvent) => {
@@ -548,38 +509,17 @@ export function StoryLanding() {
       <script dangerouslySetInnerHTML={{ __html: GATE }} />
 
       {!introGone ? (
-        <div className="st-intro" aria-hidden="true">
-          <div className="st-intro__meta st-intro__top">
-            <span>CodeCard</span>
-            <span className="st-intro__num">0%</span>
-            <span>Lisbon 2026</span>
-          </div>
-
-          <p className="st-intro__word">
-            {'CODECARD'.split('').map((c, i) => (
-              <span key={`${c}-${i}`} className="st-ch" style={{ ['--i' as string]: i }}>
-                <span>{c}</span>
-              </span>
-            ))}
+        <div className="st-boot" aria-hidden="true">
+          <div className="st-boot__field" />
+          <p className="st-boot__count">
+            <span className="st-intro__num">0</span>
+            <i>%</i>
           </p>
-
-          <div className="st-card__rise">
-            <div className="st-card">
-              <div className="st-card__field">
-                <StoryField colors={EMBER} />
-              </div>
-              <span className="st-card__sheen" />
-              <span className="st-card__edge" />
-              <CodeCardMark className="st-card__mark" />
-              <div className="st-card__foot">
-                <span>Show your work.</span>
-                <span>Keep the connection.</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="st-intro__meta st-intro__bottom">
-            <span>A professional identity for the real world</span>
+          <div className="st-boot__logo">
+            <svg viewBox="0 0 136 120" className="st-draw">
+              <path d="M 65.5 32.1 A 34 34 0 1 0 65.5 87.9" pathLength={1} />
+              <path d="M 93.5 32.1 A 34 34 0 1 0 93.5 87.9" pathLength={1} />
+            </svg>
           </div>
         </div>
       ) : null}
@@ -631,17 +571,21 @@ export function StoryLanding() {
       {/* 2 — three ideas */}
       <section className="st-ideas" data-tone="light" data-chap="1" aria-label="Why CodeCard">
         <div className="st-ideas__stage">
+          <div className="st-ideas__glow" aria-hidden />
           <p className="st-eyebrow">The idea</p>
           <div className="st-ideas__text">
             {IDEAS.map((t, i) => (
               <p key={t} className="st-idea">
                 <span className="st-idea__n">0{i + 1}</span>
-                <span>
+                <span className="st-idea__t">
                   <Words text={t} />
                 </span>
               </p>
             ))}
           </div>
+          <p className="st-ideas__foot">
+            Three things CodeCard is built to protect. Everything after this page is in service of them.
+          </p>
         </div>
       </section>
 
