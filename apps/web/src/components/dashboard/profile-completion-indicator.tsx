@@ -10,7 +10,7 @@ import { AppCard, AppMono } from './ui/dashboard-ui';
 
 type ProfileCompletionIndicatorProps = {
   completion: ProfileCompletionResult;
-  variant?: 'full' | 'compact' | 'header';
+  variant?: 'full' | 'compact' | 'header' | 'hero';
 };
 
 export function ProfileCompletionIndicator({
@@ -100,6 +100,58 @@ export function ProfileCompletionIndicator({
       </div>
     </div>
   );
+
+  if (variant === 'hero') {
+    const R = 56;
+    const C = 2 * Math.PI * R;
+    return (
+      <div className={`cc-hx-ring${expanded ? ' is-open' : ''}`}>
+        <div className="cc-hx-ring__row">
+          <div
+            className="cc-hx-ring__dial"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percentage}
+            aria-label={`Profile ${percentage}% complete`}
+          >
+            <svg viewBox="0 0 132 132" aria-hidden>
+              <circle className="cc-hx-ring__track" cx="66" cy="66" r={R} />
+              <circle
+                className="cc-hx-ring__arc"
+                cx="66"
+                cy="66"
+                r={R}
+                style={{ strokeDasharray: C, strokeDashoffset: C * (1 - percentage / 100) }}
+              />
+            </svg>
+            <span className="cc-hx-ring__pct">
+              <CountUp value={percentage} />
+              <i>%</i>
+            </span>
+          </div>
+          <div className="cc-hx-ring__copy">
+            <p className="cc-hx-ring__eyebrow">Profile strength</p>
+            <p className="cc-hx-ring__meta">
+              {completedCount} of {totalCount} steps done
+            </p>
+            <button
+              type="button"
+              aria-expanded={expanded}
+              aria-controls={detailsId}
+              aria-label={expanded ? 'Hide profile completion progress' : 'View profile completion progress'}
+              onClick={() => setExpanded((open) => !open)}
+              className="cc-hx-ring__toggle"
+            >
+              <span>{expanded ? 'Hide steps' : 'See steps'}</span>
+              <ChevronDown className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+        </div>
+        {details(true)}
+      </div>
+    );
+  }
 
   if (variant === 'header') {
     return (
