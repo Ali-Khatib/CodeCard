@@ -338,7 +338,12 @@ export function StoryLanding() {
           .to(lines(2), { yPercent: 0, stagger: 0.08, duration: 0.7, ease: 'power3.out' }, 3)
           .to(sub(2), { opacity: 1, y: 0, duration: 0.5 }, 3.4)
           .to('.st-hero__bar > i', { scaleX: 1, duration: 4 }, 0)
-          .to('.st-hero__window', { clipPath: 'inset(5% 3% 5% 3% round 44px)', duration: 0.7, ease: 'power2.inOut' }, 4)
+          .fromTo(
+            '.st-hero__window',
+            { clipPath: 'inset(0% 0% 0% 0% round 0px)' },
+            { clipPath: 'inset(5% 3% 5% 3% round 44px)', duration: 0.7, ease: 'power2.inOut', immediateRender: false },
+            4,
+          )
           .to({}, { duration: 0.8 }, 4);
         hero.eventCallback('onUpdate', () => {
           const t = hero.time();

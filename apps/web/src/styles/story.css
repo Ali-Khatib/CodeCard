@@ -312,3 +312,9 @@ html:not(.st-seen) .st-hero__window { clip-path: inset(34% 40% 34% 40% round 999
 .cc-marketing-shell:has(.st-root) { background: #120d0a; }
 .cc-marketing-shell:has(.st-root) .cc-marketing-nav-shell { position: fixed; left: 0; right: 0; pointer-events: none; }
 .cc-marketing-shell:has(.st-root) .cc-marketing-nav-shell > * { pointer-events: auto; }
+
+/* nav pill: always a solid paper pill with ink text, readable on every chapter */
+.cc-marketing-shell:has(.st-root) .cc-nav-veil { background: rgba(244, 236, 220, 0.92) !important; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.cc-marketing-shell:has(.st-root) .cc-nav-veil a,
+.cc-marketing-shell:has(.st-root) .cc-nav-veil button,
+.cc-marketing-shell:has(.st-root) .cc-nav-veil span { color: #120d0a !important; text-shadow: none !important; }
