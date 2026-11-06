@@ -202,7 +202,7 @@ function Waitlist() {
               aria-invalid={error ? true : undefined}
             />
             <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="cc-wait__trap" />
-            <button type="submit" className="cc-btn cc-btn--dark" disabled={pending}>
+            <button type="submit" className="cc-btn cc-btn--accent" disabled={pending}>
               {pending ? 'Joining' : 'Join'}
             </button>
           </div>
@@ -225,19 +225,27 @@ function Opening() {
           <div className="cc-open__card-top">
             <span className="cc-open__avatar" />
             <span className="cc-open__who">
-              <b />
-              <i />
+              <b>Alex Rivera</b>
+              <i>Product engineer · Lisbon</i>
             </span>
           </div>
-          <div className="cc-open__body">
-            <span />
-            <span />
-            <span />
-          </div>
-          <div className="cc-open__qr">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <span key={i} />
-            ))}
+          <dl className="cc-open__stats">
+            <div>
+              <dt>Projects</dt>
+              <dd>12</dd>
+            </div>
+            <div>
+              <dt>Research</dt>
+              <dd>3</dd>
+            </div>
+          </dl>
+          <div className="cc-open__share">
+            <div className="cc-open__qr">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <span key={i} />
+              ))}
+            </div>
+            <span className="cc-open__scan">Scan to open</span>
           </div>
           <span className="cc-open__sweep" />
         </div>
