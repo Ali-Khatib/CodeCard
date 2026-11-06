@@ -286,33 +286,44 @@ export function StoryLanding() {
       const vh = () => window.innerHeight;
 
       /* nav ink follows the surface under it */
-      gsap.utils.toArray<HTMLElement>('[data-tone]').forEach((sec) => {
-        const tone = sec.dataset.tone === 'dark' ? 'light' : 'dark';
-        const activate = () => {
-          applyLandingChromeInk(tone);
-          const rail = el.querySelector<HTMLElement>('.st-rail');
-          const n = Number(sec.dataset.chap ?? 0);
-          if (rail) {
-            rail.dataset.ink = tone;
-            rail.dataset.hidden = n === 0 ? 'true' : 'false';
-            const num = rail.querySelector('.st-rail__n');
-            const txt = rail.querySelector('.st-rail__t');
-            if (num) num.textContent = `0${n}`;
-            if (txt) txt.textContent = CHAPTERS[n] ?? '';
-          }
-        };
-        ScrollTrigger.create({
-          trigger: sec,
-          start: 'top 56px',
-          end: 'bottom 56px',
-          onToggle: (self) => {
-            if (self.isActive) activate();
-          },
-          onRefresh: (self) => {
-            if (self.isActive) activate();
-          },
-        });
-      });
+      /* Chrome tone: read whichever chapter sits under the nav. Pinned stages
+         make ScrollTrigger ranges unreliable here, so measure directly. */
+      const toneSections = gsap.utils.toArray<HTMLElement>('[data-tone]');
+      const rail = el.querySelector<HTMLElement>('.st-rail');
+      let lastChap = -1;
+      let ticking = false;
+      const syncTone = () => {
+        ticking = false;
+        const probe = 64;
+        let hit: HTMLElement | undefined;
+        for (const sec of toneSections) {
+          const r = sec.getBoundingClientRect();
+          if (r.top <= probe && r.bottom > probe) hit = sec;
+        }
+        if (!hit) hit = toneSections[0];
+        if (!hit) return;
+        const n = Number(hit.dataset.chap ?? 0);
+        if (n === lastChap) return;
+        lastChap = n;
+        const tone = hit.dataset.tone === 'dark' ? 'light' : 'dark';
+        applyLandingChromeInk(tone);
+        if (rail) {
+          rail.dataset.ink = tone;
+          rail.dataset.hidden = n === 0 ? 'true' : 'false';
+          const numEl = rail.querySelector('.st-rail__n');
+          const txtEl = rail.querySelector('.st-rail__t');
+          if (numEl) numEl.textContent = `0${n}`;
+          if (txtEl) txtEl.textContent = CHAPTERS[n] ?? '';
+        }
+      };
+      const onToneScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(syncTone);
+      };
+      syncTone();
+      window.addEventListener('scroll', onToneScroll, { passive: true });
+      window.addEventListener('resize', onToneScroll);
 
       {
         /* 1 · hero: three statements swap inside one pinned stage */
@@ -475,7 +486,11 @@ export function StoryLanding() {
         refreshScrollTrigger({ safe: true });
       }
 
-      return () => el.classList.remove('st-live');
+      return () => {
+        window.removeEventListener('scroll', onToneScroll);
+        window.removeEventListener('resize', onToneScroll);
+        el.classList.remove('st-live');
+      };
     },
     { scope: root, dependencies: [canEnhanceMotion, introGone] },
   );
