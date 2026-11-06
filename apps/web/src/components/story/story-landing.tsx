@@ -190,9 +190,6 @@ export function StoryLanding() {
       const q = gsap.utils.selector(el);
       const num = { v: 0 };
       const counter = el.querySelector<HTMLElement>('.st-intro__num');
-      const fill = el.querySelector<HTMLElement>('.st-intro__mark--fill');
-      void fill;
-      const mark = el.querySelector<HTMLElement>('.st-intro__markwrap');
       const veil = el.querySelector<HTMLElement>('.st-intro');
 
       const finish = () => {
@@ -208,27 +205,55 @@ export function StoryLanding() {
         refreshScrollTrigger({ safe: true });
       };
 
-      const win = el.querySelector<HTMLElement>('.st-hero__window');
+      const card = el.querySelector<HTMLElement>('.st-card');
+      const mark = el.querySelector<HTMLElement>('.st-card__mark');
+      const veil = el.querySelector<HTMLElement>('.st-intro');
       const tl = gsap.timeline({ onComplete: finish });
-      const linePath = el.querySelector<SVGPathElement>('.st-intro__mark--line path');
-      linePath?.setAttribute('pathLength', '1');
-      gsap.set(linePath, { strokeDasharray: 1, strokeDashoffset: 1 });
-      gsap.set(q('.st-orb__line'), { strokeDasharray: 1, strokeDashoffset: 1 });
-      gsap.set('.st-orb__dot', { opacity: 0 });
-      gsap.set('.st-orb__g', { rotationX: 62, rotationY: -30, transformPerspective: 1100 });
 
-      tl.fromTo(q('.st-intro__meta > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out' }, 0.15)
-        .to(q('.st-orb__line'), { strokeDashoffset: 0, duration: 1.5, stagger: 0.14, ease: 'power2.inOut' }, 0.1)
-        .to(q('.st-orb__dot'), { opacity: 1, duration: 0.4, stagger: 0.1 }, 0.9)
-        .to(q('.st-orb__ring svg'), { rotation: 360, duration: 3.4, ease: 'none', transformOrigin: '50% 50%' }, 0.2)
-        .to('.st-orb__g', { rotationY: 150, rotationX: 22, duration: 3.4, ease: 'power2.inOut' }, 0.1)
-        .to(linePath, { strokeDashoffset: 0, duration: 1.7, ease: 'power2.inOut' }, 0.5)
-        .fromTo(fill, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.7, ease: 'power2.inOut' }, 1.3)
+      /* How far the card has to grow to swallow the viewport. */
+      const cover = () => {
+        if (!card) return 6;
+        const r = card.getBoundingClientRect();
+        return Math.max(window.innerWidth / r.width, window.innerHeight / r.height) * 1.04;
+      };
+
+      gsap.set(card, { transformPerspective: 1400 });
+
+      tl.fromTo(
+        q('.st-intro__meta > *'),
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
+        0.1,
+      )
+        .fromTo(
+          q('.st-intro__word .st-ch > span'),
+          { yPercent: 108 },
+          { yPercent: 0, duration: 1, stagger: 0.045, ease: 'power4.out' },
+          0.2,
+        )
+        .fromTo(
+          card,
+          { yPercent: 14, opacity: 0, scale: 0.94, rotationY: -24, rotationX: 10 },
+          { yPercent: 0, opacity: 1, scale: 1, rotationY: -13, rotationX: 5, duration: 1.3, ease: 'power3.out' },
+          0.45,
+        )
+        .fromTo(
+          q('.st-card__mark, .st-card__foot > *'),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
+          1.1,
+        )
+        .fromTo(
+          q('.st-card__sheen'),
+          { xPercent: -140 },
+          { xPercent: 140, duration: 1.25, ease: 'power2.inOut' },
+          1.15,
+        )
         .to(
           num,
           {
             v: 100,
-            duration: 2.8,
+            duration: 2.3,
             ease: 'power2.inOut',
             onUpdate: () => {
               if (counter) counter.textContent = `${Math.round(num.v)}%`;
@@ -236,33 +261,67 @@ export function StoryLanding() {
           },
           0.2,
         )
-        .to(q('.st-orb__g'), { scale: 0.12, opacity: 0, duration: 0.9, ease: 'power3.in' }, 2.7)
-        .addLabel('open', 3.1)
-        .to(q('.st-intro__meta > *'), { opacity: 0, duration: 0.4, ease: 'power2.out' }, 'open-=0.1')
-        .to(win, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1.6, ease: 'power4.inOut' }, 'open')
-        .to(q('.st-intro__mark--base'), { color: 'rgba(244,236,220,0.25)', duration: 0.6 }, 'open')
-        .to(q('.st-intro__mark--fill'), { color: '#f4ecdc', duration: 0.6 }, 'open')
-        .fromTo('.st-hero__field', { scale: 1.15 }, { scale: 1, duration: 2.2, ease: 'power3.out' }, 'open')
+        /* the card squares up to the viewer, ready to open */
+        .to(card, { rotationY: 0, rotationX: 0, duration: 0.85, ease: 'power3.inOut' }, 2.1)
+        .addLabel('open', 2.85)
+        /* everything on the field clears, the card takes the screen */
+        .to(q('.st-intro__word .st-ch > span'), { yPercent: -108, duration: 0.75, stagger: 0.035, ease: 'power3.in' }, 'open-=0.25')
+        .to(q('.st-intro__meta > *'), { opacity: 0, duration: 0.45, ease: 'power2.out' }, 'open-=0.2')
+        .to(q('.st-card__foot > *, .st-card__edge'), { opacity: 0, duration: 0.4 }, 'open')
+        .to(
+          card,
+          {
+            scale: cover,
+            borderRadius: 0,
+            boxShadow: '0 0 0 0 rgba(18, 13, 10, 0)',
+            duration: 1.45,
+            ease: 'power4.inOut',
+          },
+          'open',
+        )
+        /* the mark leaves the card mid-flight and lands in the nav */
         .add(() => {
           const slot = document.querySelector<HTMLElement>('.cc-ed-mark-logo');
           if (!slot || !mark) return;
           const a = mark.getBoundingClientRect();
           const b = slot.getBoundingClientRect();
-          const s = Math.max(0.08, (b.height * 0.82) / a.height);
+          gsap.set(mark, {
+            position: 'fixed',
+            left: a.left,
+            top: a.top,
+            width: a.width,
+            height: a.height,
+            margin: 0,
+            zIndex: 10000,
+            scale: 1,
+          });
           gsap.to(mark, {
-            x: b.left + b.width / 2 - (a.left + a.width / 2) - 8,
+            x: b.left + b.width / 2 - (a.left + a.width / 2) - 7,
             y: b.top + b.height / 2 - (a.top + a.height / 2),
-            scale: s,
-            duration: 1.2,
+            scale: Math.max(0.08, (b.height * 0.78) / a.height),
+            duration: 1.25,
             ease: 'power4.inOut',
           });
-        }, 'open+=0.5')
-        .fromTo(q('.st-stmt:first-child .st-ln > span'), { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' }, 'open+=1.0')
-        .fromTo(q('.st-stmt:first-child .st-sub, .st-hero__cta'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' }, 'open+=1.4')
+        }, 'open+=0.15')
+        /* the hero settles underneath, then the card dissolves into it */
+        .fromTo('.st-hero__field', { scale: 1.14 }, { scale: 1, duration: 2.4, ease: 'power3.out' }, 'open+=0.3')
+        .to(veil, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 'open+=1.2')
         .add(() => {
           delete html.dataset.stIntro;
-        }, 'open+=1.5')
-        .to(mark, { opacity: 0, duration: 0.25 }, 'open+=1.65');
+        }, 'open+=1.2')
+        .fromTo(
+          q('.st-stmt:first-child .st-ln > span'),
+          { yPercent: 110 },
+          { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out' },
+          'open+=1.25',
+        )
+        .fromTo(
+          q('.st-stmt:first-child .st-sub, .st-hero__cta'),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' },
+          'open+=1.6',
+        )
+        .to(mark, { opacity: 0, duration: 0.3 }, 'open+=1.5');
 
       const skip = () => tl.progress(1);
       const onKey = (e: KeyboardEvent) => {
@@ -515,27 +574,32 @@ export function StoryLanding() {
           <div className="st-intro__meta st-intro__top">
             <span>CodeCard</span>
             <span className="st-intro__num">0%</span>
-            <span>2026</span>
+            <span>Lisbon 2026</span>
           </div>
-          <div className="st-orb" aria-hidden>
-            <div className="st-orb__g">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <div key={i} className="st-orb__ring" style={{ ['--i' as string]: i }}>
-                  <svg viewBox="-100 -100 200 200">
-                    <circle className="st-orb__line" cx="0" cy="0" r="96" pathLength={1} />
-                    <circle className="st-orb__dot" cx="96" cy="0" r="2.6" />
-                  </svg>
-                </div>
-              ))}
+
+          <p className="st-intro__word">
+            {'CODECARD'.split('').map((c, i) => (
+              <span key={`${c}-${i}`} className="st-ch">
+                <span>{c}</span>
+              </span>
+            ))}
+          </p>
+
+          <div className="st-card">
+            <div className="st-card__field">
+              <StoryField colors={EMBER} />
+            </div>
+            <span className="st-card__sheen" />
+            <span className="st-card__edge" />
+            <CodeCardMark className="st-card__mark" />
+            <div className="st-card__foot">
+              <span>Show your work.</span>
+              <span>Keep the connection.</span>
             </div>
           </div>
-          <div className="st-intro__markwrap">
-            <CodeCardMark className="st-intro__mark st-intro__mark--base" />
-            <CodeCardMark className="st-intro__mark st-intro__mark--line" />
-            <CodeCardMark className="st-intro__mark st-intro__mark--fill" />
-          </div>
+
           <div className="st-intro__meta st-intro__bottom">
-            <span>Show your work. Keep the connection.</span>
+            <span>A professional identity for the real world</span>
           </div>
         </div>
       ) : null}
