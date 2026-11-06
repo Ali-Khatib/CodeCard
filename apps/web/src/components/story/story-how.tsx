@@ -38,7 +38,7 @@ export function StoryHow() {
         words={HERO_WORDS}
         sub="Build your professional identity, share your work and keep the people you meet."
         actions={
-          <Link href="/sign-up" className="pl-btn pl-btn--accent">
+          <Link href="/sign-up" className="pl-btn pl-btn--solid">
             Create your CodeCard
           </Link>
         }
@@ -48,8 +48,8 @@ export function StoryHow() {
         <div className="pl-wrap pl-steps">
           <article className="pl-stepRow" data-reveal>
             <div className="pl-stepRow__text">
-              <p className="pl-kicker">Step 01 — Show</p>
-              <h2 className="pl-display pl-display--section">Your work, all in one place.</h2>
+              <p className="pl-kicker"><b>01</b> &nbsp;Show</p>
+              <h2 className="pl-display">Your work, all in one place.</h2>
               <p className="pl-p">
                 Build a professional profile that brings together your experience, projects, research and links.
               </p>
@@ -62,8 +62,8 @@ export function StoryHow() {
 
           <article className="pl-stepRow pl-stepRow--flip" data-reveal>
             <div className="pl-stepRow__text">
-              <p className="pl-kicker">Step 02 — Share</p>
-              <h2 className="pl-display pl-display--section">A better way to introduce yourself.</h2>
+              <p className="pl-kicker"><b>02</b> &nbsp;Share</p>
+              <h2 className="pl-display">A better way to introduce yourself.</h2>
               <p className="pl-p">Share your CodeCard instantly with a QR code.</p>
               <p className="pl-p">
                 Your profile and work are ready to explore whenever you meet someone.
@@ -79,8 +79,8 @@ export function StoryHow() {
 
           <article className="pl-stepRow" data-reveal>
             <div className="pl-stepRow__text">
-              <p className="pl-kicker">Step 03 — Keep</p>
-              <h2 className="pl-display pl-display--section">Remember more than a name.</h2>
+              <p className="pl-kicker"><b>03</b> &nbsp;Keep</p>
+              <h2 className="pl-display">Remember more than a name.</h2>
               <p className="pl-p">Save the people you meet and the details behind each introduction.</p>
               <p className="pl-p">Remember where you met, what you discussed and what comes next.</p>
             </div>
@@ -97,7 +97,7 @@ export function StoryHow() {
             Your next opportunity starts with an introduction.
           </h2>
           <div className="pl-end__cta" data-reveal>
-            <Link href="/sign-up" className="pl-btn pl-btn--accent">
+            <Link href="/sign-up" className="pl-btn pl-btn--solid">
               Create your CodeCard
             </Link>
           </div>

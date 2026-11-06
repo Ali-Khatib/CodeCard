@@ -42,10 +42,10 @@ export function StoryLanding() {
         sub="Show what you build. Share who you are. Keep the people you meet."
         actions={
           <>
-            <Link href="/sign-up" className="pl-btn pl-btn--accent" data-testid="hero-primary-cta">
+            <Link href="/sign-up" className="pl-btn pl-btn--solid" data-testid="hero-primary-cta">
               Create your CodeCard
             </Link>
-            <Link href="/how-it-works" className="pl-btn pl-btn--glass">
+            <Link href="/how-it-works" className="pl-btn pl-btn--ghostLight">
               How it works
             </Link>
           </>
@@ -55,7 +55,7 @@ export function StoryLanding() {
       {/* 02 — How CodeCard Works */}
       <section className="pl-band" data-band="light" aria-labelledby="pl-works-h">
         <div className="pl-wrap">
-          <h2 id="pl-works-h" className="pl-display pl-display--section pl-center" data-reveal>
+          <h2 id="pl-works-h" className="pl-display pl-center" data-reveal>
             How CodeCard Works
           </h2>
 
@@ -64,12 +64,12 @@ export function StoryLanding() {
               <div className="pl-panel__art">
                 <EditorialProductFrame state="profile" />
               </div>
-              <h3 className="pl-panel__h">Show your work.</h3>
+              <h3 className="pl-sub">Show your work.</h3>
               <p className="pl-panel__p">
-                Bring your professional identity, projects and research together in one place. Let people see what
-                you do.
+                Bring your professional identity, projects and research together in one place. Give people a reason to
+                discover what you do.
               </p>
-              <Link href="/sign-up" className="pl-text-cta">
+              <Link href="/sign-up" className="pl-link">
                 Create your profile <span aria-hidden>→</span>
               </Link>
             </article>
@@ -81,11 +81,11 @@ export function StoryLanding() {
                   <p className="pl-qr__cap">Scan to open the card</p>
                 </div>
               </div>
-              <h3 className="pl-panel__h">Share instantly.</h3>
+              <h3 className="pl-sub">Share instantly.</h3>
               <p className="pl-panel__p">
                 One CodeCard. One QR code. Share your professional identity whenever an introduction happens.
               </p>
-              <Link href="/demo/card" className="pl-text-cta">
+              <Link href="/demo/card" className="pl-link">
                 Explore sharing <span aria-hidden>→</span>
               </Link>
             </article>
@@ -94,12 +94,12 @@ export function StoryLanding() {
               <div className="pl-panel__art">
                 <EditorialProductFrame state="connections" />
               </div>
-              <h3 className="pl-panel__h">Keep the connection.</h3>
+              <h3 className="pl-sub">Keep the connection.</h3>
               <p className="pl-panel__p">
-                Remember who you met, what you discussed and what happens next. Turn introductions into meaningful
-                connections.
+                Remember who you met, where you met and what you discussed. Keep the context that makes a connection
+                worth following up on.
               </p>
-              <Link href="/demo/connections" className="pl-text-cta">
+              <Link href="/demo/connections" className="pl-link">
                 See connections <span aria-hidden>→</span>
               </Link>
             </article>
@@ -110,7 +110,7 @@ export function StoryLanding() {
       {/* 03 — Editorial statement */}
       <section className="pl-band pl-say" data-band="light" aria-labelledby="pl-say-h">
         <div className="pl-wrap pl-say__grid">
-          <h2 id="pl-say-h" className="pl-display pl-display--section" data-reveal>
+          <h2 id="pl-say-h" className="pl-display" data-reveal>
             CodeCard is where introductions become connections.
           </h2>
 
@@ -124,7 +124,7 @@ export function StoryLanding() {
               CodeCard brings your professional identity, your work and the people you meet into one place.
             </p>
             <p className="pl-p">Show what you do. Remember who you meet. Make the next conversation easier.</p>
-            <Link href="/how-it-works" className="pl-btn pl-btn--dark">
+            <Link href="/how-it-works" className="pl-btn pl-btn--solid">
               Discover CodeCard
             </Link>
           </div>
@@ -137,14 +137,14 @@ export function StoryLanding() {
           <h2 id="pl-end-h" className="pl-display pl-display--big pl-center" data-reveal>
             Make every introduction count.
           </h2>
-          <p className="pl-lede pl-center" data-reveal>
+          <p className="pl-subhead pl-center" data-reveal>
             Your work. Your people. Your next opportunity.
           </p>
           <div className="pl-end__cta" data-reveal>
-            <Link href="/sign-up" className="pl-btn pl-btn--accent" data-testid="finale-primary-cta">
+            <Link href="/sign-up" className="pl-btn pl-btn--solid" data-testid="finale-primary-cta">
               Create your CodeCard
             </Link>
-            <Link href="/how-it-works" className="pl-text-cta">
+            <Link href="/how-it-works" className="pl-link">
               See how it works <span aria-hidden>→</span>
             </Link>
           </div>

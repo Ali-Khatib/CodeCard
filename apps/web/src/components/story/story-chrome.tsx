@@ -6,21 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import { CodeCardExpandingMark } from '@/components/brand/codecard-mark';
 
 const EXPLORE = [
-  {
-    href: '/how-it-works',
-    label: 'How it works',
-    note: 'See how CodeCard brings your professional identity and connections together.',
-  },
-  {
-    href: '/demo/card',
-    label: 'Your profile',
-    note: 'Show your work, projects and research.',
-  },
-  {
-    href: '/demo/connections',
-    label: 'Connections',
-    note: 'Remember the people you meet.',
-  },
+  { href: '/demo/card', label: 'Your profile', note: 'Your professional identity, projects and research.' },
+  { href: '/how-it-works', label: 'How it works', note: 'Discover how CodeCard works.' },
+  { href: '/demo/connections', label: 'Your connections', note: 'Remember the people you meet.' },
 ] as const;
 
 const PAGES = [
@@ -32,7 +20,6 @@ export function StoryNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
-  const active = pathname === '/how-it-works' ? 1 : 0;
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -88,7 +75,6 @@ export function StoryNav() {
         </div>
 
         <nav className="pl-seg" aria-label="Pages">
-          <span className="pl-seg__thumb" data-at={active} aria-hidden />
           {PAGES.map((p) => (
             <Link
               key={p.href}
@@ -120,6 +106,8 @@ const COLS = [
     links: [
       { href: '/', label: 'Home' },
       { href: '/how-it-works', label: 'How it works' },
+      { href: '/demo/card', label: 'Your profile' },
+      { href: '/demo/connections', label: 'Connections' },
     ],
   },
   {
