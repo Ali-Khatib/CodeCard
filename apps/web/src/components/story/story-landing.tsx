@@ -190,7 +190,6 @@ export function StoryLanding() {
       const q = gsap.utils.selector(el);
       const num = { v: 0 };
       const counter = el.querySelector<HTMLElement>('.st-intro__num');
-      const veil = el.querySelector<HTMLElement>('.st-intro');
 
       const finish = () => {
         html.style.removeProperty('overflow');
