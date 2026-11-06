@@ -158,6 +158,7 @@
 }
 .pl-hero__inner {
   position: relative;
+  will-change: transform;
   width: 100%;
   max-width: 54rem;
   text-align: center;

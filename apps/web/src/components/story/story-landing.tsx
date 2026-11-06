@@ -258,12 +258,14 @@ export function StoryLanding() {
 
       const canvas = el.querySelector<HTMLElement>('.pl-hero__canvas');
       const words = Array.from(el.querySelectorAll<HTMLElement>('.pl-hero__w'));
+      /* Contained first, so there is real page around it, then full bleed. */
       const small = window.matchMedia('(max-width: 760px)').matches;
-      const pad = small ? 8 : 12;
-      const radius = small ? 16 : 20;
+      const padY = small ? '1.4%' : '3.4%';
+      const padX = small ? '2.5%' : '4.2%';
+      const radius = small ? 20 : 28;
 
       if (canvas) {
-        gsap.set(canvas, { clipPath: `inset(${pad}px ${pad}px ${pad}px ${pad}px round ${radius}px)` });
+        gsap.set(canvas, { clipPath: `inset(${padY} ${padX} ${padY} ${padX} round ${radius}px)` });
       }
       gsap.set(words, { opacity: 0.22 });
 
@@ -281,6 +283,7 @@ export function StoryLanding() {
         tl.to(canvas, { clipPath: 'inset(0px 0px 0px 0px round 0px)', duration: 0.5 }, 0);
       }
       tl.to(words, { opacity: 1, stagger: 0.06, duration: 0.14 }, 0.08);
+      tl.fromTo('.pl-hero__inner', { scale: 0.965 }, { scale: 1, duration: 0.5 }, 0);
       tl.to('.pl-hero__cue', { opacity: 0, duration: 0.1 }, 0);
 
       /* chrome tone follows whichever band sits under the nav */
