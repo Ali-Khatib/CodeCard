@@ -215,8 +215,6 @@ export function StoryLanding() {
       window.scrollTo(0, 0);
 
       const q = gsap.utils.selector(el);
-      const num = { v: 0 };
-      const counter = el.querySelector<HTMLElement>('.st-intro__num');
 
       const finish = () => {
         html.style.removeProperty('overflow');
@@ -235,34 +233,25 @@ export function StoryLanding() {
       const veil = el.querySelector<HTMLElement>('.st-boot');
       const tl = gsap.timeline({ onComplete: finish });
 
-      tl.to(
-        num,
-        {
-          v: 100,
-          duration: 1.9,
-          ease: 'power2.inOut',
-          onUpdate: () => {
-            if (counter) counter.textContent = String(Math.round(num.v));
-          },
-        },
-        0,
-      )
-        .addLabel('go', 2.05)
+      /* The draw and the count are CSS, so they start on the first paint.
+         Wait for them on the page's own clock, however late this boots. */
+      const paced = Math.max(0, 2350 - performance.now()) / 1000;
+
+      tl.addLabel('go', paced)
         /* the mark takes its place in the corner */
         .add(() => {
           const glyph =
-            document.querySelector<HTMLElement>('.cc-ed-mark-logo__c--first') ??
+            document.querySelector<HTMLElement>('.cc-ed-mark-logo__inner') ??
             document.querySelector<HTMLElement>('.cc-ed-mark-logo');
           if (!glyph || !logo) return;
           const a = logo.getBoundingClientRect();
           const b = glyph.getBoundingClientRect();
-          /* the drawn mark's ink fills ~84% of its box; the glyph's cap height
-             fills ~70% of its line box, so match the ink, not the boxes */
-          const scale = Math.max(0.05, (b.height * 0.7) / (a.height * 0.845));
-          const inkShift = a.height * scale * 0.025;
+          /* Match ink to ink: the drawn mark fills 84.5% of its box, the serif
+             C fills ~70% of its line box and sits a little above its middle. */
+          const scale = Math.max(0.04, (b.height * 0.7) / (a.height * 0.845));
           gsap.to(logo, {
-            x: b.right - (a.left + a.width / 2),
-            y: b.top + b.height * 0.5 - (a.top + a.height / 2) - inkShift,
+            x: b.left + b.width / 2 - (a.left + a.width / 2),
+            y: b.top + b.height * 0.445 - (a.top + a.height / 2),
             scale,
             duration: 1.15,
             ease: 'power4.inOut',
@@ -560,7 +549,7 @@ export function StoryLanding() {
         <div className="st-boot" aria-hidden="true">
           <div className="st-boot__field" />
           <p className="st-boot__count">
-            <span className="st-intro__num">0</span>
+            <span className="st-boot__n" />
             <i>%</i>
           </p>
           <div className="st-boot__logo">

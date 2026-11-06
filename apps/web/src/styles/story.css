@@ -88,6 +88,10 @@ html.st-seen .st-boot { display: none; }
   animation: st-in 0.8s var(--st-ease) both;
 }
 .st-boot__count i { font-style: normal; font-size: 0.26em; letter-spacing: 0; opacity: 0.45; }
+@property --n { syntax: '<integer>'; initial-value: 0; inherits: false; }
+.st-boot__n { counter-reset: n var(--n); animation: st-count 2.25s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.st-boot__n::after { content: counter(n); }
+@keyframes st-count { from { --n: 0; } to { --n: 100; } }
 @keyframes st-in { from { opacity: 0; transform: translate3d(0, 10px, 0); } }
 
 .st-boot__logo {
