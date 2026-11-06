@@ -4,14 +4,48 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { StoryNav, StoryFooter } from './story-chrome';
-import { VignetteConnections, VignetteProfile, VignetteShare } from './story-vignettes';
+import { ArtExchange, ArtKept, ArtScattered } from './story-art';
 import { StoryHero } from './story-hero';
 import { useChromeTone, useReveal } from './story-hooks';
+import '@/styles/codecard-mark.css';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
-/* Real product surfaces, loaded after first paint so the hero never waits. */
-const HERO_WORDS = ['Your', 'work', 'deserves', 'more', 'than', 'a', 'handshake.'] as const;
+const HERO_WORDS = ['Your', 'work', 'deserves', 'more', 'than', 'a', 'handshake'] as const;
+
+/**
+ * Each panel names the problem first and answers it second, because the
+ * problem is the part a reader recognises as their own.
+ */
+const PANELS = [
+  {
+    n: '01',
+    art: ArtScattered,
+    problem: 'Your work lives in ten places.',
+    title: 'Show it in one.',
+    body: 'A repository here, a paper there, a demo nobody can find. CodeCard brings your profile, projects and research together so one link says everything you do.',
+    href: '/sign-up',
+    cta: 'Create your profile',
+  },
+  {
+    n: '02',
+    art: ArtExchange,
+    problem: 'An introduction ends at a name.',
+    title: 'Hand over the work.',
+    body: 'Typing a name into a phone loses everything behind it. One scan opens your CodeCard — who you are and what you have built, on their screen before the conversation is over.',
+    href: '/demo/card',
+    cta: 'See a card',
+  },
+  {
+    n: '03',
+    art: ArtKept,
+    problem: 'A week later you forget where you met.',
+    title: 'Keep the context.',
+    body: 'Every connection you save keeps the detail around it: the event, the conversation, what came next. The follow-up writes itself because you still remember why it mattered.',
+    href: '/demo/connections',
+    cta: 'See connections',
+  },
+] as const;
 
 export function StoryLanding() {
   const root = useRef<HTMLDivElement>(null);
@@ -39,83 +73,55 @@ export function StoryLanding() {
         }
       />
 
-      {/* 02 — How CodeCard Works */}
+      {/* 02 — How CodeCard works: problem, then answer, three times. */}
       <section className="pl-band" data-band="light" aria-labelledby="pl-works-h">
         <div className="pl-wrap">
-          <h2 id="pl-works-h" className="pl-display pl-center" data-reveal>
-            How CodeCard Works
+          <h2 id="pl-works-h" className="pl-section-title" data-reveal>
+            How CodeCard works
           </h2>
 
           <div className="pl-panels">
-            <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art">
-                <VignetteProfile />
-              </div>
-              <p className="pl-panel__n">
-                01 <span className="pl-emb" aria-hidden />
-              </p>
-              <h3 className="pl-sub">Show your work.</h3>
-              <p className="pl-panel__p">
-                Bring your professional identity, projects and research together in one place. Give people a reason
-                to discover what you do.
-              </p>
-              <Link href="/sign-up" className="pl-link">
-                Create your profile <span aria-hidden>→</span>
-              </Link>
-            </article>
-
-            <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art">
-                <VignetteShare />
-              </div>
-              <p className="pl-panel__n">
-                02 <span className="pl-emb" aria-hidden />
-              </p>
-              <h3 className="pl-sub">Share instantly.</h3>
-              <p className="pl-panel__p">
-                One CodeCard. One QR code. Share your professional identity whenever an introduction happens.
-              </p>
-              <a href="/demo/card" className="pl-link">
-                Explore sharing <span aria-hidden>→</span>
-              </a>
-            </article>
-
-            <article className="pl-panel" data-reveal>
-              <div className="pl-panel__art">
-                <VignetteConnections />
-              </div>
-              <p className="pl-panel__n">
-                03 <span className="pl-emb" aria-hidden />
-              </p>
-              <h3 className="pl-sub">Keep the connection.</h3>
-              <p className="pl-panel__p">
-                Remember who you met, where you met and what you discussed. Keep the context that makes a connection
-                worth following up on.
-              </p>
-              <a href="/demo/connections" className="pl-link">
-                See connections <span aria-hidden>→</span>
-              </a>
-            </article>
+            {PANELS.map(({ n, art: Art, problem, title, body, href, cta }) => (
+              <article key={n} className="pl-panel" data-reveal>
+                <div className="pl-art">
+                  <Art />
+                </div>
+                <p className="pl-panel__n">
+                  {n} <span className="pl-emb" aria-hidden />
+                </p>
+                <h3 className="pl-panel__h">
+                  <span className="pl-panel__problem">{problem}</span>
+                  {title}
+                </h3>
+                <p className="pl-panel__p">{body}</p>
+                <Link href={href} className="pl-link">
+                  {cta} <span aria-hidden>→</span>
+                </Link>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 03 — Editorial statement */}
+      {/* 03 — Editorial statement: a narrow column of display type, nothing else. */}
       <section className="pl-band pl-say" data-band="light" aria-labelledby="pl-say-h">
         <div className="pl-wrap pl-say__grid">
-          <h2 id="pl-say-h" className="pl-display" data-reveal>
-            CodeCard is where introductions become connections
+          <h2 id="pl-say-h" className="pl-statement" data-reveal>
+            CodeCard is a company about the work behind a name
             <span className="pl-emb pl-emb--period" aria-hidden />
           </h2>
 
           <div className="pl-say__side" data-reveal>
-            <p className="pl-p">The best opportunities often begin with a conversation.</p>
             <p className="pl-p">
-              CodeCard brings your professional identity, your work and the people you meet into one place.
+              A name and a title are the least interesting things about a person. The work is the rest of it — and the
+              work is what gets left out of every introduction.
             </p>
-            <p className="pl-p">Show what you do. Remember who you meet. Make the next conversation easier.</p>
+            <p className="pl-p">
+              CodeCard exists so the thing you have actually built travels with you: into the room, onto their phone,
+              into the week after.
+            </p>
             <Link href="/how-it-works" className="pl-btn pl-btn--solid">
-              Discover CodeCard
+              Read more
             </Link>
           </div>
         </div>
@@ -124,7 +130,7 @@ export function StoryLanding() {
       {/* 04 — Final CTA */}
       <section className="pl-band pl-end" id="start" data-band="light" aria-labelledby="pl-end-h">
         <div className="pl-wrap pl-end__in">
-          <h2 id="pl-end-h" className="pl-display pl-display--big pl-center" data-reveal>
+          <h2 id="pl-end-h" className="pl-closer pl-center" data-reveal>
             Make every introduction count.
           </h2>
           <p className="pl-subhead pl-center" data-reveal>

@@ -41,9 +41,10 @@ export function StoryNav() {
 
   return (
     <header className="pl-nav" data-tone="light">
+      <div className="pl-nav__strip" aria-hidden />
       <div className="pl-nav__in">
         <div className="pl-nav__left">
-          <Link href="/" className="pl-nav__mark" aria-label="CodeCard home">
+          <Link href="/" className="pl-nav__mark cc-ed-mark-logo" aria-label="CodeCard home">
             <CodeCardExpandingMark />
           </Link>
           <div className="pl-nav__menu" ref={menu}>
@@ -131,7 +132,7 @@ export function StoryFooter() {
     <footer className="pl-foot">
       <div className="pl-wrap pl-foot__in">
         <div className="pl-foot__brand">
-          <span className="pl-foot__mark" aria-hidden>
+          <span className="pl-foot__mark cc-ed-mark-logo" aria-hidden>
             <CodeCardExpandingMark />
           </span>
           <p>© {new Date().getFullYear()} CodeCard</p>

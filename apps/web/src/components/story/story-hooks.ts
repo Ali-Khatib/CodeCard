@@ -47,42 +47,6 @@ export function useReveal(root: RefObject<HTMLElement | null>) {
   }, [canEnhanceMotion, root]);
 }
 
-/**
- * Product shots render at a real screen width and are scaled down to their
- * frame, so each panel reads as a screenshot instead of a squeezed app.
- */
-export function useFitShots(root: RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const shots = Array.from(el.querySelectorAll<HTMLElement>('.pl-shot'));
-    if (!shots.length) return;
-    const fit = () => {
-      for (const shot of shots) {
-        const box = shot.parentElement;
-        if (!box) continue;
-        const design = Number(shot.dataset.w ?? 1180);
-        shot.style.width = `${design}px`;
-        shot.style.transform = 'none';
-        /* contain, so the whole screen reads rather than a slice of it */
-        const natural = shot.scrollHeight || design * 0.72;
-        const k = Math.min(box.clientWidth / design, box.clientHeight / natural);
-        const left = (box.clientWidth - design * k) / 2;
-        const top = (box.clientHeight - natural * k) / 2;
-        shot.style.transform = `translate(${left}px, ${top}px) scale(${k})`;
-      }
-    };
-    fit();
-    const t = window.setTimeout(fit, 400);
-    const ro = new ResizeObserver(fit);
-    shots.forEach((s) => s.parentElement && ro.observe(s.parentElement));
-    return () => {
-      window.clearTimeout(t);
-      ro.disconnect();
-    };
-  }, [root]);
-}
-
 /** The bar reads whichever band sits under it and flips its ink to match. */
 export function useChromeTone(root: RefObject<HTMLElement | null>) {
   useEffect(() => {
