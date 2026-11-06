@@ -462,7 +462,7 @@ export function StoryLanding() {
           </div>
         </div>
         <div className="cc-hero__product cc-hero__rise">
-          <EditorialProductFrame state="profile" />
+          <EditorialProductFrame state="projects" />
         </div>
       </section>
 
