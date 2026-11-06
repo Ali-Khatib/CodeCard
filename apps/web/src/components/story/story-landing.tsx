@@ -24,6 +24,7 @@ import {
   waitlistValidationMessage,
 } from '@/lib/waitlist/submit-waitlist';
 import type { EditorialProductState } from '@/components/landing/editorial/editorial-product-frame';
+import { StoryNav, StoryFooter, type ProductSide } from './story-chrome';
 import '@/styles/editorial-landing.css';
 import '@/styles/story.css';
 
@@ -54,14 +55,30 @@ const STEPS = [
   { n: '04', k: 'Keep', t: 'Save the person, the place and the next step.', b: 'Who they are, where you met, your private note and the follow-up, on one record.' },
 ] as const;
 
-const SURFACES: { id: EditorialProductState; label: string; blurb: string }[] = [
-  { id: 'profile', label: 'Profile', blurb: 'One place that presents your professional identity, ready to open from your phone.' },
-  { id: 'projects', label: 'Projects', blurb: 'The things you have built, with the media, links and context that explain them.' },
-  { id: 'research', label: 'Research', blurb: 'Papers and write-ups that open and read inside your card.' },
-  { id: 'connections', label: 'Connections', blurb: 'Everyone you met, where you met them, your private note and the follow-up.' },
-  { id: 'circle', label: 'Circle', blurb: 'A private network of the people you have actually exchanged with.' },
-  { id: 'analysis', label: 'Analytics', blurb: 'Which projects and papers people opened after you shared your card.' },
-];
+type Surface = { id: EditorialProductState; label: string; blurb: string };
+
+/* The two sides of the product. The card is what someone else sees when they
+   scan you; the workspace is what only you see afterwards. */
+const SIDES: Record<ProductSide, { title: string; lede: string; surfaces: Surface[] }> = {
+  card: {
+    title: 'What they see when they scan you.',
+    lede: 'Your card is public. It opens in a browser in a second, with no account and nothing to install on their side.',
+    surfaces: [
+      { id: 'profile', label: 'Profile', blurb: 'Your headline, bio, location and links, in one place that is ready to open from your phone.' },
+      { id: 'projects', label: 'Projects', blurb: 'The things you have built, with the media, links and context that explain them.' },
+      { id: 'research', label: 'Research', blurb: 'Papers and write-ups that open and read inside your card, rather than as an attachment you promise to send.' },
+    ],
+  },
+  workspace: {
+    title: 'What stays with you afterwards.',
+    lede: 'Your workspace is private. It holds the people you actually exchanged with and everything you need to follow up well.',
+    surfaces: [
+      { id: 'connections', label: 'Connections', blurb: 'Everyone you met, where you met them, your private note and the next step, on one record per person.' },
+      { id: 'circle', label: 'Circle', blurb: 'A private network built only from people who scanned your card, so it never fills with strangers.' },
+      { id: 'analysis', label: 'Analytics', blurb: 'Which projects and papers people opened after you shared your card, so you know what landed.' },
+    ],
+  },
+};
 
 const RIVALS = [
   { name: 'LinkedIn', text: 'A public professional network. You find someone by searching a graph, after you already know the name.' },
@@ -219,7 +236,13 @@ export function StoryLanding() {
   const root = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<HTMLDivElement>(null);
   const { canEnhanceMotion } = useMotionPreferences();
+  const [side, setSide] = useState<ProductSide>('card');
   const [surface, setSurface] = useState<EditorialProductState>('profile');
+
+  const pickSide = (next: ProductSide) => {
+    setSide(next);
+    setSurface(SIDES[next].surfaces[0].id);
+  };
 
   useReveal(root, canEnhanceMotion);
 
@@ -275,6 +298,8 @@ export function StoryLanding() {
         if (tone === last) return;
         last = tone;
         applyLandingChromeInk(tone);
+        const bar = el.querySelector<HTMLElement>('.pl-nav');
+        if (bar) bar.dataset.tone = tone;
       };
       const onScroll = () => {
         if (ticking) return;
@@ -319,6 +344,7 @@ export function StoryLanding() {
 
   return (
     <div ref={root} className="pl" data-testid="story-landing">
+      <StoryNav side={side} onSide={pickSide} />
       {/* 01 — HERO */}
       <section className="pl-hero" data-band="dark" aria-label="CodeCard">
         <div className="pl-hero__stage">
@@ -395,13 +421,37 @@ export function StoryLanding() {
       </section>
 
       {/* 04 — THE PRODUCT */}
-      <section className="pl-band pl-tour" data-band="light" aria-labelledby="pl-tour-h">
+      <section className="pl-band pl-tour" id="product" data-band="light" aria-labelledby="pl-tour-h">
         <div className="pl-wrap">
           <h2 id="pl-tour-h" className="pl-h pl-h--center" data-reveal>
-            Everything you would show someone, in one place.
+            {SIDES[side].title}
           </h2>
-          <div className="pl-tour__tabs" role="tablist" aria-label="Product surfaces" data-reveal>
-            {SURFACES.map((s) => (
+          <p className="pl-tour__lede" data-reveal>
+            {SIDES[side].lede}
+          </p>
+          <div className="pl-seg pl-seg--page" role="tablist" aria-label="Two sides of CodeCard" data-reveal>
+            <span className="pl-seg__thumb" data-side={side} aria-hidden />
+            <button
+              type="button"
+              role="tab"
+              aria-selected={side === 'card'}
+              className="pl-seg__btn"
+              onClick={() => pickSide('card')}
+            >
+              Your card
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={side === 'workspace'}
+              className="pl-seg__btn"
+              onClick={() => pickSide('workspace')}
+            >
+              Your workspace
+            </button>
+          </div>
+          <div className="pl-tour__tabs" role="tablist" aria-label="Screens" data-reveal>
+            {SIDES[side].surfaces.map((s) => (
               <button
                 key={s.id}
                 type="button"
@@ -415,7 +465,7 @@ export function StoryLanding() {
             ))}
           </div>
           <p className="pl-tour__blurb" data-reveal>
-            {SURFACES.find((s) => s.id === surface)?.blurb}
+            {SIDES[side].surfaces.find((s) => s.id === surface)?.blurb}
           </p>
           <div className="pl-tour__frame" data-reveal>
             <EditorialProductFrame state={surface} size="lg" />
@@ -570,6 +620,8 @@ export function StoryLanding() {
           </div>
         </div>
       </section>
+
+      <StoryFooter />
 
       <div ref={zoomRef} className="pl-zoom" aria-hidden />
     </div>
