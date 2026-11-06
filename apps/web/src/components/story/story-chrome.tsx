@@ -1,36 +1,45 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { CodeCardExpandingMark } from '@/components/brand/codecard-mark';
-import { LIVE_DEMO_HREF, LIVE_DEMO_PROFILE_HREF } from '@/lib/marketing/demo-url';
-
-export type ProductSide = 'card' | 'workspace';
 
 const EXPLORE = [
-  { href: '/how-it-works', label: 'How it works', note: 'Meet, share, discover, keep' },
-  { href: '/guide', label: 'Guide', note: 'Set up a card that reads well' },
-  { href: '/profiles', label: 'Profiles', note: 'Cards people have published' },
-  { href: '/research', label: 'Research', note: 'Papers hosted on CodeCard' },
-  { href: '/pricing', label: 'Pricing', note: 'Free, and $8 a month for Pro' },
-  { href: '/faq', label: 'FAQ', note: 'Sharing, privacy and plans' },
+  {
+    href: '/how-it-works',
+    label: 'How it works',
+    note: 'See how CodeCard brings your professional identity and connections together.',
+  },
+  {
+    href: '/demo/card',
+    label: 'Your profile',
+    note: 'Show your work, projects and research.',
+  },
+  {
+    href: '/demo/connections',
+    label: 'Connections',
+    note: 'Remember the people you meet.',
+  },
 ] as const;
 
-/** Top bar: mark, an Explore menu, the two sides of the product, then account. */
-export function StoryNav({
-  side,
-  onSide,
-}: {
-  side: ProductSide;
-  onSide: (next: ProductSide) => void;
-}) {
+const PAGES = [
+  { href: '/', label: 'Home' },
+  { href: '/how-it-works', label: 'How it works' },
+] as const;
+
+export function StoryNav() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const wrap = useRef<HTMLDivElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const active = pathname === '/how-it-works' ? 1 : 0;
+
+  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
-      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+      if (!menu.current?.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
@@ -43,22 +52,17 @@ export function StoryNav({
     };
   }, [open]);
 
-  const jump = (next: ProductSide) => {
-    onSide(next);
-    document.getElementById('product')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
     <header className="pl-nav" data-tone="light">
       <div className="pl-nav__in">
-        <div className="pl-nav__left" ref={wrap}>
+        <div className="pl-nav__left">
           <Link href="/" className="pl-nav__mark" aria-label="CodeCard home">
             <CodeCardExpandingMark />
           </Link>
-          <div className="pl-nav__menu">
+          <div className="pl-nav__menu" ref={menu}>
             <button
               type="button"
-              className="pl-nav__link pl-nav__trigger"
+              className="pl-nav__link"
               aria-expanded={open}
               aria-haspopup="true"
               onClick={() => setOpen((v) => !v)}
@@ -68,11 +72,11 @@ export function StoryNav({
                 <path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
               </svg>
             </button>
-            <div className="pl-nav__drop" data-open={open ? 'true' : 'false'} inert={!open}>
+            <div className="pl-drop" data-open={open ? 'true' : 'false'} inert={!open}>
               <ul>
                 {EXPLORE.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} onClick={() => setOpen(false)}>
+                    <Link href={item.href}>
                       <span>{item.label}</span>
                       <i>{item.note}</i>
                     </Link>
@@ -83,27 +87,19 @@ export function StoryNav({
           </div>
         </div>
 
-        <div className="pl-seg" role="tablist" aria-label="Two sides of CodeCard">
-          <span className="pl-seg__thumb" data-side={side} aria-hidden />
-          <button
-            type="button"
-            role="tab"
-            aria-selected={side === 'card'}
-            className="pl-seg__btn"
-            onClick={() => jump('card')}
-          >
-            Your card
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={side === 'workspace'}
-            className="pl-seg__btn"
-            onClick={() => jump('workspace')}
-          >
-            Your workspace
-          </button>
-        </div>
+        <nav className="pl-seg" aria-label="Pages">
+          <span className="pl-seg__thumb" data-at={active} aria-hidden />
+          {PAGES.map((p) => (
+            <Link
+              key={p.href}
+              href={p.href}
+              className="pl-seg__btn"
+              aria-current={pathname === p.href ? 'page' : undefined}
+            >
+              {p.label}
+            </Link>
+          ))}
+        </nav>
 
         <div className="pl-nav__right">
           <Link href="/sign-in" className="pl-nav__link">
@@ -122,37 +118,22 @@ const COLS = [
   {
     head: 'Product',
     links: [
-      { href: LIVE_DEMO_HREF, label: 'Live demo' },
-      { href: LIVE_DEMO_PROFILE_HREF, label: 'See a live card' },
+      { href: '/', label: 'Home' },
       { href: '/how-it-works', label: 'How it works' },
-      { href: '/pricing', label: 'Pricing' },
-    ],
-  },
-  {
-    head: 'Explore',
-    links: [
-      { href: '/profiles', label: 'Profiles' },
-      { href: '/research', label: 'Research' },
-      { href: '/guide', label: 'Guide' },
-      { href: '/faq', label: 'FAQ' },
     ],
   },
   {
     head: 'Account',
     links: [
-      { href: '/sign-up', label: 'Create your CodeCard' },
       { href: '/sign-in', label: 'Sign in' },
-      { href: '/legal/contact', label: 'Contact' },
-      { href: '/legal/security', label: 'Security' },
+      { href: '/sign-up', label: 'Create your CodeCard' },
     ],
   },
   {
     head: 'Legal',
     links: [
-      { href: '/legal/terms', label: 'Terms' },
-      { href: '/legal/privacy', label: 'Privacy' },
-      { href: '/legal/cookies', label: 'Cookies' },
-      { href: '/legal/subscription', label: 'Subscription terms' },
+      { href: '/legal/privacy', label: 'Privacy Policy' },
+      { href: '/legal/terms', label: 'Terms of Service' },
     ],
   },
 ] as const;
@@ -160,18 +141,16 @@ const COLS = [
 export function StoryFooter() {
   return (
     <footer className="pl-foot">
-      <div className="pl-wrap">
-        <p className="pl-foot__say">Show your work. Keep the connection.</p>
-        <div className="pl-foot__grid">
-          <div className="pl-foot__about">
-            <p>
-              CodeCard is a professional identity built for introductions that happen in person: your work opens from
-              a phone or a QR scan, and the person you met stays with you afterwards.
-            </p>
-            <p className="pl-foot__copy">© {new Date().getFullYear()} CodeCard. All rights reserved.</p>
-          </div>
+      <div className="pl-wrap pl-foot__in">
+        <div className="pl-foot__brand">
+          <span className="pl-foot__mark" aria-hidden>
+            <CodeCardExpandingMark />
+          </span>
+          <p>© {new Date().getFullYear()} CodeCard</p>
+        </div>
+        <div className="pl-foot__cols">
           {COLS.map((col) => (
-            <nav key={col.head} className="pl-foot__col" aria-label={col.head}>
+            <nav key={col.head} aria-label={col.head}>
               <p className="pl-foot__head">{col.head}</p>
               <ul>
                 {col.links.map((l) => (
