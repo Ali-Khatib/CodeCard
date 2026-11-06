@@ -11,10 +11,14 @@ export function useReveal(root: RefObject<HTMLElement | null>) {
     const el = root.current;
     if (!el) return;
     const targets = Array.from(el.querySelectorAll<HTMLElement>('[data-reveal]'));
+    const showAll = () => targets.forEach((t) => t.setAttribute('data-in', 'true'));
     if (!canEnhanceMotion) {
-      targets.forEach((t) => t.setAttribute('data-in', 'true'));
+      showAll();
       return;
     }
+    /* Hiding only happens while this is on, so content is never invisible
+       when the script is absent or the observer misses something. */
+    el.dataset.revealRoot = 'on';
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -26,7 +30,20 @@ export function useReveal(root: RefObject<HTMLElement | null>) {
       { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
     );
     targets.forEach((t) => io.observe(t));
-    return () => io.disconnect();
+    /* Safety net: anything still hidden after a moment is shown anyway. */
+    const sweep = window.setTimeout(() => {
+      for (const t of targets) {
+        if (t.getAttribute('data-in') === 'true') continue;
+        if (t.getBoundingClientRect().top < window.innerHeight * 1.5) {
+          t.setAttribute('data-in', 'true');
+          io.unobserve(t);
+        }
+      }
+    }, 1200);
+    return () => {
+      window.clearTimeout(sweep);
+      io.disconnect();
+    };
   }, [canEnhanceMotion, root]);
 }
 
