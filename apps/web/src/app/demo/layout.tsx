@@ -5,6 +5,7 @@ import { DeferredVisitorConversionPrompt } from '@/components/visitor-conversion
  * Visitor conversion eligibility is limited to `/demo` (workspace entry).
  */
 import '@/styles/codecard-app-system.css';
+import '@/styles/product-v2.css';
 
 export default function DemoLayout({ children }: { children: React.ReactNode }) {
   return (

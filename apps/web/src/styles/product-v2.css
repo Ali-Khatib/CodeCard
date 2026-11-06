@@ -1,0 +1,209 @@
+/* CodeCard product v2 — design layer loaded after codecard-app-system.css.
+   Presentation only: no selectors depend on behaviour, no markup changes. */
+
+.cc-app-root {
+  --v2-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --v2-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --v2-radius: 26px;
+  --v2-hair: color-mix(in oklab, var(--app-ink) 11%, transparent);
+  --v2-orange: #e95a0b;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  background:
+    radial-gradient(120% 60% at 100% -10%, color-mix(in oklab, var(--v2-orange) 9%, transparent), transparent 60%),
+    var(--app-canvas);
+}
+
+/* Top bar: a quiet glass strip instead of a bordered band. */
+.cc-app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 0;
+  background: color-mix(in oklab, var(--app-canvas) 72%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+}
+.cc-app-topbar-cta {
+  border-radius: 999px;
+}
+
+/* Content rhythm and entrance (one entrance per container: children rise, parent stays). */
+.cc-app-content {
+  max-width: 1120px;
+  margin-inline: auto;
+}
+@keyframes v2-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cc-home-desk > *,
+.cc-app-page > * {
+  animation: v2-rise 640ms var(--v2-ease) both;
+}
+.cc-home-desk > *:nth-child(2),
+.cc-app-page > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.cc-home-desk > *:nth-child(3),
+.cc-app-page > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.cc-home-desk > *:nth-child(4),
+.cc-app-page > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.cc-home-desk > *:nth-child(n + 5),
+.cc-app-page > *:nth-child(n + 5) {
+  animation-delay: 190ms;
+}
+
+/* Greeting */
+.cc-home-desk__date {
+  letter-spacing: 0.08em;
+  color: color-mix(in oklab, var(--app-ink) 52%, transparent);
+}
+.cc-home-desk__title {
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+  font-weight: 600;
+}
+
+/* Surfaces */
+.cc-app-card,
+.cc-home-desk__card,
+.cc-app-project-card {
+  border: 1px solid var(--v2-hair);
+  border-radius: var(--v2-radius);
+  background: var(--app-paper);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 18px 40px -26px color-mix(in oklab, var(--app-ink) 28%, transparent);
+  transition:
+    transform 360ms var(--v2-ease),
+    box-shadow 360ms var(--v2-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cc-app-project-card:hover,
+  .cc-home-desk__card:hover {
+    transform: translate3d(0, -3px, 0);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.6) inset,
+      0 28px 50px -26px color-mix(in oklab, var(--app-ink) 36%, transparent);
+  }
+}
+
+/* Stats: big numerals, the dark tile carries the one orange accent. */
+.cc-home-desk__stat {
+  border-radius: 22px;
+  padding: 1.1rem 1.3rem;
+  transition: transform 160ms var(--v2-ease);
+}
+.cc-home-desk__stat:active {
+  transform: scale(0.97);
+}
+.cc-home-desk__stat-value {
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cc-home-desk__stat--connections {
+  position: relative;
+  background: #0e0d10;
+  color: #fcf1e7;
+}
+.cc-home-desk__stat--connections::after {
+  content: '';
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--v2-orange);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--v2-orange) 25%, transparent);
+}
+
+/* Buttons: pill, press feedback on pointer-down. */
+.cc-app-btn {
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+  touch-action: manipulation;
+  transition:
+    transform 140ms var(--v2-ease),
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+.cc-app-btn:active {
+  transform: scale(0.97);
+}
+.cc-app-btn--primary {
+  background: #0e0d10;
+  color: #fcf1e7;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cc-app-btn--primary:hover {
+    background: var(--v2-orange);
+    color: #0e0d10;
+  }
+}
+
+/* Mobile nav → floating glass dock with a clear active state. */
+.cc-app-mobile-nav {
+  left: 10px;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 6px;
+  border: 1px solid color-mix(in oklab, #fcf1e7 14%, transparent);
+  border-radius: 28px;
+  background: color-mix(in oklab, #0e0d10 88%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: 0 20px 40px -18px rgb(0 0 0 / 0.55);
+}
+.cc-app-mobile-nav__link {
+  position: relative;
+  border-radius: 22px;
+  color: color-mix(in oklab, #fcf1e7 58%, transparent) !important;
+  touch-action: manipulation;
+  transition:
+    color 200ms ease,
+    background-color 260ms var(--v2-ease),
+    transform 140ms var(--v2-ease);
+}
+.cc-app-mobile-nav__link:active {
+  transform: scale(0.94);
+}
+.cc-app-mobile-nav__link[aria-current='page'] {
+  color: #0e0d10 !important;
+  background: #fcf1e7;
+}
+.cc-app-content {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  .cc-app-content {
+    padding-bottom: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-home-desk > *,
+  .cc-app-page > * {
+    animation: none;
+  }
+  .cc-app-card,
+  .cc-app-btn,
+  .cc-app-mobile-nav__link {
+    transition-duration: 0.01ms;
+  }
+}

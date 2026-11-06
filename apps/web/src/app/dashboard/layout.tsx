@@ -4,6 +4,7 @@ import { ContentOpeningProvider } from '@/components/navigation/content-opening-
 import { ThemeRoot } from '@/components/theme/theme-root';
 import { DeferredVisitorConversionPrompt } from '@/components/visitor-conversion/deferred-visitor-conversion-prompt';
 import '@/styles/codecard-app-system.css';
+import '@/styles/product-v2.css';
 
 export default function DashboardLayout({
   children,

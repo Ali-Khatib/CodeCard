@@ -1,3 +1,3 @@
 export default function MarketingTemplate({ children }: { children: React.ReactNode }) {
-  return children;
+  return <div className="cc2-page">{children}</div>;
 }

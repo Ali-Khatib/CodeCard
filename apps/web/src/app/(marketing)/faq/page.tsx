@@ -1,5 +1,5 @@
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
-import { FaqPage } from '@/components/landing/faq-page';
+import { Cc2Faq } from '@/components/cc2/faq';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/faq',
@@ -9,5 +9,5 @@ export const metadata = buildIndexablePageMetadata({
 });
 
 export default function FaqRoute() {
-  return <FaqPage />;
+  return <Cc2Faq />;
 }
