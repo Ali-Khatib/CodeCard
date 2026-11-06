@@ -44,15 +44,25 @@ export function useFitShots(root: RefObject<HTMLElement | null>) {
       for (const shot of shots) {
         const box = shot.parentElement;
         if (!box) continue;
-        const design = Number(shot.dataset.w ?? 1120);
+        const design = Number(shot.dataset.w ?? 1180);
         shot.style.width = `${design}px`;
-        shot.style.transform = `scale(${box.clientWidth / design})`;
+        shot.style.transform = 'none';
+        /* contain, so the whole screen reads rather than a slice of it */
+        const natural = shot.scrollHeight || design * 0.72;
+        const k = Math.min(box.clientWidth / design, box.clientHeight / natural);
+        const left = (box.clientWidth - design * k) / 2;
+        const top = (box.clientHeight - natural * k) / 2;
+        shot.style.transform = `translate(${left}px, ${top}px) scale(${k})`;
       }
     };
     fit();
+    const t = window.setTimeout(fit, 400);
     const ro = new ResizeObserver(fit);
     shots.forEach((s) => s.parentElement && ro.observe(s.parentElement));
-    return () => ro.disconnect();
+    return () => {
+      window.clearTimeout(t);
+      ro.disconnect();
+    };
   }, [root]);
 }
 

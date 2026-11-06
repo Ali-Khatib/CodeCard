@@ -31,7 +31,11 @@ export function StoryHero({
   useGSAP(
     () => {
       const el = root.current;
-      if (!el || !canEnhanceMotion || !expand) return;
+      if (!el) return;
+      if (!canEnhanceMotion || !expand) {
+        el.dataset.open = 'true';
+        return;
+      }
       ensureGsapPlugins();
 
       const canvas = el.querySelector<HTMLElement>('.pl-hero__canvas');

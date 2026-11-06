@@ -68,9 +68,9 @@ export function StoryLanding() {
               <p className="pl-panel__p">
                 One CodeCard. One QR code. Share your professional identity whenever an introduction happens.
               </p>
-              <Link href="/demo/card" className="pl-link">
+              <a href="/demo/card" className="pl-link">
                 Explore sharing <span aria-hidden>→</span>
-              </Link>
+              </a>
             </article>
 
             <article className="pl-panel" data-reveal>
@@ -82,9 +82,9 @@ export function StoryLanding() {
                 Remember who you met, where you met and what you discussed. Keep the context that makes a connection
                 worth following up on.
               </p>
-              <Link href="/demo/connections" className="pl-link">
+              <a href="/demo/connections" className="pl-link">
                 See connections <span aria-hidden>→</span>
-              </Link>
+              </a>
             </article>
           </div>
         </div>

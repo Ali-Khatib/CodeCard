@@ -168,14 +168,34 @@
   inset: 0 0 auto;
   z-index: 300;
   height: 76px;
+  isolation: isolate;
   display: flex;
   align-items: center;
   padding: 0 var(--gutter);
   pointer-events: none;
   transition: color 0.4s ease;
 }
+/* A full-width translucent strip sits under the bar on every page, so the
+   mark, the menu and the actions stay legible over paper or photography. */
+.pl-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
 .pl-nav[data-tone='light'] { color: #ffffff; }
+.pl-nav[data-tone='light']::before {
+  background: rgba(5, 5, 5, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
 .pl-nav[data-tone='dark'] { color: var(--ink); }
+.pl-nav[data-tone='dark']::before {
+  background: rgba(228, 223, 217, 0.72);
+  border-bottom: 1px solid var(--fog);
+}
 .pl-nav__in {
   position: relative;
   width: 100%;
@@ -302,6 +322,90 @@
 @media (max-width: 680px) {
   .pl-nav { height: 66px; }
   .pl-nav__right .pl-nav__link { display: none; }
+}
+
+/* ── three compact actions ───────────────────────────────────────────── */
+.pl-three {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s40);
+}
+.pl-three__item { border-top: 1px solid var(--fog); padding-top: var(--s24); }
+.pl-three__item .pl-heading { margin-bottom: var(--s12); }
+@media (max-width: 860px) { .pl-three { grid-template-columns: 1fr; gap: var(--s32); } }
+
+/* ── live demo ────────────────────────────────────────────────────────── */
+.pl-live { background: var(--graphite); }
+.pl-live__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(var(--s24), 4vw, var(--s72));
+  align-items: end;
+  margin-bottom: var(--s40);
+}
+.pl-live__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s10);
+  margin: 0 0 var(--s18);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+.pl-emb--live { position: relative; }
+.pl-emb--live::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 106, 31, 0.5);
+}
+.pl-live__title { color: #fff; }
+.pl-live__aside { display: grid; gap: var(--s18); justify-items: start; }
+.pl-live__note { margin: 0; max-width: 34ch; font-size: 16px; line-height: 1.5; color: rgba(255, 255, 255, 0.68); }
+.pl-btn--light { background: var(--white); color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .pl-btn--light:hover { background: var(--paper); } }
+
+.pl-live__tabs { display: flex; flex-wrap: wrap; gap: var(--s8); margin-bottom: var(--s18); }
+.pl-live__tab {
+  padding: var(--s10) var(--s18);
+  border: 0;
+  border-radius: var(--s12);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.76);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.16s var(--e);
+}
+.pl-live__tab:active { transform: scale(0.97); }
+.pl-live__tab[aria-selected='true'] { background: var(--white); color: var(--ink); box-shadow: var(--shadow); }
+.pl-live__tab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .pl-live__tab:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+  .pl-live__tab[aria-selected='true']:hover { background: var(--white); color: var(--ink); }
+}
+.pl-live__screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+.pl-live__foot { margin: var(--s18) 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.56); }
+.pl-live__foot a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 900px) {
+  .pl-live__head { grid-template-columns: 1fr; align-items: start; }
+  .pl-live__screen { aspect-ratio: 4 / 3; }
 }
 
 /* ── hero ─────────────────────────────────────────────────────────────── */
