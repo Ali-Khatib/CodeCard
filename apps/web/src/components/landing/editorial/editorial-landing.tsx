@@ -6,10 +6,7 @@ import { EditorialLiveDemoBox } from './editorial-live-demo-box';
 import { EditorialAudience } from './editorial-audience';
 import { EditorialFinalCta } from './editorial-final-cta';
 import { EditorialWaitlist } from './editorial-waitlist';
-import { OpeningCurtain } from './opening-curtain';
 import '@/styles/editorial-landing.css';
-
-const OPENING_GATE = `try{var d=document.documentElement,q=location.search.indexOf('intro')>-1;if(q){sessionStorage.removeItem('cc.open.seen')}if(!q&&(sessionStorage.getItem('cc.open.seen')||matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('cc-intro-seen')}}catch(e){}`;
 
 const EditorialAtmosphere = dynamic(
   () => import('./editorial-atmosphere').then((m) => m.EditorialAtmosphere),
@@ -28,8 +25,6 @@ const EditorialResearchScene = dynamic(
 export function EditorialLanding() {
   return (
     <div className="cc-ed" data-testid="editorial-landing" data-chapter="hero">
-      <script dangerouslySetInnerHTML={{ __html: OPENING_GATE }} />
-      <OpeningCurtain />
       <EditorialAtmosphere />
       <EditorialHeroScene hero={<EditorialHero />} />
       <EditorialFeatureWalkthrough />
