@@ -256,23 +256,28 @@ export function StoryLanding() {
       /* nav ink follows the surface under it */
       gsap.utils.toArray<HTMLElement>('[data-tone]').forEach((sec) => {
         const tone = sec.dataset.tone === 'dark' ? 'light' : 'dark';
+        const activate = () => {
+          applyLandingChromeInk(tone);
+          const rail = el.querySelector<HTMLElement>('.st-rail');
+          const n = Number(sec.dataset.chap ?? 0);
+          if (rail) {
+            rail.dataset.ink = tone;
+            rail.dataset.hidden = n === 0 ? 'true' : 'false';
+            const num = rail.querySelector('.st-rail__n');
+            const txt = rail.querySelector('.st-rail__t');
+            if (num) num.textContent = `0${n}`;
+            if (txt) txt.textContent = CHAPTERS[n] ?? '';
+          }
+        };
         ScrollTrigger.create({
           trigger: sec,
           start: 'top 56px',
           end: 'bottom 56px',
           onToggle: (self) => {
-            if (!self.isActive) return;
-            applyLandingChromeInk(tone);
-            const rail = el.querySelector<HTMLElement>('.st-rail');
-            const n = Number(sec.dataset.chap ?? 0);
-            if (rail) {
-              rail.dataset.ink = tone;
-              rail.dataset.hidden = n === 0 ? 'true' : 'false';
-              const num = rail.querySelector('.st-rail__n');
-              const txt = rail.querySelector('.st-rail__t');
-              if (num) num.textContent = `0${n}`;
-              if (txt) txt.textContent = CHAPTERS[n] ?? '';
-            }
+            if (self.isActive) activate();
+          },
+          onRefresh: (self) => {
+            if (self.isActive) activate();
           },
         });
       });
@@ -541,7 +546,7 @@ export function StoryLanding() {
       </section>
 
       {/* the three lines, moving with the scroll */}
-      <div className="st-marq" data-tone="dark" aria-hidden>
+      <div className="st-marq" data-tone="dark" data-chap="1" aria-hidden>
         <div className="st-marq__row st-marq__row--a">
           {[0, 1].map((k) => (
             <span key={k}>

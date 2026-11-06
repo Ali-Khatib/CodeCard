@@ -318,3 +318,8 @@ html.st-seen .st-intro { display: none; }
   .st-close__lit { display: none; }
   .st-marq__row { transform: none !important; }
 }
+
+/* the nav floats over the story instead of taking a strip of the page */
+.cc-marketing-shell:has(.st-root) { background: #080a09; }
+.cc-marketing-shell:has(.st-root) .cc-marketing-nav-shell { position: fixed; left: 0; right: 0; pointer-events: none; }
+.cc-marketing-shell:has(.st-root) .cc-marketing-nav-shell > * { pointer-events: auto; }
