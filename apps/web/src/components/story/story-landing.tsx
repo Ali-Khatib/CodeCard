@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { applyLandingChromeInk } from '@/components/landing/editorial/landing-chrome-tone';
 import { StoryNav, StoryFooter } from './story-chrome';
+import { VignetteConnections, VignetteProfile, VignetteShare } from './story-vignettes';
 import { StoryHero } from './story-hero';
 import { useChromeTone, useReveal } from './story-hooks';
 import '@/styles/editorial-landing.css';
@@ -47,6 +48,9 @@ export function StoryLanding() {
 
           <div className="pl-panels">
             <article className="pl-panel" data-reveal>
+              <div className="pl-panel__art">
+                <VignetteProfile />
+              </div>
               <p className="pl-panel__n">
                 01 <span className="pl-emb" aria-hidden />
               </p>
@@ -61,6 +65,9 @@ export function StoryLanding() {
             </article>
 
             <article className="pl-panel" data-reveal>
+              <div className="pl-panel__art">
+                <VignetteShare />
+              </div>
               <p className="pl-panel__n">
                 02 <span className="pl-emb" aria-hidden />
               </p>
@@ -74,6 +81,9 @@ export function StoryLanding() {
             </article>
 
             <article className="pl-panel" data-reveal>
+              <div className="pl-panel__art">
+                <VignetteConnections />
+              </div>
               <p className="pl-panel__n">
                 03 <span className="pl-emb" aria-hidden />
               </p>
