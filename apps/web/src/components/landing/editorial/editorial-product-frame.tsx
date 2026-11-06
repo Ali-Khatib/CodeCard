@@ -28,7 +28,6 @@ import { greetingForHour } from '@/lib/dashboard/profile-completion';
 import { MutationFeedbackProvider } from '@/components/dashboard/mutation-feedback-provider';
 import type { Profile } from '@codecard/types';
 import '@/styles/codecard-app-system.css';
-import '@/styles/product-v2.css';
 
 export type EditorialProductState =
   | 'profile'

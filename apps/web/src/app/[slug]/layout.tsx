@@ -1,6 +1,5 @@
 import { ContentOpeningProvider } from '@/components/navigation/content-opening-transition';
 import '@/styles/codecard-app-system.css';
-import '@/styles/product-v2.css';
 
 /** Public profile + project/research detail routes share the opening transition host. */
 export default function PublicSlugLayout({ children }: { children: React.ReactNode }) {
