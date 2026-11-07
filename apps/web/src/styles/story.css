@@ -582,11 +582,29 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
 @media (max-width: 900px) { .pl-lede { grid-template-columns: 1fr; gap: var(--s20); align-items: start; } }
 
 /* ── a real product surface, framed as the page's own object ────────── */
-.pl-stage { position: relative; width: 100%; overflow: hidden; }
-.pl-stage__in { transform-origin: top left; }
+.pl-stage {
+  position: relative;
+  width: 100%;
+  /* A fixed window onto the surface, cropped at the fold. */
+  height: clamp(320px, 42vw, 620px);
+  overflow: hidden;
+  border-radius: 14px;
+}
+.pl-stage__in { position: absolute; inset: 0 auto auto 0; transform-origin: top left; }
+/* The crop ends in a fade rather than a hard cut, so it reads as a window. */
+.pl-stage::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 90px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(247, 246, 244, 0), var(--shell));
+}
+.pl-live .pl-stage::after { background: linear-gradient(180deg, rgba(11, 11, 12, 0), #121214); }
+.pl-step__shot .pl-stage::after { background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--white)); }
 .pl-stage__hold {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 100%;
   border-radius: 20px;
   background: var(--shell);
 }

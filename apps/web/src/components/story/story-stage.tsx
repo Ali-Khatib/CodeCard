@@ -40,12 +40,14 @@ export function ProductStage({
     const el = inner.current;
     if (!b || !el) return;
 
+    /* The surface is scaled to the box's width and cropped at its bottom
+       edge, the way a screenshot of an app is cropped at the fold. Letting
+       it run to its full page height would add two thousand pixels of
+       scroll per section. The box owns the height; this only sets scale. */
     const fit = () => {
-      const available = b.clientWidth;
-      const k = Math.min(1, available / DESIGN_WIDTH);
+      const k = Math.min(1, b.clientWidth / DESIGN_WIDTH);
       el.style.transform = k === 1 ? 'none' : `scale(${k})`;
       el.style.width = k === 1 ? '100%' : `${DESIGN_WIDTH}px`;
-      b.style.height = `${el.offsetHeight * k}px`;
     };
 
     fit();
