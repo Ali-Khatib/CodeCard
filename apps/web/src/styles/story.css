@@ -40,6 +40,7 @@
 .pl *::after { box-sizing: border-box; }
 .pl-wrap { width: 100%; max-width: var(--max); margin: 0 auto; }
 .pl-center { margin-inline: auto; text-align: center; }
+.pl-nowrap { white-space: nowrap; }
 
 /* ── type scale, measured off the reference at 1440 ───────────────────
    hero 100/-0.03em · section title 40/48 · statement 60/72 · closer 64 */
@@ -221,12 +222,12 @@
 }
 .pl-nav[data-tone='light'] { color: #ffffff; }
 .pl-nav[data-tone='light'] .pl-nav__strip {
-  background: rgba(10, 9, 8, 0.42);
+  background: rgba(10, 9, 8, 0.52);
   border-bottom-color: rgba(255, 255, 255, 0.14);
 }
 .pl-nav[data-tone='dark'] { color: var(--ink); }
 .pl-nav[data-tone='dark'] .pl-nav__strip {
-  background: rgba(228, 223, 217, 0.76);
+  background: rgba(228, 223, 217, 0.9);
   border-bottom-color: var(--fog);
 }
 .pl-nav__in {

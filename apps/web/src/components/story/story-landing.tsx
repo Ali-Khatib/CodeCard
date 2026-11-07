@@ -107,8 +107,11 @@ export function StoryLanding() {
       <section className="pl-band pl-say" data-band="light" aria-labelledby="pl-say-h">
         <div className="pl-wrap pl-say__grid">
           <h2 id="pl-say-h" className="pl-statement" data-reveal>
-            CodeCard is a company about the work behind a name
-            <span className="pl-emb pl-emb--period" aria-hidden />
+            CodeCard is a company about the work behind a{' '}
+            <span className="pl-nowrap">
+              name
+              <span className="pl-emb pl-emb--period" aria-hidden />
+            </span>
           </h2>
 
           <div className="pl-say__side" data-reveal>

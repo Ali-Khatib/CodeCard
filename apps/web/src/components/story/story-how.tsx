@@ -169,8 +169,11 @@ export function StoryHow() {
       <section className="pl-band pl-end" data-band="light" aria-labelledby="pl-how-end">
         <div className="pl-wrap pl-end__in">
           <h2 id="pl-how-end" className="pl-closer pl-center" data-reveal>
-            Your next opportunity starts with an introduction
-            <span className="pl-emb pl-emb--period" aria-hidden />
+            Your next opportunity starts with an{' '}
+            <span className="pl-nowrap">
+              introduction
+              <span className="pl-emb pl-emb--period" aria-hidden />
+            </span>
           </h2>
           <div className="pl-end__cta" data-reveal>
             <Link href="/sign-up" className="pl-btn pl-btn--solid">
