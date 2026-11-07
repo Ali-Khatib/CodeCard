@@ -45,7 +45,9 @@ export function ProductStage({
        it run to its full page height would add two thousand pixels of
        scroll per section. The box owns the height; this only sets scale. */
     const fit = () => {
-      const k = Math.min(1, b.clientWidth / DESIGN_WIDTH);
+      /* Below this the app would be too small to read, so the window
+         crops horizontally instead of shrinking further. */
+      const k = Math.max(0.54, Math.min(1, b.clientWidth / DESIGN_WIDTH));
       el.style.transform = k === 1 ? 'none' : `scale(${k})`;
       el.style.width = k === 1 ? '100%' : `${DESIGN_WIDTH}px`;
     };

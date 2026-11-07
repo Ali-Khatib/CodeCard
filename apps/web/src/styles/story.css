@@ -659,6 +659,7 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
   align-items: center;
   gap: var(--s72);
 }
+.pl-step[data-alt='true'] .pl-step__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
 .pl-step[data-alt='true'] .pl-step__copy { order: 2; }
 .pl-step__copy .pl-section-title { margin-bottom: var(--s20); }
 .pl-step__copy .pl-p { max-width: 46ch; }
@@ -672,6 +673,7 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
 }
 @media (max-width: 960px) {
   .pl-step__grid { grid-template-columns: 1fr; gap: var(--s32); }
+  .pl-step[data-alt='true'] .pl-step__grid { grid-template-columns: 1fr; }
   .pl-step[data-alt='true'] .pl-step__copy { order: 0; }
 }
 
