@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
 import { CodeCardExpandingMark } from '@/components/brand/codecard-mark';
-
-const EXPLORE = [
-  { href: '/demo/card', label: 'Your profile', note: 'Your professional identity, projects and research.' },
-  { href: '/how-it-works', label: 'How it works', note: 'Discover how CodeCard works.' },
-  { href: '/demo/connections', label: 'Your connections', note: 'Remember the people you meet.' },
-] as const;
 
 const PAGES = [
   { href: '/', label: 'Home' },
@@ -18,62 +11,14 @@ const PAGES = [
 
 export function StoryNav() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const menu = useRef<HTMLDivElement>(null);
-
-  useEffect(() => setOpen(false), [pathname]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => {
-      if (!menu.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('pointerdown', onDown);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
 
   return (
     <header className="pl-nav" data-tone="light">
       <div className="pl-nav__strip" aria-hidden />
       <div className="pl-nav__in">
-        <div className="pl-nav__left">
-          <Link href="/" className="pl-nav__mark cc-ed-mark-logo" aria-label="CodeCard home">
-            <CodeCardExpandingMark />
-          </Link>
-          <div className="pl-nav__menu" ref={menu}>
-            <button
-              type="button"
-              className="pl-nav__link"
-              aria-expanded={open}
-              aria-haspopup="true"
-              onClick={() => setOpen((v) => !v)}
-            >
-              Explore
-              <svg viewBox="0 0 12 8" aria-hidden className={open ? 'is-open' : undefined}>
-                <path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-              </svg>
-            </button>
-            <div className="pl-drop" data-open={open ? 'true' : 'false'} inert={!open}>
-              <ul>
-                {EXPLORE.map((item) => (
-                  <li key={item.href}>
-                    <Link href={item.href}>
-                      <span>{item.label}</span>
-                      <i>{item.note}</i>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+        <Link href="/" className="pl-nav__mark cc-ed-mark-logo" aria-label="CodeCard home">
+          <CodeCardExpandingMark />
+        </Link>
 
         <nav className="pl-seg" aria-label="Pages">
           {PAGES.map((p) => (
@@ -107,8 +52,6 @@ const COLS = [
     links: [
       { href: '/', label: 'Home' },
       { href: '/how-it-works', label: 'How it works' },
-      { href: '/demo/card', label: 'Your profile' },
-      { href: '/demo/connections', label: 'Connections' },
     ],
   },
   {
