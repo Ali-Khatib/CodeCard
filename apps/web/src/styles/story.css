@@ -227,7 +227,12 @@
 /* ── top bar ──────────────────────────────────────────────────────────── */
 .cc-marketing-shell:has(.pl) .cc-marketing-nav-shell,
 .cc-marketing-shell:has(.pl) .cc-site-footer { display: none !important; }
-.cc-marketing-shell:has(.pl) { background: #e4dfd9; }
+.cc-marketing-shell:has(.pl) { background: #ffffff; }
+/* The site-wide visitor-conversion card is a floating panel that lands over
+   the product showcase on these two pages, which already carry a CTA in the
+   bar, in the hero, in the statement and at the close. It is hidden here
+   only; every other route still shows it. */
+.cc-marketing-shell:has(.pl) [data-testid='sitewide-visitor-conversion-prompt'] { display: none !important; }
 
 .pl-nav {
   position: fixed;
