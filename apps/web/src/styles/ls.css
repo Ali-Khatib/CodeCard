@@ -47,6 +47,14 @@
   font-family: var(--body);
   overflow-x: clip;
 }
+/* This page brings its own chrome, so the shared marketing bar, footer and
+   floating conversion card step aside. Every other route keeps all three. */
+.cc-marketing-shell:has(.ls) { background: #ffffff; }
+.cc-marketing-shell:has(.ls) .cc-marketing-nav-shell,
+.cc-marketing-shell:has(.ls) .cc-site-footer,
+.cc-marketing-shell:has(.ls) [data-testid='sitewide-visitor-conversion-prompt'] { display: none !important; }
+.cc-marketing-shell:has(.ls) .cc-marketing-main { padding: 0; }
+
 .ls *,
 .ls *::before,
 .ls *::after { box-sizing: border-box; }
