@@ -38,7 +38,9 @@ export function LsNav({ pinned = false }: { pinned?: boolean }) {
     if (!pinned) return;
     /* Inner pages have no hero to drive the variable, so they start settled. */
     document.documentElement.style.setProperty('--ls-progress', '1');
-    return () => document.documentElement.style.removeProperty('--ls-progress');
+    return () => {
+      document.documentElement.style.removeProperty('--ls-progress');
+    };
   }, [pinned]);
 
   useEffect(() => {
