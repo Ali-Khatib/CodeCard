@@ -1,5 +1,5 @@
 import { buildIndexablePageMetadata } from '@/lib/seo/indexable-page-metadata';
-import { StoryLanding } from '@/components/story/story-landing';
+import { LsHome } from '@/components/ls/ls-home';
 
 export const metadata = buildIndexablePageMetadata({
   path: '/',
@@ -10,5 +10,5 @@ export const metadata = buildIndexablePageMetadata({
 });
 
 export default function HomePage() {
-  return <StoryLanding />;
+  return <LsHome />;
 }

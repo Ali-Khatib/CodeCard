@@ -1,0 +1,538 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   CodeCard — photography-first brand site.
+
+   The experience is translated from Lightship: a pinned hero that contracts
+   out of full bleed into a centred cinematic frame while the rest of the
+   photography arrives from the edges, oversized type rises behind it, and
+   the chrome resolves from transparent-over-image into a floating pill.
+
+   The colour is CodeCard's own: white carries the page, tangerine is the
+   signature, acid lime appears rarely and deliberately, and ink is for type.
+   Nothing from the reference's palette is used.
+
+   One number drives the whole opening: --ls-progress, published on :root by
+   the hero's single ScrollTrigger. The bar, the brand and the page's
+   background all read it, so they can never disagree with each other.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ls {
+  /* brand */
+  --tangerine: #ff6a14;
+  --tangerine-deep: #e85304;
+  --lime: #d9ff33;
+  --lime-ink: #1b2400;
+
+  /* foundation */
+  --paper: #ffffff;
+  --ink: #0d0e10;
+  --near: #1d1f23;
+  --slate: #63666c;
+  --stone: #8a8d93;
+  --fog: #e7e6e3;
+  --shell: #f6f5f3;
+
+  /* type */
+  --display: var(--font-instrument), 'Instrument Serif', Georgia, serif;
+  --body: var(--font-inter), Inter, system-ui, sans-serif;
+
+  /* rhythm */
+  --edge: 8px;              /* the page's own margin, as the reference uses */
+  --gutter: clamp(20px, 4.4vw, 56px);
+  --max: 1320px;
+  --e: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  background: var(--paper);
+  color: var(--near);
+  font-family: var(--body);
+  overflow-x: clip;
+}
+.ls *,
+.ls *::before,
+.ls *::after { box-sizing: border-box; }
+
+.ls-wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding-inline: var(--gutter); }
+
+/* ── photography ────────────────────────────────────────────────────────
+   A slot is a real commitment to dimensions. Until the file lands it shows
+   its own art direction at exactly the size the photograph will occupy. */
+.ls-photo { position: relative; width: 100%; overflow: hidden; background: #121316; }
+.ls-photo__img { object-fit: cover; object-position: var(--focal); }
+.ls-photo__img--contain { object-fit: contain; }
+@media (max-width: 760px) { .ls-photo__img { object-position: var(--focal-m); } }
+
+.ls-photo--pending {
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 2.2vw, 28px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0)),
+    #141518;
+}
+.ls-photo--pending::before {
+  /* a single tangerine corner rule, so the board reads as art direction */
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 26px;
+  height: 26px;
+  border-top: 2px solid var(--tangerine);
+  border-left: 2px solid var(--tangerine);
+}
+.ls-photo__card { max-width: 46ch; text-align: center; }
+.ls-photo__id {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tangerine);
+}
+.ls-photo__dir {
+  margin: 0;
+  font-size: clamp(12px, 1.05vw, 15px);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.62);
+}
+.ls-photo__meta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin: 14px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+@media (max-width: 700px) { .ls-photo__dir { display: none; } }
+
+/* ── the hero transformation ───────────────────────────────────────────── */
+.ls-hero { position: relative; height: 300svh; background: var(--ink); }
+.ls-hero__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* The world turns from ink to paper underneath the photography. */
+.ls-hero__pin::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--paper);
+  opacity: var(--ls-progress, 0);
+}
+
+/* the oversized line that rises behind the photographs */
+.ls-hero__wordline {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 auto 0;
+  top: 50%;
+  translate: 0 -50%;
+  margin: 0;
+  padding-inline: var(--edge);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(64px, 15.5vw, 230px);
+  line-height: 0.84;
+  letter-spacing: -0.035em;
+  text-align: center;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* the centre frame: full bleed at rest, a cinematic crop once contracted */
+.ls-hero__frame {
+  position: absolute;
+  z-index: 2;
+  inset: var(--edge);
+  will-change: clip-path;
+}
+.ls-hero__frame .ls-photo { width: 100%; height: 100%; aspect-ratio: auto; }
+
+/* the split headline, sitting against the two edges it will leave through */
+.ls-hero__title {
+  position: absolute;
+  z-index: 4;
+  inset: auto 0 auto 0;
+  top: 46%;
+  translate: 0 -50%;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(20px, 6vw, 110px);
+  padding-inline: clamp(20px, 2.4vw, 34px);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 76px);
+  line-height: 1;
+  letter-spacing: -0.028em;
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.ls-hero__half { display: block; max-width: 11ch; will-change: transform, opacity; }
+.ls-hero__half--r { text-align: right; }
+
+/* the mosaic that opens out of the contracted frame */
+.ls-hero__mosaic { position: absolute; z-index: 3; inset: 0; pointer-events: none; }
+.ls-hero__tile { position: absolute; margin: 0; will-change: transform, opacity; }
+.ls-hero__tile .ls-photo { border-radius: 14px; }
+.ls-hero__tile--a { left: 3.2vw;  top: 11%;  width: 19vw; }
+.ls-hero__tile--b { left: 7.4vw;  top: 52%;  width: 14.5vw; }
+.ls-hero__tile--c { right: 4.6vw; top: 16%;  width: 15.5vw; }
+.ls-hero__tile--d { right: 2.6vw; top: 58%;  width: 21vw; }
+
+.ls-hero__cue {
+  position: absolute;
+  z-index: 4;
+  right: clamp(20px, 2.4vw, 34px);
+  bottom: clamp(18px, 2.2vw, 30px);
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+/* a hairline above the cue, as the reference rules its opening frame */
+.ls-hero__cue::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 14px);
+  width: 100vw;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+@media (max-width: 860px) {
+  .ls-hero { height: 260svh; }
+  .ls-hero__title { top: 42%; flex-direction: column; gap: 10px; }
+  .ls-hero__half { max-width: 14ch; }
+  .ls-hero__half--r { text-align: left; align-self: flex-end; }
+  .ls-hero__tile--a { left: 4vw;  top: 9%;  width: 38vw; }
+  .ls-hero__tile--b { left: 6vw;  top: 62%; width: 30vw; }
+  .ls-hero__tile--c { right: 5vw; top: 14%; width: 32vw; }
+  .ls-hero__tile--d { right: 3vw; top: 66%; width: 40vw; }
+}
+
+/* Reduced motion gets the settled composition, drawn straight away. */
+.ls-hero[data-ls-state='settled'] .ls-hero__frame { clip-path: inset(9% 23% 9% 23% round 16px); }
+.ls-hero[data-ls-state='settled'] .ls-hero__title { opacity: 0; }
+.ls-hero[data-ls-state='settled'] .ls-hero__cue { opacity: 0; }
+@media (max-width: 860px) {
+  .ls-hero[data-ls-state='settled'] .ls-hero__frame { clip-path: inset(16% 5% 16% 5% round 16px); }
+}
+
+/* ── the bar, and the brand resolving into it ──────────────────────────── */
+.ls-nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 300;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  padding-inline: clamp(14px, 2vw, 30px);
+  pointer-events: none;
+}
+/* the pill gathers in as the page turns light */
+.ls-nav__pill {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: calc(var(--edge) + var(--ls-progress, 0) * 16%);
+  right: calc(var(--edge) + var(--ls-progress, 0) * 16%);
+  border-radius: 999px;
+  background: rgba(252, 251, 250, 0.82);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 10px 40px -18px rgba(13, 14, 16, 0.3);
+  opacity: var(--ls-progress, 0);
+}
+.ls-nav__in {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-inline: clamp(16px, 2.6vw, 48px);
+  /* white over the photograph, ink once the page is paper */
+  color: color-mix(in oklab, #ffffff, var(--ink) calc(var(--ls-progress, 0) * 100%));
+}
+.ls-nav__in > * { pointer-events: auto; }
+.ls-nav__left,
+.ls-nav__right { display: flex; align-items: center; gap: clamp(12px, 1.6vw, 26px); }
+
+.ls-nav__link {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.88;
+  transition: opacity 0.2s ease;
+}
+.ls-nav__link:hover { opacity: 1; }
+.ls-nav__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; border-radius: 4px; }
+
+.ls-nav__menu {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.ls-nav__bars { display: grid; gap: 5px; width: 26px; }
+.ls-nav__bars i { display: block; height: 1.5px; background: currentColor; border-radius: 2px; }
+.ls-nav__menu:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 6px; }
+
+.ls-nav__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--tangerine);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.16s var(--e);
+}
+.ls-nav__cta:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .ls-nav__cta:hover { background: var(--tangerine-deep); } }
+
+/* The brand closes from the full wordmark to the standalone mark as the
+   opening runs — one movement of the real logo, not a swap of two assets. */
+.ls .ls-nav__brand.cc-ed-mark-logo {
+  position: static;
+  inset: auto;
+  padding: 0;
+  z-index: auto;
+  color: inherit;
+  text-shadow: none;
+  filter: none;
+  text-decoration: none;
+}
+.ls .ls-nav__brand .cc-ed-mark-logo__inner {
+  font-size: calc(44px - 18px * var(--ls-progress, 0));
+  transition: none;
+}
+.ls .ls-nav__brand .cc-ed-mark-logo__fill {
+  max-width: calc((1 - var(--ls-progress, 0)) * 2.1em);
+  opacity: calc(1 - var(--ls-progress, 0));
+  transition: none;
+}
+.ls .ls-nav__brand .cc-ed-mark-logo__c--second {
+  margin-left: calc(0.02em - 0.26em * var(--ls-progress, 0));
+  transition: none;
+}
+
+@media (max-width: 1080px) { .ls-nav__left .ls-nav__link { display: none; } }
+@media (max-width: 720px) {
+  .ls-nav__right .ls-nav__link { display: none; }
+  .ls-nav { height: 66px; }
+}
+
+/* ── the menu overlay ──────────────────────────────────────────────────── */
+.ls-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: var(--ink);
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.56s var(--e), opacity 0.3s ease, visibility 0s linear 0.56s;
+}
+.ls-menu[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  clip-path: inset(0 0 0% 0);
+  transition: clip-path 0.56s var(--e), opacity 0.3s ease, visibility 0s;
+}
+.ls-menu__in {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(28px, 5vh, 64px);
+  padding: clamp(28px, 6vw, 90px);
+}
+.ls-menu__close {
+  position: absolute;
+  top: 26px;
+  right: clamp(20px, 3vw, 46px);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.ls-menu__close:hover { opacity: 1; }
+.ls-menu__list { margin: 0; padding: 0; list-style: none; display: grid; gap: clamp(2px, 0.8vh, 10px); }
+.ls-menu__list a {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(34px, 6.4vw, 86px);
+  line-height: 1.06;
+  letter-spacing: -0.028em;
+  color: #fff;
+  text-decoration: none;
+  opacity: 0;
+  translate: 0 18px;
+  transition: opacity 0.4s ease, translate 0.5s var(--e), color 0.2s ease;
+  transition-delay: calc(var(--i) * 45ms + 120ms);
+}
+.ls-menu[data-open='true'] .ls-menu__list a { opacity: 1; translate: 0 0; }
+@media (hover: hover) and (pointer: fine) { .ls-menu__list a:hover { color: var(--lime); } }
+.ls-menu__list a[aria-current='page'] { color: var(--tangerine); }
+.ls-menu__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.ls-menu__ghost {
+  padding: 12px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.ls-menu__cta {
+  padding: 13px 24px;
+  border-radius: 999px;
+  background: var(--tangerine);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── shared editorial pieces ───────────────────────────────────────────── */
+.ls-band { position: relative; padding-block: clamp(80px, 11vw, 168px); }
+.ls-band--shell { background: var(--shell); }
+.ls-band--ink { background: var(--ink); color: #fff; }
+
+.ls-kicker {
+  margin: 0 0 clamp(16px, 2vw, 26px);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+.ls-kicker--inv { color: rgba(255, 255, 255, 0.5); }
+.ls-kicker__dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--tangerine);
+  vertical-align: 1px;
+}
+
+.ls-h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(34px, 5vw, 76px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ls-h2--inv { color: #fff; }
+.ls-h3 {
+  margin: 0 0 14px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(24px, 2.6vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+.ls-p {
+  margin: 0 0 18px;
+  max-width: 54ch;
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.62;
+  color: var(--slate);
+}
+.ls-p--inv { color: rgba(255, 255, 255, 0.72); }
+.ls-p:last-child { margin-bottom: 0; }
+
+.ls-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 28px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--tangerine);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease, transform 0.16s var(--e);
+}
+.ls-btn:active { transform: scale(0.98); }
+.ls-btn--ghost { background: transparent; border-color: currentColor; color: inherit; }
+@media (hover: hover) and (pointer: fine) {
+  .ls-btn:hover { background: var(--tangerine-deep); }
+  .ls-btn--ghost:hover { background: rgba(255, 255, 255, 0.08); }
+}
+
+.ls-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 3px;
+}
+.ls-link span { transition: translate 0.25s var(--e); }
+@media (hover: hover) and (pointer: fine) {
+  .ls-link:hover { color: var(--tangerine); }
+  .ls-link:hover span { translate: 5px 0; }
+}
+
+/* reveal, gated so nothing can stay hidden without the script */
+[data-reveal-root='on'] [data-ls-reveal] { opacity: 0; translate: 0 22px; }
+[data-ls-reveal][data-in='true'] {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity 0.7s ease, translate 0.8s var(--e);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal-root='on'] [data-ls-reveal],
+  [data-ls-reveal][data-in='true'] { opacity: 1; translate: 0 0; transition: none; }
+  .ls-menu { transition: opacity 0.2s ease; }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

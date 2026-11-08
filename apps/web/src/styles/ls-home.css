@@ -1,0 +1,214 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Homepage compositions.
+
+   Each chapter gets its own arrangement — an offset pair, a portrait beside
+   a column, a staggered three, a wide dark passage, a full-bleed statement
+   — so the page never reads as one template repeated with new words.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ls-dot {
+  display: inline-block;
+  width: 0.2em;
+  height: 0.2em;
+  margin-left: 0.1em;
+  border-radius: 50%;
+  background: var(--tangerine);
+  vertical-align: baseline;
+}
+.ls-dot--lime { background: var(--lime); }
+.ls-kicker__dot--lime { background: var(--lime); }
+
+.ls-cap {
+  margin-top: 14px;
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  color: var(--stone);
+}
+
+/* ── 02 the problem: an offset pair, deliberately unbalanced ───────────── */
+.ls-problem__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 32px);
+  align-items: start;
+}
+.ls-problem__copy { grid-column: 1 / span 5; padding-top: clamp(0px, 4vw, 70px); }
+.ls-problem__a { grid-column: 7 / span 4; margin: 0; }
+.ls-problem__b { grid-column: 4 / span 7; margin: clamp(20px, 5vw, 90px) 0 0; }
+.ls-problem__a .ls-photo,
+.ls-problem__b .ls-photo { border-radius: 16px; }
+
+@media (max-width: 900px) {
+  .ls-problem__copy,
+  .ls-problem__a,
+  .ls-problem__b { grid-column: 1 / -1; margin-top: 0; padding-top: 0; }
+  .ls-problem__a { max-width: 70%; }
+}
+
+/* ── 03 what it is: portrait against a column of type ──────────────────── */
+.ls-intro { background: var(--shell); }
+.ls-intro__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 104px);
+}
+.ls-intro__shot { margin: 0; }
+.ls-intro__shot .ls-photo { border-radius: 18px; }
+.ls-intro__copy .ls-link { margin-top: 10px; }
+@media (max-width: 900px) {
+  .ls-intro__grid { grid-template-columns: 1fr; gap: clamp(24px, 6vw, 40px); }
+  .ls-intro__shot { max-width: 76%; }
+}
+
+/* ── 04 your work: a staggered three, type woven between ───────────────── */
+.ls-work__h { max-width: 18ch; margin-bottom: clamp(36px, 5vw, 78px); }
+.ls-work__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(22px, 3vw, 52px) clamp(16px, 2vw, 32px);
+  align-items: center;
+}
+.ls-work__one   { grid-column: 1 / span 7; margin: 0; }
+.ls-work__note  { grid-column: 9 / span 4; }
+.ls-work__two   { grid-column: 2 / span 3; margin: 0; }
+.ls-work__three { grid-column: 6 / span 4; margin: clamp(16px, 4vw, 64px) 0 0; }
+.ls-work__note--b { grid-column: 10 / span 3; }
+.ls-work__grid .ls-photo { border-radius: 16px; }
+
+@media (max-width: 900px) {
+  .ls-work__grid > * { grid-column: 1 / -1 !important; margin-top: 0; }
+  .ls-work__two { max-width: 58%; }
+  .ls-work__three { max-width: 78%; margin-left: auto; }
+}
+
+/* ── 05 connections: the dark chapter ──────────────────────────────────── */
+.ls-connect { padding-block: clamp(80px, 11vw, 168px) 0; }
+.ls-connect__head { margin-bottom: clamp(32px, 4.4vw, 64px); }
+.ls-connect__h { max-width: 16ch; }
+.ls-connect__wide { margin: 0; }
+.ls-connect__wide .ls-photo { border-radius: 0; }
+.ls-connect__foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: clamp(20px, 4vw, 60px);
+  padding-block: clamp(36px, 5vw, 72px) clamp(80px, 11vw, 168px);
+}
+.ls-link--inv { color: #fff; }
+@media (hover: hover) and (pointer: fine) { .ls-link--inv:hover { color: var(--lime); } }
+@media (max-width: 760px) {
+  .ls-connect__foot { grid-template-columns: 1fr; align-items: start; }
+}
+
+/* ── 06 the statement, carried by one photograph ───────────────────────── */
+.ls-statement { position: relative; isolation: isolate; }
+.ls-statement__bg { position: absolute; inset: 0; z-index: 0; aspect-ratio: auto !important; }
+.ls-statement::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(10, 10, 12, 0.46), rgba(10, 10, 12, 0.14) 48%, rgba(10, 10, 12, 0.5));
+}
+.ls-statement__in {
+  position: relative;
+  z-index: 2;
+  min-height: clamp(460px, 76svh, 780px);
+  display: grid;
+  align-items: center;
+  padding: clamp(40px, 8vw, 120px) var(--gutter);
+  max-width: var(--max);
+  margin-inline: auto;
+}
+.ls-statement__h {
+  margin: 0;
+  max-width: 15ch;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(38px, 6.4vw, 104px);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+/* ── 07 the close ──────────────────────────────────────────────────────── */
+.ls-close__in { max-width: 860px; }
+.ls-close__h { font-size: clamp(42px, 7vw, 108px); }
+.ls-close__p { margin-top: clamp(16px, 2vw, 26px); font-size: clamp(17px, 1.4vw, 21px); }
+.ls-close__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 32px);
+  margin-top: clamp(28px, 3.6vw, 48px);
+}
+
+/* ── footer ────────────────────────────────────────────────────────────── */
+.ls-foot {
+  padding-block: clamp(64px, 8vw, 120px) clamp(28px, 3vw, 44px);
+  background: var(--ink);
+  color: #fff;
+}
+.ls-foot__statement {
+  margin: 0 0 clamp(48px, 7vw, 104px);
+  max-width: 16ch;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(34px, 5.4vw, 80px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+.ls-foot__dot {
+  display: inline-block;
+  width: 0.18em;
+  height: 0.18em;
+  margin-left: 0.1em;
+  border-radius: 50%;
+  background: var(--tangerine);
+}
+.ls-foot__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr));
+  gap: clamp(28px, 3vw, 48px);
+  padding-bottom: clamp(40px, 5vw, 72px);
+}
+.ls-foot__mark { display: inline-flex; color: #fff; }
+.ls .ls-foot__mark.cc-ed-mark-logo { position: static; inset: auto; padding: 0; z-index: auto; text-shadow: none; }
+.ls .ls-foot__mark .cc-ed-mark-logo__inner { font-size: 30px; }
+.ls-foot__line {
+  margin: 18px 0 0;
+  max-width: 30ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.56);
+}
+.ls-foot__head {
+  margin: 0 0 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+.ls-foot__col ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+.ls-foot__col a {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+@media (hover: hover) and (pointer: fine) { .ls-foot__col a:hover { color: var(--tangerine); } }
+.ls-foot__rule {
+  margin: 0;
+  padding-top: clamp(20px, 2.4vw, 32px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.42);
+}
+@media (max-width: 900px) {
+  .ls-foot__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ls-foot__brand { grid-column: 1 / -1; }
+}
