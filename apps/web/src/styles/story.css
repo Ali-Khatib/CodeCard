@@ -521,9 +521,12 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
 .pl-hero__canvas { position: absolute; inset: 0; clip-path: inset(0% round 0px); will-change: clip-path; }
 /* The reference is a cinematic crop: deep blacks with amber-warm light and no
    second hue. The field keeps its own motion, graded to that. */
-/* Warm and lit, not murky: enough saturation to read as tangerine light
-   and enough brightness to see the field move. */
-.pl-hero__canvas > :first-child { filter: saturate(0.92) sepia(0.1) contrast(1.06) brightness(1.02); }
+/* Bright and warm, with no second hue. Grayscale first removes the
+   field's own greens and blues; sepia and a short hue-rotate put the
+   light back as tangerine, and the saturation makes it vivid. */
+.pl-hero__canvas > :first-child {
+  filter: grayscale(1) sepia(0.78) hue-rotate(-14deg) saturate(2.9) brightness(1.04) contrast(1.04);
+}
 .pl-hero[data-expand='false'] .pl-hero__canvas { clip-path: inset(3.4% 4.2% 3.4% 4.2% round 20px); }
 .pl-hero__shade {
   position: absolute;
