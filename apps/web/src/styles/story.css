@@ -12,22 +12,22 @@
 .pl {
   /* ── brand ───────────────────────────────────────────────────────────
      Three colours carry the identity. Everything else is type and paper. */
-  --tangerine: #e95a0b;      /* the signature — one per viewport, never a wash */
-  --tangerine-deep: #c44a06; /* pressed and hover states only */
-  --tangerine-tint: #fff1e8; /* the faintest wash, for a single surface */
-  --lime: #ceff1a;           /* acid lime — rare, deliberate, never a background */
+  --tangerine: #ff6a14;      /* the signature — one per viewport, never a wash */
+  --tangerine-deep: #e85304; /* pressed and hover states only */
+  --tangerine-tint: #fff3ea; /* the faintest wash, for a single surface */
+  --lime: #d9ff33;           /* acid lime — rare, deliberate, never a background */
   --lime-ink: #1b2400;       /* the only text colour legible on lime */
 
   /* ── foundation ──────────────────────────────────────────────────── */
   --paper: #ffffff;      /* the canvas: white, not cream */
   --white: #ffffff;
-  --shell: #f7f6f4;      /* a half-tone for separating a section from the page */
-  --ink: #0b0b0c;        /* headings */
-  --near: #16171a;       /* body */
+  --shell: #faf9f7;      /* a half-tone for separating a section from the page */
+  --ink: #121316;        /* headings */
+  --near: #1d1f23;       /* body */
   --graphite: #0b0b0c;   /* filled buttons, dark surfaces */
-  --slate: #5c5e63;      /* secondary text */
+  --slate: #63666c;      /* secondary text */
   --stone: #8a8d93;      /* muted text, captions */
-  --fog: #e3e3e1;        /* hairlines */
+  --fog: #e9e8e5;        /* hairlines */
   --iron: #3a3b3e;
 
   /* back-compat for rules still naming the old token */
@@ -422,7 +422,7 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
 @media (max-width: 860px) { .pl-three { grid-template-columns: 1fr; gap: var(--s32); } }
 
 /* ── live demo ────────────────────────────────────────────────────────── */
-.pl-live { background: var(--ink); }
+.pl-live { background: #1a1c20; }
 .pl-live__head {
   display: flex;
   flex-wrap: wrap;
@@ -441,7 +441,7 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.74);
+  color: rgba(255, 255, 255, 0.82);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.16s var(--e);
 }
@@ -475,12 +475,12 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
   letter-spacing: -0.018em;
   color: #fff;
 }
-.pl-live__p { margin: 0; max-width: 52ch; font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, 0.68); }
+.pl-live__p { margin: 0; max-width: 52ch; font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, 0.76); }
 .pl-live__screen {
   padding: var(--s16);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.13);
   overflow: hidden;
   animation: pl-pane 0.34s var(--e) both;
 }
@@ -521,14 +521,16 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
 .pl-hero__canvas { position: absolute; inset: 0; clip-path: inset(0% round 0px); will-change: clip-path; }
 /* The reference is a cinematic crop: deep blacks with amber-warm light and no
    second hue. The field keeps its own motion, graded to that. */
-.pl-hero__canvas > :first-child { filter: saturate(0.42) sepia(0.22) contrast(1.22) brightness(0.62); }
+/* Warm and lit, not murky: enough saturation to read as tangerine light
+   and enough brightness to see the field move. */
+.pl-hero__canvas > :first-child { filter: saturate(0.92) sepia(0.1) contrast(1.06) brightness(1.02); }
 .pl-hero[data-expand='false'] .pl-hero__canvas { clip-path: inset(3.4% 4.2% 3.4% 4.2% round 20px); }
 .pl-hero__shade {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 90% at 50% 40%, rgba(5, 5, 5, 0.1), rgba(5, 5, 5, 0.72) 100%),
-    linear-gradient(180deg, rgba(5, 5, 5, 0.58), rgba(5, 5, 5, 0.3) 42%, rgba(5, 5, 5, 0.74));
+    radial-gradient(120% 90% at 50% 40%, rgba(10, 8, 6, 0), rgba(10, 8, 6, 0.48) 100%),
+    linear-gradient(180deg, rgba(10, 8, 6, 0.4), rgba(10, 8, 6, 0.12) 44%, rgba(10, 8, 6, 0.54));
 }
 .pl-hero__inner {
   position: relative;
@@ -600,7 +602,7 @@ html[data-logo-tone] .cc-marketing-shell .pl .pl-nav__mark.cc-ed-mark-logo {
   pointer-events: none;
   background: linear-gradient(180deg, rgba(247, 246, 244, 0), var(--shell));
 }
-.pl-live .pl-stage::after { background: linear-gradient(180deg, rgba(11, 11, 12, 0), #121214); }
+.pl-live .pl-stage::after { background: linear-gradient(180deg, rgba(26, 28, 32, 0), #23262b); }
 .pl-step__shot .pl-stage::after { background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--white)); }
 .pl-stage__hold {
   width: 100%;
