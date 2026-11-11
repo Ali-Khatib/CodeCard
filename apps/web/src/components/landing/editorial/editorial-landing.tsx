@@ -3,7 +3,6 @@ import { EditorialHero } from './editorial-hero';
 import { EditorialHeroScene } from './editorial-hero-scene';
 import { EditorialFeatureWalkthrough } from './editorial-feature-walkthrough';
 import { EditorialLiveDemoBox } from './editorial-live-demo-box';
-import { EditorialAudience } from './editorial-audience';
 import { EditorialFinalCta } from './editorial-final-cta';
 import { EditorialWaitlist } from './editorial-waitlist';
 import '@/styles/editorial-landing.css';
@@ -13,14 +12,9 @@ const EditorialAtmosphere = dynamic(
   { ssr: true, loading: () => null },
 );
 
-const EditorialResearchScene = dynamic(
-  () => import('./editorial-research-scene').then((m) => m.EditorialResearchScene),
-  { ssr: true },
-);
-
 /**
  * Marketing `/`
- * Hero cinema (expand + statement reveal) → walkthrough → demo → audience → research → finale → waitlist.
+ * Hero cinema (expand + statement reveal) → walkthrough → demo → finale → waitlist.
  */
 export function EditorialLanding() {
   return (
@@ -29,8 +23,6 @@ export function EditorialLanding() {
       <EditorialHeroScene hero={<EditorialHero />} />
       <EditorialFeatureWalkthrough />
       <EditorialLiveDemoBox />
-      <EditorialAudience />
-      <EditorialResearchScene />
       <EditorialFinalCta />
       <EditorialWaitlist />
     </div>

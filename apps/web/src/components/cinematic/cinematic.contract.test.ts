@@ -52,9 +52,9 @@ describe('Editorial product landing contract', () => {
     const landing = read('src/components/landing/editorial/editorial-landing.tsx');
     expect(landing).toContain('EditorialFeatureWalkthrough');
     expect(landing).toContain('EditorialLiveDemoBox');
-    expect(landing).toContain('EditorialAudience');
-    expect(landing).toContain('EditorialResearchScene');
     expect(landing).toContain('EditorialWaitlist');
+    expect(landing).not.toContain('EditorialAudience');
+    expect(landing).not.toContain('EditorialResearchScene');
     expect(landing).not.toContain('EditorialFaq');
     expect(landing).not.toContain('ProductStory');
     expect(landing).not.toContain('ProductAnalysisSection');
