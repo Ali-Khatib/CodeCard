@@ -295,6 +295,8 @@
   left: -140px;
   top: 0;
   width: 660px;
+  /* The site caps svg at 100% of its box; this one is drawn past the phone on purpose. */
+  max-width: none;
   height: 1500px;
   overflow: visible;
 }
