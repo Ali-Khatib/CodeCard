@@ -57,3 +57,25 @@ apps/web/src/hooks/use-view-transition-navigate.ts
 - Poster-first; video `preload=metadata` only when proximity > 0.3
 - `will-change: transform` on active cards only
 - No CLS from animation (fixed aspect-ratio media containers)
+
+## One-scan scene (`EditorialScanStory`)
+
+Landing `/`, inside the walkthrough after the comparison table and before the crash-course stage.
+
+1. White stage; a hand raises a phone showing the CodeCard QR
+2. A second phone enters, scans (line sweep, lime lock, open chip)
+3. Camera view becomes the card: profile, then featured work
+4. Tap opens a project: presentation, stack, overview, screens
+5. Back to the card, down to research; the stage releases into the crash course
+
+- Pinned with `position: sticky` on a 760svh track; no scroll hijacking, runs backwards on the way up
+- Driver is dependency-free (`scan-story-timeline.ts`): passive scroll read, one transform/opacity write per frame, all measurement on mount/resize
+- Phone UI is live HTML built from the same demo data as `/demo/card`; the QR is real and opens `/demo/card?source=qr`
+- No JavaScript or reduced motion: static two-column block, every caption readable, phone on the profile
+
+```
+apps/web/src/components/landing/editorial/scan-story/
+  editorial-scan-story.tsx   # markup + mount
+  scan-story-timeline.ts     # beat map + scrub driver
+apps/web/src/styles/editorial-scan-story.css
+```

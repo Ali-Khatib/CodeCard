@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { useGSAP } from '@gsap/react';
 import {
   ensureGsapPlugins,
@@ -9,6 +10,12 @@ import {
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { ScrollTriggeredVideoHero } from '@/components/ui/scroll-triggered-video-hero';
 import { EditorialComparison } from './editorial-comparison';
+
+/** One-scan scroll scene: its own chunk, server-rendered so the captions are in the HTML. */
+const EditorialScanStory = dynamic(
+  () => import('./scan-story/editorial-scan-story').then((m) => m.EditorialScanStory),
+  { ssr: true },
+);
 
 const V = (file: string) => `https://videos.pexels.com/video-files/${file}`;
 
@@ -124,6 +131,8 @@ export function EditorialFeatureWalkthrough() {
       </div>
 
       <EditorialComparison />
+
+      <EditorialScanStory />
 
       <div className="cc-ed-walk__bridge cc-ed-walk__bridge--in" aria-hidden />
 
